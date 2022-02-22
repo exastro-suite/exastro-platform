@@ -27,6 +27,7 @@ RUN apt-get -y update   \
 &&  python3 get-pip.py \
 &&  pip install -U pip \
 &&  pip install requests \
+&&  pip install pyyaml \
 &&  python3 -m pip install Flask \
 &&  python3 -m pip install pytz \
 &&  python3 -m pip install markdown
