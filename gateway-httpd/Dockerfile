@@ -29,9 +29,12 @@ WORKDIR /app
 
 COPY    httpd-start.sh /app/
 COPY    exastroSettingsBridge.conf /app/
+COPY    gateway-httpd.conf /app/
 
 RUN     chmod +x /app/httpd-start.sh \
 &&      cp /app/exastroSettingsBridge.conf /etc/httpd/conf.d/. \
-&&      mkdir /etc/httpd/conf.d/exastroSettings
+&&      mkdir /etc/httpd/conf.d/exastroSettings \
+&&      cp /app/gateway-httpd.conf /etc/httpd/conf.d/exastroSettings/.
+
 
 CMD ["/bin/sh","/app/httpd-start.sh"]
