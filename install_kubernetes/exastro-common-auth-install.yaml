@@ -233,7 +233,7 @@ spec:
       volumes:
       containers:
       - name: gateway-httpd
-        image: exastro/exastro-common-auth-gateway-httpd:0.1.0_20220222_1100
+        image: exastro/exastro-common-auth-gateway-httpd:0.1.0_20220222_1600
 
 ---
 apiVersion: v1
