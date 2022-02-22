@@ -129,7 +129,7 @@ spec:
           name: common-api-conf
       containers:
       - name: common-api
-        image: exastro/exastro-common-auth-api:0.1.0_20220222_1000
+        image: exastro/exastro-common-auth-api:0.1.0_20220222_1100
         env:
         - name: CONFIG_API_AUTHC_INFRA_PATH
           value: "/etc/exastro-common-auth/common-api/api_authc_infra.conf"
@@ -233,7 +233,7 @@ spec:
       volumes:
       containers:
       - name: gateway-httpd
-        image: exastro/exastro-common-auth-gateway-httpd:0.1.0_20220222_1000
+        image: exastro/exastro-common-auth-gateway-httpd:0.1.0_20220222_1100
 
 ---
 apiVersion: v1
