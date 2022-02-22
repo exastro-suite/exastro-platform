@@ -35,11 +35,9 @@ from jinja2 import Template
 # User Imports
 import globals
 import common
-import api_authc_common
 import api_authc_infra_client
 import api_authc_infra_user
 import api_keycloak_call
-import api_httpd_call
 
 # 設定ファイル読み込み・globals初期化
 app = Flask(__name__)
