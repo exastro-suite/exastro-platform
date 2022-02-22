@@ -11,19 +11,27 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
-FROM    centos:7
+FROM    almalinux:8.5
 
 ARG     PROXY=""
 RUN     if [ ! -z "${PROXY}" ]; then \
           sed -i -e "$ a PROXY=${PROXY}" /etc/yum.conf; \
         fi
 
-RUN      curl -L -o /tmp/cjose-0.6.1.5-2.el7.x86_64.rpm https://github.com/zmartzone/mod_auth_openidc/releases/download/v2.4.0/cjose-0.6.1.5-2.el7.x86_64.rpm \
-&&       curl -L -o /tmp/mod_auth_openidc-2.4.10-1.el7.x86_64.rpm https://github.com/zmartzone/mod_auth_openidc/releases/download/v2.4.10/mod_auth_openidc-2.4.10-1.el7.x86_64.rpm \
-&&       yum install -y httpd mod_ssl \
-&&       yum install -y epel-release \
-&&       yum install -y redis hiredis \
-&&       yum install -y /tmp/cjose-0.6.1.5-2.el7.x86_64.rpm /tmp/mod_auth_openidc-2.4.10-1.el7.x86_64.rpm
+RUN      curl -L -o /tmp/cjose-0.6.1.5-2.el8.x86_64.rpm https://mod-auth-openidc.org/download/cjose-0.6.1.5-2.el8.x86_64.rpm \
+&&       curl -L -o /tmp/mod_auth_openidc-2.4.10-1.el8.x86_64.rpm https://mod-auth-openidc.org/download/mod_auth_openidc-2.4.10-1.el8.x86_64.rpm \
+&&       dnf install -y httpd \
+&&       dnf install -y mod_ssl \
+&&       dnf install -y epel-release \
+&&       dnf install -y redis hiredis \
+&&       dnf install -y /tmp/cjose-0.6.1.5-2.el8.x86_64.rpm /tmp/mod_auth_openidc-2.4.10-1.el8.x86_64.rpm \
+&&       dnf install -y gcc \
+&&       dnf install -y httpd-devel \
+&&       dnf install -y python39 \
+&&       dnf install -y python39-devel \
+&&       dnf install -y python39-mod_wsgi \
+&&       pip3.9 install requests \
+&&       pip3.9 install PyJWT
 
 WORKDIR /app
 

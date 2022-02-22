@@ -19,6 +19,18 @@ fi
 if [ ! -d "/etc/pki/tls/private/" ]; then
     mkdir -p "/etc/pki/tls/private/"
 fi
+if [ ! -f "/etc/pki/tls/private/localhost.key" ]; then
+    openssl req \
+    -new \
+    -x509 \
+    -sha256 \
+    -newkey rsa:2048 \
+    -days 3650 \
+    -nodes \
+    -out /etc/pki/tls/certs/localhost.crt \
+    -keyout /etc/pki/tls/private/localhost.key \
+    -subj "/C=JP/ST=Tokyo/CN=gateway-httpd.localhost.svc"
+fi
 if [ ! -f "/etc/pki/tls/private/exastro-common-auth.key" ]; then
     openssl req \
     -new \
