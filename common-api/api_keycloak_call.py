@@ -535,3 +535,51 @@ def get_user_token(user_name, password, realm_name):
         globals.logger.debug(e.args)
         globals.logger.debug(traceback.format_exc())
         raise
+
+def keycloak_user_token_introspect(client_id, client_secret, realm_name, access_token, keycloak_proto="", keycloak_host=""):
+    """user token取得
+    Args:
+        client_id (str): client id
+        client_secret (str): client secret
+        realm_name (str): realm name
+        access_token (str): access token
+        keycloak_proto (str): keycloak server protocol
+        keycloak_host (str): keycloak server host
+    Returns:
+        boolean: token active
+    """
+    try:
+        globals.logger.debug('+----- CALL keycloak_user_token_introspect -----+')
+
+        data_para = [
+            "client_id={}".format(client_id),
+            "client_secret={}".format(client_secret),
+            "token={}".format(access_token)
+        ]
+
+        # 呼び出し先設定
+        api_url = "{}://{}:{}".format(os.environ['API_KEYCLOAK_PROTOCOL'], os.environ['API_KEYCLOAK_HOST'], os.environ['API_KEYCLOAK_PORT'])
+
+        header_para = {
+            "Content-Type" : "application/x-www-form-urlencoded"
+        }
+
+        #keycloak_proto/keycloak_hostをheaderに設定
+        if keycloak_proto and keycloak_host:
+            header_para["X-Forwarded-Proto"] = keycloak_proto
+            header_para["X-Forwarded-Host"] = keycloak_host
+
+        request_response = requests.post("{}/auth/realms/{}/protocol/openid-connect/token/introspect".format(api_url, realm_name), headers=header_para, data="&".join(data_para), verify=False)
+        # # 取得できない場合は、Exceptionを発行する
+        if request_response.status_code != 200:
+            raise Exception("keycloak_user_token_introspect error status:{}, response:{}".format(request_response.status_code, request_response.text))
+
+        json_ret = json.loads(request_response.text)
+
+        # # 正常応答
+        return json_ret['active']
+
+    except Exception as e:
+        globals.logger.debug(e.args)
+        globals.logger.debug(traceback.format_exc())
+        raise

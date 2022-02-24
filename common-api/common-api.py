@@ -192,5 +192,81 @@ def call_role_users_get(realm, client_id, role_name):
         return common.server_error(e)
 
 
+@app.route('/<string:realm>/user/token', methods=['POST'])
+def access_token_get(realm):
+    """アクセストークン取得
+
+    Args:
+        realm (str): realm
+
+    Request: json
+        {
+            "user_name" : [user name],
+            "password"  : [password]
+        }
+
+    Returns:
+        Response: HTTP Respose
+    """
+    try:
+        globals.logger.debug('#' * 50)
+        globals.logger.debug('CALL {}:from[{}] realm[{}]'.format(inspect.currentframe().f_code.co_name, request.method, realm))
+        globals.logger.debug('#' * 50)
+
+        # パラメータ情報(JSON形式)
+        payload = request.json.copy()
+        user_name = payload.get("user_name")
+        password = payload.get("password")
+
+        # アクセストークン取得 get access token
+        access_token = api_keycloak_call.get_user_token(user_name, password, realm)
+
+        return jsonify({"result": "200", "access_token":access_token}), 200
+
+    except Exception as e:
+        return common.serverError(e)
+
+
+@app.route('/<string:realm>/user/token/introspect', methods=['POST'])
+def access_token_introspect(realm):
+    """アクセストークンの有効確認
+
+    Args:
+        realm (str): realm
+
+    Request: json
+        {
+            "client_id"      : [client id],
+            "client_secret"  : [client secret],
+            "access_token"   : [access token],
+            "keycloak_proto" : [keycloak server protocol],
+            "keycloak_host"  : [keycloak server host] 
+        }
+
+    Returns:
+        Response: HTTP Respose
+    """
+    try:
+        globals.logger.debug('#' * 50)
+        globals.logger.debug('CALL {}:from[{}] realm[{}]'.format(inspect.currentframe().f_code.co_name, request.method, realm))
+        globals.logger.debug('#' * 50)
+
+        # パラメータ情報(JSON形式)
+        payload = request.json.copy()
+        client_id = payload.get("client_id")
+        client_secret = payload.get("client_secret")
+        access_token = payload.get("access_token")
+        keycloak_proto = payload.get("keycloak_proto")
+        keycloak_host = payload.get("keycloak_host")
+
+        # トークンイントロスペクション token introspection
+        active = api_keycloak_call.keycloak_user_token_introspect(client_id, client_secret, realm, access_token, keycloak_proto, keycloak_host)
+
+        return jsonify({"result": "200", "active":active}), 200
+
+    except Exception as e:
+        return common.serverError(e)
+
+
 if __name__ == "__main__":
     app.run(debug=True, host='0.0.0.0', port=int(os.environ.get('API_AUTHC_INFRA_PORT', '8000')), threaded=True)
