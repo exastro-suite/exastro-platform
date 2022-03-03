@@ -537,7 +537,7 @@ def get_user_token(user_name, password, realm_name):
         raise
 
 def keycloak_user_token_introspect(client_id, client_secret, realm_name, access_token, keycloak_proto="", keycloak_host=""):
-    """user token取得
+    """user token introspect実行
     Args:
         client_id (str): client id
         client_secret (str): client secret
@@ -569,7 +569,7 @@ def keycloak_user_token_introspect(client_id, client_secret, realm_name, access_
             header_para["X-Forwarded-Proto"] = keycloak_proto
             header_para["X-Forwarded-Host"] = keycloak_host
 
-        request_response = requests.post("{}/auth/realms/{}/protocol/openid-connect/token/introspect".format(api_url, realm_name), headers=header_para, data="&".join(data_para), verify=False)
+        request_response = requests.post("{}/auth/realms/{}/protocol/openid-connect/token/introspect".format(api_url, realm_name), headers=header_para, data="&".join(data_para))
         # # 取得できない場合は、Exceptionを発行する
         if request_response.status_code != 200:
             raise Exception("keycloak_user_token_introspect error status:{}, response:{}".format(request_response.status_code, request_response.text))
