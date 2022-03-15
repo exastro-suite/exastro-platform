@@ -23,27 +23,12 @@ spec:
   - name: http
     port: 8080
     targetPort: 8080
-  selector:
-    app: keycloak
-  type: ClusterIP
-
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: keycloak-nodeport
-  labels:
-    app: keycloak
-  namespace: exastro-common-auth
-spec:
-  ports:
   - name: https
     port: 8443
     targetPort: 8443
-    nodePort: 32001
   selector:
     app: keycloak
-  type: NodePort
+  type: ClusterIP
 
 ---
 apiVersion: apps/v1
