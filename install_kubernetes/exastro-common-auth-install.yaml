@@ -14,7 +14,7 @@
 
 #---- exastro-common-auth-namespace.yaml
 ---
-#   Copyright 2021 NEC Corporation
+#   Copyright 2022 NEC Corporation
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@ metadata:
 
 #---- exastro-common-auth-env.yaml
 ---
-#   Copyright 2019 NEC Corporation
+#   Copyright 2022 NEC Corporation
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -60,7 +60,7 @@ data:
 
 #---- exastro-common-auth-secret.yaml
 ---
-#   Copyright 2019 NEC Corporation
+#   Copyright 2022 NEC Corporation
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -85,7 +85,7 @@ stringData:
   EPOCH_PASSWORD: ""
 #---- common-api.yaml
 ---
-#   Copyright 2019 NEC Corporation
+#   Copyright 2022 NEC Corporation
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -201,7 +201,7 @@ spec:
 
 #---- gateway-httpd.yaml
 ---
-#   Copyright 2019 NEC Corporation
+#   Copyright 2022 NEC Corporation
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -255,7 +255,7 @@ spec:
 
 #---- keycloak.yaml
 ---
-#   Copyright 2019 NEC Corporation
+#   Copyright 2022 NEC Corporation
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -280,27 +280,12 @@ spec:
   - name: http
     port: 8080
     targetPort: 8080
-  selector:
-    app: keycloak
-  type: ClusterIP
-
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: keycloak-nodeport
-  labels:
-    app: keycloak
-  namespace: exastro-common-auth
-spec:
-  ports:
   - name: https
     port: 8443
     targetPort: 8443
-    nodePort: 32001
   selector:
     app: keycloak
-  type: NodePort
+  type: ClusterIP
 
 ---
 apiVersion: apps/v1
