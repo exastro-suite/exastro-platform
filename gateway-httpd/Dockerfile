@@ -11,7 +11,7 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
-FROM    almalinux:8.5
+FROM    registry.access.redhat.com/ubi8/ubi-init
 
 ARG     PROXY=""
 RUN     if [ ! -z "${PROXY}" ]; then \
@@ -20,10 +20,13 @@ RUN     if [ ! -z "${PROXY}" ]; then \
 
 RUN      curl -L -o /tmp/cjose-0.6.1.5-2.el8.x86_64.rpm https://mod-auth-openidc.org/download/cjose-0.6.1.5-2.el8.x86_64.rpm \
 &&       curl -L -o /tmp/mod_auth_openidc-2.4.10-1.el8.x86_64.rpm https://mod-auth-openidc.org/download/mod_auth_openidc-2.4.10-1.el8.x86_64.rpm \
+&&       curl -L -o /tmp/epel-release-latest-8.noarch.rpm https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm \
+&&       curl -L -o /tmp/redis-5.0.3-5.module_el8.4.0+955+7126e393.x86_64.rpm https://vault.centos.org/centos/8/AppStream/x86_64/os/Packages/redis-5.0.3-5.module_el8.4.0+955+7126e393.x86_64.rpm \
+&&       curl -L -o /tmp/hiredis-0.13.3-13.el8.x86_64.rpm https://dl.fedoraproject.org/pub/epel/8/Everything/x86_64/Packages/h/hiredis-0.13.3-13.el8.x86_64.rpm \
 &&       dnf install -y httpd \
 &&       dnf install -y mod_ssl \
-&&       dnf install -y epel-release \
-&&       dnf install -y redis hiredis \
+&&       dnf install -y /tmp/epel-release-latest-8.noarch.rpm \
+&&       dnf install -y /tmp/redis-5.0.3-5.module_el8.4.0+955+7126e393.x86_64.rpm /tmp/hiredis-0.13.3-13.el8.x86_64.rpm \
 &&       dnf install -y /tmp/cjose-0.6.1.5-2.el8.x86_64.rpm /tmp/mod_auth_openidc-2.4.10-1.el8.x86_64.rpm \
 &&       dnf install -y gcc \
 &&       dnf install -y httpd-devel \
