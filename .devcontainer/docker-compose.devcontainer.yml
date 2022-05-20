@@ -1,0 +1,54 @@
+version: '3.1'
+services:
+  common-auth-api:
+    build:
+      args:
+        - HTTP_PROXY=${HTTP_PROXY}
+        - http_proxy=${HTTP_PROXY}
+        - HTTPS_PROXY=${HTTPS_PROXY}
+        - https_proxy=${HTTPS_PROXY}
+    command: "python3 -m debugpy --listen 5678 /app/common-api.py"
+    volumes:
+      - ..:/workspace:cached
+      - ~/.netrc:/root/.netrc
+      - ~/.gitconfig:/root/.gitconfig
+      - ./common-api/.vscode:/workspace/.vscode
+      - /usr/share/pki/ca-trust-source/anchors/ZscalerRootCertificate.cer:/etc/ssl/certs/ca-certificates.crt
+      - /mnt/mainte/talisman/.talismanrc:/mnt/mainte/talisman/.talismanrc
+      - ~/.talisman/bin:/root/.talisman/bin
+    environment:
+      - FLASK_ENV=development
+      - HTTP_PROXY=${HTTP_PROXY}
+      - http_proxy=${HTTP_PROXY}
+      - HTTPS_PROXY=${HTTPS_PROXY}
+      - https_proxy=${HTTPS_PROXY}
+      - NO_PROXY=localhost,127.0.0.1,keycloak
+      - no_proxy=localhost,127.0.0.1,keycloak
+      - SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
+      - SSL_CERT_DIR=/etc/ssl/certs
+      - NODE_EXTRA_CA_CERTS=/etc/ssl/certs/ca-certificates.crt
+  gateway-httpd:
+    build:
+      args:
+        - HTTP_PROXY=${HTTP_PROXY}
+        - http_proxy=${HTTP_PROXY}
+        - HTTPS_PROXY=${HTTPS_PROXY}
+        - https_proxy=${HTTPS_PROXY}
+    volumes:
+      - ..:/workspace:cached
+      - ~/.netrc:/root/.netrc
+      - ~/.gitconfig:/root/.gitconfig
+      - ./gateway-httpd/.vscode:/workspace/.vscode
+      - /usr/share/pki/ca-trust-source/anchors/ZscalerRootCertificate.cer:/etc/ssl/certs/ca-certificates.crt
+      - /mnt/mainte/talisman/.talismanrc:/mnt/mainte/talisman/.talismanrc
+      - ~/.talisman/bin:/root/.talisman/bin
+    environment:
+      - HTTP_PROXY=${HTTP_PROXY}
+      - http_proxy=${HTTP_PROXY}
+      - HTTPS_PROXY=${HTTPS_PROXY}
+      - https_proxy=${HTTPS_PROXY}
+      - NO_PROXY=localhost,127.0.0.1,keycloak
+      - no_proxy=localhost,127.0.0.1,keycloak
+      - SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
+      - SSL_CERT_DIR=/etc/ssl/certs
+      - NODE_EXTRA_CA_CERTS=/etc/ssl/certs/ca-certificates.crt

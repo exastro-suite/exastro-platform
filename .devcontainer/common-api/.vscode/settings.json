@@ -1,0 +1,20 @@
+{
+    "sqltools.connections": [
+        {
+            "mysqlOptions": {
+                "authProtocol": "default"
+            },
+            "previewLimit": 50,
+            "server": "keycloak-db",
+            "port": 3306,
+            "driver": "MariaDB",
+            "name": "keycloak-db",
+            "database": "keycloak",
+            "username": "keycloak",
+            "password": "password"
+        }
+    ],
+    "thunder-client.customLocation": "",
+    "thunder-client.saveToWorkspace": true,
+    "thunder-client.workspaceRelativePath": ".vscode_extensions"
+}
