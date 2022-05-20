@@ -7,7 +7,7 @@ services:
       - ../common-api:/app:cached
       - ~/.netrc:/root/.netrc
       - ~/.gitconfig:/root/.gitconfig
-      - ./common-api/.vscode:/workspace/.vscode
+      - ./common-api/.vscode/launch.json:/workspace/.vscode/launch.json
       - /usr/share/pki/ca-trust-source/anchors/ZscalerRootCertificate.cer:/etc/ssl/certs/ca-certificates.crt
       - /mnt/mainte/talisman/.talismanrc:/mnt/mainte/talisman/.talismanrc
       - ~/.talisman/bin:/root/.talisman/bin
@@ -28,7 +28,7 @@ services:
       - ../gateway-httpd:/app:cached
       - ~/.netrc:/root/.netrc
       - ~/.gitconfig:/root/.gitconfig
-      - ./gateway-httpd/.vscode:/workspace/.vscode
+      - ./gateway-httpd/.vscode/launch.json:/workspace/.vscode/launch.json
       - /usr/share/pki/ca-trust-source/anchors/ZscalerRootCertificate.cer:/etc/ssl/certs/ca-certificates.crt
       - /mnt/mainte/talisman/.talismanrc:/mnt/mainte/talisman/.talismanrc
       - ~/.talisman/bin:/root/.talisman/bin

@@ -13,6 +13,11 @@
 		},
 		"terminal.integrated.defaultProfile.linux": "bash",
 
+		// thunder-client setting
+		"thunder-client.customLocation": "",
+		"thunder-client.saveToWorkspace": true,
+		"thunder-client.workspaceRelativePath": ".vscode_extensions",
+	
 		// python extension setting
 		"python.linting.pylintEnabled": false,
 		"python.linting.flake8Enabled": true,

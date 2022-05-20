@@ -12,6 +12,11 @@
 			}
 		},
 		"terminal.integrated.defaultProfile.linux": "bash",
+
+		// thunder-client setting
+		"thunder-client.customLocation": "",
+		"thunder-client.saveToWorkspace": true,
+		"thunder-client.workspaceRelativePath": ".vscode_extensions",
 	},
 	// Add the IDs of extensions you want installed when the container is created.
 	"extensions": [
