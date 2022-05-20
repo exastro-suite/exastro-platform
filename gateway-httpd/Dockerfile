@@ -18,16 +18,17 @@ RUN     if [ ! -z "${PROXY}" ]; then \
           sed -i -e "$ a PROXY=${PROXY}" /etc/yum.conf; \
         fi
 
-RUN      curl -L -o /tmp/cjose-0.6.1.5-2.el8.x86_64.rpm https://mod-auth-openidc.org/download/cjose-0.6.1.5-2.el8.x86_64.rpm \
-&&       curl -L -o /tmp/mod_auth_openidc-2.4.10-1.el8.x86_64.rpm https://mod-auth-openidc.org/download/mod_auth_openidc-2.4.10-1.el8.x86_64.rpm \
-&&       curl -L -o /tmp/epel-release-latest-8.noarch.rpm https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm \
-&&       curl -L -o /tmp/redis-5.0.3-5.module_el8.4.0+955+7126e393.x86_64.rpm https://vault.centos.org/centos/8/AppStream/x86_64/os/Packages/redis-5.0.3-5.module_el8.4.0+955+7126e393.x86_64.rpm \
-&&       curl -L -o /tmp/hiredis-0.13.3-13.el8.x86_64.rpm https://dl.fedoraproject.org/pub/epel/8/Everything/x86_64/Packages/h/hiredis-0.13.3-13.el8.x86_64.rpm \
-&&       dnf install -y httpd \
+#RUN      curl -L -o /tmp/cjose-0.6.1.5-2.el8.x86_64.rpm https://mod-auth-openidc.org/download/cjose-0.6.1.5-2.el8.x86_64.rpm \
+#&&       curl -L -o /tmp/mod_auth_openidc-2.4.10-1.el8.x86_64.rpm https://mod-auth-openidc.org/download/mod_auth_openidc-2.4.10-1.el8.x86_64.rpm \
+#&&       curl -L -o /tmp/epel-release-latest-8.noarch.rpm https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm \
+#&&       curl -L -o /tmp/redis-5.0.3-5.module_el8.4.0+955+7126e393.x86_64.rpm https://vault.centos.org/centos/8/AppStream/x86_64/os/Packages/redis-5.0.3-5.module_el8.4.0+955+7126e393.x86_64.rpm \
+#&&       curl -L -o /tmp/hiredis-0.13.3-13.el8.x86_64.rpm https://dl.fedoraproject.org/pub/epel/8/Everything/x86_64/Packages/h/hiredis-0.13.3-13.el8.x86_64.rpm \
+
+RUN       dnf install -y httpd \
 &&       dnf install -y mod_ssl \
-&&       dnf install -y /tmp/epel-release-latest-8.noarch.rpm \
-&&       dnf install -y /tmp/redis-5.0.3-5.module_el8.4.0+955+7126e393.x86_64.rpm /tmp/hiredis-0.13.3-13.el8.x86_64.rpm \
-&&       dnf install -y /tmp/cjose-0.6.1.5-2.el8.x86_64.rpm /tmp/mod_auth_openidc-2.4.10-1.el8.x86_64.rpm \
+#&&       dnf install -y /tmp/epel-release-latest-8.noarch.rpm \
+#&&       dnf install -y /tmp/redis-5.0.3-5.module_el8.4.0+955+7126e393.x86_64.rpm /tmp/hiredis-0.13.3-13.el8.x86_64.rpm \
+#&&       dnf install -y /tmp/cjose-0.6.1.5-2.el8.x86_64.rpm /tmp/mod_auth_openidc-2.4.10-1.el8.x86_64.rpm \
 &&       dnf install -y gcc \
 &&       dnf install -y httpd-devel \
 &&       dnf install -y python39 \

@@ -1,0 +1,5 @@
+/.volumes/
+/.vscode/
+/.vscode_extensions/*/
+/.vscode_extensions/*
+!/.vscode_extensions/.gitkeep

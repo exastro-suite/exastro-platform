@@ -1,0 +1,46 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the README at:
+// https://github.com/microsoft/vscode-dev-containers/tree/v0.231.6/containers/jekyll
+{
+	"name": "exastro-common-auth - gateway-httpd",
+	"dockerComposeFile": ["../docker-compose.yml","../docker-compose.devcontainer.yml"],
+	"service": "gateway-httpd",
+	// Set *default* container specific settings.json values on container create.
+	"settings": {
+		"terminal.integrated.profiles.linux": {
+			"bash": {
+				"path": "/bin/bash"
+			}
+		},
+		"terminal.integrated.defaultProfile.linux": "bash",
+	},
+	// Add the IDs of extensions you want installed when the container is created.
+	"extensions": [
+		"donjayamanne.python-extension-pack",
+		"ms-python.vscode-pylance",
+		"ms-ceintl.vscode-language-pack-ja",
+		"ms-vscode.references-view",
+		"eamodio.gitlens",
+		"42crunch.vscode-openapi",
+		"arjun.swagger-viewer",
+		"redhat.vscode-yaml",
+		"adisreyaj.swagger-snippets",
+		"hediet.vscode-drawio",
+		"oderwat.indent-rainbow",
+		"aaron-bond.better-comments",
+		//"sonarsource.sonarlint-vscode",
+		"mechatroner.rainbow-csv",
+		"ryu1kn.partial-diff",
+		"pkief.material-icon-theme",
+		"rangav.vscode-thunder-client",
+		"mtxr.sqltools",
+		"mtxr.sqltools-driver-mysql",
+	],
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	"forwardPorts": [
+	],
+	// Use 'postCreateCommand' to run commands after the container is created.
+	"onCreateCommand": "dnf install -y git vim && pip install debugpy && pip install flake8 && pip install autopep8",
+	// "postAttachCommand": "ssh ",
+	"workspaceFolder": "/workspace",
+	"overrideCommand": true,
+}
