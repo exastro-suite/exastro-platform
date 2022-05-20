@@ -19,8 +19,6 @@ RUN apt-get -y update   \
     locales \
     curl \
     python3-distutils \
-    git \
-    vim \
     wget \
     unzip \
 &&  curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py \
