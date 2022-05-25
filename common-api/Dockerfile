@@ -35,7 +35,8 @@ RUN dnf install -y \
 #
 FROM    common_build as develop_build
 
-RUN dnf -y install sudo \
+RUN pip3.9 install debugpy \
+&&  dnf -y install sudo \
 &&  usermod -G wheel app_user \
 &&  echo '%wheel ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers
 

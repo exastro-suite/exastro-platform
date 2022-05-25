@@ -63,7 +63,7 @@
 		8000
 	],
 	// Use 'postCreateCommand' to run commands after the container is created.
-	"onCreateCommand":"sudo pip3.9 install debugpy && sudo pip3.9 install flake8 && sudo pip3.9 install autopep8 && sudo dnf -y install vim git",
+	"onCreateCommand":"sudo pip3.9 install flake8 && sudo pip3.9 install autopep8 && sudo dnf -y install vim git",
 	// "postAttachCommand": "",
 	"workspaceFolder": "/workspace",
 	"overrideCommand": true,
