@@ -11,28 +11,45 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
-FROM    ubuntu:20.04
+FROM    registry.access.redhat.com/ubi8/ubi-init as common_build
 
-RUN apt-get -y update   \
-&&  apt-get -y upgrade  \
-&&  apt-get -y install \
-    locales \
-    curl \
-    python3-distutils \
+ARG USERNAME=app_user
+ARG GROUPNAME=app_user
+
+RUN dnf install -y \
+    langpacks-en \
     wget \
     unzip \
-&&  curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py \
-&&  python3 get-pip.py \
-&&  pip install -U pip \
-&&  pip install requests \
-&&  pip install pyyaml \
-&&  python3 -m pip install Flask \
-&&  python3 -m pip install pytz \
-&&  python3 -m pip install markdown
+    python39 \
+&&  pip3.9 install requests \
+&&  pip3.9 install pyyaml \
+&&  pip3.9 install Flask \
+&&  pip3.9 install pytz \
+&&  pip3.9 install markdown \
+&&  groupadd $GROUPNAME \
+&&  useradd -m -s /bin/bash -g $GROUPNAME $USERNAME
 
+#
+# Build for development
+#   Specify options when creating this image: --target develop_build
+#
+FROM    common_build as develop_build
+
+RUN dnf -y install sudo \
+&&  usermod -G wheel app_user \
+&&  echo '%wheel ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers
+
+USER $USERNAME
 WORKDIR /app
-
 COPY ./ /app/
-
 CMD ["python3", "/app/common-api.py"]
 
+#
+# Build for production
+#
+FROM    common_build
+
+USER $USERNAME
+WORKDIR /app
+COPY ./ /app/
+CMD ["python3", "/app/common-api.py"]

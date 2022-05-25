@@ -1,16 +1,19 @@
 version: '3.1'
 services:
   common-auth-api:
+    build:
+      target: develop_build
+    user: 1000:1000
     command: "python3 -m debugpy --listen 5678 /app/common-api.py"
     volumes:
       - ..:/workspace:cached
       - ../common-api:/app:cached
-      - ~/.netrc:/root/.netrc
-      - ~/.gitconfig:/root/.gitconfig
+      - ~/.netrc:/home/app_user/.netrc
+      - ~/.gitconfig:/home/app_user/.gitconfig
       - ./common-api/.vscode/launch.json:/workspace/.vscode/launch.json
-      - /usr/share/pki/ca-trust-source/anchors/ZscalerRootCertificate.cer:/etc/ssl/certs/ca-certificates.crt
+      - /usr/share/pki/ca-trust-source/anchors/UserRootCertificate.crt:/etc/ssl/certs/ca-certificates.crt
       - /mnt/mainte/talisman/.talismanrc:/mnt/mainte/talisman/.talismanrc
-      - ~/.talisman/bin:/root/.talisman/bin
+      - ${TALISMAN_HOME}:${TALISMAN_HOME}
     environment:
       - FLASK_ENV=development
       - HTTP_PROXY=${HTTP_PROXY}
@@ -26,10 +29,10 @@ services:
     volumes:
       - ..:/workspace:cached
       - ../gateway-httpd:/app:cached
-      - ~/.netrc:/root/.netrc
-      - ~/.gitconfig:/root/.gitconfig
+      - ~/.netrc:/home/app_user/.netrc
+      - ~/.gitconfig:/home/app_user/.gitconfig
       - ./gateway-httpd/.vscode/launch.json:/workspace/.vscode/launch.json
-      - /usr/share/pki/ca-trust-source/anchors/ZscalerRootCertificate.cer:/etc/ssl/certs/ca-certificates.crt
+      - /usr/share/pki/ca-trust-source/anchors/UserRootCertificate.crt:/etc/ssl/certs/ca-certificates.crt
       - /mnt/mainte/talisman/.talismanrc:/mnt/mainte/talisman/.talismanrc
       - ~/.talisman/bin:/root/.talisman/bin
     environment:
