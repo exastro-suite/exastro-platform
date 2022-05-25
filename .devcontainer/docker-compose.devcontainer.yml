@@ -13,7 +13,7 @@ services:
       - ./common-api/.vscode/launch.json:/workspace/.vscode/launch.json
       - /usr/share/pki/ca-trust-source/anchors/UserRootCertificate.crt:/etc/ssl/certs/ca-certificates.crt
       - /mnt/mainte/talisman/.talismanrc:/mnt/mainte/talisman/.talismanrc
-      - ~/.talisman/bin:/home/app_user/.talisman/bin
+      - ${TALISMAN_HOME}:${TALISMAN_HOME}
     environment:
       - FLASK_ENV=development
       - HTTP_PROXY=${HTTP_PROXY}
