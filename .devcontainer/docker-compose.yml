@@ -28,6 +28,26 @@ services:
         - http_proxy=${HTTP_PROXY}
         - HTTPS_PROXY=${HTTPS_PROXY}
         - https_proxy=${HTTPS_PROXY}
+    environment:
+      - GATEWAY_PORT=8080
+      - KEYCLOAK_LOCATION=/auth/
+      - KEYCLOAK_PROTOCOL=http
+      - KEYCLOAK_HOST=keycloak
+      - KEYCLOAK_PORT=8080
+      - ITA_WEB_LOCATION=/ita/
+      - ITA_WEB_PROTOCOL=http
+      - ITA_WEB_HOST=ita-web
+      - ITA_WEB_PORT=8000
+      - ITA_API_LOCATION=/api/ita/
+      - ITA_API_PROTOCOL=http
+      - ITA_API_HOST=ita-api
+      - ITA_API_PORT=8000
+      - AUTH_API_LOCATION=/api/auth/
+      - AUTH_API_PROTOCOL=http
+      - AUTH_API_HOST=common-auth-api
+      - AUTH_API_PORT=8000
+    ports:
+      - "0.0.0.0:8080:8080"
   keycloak:
     image: jboss/keycloak:15.0.2
     environment:
@@ -39,8 +59,6 @@ services:
       - DB_DATABASE=keycloak
       - DB_USER=keycloak
       - DB_PASSWORD=password
-    ports:
-      - "0.0.0.0:8080:8080"
     depends_on:
       - keycloak-db
   keycloak-db:

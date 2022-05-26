@@ -13,6 +13,9 @@
 		},
 		"terminal.integrated.defaultProfile.linux": "bash",
 
+		// git menu setting
+		"git.allowNoVerifyCommit": true,
+
 		// thunder-client setting
 		"thunder-client.customLocation": "",
 		"thunder-client.saveToWorkspace": true,
@@ -63,7 +66,7 @@
 		8000
 	],
 	// Use 'postCreateCommand' to run commands after the container is created.
-	"onCreateCommand":"sudo pip3.9 install debugpy && sudo pip3.9 install flake8 && sudo pip3.9 install autopep8 && sudo dnf -y install vim git",
+	"onCreateCommand":"sudo dnf install -y git vim diffutils bind-utils iputils && sudo pip3.9 install flake8 && sudo pip3.9 install autopep8",
 	// "postAttachCommand": "",
 	"workspaceFolder": "/workspace",
 	"overrideCommand": true,
