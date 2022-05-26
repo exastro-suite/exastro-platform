@@ -11,7 +11,7 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
-FROM    registry.access.redhat.com/ubi8/ubi-init
+FROM    registry.access.redhat.com/ubi8/ubi-init as common_build
 
 ARG     PROXY=""
 RUN     if [ ! -z "${PROXY}" ]; then \
@@ -24,7 +24,7 @@ RUN     if [ ! -z "${PROXY}" ]; then \
 #&&       curl -L -o /tmp/redis-5.0.3-5.module_el8.4.0+955+7126e393.x86_64.rpm https://vault.centos.org/centos/8/AppStream/x86_64/os/Packages/redis-5.0.3-5.module_el8.4.0+955+7126e393.x86_64.rpm \
 #&&       curl -L -o /tmp/hiredis-0.13.3-13.el8.x86_64.rpm https://dl.fedoraproject.org/pub/epel/8/Everything/x86_64/Packages/h/hiredis-0.13.3-13.el8.x86_64.rpm \
 
-RUN       dnf install -y httpd \
+RUN      dnf install -y httpd \
 &&       dnf install -y mod_ssl \
 #&&       dnf install -y /tmp/epel-release-latest-8.noarch.rpm \
 #&&       dnf install -y /tmp/redis-5.0.3-5.module_el8.4.0+955+7126e393.x86_64.rpm /tmp/hiredis-0.13.3-13.el8.x86_64.rpm \
@@ -34,19 +34,53 @@ RUN       dnf install -y httpd \
 &&       dnf install -y python39 \
 &&       dnf install -y python39-devel \
 &&       dnf install -y python39-mod_wsgi \
+&&       dnf install -y langpacks-en \
 &&       pip3.9 install requests \
-&&       pip3.9 install PyJWT
+&&       pip3.9 install PyJWT \
+&&       mv /etc/httpd/conf.d/ssl.conf /etc/httpd/conf.d/ssl.conf.org \
+&&       cp -p /etc/httpd/conf/httpd.conf /etc/httpd/conf/httpd.conf.org \
+&&       sed -i -e '/^\s*ErrorLog\s/s|ErrorLog\s\+\S\+|ErrorLog "/dev/stderr"|' \
+                -e '/^\s*CustomLog\s/s|CustomLog\s\+\S\+|CustomLog "/dev/stdout"|' \
+                -e '/^\s*TransferLog\s/s|TransferLog\s\+\S\+|TransferLog "/dev/stdout"|' \
+            /etc/httpd/conf/httpd.conf
+# &&      cp -p /etc/httpd/conf.d/ssl.conf /etc/httpd/conf.d/ssl.conf.org \
+# &&      sed -i  -e '/^\s*ErrorLog\s/s|ErrorLog\s\+\S\+|ErrorLog "/dev/stderr"|' \
+#                 -e '/^\s*CustomLog\s/s|CustomLog\s\+\S\+|CustomLog "/dev/stdout"|' \
+#                 -e '/^\s*TransferLog\s/s|TransferLog\s\+\S\+|TransferLog "/dev/stdout"|' \
+#             /etc/httpd/conf.d/ssl.conf \
+
+#
+# Build for development
+#   Specify options when creating this image: --target develop_build
+#
+FROM    common_build  as develop_build
+
+ARG USERNAME=app_user
+ARG GROUPNAME=app_user
+
+RUN     pip3.9 install debugpy \
+&&      groupadd $GROUPNAME \
+&&      useradd -m -s /bin/bash -g $GROUPNAME $USERNAME \
+&&      dnf -y install sudo \
+&&      usermod -G wheel $USERNAME \
+&&      echo '%wheel ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers
+
+USER    $USERNAME
+COPY    ./httpd_conf.d   /etc/httpd/conf.d/
 
 WORKDIR /app
+COPY    ./app   /app/
 
-COPY    httpd-start.sh /app/
-COPY    exastroSettingsBridge.conf /app/
-COPY    gateway-httpd.conf /app/
+CMD ["sudo","-E","/bin/sh","/app/httpd-start.sh"]
 
-RUN     chmod +x /app/httpd-start.sh \
-&&      cp /app/exastroSettingsBridge.conf /etc/httpd/conf.d/. \
-&&      mkdir /etc/httpd/conf.d/exastroSettings \
-&&      cp /app/gateway-httpd.conf /etc/httpd/conf.d/exastroSettings/.
+#
+# Build for production
+#
+FROM    common_build
 
+COPY    ./httpd_conf.d   /etc/httpd/conf.d/
+
+WORKDIR /app
+COPY    ./app   /app/
 
 CMD ["/bin/sh","/app/httpd-start.sh"]

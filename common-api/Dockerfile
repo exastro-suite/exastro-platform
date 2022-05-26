@@ -37,7 +37,7 @@ FROM    common_build as develop_build
 
 RUN pip3.9 install debugpy \
 &&  dnf -y install sudo \
-&&  usermod -G wheel app_user \
+&&  usermod -G wheel $USERNAME \
 &&  echo '%wheel ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers
 
 USER $USERNAME
