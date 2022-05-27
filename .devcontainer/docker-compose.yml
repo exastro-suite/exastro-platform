@@ -37,7 +37,7 @@ services:
       - ITA_WEB_LOCATION=/ita/
       - ITA_WEB_PROTOCOL=http
       - ITA_WEB_HOST=ita-web
-      - ITA_WEB_PORT=8000
+      - ITA_WEB_PORT=80
       - ITA_API_LOCATION=/api/ita/
       - ITA_API_PROTOCOL=http
       - ITA_API_HOST=ita-api
