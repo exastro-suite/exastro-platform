@@ -61,6 +61,7 @@
 		"rangav.vscode-thunder-client",
 	// 	"mtxr.sqltools",
 	// 	"mtxr.sqltools-driver-mysql",
+		"mitchdenny.ecdc",
 	],
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	"forwardPorts": [
