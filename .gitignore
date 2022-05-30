@@ -2,4 +2,4 @@
 /.vscode_extensions/*/
 /.vscode_extensions/*
 !/.vscode_extensions/.gitkeep
-.taismanrc
+.talismanrc
