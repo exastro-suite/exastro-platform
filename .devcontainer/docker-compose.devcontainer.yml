@@ -13,6 +13,7 @@ services:
       - ./common-api/.vscode/launch.json:/workspace/.vscode/launch.json
       - /usr/share/pki/ca-trust-source/anchors/UserRootCertificate.crt:/etc/ssl/certs/ca-certificates.crt
       - /mnt/mainte/talisman/.talismanrc:/mnt/mainte/talisman/.talismanrc
+      - ~/.config/git/ignore:/home/app_user/.config/git/ignore
       - ${TALISMAN_HOME}:${TALISMAN_HOME}
     environment:
       - FLASK_ENV=development
@@ -37,6 +38,7 @@ services:
       - ./gateway-httpd/.vscode/launch.json:/workspace/.vscode/launch.json
       - /usr/share/pki/ca-trust-source/anchors/UserRootCertificate.crt:/etc/ssl/certs/ca-certificates.crt
       - /mnt/mainte/talisman/.talismanrc:/mnt/mainte/talisman/.talismanrc
+      - ~/.config/git/ignore:/home/app_user/.config/git/ignore
       - ${TALISMAN_HOME}:${TALISMAN_HOME}
     environment:
       - HTTP_PROXY=${HTTP_PROXY}
