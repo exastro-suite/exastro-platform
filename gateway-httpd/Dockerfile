@@ -65,6 +65,10 @@ RUN     pip3.9 install debugpy \
 &&      usermod -G wheel $USERNAME \
 &&      echo '%wheel ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers
 
+RUN     dnf install -y git vim diffutils bind-utils iputils \
+&&      pip3.9 install flake8 \
+&&      pip3.9 install autopep8
+
 USER    $USERNAME
 COPY    ./httpd_conf.d   /etc/httpd/conf.d/
 
