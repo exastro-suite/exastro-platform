@@ -70,6 +70,9 @@ RUN     dnf install -y git vim diffutils bind-utils iputils \
 &&      pip3.9 install autopep8
 
 USER    $USERNAME
+
+RUN mkdir ~/.config
+
 COPY    ./httpd_conf.d   /etc/httpd/conf.d/
 
 WORKDIR /app
