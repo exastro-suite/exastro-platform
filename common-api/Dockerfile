@@ -45,6 +45,9 @@ RUN dnf install -y git vim diffutils bind-utils iputils \
 &&  pip3.9 install autopep8
 
 USER $USERNAME
+
+RUN mkdir ~/.config
+
 WORKDIR /app
 COPY ./ /app/
 CMD ["python3", "/app/common-api.py"]
