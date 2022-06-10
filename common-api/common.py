@@ -27,26 +27,6 @@ def deleteDictKey(dictobj, key):
     if key in dictobj:
         del dictobj[key]
 
-def deleteDictKey2(dictobj, key):
-    """Dictionary Key削除
-
-    Args:
-        dictobj (dict): Dictionary
-        key (any): key
-    """
-    if key in dictobj:
-        del dictobj[key]
-
-def deleteDictKey3(dictobj, key):
-    """Dictionary Key削除
-
-    Args:
-        dictobj (dict): Dictionary
-        key (any): key
-    """
-    if key in dictobj:
-        del dictobj[key]
-
 def randomString(n):
     """ランダム文字列生成
 
