@@ -1,9 +1,9 @@
 version: '3.1'
 services:
-  common-auth-api:
+  platform-auth:
     build:
-      dockerfile: ./Dockerfile
-      context: ../common-api
+      dockerfile: ./platform_root/platform_auth/Dockerfile
+      context: ../.
       args:
         - HTTP_PROXY=${HTTP_PROXY}
         - http_proxy=${HTTP_PROXY}
@@ -19,16 +19,6 @@ services:
       - API_KEYCLOAK_HOST=keycloak
       - API_KEYCLOAK_PROTOCOL=http
       - API_KEYCLOAK_PORT=8080
-  gateway-httpd:
-    build:
-      dockerfile: ./Dockerfile
-      context: ../gateway-httpd
-      args:
-        - HTTP_PROXY=${HTTP_PROXY}
-        - http_proxy=${HTTP_PROXY}
-        - HTTPS_PROXY=${HTTPS_PROXY}
-        - https_proxy=${HTTPS_PROXY}
-    environment:
       - GATEWAY_PORT=8080
       - KEYCLOAK_LOCATION=/auth/
       - KEYCLOAK_PROTOCOL=http
@@ -44,7 +34,7 @@ services:
       - ITA_API_PORT=8000
       - AUTH_API_LOCATION=/api/auth/
       - AUTH_API_PROTOCOL=http
-      - AUTH_API_HOST=common-auth-api
+      - AUTH_API_HOST=platform-auth
       - AUTH_API_PORT=8000
     ports:
       - "0.0.0.0:8080:8080"
