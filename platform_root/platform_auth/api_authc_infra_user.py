@@ -26,6 +26,7 @@ import api_keycloak_call
 from common_library.common.exastro_logging import ExastroLogRecordFactory, LOGGING
 
 # 設定ファイル読み込み・globals初期化
+# Read configuration file and initialize globals
 app = Flask(__name__)
 app.config.from_envvar('CONFIG_API_AUTHC_INFRA_PATH')
 globals.init(app)
