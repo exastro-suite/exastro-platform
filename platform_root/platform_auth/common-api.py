@@ -12,25 +12,11 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-from requests.models import Response
-from flask import Flask, request, abort, jsonify, render_template, redirect, make_response
+from flask import Flask, request, jsonify
 from datetime import datetime
-import inspect
 import os
-import json
-import tempfile
-import subprocess
-import time
-import re
-from urllib.parse import urlparse
-import base64
-import requests
-from requests.auth import HTTPBasicAuth
-import traceback
-from datetime import timedelta, timezone
-
-import yaml
-from jinja2 import Template
+import logging
+from logging.config import dictConfig as dictLogConf
 
 # User Imports
 import globals
@@ -38,11 +24,18 @@ import common
 import api_authc_infra_client
 import api_authc_infra_user
 import api_keycloak_call
+from common_library.common.exastro_logging import ExastroLogRecordFactory, LOGGING
 
 # 設定ファイル読み込み・globals初期化
 app = Flask(__name__)
 app.config.from_envvar('CONFIG_API_AUTHC_INFRA_PATH')
 globals.init(app)
+
+org_factory = logging.getLogRecordFactory()
+logging.setLogRecordFactory(ExastroLogRecordFactory(org_factory, request))
+globals.logger = logging.getLogger('root')
+dictLogConf(LOGGING)
+
 
 @app.route('/alive', methods=["GET"])
 def alive():
@@ -66,16 +59,14 @@ def call_curret_user(realm, user_id):
         Response: HTTP Respose
     """
     try:
-        globals.logger.debug('#' * 50)
-        globals.logger.debug('CALL {}:from[{}] realm[{}] user_id[{}]'.format(inspect.currentframe().f_code.co_name, request.method, realm, user_id))
-        globals.logger.debug('#' * 50)
+        globals.logger.info('Get Current User. method={}, realm={}, user_id={}'.format(request.method, realm, user_id))
 
         if request.method == 'GET':
             # クライアントロール設定
             return api_authc_infra_user.curret_user_get(realm, user_id)
         else:
             # Error
-            raise Exception("method not support!")
+            raise Exception('method not support! request_method={}, expect_method={}'.format(request.method, 'GET'))
 
     except Exception as e:
         return common.server_error(e)
@@ -84,7 +75,7 @@ def call_curret_user(realm, user_id):
 # @app.route('/user/current/password', methods=['PUT'])
 # def call_curret_user_password():
 #     """カレントユーザーパスワード処理呼び出し call current_user pasword
-    
+
 #     Returns:
 #         Response: HTTP Respose
 #     """
@@ -115,22 +106,20 @@ def call_users(realm):
         Response: HTTP Respose
     """
     try:
-        globals.logger.debug('#' * 50)
-        globals.logger.debug('CALL {}:from[{}] realm[{}]'.format(inspect.currentframe().f_code.co_name, request.method, realm))
-        globals.logger.debug('#' * 50)
+        globals.logger.info('Get Users. method={}, realm={}'.format(request.method, realm))
 
         if request.method == 'GET':
             # ユーザー一覧取得 Get users
             return api_authc_infra_user.users_get(realm)
         else:
             # Error
-            raise Exception("method not support!")
+            raise Exception('method not support! request_method={}, expect_method={}'.format(request.method, 'GET'))
 
     except Exception as e:
         return common.server_error(e)
 
 
-@app.route('/<string:realm>/user/<string:user_id>/roles/<string:client_id>', methods=['GET','POST','DELETE'])
+@app.route('/<string:realm>/user/<string:user_id>/roles/<string:client_id>', methods=['GET', 'POST', 'DELETE'])
 def call_user_role_setting(realm, user_id, client_id):
     """ユーザークライアントロール設定呼び出し call user client role
 
@@ -143,9 +132,9 @@ def call_user_role_setting(realm, user_id, client_id):
         Response: HTTP Respose
     """
     try:
-        globals.logger.debug('#' * 50)
-        globals.logger.debug('CALL {}:from[{}] realm[{}] user_id[{}] client_id[{}]'.format(inspect.currentframe().f_code.co_name, request.method, realm, user_id, client_id))
-        globals.logger.debug('#' * 50)
+        globals.logger.info(
+            'User client role setting. method={}, realm={}, user_id={}, client_id={}'.format(request.method, realm, user_id, client_id)
+        )
 
         if request.method == 'GET':
             # クライアントロール情報取得 Get client role info.
@@ -158,7 +147,7 @@ def call_user_role_setting(realm, user_id, client_id):
             return api_authc_infra_user.user_client_role_delete(realm, user_id, client_id)
         else:
             # Error
-            raise Exception("method not support!")
+            raise Exception('method not support! request_method={}, expect_method={}'.format(request.method, '[GET,POST,DELETE]'))
 
     except Exception as e:
         return common.server_error(e)
@@ -177,16 +166,16 @@ def call_role_users_get(realm, client_id, role_name):
         Response: HTTP Respose
     """
     try:
-        globals.logger.debug('#' * 50)
-        globals.logger.debug('CALL {}:from[{}] realm[{}] client_id[{}] role_name[{}]'.format(inspect.currentframe().f_code.co_name, request.method, realm, client_id, role_name))
-        globals.logger.debug('#' * 50)
+        globals.logger.info(
+            'Get User client role info. method={}, realm={}, client_id={}, role_name={}'.format(request.method, realm, client_id, role_name)
+        )
 
         if request.method == 'GET':
             # ユーザークライアントロール情報取得 user client role info get
             return api_authc_infra_client.client_role_users_get(realm, client_id, role_name)
         else:
             # Error
-            raise Exception("method not support!")
+            raise Exception('method not support! request_method={}, expect_method={}'.format(request.method, 'GET'))
 
     except Exception as e:
         return common.server_error(e)
@@ -209,9 +198,7 @@ def access_token_get(realm):
         Response: HTTP Respose
     """
     try:
-        globals.logger.debug('#' * 50)
-        globals.logger.debug('CALL {}:from[{}] realm[{}]'.format(inspect.currentframe().f_code.co_name, request.method, realm))
-        globals.logger.debug('#' * 50)
+        globals.logger.info('Get access token. method={}, realm={}'.format(request.method, realm))
 
         # パラメータ情報(JSON形式)
         payload = request.json.copy()
@@ -221,7 +208,7 @@ def access_token_get(realm):
         # アクセストークン取得 get access token
         access_token = api_keycloak_call.get_user_token(user_name, password, realm)
 
-        return jsonify({"result": "200", "access_token":access_token}), 200
+        return jsonify({"result": "200", "access_token": access_token}), 200
 
     except Exception as e:
         return common.serverError(e)
@@ -240,16 +227,14 @@ def access_token_introspect(realm):
             "client_secret"  : [client secret],
             "access_token"   : [access token],
             "keycloak_proto" : [keycloak server protocol],
-            "keycloak_host"  : [keycloak server host] 
+            "keycloak_host"  : [keycloak server host]
         }
 
     Returns:
         Response: HTTP Respose
     """
     try:
-        globals.logger.debug('#' * 50)
-        globals.logger.debug('CALL {}:from[{}] realm[{}]'.format(inspect.currentframe().f_code.co_name, request.method, realm))
-        globals.logger.debug('#' * 50)
+        globals.logger.info('Token Introspection. method={}, realm={}'.format(request.method, realm))
 
         # パラメータ情報(JSON形式)
         payload = request.json.copy()
@@ -262,7 +247,7 @@ def access_token_introspect(realm):
         # トークンイントロスペクション token introspection
         active = api_keycloak_call.keycloak_user_token_introspect(client_id, client_secret, realm, access_token, keycloak_proto, keycloak_host)
 
-        return jsonify({"result": "200", "active":active}), 200
+        return jsonify({"result": "200", "active": active}), 200
 
     except Exception as e:
         return common.serverError(e)
