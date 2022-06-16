@@ -12,34 +12,28 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-from flask import Flask, request, abort, jsonify, render_template
-from datetime import datetime
-import inspect
+from flask import Flask, request, jsonify
 import os
-import json
-import tempfile
-import subprocess
-import time
-import re
-from urllib.parse import urlparse
-import base64
-import requests
-from requests.auth import HTTPBasicAuth
-import traceback
-from datetime import timedelta, timezone
-
-import yaml
-from jinja2 import Template
+import logging
+from logging.config import dictConfig as dictLogConf
 
 # User Imports
 import globals
 import common
 import api_keycloak_call
 
+from common_library.common.exastro_logging import ExastroLogRecordFactory, LOGGING
+
 # 設定ファイル読み込み・globals初期化
 app = Flask(__name__)
 app.config.from_envvar('CONFIG_API_AUTHC_INFRA_PATH')
 globals.init(app)
+
+
+org_factory = logging.getLogRecordFactory()
+logging.setLogRecordFactory(ExastroLogRecordFactory(org_factory, request))
+globals.logger = logging.getLogger('root')
+dictLogConf(LOGGING)
 
 
 def client_role_users_get(realm, client_id, role_name):
@@ -54,9 +48,7 @@ def client_role_users_get(realm, client_id, role_name):
         [type]: [description]
     """
     try:
-        globals.logger.debug('#' * 50)
-        globals.logger.debug('CALL {}:realm[{}] client_id[{}] role_name[{}]'.format(inspect.currentframe().f_code.co_name, realm, client_id, role_name))
-        globals.logger.debug('#' * 50)
+        globals.logger.info('Get client role users. realm={}, client_id={} role_name={}'.format(realm, client_id, role_name))
 
         token_user = os.environ["EXASTRO_KEYCLOAK_USER"]
         token_password = os.environ["EXASTRO_KEYCLOAK_PASSWORD"]
@@ -76,7 +68,11 @@ def client_role_users_get(realm, client_id, role_name):
             }
             rows.append(row)
 
-        return jsonify({"result": "200", "rows": rows }), 200
+        ret_status = 200
+
+        globals.logger.info('SUCCESS: Get client role users. ret_status={}'.format(ret_status))
+
+        return jsonify({"result": ret_status, "rows": rows}), ret_status
 
     except Exception as e:
         return common.serverError(e)

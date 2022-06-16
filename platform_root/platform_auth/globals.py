@@ -18,6 +18,7 @@ config = None
 TZ = None
 logger = None
 
+
 def init(app):
     global config
     global TZ
@@ -26,4 +27,3 @@ def init(app):
     config = app.config
     TZ = timezone(config['TZ'])
     logger = app.logger
-
