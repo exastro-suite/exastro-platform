@@ -3,3 +3,4 @@
 /.vscode_extensions/*
 !/.vscode_extensions/.gitkeep
 .talismanrc
+__pycache__/
