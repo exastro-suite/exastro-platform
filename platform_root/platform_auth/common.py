@@ -13,9 +13,11 @@
 #   limitations under the License.
 
 from flask import jsonify
-import random, string
+import random
+import string
 
 import globals
+
 
 def deleteDictKey(dictobj, key):
     """Dictionary Key削除
@@ -26,6 +28,7 @@ def deleteDictKey(dictobj, key):
     """
     if key in dictobj:
         del dictobj[key]
+
 
 def randomString(n):
     """ランダム文字列生成
@@ -54,8 +57,7 @@ def serverError(e):
 
     return jsonify(
         {
-            'result':       '500',
-            'exception':    ''.join(list(traceback.TracebackException.from_exception(e).format())),
+            'result': '500',
+            'exception': ''.join(list(traceback.TracebackException.from_exception(e).format())),
         }
     ), 500
-
