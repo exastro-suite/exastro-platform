@@ -43,7 +43,7 @@ RUN dnf install -y \
     requests \
     PyJWT \
 &&  groupadd $GROUPNAME \
-&&  useradd -m -s /bin/bash -g $GROUPNAME $USERNAME
+&&  useradd -m -s /bin/bash -g $GROUPNAME $USERNAME \
 &&  mv /etc/httpd/conf.d/ssl.conf /etc/httpd/conf.d/ssl.conf.org \
 &&  cp -p /etc/httpd/conf/httpd.conf /etc/httpd/conf/httpd.conf.org \
 &&  sed -i -e '/^\s*ErrorLog\s/s|ErrorLog\s\+\S\+|ErrorLog "/dev/stderr"|' \
@@ -67,7 +67,7 @@ RUN dnf install -y \
 &&  pip3.9 install \
     debugpy \
     flake8 \
-    autopep8
+    autopep8 \
 &&  usermod -G wheel $USERNAME \
 &&  echo '%wheel ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers
 
