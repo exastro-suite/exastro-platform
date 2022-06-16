@@ -1,0 +1,50 @@
+<html>
+    <head>
+        <title>
+            exastro-common-auth test page
+        </title>
+        <script type="text/javascript" src="/auth/js/keycloak.js"></script>
+        <script type="text/javascript" src="./keycloak_conf.js"></script>
+        <script type="text/javascript">
+            onProfileOnLoad = () => {
+                console.log("[INFO] called onProfileOnLoad");
+                document.getElementById("userid").value = keycloak_profile.id;
+                document.getElementById("username").value = keycloak_profile.username;
+                document.getElementById("token").value = keycloak.token;
+            }
+            function updateTokenCallback() {
+                console.log("[INFO] called updateTokenCallback");
+                document.getElementById("token").value = keycloak.token;
+            }
+        </script>
+        <script type="text/javascript" src="./exastro-common-auth.js"></script>
+        <style>
+            input[type="text"] {
+                width: 500px;
+            }
+            textarea {
+                width: 500px;
+                height: 320px;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>exastro-common-auth test page</h1>
+        <hr/>
+        <table>
+            <tr>
+                <td>id:</td>
+                <td><input id="userid" type="text" value="" readonly onclick="this.select()"></td>
+            </tr>
+            <tr>
+                <td>username:</td>
+                <td><input id="username" type="text" value="" readonly onclick="this.select()"></td>
+            </tr>
+            <tr>
+                <td>token:<br><input type="checkbox" onclick="autoUpdateToken(this.checked, updateTokenCallback)">autoupdate</td>
+                <td><textarea id="token" readonly onclick="this.select()"></textarea></td>
+            </tr>
+        </table>
+        <input type="button" value="Logout" onclick="keycloak.logout({redirectUri: location.href})">
+    </body>
+</html>
