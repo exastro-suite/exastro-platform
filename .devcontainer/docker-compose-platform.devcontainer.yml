@@ -36,4 +36,4 @@ services:
   ita-web:
     image: nginx:latest
     volumes:
-      - ../test/web/contents:/usr/share/nginx/html
+      - ../platform_root/platform_web_common/contents:/usr/share/nginx/html
