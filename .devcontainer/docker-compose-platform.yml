@@ -1,0 +1,72 @@
+version: '3.1'
+services:
+  common-auth-api:
+    build:
+      dockerfile: ./Dockerfile
+      context: ../common-api
+      args:
+        - HTTP_PROXY=${HTTP_PROXY}
+        - http_proxy=${HTTP_PROXY}
+        - HTTPS_PROXY=${HTTPS_PROXY}
+        - https_proxy=${HTTPS_PROXY}
+    environment:
+      - CONFIG_API_AUTHC_INFRA_PATH=/app/api_authc_infra.conf
+      - API_AUTHC_INFRA_PORT=8000
+      - PYTHONIOENCODING=utf-8
+      - EXASTRO_KEYCLOAK_USER=admin
+      - EXASTRO_KEYCLOAK_PASSWORD=password
+      - EXASTRO_KEYCLOAK_MASTER_REALM=master
+      - API_KEYCLOAK_HOST=keycloak
+      - API_KEYCLOAK_PROTOCOL=http
+      - API_KEYCLOAK_PORT=8080
+  gateway-httpd:
+    build:
+      dockerfile: ./Dockerfile
+      context: ../gateway-httpd
+      args:
+        - HTTP_PROXY=${HTTP_PROXY}
+        - http_proxy=${HTTP_PROXY}
+        - HTTPS_PROXY=${HTTPS_PROXY}
+        - https_proxy=${HTTPS_PROXY}
+    environment:
+      - GATEWAY_PORT=8080
+      - KEYCLOAK_LOCATION=/auth/
+      - KEYCLOAK_PROTOCOL=http
+      - KEYCLOAK_HOST=keycloak
+      - KEYCLOAK_PORT=8080
+      - ITA_WEB_LOCATION=/ita/
+      - ITA_WEB_PROTOCOL=http
+      - ITA_WEB_HOST=ita-web
+      - ITA_WEB_PORT=80
+      - ITA_API_LOCATION=/api/ita/
+      - ITA_API_PROTOCOL=http
+      - ITA_API_HOST=ita-api
+      - ITA_API_PORT=8000
+      - AUTH_API_LOCATION=/api/auth/
+      - AUTH_API_PROTOCOL=http
+      - AUTH_API_HOST=common-auth-api
+      - AUTH_API_PORT=8000
+    ports:
+      - "0.0.0.0:8080:8080"
+  keycloak:
+    image: jboss/keycloak:15.0.2
+    environment:
+      - KEYCLOAK_USER=admin
+      - KEYCLOAK_PASSWORD=password
+      - PROXY_ADDRESS_FORWARDING=true
+      - DB_VENDOR=mariadb
+      - DB_ADDR=keycloak-db
+      - DB_DATABASE=keycloak
+      - DB_USER=keycloak
+      - DB_PASSWORD=password
+    depends_on:
+      - keycloak-db
+  keycloak-db:
+    image: mariadb:10.4.8
+    volumes:
+      - ../.volumes/keycloak-db/data:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_DATABASE=keycloak
+      - MYSQL_USER=keycloak
+      - MYSQL_PASSWORD=password
