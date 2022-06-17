@@ -8,8 +8,10 @@ services:
     volumes:
       - ..:/workspace:cached
       - ../platform_root/common_library:/workspace/platform_root/platform_auth/common_library:cached
+      - ../platform_root/common_resources:/workspace/platform_root/platform_auth/common_resources:cached
       - ../platform_root/platform_auth:/app:cached
       - ../platform_root/common_library:/app/common_library:cached
+      - ../platform_root/common_resources:/app/common_resources:cached
       - ../platform_root/platform_auth/config/httpd_conf.d/exastroSettings:/etc/httpd/conf.d/exastroSettings:cached
       - ~/.netrc:/home/app_user/.netrc
       - ~/.gitconfig:/home/app_user/.gitconfig
