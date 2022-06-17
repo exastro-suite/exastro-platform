@@ -12,29 +12,13 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-from flask import Flask, request, jsonify
+from flask import jsonify
 import os
-import logging
-from logging.config import dictConfig as dictLogConf
 
 # User Imports
 import globals
 import common
 import api_keycloak_call
-
-from common_library.common.exastro_logging import ExastroLogRecordFactory, LOGGING
-
-# 設定ファイル読み込み・globals初期化
-# Read configuration file and initialize globals
-app = Flask(__name__)
-app.config.from_envvar('CONFIG_API_AUTHC_INFRA_PATH')
-globals.init(app)
-
-
-org_factory = logging.getLogRecordFactory()
-logging.setLogRecordFactory(ExastroLogRecordFactory(org_factory, request))
-globals.logger = logging.getLogger('root')
-dictLogConf(LOGGING)
 
 
 def client_role_users_get(realm, client_id, role_name):
