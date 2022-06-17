@@ -4,7 +4,7 @@ services:
     build:
       target: develop_build
     user: 1000:1000
-    command: "python3 -m debugpy --listen 5678 /app/common_api.py"
+    # command: "python3 -m debugpy --listen 5678 /app/common_api.py"
     volumes:
       - ..:/workspace:cached
       - ../platform_root/common_library:/workspace/platform_root/platform_auth/common_library:cached
@@ -38,4 +38,4 @@ services:
   ita-web:
     image: nginx:latest
     volumes:
-      - ../platform_root/platform_web_common/contents:/usr/share/nginx/html
+      - ../platform_root/platform_web/contents:/usr/share/nginx/html
