@@ -201,6 +201,14 @@ def application(environ, start_response):
             # ----ここまでアクセストークン取得処理---- #
             # Access token acquisition process up to this point
 
+        # ヘッダにuser_idの付与 addtional header user_id
+        request_post_headers = post_headers.copy
+        request_post_headers.append(
+            {
+                "user_id": user_id,
+            }
+        )
+
         # ----ここからAPサーバへのリクエスト処理---- #
         # Request processing from here to the AP server
 
@@ -231,7 +239,7 @@ def application(environ, start_response):
 
         # リクエストを実行
         # Execute request
-        ret = main_request(method, url, request_body, query_string)
+        ret = main_request(method, url, request_post_headers, request_body, query_string)
         # ----ここまでAPサーバへのリクエスト処理---- #
         # Request processing to the AP server so far
 
@@ -258,7 +266,7 @@ def application(environ, start_response):
         return [b'System Error']
 
 
-def main_request(method, url, request_body, query_string):
+def main_request(method, url, request_post_headers, request_body, query_string):
     """
     APサーバへリクエストを実行
     Execute a request to the AP server
@@ -266,8 +274,9 @@ def main_request(method, url, request_body, query_string):
     Arguments:
         method (str): method
         url (str): url
+        request_post_headers (dic): post headers
         request_body (str): request body(json)
-        query_string: query_string
+        query_string (str): query_string
 
     Returns:
         esponse: HTTP Respose
@@ -276,19 +285,19 @@ def main_request(method, url, request_body, query_string):
     globals.logger.info(f'Start main_request. method={method} url={url} request_body={request_body} query_string={query_string}')
 
     if method == 'GET':
-        ret = requests.get(url, headers=post_headers, params=query_string)
+        ret = requests.get(url, headers=request_post_headers, params=query_string)
 
     elif method == 'POST':
-        ret = requests.post(url, headers=post_headers, data=request_body, params=query_string)
+        ret = requests.post(url, headers=request_post_headers, data=request_body, params=query_string)
 
     elif method == 'PATCH':
-        ret = requests.patch(url, headers=post_headers, data=request_body, params=query_string)
+        ret = requests.patch(url, headers=request_post_headers, data=request_body, params=query_string)
 
     elif method == 'PUT':
-        ret = requests.put(url, headers=post_headers, data=request_body, params=query_string)
+        ret = requests.put(url, headers=request_post_headers, data=request_body, params=query_string)
 
     elif method == 'DELETE':
-        ret = requests.delete(url, headers=post_headers, params=query_string)
+        ret = requests.delete(url, headers=request_post_headers, params=query_string)
 
     # requestsの結果が例外の場合exceptへ
     # If the result of requests is an exception, go to except
