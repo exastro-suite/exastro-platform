@@ -8,15 +8,15 @@
         "name": "Python: Flask",
         "type": "python",
         "request": "launch",
-        "program": "/app/common-api.py",
+        "program": "/app/common_api.py",
         "env": {
-            "FLASK_APP": "/app/common-api.py",
+            "FLASK_APP": "/app/common_api.py",
             "FLASK_ENV": "development"
         },
         "cwd": "/app",
         "pathMappings": [
           {
-            "localRoot": "${workspaceFolder}/common-api",
+            "localRoot": "${workspaceFolder}/platform_root/platform_auth",
             "remoteRoot": "/app"
           }
         ],
@@ -32,15 +32,15 @@
         "name": "[DEBUG] Python: Flask",
         "type": "python",
         "request": "launch",
-        "program": "/app/common-api.py",
+        "program": "/app/common_api.py",
         "env": {
-            "FLASK_APP": "/app/common-api.py",
+            "FLASK_APP": "/app/common_api.py",
             "FLASK_ENV": "development"
         },
         "cwd": "/app",
         "pathMappings": [
           {
-            "localRoot": "${workspaceFolder}/common-api",
+            "localRoot": "${workspaceFolder}/platform_root/platform_auth",
             "remoteRoot": "/app"
           }
         ],
@@ -61,7 +61,7 @@
         },
         "pathMappings": [
           {
-            "localRoot": "${workspaceFolder}/common-api",
+            "localRoot": "${workspaceFolder}/platform_root/platform_auth",
             "remoteRoot": "/app"
           }
         ]
