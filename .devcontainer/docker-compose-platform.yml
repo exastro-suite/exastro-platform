@@ -68,3 +68,17 @@ services:
       - MYSQL_DATABASE=keycloak
       - MYSQL_USER=keycloak
       - MYSQL_PASSWORD=password
+
+  ita-api:
+    build:
+      dockerfile: ./Dockerfile
+      context: ../test/api
+      args:
+        - HTTP_PROXY=${HTTP_PROXY}
+        - http_proxy=${HTTP_PROXY}
+        - HTTPS_PROXY=${HTTPS_PROXY}
+        - https_proxy=${HTTPS_PROXY}
+    environment:
+      - CONFIG_API_PATH=/app/api.conf
+      - API_PORT=8000
+      - PYTHONIOENCODING=utf-8
