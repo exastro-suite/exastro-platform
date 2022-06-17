@@ -109,10 +109,10 @@ LOGGING = {
     'DEBUG': False,  # or False, For not Django
     'filters': {
         'require_debug_false': {
-            '()': 'exastro_logging.RequireDebugFalse',
+            '()': 'common_library.common.exastro_logging.RequireDebugFalse',
         },
         'require_debug_true': {
-            '()': 'exastro_logging.RequireDebugTrue',
+            '()': 'common_library.common.exastro_logging.RequireDebugTrue',
         },
     },
     'formatters': {

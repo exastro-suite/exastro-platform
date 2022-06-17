@@ -81,6 +81,7 @@ COPY ./platform_root/platform_auth/config/httpd_conf.d  /etc/httpd/conf.d/
 
 COPY ./platform_root/platform_auth/ $APP_PATH/
 COPY ./platform_root/common_library/ $APP_PATH/common_library/
+COPY ./platform_root/common_resources/ $APP_PATH/common_resources/
 
 CMD ["sudo","-E","/bin/sh","/app/httpd-start.sh"]
 
@@ -97,5 +98,6 @@ COPY ./platform_root/platform_auth/config/httpd_conf.d  /etc/httpd/conf.d/
 
 COPY ./platform_root/platform_auth/ $APP_PATH/
 COPY ./platform_root/common_library/ $APP_PATH/common_library/
+COPY ./platform_root/common_resources/ $APP_PATH/common_resources/
 
 CMD ["/bin/sh","/app/httpd-start.sh"]
