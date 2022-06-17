@@ -13,9 +13,9 @@
 #   limitations under the License.
 
 from datetime import datetime as dtlogging
-from logging import config, Handler, Formatter, LogRecord, LoggerAdapter, Filter
+from logging import Formatter, LogRecord, Filter
 
-from flask import has_request_context, request as flrequest
+from flask import has_request_context
 
 
 # Filter
@@ -73,10 +73,9 @@ class ExastroLogRecordFactory():
         """Add userid
         """
 
-        self.userid         = '-'
+        self.userid = '-'
         self.origin_factory = origin_factory
-        self.flask_req      = flask_req
-
+        self.flask_req = flask_req
 
     def __call__(self, *args, **kwargs):
         """Get keycloak's user id
@@ -87,16 +86,15 @@ class ExastroLogRecordFactory():
 
         return record
 
-
     def get_keycloak_userid(self):
         """Get user id from Flask request
         """
 
         user_id = '-'
 
-        if  has_request_context() \
-        and hasattr(self.flask_req, 'headers') \
-        and 'X-REMOTE-USER' in self.flask_req.headers:
+        if has_request_context() \
+           and hasattr(self.flask_req, 'headers') \
+           and 'X-REMOTE-USER' in self.flask_req.headers:
             user_id = self.flask_req.headers['X-REMOTE-USER']
             idx = user_id.rfind('@')
             user_id = user_id[:idx]
@@ -106,35 +104,35 @@ class ExastroLogRecordFactory():
 
 # Logging settings
 LOGGING = {
-    'version' : 1,
-    'disable_existing_loggers' : False, # or False
-    'DEBUG' : False, # or False, For not Django
-    'filters' : {
-        'require_debug_false' : {
-            '()' : 'exastro_logging.RequireDebugFalse',
+    'version': 1,
+    'disable_existing_loggers': False,  # or False
+    'DEBUG': False,  # or False, For not Django
+    'filters': {
+        'require_debug_false': {
+            '()': 'exastro_logging.RequireDebugFalse',
         },
-        'require_debug_true' : {
-            '()' : 'exastro_logging.RequireDebugTrue',
-        },
-    },
-    'formatters' : {
-        'verbose' : {
-            '()' : ExastroFormatter,
-            'format' : '%(asctime)s %(levelname)s (%(userid)s) %(pathname)s(%(lineno)d) %(message)s',
-        },
-        'backyards' : {
-            '()' : ExastroFormatter,
-            'format' : '%(asctime)s %(levelname)s (%(process)s) %(pathname)s(%(lineno)d) %(message)s',
+        'require_debug_true': {
+            '()': 'exastro_logging.RequireDebugTrue',
         },
     },
-    'handlers' : {
-        'console' : {
-            'level' : 'DEBUG',
-            'filters' : ['require_debug_false', ],
-            'class' : 'logging.StreamHandler',
-            'formatter' : 'verbose',
+    'formatters': {
+        'verbose': {
+            '()': ExastroFormatter,
+            'format': '%(asctime)s %(levelname)s (%(userid)s) %(pathname)s(%(lineno)d) %(message)s',
         },
-        #'file_api' : {
+        'backyards': {
+            '()': ExastroFormatter,
+            'format': '%(asctime)s %(levelname)s (%(process)s) %(pathname)s(%(lineno)d) %(message)s',
+        },
+    },
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'filters': ['require_debug_false', ],
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+        # 'file_api' : {
         #    'level' : 'INFO',
         #    'filters' : ['require_debug_false', ],
         #    'class' : 'logging.handlers.RotatingFileHandler',
@@ -142,8 +140,8 @@ LOGGING = {
         #    'filename' : '/app/logs/api.log', # Your Logfile path
         #    'maxBytes' : 100 * 1024 * 1024,
         #    'backupCount' : 10,
-        #},
-        #'err_file_api' : {
+        # },
+        # 'err_file_api' : {
         #    'level' : 'ERROR',
         #    'filters' : ['require_debug_false', ],
         #    'class' : 'logging.handlers.RotatingFileHandler',
@@ -151,19 +149,19 @@ LOGGING = {
         #    'filename' : '/app/logs/api_error.log', # Your Logfile path
         #    'maxBytes' : 100 * 1024 * 1024,
         #    'backupCount' : 10,
-        #},
+        # },
     },
-    'loggers' : {
-        'api' : {  # app name
-            'handlers' : ['console', ],
-            'propagate' : True,
-            'level' : 'DEBUG',
+    'loggers': {
+        'api': {  # app name
+            'handlers': ['console', ],
+            'propagate': True,
+            'level': 'DEBUG',
         },
-        'root' : {
-            #'handlers' : ['console', 'file_api', 'err_file_api'],
-            'handlers' : ['console', ],
-            'propagate' : False,
-            'level' : 'DEBUG',
+        'root': {
+            # 'handlers' : ['console', 'file_api', 'err_file_api'],
+            'handlers': ['console', ],
+            'propagate': False,
+            'level': 'DEBUG',
         },
     },
 }
