@@ -4,7 +4,7 @@ services:
     build:
       target: develop_build
     user: 1000:1000
-    # command: "python3 -m debugpy --listen 5678 /app/common_api.py"
+    # command: "python3 -m debugpy --listen 5678 /app/api.py"
     volumes:
       - ..:/workspace:cached
       - ../platform_root/common_library:/workspace/platform_root/platform_auth/common_library:cached
@@ -12,7 +12,8 @@ services:
       - ../platform_root/platform_auth:/app:cached
       - ../platform_root/common_library:/app/common_library:cached
       - ../platform_root/common_resources:/app/common_resources:cached
-      - ../platform_root/platform_auth/config/httpd_conf.d/exastroSettings:/etc/httpd/conf.d/exastroSettings:cached
+      - ../platform_root/platform_auth/config/httpd.conf/platform-auth_httpd.conf:/etc/httpd/conf/httpd.conf:cached
+      - ../platform_root/platform_auth/config/httpd.conf/platform-auth_wsgi.conf:/etc/httpd/conf.d/wsgi.conf:cached
       - ~/.netrc:/home/app_user/.netrc
       - ~/.gitconfig:/home/app_user/.gitconfig
       - ./platform-auth/.vscode/launch.json:/workspace/.vscode/launch.json
@@ -39,8 +40,3 @@ services:
     image: nginx:latest
     volumes:
       - ../test/web/contents:/usr/share/nginx/html
-
-  platform-web:
-    image: nginx:latest
-    volumes:
-      - ../platform_root/platform_web/contents:/usr/share/nginx/html
