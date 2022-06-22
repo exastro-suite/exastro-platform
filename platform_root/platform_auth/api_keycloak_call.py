@@ -545,8 +545,8 @@ def get_user_token(user_name, password, realm_name):
         return keycloak_client_user_get_token(realm_name, "admin-cli", None, user_name, password)
 
     except Exception as e:
-        globals.logger.debug(e.args)
-        globals.logger.debug(traceback.format_exc())
+        globals.logger.error(e.args)
+        globals.logger.error(traceback.format_exc())
         raise
 
 
