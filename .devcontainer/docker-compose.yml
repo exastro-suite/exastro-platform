@@ -12,7 +12,7 @@ services:
     environment:
       - LISTEN_PORT=8000
       - PYTHONPATH=/app/
-      - CONFIG_API_AUTHC_INFRA_PATH=/app/api_authc_infra.conf
+      - CONFIG_API_PATH=/app/api.conf
       # - API_AUTHC_INFRA_PORT=8000
       - PYTHONIOENCODING=utf-8
       - EXASTRO_KEYCLOAK_USER=admin

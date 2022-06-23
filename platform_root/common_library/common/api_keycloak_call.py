@@ -19,22 +19,20 @@ import requests
 import traceback
 
 # User Imports
-import globals
+import globals  # 共通的なglobals Common globals
 
 
 class AuthErrorException(Exception):
     pass
 
 
-def keycloak_user_role_get(realm_name, user_id, client_id, token_user, token_password, token_realm):
+def keycloak_user_role_get(realm_name, user_id, client_id, token):
     """ユーザロール情報取得 user role info get
     Args:
         realm_name (str): realm name
         user_id (str): user id
         client_id (str): client id
-        token_user (str): token user name
-        token_password (str): token user password
-        token_realm (str): token realm name
+        token (str): token
     Returns:
         Response: HTTP Respose
     """
@@ -44,7 +42,7 @@ def keycloak_user_role_get(realm_name, user_id, client_id, token_user, token_pas
 
         header_para = {
             "Content-Type": "application/json",
-            "Authorization": "Bearer {}".format(get_user_token(token_user, token_password, token_realm)),
+            "Authorization": "Bearer {}".format(token),
         }
 
         globals.logger.debug("user role get送信")
@@ -55,7 +53,7 @@ def keycloak_user_role_get(realm_name, user_id, client_id, token_user, token_pas
             headers=header_para
         )
         globals.logger.debug(request_response.text)
-        
+
         # 取得できない場合は、Exceptionを発行する if it cannot be obtained, an Exception will be thrown
         if request_response.status_code != 200:
             raise Exception("get user role error status:{}, response:{}".format(request_response.status_code, request_response.text))
@@ -63,22 +61,20 @@ def keycloak_user_role_get(realm_name, user_id, client_id, token_user, token_pas
         response_data = json.loads(request_response.text)
 
         return response_data
-    
+
     except Exception as e:
         globals.logger.debug(e.args)
         globals.logger.debug(traceback.format_exc())
         raise
 
 
-def keycloak_role_uesrs_get(realm_name, client_id, role_name, token_user, token_password, token_realm):
+def keycloak_role_uesrs_get(realm_name, client_id, role_name, token):
     """ロール毎のユーザ情報リスト取得 get user info list for each role
     Args:
         realm_name (str): realm name
         client_id (str): client id
         role_name (str): role name
-        token_user (str): token user name
-        token_password (str): token user password
-        token_realm (str): token realm name
+        token (str): token
     Returns:
         Response: HTTP Respose
     """
@@ -90,7 +86,7 @@ def keycloak_role_uesrs_get(realm_name, client_id, role_name, token_user, token_
 
         header_para = {
             "Content-Type": "application/json",
-            "Authorization": "Bearer {}".format(get_user_token(token_user, token_password, token_realm)),
+            "Authorization": "Bearer {}".format(token),
         }
 
         globals.logger.debug("role users get送信")
@@ -101,7 +97,7 @@ def keycloak_role_uesrs_get(realm_name, client_id, role_name, token_user, token_
             headers=header_para
         )
         globals.logger.debug(request_response.text)
-        
+
         # 取得できない場合は、Exceptionを発行する if it cannot be obtained, an Exception will be thrown
         if request_response.status_code == 404:
             # 404の場合は0件で返す In case of 404, return []
@@ -112,7 +108,7 @@ def keycloak_role_uesrs_get(realm_name, client_id, role_name, token_user, token_
         response_data = json.loads(request_response.text)
 
         return response_data
-    
+
     except Exception as e:
         globals.logger.debug(e.args)
         globals.logger.debug(traceback.format_exc())
@@ -137,7 +133,7 @@ def keycloak_user_client_role_mapping_create(realm_name, user_id, client_id, cli
         globals.logger.info(
             'Create keycloak user client role-mapping. user_id={}, client_id={}, client_roles={}'.format(user_id, client_id, client_roles)
         )
-        
+
         header_para = {
             "Content-Type": "application/json",
             "Authorization": "Bearer {}".format(token),
@@ -275,14 +271,12 @@ def keycloak_client_role_get(realm_name, client_id, role_name, token):
         raise
 
 
-# def keycloak_client_secret_get(realm_name, client_id, token_user, token_password, token_realm_name):
+# def keycloak_client_secret_get(realm_name, client_id, token):
 #     """client sercret 取得
 #     Args:
 #         realm_name (str): realm name
 #         client_id (str): client id
-#         toekn_user (str): token 取得用 user name
-#         toekn_password (str): token 取得用 user password
-#         toekn_realm_name (str): token 取得用 realm name
+#         toekn (str): token
 #     Returns:
 #         str: secret id
 #     """
@@ -297,7 +291,7 @@ def keycloak_client_role_get(realm_name, client_id, role_name, token):
 
 #         header_para = {
 #             "Content-Type": "application/json",
-#             "Authorization": "Bearer {}".format(get_user_token(token_user, token_password, token_realm_name)),
+#             "Authorization": "Bearer {}".format(token),
 #         }
 
 #         globals.logger.debug("client secret get")
@@ -307,12 +301,12 @@ def keycloak_client_role_get(realm_name, client_id, role_name, token):
 #             headers=header_para
 #         )
 #         globals.logger.debug(request_response.text)
-        
+
 #         # 取得できない場合は、Exceptionを発行する
 #         if request_response.status_code != 200:
 #             raise Exception("client_secret_get error status:{}, response:{}".format(request_response.status_code, request_response.text))
 #         globals.logger.debug("client secret get Succeed!")
-        
+
 #         json_ret = json.loads(request_response.text)
 #         # 正常応答
 #         return json_ret["value"]
@@ -322,14 +316,12 @@ def keycloak_client_role_get(realm_name, client_id, role_name, token):
 #         globals.logger.debug(traceback.format_exc())
 #         raise
 
-def keycloak_user_get(realm_name, user_name, token_user, token_password, token_realm_name):
+def keycloak_user_get(realm_name, user_name, token):
     """ユーザ情報取得
     Args:
         realm_name (str): realm name
         user_name (str): user name (Noneの時はすべて取得 None is all user)
-        toekn_user (str): token 取得用 user name
-        toekn_password (str): token 取得用 user password
-        toekn_realm_name (str): token 取得用 realm name
+        toekn (str): token
     Returns:
         Response: HTTP Respose
     """
@@ -342,7 +334,7 @@ def keycloak_user_get(realm_name, user_name, token_user, token_password, token_r
 
         header_para = {
             "Content-Type": "application/json",
-            "Authorization": "Bearer {}".format(get_user_token(token_user, token_password, token_realm_name)),
+            "Authorization": "Bearer {}".format(token),
         }
 
         globals.logger.debug("user get")
@@ -352,12 +344,12 @@ def keycloak_user_get(realm_name, user_name, token_user, token_password, token_r
         else:
             request_response = requests.get("{}/auth/admin/realms/{}/users?search={}".format(api_url, realm_name, user_name), headers=header_para)
         globals.logger.debug(request_response.text)
-        
+
         # 取得できない場合は、Exceptionを発行する
         if request_response.status_code != 200:
             raise Exception("user_get error status:{}, response:{}".format(request_response.status_code, request_response.text))
         globals.logger.debug("user get Succeed!")
-        
+
         user_info = json.loads(request_response.text)
         # 正常応答
         return user_info
@@ -368,14 +360,12 @@ def keycloak_user_get(realm_name, user_name, token_user, token_password, token_r
         raise
 
 
-def keycloak_user_get_by_id(realm_name, user_id, token_user, token_password, token_realm_name):
+def keycloak_user_get_by_id(realm_name, user_id, token):
     """ユーザ情報取得(user id指定)
     Args:
         realm_name (str): realm name
         user_id (str): user id
-        toekn_user (str): token 取得用 user name
-        toekn_password (str): token 取得用 user password
-        toekn_realm_name (str): token 取得用 realm name
+        toekn (str): token
     Returns:
         Response: HTTP Respose
     """
@@ -388,19 +378,19 @@ def keycloak_user_get_by_id(realm_name, user_id, token_user, token_password, tok
 
         header_para = {
             "Content-Type": "application/json",
-            "Authorization": "Bearer {}".format(get_user_token(token_user, token_password, token_realm_name)),
+            "Authorization": "Bearer {}".format(token),
         }
 
         globals.logger.debug("user get by id")
         # ユーザ情報取得
         request_response = requests.get("{}/auth/admin/realms/{}/users/{}".format(api_url, realm_name, user_id), headers=header_para)
         # globals.logger.debug(request_response.text)
-        
+
         # 取得できない場合は、Exceptionを発行する
         if request_response.status_code != 200:
             raise Exception("user_get_by_id error status:{}, response:{}".format(request_response.status_code, request_response.text))
         globals.logger.debug("user get by id Succeed!")
-        
+
         user_info = json.loads(request_response.text)
 
         # 正常応答
@@ -412,15 +402,13 @@ def keycloak_user_get_by_id(realm_name, user_id, token_user, token_password, tok
         raise
 
 
-# def keycloak_user_reset_password(realm_name, user_id, user_password, token_user, token_password, token_realm_name):
+# def keycloak_user_reset_password(realm_name, user_id, user_password, token):
 #     """ユーザパスワード変更
 #     Args:
 #         realm_name (str): realm name
 #         user_id (str): user id
 #         user_password (str): user new password
-#         toekn_user (str): token 取得用 user name
-#         toekn_password (str): token 取得用 user password
-#         toekn_realm_name (str): token 取得用 realm name
+#         toekn (str): token
 #     Returns:
 #         なし
 #     """
@@ -435,7 +423,7 @@ def keycloak_user_get_by_id(realm_name, user_id, token_user, token_password, tok
 
 #         header_para = {
 #             "Content-Type": "application/json",
-#             "Authorization": "Bearer {}".format(get_user_token(token_user, token_password, token_realm_name)),
+#             "Authorization": "Bearer {}".format(token),
 #         }
 
 #         data_para = {
@@ -452,12 +440,12 @@ def keycloak_user_get_by_id(realm_name, user_id, token_user, token_password, tok
 #             data=json.dumps(data_para)
 #         )
 #         globals.logger.debug(request_response.text)
-        
+
 #         # 更新できない場合は、Exceptionを発行する
 #         if request_response.status_code != 204:
 #             raise Exception("keycloak_user_reset_password error status:{}, response:{}".format(request_response.status_code, request_response.text))
 #         globals.logger.debug("keycloak_user_reset_password id Succeed!")
-        
+
 #         # 正常応答
 #         return
 

@@ -35,22 +35,26 @@ def alive():
     return jsonify({"result": "200", "time": str(datetime.now(globals.TZ))}), 200
 
 
-@app.route('/start', methods=["POST"])
-def start():
-    """開始テスト Start test
+@app.route('/api/workspaces/<string:workspace_id>/ita/<path:subpath>', methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTION"])
+def call_ita_test(workspace_id, subpath):
+    """死活監視
 
     Returns:
         Response: HTTP Respose
     """
+    globals.logger.info('call ita_test api. method={} workspace_id={} subpath={}'.format(request.method, workspace_id, subpath))
 
     # パラメータ情報(JSON形式)
-    payload = request.json.copy()
-    user_id = payload.get("user_id")
+    organization_id = request.headers.get("organization_id")
+    user_id = request.headers.get("user_id")
 
     ret_status = 200
 
     ret = {
         "result": ret_status,
+        "method": request.method,
+        "organization_id": organization_id,
+        "workspace_id": workspace_id,
         "user_id": user_id,
         "time": str(datetime.now(globals.TZ)),
     }
