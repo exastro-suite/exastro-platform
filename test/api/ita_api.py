@@ -48,6 +48,19 @@ def call_ita_test(workspace_id, subpath):
     organization_id = request.headers.get("organization_id")
     user_id = request.headers.get("user_id")
 
+    # パラメータを形成
+    # Form parameters
+    try:
+        request_body = request.json.copy()
+        globals.logger.debug(f'request_body: {request_body}')
+    except Exception:
+        request_body = {}
+
+    # 引数
+    # query_string
+    query_string = request.query_string
+    globals.logger.debug(f'query_string: {query_string}')
+
     ret_status = 200
 
     ret = {
@@ -56,6 +69,8 @@ def call_ita_test(workspace_id, subpath):
         "organization_id": organization_id,
         "workspace_id": workspace_id,
         "user_id": user_id,
+        "request_body": request_body,
+        "query_string": "{}".format(query_string),
         "time": str(datetime.now(globals.TZ)),
     }
 
