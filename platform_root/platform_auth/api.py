@@ -17,7 +17,6 @@ WSGI main module
 """
 # from crypt import methods
 from flask import Flask, request, jsonify
-import sys
 import os
 from datetime import datetime
 from dotenv import load_dotenv  # python-dotenv
