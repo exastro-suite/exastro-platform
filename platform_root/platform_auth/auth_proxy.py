@@ -33,6 +33,8 @@ class auth_proxy:
 
     jwt_json = None
 
+    response_original = None
+
     # TODO: realm name パスにrealmを入れるようになったらここは削除
     realm = os.environ.get('REALM_NAME')
 
@@ -288,10 +290,14 @@ class auth_proxy:
                 return {"result": status_code, "info": info, "time": str(datetime.now(globals.TZ))}
             else:
                 status_code = ret.status_code
-                result_dump = json.dumps(ret.json())
-                result_encode = result_dump.encode('utf-8')
-                info = ret.json()
-                globals.logger.info(f'SUCCESS call_api. status_code={status_code} info={result_encode}')
+                try:
+                    info = json.loads(ret.text)
+                    result_dump = json.dumps(info)
+                    result_encode = result_dump.encode('utf-8')
+                    globals.logger.info(f'SUCCESS call_api. status_code={status_code} info={result_encode}')
+                except json.JSONDecodeError:
+                    info = ret.text
+                    globals.logger.info(f'SUCCESS call_api. status_code={status_code} info={info}')
                 return {"result": status_code, "info": info, "time": str(datetime.now(globals.TZ))}
 
         except Exception as e:
@@ -346,19 +352,7 @@ class auth_proxy:
         elif method == 'DELETE':
             ret = requests.delete(url, headers=post_headers, params=query_string)
 
-        # # requestsの結果が例外の場合exceptへ
-        # # If the result of requests is an exception, go to except
-        # try:
-        #     ret.raise_for_status()
-        # except Exception as e:
-        #     globals.logger.error(f'Exception : {e.args}')
-        #     globals.logger.error(''.join(list(traceback.TracebackException.from_exception(e).format())))
-        #     raise
-
-        # # レスポンスをエンコード
-        # # Encode the response
-        # result_dump = json.dumps(ret.json())
-        # result_encode = result_dump.encode('utf-8')
+        self.response_original = ret
 
         globals.logger.info('SUCCESS main_request.')
 

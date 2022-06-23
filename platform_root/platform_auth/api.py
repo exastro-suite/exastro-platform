@@ -16,7 +16,7 @@
 WSGI main module
 """
 # from crypt import methods
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, Response
 import os
 from datetime import datetime
 from dotenv import load_dotenv  # python-dotenv
@@ -90,7 +90,8 @@ def platform_api_call(subpath):
         response_json = proxy.call_api(dest_url, response_json.get("info"))
         # 戻り値をそのまま返却
         # Return the return value as it is
-        return jsonify(response_json.get("info")), response_json.get("result")
+        # return jsonify(response_json.get("info")), response_json.get("result")
+        return Response(proxy.response_original)
 
     except Exception as e:
         globals.logger.error(f'Exception : {e.args}')
@@ -137,7 +138,8 @@ def ita_workspace_api_call(workspace_id, subpath):
         response_json = proxy.call_api(dest_url, response_json.get("info"))
         # 戻り値をそのまま返却
         # Return the return value as it is
-        return jsonify(response_json.get("info")), response_json.get("result")
+        return Response(proxy.response_original)
+        # return jsonify(response_json.get("info")), response_json.get("result")
 
     except Exception as e:
         globals.logger.error(f'Exception : {e.args}')
