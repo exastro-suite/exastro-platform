@@ -12,9 +12,10 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, make_response
 from datetime import datetime
 import os
+import json
 
 # User Imports
 import globals
@@ -74,7 +75,15 @@ def call_ita_test(workspace_id, subpath):
         "time": str(datetime.now(globals.TZ)),
     }
 
-    return jsonify(ret), ret_status
+    if subpath == "download":
+        response = make_response()
+        response.data = b'abc'
+        # response.data = json.dumps(ret).encode()
+        response.headers['Content-Type'] = 'application/octet-stream'
+        response.headers['Content-Disposition'] = 'attachment; filename=test.dat'
+        return response
+    else:
+        return jsonify(ret), ret_status
 
 
 if __name__ == "__main__":

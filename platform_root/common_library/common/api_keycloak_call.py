@@ -141,7 +141,7 @@ def keycloak_user_client_role_mapping_create(realm_name, user_id, client_id, cli
 
         data_para = client_roles
 
-        globals.logger.debug("user client role-mapping post 送信")
+        globals.logger.debug("user client role-mapping post send")
         # 呼び出し先設定 requests setting
         api_url = "{}://{}:{}".format(os.environ['API_KEYCLOAK_PROTOCOL'], os.environ['API_KEYCLOAK_HOST'], os.environ['API_KEYCLOAK_PORT'])
 
@@ -271,51 +271,6 @@ def keycloak_client_role_get(realm_name, client_id, role_name, token):
         raise
 
 
-# def keycloak_client_secret_get(realm_name, client_id, token):
-#     """client sercret 取得
-#     Args:
-#         realm_name (str): realm name
-#         client_id (str): client id
-#         toekn (str): token
-#     Returns:
-#         str: secret id
-#     """
-
-#     try:
-#         globals.logger.debug('------------------------------------------------------')
-#         globals.logger.debug('CALL keycloak_client_secret_get: id_of_client:{}'.format(client_id))
-#         globals.logger.debug('------------------------------------------------------')
-
-#         # 呼び出し先設定
-#         api_url = "{}://{}:{}".format(os.environ['API_KEYCLOAK_PROTOCOL'], os.environ['API_KEYCLOAK_HOST'], os.environ['API_KEYCLOAK_PORT'])
-
-#         header_para = {
-#             "Content-Type": "application/json",
-#             "Authorization": "Bearer {}".format(token),
-#         }
-
-#         globals.logger.debug("client secret get")
-#         # Client作成
-#         request_response = requests.get(
-#             "{}/auth/admin/realms/{}/clients/{}/client-secret".format(api_url, realm_name, client_id),
-#             headers=header_para
-#         )
-#         globals.logger.debug(request_response.text)
-
-#         # 取得できない場合は、Exceptionを発行する
-#         if request_response.status_code != 200:
-#             raise Exception("client_secret_get error status:{}, response:{}".format(request_response.status_code, request_response.text))
-#         globals.logger.debug("client secret get Succeed!")
-
-#         json_ret = json.loads(request_response.text)
-#         # 正常応答
-#         return json_ret["value"]
-
-#     except Exception as e:
-#         globals.logger.debug(e.args)
-#         globals.logger.debug(traceback.format_exc())
-#         raise
-
 def keycloak_user_get(realm_name, user_name, token):
     """ユーザ情報取得
     Args:
@@ -330,6 +285,7 @@ def keycloak_user_get(realm_name, user_name, token):
         globals.logger.info('Get keycloak user. realm_name={}, user_name={}'.format(realm_name, user_name))
 
         # 呼び出し先設定
+        # Call destination setting
         api_url = "{}://{}:{}".format(os.environ['API_KEYCLOAK_PROTOCOL'], os.environ['API_KEYCLOAK_HOST'], os.environ['API_KEYCLOAK_PORT'])
 
         header_para = {
@@ -339,6 +295,7 @@ def keycloak_user_get(realm_name, user_name, token):
 
         globals.logger.debug("user get")
         # ユーザ情報取得
+        # User information acquisition
         if user_name is None:
             request_response = requests.get("{}/auth/admin/realms/{}/users".format(api_url, realm_name), headers=header_para)
         else:
@@ -346,12 +303,15 @@ def keycloak_user_get(realm_name, user_name, token):
         globals.logger.debug(request_response.text)
 
         # 取得できない場合は、Exceptionを発行する
+        # If it cannot be obtained, an Exception will be thrown.
         if request_response.status_code != 200:
             raise Exception("user_get error status:{}, response:{}".format(request_response.status_code, request_response.text))
         globals.logger.debug("user get Succeed!")
 
         user_info = json.loads(request_response.text)
+
         # 正常応答
+        # Normal response
         return user_info
 
     except Exception as e:
@@ -361,7 +321,7 @@ def keycloak_user_get(realm_name, user_name, token):
 
 
 def keycloak_user_get_by_id(realm_name, user_id, token):
-    """ユーザ情報取得(user id指定)
+    """ユーザ情報取得(user id指定) User information acquisition (user id specified)
     Args:
         realm_name (str): realm name
         user_id (str): user id
@@ -374,6 +334,7 @@ def keycloak_user_get_by_id(realm_name, user_id, token):
         globals.logger.info('Get keycloak user. realm_name={}, user_id={}'.format(realm_name, user_id))
 
         # 呼び出し先設定
+        # Call destination setting
         api_url = "{}://{}:{}".format(os.environ['API_KEYCLOAK_PROTOCOL'], os.environ['API_KEYCLOAK_HOST'], os.environ['API_KEYCLOAK_PORT'])
 
         header_para = {
@@ -383,10 +344,12 @@ def keycloak_user_get_by_id(realm_name, user_id, token):
 
         globals.logger.debug("user get by id")
         # ユーザ情報取得
+        # User information acquisition
         request_response = requests.get("{}/auth/admin/realms/{}/users/{}".format(api_url, realm_name, user_id), headers=header_para)
         # globals.logger.debug(request_response.text)
 
         # 取得できない場合は、Exceptionを発行する
+        # If it cannot be obtained, an Exception will be thrown.
         if request_response.status_code != 200:
             raise Exception("user_get_by_id error status:{}, response:{}".format(request_response.status_code, request_response.text))
         globals.logger.debug("user get by id Succeed!")
@@ -394,6 +357,7 @@ def keycloak_user_get_by_id(realm_name, user_id, token):
         user_info = json.loads(request_response.text)
 
         # 正常応答
+        # Normal response
         return user_info
 
     except Exception as e:
@@ -402,61 +366,65 @@ def keycloak_user_get_by_id(realm_name, user_id, token):
         raise
 
 
-# def keycloak_user_reset_password(realm_name, user_id, user_password, token):
-#     """ユーザパスワード変更
-#     Args:
-#         realm_name (str): realm name
-#         user_id (str): user id
-#         user_password (str): user new password
-#         toekn (str): token
-#     Returns:
-#         なし
-#     """
+def keycloak_user_reset_password(realm_name, user_id, user_password, token):
+    """ユーザパスワード変更 Change user password
+    Args:
+        realm_name (str): realm name
+        user_id (str): user id
+        user_password (str): user new password
+        toekn (str): token
+    Returns:
+        なし none
+    """
 
-#     try:
-#         globals.logger.debug('------------------------------------------------------')
-#         globals.logger.debug('CALL keycloak_user_reset_password: realm_name:{}, user_id:{}'.format(realm_name, user_id))
-#         globals.logger.debug('------------------------------------------------------')
+    try:
+        globals.logger.debug('------------------------------------------------------')
+        globals.logger.debug('CALL keycloak_user_reset_password: realm_name:{}, user_id:{}'.format(realm_name, user_id))
+        globals.logger.debug('------------------------------------------------------')
 
-#         # 呼び出し先設定
-#         api_url = "{}://{}:{}".format(os.environ['API_KEYCLOAK_PROTOCOL'], os.environ['API_KEYCLOAK_HOST'], os.environ['API_KEYCLOAK_PORT'])
+        # 呼び出し先設定
+        # Call destination setting
+        api_url = "{}://{}:{}".format(os.environ['API_KEYCLOAK_PROTOCOL'], os.environ['API_KEYCLOAK_HOST'], os.environ['API_KEYCLOAK_PORT'])
 
-#         header_para = {
-#             "Content-Type": "application/json",
-#             "Authorization": "Bearer {}".format(token),
-#         }
+        header_para = {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer {}".format(token),
+        }
 
-#         data_para = {
-#             "type": "password",
-#             "value": user_password,
-#             "temporary": False,
-#         }
+        data_para = {
+            "type": "password",
+            "value": user_password,
+            "temporary": False,
+        }
 
-#         globals.logger.debug("keycloak_user_reset_password")
-#         # ユーザパスワード更新
-#         request_response = requests.put(
-#             "{}/auth/admin/realms/{}/users/{}/reset-password".format(api_url, realm_name, user_id),
-#             headers=header_para,
-#             data=json.dumps(data_para)
-#         )
-#         globals.logger.debug(request_response.text)
+        globals.logger.debug("keycloak_user_reset_password")
+        # ユーザパスワード更新
+        # User password update
+        request_response = requests.put(
+            "{}/auth/admin/realms/{}/users/{}/reset-password".format(api_url, realm_name, user_id),
+            headers=header_para,
+            data=json.dumps(data_para)
+        )
+        globals.logger.debug(request_response.text)
 
-#         # 更新できない場合は、Exceptionを発行する
-#         if request_response.status_code != 204:
-#             raise Exception("keycloak_user_reset_password error status:{}, response:{}".format(request_response.status_code, request_response.text))
-#         globals.logger.debug("keycloak_user_reset_password id Succeed!")
+        # 更新できない場合は、Exceptionを発行する
+        # If it cannot be updated, issue an Exception
+        if request_response.status_code != 204:
+            raise Exception("keycloak_user_reset_password error status:{}, response:{}".format(request_response.status_code, request_response.text))
+        globals.logger.debug("keycloak_user_reset_password id Succeed!")
 
-#         # 正常応答
-#         return
+        # 正常応答
+        # Normal response
+        return
 
-#     except Exception as e:
-#         globals.logger.debug(e.args)
-#         globals.logger.debug(traceback.format_exc())
-#         raise
+    except Exception as e:
+        globals.logger.debug(e.args)
+        globals.logger.debug(traceback.format_exc())
+        raise
 
 
 def keycloak_client_user_get_token(realm_name, client_id, client_secret, user_id, user_password):
-    """client user token取得
+    """client user token取得 Get client user token
 
     Args:
         realm_name (str): realm name
@@ -475,6 +443,7 @@ def keycloak_client_user_get_token(realm_name, client_id, client_secret, user_id
         globals.logger.info('Get keycloak client user token. realm_name={}, client_id={}, user_id={}'.format(realm_name, client_id, user_id))
 
         # 呼び出し先設定
+        # Call destination setting
         api_url = "{}://{}:{}".format(os.environ['API_KEYCLOAK_PROTOCOL'], os.environ['API_KEYCLOAK_HOST'], os.environ['API_KEYCLOAK_PORT'])
 
         header_para = {
@@ -490,17 +459,20 @@ def keycloak_client_user_get_token(realm_name, client_id, client_secret, user_id
         ]
 
         # その他のオプション値はすべてそのまま受け渡す
+        # Pass all other option values ​​as they are
         if client_secret is not None:
             data_para.append("client_secret={}".format(client_secret))
 
         globals.logger.debug("get token")
         # token情報取得
+        # Get token information
         request_response = requests.post(
             "{}/auth/realms/{}/protocol/openid-connect/token".format(api_url, realm_name),
             headers=header_para,
             data="&".join(data_para)
         )
         # 取得できない場合は、Exceptionを発行する
+        # If it cannot be obtained, an Exception will be thrown.
         if request_response.status_code != 200:
             raise AuthErrorException("client_user_get_token error status:{}, response:{}".format(request_response.status_code, request_response.text))
 
@@ -509,6 +481,7 @@ def keycloak_client_user_get_token(realm_name, client_id, client_secret, user_id
         json_ret = json.loads(request_response.text)
 
         # 正常応答
+        # Normal response
         return json_ret["access_token"]
 
     except Exception as e:
@@ -518,7 +491,7 @@ def keycloak_client_user_get_token(realm_name, client_id, client_secret, user_id
 
 
 def get_user_token(user_name, password, realm_name):
-    """user token取得
+    """user token取得 Get user token
     Args:
         user_name (str): user name
         password (str): user password
@@ -530,6 +503,7 @@ def get_user_token(user_name, password, realm_name):
         globals.logger.info('Get keycloak client user token. realm_name={}, user_name={}'.format(realm_name, user_name))
 
         # 下位の取得ロジックを呼びだし
+        # Call the lower acquisition logic
         return keycloak_client_user_get_token(realm_name, "admin-cli", None, user_name, password)
 
     except Exception as e:
@@ -539,7 +513,7 @@ def get_user_token(user_name, password, realm_name):
 
 
 def keycloak_user_token_introspect(client_id, client_secret, realm_name, access_token, keycloak_proto="", keycloak_host=""):
-    """user token introspect実行
+    """user token introspect実行 Run user token introspect
     Args:
         client_id (str): client id
         client_secret (str): client secret
@@ -560,6 +534,7 @@ def keycloak_user_token_introspect(client_id, client_secret, realm_name, access_
         ]
 
         # 呼び出し先設定
+        # Call destination setting
         api_url = "{}://{}:{}".format(os.environ['API_KEYCLOAK_PROTOCOL'], os.environ['API_KEYCLOAK_HOST'], os.environ['API_KEYCLOAK_PORT'])
 
         header_para = {
@@ -567,6 +542,7 @@ def keycloak_user_token_introspect(client_id, client_secret, realm_name, access_
         }
 
         # keycloak_proto/keycloak_hostをheaderに設定
+        # Set keycloak_proto / keycloak_host to header
         if keycloak_proto and keycloak_host:
             header_para["X-Forwarded-Proto"] = keycloak_proto
             header_para["X-Forwarded-Host"] = keycloak_host
@@ -576,14 +552,16 @@ def keycloak_user_token_introspect(client_id, client_secret, realm_name, access_
             headers=header_para,
             data="&".join(data_para)
         )
-        # # 取得できない場合は、Exceptionを発行する
+        # 取得できない場合は、Exceptionを発行する
+        # If it cannot be obtained, an Exception will be thrown.
         if request_response.status_code != 200:
             raise Exception("keycloak_user_token_introspect error status:{}, response:{}".format(request_response.status_code, request_response.text))
 
         json_ret = json.loads(request_response.text)
 
-        # # 正常応答
-        return json_ret['active']
+        # 正常応答
+        # Normal response
+        return json_ret.get('active')
 
     except Exception as e:
         globals.logger.debug(e.args)

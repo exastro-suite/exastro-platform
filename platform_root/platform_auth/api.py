@@ -16,7 +16,7 @@
 WSGI main module
 """
 # from crypt import methods
-from flask import Flask, request, jsonify, Response
+from flask import Flask, request, jsonify, make_response
 import os
 from datetime import datetime
 from dotenv import load_dotenv  # python-dotenv
@@ -26,6 +26,7 @@ from logging.config import dictConfig as dictLogConf
 
 # User Imports
 import globals
+import common_library.common.common as common
 from common_library.common.exastro_logging import ExastroLogRecordFactory, LOGGING
 import auth_proxy
 
@@ -88,17 +89,18 @@ def platform_api_call(subpath):
 
         # api呼び出し call api
         response_json = proxy.call_api(dest_url, response_json.get("info"))
+
         # 戻り値をそのまま返却
         # Return the return value as it is
-        # return jsonify(response_json.get("info")), response_json.get("result")
-        return Response(proxy.response_original)
+        response = make_response()
+        response.data = proxy.response_original.content
+        for key, value in proxy.response_original.headers.items():
+            if key.lower().startswith('content-'):
+                response.headers[key] = value
+        return response
 
     except Exception as e:
-        globals.logger.error(f'Exception : {e.args}')
-        globals.logger.error(''.join(list(traceback.TracebackException.from_exception(e).format())))
-        status_code = 500
-        info = e.__class__.__name__
-        return jsonify({"result": status_code, "info": info, "time": str(datetime.now(globals.TZ))}), status_code
+        return common.response_server_error(e)
 
 
 @app.route('/api/workspaces/<string:workspace_id>/ita/<path:subpath>', methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTION"])
@@ -136,17 +138,19 @@ def ita_workspace_api_call(workspace_id, subpath):
 
         # api呼び出し call api
         response_json = proxy.call_api(dest_url, response_json.get("info"))
+        globals.logger.info('responce headers={}'.format(list(proxy.response_original.headers)))
+
         # 戻り値をそのまま返却
         # Return the return value as it is
-        return Response(proxy.response_original)
-        # return jsonify(response_json.get("info")), response_json.get("result")
+        response = make_response()
+        response.data = proxy.response_original.content
+        for key, value in proxy.response_original.headers.items():
+            if key.lower().startswith('content-'):
+                response.headers[key] = value
+        return response
 
     except Exception as e:
-        globals.logger.error(f'Exception : {e.args}')
-        globals.logger.error(''.join(list(traceback.TracebackException.from_exception(e).format())))
-        status_code = 500
-        info = e.__class__.__name__
-        return jsonify({"result": status_code, "info": info, "time": str(datetime.now(globals.TZ))}), status_code
+        return common.response_server_error(e)
 
 
 if __name__ == '__main__':
