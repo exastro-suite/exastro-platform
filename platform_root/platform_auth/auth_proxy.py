@@ -33,8 +33,13 @@ class auth_proxy:
 
     jwt_json = None
 
+    response_original = None
+
     # TODO: realm name パスにrealmを入れるようになったらここは削除
     realm = os.environ.get('REALM_NAME')
+
+    # TODO: 言語の設定はまだ未確定
+    user_local = "ja"
 
     # TODO: client id や secretについても一時的に環境変数で実施
     token_check_client_id = os.environ.get('TOKEN_CHECK_CLIENT_ID')
@@ -249,6 +254,7 @@ class auth_proxy:
 
             # ヘッダにuser_idの付与 addtional header user_id
             post_headers = {
+                'user_local': self.user_local,
                 'organization_id': self.realm,
                 'user_id': info['user_id'],
             }
@@ -288,10 +294,14 @@ class auth_proxy:
                 return {"result": status_code, "info": info, "time": str(datetime.now(globals.TZ))}
             else:
                 status_code = ret.status_code
-                result_dump = json.dumps(ret.json())
-                result_encode = result_dump.encode('utf-8')
-                info = ret.json()
-                globals.logger.info(f'SUCCESS call_api. status_code={status_code} info={result_encode}')
+                try:
+                    info = json.loads(ret.text)
+                    result_dump = json.dumps(info)
+                    result_encode = result_dump.encode('utf-8')
+                    globals.logger.info(f'SUCCESS call_api. status_code={status_code} info={result_encode}')
+                except json.JSONDecodeError:
+                    info = ret.text
+                    globals.logger.info(f'SUCCESS call_api. status_code={status_code} info={info}')
                 return {"result": status_code, "info": info, "time": str(datetime.now(globals.TZ))}
 
         except Exception as e:
@@ -331,6 +341,8 @@ class auth_proxy:
 
         globals.logger.info(f'Start main_request. method={method} url={url} request_body={request_body} query_string={query_string}')
 
+        # methodによって、呼び出しの内容を変える
+        # Change the content of the call depending on the method
         if method == 'GET':
             ret = requests.get(url, headers=post_headers, params=query_string)
 
@@ -346,19 +358,9 @@ class auth_proxy:
         elif method == 'DELETE':
             ret = requests.delete(url, headers=post_headers, params=query_string)
 
-        # # requestsの結果が例外の場合exceptへ
-        # # If the result of requests is an exception, go to except
-        # try:
-        #     ret.raise_for_status()
-        # except Exception as e:
-        #     globals.logger.error(f'Exception : {e.args}')
-        #     globals.logger.error(''.join(list(traceback.TracebackException.from_exception(e).format())))
-        #     raise
-
-        # # レスポンスをエンコード
-        # # Encode the response
-        # result_dump = json.dumps(ret.json())
-        # result_encode = result_dump.encode('utf-8')
+        # 取得したレスポンスの内容を退避
+        # Save the contents of the acquired response
+        self.response_original = ret
 
         globals.logger.info('SUCCESS main_request.')
 
@@ -367,7 +369,7 @@ class auth_proxy:
         return ret
 
     def access_token_get(self, realm, user_name, password):
-        """アクセストークン取得
+        """アクセストークン取得 Get access token
 
         Args:
             realm (str): realm
@@ -380,7 +382,8 @@ class auth_proxy:
         try:
             globals.logger.info('Get access token. method={}, realm={}'.format(request.method, realm))
 
-            # アクセストークン取得 get access token
+            # アクセストークン取得
+            # get access token
             access_token = api_keycloak_call.get_user_token(user_name, password, realm)
 
             globals.logger.info('SUCCEED access token.')
@@ -390,8 +393,8 @@ class auth_proxy:
         except Exception:
             raise
 
-    def access_token_introspect(self, realm, keycloal_json):
-        """アクセストークンの有効確認
+    def access_token_introspect(self, realm, keycloak_json):
+        """アクセストークンの有効確認 Confirmation of access token validity
 
         Args:
             realm (str): realm
@@ -412,13 +415,15 @@ class auth_proxy:
             globals.logger.info('Token Introspection. method={}, realm={}'.format(request.method, realm))
 
             # パラメータ情報(JSON形式)
-            client_id = keycloal_json.get("client_id")
-            client_secret = keycloal_json.get("client_secret")
-            access_token = keycloal_json.get("access_token")
-            keycloak_proto = keycloal_json.get("keycloak_proto")
-            keycloak_host = keycloal_json.get("keycloak_host")
+            # Parameter information (JSON format)
+            client_id = keycloak_json.get("client_id")
+            client_secret = keycloak_json.get("client_secret")
+            access_token = keycloak_json.get("access_token")
+            keycloak_proto = keycloak_json.get("keycloak_proto")
+            keycloak_host = keycloak_json.get("keycloak_host")
 
-            # トークンイントロスペクション token introspection
+            # トークンイントロスペクション
+            # token introspection
             active = api_keycloak_call.keycloak_user_token_introspect(client_id, client_secret, realm, access_token, keycloak_proto, keycloak_host)
 
             globals.logger.info('SUCCEED Token Introspection.')
