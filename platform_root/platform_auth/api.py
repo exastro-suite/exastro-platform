@@ -20,7 +20,6 @@ from flask import Flask, request, jsonify, make_response
 import os
 from datetime import datetime
 from dotenv import load_dotenv  # python-dotenv
-import traceback
 import logging
 from logging.config import dictConfig as dictLogConf
 
