@@ -81,13 +81,11 @@ CMD ["sudo","-E","httpd","-D","FOREGROUND"]
 #
 FROM    common_build
 
-USER $USERNAME
-
 WORKDIR $APP_PATH
 
-COPY ./platform_root/platform_auth/config/httpd.conf/platform-auth_httpd.conf /etc/httpd/conf/httpd.conf
+COPY ./platform_root/platform_auth/config/httpd.conf/httpd.conf /etc/httpd/conf/httpd.conf
 COPY ./platform_root/platform_auth/config/httpd.conf/reverse-proxy.conf /etc/httpd/conf.d/reverse-proxy.conf
-COPY ./platform_root/platform_auth/config/httpd.conf/platform-auth_wsgi.conf /etc/httpd/conf.d/wsgi.conf
+COPY ./platform_root/platform_auth/config/httpd.conf/wsgi.conf /etc/httpd/conf.d/wsgi.conf
 
 COPY ./platform_root/platform_auth/ $APP_PATH/
 COPY ./platform_root/common_library/ $APP_PATH/common_library/
