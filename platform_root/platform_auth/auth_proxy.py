@@ -212,9 +212,7 @@ class auth_proxy:
             if auth_str:
                 auths = auth_str.split(' ')
                 if len(auths) != 2:
-                    error = 'Invalid authorization header'
-                    globals.logger.info(error)
-                    raise Exception(error)
+                    return None
 
                 get_auth_type = auths[0]
                 get_auth_value = auths[1]
