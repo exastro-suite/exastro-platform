@@ -18,17 +18,11 @@ ARG GROUPNAME=app_user
 
 ARG APP_PATH=/app
 
-ARG PROXY=""
-RUN if [ ! -z "${PROXY}" ]; then \
-        sed -i -e "$ a PROXY=${PROXY}" /etc/yum.conf; \
-    fi
-
 RUN dnf install -y \
     langpacks-en \
     wget \
     unzip \
     httpd \
-    mod_ssl \
     gcc \
     httpd-devel \
     python39 \
@@ -45,12 +39,6 @@ RUN dnf install -y \
     python-dotenv \
 &&  groupadd $GROUPNAME \
 &&  useradd -m -s /bin/bash -g $GROUPNAME $USERNAME
-# &&  mv /etc/httpd/conf.d/ssl.conf /etc/httpd/conf.d/ssl.conf.org \
-# &&  cp -p /etc/httpd/conf/httpd.conf /etc/httpd/conf/httpd.conf.org \
-# &&  sed -i -e '/^\s*ErrorLog\s/s|ErrorLog\s\+\S\+|ErrorLog "/dev/stderr"|' \
-#            -e '/^\s*CustomLog\s/s|CustomLog\s\+\S\+|CustomLog "/dev/stdout"|' \
-#            -e '/^\s*TransferLog\s/s|TransferLog\s\+\S\+|TransferLog "/dev/stdout"|' \
-#        /etc/httpd/conf/httpd.conf
 
 #
 # Build for development
@@ -78,29 +66,29 @@ RUN mkdir ~/.config
 
 WORKDIR $APP_PATH
 
-COPY ./platform_root/platform_auth/config/httpd.conf/platform-auth_httpd.conf /etc/httpd/conf/httpd.conf
-COPY ./platform_root/platform_auth/config/httpd.conf/platform-auth_wsgi.conf /etc/httpd/conf.d/wsgi.conf
+COPY ./platform_root/platform_auth/config/httpd.conf/httpd.conf /etc/httpd/conf/httpd.conf
+COPY ./platform_root/platform_auth/config/httpd.conf/reverse-proxy.conf /etc/httpd/conf.d/reverse-proxy.conf
+COPY ./platform_root/platform_auth/config/httpd.conf/wsgi.conf /etc/httpd/conf.d/wsgi.conf
 
 COPY ./platform_root/platform_auth/ $APP_PATH/
 COPY ./platform_root/common_library/ $APP_PATH/common_library/
 COPY ./platform_root/common_resources/ $APP_PATH/common_resources/
 
-CMD ["sudo","-E","/bin/sh","/app/httpd-start.sh"]
+CMD ["sudo","-E","httpd","-D","FOREGROUND"]
 
 #
 # Build for production
 #
 FROM    common_build
 
-USER $USERNAME
-
 WORKDIR $APP_PATH
 
-COPY ./platform_root/platform_auth/config/httpd.conf/platform-auth_httpd.conf /etc/httpd/conf/httpd.conf
-COPY ./platform_root/platform_auth/config/httpd.conf/platform-auth_wsgi.conf /etc/httpd/conf.d/wsgi.conf
+COPY ./platform_root/platform_auth/config/httpd.conf/httpd.conf /etc/httpd/conf/httpd.conf
+COPY ./platform_root/platform_auth/config/httpd.conf/reverse-proxy.conf /etc/httpd/conf.d/reverse-proxy.conf
+COPY ./platform_root/platform_auth/config/httpd.conf/wsgi.conf /etc/httpd/conf.d/wsgi.conf
 
 COPY ./platform_root/platform_auth/ $APP_PATH/
 COPY ./platform_root/common_library/ $APP_PATH/common_library/
 COPY ./platform_root/common_resources/ $APP_PATH/common_resources/
 
-CMD ["/bin/sh","/app/httpd-start.sh"]
+CMD ["httpd","-D","FOREGROUND"]

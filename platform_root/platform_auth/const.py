@@ -1,4 +1,4 @@
-#   Copyright 2022 NEC Corporation
+#   Copyright 2021 NEC Corporation
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -12,4 +12,6 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-IncludeOptional conf.d/exastroSettings/*.conf
+# 認証の種類 Authentication type
+AUTH_TYPE_BEARER = 'bearer'
+AUTH_TYPE_BASIC = 'basic'

@@ -21,6 +21,7 @@ ARG APP_PATH=/app
 RUN dnf install -y httpd
 
 COPY ./platform_root/platform_web/contents/ /var/www/html/
-COPY ./platform_root/platform_web/config/httpd.conf/platform-web_httpd.conf /etc/httpd/conf/httpd.conf
+COPY ./platform_root/platform_web/config/httpd.conf/httpd.conf /etc/httpd/conf/httpd.conf
+COPY ./platform_root/platform_web/config/httpd.conf/rewrite.conf /etc/httpd/conf.d/rewrite.conf
 
 CMD ["httpd","-D","FOREGROUND"]

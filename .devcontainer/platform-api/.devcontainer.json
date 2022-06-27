@@ -1,9 +1,9 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the README at:
 // https://github.com/microsoft/vscode-dev-containers/tree/v0.231.6/containers/jekyll
 {
-	"name": "exastro-common-auth - common-api",
+	"name": "exastro-common-auth - platform-api",
 	"dockerComposeFile": ["../docker-compose.yml","../docker-compose.devcontainer.yml"],
-	"service": "common-auth-api",
+	"service": "platform-api",
 	// Set *default* container specific settings.json values on container create.
 	"settings": {
 		"terminal.integrated.profiles.linux": {
@@ -20,11 +20,11 @@
 		"thunder-client.customLocation": "",
 		"thunder-client.saveToWorkspace": true,
 		"thunder-client.workspaceRelativePath": ".vscode_extensions",
-	
+
 		// python extension setting
 		"python.linting.pylintEnabled": false,
 		"python.linting.flake8Enabled": true,
-		
+
 		"python.linting.lintOnSave": true,
 
 		"python.linting.flake8Args": [
@@ -37,7 +37,7 @@
 
 		"python.formatting.autopep8Args": [
 			"--aggressive", "--aggressive",
-		],		
+		],
 	},
 	// Add the IDs of extensions you want installed when the container is created.
 	"extensions": [
@@ -46,6 +46,7 @@
 		"ms-ceintl.vscode-language-pack-ja",
 		"ms-vscode.references-view",
 		"eamodio.gitlens",
+		"mhutchie.git-graph",
 		"42crunch.vscode-openapi",
 		"arjun.swagger-viewer",
 		"redhat.vscode-yaml",
@@ -64,11 +65,9 @@
 	],
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	"forwardPorts": [
-		8000
 	],
 	// Use 'postCreateCommand' to run commands after the container is created.
 	// "onCreateCommand":"sudo dnf install -y git vim diffutils bind-utils iputils && sudo pip3.9 install flake8 && sudo pip3.9 install autopep8",
-	// "postAttachCommand": "",
 	"workspaceFolder": "/workspace",
-	"overrideCommand": true,
+	"overrideCommand": false,
 }

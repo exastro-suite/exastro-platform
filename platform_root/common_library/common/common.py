@@ -13,14 +13,15 @@
 #   limitations under the License.
 
 from flask import jsonify
+from datetime import datetime
 import random
 import string
 
 import globals
 
 
-def deleteDictKey(dictobj, key):
-    """Dictionary Key削除
+def delete_dict_key(dictobj, key):
+    """Dictionary Key delete
 
     Args:
         dictobj (dict): Dictionary
@@ -30,34 +31,31 @@ def deleteDictKey(dictobj, key):
         del dictobj[key]
 
 
-def randomString(n):
-    """ランダム文字列生成
+def random_string(n):
+    """ランダム文字列生成 Random string generation
 
     Args:
-        n (int): 文字数
+        n (int): 文字数 word count
 
     Returns:
-        str: ランダム文字列
+        str: ランダム文字列 Random string
     """
     return ''.join(random.choices(string.ascii_letters + string.digits, k=n))
 
 
-def serverError(e):
-    """サーバーエラーレスポンス
+def response_server_error(e):
+    """サーバーエラーレスポンス Server error response
 
     Args:
-        e (Exception): 例外
+        e (Exception): 例外 Exception
 
     Returns:
         response: HTTP Response (HTTP-500)
     """
     import traceback
 
+    globals.logger.error(f'Exception : {e.args}')
     globals.logger.error(''.join(list(traceback.TracebackException.from_exception(e).format())))
-
-    return jsonify(
-        {
-            'result': '500',
-            'exception': ''.join(list(traceback.TracebackException.from_exception(e).format())),
-        }
-    ), 500
+    status_code = 500
+    info = e.__class__.__name__
+    return jsonify({"result": status_code, "info": info, "time": str(datetime.now(globals.TZ))}), status_code

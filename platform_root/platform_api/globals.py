@@ -12,4 +12,18 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-IncludeOptional conf.d/exastroSettings/*.conf
+from pytz import timezone
+
+config = None
+TZ = None
+logger = None
+
+
+def init(app):
+    global config
+    global TZ
+    global logger
+
+    config = app.config
+    TZ = timezone(config['TZ'])
+    logger = app.logger
