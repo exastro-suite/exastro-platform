@@ -37,6 +37,42 @@ services:
       - REALM_NAME=${REALM_NAME}
       - TOKEN_CHECK_CLIENT_ID=${TOKEN_CHECK_CLIENT_ID}
       - TOKEN_CHECK_CLIENT_SECRET=${TOKEN_CHECK_CLIENT_SECRET}
+
+  platform-api:
+    build:
+      target: develop_build
+    user: 1000:1000
+    command: sudo -E httpd -D FOREGROUND
+    volumes:
+      - ..:/workspace:cached
+      - ../platform_root/common_library:/workspace/platform_root/platform_api/common_library:cached
+      - ../platform_root/common_resources:/workspace/platform_root/platform_api/common_resources:cached
+      - ../platform_root/platform_api:/app:cached
+      - ../platform_root/common_library:/app/common_library:cached
+      - ../platform_root/common_resources:/app/common_resources:cached
+      - ~/.netrc:/home/app_user/.netrc
+      - ~/.gitconfig:/home/app_user/.gitconfig
+      - ./platform-api/.vscode/launch.json:/workspace/.vscode/launch.json
+      - /usr/share/pki/ca-trust-source/anchors/UserRootCertificate.crt:/etc/ssl/certs/ca-certificates.crt
+      - /mnt/mainte/talisman/.talismanrc:/mnt/mainte/talisman/.talismanrc
+      - ~/.config/git/ignore:/home/app_user/.config/git/ignore
+      - ${TALISMAN_HOME}:${TALISMAN_HOME}
+    environment:
+      - FLASK_ENV=development
+      - FLASK_SERVER_PORT=8000
+      - HTTP_PROXY=${HTTP_PROXY}
+      - http_proxy=${HTTP_PROXY}
+      - HTTPS_PROXY=${HTTPS_PROXY}
+      - https_proxy=${HTTPS_PROXY}
+      - NO_PROXY=localhost,127.0.0.1,keycloak,platform-auth,platform-api,platform-web,ita-web,ita-api
+      - no_proxy=localhost,127.0.0.1,keycloak,platform-auth,platform-api,platform-web,ita-web,ita-api
+      - SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
+      - SSL_CERT_DIR=/etc/ssl/certs
+      - NODE_EXTRA_CA_CERTS=/etc/ssl/certs/ca-certificates.crt
+      - REALM_NAME=${REALM_NAME}
+      - TOKEN_CHECK_CLIENT_ID=${TOKEN_CHECK_CLIENT_ID}
+      - TOKEN_CHECK_CLIENT_SECRET=${TOKEN_CHECK_CLIENT_SECRET}
+
   platform-web:
     volumes:
       - ../platform_root/platform_web/config/httpd.conf/httpd.conf:/etc/httpd/conf/httpd.conf:cached
