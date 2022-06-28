@@ -52,7 +52,7 @@ def alive():
     Returns:
         Response: HTTP Response
     """
-    return jsonify({"result": "200", "time": str(datetime.now(globals.TZ))}), 200
+    return jsonify({"result": "200", "time": str(datetime.utcnow())}), 200
 
 
 @app.route('/api/platform/<path:subpath>', methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTION"])
@@ -72,7 +72,7 @@ def platform_api_call(subpath):
         dest_url = "{}://{}:{}/api/platform/{}".format(
             os.environ['PLATFORM_API_PROTOCOL'], os.environ['PLATFORM_API_HOST'], os.environ['PLATFORM_API_PORT'], subpath)
 
-        # return jsonify({"result": "200", "time": str(datetime.now(globals.TZ))}), 200
+        # return jsonify({"result": "200", "time": str(datetime.utcnow())}), 200
 
         # Common authorization proxy processing call - 共通の認可proxy処理呼び出し
         proxy = auth_proxy.auth_proxy()
@@ -84,7 +84,7 @@ def platform_api_call(subpath):
         if response_json.get("result") != 0:
             return jsonify({"result": response_json.get("result"),
                             "info": response_json.get("info"),
-                            "time": str(datetime.now(globals.TZ))}), response_json.get("result")
+                            "time": str(datetime.utcnow())}), response_json.get("result")
 
         # api呼び出し call api
         response_json = proxy.call_api(dest_url, response_json.get("info"))
@@ -97,6 +97,12 @@ def platform_api_call(subpath):
             if key.lower().startswith('content-'):
                 response.headers[key] = value
         return response
+
+    except common.AuthException as e:
+        globals.logger.info(f'authentication error:{e.args}')
+        status_code = 401
+        info = "authentication error"
+        return jsonify({"result": status_code, "info": info, "time": str(datetime.utcnow())}), status_code
 
     except Exception as e:
         return common.response_server_error(e)
@@ -133,7 +139,7 @@ def ita_workspace_api_call(workspace_id, subpath):
         if response_json.get("result") != 0:
             return jsonify({"result": response_json.get("result"),
                             "info": response_json.get("info"),
-                            "time": str(datetime.now(globals.TZ))}), response_json.get("result")
+                            "time": str(datetime.utcnow())}), response_json.get("result")
 
         # api呼び出し call api
         response_json = proxy.call_api(dest_url, response_json.get("info"))
@@ -147,6 +153,12 @@ def ita_workspace_api_call(workspace_id, subpath):
             if key.lower().startswith('content-'):
                 response.headers[key] = value
         return response
+
+    except common.AuthException as e:
+        globals.logger.info(f'authentication error:{e.args}')
+        status_code = 401
+        info = "authentication error"
+        return jsonify({"result": status_code, "info": info, "time": str(datetime.utcnow())}), status_code
 
     except Exception as e:
         return common.response_server_error(e)

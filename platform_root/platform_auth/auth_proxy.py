@@ -25,6 +25,7 @@ import traceback
 # User Imports
 import globals
 import const
+import common_library.common.common as common
 # import api_keycloak_call
 import common_library.common.api_keycloak_call as api_keycloak_call
 
@@ -75,7 +76,7 @@ class auth_proxy:
             if method == 'OPTIONS':
                 status_code = 200
                 info = 'Preflight'
-                return {"result": status_code, "info": info, "time": str(datetime.now(globals.TZ))}
+                return {"result": status_code, "info": info, "time": str(datetime.utcnow())}
 
             # bearerを取得
             # Get bearer
@@ -100,33 +101,40 @@ class auth_proxy:
                         token_decode = jwt.decode(access_token, options={"verify_signature": False})
 
                     except Exception:
-                        status_code = 401
                         info = 'bad token'
-                        return {"result": status_code, "info": info, "time": str(datetime.now(globals.TZ))}
+                        raise common.AuthException(info)
 
                     globals.logger.debug(f'oken_decode={token_decode}')
 
-                    iss = token_decode.get("iss")
-                    if iss is None:
-                        # issが無い場合はNGを返す。
-                        # If there is no iss, NG is returned.
-                        status_code = 401
-                        info = 'token check NG'
-                        return {"result": status_code, "info": info, "time": str(datetime.now(globals.TZ))}
+                    try:
+                        iss = token_decode.get("iss")
+                        if iss is None:
+                            # issが無い場合はNGを返す。
+                            # If there is no iss, NG is returned.
+                            info = 'token check NG'
+                            raise common.AuthException(info)
 
-                    iss_parse = urlparse(iss)
-                    keycloak_proto = iss_parse.scheme
-                    keycloak_host = iss_parse.netloc
+                    except Exception:
+                        info = 'bad token format'
+                        raise common.AuthException(info)
 
-                    # アクセストークンのアクティブチェック
-                    # Access token active check
-                    keycloak_json = {
-                        'client_id': self.token_check_client_id,
-                        'client_secret': self.token_check_client_secret,
-                        'access_token': access_token,
-                        'keycloak_proto': keycloak_proto,
-                        'keycloak_host': keycloak_host
-                    }
+                    try:
+                        iss_parse = urlparse(iss)
+                        keycloak_proto = iss_parse.scheme
+                        keycloak_host = iss_parse.netloc
+
+                        # アクセストークンのアクティブチェック
+                        # Access token active check
+                        keycloak_json = {
+                            'client_id': self.token_check_client_id,
+                            'client_secret': self.token_check_client_secret,
+                            'access_token': access_token,
+                            'keycloak_proto': keycloak_proto,
+                            'keycloak_host': keycloak_host
+                        }
+                    except Exception:
+                        info = 'token parse error'
+                        raise common.AuthException(info)
 
                     # アクセストークンの有効確認
                     active = self.access_token_introspect(self.realm, keycloak_json)
@@ -134,9 +142,9 @@ class auth_proxy:
                     if active is not True:
                         # アクティブチェックがFalseならNGを返す
                         # Returns NG if the active check is False
-                        status_code = 401
                         info = 'token invalid'
-                        return {"result": status_code, "info": info, "time": str(datetime.now(globals.TZ))}
+                        raise common.AuthException(info)
+
                     # ----ここまでアクセストークンチェック処理---- #
                     # Access token check processing so far
                     user_id = token_decode.get("preferred_username")
@@ -152,14 +160,12 @@ class auth_proxy:
                         # ユーザID、パスワードを取得
                         # Get user ID and password
                         decode_key_id = base64.b64decode(basic_auth).decode()
-                        globals.logger.debug(f'wsgi decode_key_id={decode_key_id}')
                         r = decode_key_id.split(':')
                         if len(r) < 2:
                             # ユーザID、パスワードの値が不正な場合
                             # When the user ID and password values ​​are invalid
-                            status_code = 401
                             info = 'User ID and password are not set correctly'
-                            return {"result": status_code, "info": info, "time": str(datetime.now(globals.TZ))}
+                            raise common.AuthException(info)
 
                         user_id = r[0]
                         user_password = r[1]
@@ -171,23 +177,20 @@ class auth_proxy:
                             globals.logger.debug(f'access_token_get={access_token}')
 
                         except api_keycloak_call.AuthErrorException:
-                            status_code = 401
                             info = 'ID/PW NG'
-                            return {"result": status_code, "info": info, "time": str(datetime.now(globals.TZ))}
+                            raise common.AuthException(info)
                         # ----ここまでBasic認証情報取得処理---- #
                         # basic auth acquisition process up to this point
                     else:
-                        status_code = 401
                         info = 'Authorization format is incorrect'
-                        return {"result": status_code, "info": info, "time": str(datetime.now(globals.TZ))}
+                        raise common.AuthException(info)
             else:
-                status_code = 401
                 info = 'not authorization format'
-                return {"result": status_code, "info": info, "time": str(datetime.now(globals.TZ))}
+                raise common.AuthException(info)
 
             status_code = 0
             info = {"user_id": user_id}
-            return {"result": status_code, "info": info, "time": str(datetime.now(globals.TZ))}
+            return {"result": status_code, "info": info, "time": str(datetime.utcnow())}
 
         except Exception as e:
             globals.logger.error(f'Exception : {e.args}')
@@ -289,7 +292,7 @@ class auth_proxy:
             if not ret:
                 status_code = 500
                 info = 'System Error'
-                return {"result": status_code, "info": info, "time": str(datetime.now(globals.TZ))}
+                return {"result": status_code, "info": info, "time": str(datetime.utcnow())}
             else:
                 status_code = ret.status_code
                 try:
@@ -300,7 +303,7 @@ class auth_proxy:
                 except json.JSONDecodeError:
                     info = ret.text
                     globals.logger.info(f'SUCCESS call_api. status_code={status_code} info={info}')
-                return {"result": status_code, "info": info, "time": str(datetime.now(globals.TZ))}
+                return {"result": status_code, "info": info, "time": str(datetime.utcnow())}
 
         except Exception as e:
             globals.logger.error(f'Exception : {e.args}')

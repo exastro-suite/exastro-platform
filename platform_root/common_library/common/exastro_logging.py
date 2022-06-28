@@ -14,6 +14,7 @@
 
 from datetime import datetime as dtlogging
 from logging import Formatter, LogRecord, Filter
+import uuid
 
 from flask import has_request_context
 
@@ -73,7 +74,7 @@ class ExastroLogRecordFactory():
         """Add userid
         """
 
-        self.userid = '-'
+        self.userid = uuid.uuid4()
         self.origin_factory = origin_factory
         self.flask_req = flask_req
 
@@ -98,6 +99,8 @@ class ExastroLogRecordFactory():
             user_id = self.flask_req.headers['X-REMOTE-USER']
             idx = user_id.rfind('@')
             user_id = user_id[:idx]
+        else:
+            user_id = self.userid
 
         return user_id
 
