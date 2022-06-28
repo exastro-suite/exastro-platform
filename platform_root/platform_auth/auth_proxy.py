@@ -147,7 +147,8 @@ class auth_proxy:
 
                     # ----ここまでアクセストークンチェック処理---- #
                     # Access token check processing so far
-                    user_id = token_decode.get("preferred_username")
+                    user_id = token_decode.get("sub")
+                    username = token_decode.get("preferred_username")
 
                 else:
                     # ----ここからBasic認証情報取得処理---- #
@@ -167,20 +168,34 @@ class auth_proxy:
                             info = 'User ID and password are not set correctly'
                             raise common.AuthException(info)
 
-                        user_id = r[0]
-                        user_password = r[1]
+                        basic_user_id = r[0]
+                        basic_user_password = r[1]
 
                         try:
                             # アクセストークンを取得
                             # Get an access token
-                            access_token = self.access_token_get(self.realm, user_id, user_password)
+                            access_token = self.access_token_get(self.realm, basic_user_id, basic_user_password)
                             globals.logger.debug(f'access_token_get={access_token}')
 
                         except api_keycloak_call.AuthErrorException:
                             info = 'ID/PW NG'
                             raise common.AuthException(info)
+
+                        try:
+                            # アクセストークンからissを抽出し、トークン発行元のプロトコル/ホストを解析
+                            # Extract iss from access token and analyze the protocol / host of the token issuer
+                            token_decode = jwt.decode(access_token, options={"verify_signature": False})
+
+                        except Exception:
+                            info = 'bad token'
+                            raise common.AuthException(info)
+
+                        globals.logger.debug(f'oken_decode={token_decode}')
                         # ----ここまでBasic認証情報取得処理---- #
                         # basic auth acquisition process up to this point
+                        user_id = token_decode.get("sub")
+                        username = token_decode.get("preferred_username")
+
                     else:
                         info = 'Authorization format is incorrect'
                         raise common.AuthException(info)
@@ -189,7 +204,10 @@ class auth_proxy:
                 raise common.AuthException(info)
 
             status_code = 0
-            info = {"user_id": user_id}
+            info = {
+                "user_id": user_id,
+                "username": username,
+            }
             return {"result": status_code, "info": info, "time": str(datetime.utcnow())}
 
         except Exception as e:
