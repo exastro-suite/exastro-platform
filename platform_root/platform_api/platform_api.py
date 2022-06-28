@@ -15,7 +15,7 @@
 from flask import Flask, request, jsonify, make_response
 from datetime import datetime
 import os
-import json
+# import json
 
 # User Imports
 import globals
@@ -33,7 +33,7 @@ def alive():
     Returns:
         Response: HTTP Respose
     """
-    return jsonify({"result": "200", "time": str(datetime.now(globals.TZ))}), 200
+    return jsonify({"result": "200", "time": str(datetime.utcnow())}), 200
 
 
 @app.route('/api/workspaces/<string:workspace_id>/ita/<path:subpath>', methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTION"])
@@ -72,7 +72,7 @@ def call_ita_test(workspace_id, subpath):
         "user_id": user_id,
         "request_body": request_body,
         "query_string": "{}".format(query_string),
-        "time": str(datetime.now(globals.TZ)),
+        "time": str(datetime.utcnow()),
     }
 
     if subpath == "download":
