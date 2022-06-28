@@ -46,13 +46,15 @@ RUN dnf install -y \
 #
 FROM    common_build as develop_build
 
-RUN dnf install -y \
+RUN dnf config-manager --add-repo=https://download.docker.com/linux/centos/docker-ce.repo \
+&&  dnf install -y \
     sudo \
     git \
     vim \
     diffutils \
     bind-utils \
     iputils \
+    docker-ce-cli \
 &&  pip3.9 install \
     debugpy \
     flake8 \
