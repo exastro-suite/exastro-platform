@@ -34,7 +34,7 @@ services:
       - ITA_API_PROTOCOL=http
       - ITA_API_HOST=ita-api
       - ITA_API_PORT=8000
-      - PLATFORM_WEB_LOCATION=/platform/
+      - PLATFORM_WEB_LOCATION=/exastro-common-auth/platform/
       - PLATFORM_WEB_PROTOCOL=http
       - PLATFORM_WEB_HOST=platform-web
       - PLATFORM_WEB_PORT=80

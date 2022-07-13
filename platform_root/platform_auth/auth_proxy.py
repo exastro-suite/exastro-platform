@@ -36,18 +36,31 @@ class auth_proxy:
 
     response_original = None
 
-    # TODO: realm name パスにrealmを入れるようになったらここは削除
-    realm = os.environ.get('REALM_NAME')
+    # realm name
+    realm = None
 
-    # TODO: 言語の設定はまだ未確定
-    user_local = "ja"
+    # tokenをjwt変換した内容
+    # Content of jwt conversion of token
+    token_decode = {}
 
     # TODO: client id や secretについても一時的に環境変数で実施
+    # 接続先のClient設定
+    # Client settings for connection destination
     token_check_client_id = os.environ.get('TOKEN_CHECK_CLIENT_ID')
 
     # トークンチェック用ClientIDのClisentSecret
     # Clisent Secret of Client ID for token check
     token_check_client_secret = os.environ.get('TOKEN_CHECK_CLIENT_SECRET')
+
+    # 接続先のClient設定
+    # Client settings for connection destination
+    user_token_client_id = "{}{}".format(realm, "-xxxxxxxx")
+    # TODO : client idのルールが決まるまでは固定
+    user_token_client_id = "exastro-common-auth-public"
+
+    # ユーザートークン取得用ClientIDのClisentSecret
+    # Clisent Secret of Client ID for token check
+    user_token_client_secret = None
 
     # def __init__(self):
 
@@ -98,16 +111,16 @@ class auth_proxy:
                     try:
                         # アクセストークンからissを抽出し、トークン発行元のプロトコル/ホストを解析
                         # Extract iss from access token and analyze the protocol / host of the token issuer
-                        token_decode = jwt.decode(access_token, options={"verify_signature": False})
+                        self.token_decode = jwt.decode(access_token, options={"verify_signature": False})
 
                     except Exception:
                         info = 'bad token'
                         raise common.AuthException(info)
 
-                    globals.logger.debug(f'oken_decode={token_decode}')
+                    globals.logger.debug(f'oken_decode={self.token_decode}')
 
                     try:
-                        iss = token_decode.get("iss")
+                        iss = self.token_decode.get("iss")
                         if iss is None:
                             # issが無い場合はNGを返す。
                             # If there is no iss, NG is returned.
@@ -147,8 +160,6 @@ class auth_proxy:
 
                     # ----ここまでアクセストークンチェック処理---- #
                     # Access token check processing so far
-                    user_id = token_decode.get("sub")
-                    username = token_decode.get("preferred_username")
 
                 else:
                     # ----ここからBasic認証情報取得処理---- #
@@ -184,17 +195,15 @@ class auth_proxy:
                         try:
                             # アクセストークンからissを抽出し、トークン発行元のプロトコル/ホストを解析
                             # Extract iss from access token and analyze the protocol / host of the token issuer
-                            token_decode = jwt.decode(access_token, options={"verify_signature": False})
+                            self.token_decode = jwt.decode(access_token, options={"verify_signature": False})
 
                         except Exception:
                             info = 'bad token'
                             raise common.AuthException(info)
 
-                        globals.logger.debug(f'oken_decode={token_decode}')
+                        globals.logger.debug(f'oken_decode={self.token_decode}')
                         # ----ここまでBasic認証情報取得処理---- #
                         # basic auth acquisition process up to this point
-                        user_id = token_decode.get("sub")
-                        username = token_decode.get("preferred_username")
 
                     else:
                         info = 'Authorization format is incorrect'
@@ -203,10 +212,18 @@ class auth_proxy:
                 info = 'not authorization format'
                 raise common.AuthException(info)
 
+            token_roles = self.token_decode.get("resource_access").get(self.user_token_client_id)
+            globals.logger.debug(f'token_roles={token_roles}')
+            if token_roles and "roles" in token_roles:
+                roles_str = "\t".join(token_roles["roles"])
+            else:
+                roles_str = ""
             status_code = 0
             info = {
-                "user_id": user_id,
-                "username": username,
+                "user_id": self.token_decode.get("sub"),
+                "username": self.token_decode.get("preferred_username"),
+                "roles": roles_str,
+                "locale": self.token_decode.get("locale"),
             }
             return {"result": status_code, "info": info, "time": str(datetime.utcnow())}
 
@@ -273,10 +290,9 @@ class auth_proxy:
 
             # ヘッダにuser_idの付与 addtional header user_id
             post_headers = {
-                'user_local': self.user_local,
                 'organization_id': self.realm,
-                'user_id': info['user_id'],
             }
+            post_headers.update(info)
 
             # method
             request_method = request.method
@@ -403,7 +419,12 @@ class auth_proxy:
 
             # アクセストークン取得
             # get access token
-            access_token = api_keycloak_call.get_user_token(user_name, password, realm)
+            # access_token = api_keycloak_call.get_user_token(user_name, password, realm)
+            access_token = api_keycloak_call.keycloak_client_user_get_token(realm,
+                                                                            self.user_token_client_id,
+                                                                            self.user_token_client_secret,
+                                                                            user_name,
+                                                                            password)
 
             globals.logger.info('SUCCEED access token.')
 
