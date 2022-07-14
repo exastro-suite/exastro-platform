@@ -55,8 +55,8 @@ def alive():
     return jsonify({"result": "200", "time": str(datetime.utcnow())}), 200
 
 
-@app.route('/api/platform/<path:subpath>', methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTION"])
-def platform_api_call(subpath):
+@app.route('/api/<string:organization_id>/platform/<path:subpath>', methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTION"])
+def platform_api_call(organization_id, subpath):
     """Call the platform API after authorization - 認可後にplatform APIを呼び出します
 
     Args:
@@ -66,17 +66,20 @@ def platform_api_call(subpath):
         Response: HTTP Response
     """
     try:
-        globals.logger.info('call platform api. method={} subpath={}'.format(request.method, subpath))
+        globals.logger.info('call platform api. method={} organization_id={} subpath={}'.format(request.method, organization_id, subpath))
 
         # Destination URL settings - 宛先URLの設定
-        dest_url = "{}://{}:{}/api/platform/{}".format(
-            os.environ['PLATFORM_API_PROTOCOL'], os.environ['PLATFORM_API_HOST'], os.environ['PLATFORM_API_PORT'], subpath)
+        dest_url = "{}://{}:{}/api/{}/platform/{}".format(
+            os.environ['PLATFORM_API_PROTOCOL'], os.environ['PLATFORM_API_HOST'], os.environ['PLATFORM_API_PORT'], organization_id, subpath)
 
         # return jsonify({"result": "200", "time": str(datetime.utcnow())}), 200
 
         # Common authorization proxy processing call - 共通の認可proxy処理呼び出し
         proxy = auth_proxy.auth_proxy()
 
+        # organization idをrealm名として設定
+        # Set organization id as realm name
+        proxy.realm = organization_id
         # 各種チェック check
         response_json = proxy.check_authorization()
         # 0以外は、終了
@@ -108,11 +111,12 @@ def platform_api_call(subpath):
         return common.response_server_error(e)
 
 
-@app.route('/api/workspaces/<string:workspace_id>/ita/<path:subpath>', methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTION"])
-def ita_workspace_api_call(workspace_id, subpath):
+@app.route('/api/<string:organization_id>/workspaces/<string:workspace_id>/ita/<path:subpath>', methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTION"])
+def ita_workspace_api_call(organization_id, workspace_id, subpath):
     """Call the IT-automation API after authorization - 認可後にIT-automation APIを呼び出します
 
     Args:
+        organization_id (str): organization id
         workspace_id (str): workspace id
         subpath (str): subpath
 
@@ -120,14 +124,18 @@ def ita_workspace_api_call(workspace_id, subpath):
         Response: HTTP Response
     """
     try:
-        globals.logger.info('call ita workspace api. method={} workspace_id={} subpath={}'.format(request.method, workspace_id, subpath))
+        globals.logger.info('call ita workspace api. method={} organization_id={} workspace_id={} subpath={}'.format(request.method, organization_id, workspace_id, subpath))
 
         # Destination URL settings - 宛先URLの設定
-        dest_url = "{}://{}:{}/api/workspaces/{}/ita/{}".format(
-            os.environ['ITA_API_PROTOCOL'], os.environ['ITA_API_HOST'], os.environ['ITA_API_PORT'], workspace_id, subpath)
+        dest_url = "{}://{}:{}/api/{}/workspaces/{}/ita/{}".format(
+            os.environ['ITA_API_PROTOCOL'], os.environ['ITA_API_HOST'], os.environ['ITA_API_PORT'], organization_id, workspace_id, subpath)
 
         # Common authorization proxy processing call - 共通の認可proxy処理呼び出し
         proxy = auth_proxy.auth_proxy()
+
+        # organization idをrealm名として設定
+        # Set organization id as realm name
+        proxy.realm = organization_id
 
         # 各種チェック check
         response_json = proxy.check_authorization()

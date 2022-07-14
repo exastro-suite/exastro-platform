@@ -490,7 +490,7 @@ def keycloak_client_user_get_token(realm_name, client_id, client_secret, user_id
         raise
 
 
-def get_user_token(user_name, password, realm_name):
+def get_user_token(user_name, password, realm_name, client_id="admin-cli", client_secret=None):
     """user token取得 Get user token
     Args:
         user_name (str): user name
@@ -500,11 +500,11 @@ def get_user_token(user_name, password, realm_name):
         str: token
     """
     try:
-        globals.logger.info('Get keycloak client user token. realm_name={}, user_name={}'.format(realm_name, user_name))
+        globals.logger.info('Get keycloak client user token. realm_name={}, client_id={}, user_name={}'.format(realm_name, client_id, user_name))
 
         # 下位の取得ロジックを呼びだし
         # Call the lower acquisition logic
-        return keycloak_client_user_get_token(realm_name, "admin-cli", None, user_name, password)
+        return keycloak_client_user_get_token(realm_name, client_id, client_secret, user_name, password)
 
     except Exception as e:
         globals.logger.error(e.args)

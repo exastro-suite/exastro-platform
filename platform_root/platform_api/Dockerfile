@@ -34,9 +34,11 @@ RUN dnf install -y \
     Flask \
     pytz \
     markdown \
-    requests \
     PyJWT \
     python-dotenv \
+    connexion \
+    connexion[swagger-ui] \
+    six \
 &&  groupadd $GROUPNAME \
 &&  useradd -m -s /bin/bash -g $GROUPNAME $USERNAME
 
@@ -68,23 +70,27 @@ RUN mkdir ~/.config
 
 WORKDIR $APP_PATH
 
+COPY ./platform_root/platform_api/config/httpd.conf/httpd.conf /etc/httpd/conf/httpd.conf
+COPY ./platform_root/platform_api/config/httpd.conf/wsgi.conf /etc/httpd/conf.d/wsgi.conf
+
 COPY ./platform_root/platform_api/ $APP_PATH/
 COPY ./platform_root/common_library/ $APP_PATH/common_library/
 COPY ./platform_root/common_resources/ $APP_PATH/common_resources/
 
-CMD ["python3", "/app/platform_api.py"]
+CMD ["sudo","-E","httpd","-D","FOREGROUND"]
 
 #
 # Build for production
 #
 FROM    common_build
 
-USER $USERNAME
-
 WORKDIR $APP_PATH
+
+COPY ./platform_root/platform_api/config/httpd.conf/httpd.conf /etc/httpd/conf/httpd.conf
+COPY ./platform_root/platform_api/config/httpd.conf/wsgi.conf /etc/httpd/conf.d/wsgi.conf
 
 COPY ./platform_root/platform_api/ $APP_PATH/
 COPY ./platform_root/common_library/ $APP_PATH/common_library/
 COPY ./platform_root/common_resources/ $APP_PATH/common_resources/
 
-CMD ["python3", "/app/platform_api.py"]
+CMD ["httpd","-D","FOREGROUND"]
