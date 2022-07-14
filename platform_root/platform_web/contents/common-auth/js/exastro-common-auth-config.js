@@ -47,4 +47,9 @@ const CommonAuthConfig = {
      * keycloak silent check sso redirect uri
      */
     "CHECK_SSO_REDIRECT_URI": (window.location.origin + "/_/common-auth/html/silent-check-sso.html"),
+
+    /**
+     * default language
+     */
+    "DEFAULT_LANGUAGE": "ja",
 }
