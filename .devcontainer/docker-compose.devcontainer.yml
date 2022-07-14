@@ -64,6 +64,8 @@ services:
       - ../platform_root/platform_api:/app:cached
       - ../platform_root/common_library:/app/common_library:cached
       - ../platform_root/common_resources:/app/common_resources:cached
+      - ../platform_root/platform_api/config/httpd.conf/httpd.conf:/etc/httpd/conf/httpd.conf:cached
+      - ../platform_root/platform_api/config/httpd.conf/wsgi.conf:/etc/httpd/conf.d/wsgi.conf:cached
       - ~/.netrc:/home/app_user/.netrc
       - ~/.gitconfig:/home/app_user/.gitconfig
       - ./platform-api/.vscode/launch.json:/workspace/.vscode/launch.json
