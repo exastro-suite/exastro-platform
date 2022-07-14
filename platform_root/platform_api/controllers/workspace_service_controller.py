@@ -15,13 +15,13 @@
 import connexion
 import six
 
-from swagger_server.models.runtime_error import RuntimeError  # noqa: E501
-from swagger_server.models.workspace import Workspace  # noqa: E501
-from swagger_server.models.workspace_list import WorkspaceList  # noqa: E501
-from swagger_server import util
+# from swagger_server.models.runtime_error import RuntimeError  # noqa: E501
+# from swagger_server.models.workspace import Workspace  # noqa: E501
+# from swagger_server.models.workspace_list import WorkspaceList  # noqa: E501
+# from swagger_server import util
 
 
-def workspace_service_create(body, organization_id):  # noqa: E501
+def workspace_create(body, organization_id):  # noqa: E501
     """Create creates an workspace
 
      # noqa: E501
@@ -39,7 +39,7 @@ def workspace_service_create(body, organization_id):  # noqa: E501
     return 'do some magic!'
 
 
-def workspace_service_list(organization_id, workspace_name=None):  # noqa: E501
+def workspace_list(organization_id, workspace_name=None):  # noqa: E501
     """List returns list of workspaces
 
      # noqa: E501

@@ -51,6 +51,8 @@ services:
       - ../platform_root/platform_api:/app:cached
       - ../platform_root/common_library:/app/common_library:cached
       - ../platform_root/common_resources:/app/common_resources:cached
+      - ../platform_root/platform_api/config/httpd.conf/httpd.conf:/etc/httpd/conf/httpd.conf:cached
+      - ../platform_root/platform_api/config/httpd.conf/wsgi.conf:/etc/httpd/conf.d/wsgi.conf:cached
       - ~/.netrc:/home/app_user/.netrc
       - ~/.gitconfig:/home/app_user/.gitconfig
       - ./platform-api/.vscode/launch.json:/workspace/.vscode/launch.json
@@ -61,7 +63,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
       - FLASK_ENV=development
-      - FLASK_SERVER_PORT=8000
+      - FLASK_SERVER_PORT=8002
       - HTTP_PROXY=${HTTP_PROXY}
       - http_proxy=${HTTP_PROXY}
       - HTTPS_PROXY=${HTTPS_PROXY}

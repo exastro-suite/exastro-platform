@@ -14,7 +14,7 @@ paths:
       tags:
       - WorkspaceService
       summary: List returns list of workspaces
-      operationId: workspace_service_list
+      operationId: workspace_list
       parameters:
       - name: organization_id
         in: path
@@ -44,12 +44,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/runtimeError'
-      x-openapi-router-controller: swagger_server.controllers.workspace_service_controller
+      x-openapi-router-controller: controllers.workspace_service_controller
     post:
       tags:
       - WorkspaceService
       summary: Create creates an workspace
-      operationId: workspace_service_create
+      operationId: workspace_create
       parameters:
       - name: organization_id
         in: path
@@ -77,7 +77,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/runtimeError'
-      x-openapi-router-controller: swagger_server.controllers.workspace_service_controller
+      x-openapi-router-controller: controllers.workspace_service_controller
 components:
   schemas:
     runtimeError:
