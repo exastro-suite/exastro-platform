@@ -39,6 +39,7 @@ RUN dnf install -y \
     connexion \
     connexion[swagger-ui] \
     six \
+    pymysql \
 &&  groupadd $GROUPNAME \
 &&  useradd -m -s /bin/bash -g $GROUPNAME $USERNAME
 
