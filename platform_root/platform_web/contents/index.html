@@ -4,10 +4,12 @@
             platform-web welcome
         </title>
         <script type="text/javascript" src="/auth/js/keycloak.js"></script>
-        <script type="text/javascript" src="/_/common_auth/exastro-common-auth-config.js"></script>
-        <script type="text/javascript" src="/_/common_auth/exastro-common-auth.js"></script>
+        <script type="text/javascript" src="/_/common-auth/js/exastro-common-auth-config.js"></script>
+        <script type="text/javascript" src="/_/common-auth/js/exastro-common-auth.js"></script>
         <script type="text/javascript">
-            //DebugConsole.setOutputClass("CommonAuth");
+            // CommonAuth TEST
+            DebugConsole.setOutputClass("CommonAuth");
+            // CommonAuth TEST
 
             CommonAuth.onAuthSuccess(() => {
                 document.getElementById("userid").value = CommonAuth.getUserId();

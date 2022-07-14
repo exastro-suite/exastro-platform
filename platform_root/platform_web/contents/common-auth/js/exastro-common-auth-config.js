@@ -35,7 +35,7 @@ const CommonAuthConfig = {
     },
 
     // keycloak silent check sso redirect uri
-    "CHECK_SSO_REDIRECT_URI": (window.location.origin + "/_/common_auth/silent-check-sso.html"),
+    "CHECK_SSO_REDIRECT_URI": (window.location.origin + "/_/common-auth/html/silent-check-sso.html"),
 
         // console log
     "DEBUG_LOG": true,
