@@ -19,6 +19,7 @@ import uuid
 from flask import has_request_context
 from flask_log_request_id import current_request_id
 
+
 # Filter
 class RequireDebugFalse(Filter):
 
