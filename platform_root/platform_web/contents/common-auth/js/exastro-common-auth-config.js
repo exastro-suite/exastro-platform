@@ -13,20 +13,29 @@
 #   limitations under the License.
 */
 const CommonAuthConfig = {
-    // Login client name pattern
+    /**
+     * Login client name pattern
+     */
     "LOGIN_CLIENT": "%{RELMNAME}-public",
 
-    // Interval to check token expiration (sec) / tokenの有効期限切れをチェックする間隔(sec)
+    /**
+     * Interval to check token expiration (sec) / tokenの有効期限切れをチェックする間隔(sec)
+     */
     "TOKEN_CHECK_INTERVAL": 1,
 
-    // Time to perform automatic token renewal (sec) / 自動トークン更新を実行する時間(sec)
-    //"TOKEN_AUTO_REFRESH": 60 * 60,
-    "TOKEN_AUTO_REFRESH": 60 * 6,
+    /**
+     * Time to perform automatic token renewal (sec) / 自動トークン更新を実行する時間(sec)
+     */
+    "TOKEN_AUTO_REFRESH": 60 * 60,
 
-    // Specifies how many seconds before the token expiration date / tokenの有効期限の何秒前に更新するかを指定します
-    "TOKEN_REFRESH_TIMMING": 5,
+    /**
+     * Specifies how many seconds before the token expiration date / tokenの有効期限の何秒前に更新するかを指定します
+     */
+    "TOKEN_REFRESH_TIMMING": 30,
 
-    // keycloak init config
+    /**
+     * keycloak init parameter
+     */
     "KEYCLOAK_CONFIG": {
         "url": (window.location.origin + "/auth/"),
         "ssl-required": (window.location.protocol == "https"? "all": "none"),
@@ -34,9 +43,8 @@ const CommonAuthConfig = {
         "confidential-port": 0,
     },
 
-    // keycloak silent check sso redirect uri
+    /**
+     * keycloak silent check sso redirect uri
+     */
     "CHECK_SSO_REDIRECT_URI": (window.location.origin + "/_/common-auth/html/silent-check-sso.html"),
-
-        // console log
-    "DEBUG_LOG": true,
 }
