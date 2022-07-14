@@ -17,7 +17,7 @@ from logging import Formatter, LogRecord, Filter
 import uuid
 
 from flask import has_request_context
-
+from flask_log_request_id import current_request_id
 
 # Filter
 class RequireDebugFalse(Filter):
@@ -100,8 +100,7 @@ class ExastroLogRecordFactory():
             idx = user_id.rfind('@')
             user_id = user_id[:idx]
         else:
-            user_id = self.userid
-
+            user_id = current_request_id()
         return user_id
 
 

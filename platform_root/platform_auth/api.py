@@ -22,6 +22,7 @@ from datetime import datetime
 from dotenv import load_dotenv  # python-dotenv
 import logging
 from logging.config import dictConfig as dictLogConf
+from flask_log_request_id import RequestID
 
 # User Imports
 import globals
@@ -43,6 +44,8 @@ org_factory = logging.getLogRecordFactory()
 logging.setLogRecordFactory(ExastroLogRecordFactory(org_factory, request))
 globals.logger = logging.getLogger('root')
 dictLogConf(LOGGING)
+
+RequestID(app)
 
 
 @app.route('/alive', methods=["GET"])
@@ -111,7 +114,7 @@ def platform_api_call(organization_id, subpath):
         return common.response_server_error(e)
 
 
-@app.route('/api/<string:organization_id>/workspaces/<string:workspace_id>/ita/<path:subpath>', methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTION"])
+@app.route('/api/<string:organization_id>/workspaces/<string:workspace_id>/ita/<path:subpath>', methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTION"])  # noqa: E501
 def ita_workspace_api_call(organization_id, workspace_id, subpath):
     """Call the IT-automation API after authorization - 認可後にIT-automation APIを呼び出します
 
@@ -124,7 +127,7 @@ def ita_workspace_api_call(organization_id, workspace_id, subpath):
         Response: HTTP Response
     """
     try:
-        globals.logger.info('call ita workspace api. method={} organization_id={} workspace_id={} subpath={}'.format(request.method, organization_id, workspace_id, subpath))
+        globals.logger.info('call ita workspace api. method={} organization_id={} workspace_id={} subpath={}'.format(request.method, organization_id, workspace_id, subpath))  # noqa: E501
 
         # Destination URL settings - 宛先URLの設定
         dest_url = "{}://{}:{}/api/{}/workspaces/{}/ita/{}".format(

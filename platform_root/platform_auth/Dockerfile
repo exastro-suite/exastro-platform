@@ -37,6 +37,7 @@ RUN dnf install -y \
     requests \
     PyJWT \
     python-dotenv \
+    flask-log-request-id \
 &&  groupadd $GROUPNAME \
 &&  useradd -m -s /bin/bash -g $GROUPNAME $USERNAME
 
