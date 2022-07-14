@@ -8,9 +8,9 @@
         "name": "Python: Flask",
         "type": "python",
         "request": "launch",
-        "program": "/app/platform_api.py",
+        "program": "/app/api.py",
         "env": {
-            "FLASK_APP": "/app/platform_api.py",
+            "FLASK_APP": "/app/api.py",
             "FLASK_ENV": "development",
             "MOD_WSGI_DISABLE": "TRUE",
         },
@@ -33,9 +33,9 @@
         "name": "[DEBUG] Python: Flask",
         "type": "python",
         "request": "launch",
-        "program": "/app/platform_api.py",
+        "program": "/app/api.py",
         "env": {
-            "FLASK_APP": "/app/platform_api.py",
+            "FLASK_APP": "/app/api.py",
             "FLASK_ENV": "development",
             "MOD_WSGI_DISABLE": "TRUE",
         },
