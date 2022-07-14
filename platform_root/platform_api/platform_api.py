@@ -51,7 +51,7 @@ def call_ita_test(organization_id, workspace_id, subpath):
 
     # パラメータ情報(JSON形式)
     organization_id = organization_id
-    user_id = request.headers.get("user_id")
+    user_id = request.headers.get("USER_ID")
 
     # パラメータを形成
     # Form parameters
