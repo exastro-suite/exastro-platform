@@ -18,7 +18,8 @@ paths:
       tags:
       - WorkspaceService
       summary: List returns list of workspaces
-      operationId: WorkspaceService_List
+      x-openapi-router-controller: controllers.workspace_service_controller
+      operationId: Workspace_List
       parameters:
       - name: organization_id
         in: path
@@ -47,7 +48,8 @@ paths:
       tags:
       - WorkspaceService
       summary: Create creates an workspace
-      operationId: WorkspaceService_Create
+      x-openapi-router-controller: controllers.workspace_service_controller
+      operationId: Workspace_Create
       parameters:
       - name: organization_id
         in: path
