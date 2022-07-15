@@ -176,7 +176,11 @@ const CommonAuth = {
         if(!CommonAuth.keycloak.authenticated) {
             throw "not authenticated";
         }
-        return CommonAuth.keycloak.tokenParsed.resource_access[CommonAuth._getLoginClient()].roles;
+        try {
+            return CommonAuth.keycloak.tokenParsed.resource_access[CommonAuth._getLoginClient()].roles;
+        } catch(e) {
+            return [];
+        }
     },
 
     /**
@@ -187,7 +191,19 @@ const CommonAuth = {
         if(!CommonAuth.keycloak.authenticated) {
             throw "not authenticated";
         }
-        return CommonAuth.keycloak.tokenParsed.locale;
+        if(typeof CommonAuth.keycloak.tokenParsed.locale === "undefined") {
+            return CommonAuthConfig.DEFAULT_LANGUAGE;
+        } else {
+            return CommonAuth.keycloak.tokenParsed.locale;
+        }
+    },
+
+    /**
+     * Returns the realm - レルムを返します
+     * @returns {string} realm
+     */
+    "getRealm": function() {
+        return window.location.pathname.split("/")[1];
     },
 
     /**
@@ -244,17 +260,9 @@ const CommonAuth = {
      */
     "_getKeycloakConfig": function() {
         let config = CommonAuthConfig.KEYCLOAK_CONFIG;
-        config.realm = CommonAuth._getRealm();
+        config.realm = CommonAuth.getRealm();
         config.clientId = CommonAuth._getLoginClient();
         return config;
-    },
-
-    /**
-     * Returns the realm - レルムを返します
-     * @returns {string} realm
-     */
-    "_getRealm": function() {
-        return window.location.pathname.split("/")[1];
     },
 
     /**
@@ -262,7 +270,7 @@ const CommonAuth = {
      * @returns 
      */
     "_getLoginClient": function() {
-        return CommonAuthConfig.LOGIN_CLIENT.replace(/%{RELMNAME}/g, CommonAuth._getRealm());
+        return CommonAuthConfig.LOGIN_CLIENT.replace(/%{RELMNAME}/g, CommonAuth.getRealm());
     },
 
     /**

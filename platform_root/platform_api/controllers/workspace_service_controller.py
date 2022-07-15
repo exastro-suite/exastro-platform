@@ -14,6 +14,8 @@
 
 import connexion
 import six
+import os
+import pymysql
 
 # from swagger_server.models.runtime_error import RuntimeError  # noqa: E501
 # from swagger_server.models.workspace import Workspace  # noqa: E501
@@ -51,4 +53,67 @@ def workspace_list(organization_id, workspace_name=None):  # noqa: E501
 
     :rtype: WorkspaceList
     """
-    return 'do some magic!'
+
+    platformdb = __get_dbinfo_platform()
+    orgdb = __dbinfo()
+
+    with __connect_db(dbinfo=platformdb) as platform_connection:
+        with platform_connection.cursor() as cursor:
+            sql = "SELECT db_host, db_port, db_database, db_user, db_password FROM organization_db where organization_id = %s"
+            cursor.execute(sql, (organization_id, ))
+            result = cursor.fetchone()
+
+            orgdb.db_host = result.get('db_host')
+            orgdb.db_port = result.get('db_port')
+            orgdb.db_database = result.get('db_database')
+            orgdb.db_user = result.get('db_user')
+            orgdb.db_password = result.get('db_password')
+
+    with __connect_db(dbinfo=orgdb) as org_connection:
+        with org_connection.cursor() as cursor:
+            sql = "SELECT workspace_id, workspace_name, create_at, update_at FROM workspace"
+            cursor.execute(sql)
+            result = cursor.fetchall()
+
+    return result
+
+
+class __dbinfo():
+    db_host: str
+    db_port: int
+    db_database: str
+    db_user: str
+    db_password: str
+
+
+def __connection(host, database, user, password, port=3306):
+    conn = pymysql.connect(
+        host=host,
+        database=database,
+        user=user,
+        password=password,
+        port=port,
+        cursorclass=pymysql.cursors.DictCursor,
+    )
+    return conn
+
+
+def __connect_db(dbinfo: __dbinfo):
+    conn = __connection(
+        host=dbinfo.db_host,
+        database=dbinfo.db_database,
+        user=dbinfo.db_user,
+        password=dbinfo.db_password,
+        port=dbinfo.db_port,
+    )
+    return conn
+
+
+def __get_dbinfo_platform():
+    platformdb = __dbinfo()
+    platformdb.db_host = os.environ.get('DB_ADDR')
+    platformdb.db_port = 3306
+    platformdb.db_database = os.environ.get('DB_DATABASE')
+    platformdb.db_user = os.environ.get('DB_USER')
+    platformdb.db_password = os.environ.get('DB_PASSWORD')
+    return platformdb
