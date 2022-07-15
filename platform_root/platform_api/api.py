@@ -21,7 +21,6 @@ from logging.config import dictConfig as dictLogConf
 
 # User Imports
 import globals
-import common_library.common.common
 from common_library.common.exastro_logging import ExastroLogRecordFactory, LOGGING
 
 # load environ variables

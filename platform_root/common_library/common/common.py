@@ -16,6 +16,7 @@ from flask import jsonify
 from datetime import datetime
 import random
 import string
+from functools import wraps
 
 import globals
 
@@ -63,3 +64,23 @@ def response_server_error(e):
     status_code = 500
     info = e.__class__.__name__
     return jsonify({"result": status_code, "info": info, "time": str(datetime.utcnow())}), status_code
+
+
+def platform_exception_handler(func):
+    """Exception handling decorator
+
+    Args:
+        func:
+
+    Returns:
+        inner_func:
+    """
+    @wraps(func)
+    def inner_func(*args, **kwargs):
+        try:
+            response = func(*args, **kwargs)
+        except Exception as err:
+            return response_server_error(err)
+        return response
+
+    return inner_func
