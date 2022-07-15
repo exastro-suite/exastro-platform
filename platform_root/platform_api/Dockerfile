@@ -36,6 +36,7 @@ RUN dnf install -y \
     markdown \
     PyJWT \
     python-dotenv \
+    flask-log-request-id \
     connexion \
     connexion[swagger-ui] \
     six \
