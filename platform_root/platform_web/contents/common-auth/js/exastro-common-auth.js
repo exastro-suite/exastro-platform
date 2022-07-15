@@ -210,7 +210,7 @@ const CommonAuth = {
      * logout - ログアウトします
      */
     "logout": function() {
-        CommonAuth.keycloak.logout({redirectUri: location.href});
+        CommonAuth.keycloak.logout({redirectUri: CommonAuth._getTopURL()});
     },
 
     /**
@@ -278,7 +278,7 @@ const CommonAuth = {
      * @returns {string} top url
      */
     "_getTopURL": function() {
-        return window.location.pathname.split("/").slice(0,2).join("/");
+        return window.location.origin + window.location.pathname.split("/").slice(0,2).join("/") + "/platform/";
     },
 }
 
