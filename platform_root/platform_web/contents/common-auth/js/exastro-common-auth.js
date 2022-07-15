@@ -134,7 +134,9 @@ const CommonAuth = {
         if(!CommonAuth.keycloak.authenticated) {
             throw "not authenticated";
         }
-        if(CommonAuth.keycloak.isTokenExpired()) {
+        if(CommonAuth.keycloak.isTokenExpired(0)) {
+            // tokenの有効期限が切れている場合、再ログインへ
+            CommonAuth.logout();
             return null;
         }
         CommonAuth._lastTimeToGetToken = (new Date()).getTime();
@@ -251,7 +253,8 @@ const CommonAuth = {
      * Token expired event - tokenの有効期限切れのイベント
      */
     "_onTokenExpired": function() {
-        CommonAuth.keycloak.logout({redirectUri: location.href});
+        DebugConsole.log("CommonAuth", "[INFO] keycloak.onTokenExpired");
+        // CommonAuth.keycloak.logout({redirectUri: location.href});
     },
 
     /**
