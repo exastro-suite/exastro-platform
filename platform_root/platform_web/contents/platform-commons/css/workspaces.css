@@ -1,0 +1,31 @@
+html {
+    width: 1000px;  /* autoによる既定値 */
+}
+
+.list_table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: center;
+}
+.list_table th {
+    font-weight: bold;
+    background-color: #cccccc;
+}
+.list_table th, .list_table td {
+    border: 1px solid gray;
+}
+.list_table td:nth-child(1) {
+    text-align: left;
+}
+.list_table td:nth-child(2) {
+    width: 15%;
+    text-align: center;
+}
+.list_table td:nth-child(3) {
+    width: 15%;
+    text-align: center;
+}
+.list_table td:nth-child(4) {
+    width: 20%;
+    text-align: left;
+}
