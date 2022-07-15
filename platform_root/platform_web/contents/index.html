@@ -10,7 +10,7 @@
         <script type="text/javascript">
             // CommonAuth TEST - ここから
                 // ここの記載は実際はいりません(※デバック用)、画面に更新したtokenを表示するためだけに記載しているものです
-                // DebugConsole.setOutputClass("CommonAuth");
+                DebugConsole.setOutputClass("CommonAuth");
                 CommonAuth.keycloak.onAuthRefreshSuccess = () => {
                     DebugConsole.log("CommonAuth","onAuthRefreshSuccess");
                     document.getElementById("token").value = CommonAuth.keycloak.token;
@@ -108,6 +108,7 @@
                 </td>
             </tr>
         </table>
+        <input type="button" value="GetToken" onclick="alert(CommonAuth.getToken());">
         <input type="button" value="Logout" onclick="CommonAuth.logout()">
         &nbsp;&nbsp;<input type="button" value="reload" onclick="location.reload();">
         &nbsp;&nbsp;<input type="button" value="Workspace list" onclick="window.location.href='/'+ CommonAuth.getRealm() + '/platform/workspaces'">
