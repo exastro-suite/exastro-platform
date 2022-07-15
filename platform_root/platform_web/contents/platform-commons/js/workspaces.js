@@ -84,7 +84,7 @@ $(function(){
 
             api_param = {
                 "type": "POST",
-                "url": api_conf.api.workspaces.post.replace('{organization_id}', CommonAuth._getRealm()),
+                "url": api_conf.api.workspaces.post.replace('{organization_id}', CommonAuth.getRealm()),
                 "data": JSON.stringify(reqbody),
                 contentType: "application/json",
                 dataType: "json",
