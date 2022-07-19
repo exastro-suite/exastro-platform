@@ -16,6 +16,7 @@ from flask import Flask, request, jsonify, make_response
 from datetime import datetime
 import os
 # import json
+import base64
 
 # User Imports
 import globals
@@ -54,6 +55,12 @@ def call_ita_test(organization_id, workspace_id, subpath):
     globals.logger.debug('request_headers: {}'.format(str(request.headers)))
     user_id = request.headers.get("user_id")
     roles = request.headers.get("roles")
+    globals.logger.error(f'roles: {roles}')
+    roles_decode = base64.b64decode(roles.encode()).decode("utf-8")
+    globals.logger.error(f'roles_decode: {roles_decode}')
+    json_roles = []
+    for role in roles_decode.split("\n"):
+        json_roles.append({"name": role})
 
     # パラメータを形成
     # Form parameters
@@ -77,7 +84,7 @@ def call_ita_test(organization_id, workspace_id, subpath):
         "organization_id": organization_id,
         "workspace_id": workspace_id,
         "user_id": user_id,
-        "roles": roles,
+        "roles": json_roles,
         "request_body": request_body,
         "query_string": "{}".format(query_string),
         "time": str(datetime.utcnow()),
