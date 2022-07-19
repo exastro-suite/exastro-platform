@@ -98,6 +98,11 @@ tokenを返します
 - parameter
     - @returns {string} realm
 
+### CommonAuth.getAccessibleWorkspaceId()
+アクセス可能なワークスペースIDを返します<br>
+- parameter
+    - @returns {array} workspace id array
+
 ### CommonAuth.logout()
 ログアウトします
 - parameter
