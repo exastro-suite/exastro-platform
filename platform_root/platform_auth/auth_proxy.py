@@ -215,7 +215,7 @@ class auth_proxy:
             token_roles = self.token_decode.get("resource_access").get(self.user_token_client_id)
             globals.logger.debug(f'token_roles={token_roles}')
             if token_roles and "roles" in token_roles:
-                roles_str = "\t".join(token_roles["roles"])
+                roles_str = base64.b64encode("\n".join(token_roles["roles"]).encode()).decode()
             else:
                 roles_str = ""
             status_code = 0
