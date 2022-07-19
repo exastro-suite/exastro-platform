@@ -137,7 +137,7 @@ const CommonAuth = {
         if(CommonAuth.keycloak.isTokenExpired(0)) {
             // tokenの有効期限が切れている場合、再ログインへ
             CommonAuth.logout();
-            return null;
+            throw "Token Expired";
         }
         CommonAuth._lastTimeToGetToken = (new Date()).getTime();
 
@@ -206,6 +206,18 @@ const CommonAuth = {
      */
     "getRealm": function() {
         return window.location.pathname.split("/")[1];
+    },
+
+    /**
+     * Returns the accessible workspace ID - アクセス可能なワークスペースIDを返します
+     * @returns {array} workspace id array
+     */
+    "getAccessibleWorkspaceId": function() {
+        if(!CommonAuth.keycloak.authenticated) {
+            throw "not authenticated";
+        }
+        // TODO: ロールからアクセス可能なワークスペースIDを取得し返す
+        return ["workspaceid-1","workspaceid-2"];
     },
 
     /**
