@@ -81,10 +81,10 @@ components:
     runtimeError:
       type: object
       properties:
-        code:
+        result:
           type: integer
           format: int32
-        message:
+        info:
           type: string
     workspace:
       title: workspace is a definition of Workspace resource.

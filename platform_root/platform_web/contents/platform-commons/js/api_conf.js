@@ -17,7 +17,8 @@ var api_conf = {
 
     "api" : {
         "workspaces": {
-            "post": "/api/{organization_id}/workspaces"
+            "post": "/api/{organization_id}/platform/workspaces",
+            "get": "/api/{organization_id}/platform/workspaces",
         }
     }
 }
