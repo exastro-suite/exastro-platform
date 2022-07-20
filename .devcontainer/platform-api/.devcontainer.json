@@ -84,5 +84,5 @@
 	// Use 'postCreateCommand' to run commands after the container is created.
 	// "onCreateCommand":"sudo dnf install -y git vim diffutils bind-utils iputils && sudo pip3.9 install flake8 && sudo pip3.9 install autopep8",
 	"workspaceFolder": "/workspace",
-	"overrideCommand": false,
+	"overrideCommand": true,
 }

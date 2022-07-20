@@ -42,6 +42,6 @@ if __name__ == '__main__':
     connexion_app.run(
         debug=(True if os.environ.get('FLASK_ENV', 'produciton') == 'development' else False),
         host='0.0.0.0',
-        port=int(os.environ.get('FLASK_SERVER_PORT', '8002')),
+        port=int(os.environ.get('LISTEN_PORT', '8000')),
         threaded=True
     )
