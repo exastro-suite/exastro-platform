@@ -19,6 +19,8 @@ import uuid
 from flask import has_request_context
 from flask_log_request_id import current_request_id
 
+import common_library.common.common as common
+
 
 # Filter
 class RequireDebugFalse(Filter):
@@ -96,12 +98,16 @@ class ExastroLogRecordFactory():
 
         if has_request_context() \
            and hasattr(self.flask_req, 'headers') \
-           and 'X-REMOTE-USER' in self.flask_req.headers:
-            user_id = self.flask_req.headers['X-REMOTE-USER']
+           and 'User-Id' in self.flask_req.headers:
+            user_id = self.flask_req.headers['User-Id']
             idx = user_id.rfind('@')
             user_id = user_id[:idx]
         else:
-            user_id = current_request_id()
+            try:
+                user_id = current_request_id()
+            except Exception:
+                raise common.AuthException("authentication error")
+
         return user_id
 
 
