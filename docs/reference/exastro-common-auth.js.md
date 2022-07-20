@@ -98,7 +98,7 @@ tokenを返します
 - parameter
     - @returns {string} realm
 
-### CommonAuth.getAccessibleWorkspaceId()
+### ※保留※　CommonAuth.getAccessibleWorkspaceId()
 アクセス可能なワークスペースIDを返します<br>
 - parameter
     - @returns {array} workspace id array
