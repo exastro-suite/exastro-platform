@@ -94,7 +94,9 @@ services:
       - ../platform_root/platform_web/config/httpd.conf/httpd.conf:/etc/httpd/conf/httpd.conf:cached
       - ../platform_root/platform_web/config/httpd.conf/rewrite.conf:/etc/httpd/conf.d/rewrite.conf:cached
       - ../platform_root/platform_web/contents:/var/www/html:cached
+
   ita-web:
-    image: nginx:latest
     volumes:
-      - ../test/web/contents:/usr/share/nginx/html
+      - ../test/web/config/httpd.conf/httpd.conf:/etc/httpd/conf/httpd.conf:cached
+      - ../test/web/config/httpd.conf/rewrite.conf:/etc/httpd/conf.d/rewrite.conf:cached
+      - ../test/web/contents:/var/www/html:cached
