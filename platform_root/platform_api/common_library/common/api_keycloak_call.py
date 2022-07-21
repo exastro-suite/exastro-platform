@@ -366,6 +366,53 @@ def keycloak_user_get_by_id(realm_name, user_id, token):
         raise
 
 
+def keycloak_get_user_role_mapping(realm_name, user_id, token):
+    """ユーザーロールマッピング情報取得
+        Get user role mapping information
+    Args:
+        realm_name (str): realm name
+        user_id (str): user id
+        toekn (str): token
+    Returns:
+        Response: HTTP Respose
+    """
+
+    try:
+        globals.logger.info('Get keycloak user role-mapping. realm_name={}, user_id={}'.format(realm_name, user_id))
+
+        # 呼び出し先設定
+        # Call destination setting
+        api_url = "{}://{}:{}".format(os.environ['API_KEYCLOAK_PROTOCOL'], os.environ['API_KEYCLOAK_HOST'], os.environ['API_KEYCLOAK_PORT'])
+
+        header_para = {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer {}".format(token),
+        }
+
+        globals.logger.debug("get user role-mapping")
+        # ユーザ情報取得
+        # User information acquisition
+        request_response = requests.get("{}/auth/admin/realms/{}/users/{}/role-mappings".format(api_url, realm_name, user_id), headers=header_para)
+        # globals.logger.debug(request_response.text)
+
+        # 取得できない場合は、Exceptionを発行する
+        # If it cannot be obtained, an Exception will be thrown.
+        if request_response.status_code != 200:
+            raise Exception("get user role-mapping error status:{}, response:{}".format(request_response.status_code, request_response.text))
+        globals.logger.debug("get user role-mapping Succeed!")
+
+        role_mappings = json.loads(request_response.text)
+
+        # 正常応答
+        # Normal response
+        return role_mappings
+
+    except Exception as e:
+        globals.logger.debug(e.args)
+        globals.logger.debug(traceback.format_exc())
+        raise
+
+
 def keycloak_user_reset_password(realm_name, user_id, user_password, token):
     """ユーザパスワード変更 Change user password
     Args:
