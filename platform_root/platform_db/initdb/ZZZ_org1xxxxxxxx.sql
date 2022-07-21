@@ -5,6 +5,15 @@ GRANT ALL PRIVILEGES ON org1xxxxxxxx.* TO org1xxxxxxxx_user;
 
 USE org1xxxxxxxx;
 
+CREATE TABLE IF NOT EXISTS organization_private
+(
+  id int not null,
+  informations json not null,
+  create_at datetime not null DEFAULT CURRENT_TIMESTAMP,
+  update_at datetime not null DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id)
+);
+
 CREATE TABLE IF NOT EXISTS workspace
 (
   workspace_id varchar(255) not null,
@@ -35,6 +44,7 @@ CREATE TABLE IF NOT EXISTS workspace_environment
 -- 仮データ
 INSERT INTO platform.organization (organization_id, organization_name) VALUES ("exastro-common-auth", "ExastroCommonAuth");
 INSERT INTO platform.organization_db (organization_id, db_host, db_port, db_database, db_user, db_password) VALUES ("exastro-common-auth", "platform-db", 3306, "org1xxxxxxxx", "org1xxxxxxxx_user", "password");
+INSERT INTO org1xxxxxxxx.organization_private (id, informations) VALUES (1, JSON_OBJECT("TOKEN_CHECK_CLIENT_SECRET","bearer-client-secret", "INTERNAL_API_CLIENT_SECRET","pf-client-secret" ));
 INSERT INTO org1xxxxxxxx.workspace (workspace_id, workspace_name) VALUES ("workspace001", "workspace001");
 INSERT INTO org1xxxxxxxx.workspace (workspace_id, workspace_name) VALUES ("workspace002", "workspace002");
 INSERT INTO org1xxxxxxxx.workspace (workspace_id, workspace_name) VALUES ("workspaceAAA", "workspaceAAA");
