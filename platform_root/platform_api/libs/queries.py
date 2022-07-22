@@ -24,6 +24,17 @@ values (%(workspace_id)s, %(workspace_name)s)
 """
 
 SQL_QUERY_WORKSPACE_LIST = """
-SELECT workspace_id, workspace_name, create_at, update_at 
+SELECT workspace_id, workspace_name, create_at, update_at
 FROM workspace
+"""
+
+SQL_QUERY_WORKSPACE = """
+SELECT *
+FROM workspace
+"""
+
+SQL_QUERY_ORGANIZATION_PRIVATE = """
+SELECT *
+FROM organization_private
+WHERE id = 1
 """
