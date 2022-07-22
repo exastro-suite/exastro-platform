@@ -51,9 +51,10 @@ services:
       - PLATFORM_API_PROTOCOL=http
       - PLATFORM_API_HOST=platform-api
       - PLATFORM_API_PORT=8000
-      - REALM_NAME=${REALM_NAME}
-      - TOKEN_CHECK_CLIENT_ID=${TOKEN_CHECK_CLIENT_ID}
-      - TOKEN_CHECK_CLIENT_SECRET=${TOKEN_CHECK_CLIENT_SECRET}
+      - DB_ADDR=platform-db
+      - DB_DATABASE=platform
+      - DB_USER=app_user
+      - DB_PASSWORD=password
     ports:
       - "0.0.0.0:8000:8000"
   keycloak:
@@ -113,6 +114,9 @@ services:
       - PYTHONPATH=/app/
       - CONFIG_API_PATH=/app/api.conf
       - PYTHONIOENCODING=utf-8
+      - API_KEYCLOAK_HOST=keycloak
+      - API_KEYCLOAK_PROTOCOL=http
+      - API_KEYCLOAK_PORT=8080
       - DB_ADDR=platform-db
       - DB_DATABASE=platform
       - DB_USER=app_user

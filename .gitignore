@@ -4,3 +4,4 @@
 !/.vscode_extensions/.gitkeep
 .talismanrc
 __pycache__/
+*.sql

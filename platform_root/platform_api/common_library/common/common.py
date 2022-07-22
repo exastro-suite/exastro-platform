@@ -110,7 +110,7 @@ def get_public_client_id(organization_id):
         str : public_client_id
     """
 
-    return organization_id + "_pb"
+    return f"{organization_id}-pb"
 
 
 def get_bearer_client_id(organization_id):
@@ -123,7 +123,7 @@ def get_bearer_client_id(organization_id):
         str : bearer_client_id
     """
 
-    return organization_id + "_br"
+    return f"{organization_id}-br"
 
 
 def get_platform_client_id(organization_id):
@@ -136,4 +136,4 @@ def get_platform_client_id(organization_id):
         str : platform_client_id
     """
 
-    return organization_id + "_pf"
+    return f"{organization_id}-pf"

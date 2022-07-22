@@ -20,7 +20,6 @@ import jwt
 import base64
 from urllib.parse import urlparse
 import traceback
-from contextlib import closing
 
 # User Imports
 import globals
@@ -28,8 +27,7 @@ import const
 import common_library.common.common as common
 # import api_keycloak_call
 import common_library.common.api_keycloak_call as api_keycloak_call
-from libs import queries
-from libs.db import DBconnector
+from common_library.common.db import DBconnector
 
 
 class auth_proxy:
@@ -47,35 +45,45 @@ class auth_proxy:
 
     # 接続先のClient設定
     # Client settings for connection destination
-    token_check_client_id = common.get_bearer_client_id(realm)
-
-    # サービスアカウントを使うためにClientのSercretを取得
-    # Get Client Sercret to use service account
-    with closing(DBconnector().connect_orgdb(realm)) as conn:
-        with conn.cursor() as cursor:
-            cursor.execute(queries.SQL_QUERY_ORGANIZATION_PRIVATE)
-            result = cursor.fetchall()
-
-    # 取得できない場合は、エラー
-    # If you cannot get it, an error
-    if len(result) == 0:
-        raise common.UserException("organization private information error")
-
-    json_info = result[0]["informations"]
+    token_check_client_id = None
 
     # トークンチェック用ClientIDのClisentSecret
     # Clisent Secret of Client ID for token check
-    token_check_client_secret = json_info["TOKEN_CHECK_CLIENT_SECRET"]
+    token_check_client_secret = None
 
     # 接続先のClient設定
     # Client settings for connection destination
-    user_token_client_id = common.get_public_client_id(realm)
+    user_token_client_id = None
 
     # ユーザートークン取得用ClientIDのClisentSecret
     # Clisent Secret of Client ID for token check
     user_token_client_secret = None
 
     # def __init__(self):
+    def __init__(self, realm):
+        self.realm = realm
+
+        # 接続先のClient設定
+        # Client settings for connection destination
+        self.token_check_client_id = common.get_bearer_client_id(realm)
+
+        # サービスアカウントを使うためにClientのSercretを取得
+        # Get Client Sercret to use service account
+        db = DBconnector()
+        private = db.get_organization_private(realm)
+
+        # 取得できない場合は、エラー
+        # If you cannot get it, an error
+        if not private:
+            raise common.UserException("organization private information error")
+
+        # トークンチェック用ClientIDのClisentSecret
+        # Clisent Secret of Client ID for token check
+        self.token_check_client_secret = private.token_check_client_secret
+
+        # 接続先のClient設定
+        # Client settings for connection destination
+        self.user_token_client_id = common.get_public_client_id(realm)
 
     def check_authorization(self):
         """認証情報チェック Authorization check

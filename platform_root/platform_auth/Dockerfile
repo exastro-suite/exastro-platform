@@ -38,6 +38,7 @@ RUN dnf install -y \
     PyJWT \
     python-dotenv \
     flask-log-request-id \
+    pymysql \
 &&  groupadd $GROUPNAME \
 &&  useradd -m -s /bin/bash -g $GROUPNAME $USERNAME
 

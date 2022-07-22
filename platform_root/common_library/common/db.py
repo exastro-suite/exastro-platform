@@ -17,11 +17,21 @@ import os
 import pymysql
 import json
 
-from libs import queries
-
 
 class DBconnector:
     """database connection class
+    """
+
+    SQL_ORGANIZATION_DB_INFO = """
+    SELECT db_host, db_port, db_database, db_user, db_password
+    FROM organization_db
+    WHERE organization_id = %s
+    """
+
+    SQL_ORGANIZATION_PRIVATE_INFO = """
+    SELECT id, informations, create_at, update_at
+    FROM organization_private
+    WHERE id = 1
     """
 
     class __dbinfo:
@@ -87,7 +97,7 @@ class DBconnector:
         """
         with closing(self.connect_platformdb()) as conn:
             with conn.cursor() as cursor:
-                sql = queries.SQL_ORGANIZATION_DB_INFO
+                sql = self.SQL_ORGANIZATION_DB_INFO
                 cursor.execute(sql, (organization_id, ))
                 result = cursor.fetchone()
 
@@ -139,7 +149,7 @@ class DBconnector:
 
         with closing(DBconnector().connect_orgdb(organization_id)) as conn:
             with conn.cursor() as cursor:
-                cursor.execute(queries.SQL_ORGANIZATION_PRIVATE_INFO)
+                cursor.execute(self.SQL_ORGANIZATION_PRIVATE_INFO)
                 result = cursor.fetchone()
 
                 infoormations = result.get("informations")

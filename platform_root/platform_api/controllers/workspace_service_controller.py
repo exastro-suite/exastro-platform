@@ -16,8 +16,8 @@ import connexion
 from contextlib import closing
 
 from common_library.common import common
+from common_library.common.db import DBconnector
 from libs import queries
-from libs.db import DBconnector
 
 
 @common.platform_exception_handler

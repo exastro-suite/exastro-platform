@@ -271,7 +271,7 @@ def keycloak_clients_get(realm_name, client_id, token):
         globals.logger.debug("client get Succeed!")
 
         # 正常応答 normal return
-        return request_response.text
+        return json.loads(request_response.text)
 
     except Exception as e:
         globals.logger.debug(e.args)
@@ -319,7 +319,7 @@ def keycloak_client_role_get(realm_name, client_id, role_name, token):
         globals.logger.debug("client role get Succeed!")
 
         # 正常応答 normal return
-        return request_response.text
+        return json.loads(request_response.text)
 
     except Exception as e:
         globals.logger.debug(e.args)
@@ -367,7 +367,7 @@ def keycloak_client_role_composites_get(realm_name, client_uid, role_name, token
         globals.logger.debug("client role composites get Succeed!")
 
         # 正常応答 normal return
-        return request_response.text
+        return json.loads(request_response.text)
 
     except Exception as e:
         globals.logger.debug(e.args)
