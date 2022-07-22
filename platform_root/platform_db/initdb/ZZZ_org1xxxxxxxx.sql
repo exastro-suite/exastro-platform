@@ -45,6 +45,17 @@ CREATE TABLE IF NOT EXISTS workspace_environment
 INSERT INTO platform.organization (organization_id, organization_name) VALUES ("exastro-common-auth", "ExastroCommonAuth");
 INSERT INTO platform.organization_db (organization_id, db_host, db_port, db_database, db_user, db_password) VALUES ("exastro-common-auth", "platform-db", 3306, "org1xxxxxxxx", "org1xxxxxxxx_user", "password");
 INSERT INTO org1xxxxxxxx.organization_private (id, informations) VALUES (1, JSON_OBJECT("TOKEN_CHECK_CLIENT_SECRET","bearer-client-secret", "INTERNAL_API_CLIENT_SECRET","pf-client-secret" ));
+INSERT INTO org1db.organization_private (id, informations) VALUES (1, JSON_OBJECT(
+-- "INTERNAL_API_CLIENT_CLIENTID","exastro-common-auth-pf",
+-- "INTERNAL_API_CLIENT_ID","pf-client-ID",
+-- "INTERNAL_API_CLIENT_SECRET","pf-client-secret"
+ "USER_TOKEN_CLIENT_CLIENTID","exastro-common-auth-public",
+ "USER_TOKEN_CLIENT_ID","pb-client-ID",
+
+ "TOKEN_CHECK_CLIENT_CLIENTID","exastro-common-auth-bearer",
+ "TOKEN_CHECK_CLIENT_CLIENTID","br-ID",
+ "TOKEN_CHECK_CLIENT_SECRET","bearer-client-secret",
+));
 INSERT INTO org1xxxxxxxx.workspace (workspace_id, workspace_name) VALUES ("workspace001", "workspace001");
 INSERT INTO org1xxxxxxxx.workspace (workspace_id, workspace_name) VALUES ("workspace002", "workspace002");
 INSERT INTO org1xxxxxxxx.workspace (workspace_id, workspace_name) VALUES ("workspaceAAA", "workspaceAAA");

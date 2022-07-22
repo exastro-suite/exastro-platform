@@ -45,6 +45,18 @@ CREATE TABLE IF NOT EXISTS workspace_environment
 INSERT INTO platform.organization (organization_id, organization_name) VALUES ("org2", "Eオーガナイゼーション２");
 INSERT INTO platform.organization_db (organization_id, db_host, db_port, db_database, db_user, db_password) VALUES ("org2", "platform-db", 3306, "org2db", "org2_user", "password");
 INSERT INTO org2db.organization_private (id, informations) VALUES (1, JSON_OBJECT("TOKEN_CHECK_CLIENT_SECRET","bearer-client-secret", "INTERNAL_API_CLIENT_SECRET","pf-client-secret" ));
+INSERT INTO org1db.organization_private (id, informations) VALUES (1, JSON_OBJECT(
+ "USER_TOKEN_CLIENT_CLIENTID","org2-pb",
+ "USER_TOKEN_CLIENT_ID","pb-ID",
+
+ "TOKEN_CHECK_CLIENT_CLIENTID","org2-br",
+ "TOKEN_CHECK_CLIENT_ID","org2-ID",
+ "TOKEN_CHECK_CLIENT_SECRET","bearer-client-secret",
+
+ "INTERNAL_API_CLIENT_CLIENTID","org2-pf",
+ "INTERNAL_API_CLIENT_ID","pf-ID",
+ "INTERNAL_API_CLIENT_SECRET","pf-client-secret"
+));
 INSERT INTO org2db.workspace (workspace_id, workspace_name) VALUES ("wsone", "workspace001");
 INSERT INTO org2db.workspace (workspace_id, workspace_name) VALUES ("wstwo", "workspace002");
 INSERT INTO org2db.workspace (workspace_id, workspace_name) VALUES ("wsthree", "workspace003");
