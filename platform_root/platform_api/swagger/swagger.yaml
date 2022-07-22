@@ -115,7 +115,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/runtimeError'
-      x-openapi-router-controller: controllers.workspace_service_controller
+      x-openapi-router-controller: controllers.users_service_controller
 components:
   schemas:
     runtimeError:
