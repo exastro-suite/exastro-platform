@@ -57,7 +57,14 @@ services:
     ports:
       - "0.0.0.0:8000:8000"
   keycloak:
-    image: jboss/keycloak:15.0.2
+    build:
+      dockerfile: ./platform_root/keycloak/Dockerfile
+      context: ../.
+      args:
+        - HTTP_PROXY=${HTTP_PROXY}
+        - http_proxy=${HTTP_PROXY}
+        - HTTPS_PROXY=${HTTPS_PROXY}
+        - https_proxy=${HTTPS_PROXY}
     environment:
       - KEYCLOAK_USER=admin
       - KEYCLOAK_PASSWORD=password
