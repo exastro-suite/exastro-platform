@@ -38,6 +38,7 @@ RUN dnf install -y \
     PyJWT \
     python-dotenv \
     flask-log-request-id \
+    pymysql \
 &&  groupadd $GROUPNAME \
 &&  useradd -m -s /bin/bash -g $GROUPNAME $USERNAME
 
@@ -56,6 +57,7 @@ RUN dnf config-manager --add-repo=https://download.docker.com/linux/centos/docke
     bind-utils \
     iputils \
     docker-ce-cli \
+    jq \
 &&  pip3.9 install \
     debugpy \
     flake8 \
