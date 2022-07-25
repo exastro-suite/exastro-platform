@@ -12,19 +12,10 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-responseOk:
-  $ref: "./responseOk.yaml"
-runtimeError:
-  $ref: "./runtimeError.yaml"
-role:
-  $ref: "./role.yaml"
-roleList:
-  $ref: "./roleList.yaml"
-user:
-  $ref: "./user.yaml"
-userList:
-  $ref: "./userList.yaml"
-workspace:
-  $ref: "./workspace.yaml"
-workspaceList:
-  $ref: "./workspaceList.yaml"
+type: object
+properties:
+  result:
+    type: integer
+    format: int32
+  info:
+    type: string
