@@ -59,18 +59,23 @@ def user_workspace_list(organization_id, user_id):  # noqa: E501
     # Pick up the workspace (child role = workspace_id) assigned to roles
     for key, role_parent in roles.get("clientMappings").items():
         for mapping in role_parent.get("mappings"):
-            if mapping.get("composite"):
-                composite_roles = api_keycloak_call.keycloak_client_role_composites_get(organization_id, private.user_token_client_id,
-                                                                                        mapping["name"], token)
-                for role in composite_roles:
-                    # 取得した子ロールが一度取得した内容にある場合は、重複するので読み飛ばし
-                    # If the acquired child role is in the acquired content, it will be duplicated and will be skipped.
-                    if role["name"] not in workspace_ids:
-                        workspace_ids.append(role["name"])
-                        workspaces.append({
-                            "workspace_id": role["name"],
-                            "name": "",
-                        })
+            # user_token_clinet_idと一致するロールのみチェック
+            # Check only roles that match user_token_clinet_id
+            if mapping.get("containerId") == private.user_token_client_id:
+                # 子ロールがある内容がworkspaceに紐づくのでその内容をチェックする
+                # Since the content with the child role is linked to the workspace, check the content
+                if mapping.get("composite"):
+                    composite_roles = api_keycloak_call.keycloak_client_role_composites_get(organization_id, private.user_token_client_id,
+                                                                                            mapping["name"], token)
+                    for role in composite_roles:
+                        # 取得した子ロールが一度取得した内容にある場合は、重複するので読み飛ばし
+                        # If the acquired child role is in the acquired content, it will be duplicated and will be skipped.
+                        if role["name"] not in workspace_ids:
+                            workspace_ids.append(role["name"])
+                            workspaces.append({
+                                "workspace_id": role["name"],
+                                "name": "",
+                            })
 
     with closing(DBconnector().connect_orgdb(organization_id)) as conn:
         with conn.cursor() as cursor:
