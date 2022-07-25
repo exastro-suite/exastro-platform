@@ -10,6 +10,8 @@ tags:
   description: ワークスペースに関する操作
 - name: UsersService
   description: ユーザーに関する操作
+- name: InternalWorkspaceService
+  description: ワークスペースに関する操作(内部用)
 paths:
   /api/{organization_id}/platform/workspaces:
     get:
@@ -116,6 +118,77 @@ paths:
               schema:
                 $ref: '#/components/schemas/runtimeError'
       x-openapi-router-controller: controllers.users_service_controller
+
+  /internal-api/{organization_id}/platform/workspaces/{workspace_id}/roles:
+    get:
+      tags:
+      - InternalWorkspaceService
+      summary: Get all roles for the workspace
+      operationId: workspace_role_list
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: workspace_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/roleList'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+      x-openapi-router-controller: controllers.internal_service_controller
+  /internal-api/{organization_id}/platform/workspaces/{workspace_id}/users:
+    get:
+      tags:
+      - InternalWorkspaceService
+      summary: Get all users for the workspace
+      operationId: workspace_user_list
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: workspace_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/userList'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+      x-openapi-router-controller: controllers.internal_service_controller
 components:
   schemas:
     runtimeError:
@@ -151,3 +224,54 @@ components:
           workspace_name: workspace_name
         - workspace_id: workspace_id
           workspace_name: workspace_name
+    role:
+      title: role is a definition of Role resource.
+      type: object
+      properties:
+        workspace_id:
+          type: string
+        workspace_name:
+          type: string
+      example:
+        workspace_id: workspace_id
+        workspace_name: workspace_name
+    roleList:
+      title: roleList is list of Role resources.
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/role'
+      example:
+        items:
+        - workspace_id: workspace_id
+          workspace_name: workspace_name
+        - workspace_id: workspace_id
+          workspace_name: workspace_name
+    user:
+      title: user is a definition of User resource.
+      type: object
+      properties:
+        workspace_id:
+          type: string
+        workspace_name:
+          type: string
+      example:
+        workspace_id: workspace_id
+        workspace_name: workspace_name
+    userList:
+      title: userList is list of User resources.
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/user'
+      example:
+        items:
+        - workspace_id: workspace_id
+          workspace_name: workspace_name
+        - workspace_id: workspace_id
+          workspace_name: workspace_name
+

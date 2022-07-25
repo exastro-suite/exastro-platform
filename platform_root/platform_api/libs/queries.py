@@ -12,18 +12,6 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-SQL_ORGANIZATION_DB_INFO = """
-SELECT db_host, db_port, db_database, db_user, db_password
-FROM organization_db
-WHERE organization_id = %s
-"""
-
-SQL_ORGANIZATION_PRIVATE_INFO = """
-SELECT id, informations, create_at, update_at
-FROM organization_private
-WHERE id = 1
-"""
-
 SQL_INSERT_WORKSPACE = """
 INSERT INTO workspace (workspace_id, workspace_name)
 values (%(workspace_id)s, %(workspace_name)s)
