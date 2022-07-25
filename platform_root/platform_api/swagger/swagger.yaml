@@ -10,6 +10,8 @@ tags:
   description: ワークスペースに関する操作
 - name: UsersService
   description: ユーザーに関する操作
+- name: InternalUsersService
+  description: ユーザーに関する操作(内部用)
 - name: InternalWorkspaceService
   description: ワークスペースに関する操作(内部用)
 paths:
@@ -82,12 +84,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/runtimeError'
       x-openapi-router-controller: controllers.workspace_service_controller
-
   /api/{organization_id}/platform/users/{user_id}/workspaces:
     get:
       tags:
       - UsersService
-      summary: List returns list of workspaces
+      summary: workspaces list of user posible
       operationId: user_workspace_list
       parameters:
       - name: organization_id
@@ -118,7 +119,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/runtimeError'
       x-openapi-router-controller: controllers.users_service_controller
-
   /internal-api/{organization_id}/platform/workspaces/{workspace_id}/roles:
     get:
       tags:
@@ -157,7 +157,7 @@ paths:
   /internal-api/{organization_id}/platform/workspaces/{workspace_id}/users:
     get:
       tags:
-      - InternalWorkspaceService
+      - InternalService
       summary: Get all users for the workspace
       operationId: workspace_user_list
       parameters:
@@ -189,41 +189,51 @@ paths:
               schema:
                 $ref: '#/components/schemas/runtimeError'
       x-openapi-router-controller: controllers.internal_service_controller
+  /internal-api/{organization_id}/platform/users/{user_id}/workspaces:
+    get:
+      tags:
+      - InternalUsersService
+      summary: workspaces list of user posible
+      operationId: user_workspace_list
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: user_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/workspaceList'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+      x-openapi-router-controller: controllers.internal_users_service_controller
 components:
   schemas:
     runtimeError:
       type: object
       properties:
-        code:
+        result:
           type: integer
           format: int32
-        message:
+        info:
           type: string
-    workspace:
-      title: workspace is a definition of Workspace resource.
-      type: object
-      properties:
-        workspace_id:
-          type: string
-        workspace_name:
-          type: string
-      example:
-        workspace_id: workspace_id
-        workspace_name: workspace_name
-    workspaceList:
-      title: workspaceList is list of Workspace resources.
-      type: object
-      properties:
-        items:
-          type: array
-          items:
-            $ref: '#/components/schemas/workspace'
-      example:
-        items:
-        - workspace_id: workspace_id
-          workspace_name: workspace_name
-        - workspace_id: workspace_id
-          workspace_name: workspace_name
     role:
       title: role is a definition of Role resource.
       type: object
@@ -268,6 +278,31 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/user'
+      example:
+        items:
+        - workspace_id: workspace_id
+          workspace_name: workspace_name
+        - workspace_id: workspace_id
+          workspace_name: workspace_name
+    workspace:
+      title: workspace is a definition of Workspace resource.
+      type: object
+      properties:
+        workspace_id:
+          type: string
+        workspace_name:
+          type: string
+      example:
+        workspace_id: workspace_id
+        workspace_name: workspace_name
+    workspaceList:
+      title: workspaceList is list of Workspace resources.
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/workspace'
       example:
         items:
         - workspace_id: workspace_id

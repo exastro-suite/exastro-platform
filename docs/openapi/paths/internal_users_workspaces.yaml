@@ -14,31 +14,35 @@
 
 get:
   tags:
-  - InternalWorkspaceService
-  summary: Get all roles for the workspace
-  x-openapi-router-controller: controllers.internal_service_controller
-  operationId: Workspace_role_List
+  - InternalUsersService
+  summary: workspaces list of user posible
+  operationId: user_workspace_list
   parameters:
   - name: organization_id
     in: path
     required: true
+    style: simple
+    explode: false
     schema:
       type: string
-  - name: workspace_id
+  - name: user_id
     in: path
     required: true
+    style: simple
+    explode: false
     schema:
       type: string
   responses:
-    200:
+    "200":
       description: A successful response.
       content:
         application/json:
           schema:
-            $ref: '../schemas/roleList.yaml'
+            $ref: '../schemas/workspaceList.yaml'
     default:
       description: An unexpected error response.
       content:
         application/json:
           schema:
             $ref: '../schemas/runtimeError.yaml'
+  x-openapi-router-controller: controllers.internal_users_service_controller
