@@ -76,6 +76,43 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/runtimeError'
+
+  /internal-api/{organization_id}/platform/users/{user_id}/workspaces:
+    get:
+      tags:
+      - UsersService
+      summary: workspaces list of user posible
+      operationId: user_workspace_list
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: user_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/workspaceList'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+      x-openapi-router-controller: controllers.users_service_controller
+
 components:
   schemas:
     runtimeError:
@@ -118,3 +155,19 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/user'
+    workspace:
+      title: workspace is a definition of Workspace resource.
+      type: object
+      properties:
+        workspace_id:
+          type: string
+        workspace_name:
+          type: string
+    workspaceList:
+      title: workspaceList is list of Workspace resources.
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/workspace'
