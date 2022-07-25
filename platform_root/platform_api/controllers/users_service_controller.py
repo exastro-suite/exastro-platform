@@ -66,6 +66,7 @@ def user_workspace_list(organization_id, user_id):  # noqa: E501
                     # 取得した子ロールが一度取得した内容にある場合は、重複するので読み飛ばし
                     # If the acquired child role is in the acquired content, it will be duplicated and will be skipped.
                     if role["name"] not in workspace_ids:
+                        workspace_ids.append(role["name"])
                         workspaces.append({
                             "workspace_id": role["name"],
                             "name": "",
