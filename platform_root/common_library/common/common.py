@@ -22,6 +22,20 @@ import globals
 
 
 class AuthException(Exception):
+    """認証系例外 Authentication Exception
+
+    Args:
+        Exception (Exception): Exception
+    """
+    pass
+
+
+class UserException(Exception):
+    """ユーザー例外 User Exception
+
+    Args:
+        Exception (Exception): Exception
+    """
     pass
 
 
@@ -84,3 +98,42 @@ def platform_exception_handler(func):
         return response
 
     return inner_func
+
+
+def get_public_client_id(organization_id):
+    """get public client id
+
+    Args:
+        organization_id (str) : organization id
+
+    Returns:
+        str : public_client_id
+    """
+
+    return f"{organization_id}-pb"
+
+
+def get_bearer_client_id(organization_id):
+    """get bearer client id
+
+    Args:
+        organization_id (str) : organization id
+
+    Returns:
+        str : bearer_client_id
+    """
+
+    return f"{organization_id}-br"
+
+
+def get_platform_client_id(organization_id):
+    """get platform client id
+
+    Args:
+        organization_id (str) : organization id
+
+    Returns:
+        str : platform_client_id
+    """
+
+    return f"{organization_id}-pf"
