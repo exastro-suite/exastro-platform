@@ -5,3 +5,5 @@
 .talismanrc
 __pycache__/
 *.sql
+/*/common_library/
+/*/common_resource/
