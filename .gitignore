@@ -4,6 +4,6 @@
 !/.vscode_extensions/.gitkeep
 .talismanrc
 __pycache__/
+/platform_root/*/common_library/
+/platform_root/*/common_resources/
 *.sql
-/*/common_library/
-/*/common_resource/
