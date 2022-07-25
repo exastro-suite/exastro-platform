@@ -14,9 +14,9 @@
 
 get:
   tags:
-  - InternalService
+  - InternalWorkspaceService
   summary: Get all users for the workspace
-  x-openapi-router-controller: controllers.internal_workspace_service_controller
+  x-openapi-router-controller: controllers.internal_service_controller
   operationId: Workspace_user_List
   parameters:
   - name: organization_id

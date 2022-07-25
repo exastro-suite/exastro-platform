@@ -27,6 +27,8 @@ tags:
   description: ワークスペースに関する操作
 - name: UsersService
   description: ユーザーに関する操作
+- name: InternalUsersService
+  description: ユーザーに関する操作(内部用)
 - name: InternalWorkspaceService
   description: ワークスペースに関する操作(内部用)
 
@@ -40,7 +42,7 @@ paths:
   "/internal-api/{organization_id}/platform/workspaces/{workspace_id}/users":
       $ref: './paths/workspaces_users.yaml'
   "/internal-api/{organization_id}/platform/users/{user_id}/workspaces":
-      $ref: './paths/users_workspaces.yaml'
+      $ref: './paths/internal_users_workspaces.yaml'
 
 components:
   schemas:
