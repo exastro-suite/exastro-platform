@@ -12,23 +12,22 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-SQL_INSERT_WORKSPACE = """
-INSERT INTO workspace (workspace_id, workspace_name)
-values (%(workspace_id)s, %(workspace_name)s)
-"""
 
-SQL_QUERY_WORKSPACE_LIST = """
-SELECT workspace_id, workspace_name, create_at, update_at
-FROM workspace
-"""
+from common_library.common import common
+import controllers.users_service_controller as users_service_controller
 
-SQL_QUERY_WORKSPACE = """
-SELECT *
-FROM workspace
-"""
 
-SQL_QUERY_ORGANIZATION_PRIVATE = """
-SELECT *
-FROM organization_private
-WHERE id = 1
-"""
+@common.platform_exception_handler
+def user_workspace_list(organization_id, user_id):
+    """workspaces list of user posible
+
+    :param organization_id:
+    :type organization_id: str
+    :param user_id:
+    :type user_id: str
+
+    :rtype: WorkspaceList
+    """
+
+    # 外部用の呼び出しにリダイレクト
+    return users_service_controller.user_workspace_list(organization_id, user_id)

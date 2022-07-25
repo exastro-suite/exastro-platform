@@ -15,12 +15,23 @@
 from contextlib import closing
 import os
 import pymysql
-
-from libs import queries
+import json
 
 
 class DBconnector:
     """database connection class
+    """
+
+    SQL_ORGANIZATION_DB_INFO = """
+    SELECT db_host, db_port, db_database, db_user, db_password
+    FROM organization_db
+    WHERE organization_id = %s
+    """
+
+    SQL_ORGANIZATION_PRIVATE_INFO = """
+    SELECT id, informations, create_at, update_at
+    FROM organization_private
+    WHERE id = 1
     """
 
     class __dbinfo:
@@ -86,7 +97,7 @@ class DBconnector:
         """
         with closing(self.connect_platformdb()) as conn:
             with conn.cursor() as cursor:
-                sql = queries.SQL_ORGANIZATION_DB_INFO
+                sql = self.SQL_ORGANIZATION_DB_INFO
                 cursor.execute(sql, (organization_id, ))
                 result = cursor.fetchone()
 
@@ -100,3 +111,58 @@ class DBconnector:
         conn = self.__connection(orgdb)
 
         return conn
+
+    class organization_private:
+        """organization_private info
+        """
+
+        user_token_client_clientid: str
+        """XXX-pb clientid"""
+        user_token_client_id: str
+        """XXX-pb ID"""
+
+        token_check_client_clientid: str
+        """XXX-br clientid"""
+        token_check_client_id: str
+        """XXX-br ID"""
+        token_check_client_secret: str
+        """XXX-br secret"""
+
+        internal_api_client_clientid: str
+        """XXX-pf clientid"""
+        internal_api_client_id: str
+        """XXX-pf ID"""
+        internal_api_client_secret: str
+        """XXX-pf secret"""
+
+    def get_organization_private(self, organization_id) -> organization_private:
+        """get organization_private informations
+
+        Args:
+            organization_id (str): organization_id
+
+        Returns:
+            dict: organization_private informations
+        """
+
+        json_dict = {}
+
+        with closing(DBconnector().connect_orgdb(organization_id)) as conn:
+            with conn.cursor() as cursor:
+                cursor.execute(self.SQL_ORGANIZATION_PRIVATE_INFO)
+                result = cursor.fetchone()
+
+                infoormations = result.get("informations")
+                json_dict = json.loads(infoormations)
+
+                data = self.organization_private()
+                data.user_token_client_clientid = json_dict.get("USER_TOKEN_CLIENT_CLIENTID")
+                data.user_token_client_id = json_dict.get("USER_TOKEN_CLIENT_ID")
+                data.token_check_client_clientid = json_dict.get("TOKEN_CHECK_CLIENT_CLIENTID")
+                data.token_check_client_id = json_dict.get("TOKEN_CHECK_CLIENT_ID")
+                data.token_check_client_secret = json_dict.get("TOKEN_CHECK_CLIENT_SECRET")
+                data.internal_api_client_clientid = json_dict.get("INTERNAL_API_CLIENT_CLIENTID")
+                data.internal_api_client_id = json_dict.get("INTERNAL_API_CLIENT_ID")
+                data.internal_api_client_secret = json_dict.get("INTERNAL_API_CLIENT_SECRET")
+
+        return data
