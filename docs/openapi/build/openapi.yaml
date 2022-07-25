@@ -10,6 +10,8 @@ tags:
     description: ワークスペースに関する操作
   - name: UsersService
     description: ユーザーに関する操作
+  - name: InternalCommonService
+    description: 共通(内部用)
   - name: InternalUsersService
     description: ユーザーに関する操作(内部用)
   - name: InternalWorkspaceService
@@ -146,7 +148,7 @@ paths:
   '/internal-api/{organization_id}/platform/workspaces/{workspace_id}/users':
     get:
       tags:
-        - InternalService
+        - InternalWorkspaceService
       summary: Get all users for the workspace
       x-openapi-router-controller: controllers.internal_service_controller
       operationId: Workspace_user_List
@@ -209,8 +211,36 @@ paths:
               schema:
                 $ref: '#/components/schemas/runtimeError'
       x-openapi-router-controller: controllers.internal_users_service_controller
+  /internal-api/alive:
+    get:
+      tags:
+        - InternalCommonService
+      summary: alive
+      x-openapi-router-controller: controllers.internal_common_service_controller
+      operationId: alive
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responseOk'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
 components:
   schemas:
+    responseOk:
+      type: object
+      properties:
+        result:
+          type: integer
+          format: int32
+        info:
+          type: string
     runtimeError:
       type: object
       properties:

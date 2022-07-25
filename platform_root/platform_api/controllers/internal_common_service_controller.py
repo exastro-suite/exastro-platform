@@ -12,19 +12,18 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-responseOk:
-  $ref: "./responseOk.yaml"
-runtimeError:
-  $ref: "./runtimeError.yaml"
-role:
-  $ref: "./role.yaml"
-roleList:
-  $ref: "./roleList.yaml"
-user:
-  $ref: "./user.yaml"
-userList:
-  $ref: "./userList.yaml"
-workspace:
-  $ref: "./workspace.yaml"
-workspaceList:
-  $ref: "./workspaceList.yaml"
+from flask import jsonify
+from datetime import datetime
+
+from common_library.common import common
+
+
+@common.platform_exception_handler
+def alive():
+    """死活監視
+
+    Returns:
+        Response: HTTP Respose
+    """
+    ret_status = 200
+    return jsonify({"result": ret_status, "time": str(datetime.utcnow())}), ret_status
