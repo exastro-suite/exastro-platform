@@ -17,8 +17,10 @@ FROM jboss/keycloak:15.0.2 as common_build
 ENV KEYCLOAK_WELCOME_THEME=exastro
 ENV KEYCLOAK_DEFAULT_THEME=exastro
 
-WORKDIR /opt/jboss/keycloak/themes/exastro
+WORKDIR /opt/jboss/keycloak/themes/exastro.v2
+COPY    ./platform_root/keycloak/themes/exastro/account /opt/jboss/keycloak/themes/exastro.v2/account
 
+WORKDIR /opt/jboss/keycloak/themes/exastro
 COPY    ./platform_root/keycloak/themes/exastro /opt/jboss/keycloak/themes/exastro
 
 #

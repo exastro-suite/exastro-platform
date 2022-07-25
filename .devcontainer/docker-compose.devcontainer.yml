@@ -129,4 +129,5 @@ services:
       target: develop_build
     volumes:
       - ..:/workspace:cached
+      - ../platform_root/keycloak/themes/exastro/account:/opt/jboss/keycloak/themes/exastro.v2/account:cached
       - ../platform_root/keycloak/themes/exastro:/opt/jboss/keycloak/themes/exastro:cached
