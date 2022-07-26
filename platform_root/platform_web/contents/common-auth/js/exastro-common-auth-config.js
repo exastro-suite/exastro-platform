@@ -16,7 +16,7 @@ const CommonAuthConfig = {
     /**
      * Login client name pattern
      */
-    "LOGIN_CLIENT": "%{RELMNAME}-pb",
+    "LOGIN_CLIENT": "%{RELMNAME}",
 
     /**
      * Interval to check token expiration (sec) / tokenの有効期限切れをチェックする間隔(sec)
