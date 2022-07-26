@@ -100,30 +100,30 @@ def platform_exception_handler(func):
     return inner_func
 
 
-def get_public_client_id(organization_id):
-    """get public client id
+def get_user_token_client_id(organization_id):
+    """get user token client id
 
     Args:
         organization_id (str) : organization id
 
     Returns:
-        str : public_client_id
+        str : user token client client_id
     """
 
-    return f"{organization_id}-pb"
+    return f"{organization_id}"
 
 
-def get_bearer_client_id(organization_id):
-    """get bearer client id
+def get_token_authentication_client_id(organization_id):
+    """get token authentication client id
 
     Args:
         organization_id (str) : organization id
 
     Returns:
-        str : bearer_client_id
+        str : token authentication client client_id
     """
 
-    return f"{organization_id}-br"
+    return f"system-{organization_id}-auth"
 
 
 def get_platform_client_id(organization_id):
@@ -133,7 +133,7 @@ def get_platform_client_id(organization_id):
         organization_id (str) : organization id
 
     Returns:
-        str : platform_client_id
+        str : platform client client_id
     """
 
-    return f"{organization_id}-pf"
+    return f"{organization_id}-workspaces"

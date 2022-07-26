@@ -65,7 +65,7 @@ class auth_proxy:
 
         # 接続先のClient設定
         # Client settings for connection destination
-        self.token_check_client_id = common.get_bearer_client_id(realm)
+        self.token_check_client_id = common.get_token_authentication_client_id(realm)
 
         # サービスアカウントを使うためにClientのSercretを取得
         # Get Client Sercret to use service account
@@ -83,7 +83,7 @@ class auth_proxy:
 
         # 接続先のClient設定
         # Client settings for connection destination
-        self.user_token_client_id = common.get_public_client_id(realm)
+        self.user_token_client_id = common.get_user_token_client_id(realm)
 
     def check_authorization(self):
         """認証情報チェック Authorization check
