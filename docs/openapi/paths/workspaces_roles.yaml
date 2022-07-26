@@ -16,8 +16,8 @@ get:
   tags:
   - InternalWorkspaceService
   summary: Get all roles for the workspace
-  x-openapi-router-controller: controllers.internal_service_controller
-  operationId: Workspace_role_List
+  x-openapi-router-controller: controllers.internal_workspace_service_controller
+  operationId: workspace_role_list
   parameters:
   - name: organization_id
     in: path

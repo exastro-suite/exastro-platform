@@ -169,7 +169,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/runtimeError'
-      x-openapi-router-controller: controllers.internal_service_controller
+      x-openapi-router-controller: controllers.internal_workspace_service_controller
   /internal-api/{organization_id}/platform/workspaces/{workspace_id}/users:
     get:
       tags:
@@ -204,7 +204,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/runtimeError'
-      x-openapi-router-controller: controllers.internal_service_controller
+      x-openapi-router-controller: controllers.internal_workspace_service_controller
   /internal-api/{organization_id}/platform/users/{user_id}/workspaces:
     get:
       tags:
@@ -285,13 +285,22 @@ components:
       title: role is a definition of Role resource.
       type: object
       properties:
-        workspace_id:
+        clientRole:
+          type: boolean
+        composite:
+          type: boolean
+        containerId:
           type: string
-        workspace_name:
+        id:
+          type: string
+        name:
           type: string
       example:
-        workspace_id: workspace_id
-        workspace_name: workspace_name
+        clientRole: true
+        composite: true
+        name: name
+        id: id
+        containerId: containerId
     roleList:
       title: roleList is list of Role resources.
       type: object
@@ -302,21 +311,39 @@ components:
             $ref: '#/components/schemas/role'
       example:
         items:
-        - workspace_id: workspace_id
-          workspace_name: workspace_name
-        - workspace_id: workspace_id
-          workspace_name: workspace_name
+        - clientRole: true
+          composite: true
+          name: name
+          id: id
+          containerId: containerId
+        - clientRole: true
+          composite: true
+          name: name
+          id: id
+          containerId: containerId
     user:
       title: user is a definition of User resource.
       type: object
       properties:
-        workspace_id:
+        id:
           type: string
-        workspace_name:
+        username:
           type: string
+        email:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        enabled:
+          type: boolean
       example:
-        workspace_id: workspace_id
-        workspace_name: workspace_name
+        firstName: firstName
+        lastName: lastName
+        id: id
+        email: email
+        enabled: true
+        username: username
     userList:
       title: userList is list of User resources.
       type: object
@@ -327,10 +354,18 @@ components:
             $ref: '#/components/schemas/user'
       example:
         items:
-        - workspace_id: workspace_id
-          workspace_name: workspace_name
-        - workspace_id: workspace_id
-          workspace_name: workspace_name
+        - firstName: firstName
+          lastName: lastName
+          id: id
+          email: email
+          enabled: true
+          username: username
+        - firstName: firstName
+          lastName: lastName
+          id: id
+          email: email
+          enabled: true
+          username: username
     workspace:
       title: workspace is a definition of Workspace resource.
       type: object

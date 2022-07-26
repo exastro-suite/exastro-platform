@@ -23,7 +23,7 @@ paths:
         - WorkspaceService
       summary: List returns list of workspaces
       x-openapi-router-controller: controllers.workspace_service_controller
-      operationId: Workspace_List
+      operationId: workspace_list
       parameters:
         - name: organization_id
           in: path
@@ -53,7 +53,7 @@ paths:
         - WorkspaceService
       summary: Create creates an workspace
       x-openapi-router-controller: controllers.workspace_service_controller
-      operationId: Workspace_Create
+      operationId: workspace_create
       parameters:
         - name: organization_id
           in: path
@@ -119,8 +119,8 @@ paths:
       tags:
         - InternalWorkspaceService
       summary: Get all roles for the workspace
-      x-openapi-router-controller: controllers.internal_service_controller
-      operationId: Workspace_role_List
+      x-openapi-router-controller: controllers.internal_workspace_service_controller
+      operationId: workspace_role_list
       parameters:
         - name: organization_id
           in: path
@@ -150,8 +150,8 @@ paths:
       tags:
         - InternalWorkspaceService
       summary: Get all users for the workspace
-      x-openapi-router-controller: controllers.internal_service_controller
-      operationId: Workspace_user_List
+      x-openapi-router-controller: controllers.internal_workspace_service_controller
+      operationId: workspace_user_list
       parameters:
         - name: organization_id
           in: path
@@ -253,9 +253,15 @@ components:
       title: role is a definition of Role resource.
       type: object
       properties:
-        workspace_id:
+        clientRole:
+          type: boolean
+        composite:
+          type: boolean
+        containerId:
           type: string
-        workspace_name:
+        id:
+          type: string
+        name:
           type: string
     roleList:
       title: roleList is list of Role resources.
@@ -269,10 +275,18 @@ components:
       title: user is a definition of User resource.
       type: object
       properties:
-        workspace_id:
+        id:
           type: string
-        workspace_name:
+        username:
           type: string
+        email:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        enabled:
+          type: boolean
     userList:
       title: userList is list of User resources.
       type: object

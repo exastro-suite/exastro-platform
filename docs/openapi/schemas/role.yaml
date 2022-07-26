@@ -15,7 +15,13 @@
 title: role is a definition of Role resource.
 type: object
 properties:
-  workspace_id:
+  clientRole:
+    type: boolean
+  composite:
+    type: boolean
+  containerId:
     type: string
-  workspace_name:
+  id:
+    type: string
+  name:
     type: string
