@@ -17,7 +17,7 @@ get:
   - WorkspaceService
   summary: List returns list of workspaces
   x-openapi-router-controller: controllers.workspace_service_controller
-  operationId: Workspace_List
+  operationId: workspace_list
   parameters:
   - name: organization_id
     in: path
@@ -47,7 +47,7 @@ post:
   - WorkspaceService
   summary: Create creates an workspace
   x-openapi-router-controller: controllers.workspace_service_controller
-  operationId: Workspace_Create
+  operationId: workspace_create
   parameters:
   - name: organization_id
     in: path

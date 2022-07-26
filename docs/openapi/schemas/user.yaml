@@ -15,7 +15,16 @@
 title: user is a definition of User resource.
 type: object
 properties:
-  workspace_id:
+  id:
     type: string
-  workspace_name:
+  username:
     type: string
+  email:
+    type: string
+  firstName:
+    type: string
+  lastName:
+    type: string
+  enabled:
+    type: boolean
+
