@@ -76,10 +76,13 @@ services:
       - DB_USER=keycloak
       - DB_PASSWORD=password
     depends_on:
-      - keycloak-db
+      keycloak-db:
+        condition: service_healthy
   ### keycloak-dbは後で消して、platform-db一つにする
   keycloak-db:
     image: mariadb:10.4.8
+    healthcheck:
+      test: mysqladmin ping --silent && mysql -u $${MYSQL_USER} -p$${MYSQL_PASSWORD} -D $${MYSQL_DATABASE} -e 'select 1;'
     volumes:
       - ../.volumes/keycloak-db/data:/var/lib/mysql
     environment:
