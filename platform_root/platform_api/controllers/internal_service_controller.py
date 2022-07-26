@@ -41,7 +41,7 @@ def workspace_role_list(organization_id, workspace_id):
     workspace_roles = __workspace_role_list(
         organization_id=organization_id,
         workspace_id=workspace_id,
-        client_id=private.user_token_client_id,
+        client_uid=private.user_token_client_id,
         token=token,
     )
 
@@ -73,7 +73,7 @@ def workspace_user_list(organization_id, workspace_id):
     workspace_roles = __workspace_role_list(
         organization_id=organization_id,
         workspace_id=workspace_id,
-        client_id=private.user_token_client_id,
+        client_uid=private.user_token_client_id,
         token=token,
     )
 
@@ -90,8 +90,8 @@ def workspace_user_list(organization_id, workspace_id):
     return workspace_users
 
 
-def __workspace_role_list(organization_id, workspace_id, client_id, token):
-    """_summary_
+def __workspace_role_list(organization_id, workspace_id, client_uid, token):
+    """Get all roles for the workspace
 
     Args:
         organization_id (str): organization_id
@@ -107,7 +107,7 @@ def __workspace_role_list(organization_id, workspace_id, client_id, token):
     # Get only composite workspace roles from the custum role list
     custum_roles = api_keycloak_call.keycloak_client_role_get(
         realm_name=organization_id,
-        client_id=client_id,
+        client_id=client_uid,
         role_name="",
         token=token,
     )
@@ -115,15 +115,19 @@ def __workspace_role_list(organization_id, workspace_id, client_id, token):
     workspace_roles = []
 
     for pf_role in custum_roles:
+        if pf_role.get("composite") is not True:
+            continue
 
         # ロールのcomposites から workspace_id を含むものだけを取得
         # Get only those contain workspace_id from the composite roles
-        role_composites = api_keycloak_call.keycloak_client_role_composites_get(
-            realm_name=organization_id,
-            client_uid=client_id,
-            role_name=pf_role.get("name"),
-            token=token,
-        )
+        role_composites = []
+        if pf_role.get("containerId") == client_uid:
+            role_composites = api_keycloak_call.keycloak_client_role_composites_get(
+                realm_name=organization_id,
+                client_uid=client_uid,
+                role_name=pf_role.get("name"),
+                token=token,
+            )
 
         list_search = [role for role in role_composites if role.get('name') == workspace_id]
         if len(list_search) > 0:

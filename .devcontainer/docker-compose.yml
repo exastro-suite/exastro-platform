@@ -71,33 +71,25 @@ services:
       - KEYCLOAK_PASSWORD=password
       - PROXY_ADDRESS_FORWARDING=true
       - DB_VENDOR=mariadb
-      - DB_ADDR=keycloak-db
+      - DB_ADDR=platform-db
       - DB_DATABASE=keycloak
       - DB_USER=keycloak
       - DB_PASSWORD=password
     depends_on:
-      keycloak-db:
+      platform-db:
         condition: service_healthy
-  ### keycloak-dbは後で消して、platform-db一つにする
-  keycloak-db:
-    image: mariadb:10.4.8
-    healthcheck:
-      test: mysqladmin ping --silent && mysql -u $${MYSQL_USER} -p$${MYSQL_PASSWORD} -D $${MYSQL_DATABASE} -e 'select 1;'
-    volumes:
-      - ../.volumes/keycloak-db/data:/var/lib/mysql
-    environment:
-      - MYSQL_ROOT_PASSWORD=password
-      - MYSQL_DATABASE=keycloak
-      - MYSQL_USER=keycloak
-      - MYSQL_PASSWORD=password
-  ### keycloak-dbは後で消して、platform-db一つにする
   platform-db:
     image: mariadb:10.4.8
+    healthcheck:
+      test: mysqladmin ping --silent && mysql -u $${KEYCLOAK_DB_USER} -p$${KEYCLOAK_DB_PASSWORD} -D $${KEYCLOAK_DB_DATABASE} -e 'select 1;'
     volumes:
       - ../.volumes/platform-db/data:/var/lib/mysql
       - ../platform_root/platform_db/initdb:/docker-entrypoint-initdb.d
     environment:
       - MYSQL_ROOT_PASSWORD=password
+      - KEYCLOAK_DB_DATABASE=keycloak
+      - KEYCLOAK_DB_USER=keycloak
+      - KEYCLOAK_DB_PASSWORD=password
   platform-web:
     build:
       dockerfile: ./platform_root/platform_web/Dockerfile
