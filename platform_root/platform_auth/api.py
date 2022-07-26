@@ -134,11 +134,10 @@ def ita_workspace_api_call(organization_id, workspace_id, subpath):
             os.environ['ITA_API_PROTOCOL'], os.environ['ITA_API_HOST'], os.environ['ITA_API_PORT'], organization_id, workspace_id, subpath)
 
         # Common authorization proxy processing call - 共通の認可proxy処理呼び出し
-        proxy = auth_proxy.auth_proxy()
-
         # organization idをrealm名として設定
         # Set organization id as realm name
-        proxy.realm = organization_id
+        proxy = auth_proxy.auth_proxy(organization_id)
+        # proxy.realm = organization_id
 
         # 各種チェック check
         response_json = proxy.check_authorization()
