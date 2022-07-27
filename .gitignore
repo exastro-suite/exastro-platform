@@ -7,3 +7,4 @@ __pycache__/
 /platform_root/*/common_library/
 /platform_root/*/common_resources/
 /*.sql
+/.private/
