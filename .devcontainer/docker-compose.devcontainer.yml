@@ -131,3 +131,7 @@ services:
       - ..:/workspace:cached
       - ../platform_root/keycloak/themes/exastro/account:/opt/jboss/keycloak/themes/exastro.v2/account:cached
       - ../platform_root/keycloak/themes/exastro:/opt/jboss/keycloak/themes/exastro:cached
+
+  platform-db:
+    ports:
+      - "0.0.0.0:3306:3306"
