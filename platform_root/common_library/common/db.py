@@ -23,15 +23,15 @@ class DBconnector:
     """
 
     SQL_ORGANIZATION_DB_INFO = """
-    SELECT db_host, db_port, db_database, db_user, db_password
-    FROM organization_db
-    WHERE organization_id = %s
+    SELECT DB_HOST, DB_PORT, DB_DATABASE, DB_USER, DB_PASSWORD
+    FROM T_ORGANIZATION_DB
+    WHERE ORGANIZATION_ID = %s
     """
 
     SQL_ORGANIZATION_PRIVATE_INFO = """
-    SELECT id, informations, create_at, update_at
-    FROM organization_private
-    WHERE id = 1
+    SELECT ID, INFORMATIONS
+    FROM T_ORGANIZATION_PRIVATE
+    WHERE ID = 1
     """
 
     class __dbinfo:
@@ -102,11 +102,11 @@ class DBconnector:
                 result = cursor.fetchone()
 
         orgdb = self.__dbinfo()
-        orgdb.db_host = result.get('db_host')
-        orgdb.db_port = result.get('db_port')
-        orgdb.db_database = result.get('db_database')
-        orgdb.db_user = result.get('db_user')
-        orgdb.db_password = result.get('db_password')
+        orgdb.db_host = result.get('DB_HOST')
+        orgdb.db_port = result.get('DB_PORT')
+        orgdb.db_database = result.get('DB_DATABASE')
+        orgdb.db_user = result.get('DB_USER')
+        orgdb.db_password = result.get('DB_PASSWORD')
 
         conn = self.__connection(orgdb)
 
@@ -152,7 +152,7 @@ class DBconnector:
                 cursor.execute(self.SQL_ORGANIZATION_PRIVATE_INFO)
                 result = cursor.fetchone()
 
-                infoormations = result.get("informations")
+                infoormations = result.get("INFORMATIONS")
                 json_dict = json.loads(infoormations)
 
                 data = self.organization_private()

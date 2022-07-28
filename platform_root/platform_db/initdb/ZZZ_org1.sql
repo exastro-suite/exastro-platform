@@ -5,57 +5,45 @@ GRANT ALL PRIVILEGES ON org1db.* TO org1_user;
 
 USE org1db;
 
-CREATE TABLE IF NOT EXISTS organization_private
+CREATE TABLE IF NOT EXISTS T_ORGANIZATION_PRIVATE
 (
-  id int not null,
-  informations json not null,
-  create_at datetime not null DEFAULT CURRENT_TIMESTAMP,
-  update_at datetime not null DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (id)
+  ID INT NOT NULL,
+  INFORMATIONS JSON NOT NULL,
+  CREATE_TIMESTAMP DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CREATE_USER VARCHAR(40),
+  LAST_UPDATE_TIMESTAMP DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  LAST_UPDATE_USER VARCHAR(40),
+  PRIMARY KEY (ID)
 );
 
-CREATE TABLE IF NOT EXISTS workspace
+CREATE TABLE IF NOT EXISTS T_WORKSPACE
 (
-  workspace_id varchar(255) not null,
-  workspace_name varchar(255) not null,
-  create_at datetime not null DEFAULT CURRENT_TIMESTAMP,
-  update_at datetime not null DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (workspace_id)
+  WORKSPACE_ID VARCHAR(36) NOT NULL,
+  WORKSPACE_NAME VARCHAR(255) NOT NULL,
+  INFORMATIONS JSON NOT NULL,
+  CREATE_TIMESTAMP DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CREATE_USER VARCHAR(40),
+  LAST_UPDATE_TIMESTAMP DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  LAST_UPDATE_USER VARCHAR(40),
+  PRIMARY KEY (WORKSPACE_ID)
 );
 
-CREATE TABLE IF NOT EXISTS environment
-(
-  environment_id varchar(255) not null,
-  environment_name varchar(255) not null,
-  create_at datetime not null DEFAULT CURRENT_TIMESTAMP,
-  update_at datetime not null DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (environment_id)
-);
-
-CREATE TABLE IF NOT EXISTS workspace_environment
-(
-  workspace_id varchar(255) not null,
-  environment_id varchar(255) not null,
-  create_at datetime not null DEFAULT CURRENT_TIMESTAMP,
-  update_at datetime not null DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (workspace_id, environment_id)
-);
 
 -- 仮データ
-INSERT INTO platform.organization (organization_id, organization_name) VALUES ("org1", "オーガナイゼーション１");
-INSERT INTO platform.organization_db (organization_id, db_host, db_port, db_database, db_user, db_password) VALUES ("org1", "platform-db", 3306, "org1db", "org1_user", "password");
-INSERT INTO org1db.organization_private (id, informations) VALUES (1, JSON_OBJECT(
- "USER_TOKEN_CLIENT_CLIENTID","org1-pb",
- "USER_TOKEN_CLIENT_ID","pb-ID",
+-- INSERT INTO platform.T_ORGANIZATION (ORGANIZATION_ID, ORGANIZATION_NAME, INFORMATIONS) VALUES ("org1", "オーガナイゼーション１", "{}");
+-- INSERT INTO platform.T_ORGANIZATION_DB (ORGANIZATION_ID, DB_HOST, DB_PORT, DB_DATABASE, DB_USER, DB_PASSWORD) VALUES ("org1", "platform-db", 3306, "org1db", "org1_user", "password");
+-- INSERT INTO org1db.T_ORGANIZATION_PRIVATE (ID, INFORMATIONS) VALUES (1, JSON_OBJECT(
+--  "USER_TOKEN_CLIENT_CLIENTID","org1",
+--  "USER_TOKEN_CLIENT_ID","org1-ID",
 
- "TOKEN_CHECK_CLIENT_CLIENTID","org1-br",
- "TOKEN_CHECK_CLIENT_ID","br-ID",
- "TOKEN_CHECK_CLIENT_SECRET","bearer-client-secret",
+--  "INTERNAL_API_CLIENT_CLIENTID","org1-woorkspaces",
+--  "INTERNAL_API_CLIENT_ID","woorkspaces-ID",
+--  "INTERNAL_API_CLIENT_SECRET","woorkspaces-client-secret",
 
- "INTERNAL_API_CLIENT_CLIENTID","org1-pf",
- "INTERNAL_API_CLIENT_ID","pf-ID",
- "INTERNAL_API_CLIENT_SECRET","pf-client-secret"
-));
-INSERT INTO org1db.workspace (workspace_id, workspace_name) VALUES ("ws1", "ワークスペース１");
-INSERT INTO org1db.workspace (workspace_id, workspace_name) VALUES ("ws2", "ワークスペース２");
-INSERT INTO org1db.workspace (workspace_id, workspace_name) VALUES ("ws3", "ワークスペース３");
+--  "TOKEN_CHECK_CLIENT_CLIENTID","system-org1-auth",
+--  "TOKEN_CHECK_CLIENT_ID","system-auth-ID",
+--  "TOKEN_CHECK_CLIENT_SECRET","system-auth-client-secret"
+-- ));
+-- INSERT INTO org1db.T_WORKSPACE (WORKSPACE_ID, WORKSPACE_NAME, INFORMATIONS) VALUES ("ws1", "ワークスペース１", "{}");
+-- INSERT INTO org1db.T_WORKSPACE (WORKSPACE_ID, WORKSPACE_NAME, INFORMATIONS) VALUES ("ws2", "ワークスペース２", "{}");
+-- INSERT INTO org1db.T_WORKSPACE (WORKSPACE_ID, WORKSPACE_NAME, INFORMATIONS) VALUES ("ws3", "ワークスペース３", "{}");
