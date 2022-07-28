@@ -93,7 +93,7 @@ function get_workspace_list() {
 
         workspaceListData = [];
 
-        for(var row of data) {
+        for(var row of data.data) {
             workspaceListData.push({
                 workspace_id: row.workspace_id,
                 workspace_name: row.workspace_name,
@@ -125,20 +125,25 @@ function create_workspace_list(list) {
 
     for(var row of list) {
         var tr = $('<tr></tr>');
-        tr.append('<td><div>' + row.workspace_name + '<span style="font-size: small;">('+ row.workspace_id + ')</span></div>' +
+        tr.append('<td class="workspace_datail"><div>' + row.workspace_name + '<span style="font-size: small;">('+ row.workspace_id + ')</span></div>' +
             '<div style="font-size: small; color: gray;">' + row.description + '</div></td>'
         );
-        tr.append('<td><a href="#" target="_self">' + row.member_count + '</td>');
-        tr.append('<td style="text-align: center">' + row.create_at + '</td>');
+        tr.append('<td class="workspace_datail"><a href="#" target="_self">' + row.member_count + '</td>');
+        tr.append('<td class="workspace_datail" style="text-align: center">' + row.create_at + '</td>');
         tr.append('<td><button class="btn_ita">IT-Automation</button></td>');
 
         tboby.append(tr);
 
         // IT-Automationボタン押下時
         tr.find('.btn_ita').on('click', function(){
-            alert("btn_ita");
 
             window.location.href = "/{organization_id}/workspaces/{workspace_id}/ita/".replace('{organization_id}', CommonAuth.getRealm()).replace('{workspace_id}', row.workspace_id)
+        })
+
+        // 明細押下時
+        tr.find('.workspace_datail').on('click', function(){
+
+            window.location.href = '/'+ CommonAuth.getRealm() + '/platform/workspaces/' + row.workspace_id
         })
 
     }
