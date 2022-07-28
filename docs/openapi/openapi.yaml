@@ -37,6 +37,8 @@ tags:
 paths:
   "/api/{organization_id}/platform/workspaces":
       $ref: './paths/workspaces.yaml'
+  "/api/{organization_id}/platform/workspaces/{workspace_id}":
+      $ref: './paths/workspaces.workspace_id.yaml'
   "/api/{organization_id}/platform/users/{user_id}/workspaces":
       $ref: './paths/users_workspaces.yaml'
   "/internal-api/{organization_id}/platform/workspaces/{workspace_id}/roles":

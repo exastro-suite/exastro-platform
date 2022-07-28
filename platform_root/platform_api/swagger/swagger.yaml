@@ -1,17 +1,3 @@
-#   Copyright 2022 NEC Corporation
-#
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-#
-#       http://www.apache.org/licenses/LICENSE-2.0
-#
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
-
 openapi: 3.0.3
 info:
   title: Exastro Platform API
@@ -86,6 +72,41 @@ paths:
             schema:
               $ref: '#/components/schemas/workspace'
         required: true
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/workspace'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+      x-openapi-router-controller: controllers.workspace_service_controller
+  /api/{organization_id}/platform/workspaces/{workspace_id}:
+    get:
+      tags:
+      - WorkspaceService
+      summary: workspace info returns infmation of workspaces
+      operationId: workspace_info
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: workspace_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
       responses:
         "200":
           description: A successful response.
@@ -391,3 +412,4 @@ components:
           workspace_name: workspace_name
         - workspace_id: workspace_id
           workspace_name: workspace_name
+
