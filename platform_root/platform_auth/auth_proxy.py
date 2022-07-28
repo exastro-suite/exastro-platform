@@ -209,7 +209,7 @@ class auth_proxy:
                             access_token = self.access_token_get(self.realm, basic_user_id, basic_user_password)
                             globals.logger.debug(f'access_token_get={access_token}')
 
-                        except api_keycloak_call.AuthErrorException:
+                        except common.AuthErrorException:
                             info = 'ID/PW NG'
                             raise common.AuthException(info)
 
@@ -441,11 +441,14 @@ class auth_proxy:
             # アクセストークン取得
             # get access token
             # access_token = api_keycloak_call.get_user_token(user_name, password, realm)
-            access_token = api_keycloak_call.keycloak_client_user_get_token(realm,
-                                                                            self.user_token_client_id,
-                                                                            self.user_token_client_secret,
-                                                                            user_name,
-                                                                            password)
+            access_token_response = api_keycloak_call.keycloak_client_user_get_token(
+                realm, self.user_token_client_id, self.user_token_client_secret, user_name, password)
+
+            if access_token_response.status_code != 200:
+                raise common.AuthErrorException("client_user_get_token error status:{}, response:{}".format(
+                    access_token_response.status_code, access_token_response.text))
+
+            access_token = json.loads(access_token_response.text)["access_token"]
 
             globals.logger.info('SUCCEED access token.')
 
@@ -485,7 +488,11 @@ class auth_proxy:
 
             # トークンイントロスペクション
             # token introspection
-            active = api_keycloak_call.keycloak_user_token_introspect(client_id, client_secret, realm, access_token, keycloak_proto, keycloak_host)
+            introspect_response = api_keycloak_call.keycloak_user_token_introspect(client_id, client_secret, realm, access_token, keycloak_proto, keycloak_host)
+            if introspect_response.status_code != 200:
+                raise Exception("keycloak_user_token_introspect error status:{}, response:{}".format(introspect_response.status_code, introspect_response.text))
+
+            active = json.loads(introspect_response.text).get('active')
 
             globals.logger.info('SUCCEED Token Introspection.')
 
