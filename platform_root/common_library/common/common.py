@@ -16,9 +16,11 @@ from flask import jsonify
 from datetime import datetime
 import random
 import string
+import json
 from functools import wraps
 
 import globals
+from common_library.common import multi_lang
 
 
 class AuthException(Exception):
@@ -60,6 +62,83 @@ def random_string(n):
         str: ランダム文字列 Random string
     """
     return ''.join(random.choices(string.ascii_letters + string.digits, k=n))
+
+
+def str_mask(str):
+    """指定文字列をマスク置き換えする Replace the specified character string with a mask
+
+    Args:
+        str (str): 文字列 string
+
+    Returns:
+        str: 置き換え文字列 afeter string
+    """
+
+    # 1文字以上の入力があれば置き換えする If there is more than one character input, replace it
+    if len(str) > 0:
+        ret = '*' * len(str)
+    else:
+        ret = str
+
+    return ret
+
+
+def is_json_format(str):
+    """json値判断 json value judgement
+
+    Args:
+        str (str): json文字列 json string
+
+    Returns:
+        bool: True:json, False:not json
+    """
+    try:
+        # Exceptionで引っかかるときはすべてJson意外と判断
+        # When it gets caught in Exception, it is judged that Json is unexpected
+        json.loads(str)
+
+    except json.JSONDecodeError:
+        return False
+    except ValueError:
+        return False
+    except Exception:
+        return False
+    return True
+
+
+def response_200_ok(data):
+    """サーバー200レスポンス Server 200 response
+
+    Args:
+        data (json): 戻り値 return values
+
+    Returns:
+        response: HTTP Response (HTTP-500)
+    """
+    status_code = 200
+    return response_status(status_code, data, "000-00000", "SUCCESS")
+
+
+def response_status(status_code, data, message_id, base_message="", *args):
+    """サーバーレスポンス共通 Server response common
+
+    Args:
+        status_cd (int): ステータスコード status code
+        data (str): 戻り値
+                    return values
+        message_id (str): MESSAGEに設定するmessage_id
+                          Message_id set in MESSAGE
+        base_message (str): 日本語のメッセージ(変換できない場合の初期値)
+                            Japanese message (initial value when conversion is not possible)
+        args (args): メッセージに対するパラメータ
+
+    Returns:
+        response: HTTP Response (HTTP-500)
+    """
+
+    message = multi_lang.get_text(message_id, base_message, args)
+
+    return jsonify({"result": status_code, "data": data, "message": message, "ts": str(datetime.utcnow())}), status_code
 
 
 def response_server_error(e):

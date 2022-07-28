@@ -17,7 +17,9 @@ from contextlib import closing
 
 from common_library.common import common
 from common_library.common.db import DBconnector
-from libs import queries
+from libs import queries_workspaces
+
+# import globals
 
 
 @common.platform_exception_handler
@@ -42,10 +44,39 @@ def workspace_create(body, organization_id):
                 "workspace_name": body["workspace_name"],
             }
 
-            cursor.execute(queries.SQL_INSERT_WORKSPACE, parameter)
+            cursor.execute(queries_workspaces.SQL_INSERT_WORKSPACE, parameter)
             conn.commit()
 
-    return body, 200
+    return common.response_200_ok(body)
+
+
+@common.platform_exception_handler
+def workspace_info(organization_id, workspace_id):  # noqa: E501
+    """workspace info returns infmation of workspaces
+
+    :param organization_id:
+    :type organization_id: str
+    :param workspace_id:
+    :type workspace_id: str
+
+    :rtype: Workspace
+    """
+
+    with closing(DBconnector().connect_orgdb(organization_id)) as conn:
+        with conn.cursor() as cursor:
+            parameter = {
+                "workspace_id": workspace_id,
+            }
+
+            str_where = " WHERE workspace_id = %(workspace_id)s"
+            cursor.execute(queries_workspaces.SQL_QUERY_WORKSPACE + str_where, parameter)
+
+            result = cursor.fetchall()
+
+    if len(result) > 0:
+        return common.response_200_ok(result)
+    else:
+        return common.response_status(404, None, "", "ワークスペース情報が存在しません")
 
 
 @common.platform_exception_handler
@@ -62,7 +93,16 @@ def workspace_list(organization_id, workspace_name=None):
 
     with closing(DBconnector().connect_orgdb(organization_id)) as conn:
         with conn.cursor() as cursor:
-            cursor.execute(queries.SQL_QUERY_WORKSPACE_LIST)
+            if workspace_name:
+                str_where = " WHERE workspace_name = %(workspace_name)s"
+                parameter = {
+                    "workspace_name": workspace_name,
+                }
+            else:
+                str_where = ""
+                parameter = {}
+
+            cursor.execute(queries_workspaces.SQL_QUERY_WORKSPACE_LIST + str_where, parameter)
             result = cursor.fetchall()
 
-    return result
+    return common.response_200_ok(result)
