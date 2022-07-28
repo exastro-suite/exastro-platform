@@ -17,12 +17,7 @@ INSERT INTO workspace (workspace_id, workspace_name)
 values (%(workspace_id)s, %(workspace_name)s)
 """
 
-SQL_QUERY_WORKSPACE_LIST = """
-SELECT workspace_id, workspace_name, create_at, update_at
-FROM workspace
-"""
-
-SQL_QUERY_WORKSPACE = """
+SQL_QUERY_WORKSPACES = """
 SELECT *
 FROM workspace
 """

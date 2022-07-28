@@ -33,3 +33,24 @@ html {
     cursor: pointer;
     background-color: silver;
 }
+
+
+.detail_workspace {
+    width: 70%;
+    border-collapse: collapse;
+    text-align: center;
+}
+.detail_workspace th {
+    font-weight: bold;
+    background-color: #cccccc;
+}
+.detail_workspace th, .detail_workspace td {
+    border: 1px solid gray;
+}
+
+.data_json{
+    width: 100%;
+    height: 120px;
+    overflow: auto;
+    border: 1px solid black;
+}

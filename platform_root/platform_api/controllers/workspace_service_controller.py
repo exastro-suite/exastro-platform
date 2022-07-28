@@ -51,7 +51,7 @@ def workspace_create(body, organization_id):
 
 
 @common.platform_exception_handler
-def workspace_info(organization_id, workspace_id):  # noqa: E501
+def workspace_info(organization_id, workspace_id):
     """workspace info returns infmation of workspaces
 
     :param organization_id:
@@ -69,14 +69,14 @@ def workspace_info(organization_id, workspace_id):  # noqa: E501
             }
 
             str_where = " WHERE workspace_id = %(workspace_id)s"
-            cursor.execute(queries_workspaces.SQL_QUERY_WORKSPACE + str_where, parameter)
+            cursor.execute(queries_workspaces.SQL_QUERY_WORKSPACES + str_where, parameter)
 
             result = cursor.fetchall()
 
     if len(result) > 0:
-        return common.response_200_ok(result)
+        return common.response_200_ok(result[0])
     else:
-        return common.response_status(404, None, "", "ワークスペース情報が存在しません")
+        return common.response_status(404, None, "404-03001", "ワークスペース情報が存在しません")
 
 
 @common.platform_exception_handler
@@ -102,7 +102,7 @@ def workspace_list(organization_id, workspace_name=None):
                 str_where = ""
                 parameter = {}
 
-            cursor.execute(queries_workspaces.SQL_QUERY_WORKSPACE_LIST + str_where, parameter)
+            cursor.execute(queries_workspaces.SQL_QUERY_WORKSPACES + str_where, parameter)
             result = cursor.fetchall()
 
     return common.response_200_ok(result)
