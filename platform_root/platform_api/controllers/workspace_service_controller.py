@@ -42,6 +42,7 @@ def workspace_create(body, organization_id):
             parameter = {
                 "workspace_id": body["workspace_id"],
                 "workspace_name": body["workspace_name"],
+                "informations": "{}",
             }
 
             cursor.execute(queries_workspaces.SQL_INSERT_WORKSPACE, parameter)

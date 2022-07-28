@@ -13,11 +13,11 @@
 #   limitations under the License.
 
 SQL_INSERT_WORKSPACE = """
-INSERT INTO workspace (workspace_id, workspace_name)
-values (%(workspace_id)s, %(workspace_name)s)
+INSERT INTO T_WORKSPACE (WORKSPACE_ID, WORKSPACE_NAME, INFORMATIONS)
+values (%(workspace_id)s, %(workspace_name)s, %(informations)s)
 """
 
 SQL_QUERY_WORKSPACES = """
 SELECT *
-FROM workspace
+FROM T_WORKSPACE
 """
