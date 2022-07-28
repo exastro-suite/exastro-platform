@@ -14,6 +14,8 @@
 
 from flask import request
 
+import common_library.common.const as const
+
 
 def get_text(text_id, origin_text, *args):
     """テキスト取得 Get text
@@ -29,7 +31,7 @@ def get_text(text_id, origin_text, *args):
 
     try:
         # ヘッダーのlocalを見てimportする言語を選択
-        if request.headers.get("locale", "ja") == "ja":
+        if request.headers.get("Language", const.default_language) == "ja":
             from common_resources.ja import language
         else:
             from common_resources.en import language
