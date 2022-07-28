@@ -130,7 +130,7 @@ function create_workspace_list(list) {
         );
         tr.append('<td class="workspace_datail"><a href="#" target="_self">' + row.member_count + '</td>');
         tr.append('<td class="workspace_datail" style="text-align: center">' + row.create_at + '</td>');
-        tr.append('<td><button class="btn_ita">IT-Automation</button></td>');
+        tr.append('<td><button class="btn_ita">IT-Automation</button><></td>');
 
         tboby.append(tr);
 

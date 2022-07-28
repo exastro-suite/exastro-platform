@@ -19,6 +19,10 @@ var api_conf = {
         "workspaces": {
             "post": "/api/{organization_id}/platform/workspaces",
             "get": "/api/{organization_id}/platform/workspaces",
+
+            "detail": {
+                "get": "/api/{organization_id}/platform/workspaces/{workspace_id}",
+            }
         }
     }
 }
