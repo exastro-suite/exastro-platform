@@ -11,6 +11,8 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
+import json
+import inspect
 
 from contextlib import closing
 
@@ -43,11 +45,21 @@ def user_workspace_list(organization_id, user_id):  # noqa: E501
 
     # サービスアカウントのTOKEN取得
     # Get a service account token
-    token = api_keycloak_call.keycloak_client_user_get_token(organization_id, client_id,
-                                                             private.internal_api_client_secret, user_id, "", grant_type="client_credentials")
+    token_response = api_keycloak_call.keycloak_client_user_get_token(
+        organization_id, client_id, private.internal_api_client_secret, user_id, "", grant_type="client_credentials")
+
+    if token_response.status_code != 200:
+        raise common.AuthErrorException("client_user_get_token error status:{}, response:{}".format(token_response.status_code, token_response.text))
+
+    token = json.loads(token_response.text)["access_token"]
+
     # ユーザーロール取得
     # Get user role
-    roles = api_keycloak_call.keycloak_get_user_role_mapping(organization_id, user_id, token)
+    roles_response = api_keycloak_call.keycloak_get_user_role_mapping(organization_id, user_id, token)
+    if roles_response.status_code != 200:
+        raise Exception("get user role-mapping error status:{}, response:{}".format(roles_response.status_code, roles_response.text))
+
+    roles = json.loads(roles_response.text)
 
     # # client idを元にclientの情報を取得
     # # Get client information based on client id
@@ -57,7 +69,7 @@ def user_workspace_list(organization_id, user_id):  # noqa: E501
     workspaces = []
     # rolesに割り当てられているワークスペース（子ロール＝workspace_id）をピックアップ
     # Pick up the workspace (child role = workspace_id) assigned to roles
-    for key, role_parent in roles.get("clientMappings").items():
+    for key, role_parent in roles.get("clientMappings", {}).items():
         for mapping in role_parent.get("mappings"):
             # user_token_clinet_idと一致するロールのみチェック
             # Check only roles that match user_token_clinet_id
@@ -65,8 +77,16 @@ def user_workspace_list(organization_id, user_id):  # noqa: E501
                 # 子ロールがある内容がworkspaceに紐づくのでその内容をチェックする
                 # Since the content with the child role is linked to the workspace, check the content
                 if mapping.get("composite"):
-                    composite_roles = api_keycloak_call.keycloak_client_role_composites_get(organization_id, private.user_token_client_id,
-                                                                                            mapping["name"], token)
+                    composite_roles_response = api_keycloak_call.keycloak_client_role_composites_get(
+                        organization_id, private.user_token_client_id, mapping["name"], token)
+
+                    if composite_roles_response.status_code != 200:
+                        raise Exception(
+                            "{} error status:{}, response:{}".format(
+                                inspect.currentframe().f_code.co_name, composite_roles_response.status_code, composite_roles_response.text))
+
+                    composite_roles = json.loads(composite_roles_response.text)
+                    
                     for role in composite_roles:
                         # 取得した子ロールが一度取得した内容にある場合は、重複するので読み飛ばし
                         # If the acquired child role is in the acquired content, it will be duplicated and will be skipped.

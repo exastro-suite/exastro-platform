@@ -12,6 +12,9 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
+import json
+import inspect
+
 from common_library.common import common, api_keycloak_call
 from common_library.common.db import DBconnector
 
@@ -32,9 +35,13 @@ def workspace_role_list(organization_id, workspace_id):
 
     # サービスアカウントのTOKEN取得
     # Get a service account token
-    token = api_keycloak_call.keycloak_service_account_get_token(
+    token_response = api_keycloak_call.keycloak_service_account_get_token(
         organization_id, private.internal_api_client_clientid, private.internal_api_client_secret,
     )
+    if token_response.status_code != 200:
+        raise common.AuthErrorException("client_user_get_token error status:{}, response:{}".format(token_response.status_code, token_response.text))
+
+    token = json.loads(token_response.text)["access_token"]
 
     # カスタムロールの中から、workspaceをcompositeしたロールのみを取得
     # Get only composite workspace roles from the custum role list
@@ -64,9 +71,13 @@ def workspace_user_list(organization_id, workspace_id):
 
     # サービスアカウントのTOKEN取得
     # Get a service account token
-    token = api_keycloak_call.keycloak_service_account_get_token(
+    token_response = api_keycloak_call.keycloak_service_account_get_token(
         organization_id, private.internal_api_client_clientid, private.internal_api_client_secret,
     )
+    if token_response.status_code != 200:
+        raise common.AuthErrorException("client_user_get_token error status:{}, response:{}".format(token_response.status_code, token_response.text))
+
+    token = json.loads(token_response.text)["access_token"]
 
     # カスタムロールの中から、workspaceをcompositeしたロールのみを取得
     # Get only composite workspace roles from the custum role list
@@ -79,12 +90,18 @@ def workspace_user_list(organization_id, workspace_id):
 
     workspace_users = []
     for role in workspace_roles:
-        users = api_keycloak_call.keycloak_role_uesrs_get(
+        users_response = api_keycloak_call.keycloak_role_uesrs_get(
             realm_name=organization_id,
             client_id=private.user_token_client_id,
             role_name=role.get("name"),
             token=token,
         )
+
+        if users_response.status_code != 200:
+            raise Exception("get user role error status:{}, response:{}".format(users_response.status_code, users_response.text))
+
+        users = json.loads(users_response.text)
+
         workspace_users.extend(users)
 
     return workspace_users
@@ -105,12 +122,18 @@ def __workspace_role_list(organization_id, workspace_id, client_uid, token):
 
     # カスタムロールの中から、workspaceをcompositeしたロールのみを取得
     # Get only composite workspace roles from the custum role list
-    custum_roles = api_keycloak_call.keycloak_client_role_get(
+    custum_roles_response = api_keycloak_call.keycloak_client_role_get(
         realm_name=organization_id,
         client_id=client_uid,
         role_name="",
         token=token,
     )
+    if custum_roles_response.status_code != 200:
+        raise Exception(
+            "{} error status:{}, response:{}".format(
+                inspect.currentframe().f_code.co_name, custum_roles_response.status_code, custum_roles_response.text))
+
+    custum_roles = json.loads(custum_roles_response.text)
 
     workspace_roles = []
 
@@ -122,12 +145,19 @@ def __workspace_role_list(organization_id, workspace_id, client_uid, token):
         # Get only those contain workspace_id from the composite roles
         role_composites = []
         if pf_role.get("containerId") == client_uid:
-            role_composites = api_keycloak_call.keycloak_client_role_composites_get(
+            role_composites_response = api_keycloak_call.keycloak_client_role_composites_get(
                 realm_name=organization_id,
                 client_uid=client_uid,
                 role_name=pf_role.get("name"),
                 token=token,
             )
+
+            if role_composites_response.status_code != 200:
+                raise Exception(
+                    "{} error status:{}, response:{}".format(
+                        inspect.currentframe().f_code.co_name, role_composites_response.status_code, role_composites_response.text))
+
+            role_composites = json.loads(role_composites_response.text)
 
         list_search = [role for role in role_composites if role.get('name') == workspace_id]
         if len(list_search) > 0:
