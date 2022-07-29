@@ -247,11 +247,10 @@ def datetime_to_str(datetime):
     Returns:
         str: datetime formated string
     """
-    datestr = str(datetime)
-    if len(datestr) == 19:  # LEN("YYYY-MM-DD HH:MI:SS")
-        return datestr + ".000000"
+    if datetime.strftime('%z') == "":
+        return datetime.isoformat(timespec='milliseconds') + "Z"
     else:
-        return datestr
+        return datetime.isoformat(timespec='milliseconds')
 
 
 def keycloak_timestamp_to_datetime(keycloak_timestamp):
