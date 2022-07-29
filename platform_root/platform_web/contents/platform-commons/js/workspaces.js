@@ -91,18 +91,31 @@ function get_workspace_list() {
         console.log("RESPONSE GET /api/workspace:");
         console.log(JSON.stringify(data));
 
-        workspaceListData = [];
-
-        for(var row of data.data) {
-            workspaceListData.push({
-                workspace_id: row.workspace_id,
-                workspace_name: row.workspace_name,
-                description: "説明XXXXXXXX",
-                create_at: row.create_at,
-                member_count: 9,
-            });
+        if (data.result != 200){
+            msg = "[" + data.result + "]\n" + data.message;
+            alert(msg);
         }
-        create_workspace_list(workspaceListData);
+        else{
+            workspaceListData = [];
+
+            for(var row of data.data) {
+                workspaceListData.push({
+                    workspace_id: row.workspace_id,
+                    workspace_name: row.workspace_name,
+                    description: "説明XXXXXXXX",
+                    create_timestamp: row.create_timestamp,
+                    member_count: 9,
+                });
+            }
+            create_workspace_list(workspaceListData);
+        }
+        // resolve();
+
+    }).fail(function(jqXHR, textStatus, errorThrown) {
+        console.log("FAIL : RESPONSE GET /api/workspace: jqXHR.status:"+jqXHR.status);
+        msg = "[" + jqXHR.status + "]\n" + textStatus;
+        alert(msg);
+        // reject();
     });
 }
 
@@ -110,7 +123,7 @@ function create_workspace_list(list) {
     var tboby = $("#workspace_list tbody");
     tboby.empty();
 
-    const sortKey = 'create_at';
+    const sortKey = 'create_timestamp';
     const sortreverse = -1;
     list.sort(function(a, b){
         const as = a[sortKey].toLowerCase(), bs = b[sortKey].toLowerCase();
@@ -129,7 +142,7 @@ function create_workspace_list(list) {
             '<div style="font-size: small; color: gray;">' + row.description + '</div></td>'
         );
         tr.append('<td class="workspace_datail"><a href="#" target="_self">' + row.member_count + '</td>');
-        tr.append('<td class="workspace_datail" style="text-align: center">' + row.create_at + '</td>');
+        tr.append('<td class="workspace_datail" style="text-align: center">' + row.create_timestamp + '</td>');
         tr.append('<td><button class="btn_ita">IT-Automation</button><></td>');
 
         tboby.append(tr);
