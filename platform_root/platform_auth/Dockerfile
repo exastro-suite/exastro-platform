@@ -11,12 +11,15 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
-FROM    registry.access.redhat.com/ubi8/ubi-init as common_build
-
 ARG USERNAME=app_user
 ARG GROUPNAME=app_user
-
 ARG APP_PATH=/app
+
+FROM    registry.access.redhat.com/ubi8/ubi-init as common_build
+
+ARG USERNAME
+ARG GROUPNAME
+ARG APP_PATH
 
 RUN dnf install -y \
     langpacks-en \
@@ -47,6 +50,10 @@ RUN dnf install -y \
 #   Specify options when creating this image: --target develop_build
 #
 FROM    common_build as develop_build
+
+ARG USERNAME
+ARG GROUPNAME
+ARG APP_PATH
 
 RUN dnf config-manager --add-repo=https://download.docker.com/linux/centos/docker-ce.repo \
 &&  dnf install -y \
@@ -85,6 +92,10 @@ CMD ["sudo","-E","httpd","-D","FOREGROUND"]
 # Build for production
 #
 FROM    common_build
+
+ARG USERNAME
+ARG GROUPNAME
+ARG APP_PATH
 
 WORKDIR $APP_PATH
 
