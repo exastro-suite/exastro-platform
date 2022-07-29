@@ -22,6 +22,9 @@ from common_library.common.db import DBconnector
 from libs import queries
 
 
+MSG_FUNCTION_ID = "21"
+
+
 @common.platform_exception_handler
 def user_workspace_list(organization_id, user_id):  # noqa: E501
     """workspaces list of user posible
@@ -56,7 +59,9 @@ def user_workspace_list(organization_id, user_id):  # noqa: E501
     # ユーザーロール取得
     # Get user role
     roles_response = api_keycloak_call.keycloak_get_user_role_mapping(organization_id, user_id, token)
-    if roles_response.status_code != 200:
+    if roles_response.status_code == 404:
+        return common.response_status(404, None, '404-{}001'.format(MSG_FUNCTION_ID), "ユーザが存在しません")
+    elif roles_response.status_code != 200:
         raise Exception("get user role-mapping error status:{}, response:{}".format(roles_response.status_code, roles_response.text))
 
     roles = json.loads(roles_response.text)
@@ -93,7 +98,7 @@ def user_workspace_list(organization_id, user_id):  # noqa: E501
                         if role["name"] not in workspace_ids:
                             workspace_ids.append(role["name"])
                             workspaces.append({
-                                "workspace_id": role["name"],
+                                "id": role["name"],
                                 "name": "",
                             })
 
@@ -103,7 +108,7 @@ def user_workspace_list(organization_id, user_id):  # noqa: E501
                 # ユーザーに紐づくワークスペースIDを元に名称等を取得
                 # Get the name etc. based on the workspace ID associated with the user
                 parameter = {
-                    "workspace_id": workspace["workspace_id"],
+                    "workspace_id": workspace["id"],
                 }
                 str_where = " WHERE workspace_id = %(workspace_id)s"
                 cursor.execute(queries.SQL_QUERY_WORKSPACE + str_where, parameter)
@@ -111,6 +116,8 @@ def user_workspace_list(organization_id, user_id):  # noqa: E501
 
                 # データが取得できた際に名称を設定
                 if len(result) > 0:
-                    workspaces[idx]["name"] = result[0]["workspace_name"]
+                    workspaces[idx]["name"] = result[0]["WORKSPACE_NAME"]
+                    workspaces[idx]["create_timestamp"] = common.datetime_to_str(result[0]["CREATE_TIMESTAMP"])
+                    workspaces[idx]["last_update_timestamp"] = common.datetime_to_str(result[0]["LAST_UPDATE_TIMESTAMP"])
 
-    return workspaces
+    return common.response_200_ok(workspaces)
