@@ -241,10 +241,9 @@ class auth_proxy:
                 roles_str = ""
             status_code = 0
             info = {
-                "user_id": self.token_decode.get("sub"),
-                "username": self.token_decode.get("preferred_username"),
-                "roles": roles_str,
-                "locale": self.token_decode.get("locale"),
+                "User-Id": self.token_decode.get("sub"),
+                "Roles": roles_str,
+                "Language": self.token_decode.get("locale"),
             }
             return {"result": status_code, "info": info, "time": str(datetime.utcnow())}
 
@@ -488,9 +487,12 @@ class auth_proxy:
 
             # トークンイントロスペクション
             # token introspection
-            introspect_response = api_keycloak_call.keycloak_user_token_introspect(client_id, client_secret, realm, access_token, keycloak_proto, keycloak_host)
+            introspect_response = api_keycloak_call.keycloak_user_token_introspect(
+                client_id, client_secret, realm, access_token, keycloak_proto, keycloak_host)
+
             if introspect_response.status_code != 200:
-                raise Exception("keycloak_user_token_introspect error status:{}, response:{}".format(introspect_response.status_code, introspect_response.text))
+                raise Exception("keycloak_user_token_introspect error status:{}, response:{}".format(
+                    introspect_response.status_code, introspect_response.text))
 
             active = json.loads(introspect_response.text).get('active')
 

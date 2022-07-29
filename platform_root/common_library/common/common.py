@@ -216,3 +216,71 @@ def get_platform_client_id(organization_id):
     """
 
     return f"{organization_id}-workspaces"
+
+
+def get_username(fitstName, LastName, username):
+    """get username
+
+    Args:
+        fitstName (str): fitstName
+        LastName (str): LastName
+        username (str): username
+    """
+    if (fitstName is None or fitstName == ""):
+        if(LastName is None or LastName == ""):
+            return username
+        else:
+            return LastName
+    else:
+        if(LastName is None or LastName == ""):
+            return fitstName
+        else:
+            return fitstName + " " + LastName
+
+
+def datetime_to_str(datetime):
+    """datetime to string
+
+    Args:
+        datetime (datetime): datetime
+
+    Returns:
+        str: datetime formated string
+    """
+    return str(datetime)
+
+
+def keycloak_timestamp_to_datetime(keycloak_timestamp):
+    """keycloak timestamp to string
+
+    Args:
+        keycloak_timestamp (int): keycloak timestamp
+
+    Returns:
+        str: datetime formated string
+    """
+    try:
+        if keycloak_timestamp is None:
+            return None
+        else:
+            return datetime.fromtimestamp(keycloak_timestamp / 1000)
+    except Exception:
+        return None
+
+
+def keycloak_timestamp_to_str(keycloak_timestamp):
+    """keycloak timestamp to string
+
+    Args:
+        keycloak_timestamp (int): keycloak timestamp
+
+    Returns:
+        str: datetime formated string
+    """
+    try:
+        if keycloak_timestamp is None:
+            return None
+        else:
+            return datetime_to_str(datetime.fromtimestamp(keycloak_timestamp / 1000))
+    except Exception:
+        return None
