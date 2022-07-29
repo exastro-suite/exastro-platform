@@ -16,6 +16,8 @@
 from common_library.common import common
 import controllers.users_service_controller as users_service_controller
 
+MSG_FUNCTION_ID = "21"
+
 
 @common.platform_exception_handler
 def user_workspace_list(organization_id, user_id):
