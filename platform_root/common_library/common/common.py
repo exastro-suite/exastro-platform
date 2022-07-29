@@ -138,7 +138,7 @@ def response_status(status_code, data, message_id, base_message="", *args):
 
     message = multi_lang.get_text(message_id, base_message, args)
 
-    return jsonify({"result": status_code, "data": data, "message": message, "ts": str(datetime.utcnow())}), status_code
+    return jsonify({"result": status_code, "data": data, "message": message, "ts": datetime_to_str(datetime.utcnow())}), status_code
 
 
 def response_server_error(e):
@@ -156,7 +156,7 @@ def response_server_error(e):
     globals.logger.error(''.join(list(traceback.TracebackException.from_exception(e).format())))
     status_code = 500
     info = e.__class__.__name__
-    return jsonify({"result": status_code, "data": None, "message": info, "ts": str(datetime.utcnow())}), status_code
+    return jsonify({"result": status_code, "data": None, "message": info, "ts": datetime_to_str(datetime.utcnow())}), status_code
 
 
 def platform_exception_handler(func):

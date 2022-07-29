@@ -22,6 +22,9 @@ from libs import queries_workspaces
 
 # import globals
 
+# 機能ID
+_func_id = "22"
+
 
 @common.platform_exception_handler
 def workspace_create(body, organization_id):
@@ -84,15 +87,15 @@ def workspace_info(organization_id, workspace_id):
             "id": row["WORKSPACE_ID"],
             "name": row["WORKSPACE_NAME"],
             "informations": json.loads(row["INFORMATIONS"]),
-            "create_timestamp": str(row["CREATE_TIMESTAMP"]),
+            "create_timestamp": common.datetime_to_str(row["CREATE_TIMESTAMP"]),
             "create_user": row["CREATE_USER"],
-            "last_update_timestamp": str(row["LAST_UPDATE_TIMESTAMP"]),
+            "last_update_timestamp": common.datetime_to_str(row["LAST_UPDATE_TIMESTAMP"]),
             "last_update_user": row["LAST_UPDATE_USER"],
         }
 
         return common.response_200_ok(data)
     else:
-        return common.response_status(404, None, "404-03001", "ワークスペース情報が存在しません")
+        return common.response_status(404, None, f"404-{_func_id}001", "ワークスペース情報が存在しません")
 
 
 @common.platform_exception_handler
@@ -127,9 +130,9 @@ def workspace_list(organization_id, workspace_name=None):
             "id": row["WORKSPACE_ID"],
             "name": row["WORKSPACE_NAME"],
             "informations": json.loads(row["INFORMATIONS"]),
-            "create_timestamp": str(row["CREATE_TIMESTAMP"]),
+            "create_timestamp": common.datetime_to_str(row["CREATE_TIMESTAMP"]),
             "create_user": row["CREATE_USER"],
-            "last_update_timestamp": "{0:%x %X}".format(row["LAST_UPDATE_TIMESTAMP"]),
+            "last_update_timestamp": common.datetime_to_str(row["LAST_UPDATE_TIMESTAMP"]),
             "last_update_user": row["LAST_UPDATE_USER"],
         }
         data.append(row)

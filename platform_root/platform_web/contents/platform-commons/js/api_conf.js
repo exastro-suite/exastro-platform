@@ -22,7 +22,10 @@ var api_conf = {
 
             "detail": {
                 "get": "/api/{organization_id}/platform/workspaces/{workspace_id}",
-            }
-        }
+                "users": {
+                    "get": "/api/{organization_id}/platform/workspaces/{workspace_id}/users",
+                },
+            },
+        },
     }
 }
