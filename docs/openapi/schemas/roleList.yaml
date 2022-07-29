@@ -15,7 +15,7 @@
 title: roleList is list of Role resources.
 type: object
 properties:
-  items:
+  data:
     type: array
     items:
       $ref: './role.yaml'

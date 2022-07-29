@@ -110,41 +110,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/runtimeError'
-  '/api/{organization_id}/platform/users/{user_id}/workspaces':
-    get:
-      tags:
-        - UsersService
-      summary: workspaces list of user posible
-      operationId: user_workspace_list
-      parameters:
-        - name: organization_id
-          in: path
-          required: true
-          style: simple
-          explode: false
-          schema:
-            type: string
-        - name: user_id
-          in: path
-          required: true
-          style: simple
-          explode: false
-          schema:
-            type: string
-      responses:
-        '200':
-          description: A successful response.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/workspaceList'
-        default:
-          description: An unexpected error response.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/runtimeError'
-      x-openapi-router-controller: controllers.users_service_controller
   '/internal-api/{organization_id}/platform/workspaces/{workspace_id}/roles':
     get:
       tags:
@@ -169,7 +134,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/roleList'
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - $ref: '#/components/schemas/roleList'
         default:
           description: An unexpected error response.
           content:
@@ -200,7 +167,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/userList'
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - $ref: '#/components/schemas/userList'
         default:
           description: An unexpected error response.
           content:
@@ -234,7 +203,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/workspaceList'
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - $ref: '#/components/schemas/userWorkspaceList'
         default:
           description: An unexpected error response.
           content:
@@ -255,7 +226,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/responseOk'
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        example: null
         default:
           description: An unexpected error response.
           content:
@@ -265,40 +242,46 @@ paths:
 components:
   schemas:
     responseOk:
+      title: A successful base response.
       type: object
       properties:
         result:
           type: integer
-          format: int32
-        info:
+          example: 200
+        message:
           type: string
+          example: SUCCESS
+        ts:
+          type: string
+          format: date-time
     runtimeError:
       type: object
       properties:
         result:
           type: integer
           format: int32
-        info:
+          example: 500
+        message:
           type: string
+          example: Error Message
+        ts:
+          type: string
+          format: date-time
+        data:
+          type: object
+          example: null
     role:
       title: role is a definition of Role resource.
       type: object
       properties:
-        clientRole:
-          type: boolean
-        composite:
-          type: boolean
-        containerId:
-          type: string
-        id:
-          type: string
         name:
           type: string
+          example: role-1
     roleList:
       title: roleList is list of Role resources.
       type: object
       properties:
-        items:
+        data:
           type: array
           items:
             $ref: '#/components/schemas/role'
@@ -308,21 +291,26 @@ components:
       properties:
         id:
           type: string
-        username:
+          format: uuid
+        name:
           type: string
-        email:
-          type: string
+          example: firstname lastname
         firstName:
           type: string
         lastName:
           type: string
+        preferred_username:
+          type: string
         enabled:
           type: boolean
+        create_timestamp:
+          type: string
+          format: date-time
     userList:
       title: userList is list of User resources.
       type: object
       properties:
-        items:
+        data:
           type: array
           items:
             $ref: '#/components/schemas/user'
@@ -330,15 +318,47 @@ components:
       title: workspace is a definition of Workspace resource.
       type: object
       properties:
-        workspace_id:
+        id:
           type: string
-        workspace_name:
+          example: workspace-1
+        name:
           type: string
+          example: name of workspace
+        create_timestamp:
+          type: string
+          format: date-time
+        last_update_timestamp:
+          type: string
+          format: date-time
     workspaceList:
       title: workspaceList is list of Workspace resources.
       type: object
       properties:
-        items:
+        data:
           type: array
           items:
             $ref: '#/components/schemas/workspace'
+    userWorkspace:
+      title: workspace is a definition of Workspace resource.
+      type: object
+      properties:
+        id:
+          type: string
+          example: workspace-1
+        name:
+          type: string
+          example: name of workspace
+        create_timestamp:
+          type: string
+          format: date-time
+        last_update_timestamp:
+          type: string
+          format: date-time
+    userWorkspaceList:
+      title: WorkspaceList is a list of workspace resources that users can access.
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/userWorkspace'

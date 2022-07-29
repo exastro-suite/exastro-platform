@@ -38,7 +38,9 @@ get:
       content:
         application/json:
           schema:
-            $ref: '../schemas/workspaceList.yaml'
+            allOf:
+              - $ref: '../schemas/responseOk.yaml'
+              - $ref: '../schemas/userWorkspaceList.yaml'
     default:
       description: An unexpected error response.
       content:

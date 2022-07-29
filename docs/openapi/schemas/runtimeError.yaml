@@ -17,5 +17,14 @@ properties:
   result:
     type: integer
     format: int32
-  info:
+    example: 500
+  message:
     type: string
+    example: Error Message
+  ts:
+    type: string
+    format: date-time
+  data:
+    type: object
+    example: null
+

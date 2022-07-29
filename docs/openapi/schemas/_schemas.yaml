@@ -28,3 +28,7 @@ workspace:
   $ref: "./workspace.yaml"
 workspaceList:
   $ref: "./workspaceList.yaml"
+userWorkspace:
+  $ref: "./userWorkspace.yaml"
+userWorkspaceList:
+  $ref: "./userWorkspaceList.yaml"

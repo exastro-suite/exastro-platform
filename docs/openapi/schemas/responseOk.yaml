@@ -12,10 +12,16 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
+title: A successful base response.
 type: object
 properties:
   result:
     type: integer
-    format: int32
-  info:
+    example: 200
+  message:
     type: string
+    example: SUCCESS
+  ts:
+    type: string
+    format: date-time
+
