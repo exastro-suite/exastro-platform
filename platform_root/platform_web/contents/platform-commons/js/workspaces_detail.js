@@ -49,7 +49,9 @@ function get_workspace_info() {
                 obj.text(row.name);
 
                 var obj = $(".last_update_timestamp");
-                obj.text(row.last_update_timestamp);
+                var date = new Date(row.last_update_timestamp);
+                result = date.toLocaleString();
+                obj.text(result);
 
                 if ("informations" in row){
                     var obj = $(".environments_list");

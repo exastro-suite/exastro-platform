@@ -109,7 +109,7 @@ function get_workspace_list() {
                     workspace_id: row.id,
                     workspace_name: row.name,
                     description: description,
-                    create_timestamp: row.create_timestamp,
+                    last_update_timestamp: row.last_update_timestamp,
                 });
             }
             create_workspace_list(workspaceListData);
@@ -128,7 +128,7 @@ function create_workspace_list(list) {
     var tboby = $("#workspace_list tbody");
     tboby.empty();
 
-    const sortKey = 'create_timestamp';
+    const sortKey = 'last_update_timestamp';
     const sortreverse = -1;
     list.sort(function(a, b){
         const as = a[sortKey].toLowerCase(), bs = b[sortKey].toLowerCase();
@@ -142,6 +142,9 @@ function create_workspace_list(list) {
     });
 
     for(var row of list) {
+        var date = new Date(row.last_update_timestamp);
+        format_last_update_timestamp = date.toLocaleString();
+
         var tr = $('<tr></tr>');
         tr.append('<td class="workspace_datail"><div>' + row.workspace_name + '<span style="font-size: small;">('+ row.workspace_id + ')</span></div>' +
                 '<div style="font-size: small; color: gray;">' + row.description + '</div>' +
@@ -149,7 +152,7 @@ function create_workspace_list(list) {
             '</td>'
         );
         tr.append('<td class="workspace_datail"><button class="btn_members">メンバー一覧</button></td>');
-        tr.append('<td class="workspace_datail" style="text-align: center">' + row.last_update_timestamp + '</td>');
+        tr.append('<td class="workspace_datail" style="text-align: center">' + format_last_update_timestamp + '</td>');
         tr.append('<td><button class="btn_ita">IT-Automation</button></td>');
 
         tboby.append(tr);
