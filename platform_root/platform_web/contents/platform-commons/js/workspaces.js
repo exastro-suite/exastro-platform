@@ -9,8 +9,8 @@ $(function(){
     // 見出し作成
     $(  '<tr>' +
             '<th>ワークスペース名(ワークスペースID)</th>' +
-            '<th>メンバー数</a></th>' +
-            '<th>作成日</th>' +
+            '<th>&nbsp;</th>' +
+            '<th>最終更新日時</th>' +
             '<th>サービス選択</th>' +
         '</tr>').appendTo('#workspace_list thead');
 
@@ -91,18 +91,36 @@ function get_workspace_list() {
         console.log("RESPONSE GET /api/workspace:");
         console.log(JSON.stringify(data));
 
-        workspaceListData = [];
-
-        for(var row of data.data) {
-            workspaceListData.push({
-                workspace_id: row.workspace_id,
-                workspace_name: row.workspace_name,
-                description: "説明XXXXXXXX",
-                create_at: row.create_at,
-                member_count: 9,
-            });
+        if (data.result != 200){
+            msg = "[" + data.result + "]\n" + data.message;
+            alert(msg);
         }
-        create_workspace_list(workspaceListData);
+        else{
+            workspaceListData = [];
+
+            for(var row of data.data) {
+                if ("description" in row.informations){
+                    description = row.informations.description;
+                }
+                else{
+                    description = "";
+                }
+                workspaceListData.push({
+                    workspace_id: row.id,
+                    workspace_name: row.name,
+                    description: description,
+                    create_timestamp: row.create_timestamp,
+                });
+            }
+            create_workspace_list(workspaceListData);
+        }
+        // resolve();
+
+    }).fail(function(jqXHR, textStatus, errorThrown) {
+        console.log("FAIL : RESPONSE GET /api/workspace: jqXHR.status:"+jqXHR.status);
+        msg = "[" + jqXHR.status + "]\n" + textStatus;
+        alert(msg);
+        // reject();
     });
 }
 
@@ -110,7 +128,7 @@ function create_workspace_list(list) {
     var tboby = $("#workspace_list tbody");
     tboby.empty();
 
-    const sortKey = 'create_at';
+    const sortKey = 'create_timestamp';
     const sortreverse = -1;
     list.sort(function(a, b){
         const as = a[sortKey].toLowerCase(), bs = b[sortKey].toLowerCase();
@@ -126,25 +144,88 @@ function create_workspace_list(list) {
     for(var row of list) {
         var tr = $('<tr></tr>');
         tr.append('<td class="workspace_datail"><div>' + row.workspace_name + '<span style="font-size: small;">('+ row.workspace_id + ')</span></div>' +
-            '<div style="font-size: small; color: gray;">' + row.description + '</div></td>'
+                '<div style="font-size: small; color: gray;">' + row.description + '</div>' +
+                '<input type="hidden" class="workspace_id" value="' + row.workspace_id + '">' +
+            '</td>'
         );
-        tr.append('<td class="workspace_datail"><a href="#" target="_self">' + row.member_count + '</td>');
-        tr.append('<td class="workspace_datail" style="text-align: center">' + row.create_at + '</td>');
-        tr.append('<td><button class="btn_ita">IT-Automation</button><></td>');
+        tr.append('<td class="workspace_datail"><button class="btn_members">メンバー一覧</button></td>');
+        tr.append('<td class="workspace_datail" style="text-align: center">' + row.last_update_timestamp + '</td>');
+        tr.append('<td><button class="btn_ita">IT-Automation</button></td>');
 
         tboby.append(tr);
 
+        // メンバーボタン押下時
+        tr.find('.btn_members').on('click', function(){
+            workspace_id = $(this).closest('tr').find('.workspace_id').val();
+
+            get_members_list(workspace_id);
+
+            return false;
+        })
+
         // IT-Automationボタン押下時
         tr.find('.btn_ita').on('click', function(){
+            workspace_id = $(this).closest('tr').find('.workspace_id').val();
 
-            window.location.href = "/{organization_id}/workspaces/{workspace_id}/ita/".replace('{organization_id}', CommonAuth.getRealm()).replace('{workspace_id}', row.workspace_id)
+            window.location.href = "/{organization_id}/workspaces/{workspace_id}/ita/".replace('{organization_id}', CommonAuth.getRealm()).replace('{workspace_id}', workspace_id)
+
+            return false;
         })
 
         // 明細押下時
         tr.find('.workspace_datail').on('click', function(){
-
-            window.location.href = '/'+ CommonAuth.getRealm() + '/platform/workspaces/' + row.workspace_id
+            workspace_id = $(this).closest('tr').find('.workspace_id').val();
+            window.location.href = '/'+ CommonAuth.getRealm() + '/platform/workspaces/' + workspace_id;
         })
 
     }
+}
+
+function get_members_list(workspace_id) {
+
+    alert("メンバー一覧:\n\n○○ ○○\nxx xxx\n");
+
+    // $.ajax({
+    //     type: "GET",
+    //     url: api_conf.api.workspaces.get.replace('{organization_id}', CommonAuth.getRealm()),
+    //     headers: {
+    //         Authorization: "Bearer " + CommonAuth.getToken(),
+    //     },
+    //     contentType: "application/json",
+    //     dataType: "json",
+    // }).done(function(data) {
+    //     console.log("RESPONSE GET /api/workspace:");
+    //     console.log(JSON.stringify(data));
+
+    //     if (data.result != 200){
+    //         msg = "[" + data.result + "]\n" + data.message;
+    //         alert(msg);
+    //     }
+    //     else{
+    //         workspaceListData = [];
+
+    //         for(var row of data.data) {
+    //             if ("description" in row.informations){
+    //                 description = row.informations.description;
+    //             }
+    //             else{
+    //                 description = "";
+    //             }
+    //             workspaceListData.push({
+    //                 workspace_id: row.id,
+    //                 workspace_name: row.name,
+    //                 description: description,
+    //                 create_timestamp: row.create_timestamp,
+    //             });
+    //         }
+    //         create_workspace_list(workspaceListData);
+    //     }
+    //     // resolve();
+
+    // }).fail(function(jqXHR, textStatus, errorThrown) {
+    //     console.log("FAIL : RESPONSE GET /api/workspace: jqXHR.status:"+jqXHR.status);
+    //     msg = "[" + jqXHR.status + "]\n" + textStatus;
+    //     alert(msg);
+    //     // reject();
+    // });
 }

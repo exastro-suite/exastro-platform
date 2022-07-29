@@ -156,7 +156,7 @@ def response_server_error(e):
     globals.logger.error(''.join(list(traceback.TracebackException.from_exception(e).format())))
     status_code = 500
     info = e.__class__.__name__
-    return jsonify({"result": status_code, "info": info, "time": str(datetime.utcnow())}), status_code
+    return jsonify({"result": status_code, "data": None, "message": info, "ts": datetime_to_str(datetime.utcnow())}), status_code
 
 
 def platform_exception_handler(func):

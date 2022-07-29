@@ -14,6 +14,7 @@
 
 import connexion
 from contextlib import closing
+import json
 
 from common_library.common import common
 from common_library.common.db import DBconnector
@@ -76,10 +77,24 @@ def workspace_info(organization_id, workspace_id):
 
             result = cursor.fetchall()
 
+    # 取得したデータがあるかチェック
+    # Check if there is acquired data
     if len(result) > 0:
-        return common.response_200_ok(result[0])
+
+        row = result[0]
+        data = {
+            "id": row["WORKSPACE_ID"],
+            "name": row["WORKSPACE_NAME"],
+            "informations": json.loads(row["INFORMATIONS"]),
+            "create_timestamp": common.datetime_to_str(row["CREATE_TIMESTAMP"]),
+            "create_user": row["CREATE_USER"],
+            "last_update_timestamp": common.datetime_to_str(row["LAST_UPDATE_TIMESTAMP"]),
+            "last_update_user": row["LAST_UPDATE_USER"],
+        }
+
+        return common.response_200_ok(data)
     else:
-        return common.response_status(404, None, "404-03001", "ワークスペース情報が存在しません")
+        return common.response_status(404, None, f"404-{MSG_FUNCTION_ID}001", "ワークスペース情報が存在しません")
 
 
 @common.platform_exception_handler
@@ -108,4 +123,17 @@ def workspace_list(organization_id, workspace_name=None):
             cursor.execute(queries_workspaces.SQL_QUERY_WORKSPACES + str_where, parameter)
             result = cursor.fetchall()
 
-    return common.response_200_ok(result)
+    data = []
+    for row in result:
+        row = {
+            "id": row["WORKSPACE_ID"],
+            "name": row["WORKSPACE_NAME"],
+            "informations": json.loads(row["INFORMATIONS"]),
+            "create_timestamp": common.datetime_to_str(row["CREATE_TIMESTAMP"]),
+            "create_user": row["CREATE_USER"],
+            "last_update_timestamp": common.datetime_to_str(row["LAST_UPDATE_TIMESTAMP"]),
+            "last_update_user": row["LAST_UPDATE_USER"],
+        }
+        data.append(row)
+
+    return common.response_200_ok(data)
