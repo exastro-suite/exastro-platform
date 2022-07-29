@@ -1,2 +1,4 @@
 #!/bin/sh
-swagger-cli bundle -o ./build/openapi.yaml -t yaml ./openapi.yaml
+BASEDIR=$(dirname "$0")
+
+swagger-cli bundle -o ${BASEDIR}/build/openapi.yaml -t yaml ${BASEDIR}/openapi.yaml
