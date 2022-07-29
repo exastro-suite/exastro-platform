@@ -17,6 +17,8 @@ from datetime import datetime
 
 from common_library.common import common
 
+MSG_FUNCTION_ID = "20"
+
 
 @common.platform_exception_handler
 def alive():

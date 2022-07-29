@@ -22,8 +22,7 @@ from libs import queries_workspaces
 
 # import globals
 
-# 機能ID
-_func_id = "22"
+MSG_FUNCTION_ID = "22"
 
 
 @common.platform_exception_handler
@@ -95,7 +94,7 @@ def workspace_info(organization_id, workspace_id):
 
         return common.response_200_ok(data)
     else:
-        return common.response_status(404, None, f"404-{_func_id}001", "ワークスペース情報が存在しません")
+        return common.response_status(404, None, f"404-{MSG_FUNCTION_ID}001", "ワークスペース情報が存在しません")
 
 
 @common.platform_exception_handler

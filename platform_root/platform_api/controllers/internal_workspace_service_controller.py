@@ -18,6 +18,8 @@ import inspect
 from common_library.common import common, api_keycloak_call
 from common_library.common.db import DBconnector
 
+MSG_FUNCTION_ID = "22"
+
 
 @common.platform_exception_handler
 def workspace_role_list(organization_id, workspace_id):
@@ -39,7 +41,7 @@ def workspace_role_list(organization_id, workspace_id):
         organization_id, private.internal_api_client_clientid, private.internal_api_client_secret,
     )
     if token_response.status_code != 200:
-        raise common.AuthErrorException("client_user_get_token error status:{}, response:{}".format(token_response.status_code, token_response.text))
+        raise common.AuthException("client_user_get_token error status:{}, response:{}".format(token_response.status_code, token_response.text))
 
     token = json.loads(token_response.text)["access_token"]
 
@@ -51,8 +53,10 @@ def workspace_role_list(organization_id, workspace_id):
         client_uid=private.user_token_client_id,
         token=token,
     )
+    
+    response_data = [{"name": x["name"]} for x in workspace_roles]
 
-    return workspace_roles
+    return common.response_200_ok(response_data)
 
 
 @common.platform_exception_handler
@@ -75,7 +79,7 @@ def workspace_user_list(organization_id, workspace_id):
         organization_id, private.internal_api_client_clientid, private.internal_api_client_secret,
     )
     if token_response.status_code != 200:
-        raise common.AuthErrorException("client_user_get_token error status:{}, response:{}".format(token_response.status_code, token_response.text))
+        raise common.AuthException("client_user_get_token error status:{}, response:{}".format(token_response.status_code, token_response.text))
 
     token = json.loads(token_response.text)["access_token"]
 
@@ -102,9 +106,18 @@ def workspace_user_list(organization_id, workspace_id):
 
         users = json.loads(users_response.text)
 
-        workspace_users.extend(users)
+        workspace_users.extend([
+            {
+                "id": user["id"],
+                "firstName": user.get("firstName", ""),
+                "lastName": user.get("lastName", ""),
+                "preferred_username": user.get("username", ""),
+                "name": common.get_username(user.get("firstName"), user.get("lastName"), user.get("username")),
+                "enabled": user.get("enabled", False),
+                "create_timestamp": common.keycloak_timestamp_to_str(user.get("createdTimestamp")),
+            } for user in users])
 
-    return workspace_users
+    return common.response_200_ok(workspace_users)
 
 
 def __workspace_role_list(organization_id, workspace_id, client_uid, token):
