@@ -17,14 +17,20 @@ type: object
 properties:
   id:
     type: string
-  username:
+    format: uuid
+  name:
     type: string
-  email:
-    type: string
+    example: firstname lastname
   firstName:
     type: string
   lastName:
     type: string
+  preferred_username:
+    type: string
   enabled:
     type: boolean
+  create_timestamp:
+    type: string
+    format: date-time
+
 

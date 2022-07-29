@@ -35,7 +35,9 @@ get:
       content:
         application/json:
           schema:
-            $ref: '../schemas/userList.yaml'
+            allOf:
+              - $ref: '../schemas/responseOk.yaml'
+              - $ref: '../schemas/userList.yaml'
     default:
       description: An unexpected error response.
       content:

@@ -15,7 +15,7 @@
 title: userList is list of User resources.
 type: object
 properties:
-  items:
+  data:
     type: array
     items:
       $ref: './user.yaml'
