@@ -36,9 +36,9 @@ CREATE TABLE IF NOT EXISTS T_WORKSPACE
 --  "USER_TOKEN_CLIENT_CLIENTID","org1",
 --  "USER_TOKEN_CLIENT_ID","org1-ID",
 
---  "INTERNAL_API_CLIENT_CLIENTID","org1-woorkspaces",
---  "INTERNAL_API_CLIENT_ID","woorkspaces-ID",
---  "INTERNAL_API_CLIENT_SECRET","woorkspaces-client-secret",
+--  "INTERNAL_API_CLIENT_CLIENTID","org1-workspaces",
+--  "INTERNAL_API_CLIENT_ID","workspaces-ID",
+--  "INTERNAL_API_CLIENT_SECRET","workspaces-client-secret",
 
 --  "TOKEN_CHECK_CLIENT_CLIENTID","system-org1-auth",
 --  "TOKEN_CHECK_CLIENT_ID","system-auth-ID",

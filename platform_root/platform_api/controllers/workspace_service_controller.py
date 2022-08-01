@@ -12,11 +12,13 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
+import base64
 import connexion
 from contextlib import closing
 import json
+import inspect
 
-from common_library.common import common
+from common_library.common import common, api_keycloak_call
 from common_library.common.db import DBconnector
 from libs import queries_workspaces
 
@@ -36,19 +38,90 @@ def workspace_create(body, organization_id):
 
     :rtype: Workspace
     """
-    if not connexion.request.is_json:
+    r = connexion.request
+    if not r.is_json:
         raise
 
-    body = connexion.request.get_json()
-    with closing(DBconnector().connect_orgdb(organization_id)) as conn:
-        with conn.cursor() as cursor:
-            parameter = {
-                "workspace_id": body["workspace_id"],
-                "workspace_name": body["workspace_name"],
-                "informations": "{}",
-            }
+    user_id = r.headers.get("User-id")
+    encode_roles = r.headers.get("Roles")
+    roles = base64.b64decode(encode_roles).decode()
+    language = r.headers.get("Language")
 
+    body = r.get_json()
+    workspace_id = body["workspace_id"]
+    workspace_name = body["workspace_name"]
+    environments = body.get("environments") if body.get("environments") else []
+    wsadmin_users = body.get("workspace_administrators") if body.get("workspace_administrators") else []
+    description = body.get("description") if body.get("description") else ""
+
+    db = DBconnector()
+    with closing(db.connect_orgdb(organization_id)) as conn:
+        with conn.cursor() as cursor:
+
+            # DB登録
+            # insert workspace
+            informations = {"environments": environments, "description": description, }
+            parameter = {
+                "workspace_id": workspace_id,
+                "workspace_name": workspace_name,
+                "informations": json.dumps(informations, ensure_ascii=False),
+            }
             cursor.execute(queries_workspaces.SQL_INSERT_WORKSPACE, parameter)
+
+            private = db.get_organization_private(organization_id)
+
+            # サービスアカウントのTOKEN取得
+            # Get a service account token
+            token_response = api_keycloak_call.keycloak_service_account_get_token(
+                organization_id, private.internal_api_client_clientid, private.internal_api_client_secret,
+            )
+            if token_response.status_code != 200:
+                raise common.AuthException(
+                    "client_user_get_token error status:{}, response:{}".format(token_response.status_code, token_response.text)
+                )
+
+            token = json.loads(token_response.text)["access_token"]
+
+            # ws
+            # ロール作成(ws)
+            # create ws role
+            role_name = workspace_id
+            request_response = api_keycloak_call.keycloak_client_role_create(
+                realm_name=organization_id, client_uid=private.internal_api_client_id, role_name=role_name, token=token,
+            )
+
+            # ws-admin
+            # ロール作成(ws-admin)
+            # create ws-admin role
+            role_name = "{}-admin".format(workspace_id)
+            request_response = api_keycloak_call.keycloak_client_role_create(
+                realm_name=organization_id, client_uid=private.user_token_client_id, role_name=role_name, token=token
+            )
+
+            # ws-adminロールにwsロールをcompositeする
+            # ws-admin role composite ws
+            response_get_role = api_keycloak_call.keycloak_client_role_get(
+                realm_name=organization_id, client_id=private.user_token_client_id, role_name=role_name, token=token,
+            )
+            add_roles = [json.loads(response_get_role.text), ]
+            request_response = api_keycloak_call.keycloak_client_role_composites_create(
+                realm_name=organization_id, client_uid=private.user_token_client_id, role_name=role_name, add_roles=add_roles, token=token,
+            )
+
+            # 管理者ユーザーのrole mappingにws-adminロールを追加する
+            # Add ws-admin role to administrat users role mapping
+            wsadmin_users = wsadmin_users + [{"id": user_id}, ]
+            # 重複除去
+            wsadmin_users = [dict(t) for t in {tuple(d.items()) for d in wsadmin_users}]
+            for wsadmin in wsadmin_users:
+                target_user_id = wsadmin.get("id")
+                request_response = api_keycloak_call.keycloak_user_client_role_mapping_create(
+                    realm_name=organization_id, user_id=target_user_id, client_id=private.user_token_client_id, client_roles=add_roles, token=token,
+                )
+
+            # IT Automation call
+            # XXXX
+
             conn.commit()
 
     return common.response_200_ok(body)
@@ -137,3 +210,119 @@ def workspace_list(organization_id, workspace_name=None):
         data.append(row)
 
     return common.response_200_ok(data)
+
+
+@common.platform_exception_handler
+def workspace_member_list(organization_id, workspace_id):
+    """Get all members for the workspace
+
+    :param organization_id:
+    :type organization_id: str
+    :param workspace_id:
+    :type workspace_id: str
+
+    :rtype: InlineResponse200
+    """
+
+    private = DBconnector().get_organization_private(organization_id)
+
+    # サービスアカウントのTOKEN取得
+    # Get a service account token
+    token_response = api_keycloak_call.keycloak_service_account_get_token(
+        organization_id, private.internal_api_client_clientid, private.internal_api_client_secret,
+    )
+    if token_response.status_code != 200:
+        raise common.AuthException("client_user_get_token error status:{}, response:{}".format(token_response.status_code, token_response.text))
+
+    token = json.loads(token_response.text)["access_token"]
+
+    # カスタムロールの中から、workspaceをcompositeしたロールのみを取得
+    # Get only composite workspace roles from the custum role list
+    workspace_roles = __workspace_role_list(
+        organization_id=organization_id,
+        workspace_id=workspace_id,
+        client_uid=private.user_token_client_id,
+        token=token,
+    )
+
+    workspace_users = []
+    for role in workspace_roles:
+        users_response = api_keycloak_call.keycloak_role_uesrs_get(
+            realm_name=organization_id,
+            client_id=private.user_token_client_id,
+            role_name=role.get("name"),
+            token=token,
+        )
+
+        if users_response.status_code != 200:
+            raise Exception("get user role error status:{}, response:{}".format(users_response.status_code, users_response.text))
+
+        users = json.loads(users_response.text)
+
+        workspace_users.extend([
+            {
+                "firstName": user.get("firstName", ""),
+                "lastName": user.get("lastName", ""),
+                "name": common.get_username(user.get("firstName"), user.get("lastName"), user.get("username")),
+            } for user in users])
+
+    return common.response_200_ok(workspace_users)
+
+
+def __workspace_role_list(organization_id, workspace_id, client_uid, token):
+    """Get all roles for the workspace
+
+    Args:
+        organization_id (str): organization_id
+        workspace_id (str): workspace_id
+        client_id (str): client_id
+        token (str): token
+
+    Returns:
+        list: role list
+    """
+
+    # カスタムロールの中から、workspaceをcompositeしたロールのみを取得
+    # Get only composite workspace roles from the custum role list
+    custum_roles_response = api_keycloak_call.keycloak_client_role_get(
+        realm_name=organization_id,
+        client_id=client_uid,
+        role_name="",
+        token=token,
+    )
+    if custum_roles_response.status_code != 200:
+        raise Exception(
+            "{} error status:{}, response:{}".format(
+                inspect.currentframe().f_code.co_name, custum_roles_response.status_code, custum_roles_response.text))
+
+    custum_roles = json.loads(custum_roles_response.text)
+
+    workspace_roles = []
+
+    for pf_role in custum_roles:
+        if pf_role.get("composite") is not True:
+            continue
+
+        # ロールのcomposites から workspace_id を含むものだけを取得
+        # Get only those contain workspace_id from the composite roles
+        role_composites = []
+        if pf_role.get("containerId") == client_uid:
+            role_composites_response = api_keycloak_call.keycloak_client_role_composites_get(
+                realm_name=organization_id,
+                client_uid=client_uid,
+                role_name=pf_role.get("name"),
+                token=token,
+            )
+
+            if role_composites_response.status_code != 200:
+                raise Exception(
+                    "{} error status:{}, response:{}".format(
+                        inspect.currentframe().f_code.co_name, role_composites_response.status_code, role_composites_response.text))
+
+            role_composites = json.loads(role_composites_response.text)
+
+        list_search = [role for role in role_composites if role.get('name') == workspace_id]
+        if len(list_search) > 0:
+            workspace_roles.append(pf_role)
+
+    return workspace_roles

@@ -79,5 +79,38 @@ function get_workspace_info() {
 
 function get_members_list(workspace_id) {
 
-    alert("メンバー一覧:\n\n○○ ○○\nxx xxx\n");
+    $.ajax({
+        type: "GET",
+        url: api_conf.api.workspaces.detail.members.get.replace('{organization_id}', CommonAuth.getRealm()).replace('{workspace_id}', workspace_id),
+        headers: {
+            Authorization: "Bearer " + CommonAuth.getToken(),
+        },
+        contentType: "application/json",
+        dataType: "json",
+    }).done(function(data) {
+        console.log("RESPONSE GET /api/workspaces/members:");
+        console.log(JSON.stringify(data));
+
+        if (data.result != 200){
+            msg = "[" + data.result + "]\n" + data.message;
+            alert(msg);
+        }
+        else{
+            memberList = "";
+
+            for(var row of data.data) {
+                if ("name" in row){
+                    memberList = memberList + row.name + "\n";
+                }
+            }
+            alert("メンバー一覧:\n\n" + memberList);
+        }
+        // resolve();
+
+    }).fail(function(jqXHR, textStatus, errorThrown) {
+        console.log("FAIL : RESPONSE GET /api/workspaces/members: jqXHR.status:"+jqXHR.status);
+        msg = "[" + jqXHR.status + "]\n" + textStatus;
+        alert(msg);
+        // reject();
+    });
 }

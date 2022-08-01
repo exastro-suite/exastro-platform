@@ -41,7 +41,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/workspaceList'
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - $ref: '#/components/schemas/workspaceList'
         default:
           description: An unexpected error response.
           content:
@@ -103,7 +105,42 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/workspace'
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - $ref: '#/components/schemas/workspace'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+  '/api/{organization_id}/platform/workspaces/{workspace_id}/members':
+    get:
+      tags:
+        - WorkspaceService
+      summary: Get all members for the workspace
+      x-openapi-router-controller: controllers.workspace_service_controller
+      operationId: workspace_member_list
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: workspace_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - $ref: '#/components/schemas/memberList'
         default:
           description: An unexpected error response.
           content:
@@ -314,6 +351,25 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/user'
+    member:
+      title: member is a definition of Member resource.
+      type: object
+      properties:
+        name:
+          type: string
+          example: firstname lastname
+        firstName:
+          type: string
+        lastName:
+          type: string
+    memberList:
+      title: memberList is list of Member resources.
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/member'
     workspace:
       title: workspace is a definition of Workspace resource.
       type: object
