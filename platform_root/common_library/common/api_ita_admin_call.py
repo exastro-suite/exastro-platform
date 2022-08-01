@@ -16,7 +16,6 @@
 import os
 import json
 import requests
-import traceback
 
 # User Imports
 import globals  # 共通的なglobals Common globals
@@ -107,7 +106,8 @@ def ita_workspace_create(organization_id, workspace_id, wsadmin_role_name, user_
     """
 
     globals.logger.info(
-        'Create ITA Workspace. organization_id={}, workspace_id={}, wsadmin_role_name={}, user_id={}'.format(organization_id, workspace_id, wsadmin_role_name, user_id)
+        'Create ITA Workspace. organization_id={}, workspace_id={}, wsadmin_role_name={}, user_id={}'.format(
+            organization_id, workspace_id, wsadmin_role_name, user_id)
     )
 
     header_para = {
