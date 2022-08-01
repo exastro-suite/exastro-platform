@@ -121,6 +121,41 @@ paths:
               schema:
                 $ref: '#/components/schemas/runtimeError'
       x-openapi-router-controller: controllers.workspace_service_controller
+  /api/{organization_id}/platform/workspaces/{workspace_id}/members:
+    get:
+      tags:
+      - WorkspaceService
+      summary: Get all members for the workspace
+      operationId: workspace_member_list
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: workspace_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+      x-openapi-router-controller: controllers.workspace_service_controller
   /internal-api/{organization_id}/platform/workspaces/{workspace_id}/roles:
     get:
       tags:
@@ -148,7 +183,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200'
+                $ref: '#/components/schemas/inline_response_200_1'
         default:
           description: An unexpected error response.
           content:
@@ -183,7 +218,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_1'
+                $ref: '#/components/schemas/inline_response_200_2'
         default:
           description: An unexpected error response.
           content:
@@ -218,7 +253,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_2'
+                $ref: '#/components/schemas/inline_response_200_3'
         default:
           description: An unexpected error response.
           content:
@@ -238,7 +273,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_3'
+                $ref: '#/components/schemas/inline_response_200_4'
         default:
           description: An unexpected error response.
           content:
@@ -320,6 +355,25 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/user'
+    member:
+      title: member is a definition of Member resource.
+      type: object
+      properties:
+        name:
+          type: string
+          example: firstname lastname
+        firstName:
+          type: string
+        lastName:
+          type: string
+    memberList:
+      title: memberList is list of Member resources.
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/member'
     workspace:
       title: workspace is a definition of Workspace resource.
       type: object
@@ -386,16 +440,20 @@ components:
     inline_response_200:
       allOf:
       - $ref: '#/components/schemas/responseOk'
-      - $ref: '#/components/schemas/roleList'
+      - $ref: '#/components/schemas/memberList'
     inline_response_200_1:
       allOf:
       - $ref: '#/components/schemas/responseOk'
-      - $ref: '#/components/schemas/userList'
+      - $ref: '#/components/schemas/roleList'
     inline_response_200_2:
       allOf:
       - $ref: '#/components/schemas/responseOk'
-      - $ref: '#/components/schemas/userWorkspaceList'
+      - $ref: '#/components/schemas/userList'
     inline_response_200_3:
+      allOf:
+      - $ref: '#/components/schemas/responseOk'
+      - $ref: '#/components/schemas/userWorkspaceList'
+    inline_response_200_4:
       allOf:
       - $ref: '#/components/schemas/responseOk'
       - type: object

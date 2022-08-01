@@ -12,27 +12,10 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-responseOk:
-  $ref: "./responseOk.yaml"
-runtimeError:
-  $ref: "./runtimeError.yaml"
-role:
-  $ref: "./role.yaml"
-roleList:
-  $ref: "./roleList.yaml"
-user:
-  $ref: "./user.yaml"
-userList:
-  $ref: "./userList.yaml"
-member:
-  $ref: "./member.yaml"
-memberList:
-  $ref: "./memberList.yaml"
-workspace:
-  $ref: "./workspace.yaml"
-workspaceList:
-  $ref: "./workspaceList.yaml"
-userWorkspace:
-  $ref: "./userWorkspace.yaml"
-userWorkspaceList:
-  $ref: "./userWorkspaceList.yaml"
+title: memberList is list of Member resources.
+type: object
+properties:
+  data:
+    type: array
+    items:
+      $ref: './member.yaml'
