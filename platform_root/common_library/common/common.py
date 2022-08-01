@@ -227,12 +227,12 @@ def get_username(fitstName, LastName, username):
         username (str): username
     """
     if (fitstName is None or fitstName == ""):
-        if(LastName is None or LastName == ""):
+        if (LastName is None or LastName == ""):
             return username
         else:
             return LastName
     else:
-        if(LastName is None or LastName == ""):
+        if (LastName is None or LastName == ""):
             return fitstName
         else:
             return fitstName + " " + LastName
