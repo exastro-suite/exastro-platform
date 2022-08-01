@@ -408,6 +408,9 @@ components:
           - name: staging
           - name: staging
           description: description
+          workspace_administrators:
+          - id: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+          - id: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
     workspaceList:
       title: workspaceList is list of Workspace resources.
       type: object
@@ -449,6 +452,15 @@ components:
           example: staging
       example:
         name: staging
+    workspace_administrator:
+      title: workspace_administrator is a definition of Workspace information resource.
+      type: object
+      properties:
+        id:
+          type: string
+          example: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+      example:
+        id: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
     inline_response_200:
       allOf:
       - $ref: '#/components/schemas/responseOk'
@@ -487,15 +499,22 @@ components:
     workspace_informations:
       type: object
       properties:
+        description:
+          type: string
         environments:
           type: array
           items:
             $ref: '#/components/schemas/environment'
-        description:
-          type: string
+        workspace_administrators:
+          type: array
+          items:
+            $ref: '#/components/schemas/workspace_administrator'
       example:
         environments:
         - name: staging
         - name: staging
         description: description
+        workspace_administrators:
+        - id: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+        - id: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 

@@ -24,12 +24,16 @@ properties:
   informations:
     type: object
     properties:
+      description:
+        type: string
       environments:
         type: array
         items:
           $ref: './environment.yaml'
-      description:
-        type: string
+      workspace_administrators:
+        type: array
+        items:
+          $ref: './workspace_administrator.yaml'
   create_timestamp:
     type: string
     format: date-time

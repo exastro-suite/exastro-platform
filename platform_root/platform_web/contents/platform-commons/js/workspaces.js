@@ -18,10 +18,28 @@ $(function(){
     var data = {
         "rows": [
             {
-                "workspace_id": "入力してください",
-                "workspace_name": "入力してください",
-                "description": "入力してください",
-            },
+                "id": "入力してください",
+                "name": "入力してください",
+                "informations": {
+                    "description": "入力してください",
+                    "environments": [
+                        {
+                            "name": "入力してください"
+                        },
+                        {
+                            "name": "入力してください"
+                        }
+                    ],
+                    "workspace_administrators": [
+                        {
+                            "id": "入力してください(keycloak user id)"
+                        },
+                        {
+                            "id": "入力してください(keycloak user id)"
+                        }
+                    ]
+                }
+            }
         ]
     };
     $("#new_workspace").html(
