@@ -79,6 +79,8 @@ def workspace_create(body, organization_id):
                 "workspace_id": workspace_id,
                 "workspace_name": workspace_name,
                 "informations": json.dumps(informations, ensure_ascii=False),
+                "create_user": user_id,
+                "last_update_user": user_id,
             }
             try:
                 cursor.execute(queries_workspaces.SQL_INSERT_WORKSPACE, parameter)

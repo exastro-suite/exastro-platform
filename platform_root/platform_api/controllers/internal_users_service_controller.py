@@ -19,7 +19,7 @@ from contextlib import closing
 from common_library.common import common
 from common_library.common import api_keycloak_call
 from common_library.common.db import DBconnector
-from libs import queries
+from libs import queries_internal_users
 
 MSG_FUNCTION_ID = "21"
 
@@ -90,7 +90,7 @@ def user_workspace_list(organization_id, user_id):
                                 inspect.currentframe().f_code.co_name, composite_roles_response.status_code, composite_roles_response.text))
 
                     composite_roles = json.loads(composite_roles_response.text)
-                    
+
                     for role in composite_roles:
                         # 取得した子ロールが一度取得した内容にある場合は、重複するので読み飛ばし
                         # If the acquired child role is in the acquired content, it will be duplicated and will be skipped.
@@ -110,7 +110,7 @@ def user_workspace_list(organization_id, user_id):
                     "workspace_id": workspace["id"],
                 }
                 str_where = " WHERE workspace_id = %(workspace_id)s"
-                cursor.execute(queries.SQL_QUERY_WORKSPACE + str_where, parameter)
+                cursor.execute(queries_internal_users.SQL_QUERY_WORKSPACES + str_where, parameter)
                 result = cursor.fetchall()
 
                 # データが取得できた際に名称を設定
