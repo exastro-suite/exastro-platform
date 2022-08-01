@@ -12,13 +12,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-SQL_QUERY_WORKSPACE = """
+SQL_QUERY_WORKSPACES = """
 SELECT *
 FROM T_WORKSPACE
-"""
-
-SQL_QUERY_ORGANIZATION_PRIVATE = """
-SELECT *
-FROM T_ORGANIZATION_PRIVATE
-WHERE id = 1
 """
