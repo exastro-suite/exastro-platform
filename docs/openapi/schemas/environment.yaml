@@ -12,31 +12,9 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-title: workspace is a definition of Workspace resource.
+title: environments is a definition of Workspace information resource.
 type: object
 properties:
-  id:
-    type: string
-    example: workspace-1
   name:
     type: string
-    example: name of workspace
-  informations:
-    type: object
-    properties:
-      environments:
-        type: array
-        items:
-          $ref: './environment.yaml'
-      description:
-        type: string
-  create_timestamp:
-    type: string
-    format: date-time
-  create_user:
-    type: string
-  last_update_timestamp:
-    type: string
-    format: date-time
-  last_update_user:
-    type: string
+    example: staging

@@ -107,7 +107,11 @@ paths:
               schema:
                 allOf:
                   - $ref: '#/components/schemas/responseOk'
-                  - $ref: '#/components/schemas/workspace'
+                  - title: workspaceDetail is Workspace resources.
+                    type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/workspace'
         default:
           description: An unexpected error response.
           content:
@@ -380,12 +384,25 @@ components:
         name:
           type: string
           example: name of workspace
+        informations:
+          type: object
+          properties:
+            environments:
+              type: array
+              items:
+                $ref: '#/components/schemas/environment'
+            description:
+              type: string
         create_timestamp:
           type: string
           format: date-time
+        create_user:
+          type: string
         last_update_timestamp:
           type: string
           format: date-time
+        last_update_user:
+          type: string
     workspaceList:
       title: workspaceList is list of Workspace resources.
       type: object
@@ -418,3 +435,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/userWorkspace'
+    environment:
+      title: environments is a definition of Workspace information resource.
+      type: object
+      properties:
+        name:
+          type: string
+          example: staging
