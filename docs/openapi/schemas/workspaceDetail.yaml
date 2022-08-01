@@ -16,4 +16,6 @@ title: workspaceDetail is Workspace resources.
 type: object
 properties:
   data:
-    $ref: './workspace.yaml'
+      allOf:
+        - $ref: './workspace.yaml'
+        - $ref: '../schemas/responseStat.yaml'

@@ -68,7 +68,13 @@ post:
       content:
         application/json:
           schema:
-            $ref: '../schemas/workspace.yaml'
+            allOf:
+              - $ref: '../schemas/responseOk.yaml'
+              - type: object
+                properties:
+                  data:
+                    type: object
+                    example: null
     default:
       description: An unexpected error response.
       content:

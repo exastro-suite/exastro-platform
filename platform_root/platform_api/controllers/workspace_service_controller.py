@@ -173,7 +173,7 @@ def workspace_create(body, organization_id):
 
             conn.commit()
 
-    return common.response_200_ok(body)
+    return common.response_200_ok(data=None)
 
 
 @common.platform_exception_handler

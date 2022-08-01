@@ -74,7 +74,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/workspace'
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        example: null
         default:
           description: An unexpected error response.
           content:
@@ -111,7 +117,9 @@ paths:
                     type: object
                     properties:
                       data:
-                        $ref: '#/components/schemas/workspace'
+                        allOf:
+                          - $ref: '#/components/schemas/workspace'
+                          - $ref: '#/components/schemas/responseStat'
         default:
           description: An unexpected error response.
           content:
@@ -295,6 +303,19 @@ components:
         ts:
           type: string
           format: date-time
+    responseStat:
+      type: object
+      properties:
+        create_timestamp:
+          type: string
+          format: date-time
+        create_user:
+          type: string
+        last_update_timestamp:
+          type: string
+          format: date-time
+        last_update_user:
+          type: string
     runtimeError:
       type: object
       properties:
@@ -397,16 +418,6 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/workspace_administrator'
-        create_timestamp:
-          type: string
-          format: date-time
-        create_user:
-          type: string
-        last_update_timestamp:
-          type: string
-          format: date-time
-        last_update_user:
-          type: string
     workspaceList:
       title: workspaceList is list of Workspace resources.
       type: object
@@ -414,7 +425,9 @@ components:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/workspace'
+            allOf:
+              - $ref: '#/components/schemas/workspace'
+              - $ref: '#/components/schemas/responseStat'
     userWorkspace:
       title: workspace is a definition of Workspace resource.
       type: object
