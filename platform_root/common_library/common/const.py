@@ -13,3 +13,8 @@
 #   limitations under the License.
 
 default_language = "ja"
+
+length_organization_id = 36
+length_organization_name = 255
+length_workspace_id = 36
+length_workspace_name = 255
