@@ -101,5 +101,15 @@ def call_ita_test(organization_id, workspace_id, subpath):
         return jsonify(ret), ret_status
 
 
+@app.route('/api/<string:organization_id>/workspaces/<string:workspace_id>/ita/', methods=["POST"])
+def create_workspace(organization_id, workspace_id):
+    """死活監視
+
+    Returns:
+        Response: HTTP Respose
+    """
+    return jsonify({"result": "200", "time": str(datetime.utcnow())}), 200
+
+
 if __name__ == "__main__":
     app.run(debug=True, host='0.0.0.0', port=int(os.environ.get('API_PORT', '8000')), threaded=True)

@@ -387,12 +387,16 @@ components:
         informations:
           type: object
           properties:
+            description:
+              type: string
             environments:
               type: array
               items:
                 $ref: '#/components/schemas/environment'
-            description:
-              type: string
+            workspace_administrators:
+              type: array
+              items:
+                $ref: '#/components/schemas/workspace_administrator'
         create_timestamp:
           type: string
           format: date-time
@@ -442,3 +446,10 @@ components:
         name:
           type: string
           example: staging
+    workspace_administrator:
+      title: workspace_administrator is a definition of Workspace information resource.
+      type: object
+      properties:
+        id:
+          type: string
+          example: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx

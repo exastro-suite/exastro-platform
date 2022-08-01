@@ -12,31 +12,9 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-responseOk:
-  $ref: "./responseOk.yaml"
-runtimeError:
-  $ref: "./runtimeError.yaml"
-role:
-  $ref: "./role.yaml"
-roleList:
-  $ref: "./roleList.yaml"
-user:
-  $ref: "./user.yaml"
-userList:
-  $ref: "./userList.yaml"
-member:
-  $ref: "./member.yaml"
-memberList:
-  $ref: "./memberList.yaml"
-workspace:
-  $ref: "./workspace.yaml"
-workspaceList:
-  $ref: "./workspaceList.yaml"
-userWorkspace:
-  $ref: "./userWorkspace.yaml"
-userWorkspaceList:
-  $ref: "./userWorkspaceList.yaml"
-environment:
-  $ref: "./environment.yaml"
-workspace_administrator:
-  $ref: "./workspace_administrator.yaml"
+title: workspace_administrator is a definition of Workspace information resource.
+type: object
+properties:
+  id:
+    type: string
+    example: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx

@@ -43,6 +43,13 @@ class DBconnector:
         db_user: str
         db_password: str
 
+        def __init__(self):
+            self.db_host = ""
+            self.db_port = 3306
+            self.db_database = ""
+            self.db_user = ""
+            self.db_password = ""
+
     def __get_dbinfo_platform(self):
         """get platformdb dbinfo
 
@@ -102,11 +109,12 @@ class DBconnector:
                 result = cursor.fetchone()
 
         orgdb = self.__dbinfo()
-        orgdb.db_host = result.get('DB_HOST')
-        orgdb.db_port = result.get('DB_PORT')
-        orgdb.db_database = result.get('DB_DATABASE')
-        orgdb.db_user = result.get('DB_USER')
-        orgdb.db_password = result.get('DB_PASSWORD')
+        if result:
+            orgdb.db_host = result.get('DB_HOST')
+            orgdb.db_port = result.get('DB_PORT')
+            orgdb.db_database = result.get('DB_DATABASE')
+            orgdb.db_user = result.get('DB_USER')
+            orgdb.db_password = result.get('DB_PASSWORD')
 
         conn = self.__connection(orgdb)
 
@@ -117,23 +125,33 @@ class DBconnector:
         """
 
         user_token_client_clientid: str
-        """XXX-pb clientid"""
+        """XXX clientid"""
         user_token_client_id: str
-        """XXX-pb ID"""
-
-        token_check_client_clientid: str
-        """XXX-br clientid"""
-        token_check_client_id: str
-        """XXX-br ID"""
-        token_check_client_secret: str
-        """XXX-br secret"""
+        """XXX ID"""
 
         internal_api_client_clientid: str
-        """XXX-pf clientid"""
+        """XXX-workspaces clientid"""
         internal_api_client_id: str
-        """XXX-pf ID"""
+        """XXX-workspaces ID"""
         internal_api_client_secret: str
-        """XXX-pf secret"""
+        """XXX-workspaces secret"""
+
+        token_check_client_clientid: str
+        """system-XXX-auth clientid"""
+        token_check_client_id: str
+        """system-XXX-auth ID"""
+        token_check_client_secret: str
+        """system-XXX-auth secret"""
+
+        def __init__(self):
+            self.user_token_client_clientid = ""
+            self.user_token_client_id = ""
+            self.internal_api_client_clientid = ""
+            self.internal_api_client_id = ""
+            self.internal_api_client_secret = ""
+            self.token_check_client_clientid = ""
+            self.token_check_client_id = ""
+            self.token_check_client_secret = ""
 
     def get_organization_private(self, organization_id) -> organization_private:
         """get organization_private informations
