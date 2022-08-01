@@ -45,7 +45,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/workspaceList'
+                $ref: '#/components/schemas/inline_response_200'
         default:
           description: An unexpected error response.
           content:
@@ -113,7 +113,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/workspace'
+                $ref: '#/components/schemas/inline_response_200_1'
         default:
           description: An unexpected error response.
           content:
@@ -148,7 +148,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200'
+                $ref: '#/components/schemas/inline_response_200_2'
         default:
           description: An unexpected error response.
           content:
@@ -183,7 +183,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_1'
+                $ref: '#/components/schemas/inline_response_200_3'
         default:
           description: An unexpected error response.
           content:
@@ -218,7 +218,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_2'
+                $ref: '#/components/schemas/inline_response_200_4'
         default:
           description: An unexpected error response.
           content:
@@ -253,7 +253,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_3'
+                $ref: '#/components/schemas/inline_response_200_5'
         default:
           description: An unexpected error response.
           content:
@@ -273,7 +273,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_4'
+                $ref: '#/components/schemas/inline_response_200_6'
         default:
           description: An unexpected error response.
           content:
@@ -403,16 +403,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/workspace'
-      example:
-        data:
-        - create_timestamp: 2000-01-23T04:56:07.000+00:00
-          last_update_timestamp: 2000-01-23T04:56:07.000+00:00
-          name: name of workspace
-          id: workspace-1
-        - create_timestamp: 2000-01-23T04:56:07.000+00:00
-          last_update_timestamp: 2000-01-23T04:56:07.000+00:00
-          name: name of workspace
-          id: workspace-1
     userWorkspace:
       title: workspace is a definition of Workspace resource.
       type: object
@@ -440,20 +430,28 @@ components:
     inline_response_200:
       allOf:
       - $ref: '#/components/schemas/responseOk'
-      - $ref: '#/components/schemas/memberList'
+      - $ref: '#/components/schemas/workspaceList'
     inline_response_200_1:
       allOf:
       - $ref: '#/components/schemas/responseOk'
-      - $ref: '#/components/schemas/roleList'
+      - $ref: '#/components/schemas/workspace'
     inline_response_200_2:
       allOf:
       - $ref: '#/components/schemas/responseOk'
-      - $ref: '#/components/schemas/userList'
+      - $ref: '#/components/schemas/memberList'
     inline_response_200_3:
       allOf:
       - $ref: '#/components/schemas/responseOk'
-      - $ref: '#/components/schemas/userWorkspaceList'
+      - $ref: '#/components/schemas/roleList'
     inline_response_200_4:
+      allOf:
+      - $ref: '#/components/schemas/responseOk'
+      - $ref: '#/components/schemas/userList'
+    inline_response_200_5:
+      allOf:
+      - $ref: '#/components/schemas/responseOk'
+      - $ref: '#/components/schemas/userWorkspaceList'
+    inline_response_200_6:
       allOf:
       - $ref: '#/components/schemas/responseOk'
       - type: object
