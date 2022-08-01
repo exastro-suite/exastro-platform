@@ -18,4 +18,4 @@ properties:
   data:
       allOf:
         - $ref: './workspace.yaml'
-        - $ref: '../schemas/responseStat.yaml'
+        - $ref: './responseStat.yaml'
