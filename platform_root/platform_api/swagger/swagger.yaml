@@ -78,7 +78,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/workspace'
+                $ref: '#/components/schemas/inline_response_200_1'
         default:
           description: An unexpected error response.
           content:
@@ -113,7 +113,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_1'
+                $ref: '#/components/schemas/inline_response_200_2'
         default:
           description: An unexpected error response.
           content:
@@ -148,7 +148,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_2'
+                $ref: '#/components/schemas/inline_response_200_3'
         default:
           description: An unexpected error response.
           content:
@@ -183,7 +183,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_3'
+                $ref: '#/components/schemas/inline_response_200_4'
         default:
           description: An unexpected error response.
           content:
@@ -218,7 +218,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_4'
+                $ref: '#/components/schemas/inline_response_200_5'
         default:
           description: An unexpected error response.
           content:
@@ -253,7 +253,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_5'
+                $ref: '#/components/schemas/inline_response_200_6'
         default:
           description: An unexpected error response.
           content:
@@ -273,7 +273,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_6'
+                $ref: '#/components/schemas/inline_response_200_1'
         default:
           description: An unexpected error response.
           content:
@@ -296,6 +296,19 @@ components:
         ts:
           type: string
           format: date-time
+    responseStat:
+      type: object
+      properties:
+        create_timestamp:
+          type: string
+          format: date-time
+        create_user:
+          type: string
+        last_update_timestamp:
+          type: string
+          format: date-time
+        last_update_user:
+          type: string
     runtimeError:
       type: object
       properties:
@@ -386,31 +399,6 @@ components:
           example: name of workspace
         informations:
           $ref: '#/components/schemas/workspace_informations'
-        create_timestamp:
-          type: string
-          format: date-time
-        create_user:
-          type: string
-        last_update_timestamp:
-          type: string
-          format: date-time
-        last_update_user:
-          type: string
-      example:
-        create_timestamp: 2000-01-23T04:56:07.000+00:00
-        last_update_user: last_update_user
-        last_update_timestamp: 2000-01-23T04:56:07.000+00:00
-        name: name of workspace
-        id: workspace-1
-        create_user: create_user
-        informations:
-          environments:
-          - name: staging
-          - name: staging
-          description: description
-          workspace_administrators:
-          - id: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-          - id: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
     workspaceList:
       title: workspaceList is list of Workspace resources.
       type: object
@@ -418,7 +406,9 @@ components:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/workspace'
+            allOf:
+            - $ref: '#/components/schemas/workspace'
+            - $ref: '#/components/schemas/responseStat'
     userWorkspace:
       title: workspace is a definition of Workspace resource.
       type: object
@@ -450,8 +440,6 @@ components:
         name:
           type: string
           example: staging
-      example:
-        name: staging
     workspace_administrator:
       title: workspace_administrator is a definition of Workspace information resource.
       type: object
@@ -459,8 +447,6 @@ components:
         id:
           type: string
           example: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-      example:
-        id: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
     inline_response_200:
       allOf:
       - $ref: '#/components/schemas/responseOk'
@@ -468,34 +454,36 @@ components:
     inline_response_200_1:
       allOf:
       - $ref: '#/components/schemas/responseOk'
-      - title: workspaceDetail is Workspace resources.
-        type: object
-        properties:
-          data:
-            $ref: '#/components/schemas/workspace'
-    inline_response_200_2:
-      allOf:
-      - $ref: '#/components/schemas/responseOk'
-      - $ref: '#/components/schemas/memberList'
-    inline_response_200_3:
-      allOf:
-      - $ref: '#/components/schemas/responseOk'
-      - $ref: '#/components/schemas/roleList'
-    inline_response_200_4:
-      allOf:
-      - $ref: '#/components/schemas/responseOk'
-      - $ref: '#/components/schemas/userList'
-    inline_response_200_5:
-      allOf:
-      - $ref: '#/components/schemas/responseOk'
-      - $ref: '#/components/schemas/userWorkspaceList'
-    inline_response_200_6:
-      allOf:
-      - $ref: '#/components/schemas/responseOk'
       - type: object
         properties:
           data:
             type: object
+    inline_response_200_2:
+      allOf:
+      - $ref: '#/components/schemas/responseOk'
+      - title: workspaceDetail is Workspace resources.
+        type: object
+        properties:
+          data:
+            allOf:
+            - $ref: '#/components/schemas/workspace'
+            - $ref: '#/components/schemas/responseStat'
+    inline_response_200_3:
+      allOf:
+      - $ref: '#/components/schemas/responseOk'
+      - $ref: '#/components/schemas/memberList'
+    inline_response_200_4:
+      allOf:
+      - $ref: '#/components/schemas/responseOk'
+      - $ref: '#/components/schemas/roleList'
+    inline_response_200_5:
+      allOf:
+      - $ref: '#/components/schemas/responseOk'
+      - $ref: '#/components/schemas/userList'
+    inline_response_200_6:
+      allOf:
+      - $ref: '#/components/schemas/responseOk'
+      - $ref: '#/components/schemas/userWorkspaceList'
     workspace_informations:
       type: object
       properties:
@@ -509,12 +497,5 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/workspace_administrator'
-      example:
-        environments:
-        - name: staging
-        - name: staging
-        description: description
-        workspace_administrators:
-        - id: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-        - id: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+      example: null
 
