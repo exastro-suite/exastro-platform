@@ -384,17 +384,30 @@ components:
         name:
           type: string
           example: name of workspace
+        informations:
+          $ref: '#/components/schemas/workspace_informations'
         create_timestamp:
           type: string
           format: date-time
+        create_user:
+          type: string
         last_update_timestamp:
           type: string
           format: date-time
+        last_update_user:
+          type: string
       example:
         create_timestamp: 2000-01-23T04:56:07.000+00:00
+        last_update_user: last_update_user
         last_update_timestamp: 2000-01-23T04:56:07.000+00:00
         name: name of workspace
         id: workspace-1
+        create_user: create_user
+        informations:
+          environments:
+          - name: staging
+          - name: staging
+          description: description
     workspaceList:
       title: workspaceList is list of Workspace resources.
       type: object
@@ -434,7 +447,11 @@ components:
     inline_response_200_1:
       allOf:
       - $ref: '#/components/schemas/responseOk'
-      - $ref: '#/components/schemas/workspace'
+      - title: workspaceDetail is Workspace resources.
+        type: object
+        properties:
+          data:
+            $ref: '#/components/schemas/workspace'
     inline_response_200_2:
       allOf:
       - $ref: '#/components/schemas/responseOk'
@@ -458,4 +475,27 @@ components:
         properties:
           data:
             type: object
+    environments is a definition of Workspace information resource.:
+      title: environments is a definition of Workspace information resource.
+      type: object
+      properties:
+        name:
+          type: string
+          example: staging
+      example:
+        name: staging
+    workspace_informations:
+      type: object
+      properties:
+        environments:
+          type: array
+          items:
+            $ref: environments is a definition of Workspace information resource.
+        description:
+          type: string
+      example:
+        environments:
+        - name: staging
+        - name: staging
+        description: description
 
