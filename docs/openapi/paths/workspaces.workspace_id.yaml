@@ -37,7 +37,7 @@ get:
           schema:
             allOf:
               - $ref: '../schemas/responseOk.yaml'
-              - $ref: '../schemas/workspace.yaml'
+              - $ref: '../schemas/workspaceDetail.yaml'
     default:
       description: An unexpected error response.
       content:
