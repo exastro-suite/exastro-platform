@@ -39,12 +39,15 @@ paths:
       $ref: './paths/workspaces.yaml'
   "/api/{organization_id}/platform/workspaces/{workspace_id}":
       $ref: './paths/workspaces.workspace_id.yaml'
+  "/api/{organization_id}/platform/workspaces/{workspace_id}/members":
+      $ref: './paths/workspaces.workspace_id.members.yaml'
+
   "/internal-api/{organization_id}/platform/workspaces/{workspace_id}/roles":
-      $ref: './paths/workspaces_roles.yaml'
+      $ref: './paths/internal_workspaces.workspace_id.roles.yaml'
   "/internal-api/{organization_id}/platform/workspaces/{workspace_id}/users":
-      $ref: './paths/workspaces_users.yaml'
+      $ref: './paths/internal_workspaces.workspace_id.users.yaml'
   "/internal-api/{organization_id}/platform/users/{user_id}/workspaces":
-      $ref: './paths/internal_users_workspaces.yaml'
+      $ref: './paths/internal_users.user_id.workspaces.yaml'
 
   "/internal-api/alive":
       $ref: './paths/internal_alive.yaml'

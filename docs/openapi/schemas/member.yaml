@@ -12,27 +12,13 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-responseOk:
-  $ref: "./responseOk.yaml"
-runtimeError:
-  $ref: "./runtimeError.yaml"
-role:
-  $ref: "./role.yaml"
-roleList:
-  $ref: "./roleList.yaml"
-user:
-  $ref: "./user.yaml"
-userList:
-  $ref: "./userList.yaml"
-member:
-  $ref: "./member.yaml"
-memberList:
-  $ref: "./memberList.yaml"
-workspace:
-  $ref: "./workspace.yaml"
-workspaceList:
-  $ref: "./workspaceList.yaml"
-userWorkspace:
-  $ref: "./userWorkspace.yaml"
-userWorkspaceList:
-  $ref: "./userWorkspaceList.yaml"
+title: member is a definition of Member resource.
+type: object
+properties:
+  name:
+    type: string
+    example: firstname lastname
+  firstName:
+    type: string
+  lastName:
+    type: string

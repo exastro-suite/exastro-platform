@@ -186,49 +186,38 @@ function create_workspace_list(list) {
 
 function get_members_list(workspace_id) {
 
-    alert("メンバー一覧:\n\n○○ ○○\nxx xxx\n");
+    $.ajax({
+        type: "GET",
+        url: api_conf.api.workspaces.detail.members.get.replace('{organization_id}', CommonAuth.getRealm()).replace('{workspace_id}', workspace_id),
+        headers: {
+            Authorization: "Bearer " + CommonAuth.getToken(),
+        },
+        contentType: "application/json",
+        dataType: "json",
+    }).done(function(data) {
+        console.log("RESPONSE GET /api/workspaces/members:");
+        console.log(JSON.stringify(data));
 
-    // $.ajax({
-    //     type: "GET",
-    //     url: api_conf.api.workspaces.get.replace('{organization_id}', CommonAuth.getRealm()),
-    //     headers: {
-    //         Authorization: "Bearer " + CommonAuth.getToken(),
-    //     },
-    //     contentType: "application/json",
-    //     dataType: "json",
-    // }).done(function(data) {
-    //     console.log("RESPONSE GET /api/workspace:");
-    //     console.log(JSON.stringify(data));
+        if (data.result != 200){
+            msg = "[" + data.result + "]\n" + data.message;
+            alert(msg);
+        }
+        else{
+            memberList = "";
 
-    //     if (data.result != 200){
-    //         msg = "[" + data.result + "]\n" + data.message;
-    //         alert(msg);
-    //     }
-    //     else{
-    //         workspaceListData = [];
+            for(var row of data.data) {
+                if ("name" in row){
+                    memberList = memberList + row.name + "\n";
+                }
+            }
+            alert("メンバー一覧:\n\n" + memberList);
+        }
+        // resolve();
 
-    //         for(var row of data.data) {
-    //             if ("description" in row.informations){
-    //                 description = row.informations.description;
-    //             }
-    //             else{
-    //                 description = "";
-    //             }
-    //             workspaceListData.push({
-    //                 workspace_id: row.id,
-    //                 workspace_name: row.name,
-    //                 description: description,
-    //                 create_timestamp: row.create_timestamp,
-    //             });
-    //         }
-    //         create_workspace_list(workspaceListData);
-    //     }
-    //     // resolve();
-
-    // }).fail(function(jqXHR, textStatus, errorThrown) {
-    //     console.log("FAIL : RESPONSE GET /api/workspace: jqXHR.status:"+jqXHR.status);
-    //     msg = "[" + jqXHR.status + "]\n" + textStatus;
-    //     alert(msg);
-    //     // reject();
-    // });
+    }).fail(function(jqXHR, textStatus, errorThrown) {
+        console.log("FAIL : RESPONSE GET /api/workspaces/members: jqXHR.status:"+jqXHR.status);
+        msg = "[" + jqXHR.status + "]\n" + textStatus;
+        alert(msg);
+        // reject();
+    });
 }
