@@ -27,5 +27,4 @@ def alive():
     Returns:
         Response: HTTP Respose
     """
-    ret_status = 200
-    return jsonify({"result": ret_status, "time": str(datetime.utcnow())}), ret_status
+    return common.response_200_ok(None)
