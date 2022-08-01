@@ -390,12 +390,7 @@ components:
             environments:
               type: array
               items:
-                title: environments is a definition of Workspace information resource.
-                type: object
-                properties:
-                  name:
-                    type: string
-                    example: staging
+                $ref: '#/components/schemas/environment'
             description:
               type: string
         create_timestamp:
@@ -440,3 +435,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/userWorkspace'
+    environment:
+      title: environments is a definition of Workspace information resource.
+      type: object
+      properties:
+        name:
+          type: string
+          example: staging

@@ -27,7 +27,7 @@ properties:
       environments:
         type: array
         items:
-          $ref: './environments.yaml'
+          $ref: './environment.yaml'
       description:
         type: string
   create_timestamp:

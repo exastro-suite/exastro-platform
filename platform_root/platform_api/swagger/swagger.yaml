@@ -440,6 +440,15 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/userWorkspace'
+    environment:
+      title: environments is a definition of Workspace information resource.
+      type: object
+      properties:
+        name:
+          type: string
+          example: staging
+      example:
+        name: staging
     inline_response_200:
       allOf:
       - $ref: '#/components/schemas/responseOk'
@@ -475,22 +484,13 @@ components:
         properties:
           data:
             type: object
-    environments is a definition of Workspace information resource.:
-      title: environments is a definition of Workspace information resource.
-      type: object
-      properties:
-        name:
-          type: string
-          example: staging
-      example:
-        name: staging
     workspace_informations:
       type: object
       properties:
         environments:
           type: array
           items:
-            $ref: environments is a definition of Workspace information resource.
+            $ref: '#/components/schemas/environment'
         description:
           type: string
       example:
