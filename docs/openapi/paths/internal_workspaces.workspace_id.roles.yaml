@@ -19,16 +19,31 @@ get:
   x-openapi-router-controller: controllers.internal_workspace_service_controller
   operationId: workspace_role_list
   parameters:
-  - name: organization_id
-    in: path
-    required: true
-    schema:
-      type: string
-  - name: workspace_id
-    in: path
-    required: true
-    schema:
-      type: string
+    - name: organization_id
+      in: path
+      required: true
+      schema:
+        type: string
+    - name: workspace_id
+      in: path
+      required: true
+      schema:
+        type: string
+    - name: User-Id
+      in: header
+      required: true
+      schema:
+        type: string
+    - name: Roles
+      in: header
+      required: true
+      schema:
+        type: string
+    - name: Language
+      in: header
+      required: true
+      schema:
+        type: string
   responses:
     200:
       description: A successful response.

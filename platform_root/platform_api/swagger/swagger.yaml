@@ -177,6 +177,27 @@ paths:
         explode: false
         schema:
           type: string
+      - name: User_Id
+        in: header
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: Roles
+        in: header
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: Language
+        in: header
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
       responses:
         "200":
           description: A successful response.
@@ -207,6 +228,27 @@ paths:
           type: string
       - name: workspace_id
         in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: User_Id
+        in: header
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: Roles
+        in: header
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: Language
+        in: header
         required: true
         style: simple
         explode: false
@@ -247,6 +289,27 @@ paths:
         explode: false
         schema:
           type: string
+      - name: User_Id
+        in: header
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: Roles
+        in: header
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: Language
+        in: header
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
       responses:
         "200":
           description: A successful response.
@@ -267,6 +330,28 @@ paths:
       - InternalCommonService
       summary: alive
       operationId: alive
+      parameters:
+      - name: User_Id
+        in: header
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: Roles
+        in: header
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: Language
+        in: header
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
       responses:
         "200":
           description: A successful response.
