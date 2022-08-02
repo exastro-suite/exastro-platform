@@ -18,6 +18,22 @@ get:
   summary: alive
   x-openapi-router-controller: controllers.internal_common_service_controller
   operationId: alive
+  parameters:
+    - name: User-Id
+      in: header
+      required: true
+      schema:
+        type: string
+    - name: Roles
+      in: header
+      required: true
+      schema:
+        type: string
+    - name: Language
+      in: header
+      required: true
+      schema:
+        type: string
   responses:
     200:
       description: A successful response.
