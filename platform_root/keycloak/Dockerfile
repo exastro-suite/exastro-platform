@@ -42,3 +42,6 @@ COPY    ./platform_root/keycloak/startup-scripts/01_dev_cp_original_file.sh    /
 # Build for production
 #
 FROM    common_build
+
+COPY    ./platform_root/keycloak/configuration/standalone.prod.xml               /opt/jboss/keycloak/standalone/configuration/standalone.xml
+COPY    ./platform_root/keycloak/configuration/standalone-ha.prod.xml            /opt/jboss/keycloak/standalone/configuration/standalone-ha.xml
