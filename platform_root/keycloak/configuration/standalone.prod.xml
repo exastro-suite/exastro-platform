@@ -87,7 +87,8 @@
         <subsystem xmlns="urn:jboss:domain:logging:8.0">
             <console-handler name="CONSOLE">
                 <formatter>
-                    <named-formatter name="COLOR-PATTERN"/>
+                    <!--<named-formatter name="COLOR-PATTERN"/>-->
+                    <named-formatter name="PATTERN"/>
                 </formatter>
             </console-handler>
             <logger category="com.arjuna">
@@ -509,6 +510,13 @@
                         <property name="httpPort" value="${keycloak.hostname.fixed.httpPort:-1}"/>
                         <property name="httpsPort" value="${keycloak.hostname.fixed.httpsPort:-1}"/>
                         <property name="alwaysHttps" value="${keycloak.hostname.fixed.alwaysHttps:false}"/>
+                    </properties>
+                </provider>
+            </spi>
+            <spi name="eventsListener">
+                <provider name="jboss-logging" enabled="true">
+                    <properties>
+                        <property name="success-level" value="info"/>
                     </properties>
                 </provider>
             </spi>
