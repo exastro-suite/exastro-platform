@@ -61,7 +61,8 @@
         <subsystem xmlns="urn:jboss:domain:logging:8.0">
             <console-handler name="CONSOLE">
                 <formatter>
-                    <named-formatter name="COLOR-PATTERN"/>
+                    <!--<named-formatter name="COLOR-PATTERN"/>-->
+                    <named-formatter name="PATTERN"/>
                 </formatter>
             </console-handler>
             <logger category="com.arjuna">
@@ -418,9 +419,9 @@
             <master-realm-name>master</master-realm-name>
             <scheduled-task-interval>900</scheduled-task-interval>
             <theme>
-                <staticMaxAge>2592000</staticMaxAge>
-                <cacheThemes>true</cacheThemes>
-                <cacheTemplates>true</cacheTemplates>
+                <staticMaxAge>-1</staticMaxAge>
+                <cacheThemes>false</cacheThemes>
+                <cacheTemplates>false</cacheTemplates>
                 <welcomeTheme>${env.KEYCLOAK_WELCOME_THEME:keycloak}</welcomeTheme>
                 <default>${env.KEYCLOAK_DEFAULT_THEME:keycloak}</default>
                 <dir>${jboss.home.dir}/themes</dir>
@@ -496,6 +497,13 @@
                         <property name="alwaysHttps" value="${keycloak.hostname.fixed.alwaysHttps:false}"/>
                     </properties>
                 </provider>
+            </spi>
+            <spi name="eventsListener">
+                <provider name="jboss-logging" enabled="true">
+                    <properties>
+                        <property name="success-level" value="info"/>
+                    </properties>
+                </provider>                   
             </spi>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:mail:4.0">
