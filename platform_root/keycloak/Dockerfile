@@ -12,7 +12,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-FROM jboss/keycloak:15.0.2 as common_build
+FROM jboss/keycloak:16.1.1 as common_build
 
 ENV KEYCLOAK_WELCOME_THEME=exastro
 ENV KEYCLOAK_DEFAULT_THEME=exastro
