@@ -22,6 +22,19 @@ MSG_FUNCTION_ID = "00"
 RE_ID_USABLE_CHARACTERS = r'[a-zA-Z0-9_-]'
 RE_ID_USABLE_FIRST_CHARACTER = r'[a-zA-Z]'
 
+ORG_RESERVED_WORDS = [
+    {"text": "master", "re": r"^master$"},
+    {"text": "platform", "re": r"^platform$"},
+    {"text": "account", "re": r"^account$"},
+    {"text": "account-console", "re": r"^account-console$"},
+    {"text": "admin-cli", "re": r"^admin-cli$"},
+    {"text": "broker", "re": r"^broker$"},
+    {"text": "realm-management", "re": r"^realm-management$"},
+    {"text": "security-admin-console", "re": r"^security-admin-console$"},
+    {"text": "*-workspaces", "re": r".*-workspaces$"},
+    {"text": "system-*-auth", "re": r"^system-.*-auth$"}
+]
+
 
 class result():
     """Validation result class
@@ -40,6 +53,84 @@ class result():
         self.message_id = message_id
         self.base_message = base_message
         self.args = args
+
+
+def validate_organization_id(organization_id):
+    """Validate organization id
+
+    Args:
+        organization_id (str): organization id
+
+    Returns:
+        result: Validation result
+    """
+    if organization_id is None or organization_id == "":
+        return result(
+            False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。',
+            multi_lang.get_text('000-00103', "オーガナイゼーションID")
+        )
+
+    if len(organization_id) > const.length_organization_id:
+        return result(
+            False, 400, '400-{}012'.format(MSG_FUNCTION_ID), '指定可能な文字数を超えています。',
+            multi_lang.get_text('000-00103', "オーガナイゼーションID"),
+            str(const.length_organization_id)
+        )
+
+    rlt, chr = validate_id_characters(organization_id)
+    if not rlt:
+        return result(
+            False, 400, '400-{}013'.format(MSG_FUNCTION_ID), '指定できない文字が含まれています。',
+            multi_lang.get_text('000-00103', "オーガナイゼーションID"),
+            chr
+        )
+
+    if organization_id != organization_id.lower():
+        return result(
+            False, 400, '400-{}015'.format(MSG_FUNCTION_ID), 'アルファベットは小文字のみ指定可能です。',
+            multi_lang.get_text('000-00103', "オーガナイゼーションID")
+        )
+
+    if not re.match(RE_ID_USABLE_FIRST_CHARACTER, organization_id):
+        return result(
+            False, 400, '400-{}014'.format(MSG_FUNCTION_ID), '先頭の文字にアルファベット以外が指定されています。',
+            multi_lang.get_text('000-00103', "オーガナイゼーションID")
+        )
+
+    for rsv_word in ORG_RESERVED_WORDS:
+        if re.match(rsv_word["re"], organization_id):
+            return result(
+                False, 400, '400-{}016'.format(MSG_FUNCTION_ID), '予約語のため指定できません。',
+                multi_lang.get_text('000-00103', "オーガナイゼーションID"),
+                rsv_word["text"]
+            )
+
+    return result(True)
+
+
+def validate_organization_name(organization_name):
+    """Validate organization name
+
+    Args:
+        organization_name (str): organization name
+
+    Returns:
+        result: Validation result
+    """
+    if organization_name is None or organization_name == "":
+        return result(
+            False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。',
+            multi_lang.get_text('000-00104', "オーガナイゼーション名")
+        )
+
+    if len(organization_name) > const.length_organization_name:
+        return result(
+            False, 400, '400-{}012'.format(MSG_FUNCTION_ID), '指定可能な文字数を超えています。',
+            multi_lang.get_text('000-00104', "オーガナイゼーション名"),
+            str(const.length_organization_name)
+        )
+
+    return result(True)
 
 
 def validate_workspace_id(workspace_id):
