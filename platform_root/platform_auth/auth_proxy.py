@@ -209,7 +209,7 @@ class auth_proxy:
                             access_token = self.access_token_get(self.realm, basic_user_id, basic_user_password)
                             globals.logger.debug(f'access_token_get={access_token}')
 
-                        except common.AuthErrorException:
+                        except common.AuthException:
                             info = 'ID/PW NG'
                             raise common.AuthException(info)
 
@@ -444,7 +444,7 @@ class auth_proxy:
                 realm, self.user_token_client_id, self.user_token_client_secret, user_name, password)
 
             if access_token_response.status_code != 200:
-                raise common.AuthErrorException("client_user_get_token error status:{}, response:{}".format(
+                raise common.AuthException("client_user_get_token error status:{}, response:{}".format(
                     access_token_response.status_code, access_token_response.text))
 
             access_token = json.loads(access_token_response.text)["access_token"]
