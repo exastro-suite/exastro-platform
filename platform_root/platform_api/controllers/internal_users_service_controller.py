@@ -51,7 +51,7 @@ def user_workspace_list(organization_id, user_id):
         organization_id, client_id, private.internal_api_client_secret, user_id, "", grant_type="client_credentials")
 
     if token_response.status_code != 200:
-        raise common.AuthErrorException("client_user_get_token error status:{}, response:{}".format(token_response.status_code, token_response.text))
+        raise common.AuthException("client_user_get_token error status:{}, response:{}".format(token_response.status_code, token_response.text))
 
     token = json.loads(token_response.text)["access_token"]
 
