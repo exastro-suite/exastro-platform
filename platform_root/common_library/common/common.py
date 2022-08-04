@@ -29,7 +29,53 @@ class AuthException(Exception):
     Args:
         Exception (Exception): Exception
     """
-    pass
+    def __init__(self, data, message_id, message):
+        self.status_code = 401
+        self.data = data
+        self.message_id = message_id
+        self.message = message
+
+
+class BadRequestException(Exception):
+    """Bad Request Exception
+
+    Args:
+        Exception (Exception): Exception
+    """
+
+    def __init__(self, data, message_id, message):
+        self.status_code = 400
+        self.data = data
+        self.message_id = message_id
+        self.message = message
+
+
+class InternalErrorException(Exception):
+    """Internal Error Exception
+
+    Args:
+        Exception (Exception): Exception
+    """
+
+    def __init__(self, data, message_id, message):
+        self.status_code = 500
+        self.data = data
+        self.message_id = message_id
+        self.message = message
+
+
+class OtherException(Exception):
+    """Other Exception
+
+    Args:
+        Exception (Exception): Exception
+    """
+
+    def __init__(self, status_code, data, message_id, message):
+        self.status_code = status_code
+        self.data = data
+        self.message_id = message_id
+        self.message = message
 
 
 class UserException(Exception):
@@ -172,6 +218,14 @@ def platform_exception_handler(func):
     def inner_func(*args, **kwargs):
         try:
             response = func(*args, **kwargs)
+        except BadRequestException as err:
+            return response_status(err.status_code, err.data, err.message_id, err.message)
+        except AuthException as err:
+            return response_status(err.status_code, err.data, err.message_id, err.message)
+        except InternalErrorException as err:
+            return response_status(err.status_code, err.data, err.message_id, err.message)
+        except OtherException as err:
+            return response_status(err.status_code, err.data, err.message_id, err.message)
         except Exception as err:
             return response_server_error(err)
         return response

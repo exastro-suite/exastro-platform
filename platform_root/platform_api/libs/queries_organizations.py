@@ -12,23 +12,22 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-title: organization is a definition of Organization resource.
-type: object
-properties:
-  id:
-    type: string
-    example: org1
-  name:
-    type: string
-    example: organization of org1
-  organization_managers:
-    type: array
-    items:
-      $ref: "./userCreate.yaml"
+SQL_INSERT_ORGANIZATION = """
+INSERT INTO `T_ORGANIZATION`
+(`ORGANIZATION_ID`,
+`ORGANIZATION_NAME`,
+`INFORMATIONS`,
+`CREATE_USER`,
+`LAST_UPDATE_USER`)
+VALUES
+(%(ORGANIZATION_ID)s,
+%(ORGANIZATION_NAME)s,
+%(INFORMATIONS)s,
+%(CREATE_USER)s,
+%(LAST_UPDATE_USER)s)
+"""
 
-  options:
-    type: object
-    description: Organization Add Json Parameter (json of KeyCloak)
-
-required:
-  - id
+SQL_QUERY_ORGANIZATIONS = """
+SELECT *
+FROM T_ORGANIZATION
+"""

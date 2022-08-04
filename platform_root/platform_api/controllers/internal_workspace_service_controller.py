@@ -15,7 +15,7 @@
 import json
 import inspect
 
-from common_library.common import common, api_keycloak_call
+from common_library.common import common, api_keycloak_tokens, api_keycloak_users, api_keycloak_clients
 from common_library.common.db import DBconnector
 
 MSG_FUNCTION_ID = "22"
@@ -37,7 +37,7 @@ def workspace_role_list(organization_id, workspace_id):
 
     # サービスアカウントのTOKEN取得
     # Get a service account token
-    token_response = api_keycloak_call.keycloak_service_account_get_token(
+    token_response = api_keycloak_tokens.service_account_get_token(
         organization_id, private.internal_api_client_clientid, private.internal_api_client_secret,
     )
     if token_response.status_code != 200:
@@ -53,7 +53,7 @@ def workspace_role_list(organization_id, workspace_id):
         client_uid=private.user_token_client_id,
         token=token,
     )
-    
+
     response_data = [{"name": x["name"]} for x in workspace_roles]
 
     return common.response_200_ok(response_data)
@@ -75,7 +75,7 @@ def workspace_user_list(organization_id, workspace_id):
 
     # サービスアカウントのTOKEN取得
     # Get a service account token
-    token_response = api_keycloak_call.keycloak_service_account_get_token(
+    token_response = api_keycloak_tokens.service_account_get_token(
         organization_id, private.internal_api_client_clientid, private.internal_api_client_secret,
     )
     if token_response.status_code != 200:
@@ -94,7 +94,7 @@ def workspace_user_list(organization_id, workspace_id):
 
     workspace_users = []
     for role in workspace_roles:
-        users_response = api_keycloak_call.keycloak_role_uesrs_get(
+        users_response = api_keycloak_users.role_uesrs_get(
             realm_name=organization_id,
             client_id=private.user_token_client_id,
             role_name=role.get("name"),
@@ -135,7 +135,7 @@ def __workspace_role_list(organization_id, workspace_id, client_uid, token):
 
     # カスタムロールの中から、workspaceをcompositeしたロールのみを取得
     # Get only composite workspace roles from the custum role list
-    custum_roles_response = api_keycloak_call.keycloak_client_role_get(
+    custum_roles_response = api_keycloak_clients.client_role_get(
         realm_name=organization_id,
         client_id=client_uid,
         role_name="",
@@ -158,7 +158,7 @@ def __workspace_role_list(organization_id, workspace_id, client_uid, token):
         # Get only those contain workspace_id from the composite roles
         role_composites = []
         if pf_role.get("containerId") == client_uid:
-            role_composites_response = api_keycloak_call.keycloak_client_role_composites_get(
+            role_composites_response = api_keycloak_clients.client_role_composites_get(
                 realm_name=organization_id,
                 client_uid=client_uid,
                 role_name=pf_role.get("name"),

@@ -6,6 +6,8 @@ info:
 servers:
 - url: /
 tags:
+- name: OrganizationService
+  description: オーガナイゼーションに関する操作
 - name: WorkspaceService
   description: ワークスペースに関する操作
 - name: UsersService
@@ -17,6 +19,41 @@ tags:
 - name: InternalWorkspaceService
   description: ワークスペースに関する操作(内部用)
 paths:
+  /api/platform/organizations:
+    post:
+      tags:
+      - OrganizationService
+      summary: Create creates an organization
+      operationId: organization_create
+      parameters:
+      - name: retry
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          description: \"1\" is retry organization create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/organizationCreate'
+        required: true
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responseOk'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+      x-openapi-router-controller: controllers.organization_service_controller
   /api/{organization_id}/platform/workspaces:
     get:
       tags:
@@ -381,6 +418,10 @@ components:
         ts:
           type: string
           format: date-time
+      example:
+        result: 200
+        message: SUCCESS
+        ts: 2000-01-23T04:56:07.000+00:00
     responseStat:
       type: object
       properties:
@@ -409,6 +450,25 @@ components:
           format: date-time
         data:
           type: object
+    organizationCreate:
+      title: organization is a definition of Organization resource.
+      required:
+      - id
+      type: object
+      properties:
+        id:
+          type: string
+          example: org1
+        name:
+          type: string
+          example: organization of org1
+        organization_managers:
+          type: array
+          items:
+            $ref: '#/components/schemas/userCreate'
+        options:
+          type: object
+          description: Organization Add Json Parameter (json of KeyCloak)
     role:
       title: role is a definition of Role resource.
       type: object
@@ -453,6 +513,51 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/user'
+    userCreate:
+      title: user is a definition of User resource.
+      required:
+      - username
+      type: object
+      properties:
+        username:
+          type: string
+          example: user-id
+        email:
+          type: string
+          example: user e-mail address
+        firstName:
+          type: string
+        lastName:
+          type: string
+        credentials:
+          type: array
+          items:
+            $ref: '#/components/schemas/userCredentials'
+        requiredActions:
+          $ref: '#/components/schemas/userRequiredActions'
+        enabled:
+          type: boolean
+    userCredentials:
+      title: userCredentials is Credentials of User resources.
+      type: object
+      properties:
+        type:
+          type: string
+          example: password
+        value:
+          type: string
+          example: password
+        temporary:
+          type: boolean
+          example: true
+    userRequiredActions:
+      title: userRequiredActions is RequiredActions of User resources.
+      type: array
+      items:
+        type: string
+        description: \"UPDATE_PROFILE\" or \"UPDATE_PASSWORD\" or \"VERIFY EMAIL\"
+          or \"UPDATE USER LOCAL\" or \"CONFIGURE OTP\"
+        example: UPDATE_PROFILE
     member:
       title: member is a definition of Member resource.
       type: object

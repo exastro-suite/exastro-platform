@@ -25,8 +25,8 @@ import traceback
 import globals
 import const
 import common_library.common.common as common
-# import api_keycloak_call
-import common_library.common.api_keycloak_call as api_keycloak_call
+# import api_keycloak_tokens
+import common_library.common.api_keycloak_tokens as api_keycloak_tokens
 from common_library.common.db import DBconnector
 
 
@@ -439,8 +439,8 @@ class auth_proxy:
 
             # アクセストークン取得
             # get access token
-            # access_token = api_keycloak_call.get_user_token(user_name, password, realm)
-            access_token_response = api_keycloak_call.keycloak_client_user_get_token(
+            # access_token = api_keycloak_tokens.get_user_token(user_name, password, realm)
+            access_token_response = api_keycloak_tokens.client_user_get_token(
                 realm, self.user_token_client_id, self.user_token_client_secret, user_name, password)
 
             if access_token_response.status_code != 200:
@@ -487,11 +487,11 @@ class auth_proxy:
 
             # トークンイントロスペクション
             # token introspection
-            introspect_response = api_keycloak_call.keycloak_user_token_introspect(
+            introspect_response = api_keycloak_tokens.user_token_introspect(
                 client_id, client_secret, realm, access_token, keycloak_proto, keycloak_host)
 
             if introspect_response.status_code != 200:
-                raise Exception("keycloak_user_token_introspect error status:{}, response:{}".format(
+                raise Exception("user_token_introspect error status:{}, response:{}".format(
                     introspect_response.status_code, introspect_response.text))
 
             active = json.loads(introspect_response.text).get('active')

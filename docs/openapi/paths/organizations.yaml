@@ -4,6 +4,12 @@ post:
   summary: Create creates an organization
   x-openapi-router-controller: controllers.organization_service_controller
   operationId: organization_create
+  parameters:
+    - name: retry
+      in: query
+      schema:
+        type: string
+        description: \"1\" is retry organization create
   requestBody:
     content:
       application/json:

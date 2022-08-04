@@ -17,7 +17,7 @@ import inspect
 from contextlib import closing
 
 from common_library.common import common
-from common_library.common import api_keycloak_call
+from common_library.common import api_keycloak_tokens, api_keycloak_users, api_keycloak_clients
 from common_library.common.db import DBconnector
 from libs import queries_internal_users
 
@@ -47,7 +47,7 @@ def user_workspace_list(organization_id, user_id):
 
     # サービスアカウントのTOKEN取得
     # Get a service account token
-    token_response = api_keycloak_call.keycloak_client_user_get_token(
+    token_response = api_keycloak_tokens.client_user_get_token(
         organization_id, client_id, private.internal_api_client_secret, user_id, "", grant_type="client_credentials")
 
     if token_response.status_code != 200:
@@ -57,7 +57,7 @@ def user_workspace_list(organization_id, user_id):
 
     # ユーザーロール取得
     # Get user role
-    roles_response = api_keycloak_call.keycloak_get_user_role_mapping(organization_id, user_id, token)
+    roles_response = api_keycloak_users.get_user_role_mapping(organization_id, user_id, token)
     if roles_response.status_code == 404:
         return common.response_status(404, None, '404-{}001'.format(MSG_FUNCTION_ID), "ユーザが存在しません")
     elif roles_response.status_code != 200:
@@ -67,7 +67,7 @@ def user_workspace_list(organization_id, user_id):
 
     # # client idを元にclientの情報を取得
     # # Get client information based on client id
-    # clients = api_keycloak_call.keycloak_clients_get(organization_id, client_id, token)
+    # clients = api_keycloak_clients.clients_get(organization_id, client_id, token)
 
     workspace_ids = []
     workspaces = []
@@ -81,7 +81,7 @@ def user_workspace_list(organization_id, user_id):
                 # 子ロールがある内容がworkspaceに紐づくのでその内容をチェックする
                 # Since the content with the child role is linked to the workspace, check the content
                 if mapping.get("composite"):
-                    composite_roles_response = api_keycloak_call.keycloak_client_role_composites_get(
+                    composite_roles_response = api_keycloak_clients.client_role_composites_get(
                         organization_id, private.user_token_client_id, mapping["name"], token)
 
                     if composite_roles_response.status_code != 200:

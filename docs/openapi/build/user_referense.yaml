@@ -204,6 +204,9 @@ components:
         id:
           type: string
           example: org1
+        name:
+          type: string
+          example: organization of org1
         organization_managers:
           type: array
           items:
