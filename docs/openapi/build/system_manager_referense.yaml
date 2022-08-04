@@ -1,0 +1,287 @@
+openapi: 3.0.3
+info:
+  title: Exastro Platform API
+  description: Exastro Platform API
+  version: 1.0.0
+servers:
+  - url: /
+tags:
+  - name: OrganizationService
+    description: オーガナイゼーションに関する操作
+paths:
+  /api/platform/organizations:
+    post:
+      tags:
+        - OrganizationService
+      summary: Create creates an organization
+      x-openapi-router-controller: controllers.organization_service_controller
+      operationId: organization_create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/organizationCreate'
+        required: true
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responseOk'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+components:
+  schemas:
+    responseOk:
+      title: A successful base response.
+      type: object
+      properties:
+        result:
+          type: integer
+          example: 200
+        message:
+          type: string
+          example: SUCCESS
+        ts:
+          type: string
+          format: date-time
+    responseStat:
+      type: object
+      properties:
+        create_timestamp:
+          type: string
+          format: date-time
+        create_user:
+          type: string
+        last_update_timestamp:
+          type: string
+          format: date-time
+        last_update_user:
+          type: string
+    runtimeError:
+      type: object
+      properties:
+        result:
+          type: integer
+          format: int32
+          example: 500
+        message:
+          type: string
+          example: Error Message
+        ts:
+          type: string
+          format: date-time
+        data:
+          type: object
+          example: null
+    organizationCreate:
+      title: organization is a definition of Organization resource.
+      type: object
+      properties:
+        id:
+          type: string
+          example: org1
+        organization_managers:
+          type: array
+          items:
+            $ref: '#/components/schemas/userCreate'
+        options:
+          type: object
+          description: Organization Add Json Parameter (json of KeyCloak)
+      required:
+        - id
+    role:
+      title: role is a definition of Role resource.
+      type: object
+      properties:
+        name:
+          type: string
+          example: role-1
+    roleList:
+      title: roleList is list of Role resources.
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/role'
+    user:
+      title: user is a definition of User resource.
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          example: firstname lastname
+        firstName:
+          type: string
+        lastName:
+          type: string
+        preferred_username:
+          type: string
+        enabled:
+          type: boolean
+        create_timestamp:
+          type: string
+          format: date-time
+    userList:
+      title: userList is list of User resources.
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/user'
+    userCreate:
+      title: user is a definition of User resource.
+      type: object
+      properties:
+        username:
+          type: string
+          example: user-id
+        email:
+          type: string
+          example: user e-mail address
+        firstName:
+          type: string
+        lastName:
+          type: string
+        credentials:
+          type: array
+          items:
+            $ref: '#/components/schemas/userCredentials'
+        requiredActions:
+          $ref: '#/components/schemas/userRequiredActions'
+        enabled:
+          type: boolean
+      required:
+        - username
+    userCredentials:
+      title: userCredentials is Credentials of User resources.
+      type: object
+      properties:
+        type:
+          type: string
+          example: password
+        value:
+          type: string
+          example: password
+        temporary:
+          type: boolean
+          example: true
+    userRequiredActions:
+      title: userRequiredActions is RequiredActions of User resources.
+      type: array
+      items:
+        type: string
+        example: UPDATE_PROFILE
+        description: \"UPDATE_PROFILE\" or \"UPDATE_PASSWORD\" or \"VERIFY EMAIL\" or \"UPDATE USER LOCAL\" or \"CONFIGURE OTP\"
+    member:
+      title: member is a definition of Member resource.
+      type: object
+      properties:
+        name:
+          type: string
+          example: firstname lastname
+        firstName:
+          type: string
+        lastName:
+          type: string
+    memberList:
+      title: memberList is list of Member resources.
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/member'
+    workspace:
+      title: workspace is a definition of Workspace resource.
+      type: object
+      properties:
+        id:
+          type: string
+          example: workspace-1
+        name:
+          type: string
+          example: name of workspace
+        informations:
+          type: object
+          properties:
+            description:
+              type: string
+            environments:
+              type: array
+              items:
+                $ref: '#/components/schemas/environment'
+            workspace_administrators:
+              type: array
+              items:
+                $ref: '#/components/schemas/workspace_administrator'
+    workspaceList:
+      title: workspaceList is list of Workspace resources.
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            allOf:
+              - $ref: '#/components/schemas/workspace'
+              - $ref: '#/components/schemas/responseStat'
+    userWorkspace:
+      title: workspace is a definition of Workspace resource.
+      type: object
+      properties:
+        id:
+          type: string
+          example: workspace-1
+        name:
+          type: string
+          example: name of workspace
+        create_timestamp:
+          type: string
+          format: date-time
+        last_update_timestamp:
+          type: string
+          format: date-time
+    userWorkspaceList:
+      title: WorkspaceList is a list of workspace resources that users can access.
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/userWorkspace'
+    environment:
+      title: environments is a definition of Workspace information resource.
+      type: object
+      properties:
+        name:
+          type: string
+          example: staging
+    workspace_administrator:
+      title: workspace_administrator is a definition of Workspace information resource.
+      type: object
+      properties:
+        id:
+          type: string
+          example: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
+      description: Value converted from ID/Password in base64
+    BearerAuth:
+      type: http
+      scheme: bearer
+      description: Credentials or access token for API
+security:
+  - BearerAuth: []
+  - BasicAuth: []

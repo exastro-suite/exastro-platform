@@ -1,0 +1,25 @@
+post:
+  tags:
+  - OrganizationService
+  summary: Create creates an organization
+  x-openapi-router-controller: controllers.organization_service_controller
+  operationId: organization_create
+  requestBody:
+    content:
+      application/json:
+        schema:
+          $ref: '../schemas/organizationCreate.yaml'
+    required: true
+  responses:
+    200:
+      description: A successful response.
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/responseOk.yaml'
+    default:
+      description: An unexpected error response.
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'
