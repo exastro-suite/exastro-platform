@@ -31,31 +31,30 @@ def get_text(text_id, origin_text, *args):
 
     try:
         # ヘッダーのlocalを見てimportする言語を選択
+        # Select the language to import by looking at local in the header
         if request.headers.get("Language", const.default_language) == "ja":
             from common_resources.ja import language
         else:
             from common_resources.en import language
 
-        text = ""
-
-        # text_id存在チェック text_id Existence check
+        # text_id存在チェック
+        # text_id Existence check
         if (text_id in language.LanguageList.lang_array):
-            text = (language.LanguageList.lang_array[text_id])
+            text = (language.LanguageList.lang_array.get(text_id))
 
-            i = 0
-
-            for arg in args:
-                # {0}, {1}..に埋め込む変数を第3引数以降（args）で指定した文字列に置き換える
-                # Replace the variable to be embedded in {0}, {1} .. with the character string specified by the third argument and after (args).
-                text = text.replace("{" + str(i) + "}", arg)
-                i += 1
-
-        else:
-            # text_idが存在しない場合は、原文を返却
-            # If text_id does not exist, return the original text
+        if not text:
             text = origin_text
-
+        # エラーは無視する
+        # ignore the error
+        try:
+            text = text.format(*args)
+        except Exception:
+            pass
         return text
 
     except Exception:
+        try:
+            origin_text = origin_text.format(*args)
+        except Exception:
+            pass
         return origin_text

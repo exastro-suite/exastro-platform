@@ -48,6 +48,9 @@ services:
       - SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
       - SSL_CERT_DIR=/etc/ssl/certs
       - NODE_EXTRA_CA_CERTS=/etc/ssl/certs/ca-certificates.crt
+      - REALM_NAME=${REALM_NAME}
+      - TOKEN_CHECK_CLIENT_ID=${TOKEN_CHECK_CLIENT_ID}
+      - TOKEN_CHECK_CLIENT_SECRET=${TOKEN_CHECK_CLIENT_SECRET}
 
   platform-api:
     build:
@@ -82,6 +85,9 @@ services:
       - SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
       - SSL_CERT_DIR=/etc/ssl/certs
       - NODE_EXTRA_CA_CERTS=/etc/ssl/certs/ca-certificates.crt
+      - REALM_NAME=${REALM_NAME}
+      - TOKEN_CHECK_CLIENT_ID=${TOKEN_CHECK_CLIENT_ID}
+      - TOKEN_CHECK_CLIENT_SECRET=${TOKEN_CHECK_CLIENT_SECRET}
 
   platform-web:
     build:

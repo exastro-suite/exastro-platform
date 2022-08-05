@@ -1,6 +1,7 @@
 {
     "id": "{{organization_id}}",
-    "realm": "{{organization_name}}",
+    "realm": "{{organization_id}}",
+    "displayName": "{{organization_name}}",
     "enabled": false,
     "smtpServer": {},
     "eventsEnabled": false,
@@ -95,5 +96,5 @@
         "ja",
         "en"
     ],
-    "defaultLocale": "ja",
+    "defaultLocale": "ja"
 }

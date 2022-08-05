@@ -20,14 +20,21 @@ INSERT INTO `T_ORGANIZATION`
 `CREATE_USER`,
 `LAST_UPDATE_USER`)
 VALUES
-(%(ORGANIZATION_ID)s,
-%(ORGANIZATION_NAME)s,
-%(INFORMATIONS)s,
-%(CREATE_USER)s,
-%(LAST_UPDATE_USER)s)
+(%(organization_id)s,
+%(organization_name)s,
+%(informations)s,
+%(create_user)s,
+%(last_update_user)s)
 """
 
 SQL_QUERY_ORGANIZATIONS = """
 SELECT *
 FROM T_ORGANIZATION
+"""
+
+SQL_STATUS_UPDATE_ORGANIZATIONS = """
+UPDATE T_ORGANIZATION
+SET INFORMATIONS = json_replace(INFORMATIONS, "$.status", %(INFORMATIONS_status)s)
+, LAST_UPDATE_USER = %(last_update_user)s
+WHERE ORGANIZATION_ID = %(organization_id)s
 """

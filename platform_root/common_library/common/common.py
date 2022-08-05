@@ -29,7 +29,7 @@ class AuthException(Exception):
     Args:
         Exception (Exception): Exception
     """
-    def __init__(self, data, message_id, message):
+    def __init__(self, data=None, message_id=None, message=None):
         self.status_code = 401
         self.data = data
         self.message_id = message_id
@@ -43,7 +43,7 @@ class BadRequestException(Exception):
         Exception (Exception): Exception
     """
 
-    def __init__(self, data, message_id, message):
+    def __init__(self, data=None, message_id=None, message=None):
         self.status_code = 400
         self.data = data
         self.message_id = message_id
@@ -57,7 +57,7 @@ class InternalErrorException(Exception):
         Exception (Exception): Exception
     """
 
-    def __init__(self, data, message_id, message):
+    def __init__(self, data=None, message_id=None, message=None):
         self.status_code = 500
         self.data = data
         self.message_id = message_id
@@ -71,7 +71,7 @@ class OtherException(Exception):
         Exception (Exception): Exception
     """
 
-    def __init__(self, status_code, data, message_id, message):
+    def __init__(self, status_code, data=None, message_id=None, message=None):
         self.status_code = status_code
         self.data = data
         self.message_id = message_id

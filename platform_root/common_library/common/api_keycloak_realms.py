@@ -31,7 +31,7 @@ def realm_create(realm_json, token):
     Returns:
         Response: HTTP Respose (success : .status_code=200)
     """
-    globals.logger.info(f'Get keycloak user role. realm_name={realm_json["id"]}')
+    globals.logger.info('Get keycloak user role. realm_name={}'.format(realm_json["id"]))
 
     header_para = {
         "Content-Type": "application/json",
@@ -40,7 +40,7 @@ def realm_create(realm_json, token):
 
     data_para = realm_json
 
-    globals.logger.debug("realms post送信")
+    globals.logger.debug("realms post send")
     # 呼び出し先設定
     # Call destination setting
     api_url = "{}://{}:{}".format(os.environ['API_KEYCLOAK_PROTOCOL'], os.environ['API_KEYCLOAK_HOST'], os.environ['API_KEYCLOAK_PORT'])
@@ -50,4 +50,4 @@ def realm_create(realm_json, token):
 
     # 応答をそのまま返却
     # return response as is
-    return request_response.text
+    return request_response
