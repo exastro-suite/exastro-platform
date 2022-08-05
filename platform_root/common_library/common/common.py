@@ -78,6 +78,15 @@ class OtherException(Exception):
         self.message = message
 
 
+class NotAllowedException(Exception):
+    """権限不足例外 - Not Allow Exception
+
+    Args:
+        Exception (Exception): Exception
+    """
+    pass
+
+
 class UserException(Exception):
     """ユーザー例外 User Exception
 

@@ -24,6 +24,7 @@ services:
         - https_proxy=${HTTPS_PROXY}
     environment:
       - LISTEN_PORT=8000
+      - LISTEN_PORT_PF_MNG=8001
       - PYTHONPATH=/app/
       - CONFIG_API_PATH=/app/api.conf
       - PYTHONIOENCODING=utf-8
@@ -57,6 +58,7 @@ services:
       - DB_PASSWORD=password
     ports:
       - "0.0.0.0:8000:8000"
+      - "0.0.0.0:8001:8001"
   keycloak:
     build:
       dockerfile: ./platform_root/keycloak/Dockerfile

@@ -20,12 +20,15 @@ import jwt
 import base64
 from urllib.parse import urlparse
 import traceback
+import re
 
 # User Imports
 import globals
 import const
 import common_library.common.common as common
 # import api_keycloak_tokens
+import config.auth.auth_pattern as auth_pattern
+# import api_keycloak_call
 import common_library.common.api_keycloak_tokens as api_keycloak_tokens
 
 
@@ -225,6 +228,11 @@ class auth_proxy:
             else:
                 info = 'not authorization format'
                 raise common.AuthException(info)
+
+            allowd = self.is_allowed_request()
+            if not allowd:
+                info = 'Access is not allowed'
+                raise common.NotAllowedException(info)
 
             token_roles = self.token_decode.get("resource_access").get(self.user_token_client_id)
             globals.logger.debug(f'token_roles={token_roles}')
@@ -495,3 +503,60 @@ class auth_proxy:
 
         except Exception:
             raise
+
+    def is_allowed_request(self):
+        """check if the request is allowed - リクエストが許可されているかチェックします
+
+        Returns:
+            bool: True = allowed / False = denied
+        """
+        globals.logger.info('Is allowed request. path={}, method={}'.format(request.path, request.method))
+
+        # check from the back - 後ろから順番にチェックする
+        for pattern in reversed(auth_pattern.AUTH_PATTERN):
+
+            match = re.match(pattern["url"], request.path)
+            if not match:
+                # If the URL does not match, proceed to the next - URLが一致していない時は次に進む
+                continue
+
+            # Get variables obtained by regular expression as a dictionary - 正規表現で取得した変数をディクショナリとして取得する
+            match_dict = match.groupdict()
+
+            for auth in pattern["auth"]:
+                if not ("*" in auth["method"] or request.method in auth["method"]):
+                    # If the method does not match, proceed to the next - methodが一致していない時は次に進む
+                    continue
+
+                # When the method matches, check if there is a match for the role
+                # - methodが一致した時、roleに合致するものが存在するかチェックする
+                for role in auth["roles"]:
+                    role_name = role["role"].format(**match_dict)
+                    if role.get("client") is None:
+                        # If client is not specified, check if there is anything that matches the realm role
+                        # - clientの指定が無いときはrealmロールに合致するものが無いかチェックする
+                        if role_name in self.token_decode.get("realm_access", {}).get("roles", []):
+                            globals.logger.info('SUCCEED Is allowed request. Realm-role={}'.format(role_name))
+                            return True
+                    else:
+                        # If client is specified, check if there is anything that matches the client role
+                        # - clientの指定があるときはclientロールに合致するものが無いかチェックする
+                        role_client = role["client"].format(**match_dict)
+                        if role_name in self.token_decode.get("resource_access", {}).get(role_client, {}).get("roles", []):
+                            globals.logger.info('SUCCEED Is allowed request. client-role={}.{}'.format(role_client, role_name))
+                            return True
+
+                # Access is not allowed when the method matches and there is no match for the role
+                # - methodが一致し、roleに合致するものが存在しないときはaccess不可
+                globals.logger.info('FORBIDDEN Is allowed request.')
+                return False
+
+            # Access is allowed when there is no matching method
+            # - methodに一致するものが無いときはAccess可する
+            globals.logger.info('SUCCEED Is allowed request. method no match')
+            return True
+
+        # Access is allowed when there is no matching url
+        # - urlに一致するものが無いときはAccess可する
+        globals.logger.info('SUCCEED Is allowed request. pattern no match')
+        return True

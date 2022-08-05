@@ -197,6 +197,12 @@ def platform_api_call(organization_id, subpath):
         message = multi_lang.get_text(message_id, "認証に失敗しました。")
         raise common.AuthException(message_id=message_id, message=message)
 
+    except common.NotAllowedException as e:
+        globals.logger.info(f'authorization error:{e.args}')
+        status_code = 403
+        info = "authorization error"
+        return jsonify({"result": status_code, "info": info, "time": str(datetime.utcnow())}), status_code
+
     except Exception as e:
         return common.response_server_error(e)
 
@@ -273,6 +279,12 @@ def ita_workspace_api_call(organization_id, workspace_id, subpath):
         message = multi_lang.get_text(message_id, "認証に失敗しました。")
         raise common.AuthException(message_id=message_id, message=message)
 
+    except common.NotAllowedException as e:
+        globals.logger.info(f'permission error:{e.args}')
+        status_code = 403
+        info = "permission error"
+        return jsonify({"result": status_code, "info": info, "time": str(datetime.utcnow())}), status_code
+
     except Exception as e:
         return common.response_server_error(e)
 
@@ -281,5 +293,5 @@ if __name__ == '__main__':
     app.run(
         debug=(True if os.environ.get('FLASK_ENV', 'produciton') == 'development' else False),
         host='0.0.0.0',
-        port=int(os.environ.get('FLASK_SERVER_PORT', '8001')),
+        port=int(os.environ.get('FLASK_SERVER_PORT', '8801')),
         threaded=True)
