@@ -26,10 +26,10 @@ import re
 import globals
 import const
 import common_library.common.common as common
+# import api_keycloak_tokens
 import config.auth.auth_pattern as auth_pattern
 # import api_keycloak_call
-import common_library.common.api_keycloak_call as api_keycloak_call
-from common_library.common.db import DBconnector
+import common_library.common.api_keycloak_tokens as api_keycloak_tokens
 
 
 class auth_proxy:
@@ -62,30 +62,24 @@ class auth_proxy:
     user_token_client_secret = None
 
     # def __init__(self):
-    def __init__(self, realm):
+    def __init__(self, realm, token_check_client_id, token_check_client_secret, user_token_client_id, user_token_client_secret):
+        """初期化処理 initialize setting
+
+        Args:
+            realm (str): realm name
+            token_check_client_id (str): token check client id
+            token_check_client_secret (str): token check client secret
+            user_token_client_id (str): user token check client id
+
+        """
         self.realm = realm
 
         # 接続先のClient設定
         # Client settings for connection destination
-        self.token_check_client_id = common.get_token_authentication_client_id(realm)
-
-        # サービスアカウントを使うためにClientのSercretを取得
-        # Get Client Sercret to use service account
-        db = DBconnector()
-        private = db.get_organization_private(realm)
-
-        # 取得できない場合は、エラー
-        # If you cannot get it, an error
-        if not private:
-            raise common.UserException("organization private information error")
-
-        # トークンチェック用ClientIDのClisentSecret
-        # Clisent Secret of Client ID for token check
-        self.token_check_client_secret = private.token_check_client_secret
-
-        # 接続先のClient設定
-        # Client settings for connection destination
-        self.user_token_client_id = common.get_user_token_client_id(realm)
+        self.token_check_client_id = token_check_client_id
+        self.token_check_client_secret = token_check_client_secret
+        self.user_token_client_id = user_token_client_id
+        self.user_token_client_secret = user_token_client_secret
 
     def check_authorization(self):
         """認証情報チェック Authorization check
@@ -446,8 +440,8 @@ class auth_proxy:
 
             # アクセストークン取得
             # get access token
-            # access_token = api_keycloak_call.get_user_token(user_name, password, realm)
-            access_token_response = api_keycloak_call.keycloak_client_user_get_token(
+            # access_token = api_keycloak_tokens.get_user_token(user_name, password, realm)
+            access_token_response = api_keycloak_tokens.client_user_get_token(
                 realm, self.user_token_client_id, self.user_token_client_secret, user_name, password)
 
             if access_token_response.status_code != 200:
@@ -494,11 +488,11 @@ class auth_proxy:
 
             # トークンイントロスペクション
             # token introspection
-            introspect_response = api_keycloak_call.keycloak_user_token_introspect(
+            introspect_response = api_keycloak_tokens.user_token_introspect(
                 client_id, client_secret, realm, access_token, keycloak_proto, keycloak_host)
 
             if introspect_response.status_code != 200:
-                raise Exception("keycloak_user_token_introspect error status:{}, response:{}".format(
+                raise Exception("user_token_introspect error status:{}, response:{}".format(
                     introspect_response.status_code, introspect_response.text))
 
             active = json.loads(introspect_response.text).get('active')

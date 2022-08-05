@@ -18,7 +18,7 @@ import json
 import inspect
 import pymysql
 
-from common_library.common import common, api_keycloak_call, api_ita_admin_call, validation
+from common_library.common import common, api_keycloak_tokens, api_keycloak_users, api_keycloak_clients, api_ita_admin_call, validation
 from common_library.common.db import DBconnector
 from libs import queries_workspaces
 
@@ -92,7 +92,7 @@ def workspace_create(body, organization_id):
 
             # サービスアカウントのTOKEN取得
             # Get a service account token
-            token_response = api_keycloak_call.keycloak_service_account_get_token(
+            token_response = api_keycloak_tokens.service_account_get_token(
                 organization_id, private.internal_api_client_clientid, private.internal_api_client_secret,
             )
             if token_response.status_code != 200:
@@ -109,7 +109,7 @@ def workspace_create(body, organization_id):
 
             # ロール作成(ws)
             # create ws role
-            r_create_ws = api_keycloak_call.keycloak_client_role_create(
+            r_create_ws = api_keycloak_clients.client_role_create(
                 realm_name=organization_id, client_uid=private.internal_api_client_id, role_name=role_name_ws, token=token,
             )
             if r_create_ws.status_code not in [201, 409]:
@@ -118,7 +118,7 @@ def workspace_create(body, organization_id):
 
             # ロール作成(ws-admin)
             # create ws-admin role
-            r_create_wsadmin = api_keycloak_call.keycloak_client_role_create(
+            r_create_wsadmin = api_keycloak_clients.client_role_create(
                 realm_name=organization_id, client_uid=private.user_token_client_id, role_name=role_name_wsadmin, token=token
             )
             if r_create_wsadmin.status_code not in [201, 409]:
@@ -127,14 +127,14 @@ def workspace_create(body, organization_id):
 
             # ws-adminロールにwsロールをcompositeする
             # ws-admin role composite ws
-            r_get_role_ws = api_keycloak_call.keycloak_client_role_get(
+            r_get_role_ws = api_keycloak_clients.client_role_get(
                 realm_name=organization_id, client_id=private.internal_api_client_id, role_name=role_name_ws, token=token,
             )
             if r_get_role_ws.status_code != 200:
                 return common.response_status(500, None, f"500-{MSG_FUNCTION_ID}003", "ワークスペースロールの取得に失敗しました(対象ID:{})".format(workspace_id))
 
             roles_ws = [json.loads(r_get_role_ws.text), ]
-            r_create_composite = api_keycloak_call.keycloak_client_role_composites_create(
+            r_create_composite = api_keycloak_clients.client_role_composites_create(
                 realm_name=organization_id, client_uid=private.user_token_client_id, role_name=role_name_wsadmin, add_roles=roles_ws, token=token,
             )
             if r_create_composite.status_code != 204:
@@ -143,7 +143,7 @@ def workspace_create(body, organization_id):
 
             # 管理者ユーザーのrole mappingにws-adminロールを追加する
             # Add ws-admin role to administrat users role mapping
-            r_get_role_admin = api_keycloak_call.keycloak_client_role_get(
+            r_get_role_admin = api_keycloak_clients.client_role_get(
                 realm_name=organization_id, client_id=private.user_token_client_id, role_name=role_name_wsadmin, token=token,
             )
             if r_get_role_admin.status_code != 200:
@@ -156,7 +156,7 @@ def workspace_create(body, organization_id):
             wsadmin_users = [dict(t) for t in {tuple(d.items()) for d in wsadmin_users}]
             for wsadmin in wsadmin_users:
                 target_user_id = wsadmin.get("id")
-                r_create_mapping = api_keycloak_call.keycloak_user_client_role_mapping_create(
+                r_create_mapping = api_keycloak_users.user_client_role_mapping_create(
                     realm_name=organization_id, user_id=target_user_id, client_id=private.user_token_client_id, client_roles=roles_admin, token=token,
                 )
                 if r_create_mapping.status_code != 204:
@@ -277,7 +277,7 @@ def workspace_member_list(organization_id, workspace_id):
 
     # サービスアカウントのTOKEN取得
     # Get a service account token
-    token_response = api_keycloak_call.keycloak_service_account_get_token(
+    token_response = api_keycloak_tokens.service_account_get_token(
         organization_id, private.internal_api_client_clientid, private.internal_api_client_secret,
     )
     if token_response.status_code != 200:
@@ -296,7 +296,7 @@ def workspace_member_list(organization_id, workspace_id):
 
     workspace_users = []
     for role in workspace_roles:
-        users_response = api_keycloak_call.keycloak_role_uesrs_get(
+        users_response = api_keycloak_users.role_uesrs_get(
             realm_name=organization_id,
             client_id=private.user_token_client_id,
             role_name=role.get("name"),
@@ -333,7 +333,7 @@ def __workspace_role_list(organization_id, workspace_id, client_uid, token):
 
     # カスタムロールの中から、workspaceをcompositeしたロールのみを取得
     # Get only composite workspace roles from the custum role list
-    custum_roles_response = api_keycloak_call.keycloak_client_role_get(
+    custum_roles_response = api_keycloak_clients.client_role_get(
         realm_name=organization_id,
         client_id=client_uid,
         role_name="",
@@ -356,7 +356,7 @@ def __workspace_role_list(organization_id, workspace_id, client_uid, token):
         # Get only those contain workspace_id from the composite roles
         role_composites = []
         if pf_role.get("containerId") == client_uid:
-            role_composites_response = api_keycloak_call.keycloak_client_role_composites_get(
+            role_composites_response = api_keycloak_clients.client_role_composites_get(
                 realm_name=organization_id,
                 client_uid=client_uid,
                 role_name=pf_role.get("name"),

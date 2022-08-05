@@ -6,51 +6,11 @@ info:
 servers:
   - url: /
 tags:
-  - name: OrganizationService
-    description: オーガナイゼーションに関する操作
   - name: WorkspaceService
     description: ワークスペースに関する操作
   - name: UsersService
     description: ユーザーに関する操作
-  - name: InternalCommonService
-    description: 共通(内部用)
-  - name: InternalUsersService
-    description: ユーザーに関する操作(内部用)
-  - name: InternalWorkspaceService
-    description: ワークスペースに関する操作(内部用)
 paths:
-  /api/platform/organizations:
-    post:
-      tags:
-        - OrganizationService
-      summary: Create creates an organization
-      x-openapi-router-controller: controllers.organization_service_controller
-      operationId: organization_create
-      parameters:
-        - name: retry
-          in: query
-          schema:
-            type: string
-            description: \"1\" is retry organization create
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/organizationCreate'
-        required: true
-      responses:
-        '200':
-          description: A successful response.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/responseOk'
-        default:
-          description: An unexpected error response.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/runtimeError'
   '/api/{organization_id}/platform/workspaces':
     get:
       tags:
@@ -187,196 +147,6 @@ paths:
                 allOf:
                   - $ref: '#/components/schemas/responseOk'
                   - $ref: '#/components/schemas/memberList'
-        default:
-          description: An unexpected error response.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/runtimeError'
-  '/internal-api/{organization_id}/platform/workspaces/{workspace_id}/roles':
-    get:
-      tags:
-        - InternalWorkspaceService
-      summary: Get all roles for the workspace
-      x-openapi-router-controller: controllers.internal_workspace_service_controller
-      operationId: workspace_role_list
-      parameters:
-        - name: organization_id
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: workspace_id
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: User-Id
-          in: header
-          required: true
-          schema:
-            type: string
-        - name: Roles
-          in: header
-          required: true
-          schema:
-            type: string
-        - name: Language
-          in: header
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: A successful response.
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: '#/components/schemas/responseOk'
-                  - $ref: '#/components/schemas/roleList'
-        default:
-          description: An unexpected error response.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/runtimeError'
-  '/internal-api/{organization_id}/platform/workspaces/{workspace_id}/users':
-    get:
-      tags:
-        - InternalWorkspaceService
-      summary: Get all users for the workspace
-      x-openapi-router-controller: controllers.internal_workspace_service_controller
-      operationId: workspace_user_list
-      parameters:
-        - name: organization_id
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: workspace_id
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: User-Id
-          in: header
-          required: true
-          schema:
-            type: string
-        - name: Roles
-          in: header
-          required: true
-          schema:
-            type: string
-        - name: Language
-          in: header
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: A successful response.
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: '#/components/schemas/responseOk'
-                  - $ref: '#/components/schemas/userList'
-        default:
-          description: An unexpected error response.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/runtimeError'
-  '/internal-api/{organization_id}/platform/users/{user_id}/workspaces':
-    get:
-      tags:
-        - InternalUsersService
-      summary: workspaces list of user posible
-      operationId: user_workspace_list
-      parameters:
-        - name: organization_id
-          in: path
-          required: true
-          style: simple
-          explode: false
-          schema:
-            type: string
-        - name: user_id
-          in: path
-          required: true
-          style: simple
-          explode: false
-          schema:
-            type: string
-        - name: User-Id
-          in: header
-          required: true
-          schema:
-            type: string
-        - name: Roles
-          in: header
-          required: true
-          schema:
-            type: string
-        - name: Language
-          in: header
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: A successful response.
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: '#/components/schemas/responseOk'
-                  - $ref: '#/components/schemas/userWorkspaceList'
-        default:
-          description: An unexpected error response.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/runtimeError'
-      x-openapi-router-controller: controllers.internal_users_service_controller
-  /internal-api/alive:
-    get:
-      tags:
-        - InternalCommonService
-      summary: alive
-      x-openapi-router-controller: controllers.internal_common_service_controller
-      operationId: alive
-      parameters:
-        - name: User-Id
-          in: header
-          required: true
-          schema:
-            type: string
-        - name: Roles
-          in: header
-          required: true
-          schema:
-            type: string
-        - name: Language
-          in: header
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: A successful response.
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: '#/components/schemas/responseOk'
-                  - type: object
-                    properties:
-                      data:
-                        type: object
-                        example: null
         default:
           description: An unexpected error response.
           content:
@@ -624,3 +394,15 @@ components:
         id:
           type: string
           example: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
+      description: Value converted from ID/Password in base64
+    BearerAuth:
+      type: http
+      scheme: bearer
+      description: Credentials or access token for API
+security:
+  - BearerAuth: []
+  - BasicAuth: []

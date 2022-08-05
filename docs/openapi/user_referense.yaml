@@ -23,23 +23,12 @@ servers:
 - url: /
 
 tags:
-- name: OrganizationService
-  description: オーガナイゼーションに関する操作
 - name: WorkspaceService
   description: ワークスペースに関する操作
 - name: UsersService
   description: ユーザーに関する操作
-- name: InternalCommonService
-  description: 共通(内部用)
-- name: InternalUsersService
-  description: ユーザーに関する操作(内部用)
-- name: InternalWorkspaceService
-  description: ワークスペースに関する操作(内部用)
 
 paths:
-  "/api/platform/organizations":
-      $ref: './paths/organizations.yaml'
-
   "/api/{organization_id}/platform/workspaces":
       $ref: './paths/workspaces.yaml'
   "/api/{organization_id}/platform/workspaces/{workspace_id}":
@@ -47,16 +36,13 @@ paths:
   "/api/{organization_id}/platform/workspaces/{workspace_id}/members":
       $ref: './paths/workspaces.workspace_id.members.yaml'
 
-  "/internal-api/{organization_id}/platform/workspaces/{workspace_id}/roles":
-      $ref: './paths/internal_workspaces.workspace_id.roles.yaml'
-  "/internal-api/{organization_id}/platform/workspaces/{workspace_id}/users":
-      $ref: './paths/internal_workspaces.workspace_id.users.yaml'
-  "/internal-api/{organization_id}/platform/users/{user_id}/workspaces":
-      $ref: './paths/internal_users.user_id.workspaces.yaml'
-
-  "/internal-api/alive":
-      $ref: './paths/internal_alive.yaml'
-
 components:
   schemas:
     $ref: './schemas/_schemas.yaml'
+
+  securitySchemes:
+    $ref: './schemas/_securitySchemes.yaml'
+
+security:
+- BearerAuth: []
+- BasicAuth: []
