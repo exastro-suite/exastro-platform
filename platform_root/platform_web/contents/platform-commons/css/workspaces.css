@@ -54,3 +54,13 @@ html {
     overflow: auto;
     border: 1px solid black;
 }
+
+.btn_ita{
+    cursor: pointer;
+    width: 120px;
+    height: 30px;
+}
+.btn_ita:hover{
+    cursor: pointer;
+    background-color: silver;
+}

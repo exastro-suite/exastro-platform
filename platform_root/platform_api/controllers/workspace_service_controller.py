@@ -87,7 +87,7 @@ def workspace_create(body, organization_id):
             except pymysql.err.IntegrityError:
                 # Duplicate PRIMARY KEY
                 return common.response_status(
-                    200, None, "200-00208", "他レコードと重複しています。(対象ID:{},値:{})".format("workspace_id", workspace_id)
+                    409, None, f"409-{MSG_FUNCTION_ID}001", "指定されたワークスペースはすでに存在しているため作成できません。"
                 )
 
             # サービスアカウントのTOKEN取得

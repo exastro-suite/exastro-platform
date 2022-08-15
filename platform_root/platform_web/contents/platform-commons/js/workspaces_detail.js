@@ -28,11 +28,11 @@ function get_workspace_info() {
         },
         contentType: "application/json",
         dataType: "json",
-    }).done(function(data) {
+    }).done(function(data, status, xhr) {
         console.log("RESPONSE GET /api/workspaces_detail:");
         console.log(JSON.stringify(data));
 
-        if (data.result != 200){
+        if (xhr.status != 200){
             msg = "[" + data.result + "]\n" + data.message;
             alert(msg);
         }
@@ -87,11 +87,11 @@ function get_members_list(workspace_id) {
         },
         contentType: "application/json",
         dataType: "json",
-    }).done(function(data) {
+    }).done(function(data, status, xhr) {
         console.log("RESPONSE GET /api/workspaces/members:");
         console.log(JSON.stringify(data));
 
-        if (data.result != 200){
+        if (xhr.status != 200){
             msg = "[" + data.result + "]\n" + data.message;
             alert(msg);
         }

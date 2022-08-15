@@ -105,11 +105,11 @@ function get_workspace_list() {
         },
         contentType: "application/json",
         dataType: "json",
-    }).done(function(data) {
-        console.log("RESPONSE GET /api/workspace:");
+    }).done(function(data, status, xhr) {
+        console.log("RESPONSE GET /api/workspace:" + xhr);
         console.log(JSON.stringify(data));
 
-        if (data.result != 200){
+        if (xhr.status != 200){
             msg = "[" + data.result + "]\n" + data.message;
             alert(msg);
         }
@@ -171,7 +171,7 @@ function create_workspace_list(list) {
         );
         tr.append('<td class="workspace_datail"><button class="btn_members">メンバー一覧</button></td>');
         tr.append('<td class="workspace_datail" style="text-align: center">' + format_last_update_timestamp + '</td>');
-        tr.append('<td><button class="btn_ita">IT-Automation</button></td>');
+        tr.append('<td><button class="btn_ita"><img src="/_/platform-commons/img/Exastro-ITA-logo1-rgb.png" width=80 height=20></button></td>');
 
         tboby.append(tr);
 
@@ -212,11 +212,11 @@ function get_members_list(workspace_id) {
         },
         contentType: "application/json",
         dataType: "json",
-    }).done(function(data) {
+    }).done(function(data, status, xhr) {
         console.log("RESPONSE GET /api/workspaces/members:");
         console.log(JSON.stringify(data));
 
-        if (data.result != 200){
+        if (xhr.status != 200){
             msg = "[" + data.result + "]\n" + data.message;
             alert(msg);
         }
