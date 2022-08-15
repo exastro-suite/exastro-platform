@@ -193,7 +193,7 @@ def response_status(status_code, data, message_id, base_message="", *args):
 
     message = multi_lang.get_text(message_id, base_message, args)
 
-    return jsonify({"result": status_code, "data": data, "message": message, "ts": datetime_to_str(datetime.utcnow())}), status_code
+    return jsonify({"result": message_id, "data": data, "message": message, "ts": datetime_to_str(datetime.utcnow())}), status_code
 
 
 def response_server_error(e):
@@ -207,11 +207,13 @@ def response_server_error(e):
     """
     import traceback
 
-    globals.logger.error(f'Exception : {e.args}')
+    info = e.__class__.__name__
+    globals.logger.error(f'last call:[{info}] Exception:{e.args}')
     globals.logger.error(''.join(list(traceback.TracebackException.from_exception(e).format())))
     status_code = 500
-    info = e.__class__.__name__
-    return jsonify({"result": status_code, "data": None, "message": info, "ts": datetime_to_str(datetime.utcnow())}), status_code
+    message_id = "500-99999"
+    message = multi_lang.get_text(message_id, "システムエラー")
+    return jsonify({"result": "500-99999", "data": None, "message": message, "ts": datetime_to_str(datetime.utcnow())}), status_code
 
 
 def platform_exception_handler(func):
