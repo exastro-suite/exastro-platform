@@ -20,7 +20,7 @@ AUTH_PATTERN = [
             {
                 "method": ["POST"],
                 "roles": [
-                    {"client": "{org_id}-workspaces", "role": "_org_manager"}
+                    {"client": "{org_id}-workspaces", "role": "_org-manager"}
                 ]
             }
         ]
