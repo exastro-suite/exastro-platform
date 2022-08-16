@@ -19,7 +19,7 @@ import string
 import uuid
 
 from common_library.common.db import DBconnector
-from common_library.common import queries_dbinit
+from common_library.common.libs import queries_dbinit
 
 
 class DBinit(DBconnector):

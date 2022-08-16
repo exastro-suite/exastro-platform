@@ -30,5 +30,13 @@ properties:
     type: object
     description: Organization Add Json Parameter (json of KeyCloak)
 
+  # plan add to pending
+  # infomations:
+  #   type: array
+  #   items:
+  #     plan:
+  #       type: string
+  #       description: choise a plan id (default 0)
+
 required:
   - id

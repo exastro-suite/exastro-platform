@@ -12,7 +12,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-from flask import render_template
+from flask import render_template, request
 # from math import fabs
 import os
 import connexion
@@ -21,6 +21,7 @@ import json
 import inspect
 import pymysql
 import pymysql.cursors
+import requests
 # import base64
 
 from common_library.common import common, api_keycloak_tokens, api_keycloak_realms, api_keycloak_clients, api_keycloak_users, validation
@@ -36,7 +37,7 @@ MSG_FUNCTION_ID = "23"
 
 
 @common.platform_exception_handler
-def organization_create(body, retry=None):  # noqa: E501
+def organization_create(body, retry=None):
     """Create creates an organization
 
     :param body:
@@ -295,6 +296,8 @@ def __create_start(organization_id, organization_name, options, user_id):
                                               organization_id)
                 raise common.BadRequestException(message_id=message_id, message=message)
 
+    return
+
 
 def __realm_create(organization_id, organization_name, options, user_id):
     """realm create
@@ -347,6 +350,8 @@ def __realm_create(organization_id, organization_name, options, user_id):
     # update status
     __update_status(const.ORG_STATUS_REALM_CREATE, organization_id, user_id)
 
+    return
+
 
 def __get_token():
     """get a token
@@ -382,10 +387,12 @@ def __get_token():
 
 
 def __update_status(status, organization_id, user_id):
-    """ステータス更新
+    """ステータス更新 update status
 
     Args:
         status (str): status
+        organization_id (str): organization id
+        user_id (str): user id
 
     Raises:
         common.InternalErrorException: _description_
@@ -414,6 +421,8 @@ def __update_status(status, organization_id, user_id):
                 message = multi_lang.get_text(message_id,
                                               "ステータスの更新に失敗しました。")
                 raise common.InternalErrorException(message_id=message_id, message=message)
+
+    return
 
 
 def __client_create(organization_id, user_id):
@@ -538,6 +547,8 @@ def __client_create(organization_id, user_id):
     # update status
     __update_status(const.ORG_STATUS_CLIENT_CREATE, organization_id, user_id)
 
+    return
+
 
 def __service_account_setting(organization_id, user_id):
     """service account setting
@@ -580,7 +591,7 @@ def __service_account_setting(organization_id, user_id):
         message_id = f"500-{MSG_FUNCTION_ID}006"
         message = multi_lang.get_text(
             message_id,
-            "clientの取得に失敗しました(対象ID:{0} client:{1})",
+            "service account userの取得に失敗しました(対象ID:{0} client:{1})",
             organization_id,
             platform_client_id
         )
@@ -617,7 +628,7 @@ def __service_account_setting(organization_id, user_id):
     if response.status_code != 200:
         globals.logger.error(f"response.status_code:{response.status_code}")
         globals.logger.error(f"response.text:{response.text}")
-        message_id = f"500-{MSG_FUNCTION_ID}010"
+        message_id = f"500-{MSG_FUNCTION_ID}011"
         message = multi_lang.get_text(
             message_id,
             "client roleの取得に失敗しました(対象ID:{0} client:{1})",
@@ -648,6 +659,8 @@ def __service_account_setting(organization_id, user_id):
     # update status
     __update_status(const.ORG_STATUS_SA_SETTING, organization_id, user_id)
 
+    return
+
 
 def __user_create(organization_id, user_id, org_mng_users):
     """user create
@@ -675,7 +688,7 @@ def __user_create(organization_id, user_id, org_mng_users):
            response.status_code != 409:    # 409 exists user
             globals.logger.error(f"response.status_code:{response.status_code}")
             globals.logger.error(f"response.text:{response.text}")
-            message_id = f"500-{MSG_FUNCTION_ID}008"
+            message_id = f"500-{MSG_FUNCTION_ID}009"
             message = multi_lang.get_text(
                 message_id,
                 "オーガナイゼーション管理者の作成に失敗しました(対象ID:{0} username:{1})",
@@ -687,6 +700,8 @@ def __user_create(organization_id, user_id, org_mng_users):
     # ステータス更新
     # update status
     __update_status(const.ORG_STATUS_USER_CREATE, organization_id, user_id)
+
+    return
 
 
 def __user_role_create(organization_id, user_id, org_mng_users):
@@ -715,7 +730,7 @@ def __user_role_create(organization_id, user_id, org_mng_users):
         if response.status_code != 200:
             globals.logger.error(f"response.status_code:{response.status_code}")
             globals.logger.error(f"response.text:{response.text}")
-            message_id = f"500-{MSG_FUNCTION_ID}009"
+            message_id = f"500-{MSG_FUNCTION_ID}010"
             message = multi_lang.get_text(
                 message_id,
                 "オーガナイゼーション管理者の取得に失敗しました(対象ID:{0} username:{1})",
@@ -750,7 +765,7 @@ def __user_role_create(organization_id, user_id, org_mng_users):
         if response.status_code != 200:
             globals.logger.error(f"response.status_code:{response.status_code}")
             globals.logger.error(f"response.text:{response.text}")
-            message_id = f"500-{MSG_FUNCTION_ID}010"
+            message_id = f"500-{MSG_FUNCTION_ID}011"
             message = multi_lang.get_text(
                 message_id,
                 "client roleの取得に失敗しました(対象ID:{0} client:{1})",
@@ -768,7 +783,7 @@ def __user_role_create(organization_id, user_id, org_mng_users):
            response.status_code != 204:
             globals.logger.error(f"response.status_code:{response.status_code}")
             globals.logger.error(f"response.text:{response.text}")
-            message_id = f"500-{MSG_FUNCTION_ID}011"
+            message_id = f"500-{MSG_FUNCTION_ID}012"
             message = multi_lang.get_text(
                 message_id,
                 "オーガナイゼーション管理者のロール設定に失敗しました(対象ID:{0} username:{1})",
@@ -780,6 +795,8 @@ def __user_role_create(organization_id, user_id, org_mng_users):
     # ステータス更新
     # update status
     __update_status(const.ORG_STATUS_USER_ROLE, organization_id, user_id)
+
+    return
 
 
 def __organization_database_create(organization_id, user_id):
@@ -825,6 +842,7 @@ def __organization_database_create(organization_id, user_id):
     # ステータス更新
     # update status
     __update_status(const.ORG_STATUS_DB_CREATE, organization_id, user_id)
+
     return
 
 
@@ -838,9 +856,149 @@ def __organization_database_update(organization_id, user_id):
 
     globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
 
+    # client secret値を取得して更新
+    # Get client secret value and update
+
+    # サービスアカウントのTOKEN取得
+    # Get a service account token
+    token = __get_token()
+
+    user_token_client_clientid = common.get_user_token_client_id(organization_id)
+    internal_api_client_clientid = common.get_platform_client_id(organization_id)
+    token_check_client_clientid = common.get_token_authentication_client_id(organization_id)
+
+    # 該当Client情報を取得
+    # get client infomations
+    response = api_keycloak_clients.clients_get(organization_id, user_token_client_clientid, token)
+    if response.status_code != 200:
+        globals.logger.error(f"response.status_code:{response.status_code}")
+        globals.logger.error(f"response.text:{response.text}")
+        message_id = f"500-{MSG_FUNCTION_ID}004"
+        message = multi_lang.get_text(
+            message_id,
+            "clientの取得に失敗しました(対象ID:{0} client:{1})",
+            organization_id,
+            user_token_client_clientid
+        )
+        raise common.InternalErrorException(message_id=message_id, message=message)
+
+    response_json = json.loads(response.text)
+    globals.logger.info(f"-- clients_get:{response_json}")
+    user_token_client_id = response_json.get("id")
+
+    response = api_keycloak_clients.clients_get(organization_id, internal_api_client_clientid, token)
+    if response.status_code != 200:
+        globals.logger.error(f"response.status_code:{response.status_code}")
+        globals.logger.error(f"response.text:{response.text}")
+        message_id = f"500-{MSG_FUNCTION_ID}004"
+        message = multi_lang.get_text(
+            message_id,
+            "clientの取得に失敗しました(対象ID:{0} client:{1})",
+            organization_id,
+            internal_api_client_clientid
+        )
+        raise common.InternalErrorException(message_id=message_id, message=message)
+
+    response_json = json.loads(response.text)
+    internal_api_client_id = response_json.get("id")
+
+    response = api_keycloak_clients.clients_get(organization_id, token_check_client_clientid, token)
+    if response.status_code != 200:
+        globals.logger.error(f"response.status_code:{response.status_code}")
+        globals.logger.error(f"response.text:{response.text}")
+        message_id = f"500-{MSG_FUNCTION_ID}014"
+        message = multi_lang.get_text(
+            message_id,
+            "clientの取得に失敗しました(対象ID:{0} client:{1})",
+            organization_id,
+            token_check_client_clientid
+        )
+        raise common.InternalErrorException(message_id=message_id, message=message)
+
+    response_json = json.loads(response.text)
+    token_check_client_id = response_json.get("id")
+
+    # 該当Client secret情報を取得
+    # get client secret
+
+    response = api_keycloak_clients.client_secret_get(organization_id, user_token_client_id, token)
+    if response.status_code == 200:
+        response_json = json.loads(response.text)
+        globals.logger.info(f"-- client_secret_get:{response_json}")
+        user_token_client_secret = response_json.get("value")
+    elif response.status_code == 404:
+        user_token_client_secret = ""
+    else:
+        globals.logger.error(f"response.status_code:{response.status_code}")
+        globals.logger.error(f"response.text:{response.text}")
+        message_id = f"500-{MSG_FUNCTION_ID}016"
+        message = multi_lang.get_text(
+            message_id,
+            "client secretの取得に失敗しました(対象ID:{0} client:{1} client_id{2})",
+            organization_id,
+            user_token_client_clientid,
+            user_token_client_id
+        )
+        raise common.InternalErrorException(message_id=message_id, message=message)
+
+    response = api_keycloak_clients.client_secret_get(organization_id, internal_api_client_id, token)
+    if response.status_code == 200:
+        response_json = json.loads(response.text)
+        internal_api_client_secret = response_json.get("value")
+    elif response.status_code == 404:
+        internal_api_client_secret = ""
+    else:
+        globals.logger.error(f"response.status_code:{response.status_code}")
+        globals.logger.error(f"response.text:{response.text}")
+        message_id = f"500-{MSG_FUNCTION_ID}016"
+        message = multi_lang.get_text(
+            message_id,
+            "client secretの取得に失敗しました(対象ID:{0} client:{1} client_id{2})",
+            organization_id,
+            token_check_client_clientid,
+            token_check_client_id
+        )
+        raise common.InternalErrorException(message_id=message_id, message=message)
+
+    response = api_keycloak_clients.client_secret_get(organization_id, token_check_client_id, token)
+    if response.status_code == 200:
+        response_json = json.loads(response.text)
+        token_check_client_secret = response_json.get("value")
+    elif response.status_code == 404:
+        token_check_client_secret = ""
+    else:
+        globals.logger.error(f"response.status_code:{response.status_code}")
+        globals.logger.error(f"response.text:{response.text}")
+        message_id = f"500-{MSG_FUNCTION_ID}016"
+        message = multi_lang.get_text(
+            message_id,
+            "client secretの取得に失敗しました(対象ID:{0} client:{1} client_id{2})",
+            organization_id,
+            token_check_client_clientid,
+            token_check_client_id
+        )
+        raise common.InternalErrorException(message_id=message_id, message=message)
+
+    infomations = {
+        "USER_TOKEN_CLIENT_CLIENTID": user_token_client_clientid,
+        "USER_TOKEN_CLIENT_ID": user_token_client_id,
+        "USER_TOKEN_CLIENT_SECRET": user_token_client_secret,
+        "INTERNAL_API_CLIENT_CLIENTID": internal_api_client_clientid,
+        "INTERNAL_API_CLIENT_ID": internal_api_client_id,
+        "INTERNAL_API_CLIENT_SECRET": internal_api_client_secret,
+        "TOKEN_CHECK_CLIENT_CLIENTID": token_check_client_clientid,
+        "TOKEN_CHECK_CLIENT_ID": token_check_client_id,
+        "TOKEN_CHECK_CLIENT_SECRET": token_check_client_secret,
+    }
+
+    # organization private table update
+    __update_organization_private(infomations, organization_id, user_id)
+
+    return
+
 
 def __ita_create(organization_id, user_id):
-    """IT-Automation initialize call
+    """Exastro IT Automation initialize call
 
     Args:
         organization_id (str): organization id
@@ -848,6 +1006,43 @@ def __ita_create(organization_id, user_id):
     """
 
     globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
+
+    header_para = {
+        "Content-Type": "application/json",
+        "User-Id": request.headers.get("User-Id"),
+        "Roles": request.headers.get("Roles"),
+        "Language": request.headers.get("Language"),
+    }
+
+    json_para = {
+    }
+
+    globals.logger.debug("realms post send")
+
+    # 呼び出し先設定
+    # Call destination setting
+    api_url = "{}://{}:{}".format(os.environ['ITA_API_ADMIN_PROTOCOL'], os.environ['ITA_API_ADMIN_HOST'], os.environ['ITA_API_ADMIN_PORT'])
+    response = requests.post(f"{api_url}/api/organizations/{organization_id}/ita/", headers=header_para, json=json_para)
+
+    if response.status_code != 200 and \
+       response.status_code != 409:
+        globals.logger.error(f"response.status_code:{response.status_code}")
+        globals.logger.error(f"response.text:{response.text}")
+        message_id = f"500-{MSG_FUNCTION_ID}013"
+        message = multi_lang.get_text(
+            message_id,
+            "Exastro IT Automationのoganization作成に失敗しました。(対象ID:{0})",
+            organization_id
+        )
+        raise common.InternalErrorException(message_id=message_id, message=message)
+
+    globals.logger.debug(response.text)
+
+    # ステータス更新
+    # update status
+    __update_status(const.ORG_STATUS_ITA_CREATE, organization_id, user_id)
+
+    return
 
 
 def __realm_enabled(organization_id, user_id):
@@ -860,6 +1055,33 @@ def __realm_enabled(organization_id, user_id):
 
     globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
 
+    # サービスアカウントのTOKEN取得
+    # Get a service account token
+    token = __get_token()
+
+    realm_json = {
+        "enabled": True,
+    }
+
+    # realm登録
+    # realm registration to keycloak
+    response = api_keycloak_realms.realm_update(organization_id, realm_json, token)
+    if response.status_code != 200 and \
+       response.status_code != 204:
+        globals.logger.error(f"response.status_code:{response.status_code}")
+        globals.logger.error(f"response.text:{response.text}")
+        message_id = f"500-{MSG_FUNCTION_ID}014"
+        message = multi_lang.get_text(message_id,
+                                      "realmの有効化に失敗しました(対象ID:{0})",
+                                      organization_id)
+        raise common.InternalErrorException(message_id=message_id, message=message)
+
+    # ステータス更新
+    # update status
+    __update_status(const.ORG_STATUS_REALM_ENABLED, organization_id, user_id)
+
+    return
+
 
 def __organization_complete(organization_id, user_id):
     """organization complete function
@@ -870,3 +1092,49 @@ def __organization_complete(organization_id, user_id):
     """
 
     globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
+
+    # ステータス更新
+    # update status
+    __update_status(const.ORG_STATUS_CREATE_COMPLETE, organization_id, user_id)
+
+    return
+
+
+def __update_organization_private(infomations, organization_id, user_id):
+    """organization private table update
+
+    Args:
+        infomations (dict): infomations json
+        organization_id (str): organization id
+        user_id (str): user id
+
+    Raises:
+        common.InternalErrorException: _description_
+    """
+
+    # ステータス更新
+    # update status
+    db = DBconnector()
+    with closing(db.connect_orgdb(organization_id)) as conn:
+        with conn.cursor() as cursor:
+
+            parameter = {
+                "informations": json.dumps(infomations),
+                "organization_id": organization_id,
+                "last_update_user": user_id,
+            }
+            try:
+                cursor.execute(queries_organizations.SQL_STATUS_UPDATE_ORGANIZATIONS, parameter)
+
+                conn.commit()
+
+            except Exception as e:
+                globals.logger.error(f"exception:{e.args}")
+                # Duplicate PRIMARY KEY
+                message_id = f"500-{MSG_FUNCTION_ID}017"
+                message = multi_lang.get_text(message_id,
+                                              "organization private tableの更新に失敗しました。(対象ID:{0})",
+                                              organization_id)
+                raise common.InternalErrorException(message_id=message_id, message=message)
+
+    return
