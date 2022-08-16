@@ -12,7 +12,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-from flask import render_template
+from flask import render_template, request
 # from math import fabs
 import os
 import connexion
@@ -21,6 +21,7 @@ import json
 import inspect
 import pymysql
 import pymysql.cursors
+import requests
 # import base64
 
 from common_library.common import common, api_keycloak_tokens, api_keycloak_realms, api_keycloak_clients, api_keycloak_users, validation
@@ -35,7 +36,7 @@ MSG_FUNCTION_ID = "23"
 
 
 @common.platform_exception_handler
-def organization_create(body, retry=None):  # noqa: E501
+def organization_create(body, retry=None):
     """Create creates an organization
 
     :param body:
@@ -294,6 +295,8 @@ def __create_start(organization_id, organization_name, options, user_id):
                                               organization_id)
                 raise common.BadRequestException(message_id=message_id, message=message)
 
+    return
+
 
 def __realm_create(organization_id, organization_name, options, user_id):
     """realm create
@@ -345,6 +348,8 @@ def __realm_create(organization_id, organization_name, options, user_id):
     # ステータス更新
     # update status
     __update_status(const.ORG_STATUS_REALM_CREATE, organization_id, user_id)
+
+    return
 
 
 def __get_token():
@@ -413,6 +418,8 @@ def __update_status(status, organization_id, user_id):
                 message = multi_lang.get_text(message_id,
                                               "ステータスの更新に失敗しました。")
                 raise common.InternalErrorException(message_id=message_id, message=message)
+
+    return
 
 
 def __client_create(organization_id, user_id):
@@ -537,6 +544,8 @@ def __client_create(organization_id, user_id):
     # update status
     __update_status(const.ORG_STATUS_CLIENT_CREATE, organization_id, user_id)
 
+    return
+
 
 def __service_account_setting(organization_id, user_id):
     """service account setting
@@ -579,7 +588,7 @@ def __service_account_setting(organization_id, user_id):
         message_id = f"500-{MSG_FUNCTION_ID}006"
         message = multi_lang.get_text(
             message_id,
-            "clientの取得に失敗しました(対象ID:{0} client:{1})",
+            "service account userの取得に失敗しました(対象ID:{0} client:{1})",
             organization_id,
             platform_client_id
         )
@@ -616,7 +625,7 @@ def __service_account_setting(organization_id, user_id):
     if response.status_code != 200:
         globals.logger.error(f"response.status_code:{response.status_code}")
         globals.logger.error(f"response.text:{response.text}")
-        message_id = f"500-{MSG_FUNCTION_ID}010"
+        message_id = f"500-{MSG_FUNCTION_ID}011"
         message = multi_lang.get_text(
             message_id,
             "client roleの取得に失敗しました(対象ID:{0} client:{1})",
@@ -647,6 +656,8 @@ def __service_account_setting(organization_id, user_id):
     # update status
     __update_status(const.ORG_STATUS_SA_SETTING, organization_id, user_id)
 
+    return
+
 
 def __user_create(organization_id, user_id, org_mng_users):
     """user create
@@ -674,7 +685,7 @@ def __user_create(organization_id, user_id, org_mng_users):
            response.status_code != 409:    # 409 exists user
             globals.logger.error(f"response.status_code:{response.status_code}")
             globals.logger.error(f"response.text:{response.text}")
-            message_id = f"500-{MSG_FUNCTION_ID}008"
+            message_id = f"500-{MSG_FUNCTION_ID}009"
             message = multi_lang.get_text(
                 message_id,
                 "オーガナイゼーション管理者の作成に失敗しました(対象ID:{0} username:{1})",
@@ -686,6 +697,8 @@ def __user_create(organization_id, user_id, org_mng_users):
     # ステータス更新
     # update status
     __update_status(const.ORG_STATUS_USER_CREATE, organization_id, user_id)
+
+    return
 
 
 def __user_role_create(organization_id, user_id, org_mng_users):
@@ -714,7 +727,7 @@ def __user_role_create(organization_id, user_id, org_mng_users):
         if response.status_code != 200:
             globals.logger.error(f"response.status_code:{response.status_code}")
             globals.logger.error(f"response.text:{response.text}")
-            message_id = f"500-{MSG_FUNCTION_ID}009"
+            message_id = f"500-{MSG_FUNCTION_ID}010"
             message = multi_lang.get_text(
                 message_id,
                 "オーガナイゼーション管理者の取得に失敗しました(対象ID:{0} username:{1})",
@@ -749,7 +762,7 @@ def __user_role_create(organization_id, user_id, org_mng_users):
         if response.status_code != 200:
             globals.logger.error(f"response.status_code:{response.status_code}")
             globals.logger.error(f"response.text:{response.text}")
-            message_id = f"500-{MSG_FUNCTION_ID}010"
+            message_id = f"500-{MSG_FUNCTION_ID}011"
             message = multi_lang.get_text(
                 message_id,
                 "client roleの取得に失敗しました(対象ID:{0} client:{1})",
@@ -767,7 +780,7 @@ def __user_role_create(organization_id, user_id, org_mng_users):
            response.status_code != 204:
             globals.logger.error(f"response.status_code:{response.status_code}")
             globals.logger.error(f"response.text:{response.text}")
-            message_id = f"500-{MSG_FUNCTION_ID}011"
+            message_id = f"500-{MSG_FUNCTION_ID}012"
             message = multi_lang.get_text(
                 message_id,
                 "オーガナイゼーション管理者のロール設定に失敗しました(対象ID:{0} username:{1})",
@@ -780,6 +793,8 @@ def __user_role_create(organization_id, user_id, org_mng_users):
     # update status
     __update_status(const.ORG_STATUS_USER_ROLE, organization_id, user_id)
 
+    return
+
 
 def __organization_database_create(organization_id, user_id):
     """organization database create
@@ -790,6 +805,8 @@ def __organization_database_create(organization_id, user_id):
     """
 
     globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
+
+    return
 
 
 def __organization_database_update(organization_id, user_id):
@@ -802,9 +819,11 @@ def __organization_database_update(organization_id, user_id):
 
     globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
 
+    return
+
 
 def __ita_create(organization_id, user_id):
-    """IT-Automation initialize call
+    """Exastro IT Automation initialize call
 
     Args:
         organization_id (str): organization id
@@ -812,6 +831,43 @@ def __ita_create(organization_id, user_id):
     """
 
     globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
+
+    header_para = {
+        "Content-Type": "application/json",
+        "User-Id": request.headers.get("User-Id"),
+        "Roles": request.headers.get("Roles"),
+        "Language": request.headers.get("Language"),
+    }
+
+    json_para = {
+    }
+
+    globals.logger.debug("realms post send")
+
+    # 呼び出し先設定
+    # Call destination setting
+    api_url = "{}://{}:{}".format(os.environ['ITA_API_ADMIN_PROTOCOL'], os.environ['ITA_API_ADMIN_HOST'], os.environ['ITA_API_ADMIN_PORT'])
+    response = requests.post(f"{api_url}/api/organizations/{organization_id}/ita/", headers=header_para, json=json_para)
+
+    if response.status_code != 200 and \
+       response.status_code != 409:
+        globals.logger.error(f"response.status_code:{response.status_code}")
+        globals.logger.error(f"response.text:{response.text}")
+        message_id = f"500-{MSG_FUNCTION_ID}013"
+        message = multi_lang.get_text(
+            message_id,
+            "Exastro IT Automationのoganization作成に失敗しました。(対象ID:{0})",
+            organization_id
+        )
+        raise common.InternalErrorException(message_id=message_id, message=message)
+
+    globals.logger.debug(response.text)
+
+    # ステータス更新
+    # update status
+    __update_status(const.ORG_STATUS_ITA_CREATE, organization_id, user_id)
+
+    return
 
 
 def __realm_enabled(organization_id, user_id):
@@ -824,6 +880,33 @@ def __realm_enabled(organization_id, user_id):
 
     globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
 
+    # サービスアカウントのTOKEN取得
+    # Get a service account token
+    token = __get_token()
+
+    realm_json = {
+        "enabled": True,
+    }
+
+    # realm登録
+    # realm registration to keycloak
+    response = api_keycloak_realms.realm_update(organization_id, realm_json, token)
+    if response.status_code != 200 and \
+       response.status_code != 204:
+        globals.logger.error(f"response.status_code:{response.status_code}")
+        globals.logger.error(f"response.text:{response.text}")
+        message_id = f"500-{MSG_FUNCTION_ID}014"
+        message = multi_lang.get_text(message_id,
+                                      "realmの有効化に失敗しました(対象ID:{0})",
+                                      organization_id)
+        raise common.InternalErrorException(message_id=message_id, message=message)
+
+    # ステータス更新
+    # update status
+    __update_status(const.ORG_STATUS_REALM_ENABLED, organization_id, user_id)
+
+    return
+
 
 def __organization_complete(organization_id, user_id):
     """organization complete function
@@ -834,3 +917,9 @@ def __organization_complete(organization_id, user_id):
     """
 
     globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
+
+    # ステータス更新
+    # update status
+    __update_status(const.ORG_STATUS_CREATE_COMPLETE, organization_id, user_id)
+
+    return
