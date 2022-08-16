@@ -25,6 +25,7 @@ import pymysql.cursors
 
 from common_library.common import common, api_keycloak_tokens, api_keycloak_realms, api_keycloak_clients, api_keycloak_users, validation
 from common_library.common.db import DBconnector
+from common_library.common.db_init import DBinit
 from libs import queries_organizations
 import const
 from common_library.common import multi_lang
@@ -790,6 +791,41 @@ def __organization_database_create(organization_id, user_id):
     """
 
     globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
+
+    dbinit = DBinit()
+    org_dbinfo = dbinit.generate_dbinfo("ORG")
+
+    try:
+        # organization database 作成
+        # create organization database
+        dbinit.create_database(org_dbinfo)
+
+        # Table 作成
+        # create table in organization database
+        dbinit.create_table_organizationdb(org_dbinfo)
+
+        # organization database 接続情報登録
+        # organization database connect infomation registration
+        dbinit.insert_organization_dbinfo(org_dbinfo, organization_id, user_id)
+
+    except Exception as e:
+        globals.logger.error(f"create organization database error:{str(e)}")
+
+        dbinit.drop_database(org_dbinfo)
+
+        message_id = f"500-{MSG_FUNCTION_ID}015"
+        message = multi_lang.get_text(
+            message_id,
+            "Organization Database 作成に失敗しました(対象ID:{0} database:{1})",
+            organization_id,
+            org_dbinfo.db_database,
+        )
+        raise common.InternalErrorException(message_id=message_id, message=message)
+
+    # ステータス更新
+    # update status
+    __update_status(const.ORG_STATUS_DB_CREATE, organization_id, user_id)
+    return
 
 
 def __organization_database_update(organization_id, user_id):
