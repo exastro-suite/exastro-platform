@@ -38,3 +38,10 @@ SET INFORMATIONS = json_replace(INFORMATIONS, "$.status", %(INFORMATIONS_status)
 , LAST_UPDATE_USER = %(last_update_user)s
 WHERE ORGANIZATION_ID = %(organization_id)s
 """
+
+SQL_INFORMATIONS_UPDATE_ORGANIZATIONS_PRIVATE = """
+UPDATE T_ORGANIZATION_PRIVATE
+SET INFORMATIONS = %(informations)s
+, LAST_UPDATE_USER = %(last_update_user)s
+WHERE ORGANIZATION_ID = %(organization_id)s
+"""

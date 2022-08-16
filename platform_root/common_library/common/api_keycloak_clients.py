@@ -102,7 +102,7 @@ def client_secret_create(realm_name, client_id, token):
     Returns:
         Response: HTTP Respose (success : .status_code=200)
     """
-    globals.logger.info('Post keycloak clients. client_id={}'.format(client_id))
+    globals.logger.info('Post keycloak clients secret. client_id={}'.format(client_id))
 
     header_para = {
         "Content-Type": "application/json",
@@ -115,6 +115,34 @@ def client_secret_create(realm_name, client_id, token):
     request_response = requests.post(f"{api_url}/auth/admin/realms/{realm_name}/clients/{client_id}/client-secret",
                                      headers=header_para,
                                      )
+
+    return request_response
+
+
+def client_secret_get(realm_name, client_id, token):
+    """クライアントシークレット取得 client secret get
+
+    Args:
+        realm_name (str): realm name
+        client_id (str): client id (not client-id)
+        toekn (str): token
+
+    Returns:
+        Response: HTTP Respose (success : .status_code=200)
+    """
+    globals.logger.info('Get keycloak clients secret. client_id={}'.format(client_id))
+
+    header_para = {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer {}".format(token),
+    }
+
+    # 呼び出し先設定 requests setting
+    api_url = "{}://{}:{}".format(os.environ['API_KEYCLOAK_PROTOCOL'], os.environ['API_KEYCLOAK_HOST'], os.environ['API_KEYCLOAK_PORT'])
+
+    request_response = requests.get(f"{api_url}/auth/admin/realms/{realm_name}/clients/{client_id}/client-secret",
+                                    headers=header_para,
+                                    )
 
     return request_response
 

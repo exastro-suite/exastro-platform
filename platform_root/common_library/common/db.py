@@ -34,7 +34,7 @@ class DBconnector:
     WHERE ID = 1
     """
 
-    class __dbinfo:
+    class DBinfo:
         """dbinfo
         """
         db_host: str
@@ -54,9 +54,9 @@ class DBconnector:
         """get platformdb dbinfo
 
         Returns:
-            __dbinfo: platformdb dbinfo
+            DBinfo: platformdb dbinfo
         """
-        platformdb = self.__dbinfo()
+        platformdb = self.DBinfo()
         platformdb.db_host = os.environ.get('DB_ADDR')
         platformdb.db_port = 3306
         platformdb.db_database = os.environ.get('DB_DATABASE')
@@ -64,11 +64,46 @@ class DBconnector:
         platformdb.db_password = os.environ.get('DB_PASSWORD')
         return platformdb
 
-    def __connection(self, dbinfo: __dbinfo):
+    def __get_dbinfo_root(self):
+        """get root dbinfo
+
+        Returns:
+            DBinfo: root dbinfo
+        """
+        db_root = self.DBinfo()
+        db_root.db_host = os.environ.get('DB_ADDR')
+        db_root.db_port = 3306
+        db_root.db_database = ""
+        db_root.db_user = "root"
+        db_root.db_password = os.environ.get('MYSQL_ROOT_PASSWORD')
+        return db_root
+
+    def __get_dbinfo_organization(self, organization_id):
+        """get organization dbinfo
+
+        Returns:
+            DBinfo: organization dbinfo
+        """
+        with closing(self.connect_platformdb()) as conn:
+            with conn.cursor() as cursor:
+                sql = self.SQL_ORGANIZATION_DB_INFO
+                cursor.execute(sql, (organization_id, ))
+                result = cursor.fetchone()
+
+        orgdb = self.DBinfo()
+        if result:
+            orgdb.db_host = result.get('DB_HOST')
+            orgdb.db_port = result.get('DB_PORT')
+            orgdb.db_database = result.get('DB_DATABASE')
+            orgdb.db_user = result.get('DB_USER')
+            orgdb.db_password = result.get('DB_PASSWORD')
+        return orgdb
+
+    def connection(self, dbinfo: DBinfo):
         """connect database
 
         Args:
-            dbinfo (__dbinfo): dbinfo
+            dbinfo (DBinfo): dbinfo
 
         Returns:
             pymysql.connections.Connection: connection
@@ -83,41 +118,37 @@ class DBconnector:
         )
         return conn
 
-    def connect_platformdb(self) -> pymysql.connections.Connection:
-        """connect database at platformdb
+    def connect_root(self) -> pymysql.connections.Connection:
+        """connect database at root
 
         Returns:
-            pymysql.connections.Connection: platformdb connection
+            pymysql.connections.Connection: root connection
+        """
+        db_root = self.__get_dbinfo_root()
+        conn = self.connection(db_root)
+        return conn
+
+    def connect_platformdb(self) -> pymysql.connections.Connection:
+        """connect database at platform
+
+        Returns:
+            pymysql.connections.Connection: platform connection
         """
         platformdb = self.__get_dbinfo_platform()
-        conn = self.__connection(platformdb)
+        conn = self.connection(platformdb)
         return conn
 
     def connect_orgdb(self, organization_id: str) -> pymysql.connections.Connection:
-        """connect database at platformdb
+        """connect database at organization
 
         Args:
             organization_id (str): organization_id
 
         Returns:
-            pymysql.connections.Connection: orgdb connection
+            pymysql.connections.Connection: organization connection
         """
-        with closing(self.connect_platformdb()) as conn:
-            with conn.cursor() as cursor:
-                sql = self.SQL_ORGANIZATION_DB_INFO
-                cursor.execute(sql, (organization_id, ))
-                result = cursor.fetchone()
-
-        orgdb = self.__dbinfo()
-        if result:
-            orgdb.db_host = result.get('DB_HOST')
-            orgdb.db_port = result.get('DB_PORT')
-            orgdb.db_database = result.get('DB_DATABASE')
-            orgdb.db_user = result.get('DB_USER')
-            orgdb.db_password = result.get('DB_PASSWORD')
-
-        conn = self.__connection(orgdb)
-
+        orgdb = self.__get_dbinfo_organization(organization_id)
+        conn = self.connection(orgdb)
         return conn
 
     class organization_private:
@@ -163,9 +194,9 @@ class DBconnector:
             dict: organization_private informations
         """
 
-        json_dict = {}
+        data = self.organization_private()
 
-        with closing(DBconnector().connect_orgdb(organization_id)) as conn:
+        with closing(self.connect_orgdb(organization_id)) as conn:
             with conn.cursor() as cursor:
                 cursor.execute(self.SQL_ORGANIZATION_PRIVATE_INFO)
                 result = cursor.fetchone()
@@ -173,7 +204,6 @@ class DBconnector:
                 infoormations = result.get("INFORMATIONS")
                 json_dict = json.loads(infoormations)
 
-                data = self.organization_private()
                 data.user_token_client_clientid = json_dict.get("USER_TOKEN_CLIENT_CLIENTID")
                 data.user_token_client_id = json_dict.get("USER_TOKEN_CLIENT_ID")
                 data.token_check_client_clientid = json_dict.get("TOKEN_CHECK_CLIENT_CLIENTID")
