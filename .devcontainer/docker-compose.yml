@@ -129,6 +129,8 @@ services:
       - DB_DATABASE=platform
       - DB_USER=app_user
       - DB_PASSWORD=password
+      - MYSQL_ROOT_PASSWORD=password
+
 
   ita-api:
     build:
