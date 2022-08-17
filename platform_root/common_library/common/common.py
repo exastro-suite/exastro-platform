@@ -57,7 +57,7 @@ class NotAllowedException(Exception):
         Exception (Exception): Exception
     """
 
-    def __init__(self, status_code, data=None, message_id=None, message=None):
+    def __init__(self, data=None, message_id=None, message=None):
         self.status_code = 403
         self.data = data
         self.message_id = message_id

@@ -12,13 +12,18 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
+import re
+from urllib import response
+from flask import request
 import connexion
 from contextlib import closing
 import json
 import inspect
 import pymysql
+import base64
 
-from common_library.common import common, api_keycloak_tokens, api_keycloak_users, api_keycloak_clients, api_ita_admin_call, validation
+from common_library.common import common, api_keycloak_tokens, api_keycloak_users, \
+                                  api_keycloak_roles, api_keycloak_clients, api_ita_admin_call, validation
 from common_library.common.db import DBconnector
 from libs import queries_workspaces
 
@@ -249,6 +254,39 @@ def workspace_list(organization_id, workspace_name=None):
     :rtype: WorkspaceList
     """
 
+    roles = request.headers.get("Roles")
+    roles_decode = base64.b64decode(roles.encode()).decode("utf-8")
+    roles_arr = roles_decode.split("\n")
+    globals.logger.debug(f'roles_decode: {roles_decode}')
+
+    private = DBconnector().get_organization_private(organization_id)
+
+    # サービスアカウントのTOKEN取得
+    # Get a service account token
+    token_response = api_keycloak_tokens.service_account_get_token(
+        organization_id, private.internal_api_client_clientid, private.internal_api_client_secret,
+    )
+    if token_response.status_code != 200:
+        raise common.AuthException("client_user_get_token error status:{}, response:{}".format(token_response.status_code, token_response.text))
+
+    token = json.loads(token_response.text)["access_token"]
+
+    # ユーザーのRolesをもとに、子ロール(workspace名と同じrole名）を取得する
+    # Get child role (same role name as workspace name) based on user Roles
+    posible_workspace_id = []
+    for role in roles_arr:
+        response_api = api_keycloak_roles.clients_composite_roles_get(organization_id, private.user_token_client_id, role, token)
+        if response_api.status_code == 200:
+            response_json = json.loads(response_api.text)
+            for composite_role in response_json:
+                # 該当ロール名(Workspace名)が重複しないように設定
+                # Set so that the corresponding role name (Workspace name) does not overlap
+                if composite_role["name"] not in posible_workspace_id:
+                    posible_workspace_id.append(composite_role["name"])
+
+    globals.logger.debug(f'posible_workspace_id: {posible_workspace_id}')
+
+    # workspace list get
     with closing(DBconnector().connect_orgdb(organization_id)) as conn:
         with conn.cursor() as cursor:
             if workspace_name:
@@ -265,16 +303,19 @@ def workspace_list(organization_id, workspace_name=None):
 
     data = []
     for row in result:
-        row = {
-            "id": row["WORKSPACE_ID"],
-            "name": row["WORKSPACE_NAME"],
-            "informations": json.loads(row["INFORMATIONS"]),
-            "create_timestamp": common.datetime_to_str(row["CREATE_TIMESTAMP"]),
-            "create_user": row["CREATE_USER"],
-            "last_update_timestamp": common.datetime_to_str(row["LAST_UPDATE_TIMESTAMP"]),
-            "last_update_user": row["LAST_UPDATE_USER"],
-        }
-        data.append(row)
+        # 該当のロールがある場合のみ、設定
+        # Set only if there is a corresponding role
+        if row["WORKSPACE_ID"] in posible_workspace_id:
+            row = {
+                "id": row["WORKSPACE_ID"],
+                "name": row["WORKSPACE_NAME"],
+                "informations": json.loads(row["INFORMATIONS"]),
+                "create_timestamp": common.datetime_to_str(row["CREATE_TIMESTAMP"]),
+                "create_user": row["CREATE_USER"],
+                "last_update_timestamp": common.datetime_to_str(row["LAST_UPDATE_TIMESTAMP"]),
+                "last_update_user": row["LAST_UPDATE_USER"],
+            }
+            data.append(row)
 
     return common.response_200_ok(data)
 
