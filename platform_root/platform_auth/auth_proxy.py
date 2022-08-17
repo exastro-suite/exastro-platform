@@ -12,7 +12,6 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 from flask import request
-from datetime import datetime
 import requests
 # import pprint
 import json
@@ -106,7 +105,7 @@ class auth_proxy:
             if method == 'OPTIONS':
                 status_code = 200
                 info = 'Preflight'
-                return {"result": status_code, "info": info, "time": str(datetime.utcnow())}
+                return {"result": status_code, "data": info}
 
             # bearerを取得
             # Get bearer
@@ -246,7 +245,7 @@ class auth_proxy:
                 "Roles": roles_str,
                 "Language": self.token_decode.get("locale"),
             }
-            return {"result": status_code, "info": info, "time": str(datetime.utcnow())}
+            return {"status_code": status_code, "data": info}
 
         except Exception as e:
             globals.logger.error(f'Exception : {e.args}')
@@ -314,6 +313,7 @@ class auth_proxy:
                 'organization_id': self.realm,
             }
             post_headers.update(info)
+            globals.logger.debug(f'post_headers: {post_headers}')
 
             # method
             request_method = request.method
@@ -344,21 +344,19 @@ class auth_proxy:
 
             # レスポンスをリターン
             # Return response
-            if not ret:
-                status_code = 500
-                info = 'System Error'
-                return {"result": status_code, "info": info, "time": str(datetime.utcnow())}
-            else:
-                status_code = ret.status_code
-                try:
-                    info = json.loads(ret.text)
-                    result_dump = json.dumps(info)
-                    result_encode = result_dump.encode('utf-8')
-                    globals.logger.info(f'SUCCESS call_api. status_code={status_code} info={result_encode}')
-                except json.JSONDecodeError:
-                    info = ret.text
-                    globals.logger.info(f'SUCCESS call_api. status_code={status_code} info={info}')
-                return {"result": status_code, "info": info, "time": str(datetime.utcnow())}
+            status_code = ret.status_code
+            try:
+                info = json.loads(ret.text)
+                result_dump = json.dumps(info)
+                result_encode = result_dump.encode('utf-8')
+                globals.logger.info(f'SUCCESS call_api. status_code={status_code} info={result_encode}')
+
+                return ret
+            except json.JSONDecodeError:
+                info = ret.text
+                message_id = "500-00001"
+                globals.logger.info(f'SUCCESS call_api. status_code={status_code} info={info}')
+            raise common.InternalErrorException(None, "500-00001", common.multi_lang.get_text(message_id, "システムエラー"))
 
         except Exception as e:
             globals.logger.error(f'Exception : {e.args}')

@@ -884,7 +884,7 @@ def __organization_database_update(organization_id, user_id):
 
     response_json = json.loads(response.text)
     globals.logger.info(f"-- clients_get:{response_json}")
-    user_token_client_id = response_json.get("id")
+    user_token_client_id = response_json[0].get("id")
 
     response = api_keycloak_clients.clients_get(organization_id, internal_api_client_clientid, token)
     if response.status_code != 200:
@@ -900,7 +900,7 @@ def __organization_database_update(organization_id, user_id):
         raise common.InternalErrorException(message_id=message_id, message=message)
 
     response_json = json.loads(response.text)
-    internal_api_client_id = response_json.get("id")
+    internal_api_client_id = response_json[0].get("id")
 
     response = api_keycloak_clients.clients_get(organization_id, token_check_client_clientid, token)
     if response.status_code != 200:
@@ -916,7 +916,7 @@ def __organization_database_update(organization_id, user_id):
         raise common.InternalErrorException(message_id=message_id, message=message)
 
     response_json = json.loads(response.text)
-    token_check_client_id = response_json.get("id")
+    token_check_client_id = response_json[0].get("id")
 
     # 該当Client secret情報を取得
     # get client secret
@@ -1120,11 +1120,10 @@ def __update_organization_private(infomations, organization_id, user_id):
 
             parameter = {
                 "informations": json.dumps(infomations),
-                "organization_id": organization_id,
                 "last_update_user": user_id,
             }
             try:
-                cursor.execute(queries_organizations.SQL_STATUS_UPDATE_ORGANIZATIONS, parameter)
+                cursor.execute(queries_organizations.SQL_INSERT_ORGANIZATION_PRIVATE, parameter)
 
                 conn.commit()
 
