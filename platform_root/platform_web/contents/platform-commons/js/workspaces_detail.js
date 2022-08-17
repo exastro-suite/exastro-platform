@@ -20,6 +20,8 @@ $(function(){
 
 function get_workspace_info() {
 
+    var run_title = "get_workspace_info";
+
     $.ajax({
         type: "GET",
         url: api_conf.api.workspaces.detail.get.replace('{organization_id}', CommonAuth.getRealm()).replace('{workspace_id}', window.location.pathname.split("/")[4]),
@@ -73,6 +75,12 @@ function get_workspace_info() {
                 obj.text(JSON.stringify(row, null, 2));
             }
         }
+    }).fail((jqXHR, textStatus, errorThrown) => {
+        console.log("FAIL : " + run_title);
+        console.log("RESPONSE:" + jqXHR.responseText);
+
+        msg = "status:[" + jqXHR.status + "]\nmessage_id:[" + jqXHR.responseJSON.result + "]\n" + jqXHR.responseJSON.message;
+        alert(msg);
     });
 }
 
