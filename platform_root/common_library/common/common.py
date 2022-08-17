@@ -225,17 +225,15 @@ def platform_exception_handler(func):
     Returns:
         inner_func:
     """
+    import traceback
+
     @wraps(func)
     def inner_func(*args, **kwargs):
         try:
             response = func(*args, **kwargs)
-        except BadRequestException as err:
-            return response_status(err.status_code, err.data, err.message_id, err.message)
-        except AuthException as err:
-            return response_status(err.status_code, err.data, err.message_id, err.message)
-        except InternalErrorException as err:
-            return response_status(err.status_code, err.data, err.message_id, err.message)
-        except OtherException as err:
+        except (BadRequestException, AuthException, InternalErrorException, OtherException) as err:
+            globals.logger.error(f'exception handler:\n status_code:[{err.status_code}]\n message_id:[{err.message_id}]')
+            globals.logger.error(''.join(list(traceback.TracebackException.from_exception(err).format())))
             return response_status(err.status_code, err.data, err.message_id, err.message)
         except Exception as err:
             return response_server_error(err)
