@@ -79,7 +79,7 @@ $(function(){
                 if (xhr.status != 200){
                     console.log("--- message ----");
                     console.log(data.message);
-                    msg = "[" + data.result + "]\n" + data.message;
+                    msg = "status:[" + xhr.status + "]\nmessage_id:[" + data.result + "]\n" + data.message;
                     alert(msg);
                 }
 
@@ -89,7 +89,7 @@ $(function(){
                 console.log("FAIL : " + run_title);
                 console.log("RESPONSE:" + jqXHR.responseText);
 
-                msg = "[" + jqXHR.responseJSON.result + "]\n" + jqXHR.responseJSON.message;
+                msg = "status:[" + jqXHR.status + "]\nmessage_id:[" + jqXHR.responseJSON.result + "]\n" + jqXHR.responseJSON.message;
                 alert(msg);
             });
         }).then(() => {

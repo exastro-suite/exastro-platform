@@ -33,7 +33,7 @@ function get_workspace_info() {
         console.log(JSON.stringify(data));
 
         if (xhr.status != 200){
-            msg = "[" + data.result + "]\n" + data.message;
+            msg = "status:[" + xhr.status + "]\nmessage_id:[" + data.result + "]\n" + data.message;
             alert(msg);
         }
         else{
@@ -92,7 +92,7 @@ function get_members_list(workspace_id) {
         console.log(JSON.stringify(data));
 
         if (xhr.status != 200){
-            msg = "[" + data.result + "]\n" + data.message;
+            msg = "status:[" + xhr.status + "]\nmessage_id:[" + data.result + "]\n" + data.message;
             alert(msg);
         }
         else{
@@ -109,7 +109,7 @@ function get_members_list(workspace_id) {
 
     }).fail(function(jqXHR, textStatus, errorThrown) {
         console.log("FAIL : RESPONSE GET /api/workspaces/members: jqXHR.status:"+jqXHR.status);
-        msg = "[" + jqXHR.status + "]\n" + textStatus;
+        msg = "status:[" + jqXHR.status + "]\n" + textStatus;
         alert(msg);
         // reject();
     });

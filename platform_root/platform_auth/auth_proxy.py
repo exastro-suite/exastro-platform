@@ -92,38 +92,121 @@ class auth_proxy:
             }
         """
 
-        try:
-            globals.logger.info('CALLED auth_proxy.call_fnc')
+        globals.logger.info('CALLED auth_proxy.call_fnc')
 
-            # methodを取得
-            # get method
-            method = request.method
-            globals.logger.info(f'wsgi method={method}')
+        # methodを取得
+        # get method
+        method = request.method
+        globals.logger.info(f'wsgi method={method}')
 
-            # methodがOPTIONSならstatus 200でリターンを返す（preflight）
-            # If method is OPTIONS, return with status 200 (preflight)
-            if method == 'OPTIONS':
-                status_code = 200
-                info = 'Preflight'
-                return {"result": status_code, "data": info}
+        # methodがOPTIONSならstatus 200でリターンを返す（preflight）
+        # If method is OPTIONS, return with status 200 (preflight)
+        if method == 'OPTIONS':
+            status_code = 200
+            info = 'Preflight'
+            return {"result": status_code, "data": info}
 
-            # bearerを取得
-            # Get bearer
-            # bearer = environ.get('HTTP_AUTHORIZATION')
-            get_auth = request.headers.get('Authorization')
-            globals.logger.debug(f'auth={get_auth}')
-            # アクセストークンチェックを実行
+        # bearerを取得
+        # Get bearer
+        # bearer = environ.get('HTTP_AUTHORIZATION')
+        get_auth = request.headers.get('Authorization')
+        globals.logger.debug(f'auth={get_auth}')
+        # アクセストークンチェックを実行
+        # Extract only the token part
+        if get_auth:
+            # ----ここからアクセストークンチェック処理---- #
+            # Access token check process from here
+
+            # トークン部分のみ抽出
             # Extract only the token part
-            if get_auth:
-                # ----ここからアクセストークンチェック処理---- #
-                # Access token check process from here
+            access_token = self.get_authorization(get_auth, const.AUTH_TYPE_BEARER)
+            # 「bearer XXX」の形式で無い場合エラー
+            # Error if not in "bearer XXX" format
+            if access_token:
+                try:
+                    # アクセストークンからissを抽出し、トークン発行元のプロトコル/ホストを解析
+                    # Extract iss from access token and analyze the protocol / host of the token issuer
+                    self.token_decode = jwt.decode(access_token, options={"verify_signature": False})
 
-                # トークン部分のみ抽出
-                # Extract only the token part
-                access_token = self.get_authorization(get_auth, const.AUTH_TYPE_BEARER)
-                # 「bearer XXX」の形式で無い場合エラー
-                # Error if not in "bearer XXX" format
-                if access_token:
+                except Exception:
+                    info = 'bad token'
+                    raise common.AuthException(info)
+
+                globals.logger.debug(f'oken_decode={self.token_decode}')
+
+                try:
+                    iss = self.token_decode.get("iss")
+                    if iss is None:
+                        # issが無い場合はNGを返す。
+                        # If there is no iss, NG is returned.
+                        info = 'token check NG'
+                        raise common.AuthException(info)
+
+                except Exception:
+                    info = 'bad token format'
+                    raise common.AuthException(info)
+
+                try:
+                    iss_parse = urlparse(iss)
+                    keycloak_proto = iss_parse.scheme
+                    keycloak_host = iss_parse.netloc
+
+                    # アクセストークンのアクティブチェック
+                    # Access token active check
+                    keycloak_json = {
+                        'client_id': self.token_check_client_id,
+                        'client_secret': self.token_check_client_secret,
+                        'access_token': access_token,
+                        'keycloak_proto': keycloak_proto,
+                        'keycloak_host': keycloak_host
+                    }
+                except Exception:
+                    info = 'token parse error'
+                    raise common.AuthException(info)
+
+                # アクセストークンの有効確認
+                active = self.access_token_introspect(self.realm, keycloak_json)
+
+                if active is not True:
+                    # アクティブチェックがFalseならNGを返す
+                    # Returns NG if the active check is False
+                    info = 'token invalid'
+                    raise common.AuthException(info)
+
+                # ----ここまでアクセストークンチェック処理---- #
+                # Access token check processing so far
+
+            else:
+                # ----ここからBasic認証情報取得処理---- #
+                # basic auth acquisition process from here
+                basic_auth = self.get_authorization(get_auth, const.AUTH_TYPE_BASIC)
+                # 「basic XXX」の形式で無い場合エラー
+                # Error if not in "basic XXX" format
+                if basic_auth:
+
+                    # ユーザID、パスワードを取得
+                    # Get user ID and password
+                    decode_key_id = base64.b64decode(basic_auth).decode()
+                    r = decode_key_id.split(':')
+                    if len(r) < 2:
+                        # ユーザID、パスワードの値が不正な場合
+                        # When the user ID and password values ​​are invalid
+                        info = 'User ID and password are not set correctly'
+                        raise common.AuthException(info)
+
+                    basic_user_id = r[0]
+                    basic_user_password = r[1]
+
+                    try:
+                        # アクセストークンを取得
+                        # Get an access token
+                        access_token = self.access_token_get(self.realm, basic_user_id, basic_user_password)
+                        globals.logger.debug(f'access_token_get={access_token}')
+
+                    except common.AuthException:
+                        info = 'ID/PW NG'
+                        raise common.AuthException(info)
+
                     try:
                         # アクセストークンからissを抽出し、トークン発行元のプロトコル/ホストを解析
                         # Extract iss from access token and analyze the protocol / host of the token issuer
@@ -134,123 +217,34 @@ class auth_proxy:
                         raise common.AuthException(info)
 
                     globals.logger.debug(f'oken_decode={self.token_decode}')
-
-                    try:
-                        iss = self.token_decode.get("iss")
-                        if iss is None:
-                            # issが無い場合はNGを返す。
-                            # If there is no iss, NG is returned.
-                            info = 'token check NG'
-                            raise common.AuthException(info)
-
-                    except Exception:
-                        info = 'bad token format'
-                        raise common.AuthException(info)
-
-                    try:
-                        iss_parse = urlparse(iss)
-                        keycloak_proto = iss_parse.scheme
-                        keycloak_host = iss_parse.netloc
-
-                        # アクセストークンのアクティブチェック
-                        # Access token active check
-                        keycloak_json = {
-                            'client_id': self.token_check_client_id,
-                            'client_secret': self.token_check_client_secret,
-                            'access_token': access_token,
-                            'keycloak_proto': keycloak_proto,
-                            'keycloak_host': keycloak_host
-                        }
-                    except Exception:
-                        info = 'token parse error'
-                        raise common.AuthException(info)
-
-                    # アクセストークンの有効確認
-                    active = self.access_token_introspect(self.realm, keycloak_json)
-
-                    if active is not True:
-                        # アクティブチェックがFalseならNGを返す
-                        # Returns NG if the active check is False
-                        info = 'token invalid'
-                        raise common.AuthException(info)
-
-                    # ----ここまでアクセストークンチェック処理---- #
-                    # Access token check processing so far
+                    # ----ここまでBasic認証情報取得処理---- #
+                    # basic auth acquisition process up to this point
 
                 else:
-                    # ----ここからBasic認証情報取得処理---- #
-                    # basic auth acquisition process from here
-                    basic_auth = self.get_authorization(get_auth, const.AUTH_TYPE_BASIC)
-                    # 「basic XXX」の形式で無い場合エラー
-                    # Error if not in "basic XXX" format
-                    if basic_auth:
+                    info = 'Authorization format is incorrect'
+                    raise common.AuthException(info)
+        else:
+            info = 'not authorization format'
+            raise common.AuthException(info)
 
-                        # ユーザID、パスワードを取得
-                        # Get user ID and password
-                        decode_key_id = base64.b64decode(basic_auth).decode()
-                        r = decode_key_id.split(':')
-                        if len(r) < 2:
-                            # ユーザID、パスワードの値が不正な場合
-                            # When the user ID and password values ​​are invalid
-                            info = 'User ID and password are not set correctly'
-                            raise common.AuthException(info)
+        allowd = self.is_allowed_request()
+        if not allowd:
+            info = 'Access is not allowed'
+            raise common.NotAllowedException(info)
 
-                        basic_user_id = r[0]
-                        basic_user_password = r[1]
-
-                        try:
-                            # アクセストークンを取得
-                            # Get an access token
-                            access_token = self.access_token_get(self.realm, basic_user_id, basic_user_password)
-                            globals.logger.debug(f'access_token_get={access_token}')
-
-                        except common.AuthException:
-                            info = 'ID/PW NG'
-                            raise common.AuthException(info)
-
-                        try:
-                            # アクセストークンからissを抽出し、トークン発行元のプロトコル/ホストを解析
-                            # Extract iss from access token and analyze the protocol / host of the token issuer
-                            self.token_decode = jwt.decode(access_token, options={"verify_signature": False})
-
-                        except Exception:
-                            info = 'bad token'
-                            raise common.AuthException(info)
-
-                        globals.logger.debug(f'oken_decode={self.token_decode}')
-                        # ----ここまでBasic認証情報取得処理---- #
-                        # basic auth acquisition process up to this point
-
-                    else:
-                        info = 'Authorization format is incorrect'
-                        raise common.AuthException(info)
-            else:
-                info = 'not authorization format'
-                raise common.AuthException(info)
-
-            allowd = self.is_allowed_request()
-            if not allowd:
-                info = 'Access is not allowed'
-                raise common.NotAllowedException(info)
-
-            token_roles = self.token_decode.get("resource_access").get(self.user_token_client_id)
-            globals.logger.debug(f'token_roles={token_roles}')
-            if token_roles and "roles" in token_roles:
-                roles_str = base64.b64encode("\n".join(token_roles["roles"]).encode()).decode()
-            else:
-                roles_str = ""
-            status_code = 0
-            info = {
-                "User-Id": self.token_decode.get("sub"),
-                "Roles": roles_str,
-                "Language": self.token_decode.get("locale"),
-            }
-            return {"status_code": status_code, "data": info}
-
-        except Exception as e:
-            globals.logger.error(f'Exception : {e.args}')
-            globals.logger.error(''.join(list(traceback.TracebackException.from_exception(e).format())))
-            raise
+        token_roles = self.token_decode.get("resource_access").get(self.user_token_client_id)
+        globals.logger.debug(f'token_roles={token_roles}')
+        if token_roles and "roles" in token_roles:
+            roles_str = base64.b64encode("\n".join(token_roles["roles"]).encode()).decode()
+        else:
+            roles_str = ""
+        status_code = 0
+        info = {
+            "User-Id": self.token_decode.get("sub"),
+            "Roles": roles_str,
+            "Language": self.token_decode.get("locale"),
+        }
+        return {"status_code": status_code, "data": info}
 
     def get_authorization(self, auth_str, auth_type):
         """認証情報取得 get authorization
@@ -304,64 +298,58 @@ class auth_proxy:
         Returns:
             _type_: _description_
         """
+
+        globals.logger.info('CALLED auth_proxy.call_api')
+
+        # ヘッダにuser_idの付与 addtional header user_id
+        post_headers = {
+            'organization_id': self.realm,
+        }
+        post_headers.update(info)
+        globals.logger.debug(f'post_headers: {post_headers}')
+
+        # method
+        request_method = request.method
+        globals.logger.debug(f'request_method: {request_method}')
+
+        # パラメータを形成
+        # Form parameters
         try:
+            request_body = request.json.copy()
+            globals.logger.debug(f'request_body: {request_body}')
+        except Exception:
+            request_body = {}
 
-            globals.logger.info('CALLED auth_proxy.call_api')
+        # 引数
+        # query_string
+        query_string = request.query_string
+        globals.logger.debug(f'query_string: {query_string}')
 
-            # ヘッダにuser_idの付与 addtional header user_id
-            post_headers = {
-                'organization_id': self.realm,
-            }
-            post_headers.update(info)
-            globals.logger.debug(f'post_headers: {post_headers}')
+        globals.logger.debug(f'CALL dest_url: {dest_url}')
 
-            # method
-            request_method = request.method
-            globals.logger.debug(f'request_method: {request_method}')
+        # リクエストを実行
+        # Execute request
+        ret = self.main_request(request_method, dest_url, post_headers, request_body, query_string)
+        # ----ここまでAPサーバへのリクエスト処理---- #
+        # Request processing to the AP server so far
 
-            # パラメータを形成
-            # Form parameters
-            try:
-                request_body = request.json.copy()
-                globals.logger.debug(f'request_body: {request_body}')
-            except Exception:
-                request_body = {}
+        globals.logger.info(f'return main_request ret={ret}')
 
-            # 引数
-            # query_string
-            query_string = request.query_string
-            globals.logger.debug(f'query_string: {query_string}')
+        # レスポンスをリターン
+        # Return response
+        status_code = ret.status_code
+        try:
+            info = json.loads(ret.text)
+            result_dump = json.dumps(info)
+            result_encode = result_dump.encode('utf-8')
+            globals.logger.info(f'SUCCESS call_api. status_code={status_code} info={result_encode}')
 
-            globals.logger.debug(f'CALL dest_url: {dest_url}')
-
-            # リクエストを実行
-            # Execute request
-            ret = self.main_request(request_method, dest_url, post_headers, request_body, query_string)
-            # ----ここまでAPサーバへのリクエスト処理---- #
-            # Request processing to the AP server so far
-
-            globals.logger.info(f'return main_request ret={ret}')
-
-            # レスポンスをリターン
-            # Return response
-            status_code = ret.status_code
-            try:
-                info = json.loads(ret.text)
-                result_dump = json.dumps(info)
-                result_encode = result_dump.encode('utf-8')
-                globals.logger.info(f'SUCCESS call_api. status_code={status_code} info={result_encode}')
-
-                return ret
-            except json.JSONDecodeError:
-                info = ret.text
-                message_id = "500-00001"
-                globals.logger.info(f'SUCCESS call_api. status_code={status_code} info={info}')
-            raise common.InternalErrorException(None, "500-00001", common.multi_lang.get_text(message_id, "システムエラー"))
-
-        except Exception as e:
-            globals.logger.error(f'Exception : {e.args}')
-            globals.logger.error(''.join(list(traceback.TracebackException.from_exception(e).format())))
-            raise
+            return ret
+        except json.JSONDecodeError:
+            info = ret.text
+            message_id = "500-00001"
+            globals.logger.info(f'SUCCESS call_api. status_code={status_code} info={info}')
+        raise common.InternalErrorException(None, message_id, common.multi_lang.get_text(message_id, "システムエラー"))
 
     def call_fnc(self, func, args):
         """Auth api call
