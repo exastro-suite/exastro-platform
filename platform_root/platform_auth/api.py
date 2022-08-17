@@ -83,18 +83,27 @@ def platform_organization_api_call(subpath):
 
         # Common authorization proxy processing call - 共通の認可proxy処理呼び出し
 
-        realm_name = os.environ["REALM_NAME"]
-        token_check_client_clientid = os.environ["TOKEN_CHECK_CLIENT_ID"]
-        token_check_client_secret = os.environ["TOKEN_CHECK_CLIENT_SECRET"]
-        user_token_client_id = os.environ["TOKEN_CHECK_CLIENT_ID"]
-        user_token_client_secret = os.environ["TOKEN_CHECK_CLIENT_SECRET"]
+        # サービスアカウントを使うためにClientのSercretを取得
+        # Get Client Sercret to use service account
+        db = DBconnector()
+        private = db.get_platform_private()
+
+        # 取得できない場合は、エラー
+        # If you cannot get it, an error
+        if not private:
+            message_id = "500-11002"
+            message = multi_lang.get_text(
+                message_id, "platform private情報の取得に失敗しました")
+            raise common.InternalErrorException(essage_id=message_id, message=message)
+
         # realm名設定
         # Set realm name
-        proxy = auth_proxy.auth_proxy(realm_name,
-                                      token_check_client_clientid,
-                                      token_check_client_secret,
-                                      user_token_client_id,
-                                      user_token_client_secret)
+        proxy = auth_proxy.auth_proxy(
+            private.token_check_realm_id,
+            private.token_check_client_clientid,
+            private.token_check_client_secret,
+            private.token_check_client_clientid,
+            private.token_check_client_secret)
 
         # 各種チェック check
         response_json = proxy.check_authorization()
