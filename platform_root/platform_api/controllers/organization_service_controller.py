@@ -363,22 +363,18 @@ def __get_token():
         str: token
     """
 
-    # private = DBconnector().get_platform_private(organization_id)
-    token_check_realm_id = os.environ["REALM_NAME"]
-    token_check_client_id = os.environ["TOKEN_CHECK_CLIENT_ID"]
-    token_check_client_secret = os.environ["TOKEN_CHECK_CLIENT_SECRET"]
-    # client_id = private.internal_api_client_clientid
-    # client_secret = private.internal_api_client_secret
+    private = DBconnector().get_platform_private()
 
     # サービスアカウントのTOKEN取得
     # Get a service account token
-    response = api_keycloak_tokens.service_account_get_token(token_check_realm_id, token_check_client_id, token_check_client_secret)
+    response = api_keycloak_tokens.service_account_get_token(
+        private.token_check_realm_id, private.token_check_client_clientid, private.token_check_client_secret)
     if response.status_code != 200:
         message_id = "401-00001"
         message = multi_lang.get_text(message_id,
                                       "tokenの取得に失敗しました。 realm:[{0}] client:[{1}]",
-                                      token_check_realm_id,
-                                      token_check_client_id)
+                                      private.token_check_realm_id,
+                                      private.token_check_client_clientid)
         raise common.AuthException(message_id=message_id, message=message)
 
     token = json.loads(response.text).get("access_token")

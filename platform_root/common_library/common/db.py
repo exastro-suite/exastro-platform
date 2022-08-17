@@ -34,6 +34,12 @@ class DBconnector:
     WHERE ID = 1
     """
 
+    SQL_PLATFORM_PRIVATE_INFO = """
+    SELECT ID, INFORMATIONS
+    FROM T_PLATFORM_PRIVATE
+    WHERE ID = 1
+    """
+
     class DBinfo:
         """dbinfo
         """
@@ -191,10 +197,10 @@ class DBconnector:
             organization_id (str): organization_id
 
         Returns:
-            dict: organization_private informations
+            organization_private: organization_private informations
         """
 
-        data = self.organization_private()
+        data = None
 
         with closing(self.connect_orgdb(organization_id)) as conn:
             with conn.cursor() as cursor:
@@ -204,6 +210,7 @@ class DBconnector:
                 infoormations = result.get("INFORMATIONS")
                 json_dict = json.loads(infoormations)
 
+                data = self.organization_private()
                 data.user_token_client_clientid = json_dict.get("USER_TOKEN_CLIENT_CLIENTID")
                 data.user_token_client_id = json_dict.get("USER_TOKEN_CLIENT_ID")
                 data.token_check_client_clientid = json_dict.get("TOKEN_CHECK_CLIENT_CLIENTID")
@@ -212,5 +219,49 @@ class DBconnector:
                 data.internal_api_client_clientid = json_dict.get("INTERNAL_API_CLIENT_CLIENTID")
                 data.internal_api_client_id = json_dict.get("INTERNAL_API_CLIENT_ID")
                 data.internal_api_client_secret = json_dict.get("INTERNAL_API_CLIENT_SECRET")
+
+        return data
+
+    class platform_private:
+        """platform_private info
+        """
+
+        token_check_realm_id: str
+        """_platform realm_id  """
+        token_check_client_clientid: str
+        """_platform clientid"""
+        token_check_client_id: str
+        """_platform ID"""
+        token_check_client_secret: str
+        """_platform secret"""
+
+        def __init__(self):
+            self.token_check_realm_id = ""
+            self.token_check_client_clientid = ""
+            self.token_check_client_id = ""
+            self.token_check_client_secret = ""
+
+    def get_platform_private(self) -> platform_private:
+        """get platform_private informations
+
+        Returns:
+            platform_private: platform_private informations
+        """
+
+        data = None
+
+        with closing(self.connect_platformdb()) as conn:
+            with conn.cursor() as cursor:
+                cursor.execute(self.SQL_PLATFORM_PRIVATE_INFO)
+                result = cursor.fetchone()
+
+                infoormations = result.get("INFORMATIONS")
+                json_dict = json.loads(infoormations)
+
+                data = self.platform_private()
+                data.token_check_realm_id = json_dict.get("TOKEN_CHECK_REALM_ID")
+                data.token_check_client_clientid = json_dict.get("TOKEN_CHECK_CLIENT_CLIENTID")
+                data.token_check_client_id = json_dict.get("TOKEN_CHECK_CLIENT_ID")
+                data.token_check_client_secret = json_dict.get("TOKEN_CHECK_CLIENT_SECRET")
 
         return data
