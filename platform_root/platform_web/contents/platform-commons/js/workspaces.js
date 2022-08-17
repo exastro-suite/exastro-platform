@@ -70,15 +70,27 @@ $(function(){
                 dataType: "json",
             }
 
-            $.ajax(api_param).done(function(data) {
+            $.ajax(api_param).done(function(data, status, xhr) {
                 console.log("DONE : " + run_title);
                 console.log("--- data ----");
                 console.log(JSON.stringify(data));
+                console.log(xhr.status);
+
+                if (xhr.status != 200){
+                    console.log("--- message ----");
+                    console.log(data.message);
+                    msg = "[" + data.result + "]\n" + data.message;
+                    alert(msg);
+                }
+
                 // 成功
                 resolve();
             }).fail((jqXHR, textStatus, errorThrown) => {
                 console.log("FAIL : " + run_title);
                 console.log("RESPONSE:" + jqXHR.responseText);
+
+                msg = "[" + jqXHR.responseJSON.result + "]\n" + jqXHR.responseJSON.message;
+                alert(msg);
             });
         }).then(() => {
             get_workspace_list();

@@ -22,7 +22,7 @@ from common_library.common import common, api_keycloak_tokens, api_keycloak_user
 from common_library.common.db import DBconnector
 from libs import queries_workspaces
 
-# import globals
+import globals
 
 MSG_FUNCTION_ID = "22"
 
@@ -114,7 +114,7 @@ def workspace_create(body, organization_id):
             )
             if r_create_ws.status_code not in [201, 409]:
                 # 201 Created 以外に、409 already exists は許容する
-                return common.response_status(500, None, f"500-{MSG_FUNCTION_ID}001", "ワークスペースロール作成に失敗しました(対象ID:{})".format(workspace_id))
+                raise common.InternalErrorException(None, f"500-{MSG_FUNCTION_ID}001", "ワークスペースロール作成に失敗しました(対象ID:{})".format(workspace_id))
 
             # ロール作成(ws-admin)
             # create ws-admin role
@@ -123,7 +123,7 @@ def workspace_create(body, organization_id):
             )
             if r_create_wsadmin.status_code not in [201, 409]:
                 # 201 Created 以外に、409 already exists は許容する
-                return common.response_status(500, None, f"500-{MSG_FUNCTION_ID}002", "ワークスペース管理者ロール作成に失敗しました(対象ID:{})".format(workspace_id))
+                raise common.InternalErrorException(None, f"500-{MSG_FUNCTION_ID}002", "ワークスペース管理者ロール作成に失敗しました(対象ID:{})".format(workspace_id))
 
             # ws-adminロールにwsロールをcompositeする
             # ws-admin role composite ws
@@ -131,23 +131,29 @@ def workspace_create(body, organization_id):
                 realm_name=organization_id, client_id=private.internal_api_client_id, role_name=role_name_ws, token=token,
             )
             if r_get_role_ws.status_code != 200:
-                return common.response_status(500, None, f"500-{MSG_FUNCTION_ID}003", "ワークスペースロールの取得に失敗しました(対象ID:{})".format(workspace_id))
+                raise common.InternalErrorException(None, f"500-{MSG_FUNCTION_ID}003", "ワークスペースロールの取得に失敗しました(対象ID:{})".format(workspace_id))
 
             roles_ws = [json.loads(r_get_role_ws.text), ]
             r_create_composite = api_keycloak_clients.client_role_composites_create(
                 realm_name=organization_id, client_uid=private.user_token_client_id, role_name=role_name_wsadmin, add_roles=roles_ws, token=token,
             )
             if r_create_composite.status_code != 204:
-                return common.response_status(
-                    500, None, f"500-{MSG_FUNCTION_ID}004", "ワークスペース管理者ロールとワークスペースロールの紐づけに失敗しました(対象ID:{})".format(workspace_id))
+                raise common.InternalErrorException(
+                    None,
+                    f"500-{MSG_FUNCTION_ID}004",
+                    "ワークスペース管理者ロールとワークスペースロールの紐づけに失敗しました(対象ID:{})".format(workspace_id)
+                )
 
             # 管理者ユーザーのrole mappingにws-adminロールを追加する
             # Add ws-admin role to administrat users role mapping
             r_get_role_admin = api_keycloak_clients.client_role_get(
-                realm_name=organization_id, client_id=private.user_token_client_id, role_name=role_name_wsadmin, token=token,
+                realm_name=organization_id,
+                client_id=private.user_token_client_id,
+                role_name=role_name_wsadmin,
+                token=token,
             )
             if r_get_role_admin.status_code != 200:
-                return common.response_status(500, None, f"500-{MSG_FUNCTION_ID}005", "ワークスペース管理者ロールの取得に失敗しました(対象ID:{})".format(workspace_id))
+                raise common.InternalErrorException(None, f"500-{MSG_FUNCTION_ID}005", "ワークスペース管理者ロールの取得に失敗しました(対象ID:{})".format(workspace_id))
 
             roles_admin = [json.loads(r_get_role_admin.text), ]
 
@@ -157,19 +163,31 @@ def workspace_create(body, organization_id):
             for wsadmin in wsadmin_users:
                 target_user_id = wsadmin.get("id")
                 r_create_mapping = api_keycloak_users.user_client_role_mapping_create(
-                    realm_name=organization_id, user_id=target_user_id, client_id=private.user_token_client_id, client_roles=roles_admin, token=token,
+                    realm_name=organization_id,
+                    user_id=target_user_id,
+                    client_id=private.user_token_client_id,
+                    client_roles=roles_admin,
+                    token=token,
                 )
                 if r_create_mapping.status_code != 204:
-                    return common.response_status(
-                        500, None, f"500-{MSG_FUNCTION_ID}006", "管理者ユーザーとワークスペース管理者ロールの紐づけに失敗しました(対象ID:{})".format(target_user_id))
+                    globals.logger.debug(f"response:{r_create_mapping.text}")
+
+                    raise common.InternalErrorException(
+                        None,
+                        f"500-{MSG_FUNCTION_ID}006",
+                        "管理者ユーザーとワークスペース管理者ロールの紐づけに失敗しました(対象ID:{})".format(target_user_id)
+                    )
 
             # IT Automation call
             r_create_ita_workspace = api_ita_admin_call.ita_workspace_create(
                 organization_id, workspace_id, role_name_wsadmin, user_id, encode_roles, language,
             )
             if r_create_ita_workspace.status_code != 200:
-                return common.response_status(
-                    500, None, f"500-{MSG_FUNCTION_ID}007", "IT Automationのワークスペース作成に失敗しました(対象ID:{})".format(workspace_id))
+                raise common.InternalErrorException(
+                    None,
+                    f"500-{MSG_FUNCTION_ID}007",
+                    "IT Automationのワークスペース作成に失敗しました(対象ID:{})".format(workspace_id)
+                )
 
             conn.commit()
 

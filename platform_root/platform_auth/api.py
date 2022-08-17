@@ -98,21 +98,16 @@ def platform_organization_api_call(subpath):
 
         # 各種チェック check
         response_json = proxy.check_authorization()
-        # 0以外は、終了
-        # Non-zero, end
-        if response_json.get("result") != 0:
-            return jsonify({"result": response_json.get("result"),
-                            "info": response_json.get("info"),
-                            "time": str(datetime.utcnow())}), response_json.get("result")
 
         # api呼び出し call api
-        response_json = proxy.call_api(dest_url, response_json.get("info"))
+        return_api = proxy.call_api(dest_url, response_json.get("data"))
 
         # 戻り値をそのまま返却
         # Return the return value as it is
         response = make_response()
-        response.data = proxy.response_original.content
-        for key, value in proxy.response_original.headers.items():
+        response.status_code = return_api.status_code
+        response.data = return_api.content
+        for key, value in return_api.headers.items():
             if key.lower().startswith('content-'):
                 response.headers[key] = value
         return response
@@ -122,6 +117,11 @@ def platform_organization_api_call(subpath):
         message_id = "401-00002"
         message = multi_lang.get_text(message_id, "認証に失敗しました。")
         raise common.AuthException(message_id=message_id, message=message)
+
+    except common.NotAllowedException as e:
+        globals.logger.info(f'permission error:{e.args}')
+        info = "permission error"
+        raise common.NotAllowedException(message_id=None, message=info)
 
     except Exception as e:
         return common.response_server_error(e)
@@ -172,21 +172,16 @@ def platform_api_call(organization_id, subpath):
 
         # 各種チェック check
         response_json = proxy.check_authorization()
-        # 0以外は、終了
-        # Non-zero, end
-        if response_json.get("result") != 0:
-            return jsonify({"result": response_json.get("result"),
-                            "info": response_json.get("info"),
-                            "time": str(datetime.utcnow())}), response_json.get("result")
 
         # api呼び出し call api
-        response_json = proxy.call_api(dest_url, response_json.get("info"))
+        return_api = proxy.call_api(dest_url, response_json.get("data"))
 
         # 戻り値をそのまま返却
         # Return the return value as it is
         response = make_response()
-        response.data = proxy.response_original.content
-        for key, value in proxy.response_original.headers.items():
+        response.status_code = return_api.status_code
+        response.data = return_api.content
+        for key, value in return_api.headers.items():
             if key.lower().startswith('content-'):
                 response.headers[key] = value
         return response
@@ -198,10 +193,9 @@ def platform_api_call(organization_id, subpath):
         raise common.AuthException(message_id=message_id, message=message)
 
     except common.NotAllowedException as e:
-        globals.logger.info(f'authorization error:{e.args}')
-        status_code = 403
-        info = "authorization error"
-        return jsonify({"result": status_code, "info": info, "time": str(datetime.utcnow())}), status_code
+        globals.logger.info(f'permission error:{e.args}')
+        info = "permission error"
+        raise common.NotAllowedException(message_id=None, message=info)
 
     except Exception as e:
         return common.response_server_error(e)
@@ -253,22 +247,16 @@ def ita_workspace_api_call(organization_id, workspace_id, subpath):
 
         globals.logger.info(f'called check_authorization responce={response_json}')
 
-        # 0以外は、終了
-        # Non-zero, end
-        if response_json.get("result") != 0:
-            return jsonify({"result": response_json.get("result"),
-                            "info": response_json.get("info"),
-                            "time": str(datetime.utcnow())}), response_json.get("result")
-
         # api呼び出し call api
-        response_json = proxy.call_api(dest_url, response_json.get("info"))
-        globals.logger.info('responce headers={}'.format(list(proxy.response_original.headers)))
+        return_api = proxy.call_api(dest_url, response_json.get("data"))
+        globals.logger.info('responce headers={}'.format(list(return_api.headers)))
 
         # 戻り値をそのまま返却
         # Return the return value as it is
         response = make_response()
-        response.data = proxy.response_original.content
-        for key, value in proxy.response_original.headers.items():
+        response.status_code = return_api.status_code
+        response.data = return_api.content
+        for key, value in return_api.headers.items():
             if key.lower().startswith('content-'):
                 response.headers[key] = value
         return response
@@ -281,9 +269,8 @@ def ita_workspace_api_call(organization_id, workspace_id, subpath):
 
     except common.NotAllowedException as e:
         globals.logger.info(f'permission error:{e.args}')
-        status_code = 403
         info = "permission error"
-        return jsonify({"result": status_code, "info": info, "time": str(datetime.utcnow())}), status_code
+        raise common.NotAllowedException(message_id=None, message=info)
 
     except Exception as e:
         return common.response_server_error(e)
