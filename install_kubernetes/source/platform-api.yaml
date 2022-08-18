@@ -42,7 +42,7 @@ spec:
           name: platform-api-conf
       containers:
       - name: platform-api
-        image: exastro/exastro-common-auth-platform_api:0.1.0.98e181.20220802-091937
+        image: exastro/exastro-common-auth-platform-api:0.1.0.a2e88d.20220805-155454
         env:
         - name: CONFIG_API_PATH
           value: "/api/api.conf"
@@ -58,17 +58,17 @@ spec:
         - name: API_KEYCLOAK_PROTOCOL
           valueFrom:
             configMapKeyRef:
-              name: keycloak-api
+              name: keycloak
               key: API_KEYCLOAK_PROTOCOL
         - name: API_KEYCLOAK_HOST
           valueFrom:
             configMapKeyRef:
-              name: keycloak-api
+              name: keycloak
               key: API_KEYCLOAK_HOST
         - name: API_KEYCLOAK_PORT
           valueFrom:
             configMapKeyRef:
-              name: keycloak-api
+              name: keycloak
               key: API_KEYCLOAK_PORT
         - name: ITA_API_ADMIN_PROTOCOL
           valueFrom:
@@ -95,25 +95,25 @@ spec:
             configMapKeyRef:
               name: platform-db
               key: DB_PORT
-        - name: DB_PORT
+        - name: DB_DATABASE
           valueFrom:
             configMapKeyRef:
               name: platform-db
-              key: DB_DATABASE
+              key: PLATFORM_DB_DATABASE
         - name: DB_USER
           valueFrom:
             secretKeyRef:
-              name: platform-db-secret
-              key: DB_USER
+              name: platform-db
+              key: PLATFORM_DB_USER
         - name: DB_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: platform-db-secret
-              key: DB_PASSWORD
+              name: platform-db
+              key: PLATFORM_DB_PASSWORD
         - name: MYSQL_ROOT_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: platform-db-secret
+              name: platform-db
               key: MYSQL_ROOT_PASSWORD
 
         volumeMounts:
@@ -133,15 +133,7 @@ spec:
   type: ClusterIP
   ports:
   - name: http
-    port:
-      valueFrom:
-        configMapKeyRef:
-          name: platform-api
-          key: PLATFORM_API_PORT
-    targetPort:
-      valueFrom:
-        configMapKeyRef:
-          name: platform-api
-          key: LISTEN_PORT
+    port: 8000
+    targetPort: 8000
   selector:
     name: platform-api

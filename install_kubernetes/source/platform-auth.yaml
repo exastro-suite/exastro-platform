@@ -42,7 +42,7 @@ spec:
           name: platform-auth-conf
       containers:
       - name: platform-auth
-        image: exastro/exastro-common-auth-platform_auth:0.1.0.98e181.20220802-091931
+        image: exastro/exastro-common-auth-platform-auth:0.1.0.a2e88d.20220805-155446
         env:
         - name: CONFIG_API_PATH
           value: "/api/api.conf"
@@ -63,32 +63,32 @@ spec:
         - name: API_KEYCLOAK_PROTOCOL
           valueFrom:
             configMapKeyRef:
-              name: keycloak-api
+              name: keycloak
               key: API_KEYCLOAK_PROTOCOL
         - name: API_KEYCLOAK_HOST
           valueFrom:
             configMapKeyRef:
-              name: keycloak-api
+              name: keycloak
               key: API_KEYCLOAK_HOST
         - name: API_KEYCLOAK_PORT
           valueFrom:
             configMapKeyRef:
-              name: keycloak-api
+              name: keycloak
               key: API_KEYCLOAK_PORT
         - name: KEYCLOAK_PROTOCOL
           valueFrom:
             configMapKeyRef:
-              name: keycloak-api
+              name: keycloak
               key: KEYCLOAK_PROTOCOL
         - name: KEYCLOAK_HOST
           valueFrom:
             configMapKeyRef:
-              name: keycloak-api
+              name: keycloak
               key: KEYCLOAK_HOST
         - name: KEYCLOAK_PORT
           valueFrom:
             configMapKeyRef:
-              name: keycloak-api
+              name: keycloak
               key: KEYCLOAK_PORT
         - name: ITA_WEB_PROTOCOL
           valueFrom:
@@ -160,21 +160,21 @@ spec:
             configMapKeyRef:
               name: platform-db
               key: DB_PORT
-        - name: DB_PORT
+        - name: DB_DATABASE
           valueFrom:
             configMapKeyRef:
               name: platform-db
-              key: DB_DATABASE
+              key: PLATFORM_DB_DATABASE
         - name: DB_USER
           valueFrom:
             secretKeyRef:
-              name: platform-db-secret
-              key: DB_USER
+              name: platform-db
+              key: PLATFORM_DB_USER
         - name: DB_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: platform-db-secret
-              key: DB_PASSWORD
+              name: platform-db
+              key: PLATFORM_DB_PASSWORD
 
         volumeMounts:
         - name: platform-auth-conf
@@ -193,26 +193,10 @@ spec:
   type: ClusterIP
   ports:
   - name: http
-    port:
-      valueFrom:
-        configMapKeyRef:
-          name: platform-auth
-          key: PLATFORM_AUTH_PORT
-    targetPort:
-      valueFrom:
-        configMapKeyRef:
-          name: platform-auth
-          key: LISTEN_PORT
+    port: 8000
+    targetPort: 8000
   - name: http-pf-mng
-    port:
-      valueFrom:
-        configMapKeyRef:
-          name: platform-auth
-          key: PLATFORM_AUTH_PORT
-    targetPort:
-      valueFrom:
-        configMapKeyRef:
-          name: platform-auth
-          key: LISTEN_PORT_PF_MNG
+    port: 8001
+    targetPort: 8000
   selector:
     name: platform-auth

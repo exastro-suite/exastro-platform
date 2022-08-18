@@ -28,7 +28,7 @@ spec:
     spec:
       containers:
       - name: platform-web
-        image: exastro/exastro-common-auth-platform_web:0.1.0.98e181.20220802-091945
+        image: exastro/exastro-common-auth-platform-web:0.1.0.a2e88d.20220805-155614
         env:
         - name: LISTEN_PORT
           valueFrom:
@@ -49,15 +49,7 @@ spec:
   type: ClusterIP
   ports:
   - name: http
-    port:
-      valueFrom:
-        configMapKeyRef:
-          name: platform-web
-          key: PLATFORM_WEB_PORT
-    targetPort:
-      valueFrom:
-        configMapKeyRef:
-          name: platform-web
-          key: LISTEN_PORT
+    port: 80
+    targetPort: 80
   selector:
     name: platform-web
