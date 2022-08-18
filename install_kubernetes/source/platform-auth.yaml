@@ -1,0 +1,218 @@
+#   Copyright 2022 NEC Corporation
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: platform-auth-conf
+  namespace: exastro-platform
+data:
+  api.conf: |
+    TZ='Asia/Tokyo'
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: platform-auth
+  namespace: exastro-platform
+spec:
+  selector:
+    matchLabels:
+      name: platform-auth
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: platform-auth
+    spec:
+      volumes:
+      - name: platform-auth-conf
+        configMap:
+          name: platform-auth-conf
+      containers:
+      - name: platform-auth
+        image: exastro/exastro-common-auth-platform_auth:0.1.0.98e181.20220802-091931
+        env:
+        - name: CONFIG_API_PATH
+          value: "/api/api.conf"
+        - name: PYTHONPATH
+          value: "/app/"
+        - name: LISTEN_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: platform-auth
+              key: LISTEN_PORT
+        - name: LISTEN_PORT_PF_MNG
+          valueFrom:
+            configMapKeyRef:
+              name: platform-auth
+              key: LISTEN_PORT_PF_MNG
+        - name: PYTHONIOENCODING
+          value: utf-8
+        - name: API_KEYCLOAK_PROTOCOL
+          valueFrom:
+            configMapKeyRef:
+              name: keycloak-api
+              key: API_KEYCLOAK_PROTOCOL
+        - name: API_KEYCLOAK_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: keycloak-api
+              key: API_KEYCLOAK_HOST
+        - name: API_KEYCLOAK_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: keycloak-api
+              key: API_KEYCLOAK_PORT
+        - name: KEYCLOAK_PROTOCOL
+          valueFrom:
+            configMapKeyRef:
+              name: keycloak-api
+              key: KEYCLOAK_PROTOCOL
+        - name: KEYCLOAK_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: keycloak-api
+              key: KEYCLOAK_HOST
+        - name: KEYCLOAK_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: keycloak-api
+              key: KEYCLOAK_PORT
+        - name: ITA_WEB_PROTOCOL
+          valueFrom:
+            configMapKeyRef:
+              name: ita
+              key: ITA_WEB_PROTOCOL
+        - name: ITA_WEB_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: ita
+              key: ITA_WEB_HOST
+        - name: ITA_WEB_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: ita
+              key: ITA_WEB_PORT
+        - name: ITA_API_PROTOCOL
+          valueFrom:
+            configMapKeyRef:
+              name: ita
+              key: ITA_API_PROTOCOL
+        - name: ITA_API_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: ita
+              key: ITA_API_HOST
+        - name: ITA_API_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: ita
+              key: ITA_API_PORT
+        - name: PLATFORM_WEB_PROTOCOL
+          valueFrom:
+            configMapKeyRef:
+              name: platform-web
+              key: PLATFORM_WEB_PROTOCOL
+        - name: PLATFORM_WEB_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: platform-web
+              key: PLATFORM_WEB_HOST
+        - name: PLATFORM_WEB_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: platform-web
+              key: PLATFORM_WEB_PORT
+        - name: PLATFORM_API_PROTOCOL
+          valueFrom:
+            configMapKeyRef:
+              name: platform-api
+              key: PLATFORM_API_PROTOCOL
+        - name: PLATFORM_API_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: platform-api
+              key: PLATFORM_API_HOST
+        - name: PLATFORM_API_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: platform-api
+              key: PLATFORM_API_PORT
+        - name: DB_ADDR
+          valueFrom:
+            configMapKeyRef:
+              name: platform-db
+              key: DB_ADDR
+        - name: DB_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: platform-db
+              key: DB_PORT
+        - name: DB_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: platform-db
+              key: DB_DATABASE
+        - name: DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: platform-db-secret
+              key: DB_USER
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: platform-db-secret
+              key: DB_PASSWORD
+
+        volumeMounts:
+        - name: platform-auth-conf
+          mountPath: /app
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: platform-auth
+  labels:
+    name: platform-auth
+  namespace: exastro-platform
+spec:
+  type: ClusterIP
+  ports:
+  - name: http
+    port:
+      valueFrom:
+        configMapKeyRef:
+          name: platform-auth
+          key: PLATFORM_AUTH_PORT
+    targetPort:
+      valueFrom:
+        configMapKeyRef:
+          name: platform-auth
+          key: LISTEN_PORT
+  - name: http-pf-mng
+    port:
+      valueFrom:
+        configMapKeyRef:
+          name: platform-auth
+          key: PLATFORM_AUTH_PORT
+    targetPort:
+      valueFrom:
+        configMapKeyRef:
+          name: platform-auth
+          key: LISTEN_PORT_PF_MNG
+  selector:
+    name: platform-auth
