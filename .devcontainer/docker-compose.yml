@@ -28,9 +28,9 @@ services:
       - PYTHONPATH=/app/
       - CONFIG_API_PATH=/app/api.conf
       - PYTHONIOENCODING=utf-8
-      - EXASTRO_KEYCLOAK_USER=admin
-      - EXASTRO_KEYCLOAK_PASSWORD=password
-      - EXASTRO_KEYCLOAK_MASTER_REALM=master
+      # - EXASTRO_KEYCLOAK_USER=admin
+      # - EXASTRO_KEYCLOAK_PASSWORD=password
+      # - EXASTRO_KEYCLOAK_MASTER_REALM=master
       - API_KEYCLOAK_HOST=keycloak
       - API_KEYCLOAK_PROTOCOL=http
       - API_KEYCLOAK_PORT=8080
