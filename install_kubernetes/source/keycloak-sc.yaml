@@ -14,7 +14,7 @@
 apiVersion: v1
 kind: Secret
 metadata:
-  name: keycloak-sc
+  name: keycloak
   namespace: exastro-platform
 stringData:
   KEYCLOAK_USER: "admin"

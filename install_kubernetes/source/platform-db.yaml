@@ -54,43 +54,42 @@ spec:
         - name: MYSQL_ROOT_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: platform-db-sc
+              name: platform-db
               key: MYSQL_ROOT_PASSWORD
         - name: KEYCLOAK_DB_DATABASE
           valueFrom:
             configMapKeyRef:
-              name: keycloak-cm
+              name: keycloak
               key: KEYCLOAK_DB_DATABASE
         - name: KEYCLOAK_DB_USER
           valueFrom:
             secretKeyRef:
-              name: keycloak-sc
+              name: keycloak
               key: KEYCLOAK_DB_USER
         - name: KEYCLOAK_DB_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: keycloak-sc
+              name: keycloak
               key: KEYCLOAK_DB_PASSWORD
         - name: PLATFORM_DB_DATABASE
           valueFrom:
             configMapKeyRef:
-              name: platform-db-cm
+              name: platform-db
               key: PLATFORM_DB_DATABASE
         - name: PLATFORM_DB_USER
           valueFrom:
             secretKeyRef:
-              name: platform-db-sc
+              name: platform-db
               key: PLATFORM_DB_USER
         - name: PLATFORM_DB_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: platform-db-sc
+              name: platform-db
               key: PLATFORM_DB_PASSWORD
-
-      #   volumeMounts:
-      #   - name: persistent-storage
-      #     mountPath: /var/lib/mysql
-      # volumes:
-      # - name: persistent-storage
-      #   persistentVolumeClaim:
-      #     claimName: platform-db
+        volumeMounts:
+        - name: persistent-storage
+          mountPath: /var/lib/mysql
+      volumes:
+      - name: persistent-storage
+        persistentVolumeClaim:
+          claimName: platform-db

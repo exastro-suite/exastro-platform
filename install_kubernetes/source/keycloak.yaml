@@ -54,39 +54,39 @@ spec:
         - name: KEYCLOAK_USER
           valueFrom:
             secretKeyRef:
-              name: keycloak-sc
+              name: keycloak
               key: KEYCLOAK_USER
         - name: KEYCLOAK_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: keycloak-sc
+              name: keycloak
               key: KEYCLOAK_PASSWORD
         - name: PROXY_ADDRESS_FORWARDING
           value: "true"
         - name: DB_VENDOR
           valueFrom:
             configMapKeyRef:
-              name: platform-db-cm
+              name: platform-db
               key: DB_VENDOR
         - name: DB_ADDR
           valueFrom:
             configMapKeyRef:
-              name: platform-db-cm
+              name: platform-db
               key: DB_ADDR
         - name: DB_DATABASE
           valueFrom:
             configMapKeyRef:
-              name: keycloak-cm
+              name: keycloak
               key: KEYCLOAK_DB_DATABASE
         - name: DB_USER
           valueFrom:
             secretKeyRef:
-              name: keycloak-sc
+              name: keycloak
               key: KEYCLOAK_DB_USER
         - name: DB_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: keycloak-sc
+              name: keycloak
               key: KEYCLOAK_DB_PASSWORD
         readinessProbe:
           httpGet:
