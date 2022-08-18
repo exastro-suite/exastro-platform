@@ -14,7 +14,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: platform-db-cm
+  name: platform-db
   namespace: exastro-platform
 data:
   DB_VENDOR: "mariadb"
