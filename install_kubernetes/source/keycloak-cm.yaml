@@ -14,7 +14,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: keycloak-cm
+  name: keycloak
   namespace: exastro-platform
 data:
   API_KEYCLOAK_PROTOCOL: "http"

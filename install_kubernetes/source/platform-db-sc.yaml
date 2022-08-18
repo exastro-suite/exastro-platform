@@ -14,7 +14,7 @@
 apiVersion: v1
 kind: Secret
 metadata:
-  name: platform-db-sc
+  name: platform-db
   namespace: exastro-platform
 stringData:
   PLATFORM_DB_USER: "app_user"
