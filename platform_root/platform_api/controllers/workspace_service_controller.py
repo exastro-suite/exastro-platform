@@ -12,8 +12,6 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-import re
-from urllib import response
 from flask import request
 import connexion
 from contextlib import closing
@@ -22,8 +20,8 @@ import inspect
 import pymysql
 import base64
 
-from common_library.common import common, api_keycloak_tokens, api_keycloak_users, \
-                                  api_keycloak_roles, api_keycloak_clients, api_ita_admin_call, validation
+from common_library.common import common, api_keycloak_tokens, api_keycloak_users
+from common_library.common import api_keycloak_roles, api_keycloak_clients, api_ita_admin_call, validation
 from common_library.common.db import DBconnector
 from libs import queries_workspaces
 
