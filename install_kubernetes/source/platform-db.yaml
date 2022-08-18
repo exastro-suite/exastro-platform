@@ -14,81 +14,83 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: keycloak
+  name: platform-db
   labels:
-    app: keycloak
+    app: platform-db
   namespace: exastro-platform
 spec:
   type: ClusterIP
   ports:
-  - name: http
-    port: 8080
-    targetPort: 8080
+  - name: mariadb
+    port: 3306
+    targetPort: 3306
   selector:
-    app: keycloak
+    app: platform-db
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: keycloak
+  name: platform-db
   labels:
-    app: keycloak
+    app: platform-db
   namespace: exastro-platform
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: keycloak
+      app: platform-db
   template:
     metadata:
       labels:
-        app: keycloak
+        app: platform-db
     spec:
       containers:
-      - name: keycloak
-        image: exastro/exastro-common-auth-keycloak:0.1.0.a2e88d.20220805-155443
+      - name: platform-db
+        image: exastro/exastro-common-auth-platform-db:0.1.0.a2e88d.20220805-155453
         ports:
-        - name: http
-          containerPort: 8080
+        - name: mariadb
+          containerPort: 3306
         env:
-        - name: KEYCLOAK_USER
+        - name: MYSQL_ROOT_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: keycloak-sc
-              key: KEYCLOAK_USER
-        - name: KEYCLOAK_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: keycloak-sc
-              key: KEYCLOAK_PASSWORD
-        - name: PROXY_ADDRESS_FORWARDING
-          value: "true"
-        - name: DB_VENDOR
-          valueFrom:
-            configMapKeyRef:
-              name: platform-db-cm
-              key: DB_VENDOR
-        - name: DB_ADDR
-          valueFrom:
-            configMapKeyRef:
-              name: platform-db-cm
-              key: DB_ADDR
-        - name: DB_DATABASE
+              name: platform-db-sc
+              key: MYSQL_ROOT_PASSWORD
+        - name: KEYCLOAK_DB_DATABASE
           valueFrom:
             configMapKeyRef:
               name: keycloak-cm
               key: KEYCLOAK_DB_DATABASE
-        - name: DB_USER
+        - name: KEYCLOAK_DB_USER
           valueFrom:
             secretKeyRef:
               name: keycloak-sc
               key: KEYCLOAK_DB_USER
-        - name: DB_PASSWORD
+        - name: KEYCLOAK_DB_PASSWORD
           valueFrom:
             secretKeyRef:
               name: keycloak-sc
               key: KEYCLOAK_DB_PASSWORD
-        readinessProbe:
-          httpGet:
-            path: /auth/realms/master
-            port: 8080
+        - name: PLATFORM_DB_DATABASE
+          valueFrom:
+            configMapKeyRef:
+              name: platform-db-cm
+              key: PLATFORM_DB_DATABASE
+        - name: PLATFORM_DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: platform-db-sc
+              key: PLATFORM_DB_USER
+        - name: PLATFORM_DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: platform-db-sc
+              key: PLATFORM_DB_PASSWORD
+
+      #   volumeMounts:
+      #   - name: persistent-storage
+      #     mountPath: /var/lib/mysql
+      # volumes:
+      # - name: persistent-storage
+      #   persistentVolumeClaim:
+      #     claimName: platform-db
