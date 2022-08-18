@@ -103,17 +103,17 @@ spec:
         - name: DB_USER
           valueFrom:
             secretKeyRef:
-              name: platform-db-secret
+              name: platform-db
               key: DB_USER
         - name: DB_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: platform-db-secret
+              name: platform-db
               key: DB_PASSWORD
         - name: MYSQL_ROOT_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: platform-db-secret
+              name: platform-db
               key: MYSQL_ROOT_PASSWORD
 
         volumeMounts:
