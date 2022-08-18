@@ -193,26 +193,10 @@ spec:
   type: ClusterIP
   ports:
   - name: http
-    port:
-      valueFrom:
-        configMapKeyRef:
-          name: platform-auth
-          key: PLATFORM_AUTH_PORT
-    targetPort:
-      valueFrom:
-        configMapKeyRef:
-          name: platform-auth
-          key: LISTEN_PORT
+    port: 8000
+    targetPort: 8000
   - name: http-pf-mng
-    port:
-      valueFrom:
-        configMapKeyRef:
-          name: platform-auth
-          key: PLATFORM_AUTH_PORT
-    targetPort:
-      valueFrom:
-        configMapKeyRef:
-          name: platform-auth
-          key: LISTEN_PORT_PF_MNG
+    port: 8001
+    targetPort: 8000
   selector:
     name: platform-auth

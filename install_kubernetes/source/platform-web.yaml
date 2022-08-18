@@ -49,15 +49,7 @@ spec:
   type: ClusterIP
   ports:
   - name: http
-    port:
-      valueFrom:
-        configMapKeyRef:
-          name: platform-web
-          key: PLATFORM_WEB_PORT
-    targetPort:
-      valueFrom:
-        configMapKeyRef:
-          name: platform-web
-          key: LISTEN_PORT
+    port: 80
+    targetPort: 80
   selector:
     name: platform-web

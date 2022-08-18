@@ -133,15 +133,7 @@ spec:
   type: ClusterIP
   ports:
   - name: http
-    port:
-      valueFrom:
-        configMapKeyRef:
-          name: platform-api
-          key: PLATFORM_API_PORT
-    targetPort:
-      valueFrom:
-        configMapKeyRef:
-          name: platform-api
-          key: LISTEN_PORT
+    port: 8000
+    targetPort: 8000
   selector:
     name: platform-api
