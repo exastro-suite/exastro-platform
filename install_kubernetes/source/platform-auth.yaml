@@ -63,32 +63,32 @@ spec:
         - name: API_KEYCLOAK_PROTOCOL
           valueFrom:
             configMapKeyRef:
-              name: keycloak-api
+              name: keycloak
               key: API_KEYCLOAK_PROTOCOL
         - name: API_KEYCLOAK_HOST
           valueFrom:
             configMapKeyRef:
-              name: keycloak-api
+              name: keycloak
               key: API_KEYCLOAK_HOST
         - name: API_KEYCLOAK_PORT
           valueFrom:
             configMapKeyRef:
-              name: keycloak-api
+              name: keycloak
               key: API_KEYCLOAK_PORT
         - name: KEYCLOAK_PROTOCOL
           valueFrom:
             configMapKeyRef:
-              name: keycloak-api
+              name: keycloak
               key: KEYCLOAK_PROTOCOL
         - name: KEYCLOAK_HOST
           valueFrom:
             configMapKeyRef:
-              name: keycloak-api
+              name: keycloak
               key: KEYCLOAK_HOST
         - name: KEYCLOAK_PORT
           valueFrom:
             configMapKeyRef:
-              name: keycloak-api
+              name: keycloak
               key: KEYCLOAK_PORT
         - name: ITA_WEB_PROTOCOL
           valueFrom:
