@@ -129,8 +129,9 @@ def platform_organization_api_call(subpath):
 
     except common.NotAllowedException as e:
         globals.logger.info(f'permission error:{e.args}')
-        info = "permission error"
-        raise common.NotAllowedException(message_id=None, message=info)
+        message_id = "403-00001"
+        info = common.multi_lang.get_text(message_id, "permission error")
+        raise common.NotAllowedException(message_id=message_id, message=info)
 
     except Exception as e:
         return common.response_server_error(e)
@@ -203,8 +204,9 @@ def platform_api_call(organization_id, subpath):
 
     except common.NotAllowedException as e:
         globals.logger.info(f'permission error:{e.args}')
-        info = "permission error"
-        raise common.NotAllowedException(message_id=None, message=info)
+        message_id = "403-00001"
+        info = common.multi_lang.get_text(message_id, "permission error")
+        raise common.NotAllowedException(message_id=message_id, message=info)
 
     except Exception as e:
         return common.response_server_error(e)
@@ -278,8 +280,9 @@ def ita_workspace_api_call(organization_id, workspace_id, subpath):
 
     except common.NotAllowedException as e:
         globals.logger.info(f'permission error:{e.args}')
-        info = "permission error"
-        raise common.NotAllowedException(message_id=None, message=info)
+        message_id = "403-00001"
+        info = common.multi_lang.get_text(message_id, "permission error")
+        raise common.NotAllowedException(message_id=message_id, message=info)
 
     except Exception as e:
         return common.response_server_error(e)
