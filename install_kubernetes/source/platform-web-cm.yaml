@@ -14,7 +14,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: platfrom-web
+  name: platform-web
   namespace: exastro-platform
 data:
   PLATFORM_WEB_PROTOCOL: "http"
