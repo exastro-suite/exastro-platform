@@ -19,5 +19,5 @@ metadata:
 data:
   PLATFORM_WEB_PROTOCOL: "http"
   PLATFORM_WEB_HOST: "platform-web"
-  PLATFORM_WEB_PORT: "80"
-  LISTEN_PORT: "80"
+  PLATFORM_WEB_PORT: 80
+  LISTEN_PORT: 80
