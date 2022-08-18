@@ -160,11 +160,11 @@ spec:
             configMapKeyRef:
               name: platform-db
               key: DB_PORT
-        - name: DB_PORT
+        - name: DB_DATABASE
           valueFrom:
             configMapKeyRef:
               name: platform-db
-              key: DB_DATABASE
+              key: PLATFORM_DB_DATABASE
         - name: DB_USER
           valueFrom:
             secretKeyRef:
