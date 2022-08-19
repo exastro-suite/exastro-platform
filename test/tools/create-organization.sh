@@ -2,19 +2,36 @@
 
 source "`dirname $0`/create-oraganization.conf"
 
-if [ $# -gt 1 ]; then
-    echo "Usage: `basename $0` [organaization info json file]"
+if [ $# -gt 2 ]; then
+    echo "Usage: `basename $0` [--retry] [organaization info json file]"
     exit 1
 fi
 
-if [ $# -eq 1 ]; then
-    if [ ! -f "$1" ]; then
-        echo "Error: not found organaization info json file : $1"
+PARAM_JSON_FILE=""
+PARAM_RETRY="OFF"
+while [ $# -gt 0 ]
+do
+    if [ "$1" == "--retry" ]; then
+        PARAM_RETRY="ON"
+        QUERY_STRING="?retry=1"
+    else
+        PARAM_JSON_FILE="$1"
+    fi
+    shift
+done
+
+# echo "PARAM_JSON_FILE :[${PARAM_JSON_FILE}]"
+# echo "PARAM_RETRY     :[${PARAM_RETRY}]"
+
+if [ ! -z "${PARAM_JSON_FILE}" ]; then
+    if [ ! -f "${PARAM_JSON_FILE}" ]; then
+        echo "Error: not found organaization info json file : ${PARAM_JSON_FILE}"
         exit 1
     fi
 fi
 
-if [ $# -eq 0 ]; then
+
+if [ -z "${PARAM_JSON_FILE}" ]; then
     echo
     echo "Please enter the organization information to be created"
     echo
@@ -55,7 +72,7 @@ if [ $# -eq 0 ]; then
 EOF
     )
 else
-    BODY_JSON=$(cat $1)
+    BODY_JSON=$(cat "${PARAM_JSON_FILE}")
 fi
 
 echo
@@ -72,22 +89,37 @@ fi
 # echo "${BODY_JSON}"
 # echo
 
-TEMPFILE="/tmp/`basename $0`.$$"
-curl -s -v -X POST \
+TEMPFILE_API_RESPONSE="/tmp/`basename $0`.$$.1"
+TEMPFILE_API_CODE="/tmp/`basename $0`.$$.2"
+
+touch "${TEMPFILE_API_RESPONSE}"
+touch "${TEMPFILE_API_CODE}"
+
+curl ${CURL_OPT} -X POST \
     -u ${USERNAME}:${PASSWORD} \
     -H 'Content-type: application/json' \
     -d "${BODY_JSON}" \
-    -o "${TEMPFILE}" \
-    "${CONF_BASE_URL}/api/platform/organizations"
+    -o "${TEMPFILE_API_RESPONSE}" \
+    -w '%{http_code}\n' \
+    "${CONF_BASE_URL}/api/platform/organizations${QUERY_STRING}" > "${TEMPFILE_API_CODE}"
+
+RESULT_CURL=$?
+RESULT_CODE=$(cat "${TEMPFILE_API_CODE}")
 
 which jq &> /dev/null
 if [ $? -eq 0 ]; then
-    cat "${TEMPFILE}" | jq
+    cat "${TEMPFILE_API_RESPONSE}" | jq
     if [ $? -ne 0 ]; then
-        cat "${TEMPFILE}"
+        cat "${TEMPFILE_API_RESPONSE}"
     fi
 else
-    cat "${TEMPFILE}"
+    cat "${TEMPFILE_API_RESPONSE}"
 fi
 
-rm "${TEMPFILE}"
+rm "${TEMPFILE_API_RESPONSE}" "${TEMPFILE_API_CODE}"
+
+if [ ${RESULT_CURL} -eq 0 -a "${RESULT_CODE}" == "200" ]; then
+    exit 0
+else
+    exit -1
+fi
