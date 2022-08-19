@@ -28,7 +28,7 @@ spec:
     spec:
       containers:
       - name: platform-web
-        image: exastro/exastro-common-auth-platform-web:0.1.0.a2e88d.20220805-155614
+        image: exastro/exastro-common-auth-platform-web:0.1.0.8ff64e.20220819-140918
         env:
         - name: LISTEN_PORT
           valueFrom:
