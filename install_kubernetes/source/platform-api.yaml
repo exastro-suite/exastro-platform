@@ -36,16 +36,12 @@ spec:
       labels:
         name: platform-api
     spec:
-      volumes:
-      - name: platform-api-conf
-        configMap:
-          name: platform-api-conf
       containers:
       - name: platform-api
         image: exastro/exastro-common-auth-platform-api:0.1.0.8ff64e.20220819-140911
         env:
         - name: CONFIG_API_PATH
-          value: "/api/api.conf"
+          value: "/etc/exastro-platform/api.conf"
         - name: PYTHONPATH
           value: "/app/"
         - name: LISTEN_PORT
@@ -118,8 +114,11 @@ spec:
 
         volumeMounts:
         - name: platform-api-conf
-          mountPath: /app/api.conf
-          subPath: api.conf
+          mountPath: /etc/exastro-platform
+      volumes:
+      - name: platform-api-conf
+        configMap:
+          name: platform-api-conf
 
 ---
 
