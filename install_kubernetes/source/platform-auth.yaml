@@ -197,6 +197,6 @@ spec:
     targetPort: 8000
   - name: http-pf-mng
     port: 8001
-    targetPort: 8000
+    targetPort: 8001
   selector:
     name: platform-auth
