@@ -20,9 +20,8 @@ spec:
   capacity:
     storage: 1Gi
   accessModes:
-  - ReadWriteOnce
+    - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
   hostPath:
     path: /var/data/exastro-platform/platform-db-pv
     type: DirectoryOrCreate
-
