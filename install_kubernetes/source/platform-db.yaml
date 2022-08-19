@@ -46,7 +46,7 @@ spec:
     spec:
       containers:
         - name: platform-db
-          image: exastro/exastro-common-auth-platform-db:0.1.0.a2e88d.20220805-155453
+          image: exastro/exastro-common-auth-platform-db:0.1.0.8ff64e.20220819-140753
           ports:
             - name: mariadb
               containerPort: 3306
