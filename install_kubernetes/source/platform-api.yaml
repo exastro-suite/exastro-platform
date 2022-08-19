@@ -118,7 +118,8 @@ spec:
 
         volumeMounts:
         - name: platform-api-conf
-          mountPath: /app
+          mountPath: /app/api.conf
+          subPath: api.conf
 
 ---
 
