@@ -12,9 +12,6 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-from flask import jsonify
-from datetime import datetime
-
 from common_library.common import common
 
 MSG_FUNCTION_ID = "20"
