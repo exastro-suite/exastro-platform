@@ -1,15 +1,15 @@
 #!/bin/bash
 
-source "`dirname $0`/create-oraganization.conf"
+source "`dirname $0`/create-organization.conf"
 
 if [ $# -gt 1 ]; then
-    echo "Usage: `basename $0` [organaization info json file]"
+    echo "Usage: `basename $0` [organization info json file]"
     exit 1
 fi
 
 if [ $# -eq 1 ]; then
     if [ ! -f "$1" ]; then
-        echo "Error: not found organaization info json file : $1"
+        echo "Error: not found organization info json file : $1"
         exit 1
     fi
 fi
