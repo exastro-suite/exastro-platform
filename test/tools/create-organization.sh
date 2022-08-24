@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source "`dirname $0`/create-oraganization.conf"
+source "`dirname $0`/create-organization.conf"
 
 if [ $# -gt 2 ]; then
     echo "Usage: `basename $0` [--retry] [organaization info json file]"
