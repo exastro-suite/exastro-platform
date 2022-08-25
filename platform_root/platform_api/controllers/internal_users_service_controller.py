@@ -116,6 +116,10 @@ def user_workspace_list(organization_id, user_id):
                 # データが取得できた際に名称を設定
                 if len(result) > 0:
                     workspaces[idx]["name"] = result[0]["WORKSPACE_NAME"]
+                    info = json.loads(result[0]["INFORMATIONS"])
+                    workspaces[idx]["informations"] = {
+                        "environments": info.get("environments", [])
+                    }
                     workspaces[idx]["create_timestamp"] = common.datetime_to_str(result[0]["CREATE_TIMESTAMP"])
                     workspaces[idx]["last_update_timestamp"] = common.datetime_to_str(result[0]["LAST_UPDATE_TIMESTAMP"])
 
