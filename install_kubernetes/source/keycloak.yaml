@@ -46,7 +46,7 @@ spec:
     spec:
       containers:
         - name: keycloak
-          image: exastro/exastro-common-auth-keycloak:0.1.0.8ff64e.20220819-140925
+          image: exastro/exastro-common-auth-keycloak:0.1.0.47d4d2.20220825-163604
           ports:
             - name: http
               containerPort: 8080
