@@ -1,0 +1,139 @@
+#   Copyright 2022 NEC Corporation
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: platform-api-conf
+  namespace: exastro-platform
+data:
+  api.conf: |
+    TZ='Asia/Tokyo'
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: platform-api
+  namespace: exastro-platform
+spec:
+  selector:
+    matchLabels:
+      name: platform-api
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: platform-api
+    spec:
+      containers:
+      - name: platform-api
+        image: {{ image }}:{{ image_tag }}
+        env:
+        - name: CONFIG_API_PATH
+          value: "/etc/exastro-platform/api.conf"
+        - name: PYTHONPATH
+          value: "/app/"
+        - name: LISTEN_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: platform-api
+              key: LISTEN_PORT
+        - name: PYTHONIOENCODING
+          value: utf-8
+        - name: API_KEYCLOAK_PROTOCOL
+          valueFrom:
+            configMapKeyRef:
+              name: keycloak
+              key: API_KEYCLOAK_PROTOCOL
+        - name: API_KEYCLOAK_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: keycloak
+              key: API_KEYCLOAK_HOST
+        - name: API_KEYCLOAK_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: keycloak
+              key: API_KEYCLOAK_PORT
+        - name: ITA_API_ADMIN_PROTOCOL
+          valueFrom:
+            configMapKeyRef:
+              name: ita
+              key: ITA_API_ADMIN_PROTOCOL
+        - name: ITA_API_ADMIN_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: ita
+              key: ITA_API_ADMIN_HOST
+        - name: ITA_API_ADMIN_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: ita
+              key: ITA_API_ADMIN_PORT
+        - name: DB_ADDR
+          valueFrom:
+            configMapKeyRef:
+              name: platform-db
+              key: DB_ADDR
+        - name: DB_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: platform-db
+              key: DB_PORT
+        - name: DB_DATABASE
+          valueFrom:
+            configMapKeyRef:
+              name: platform-db
+              key: PLATFORM_DB_DATABASE
+        - name: DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: platform-db
+              key: PLATFORM_DB_USER
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: platform-db
+              key: PLATFORM_DB_PASSWORD
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: platform-db
+              key: MYSQL_ROOT_PASSWORD
+
+        volumeMounts:
+        - name: platform-api-conf
+          mountPath: /etc/exastro-platform
+      volumes:
+      - name: platform-api-conf
+        configMap:
+          name: platform-api-conf
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: platform-api
+  labels:
+    name: platform-api
+  namespace: exastro-platform
+spec:
+  type: ClusterIP
+  ports:
+  - name: http
+    port: 8000
+    targetPort: 8000
+  selector:
+    name: platform-api

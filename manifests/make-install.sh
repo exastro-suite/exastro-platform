@@ -16,7 +16,7 @@
 BASE_DIR=`dirname $0`
 
 ALL_MANIFESTS="${BASE_DIR}/exastro-common-auth-install.yaml"
-SOURCE_MANIFEST="${BASE_DIR}/source"
+SOURCE_MANIFEST="${BASE_DIR}/base"
 
 # ---- source内のyamlファイル定義 ----
 YAMLFILES=()
