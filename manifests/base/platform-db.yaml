@@ -12,21 +12,18 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 apiVersion: v1
-kind: Service
+kind: ConfigMap
 metadata:
   name: platform-db
-  labels:
-    app: platform-db
   namespace: exastro-platform
-spec:
-  type: ClusterIP
-  ports:
-    - name: mariadb
-      port: 3306
-      targetPort: 3306
-  selector:
-    app: platform-db
+data:
+  DB_VENDOR: "mariadb"
+  DB_ADDR: "platform-db"
+  DB_PORT: "3306"
+  PLATFORM_DB_DATABASE: "platform"
+
 ---
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:

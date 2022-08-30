@@ -11,17 +11,18 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
-kind: PersistentVolume
 apiVersion: v1
+kind: ConfigMap
 metadata:
-  name: platform-db
-spec:
-  storageClassName: manual
-  capacity:
-    storage: 1Gi
-  accessModes:
-    - ReadWriteOnce
-  persistentVolumeReclaimPolicy: Retain
-  hostPath:
-    path: /var/data/exastro-platform/platform-db-pv
-    type: DirectoryOrCreate
+  name: ita
+  namespace: exastro-platform
+data:
+  ITA_WEB_PROTOCOL: "http"
+  ITA_WEB_HOST: "ita-web-server.exastro-it-automation.svc"
+  ITA_WEB_PORT: "8000"
+  ITA_API_PROTOCOL: "http"
+  ITA_API_HOST: "ita-api-organization.exastro-it-automation.svc"
+  ITA_API_PORT: "8080"
+  ITA_API_ADMIN_PROTOCOL: "http"
+  ITA_API_ADMIN_HOST: "ita-api-admin.exastro-it-automation.svc"
+  ITA_API_ADMIN_PORT: "8080"

@@ -14,6 +14,20 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
+  name: platform-auth
+  namespace: exastro-platform
+data:
+  PLATFORM_AUTH_PROTOCOL: "http"
+  PLATFORM_AUTH_HOST: "platform-auth"
+  PLATFORM_AUTH_PORT: "8000"
+  LISTEN_PORT: "8000"
+  LISTEN_PORT_PF_MNG: "8001"
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
   name: platform-auth-conf
   namespace: exastro-platform
 data:
@@ -21,6 +35,7 @@ data:
     TZ='Asia/Tokyo'
 
 ---
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -179,24 +194,3 @@ spec:
       - name: platform-auth-conf
         configMap:
           name: platform-auth-conf
-
----
-
-apiVersion: v1
-kind: Service
-metadata:
-  name: platform-auth
-  labels:
-    name: platform-auth
-  namespace: exastro-platform
-spec:
-  type: ClusterIP
-  ports:
-  - name: http
-    port: 8000
-    targetPort: 8000
-  - name: http-pf-mng
-    port: 8001
-    targetPort: 8001
-  selector:
-    name: platform-auth

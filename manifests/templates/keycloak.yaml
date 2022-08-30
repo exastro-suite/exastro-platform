@@ -12,21 +12,22 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 apiVersion: v1
-kind: Service
+kind: ConfigMap
 metadata:
   name: keycloak
-  labels:
-    app: keycloak
   namespace: exastro-platform
-spec:
-  type: ClusterIP
-  ports:
-    - name: http
-      port: 8080
-      targetPort: 8080
-  selector:
-    app: keycloak
+data:
+  API_KEYCLOAK_PROTOCOL: "http"
+  API_KEYCLOAK_HOST: "keycloak"
+  API_KEYCLOAK_PORT: "8080"
+  KEYCLOAK_PROTOCOL: "http"
+  KEYCLOAK_HOST: "keycloak"
+  KEYCLOAK_PORT: "8080"
+  KEYCLOAK_MASTER_REALM: "master"
+  KEYCLOAK_DB_DATABASE: "keycloak"
+
 ---
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
