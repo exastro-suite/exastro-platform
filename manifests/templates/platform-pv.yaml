@@ -12,12 +12,16 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 apiVersion: v1
-kind: Secret
+kind: PersistentVolume
 metadata:
   name: platform-db
-  namespace: exastro-platform
-type: Opaque
-data:
-  PLATFORM_DB_USER: YXBwX3VzZXI=
-  PLATFORM_DB_PASSWORD: cGFzc3dvcmQ=
-  MYSQL_ROOT_PASSWORD: cGFzc3dvcmQ=
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  hostPath:
+    path: /var/data/exastro-platform/platform-db-pv
+    type: DirectoryOrCreate

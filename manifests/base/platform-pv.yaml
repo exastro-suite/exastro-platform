@@ -12,12 +12,16 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 apiVersion: v1
-kind: ConfigMap
+kind: PersistentVolume
 metadata:
-  name: platform-api
-  namespace: exastro-platform
-data:
-  PLATFORM_API_PROTOCOL: "http"
-  PLATFORM_API_HOST: "platform-api"
-  PLATFORM_API_PORT: "8000"
-  LISTEN_PORT: "8000"
+  name: platform-db
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  hostPath:
+    path: /var/data/exastro-platform/platform-db-pv
+    type: DirectoryOrCreate

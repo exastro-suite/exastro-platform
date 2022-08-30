@@ -12,13 +12,15 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 apiVersion: v1
-kind: ConfigMap
+kind: PersistentVolumeClaim
 metadata:
-  name: platform-auth
+  name: platform-db
   namespace: exastro-platform
-data:
-  PLATFORM_AUTH_PROTOCOL: "http"
-  PLATFORM_AUTH_HOST: "platform-auth"
-  PLATFORM_AUTH_PORT: "8000"
-  LISTEN_PORT: "8000"
-  LISTEN_PORT_PF_MNG: "8001"
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  volumeName: platform-db
