@@ -24,3 +24,6 @@ spec:
     requests:
       storage: 1Gi
   volumeName: platform-db
+
+# epoch-required-param
+# {{ image }}:{{ image_tag }}

@@ -101,3 +101,6 @@ spec:
     targetPort: 80
   selector:
     name: platform-web
+
+# epoch-required-param
+# {{ image }}:{{ image_tag }}
