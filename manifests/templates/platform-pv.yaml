@@ -25,3 +25,6 @@ spec:
   hostPath:
     path: /var/data/exastro-platform/platform-db-pv
     type: DirectoryOrCreate
+
+# epoch-required-param
+# {{ image }}:{{ image_tag }}

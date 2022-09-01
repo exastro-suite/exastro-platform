@@ -26,3 +26,6 @@ data:
   ITA_API_ADMIN_PROTOCOL: "http"
   ITA_API_ADMIN_HOST: "ita-api-admin.exastro-it-automation.svc"
   ITA_API_ADMIN_PORT: "8080"
+
+# epoch-required-param
+# {{ image }}:{{ image_tag }}
