@@ -209,22 +209,18 @@ const CommonAuth = {
     },
 
     /**
-     * Returns the accessible workspace ID - アクセス可能なワークスペースIDを返します
-     * @returns {array} workspace id array
-     */
-    "getAccessibleWorkspaceId": function() {
-        if(!CommonAuth.keycloak.authenticated) {
-            throw "not authenticated";
-        }
-        // TODO: ロールからアクセス可能なワークスペースIDを取得し返す
-        return ["workspaceid-1","workspaceid-2"];
-    },
-
-    /**
      * logout - ログアウトします
+     *  redirectUriを指定しない場合は、再ログイン後にTOP画面に遷移します
+     * @param {string} redirectUri - Optional param
      */
-    "logout": function() {
-        CommonAuth.keycloak.logout({redirectUri: CommonAuth._getTopURL()});
+    "logout": function(redirectUri) {
+        let uri = null;
+        if((typeof redirectUri) === "undefined") {
+            uri = CommonAuth._getTopURL();
+        } else {
+            uri = redirectUri;
+        }
+        CommonAuth.keycloak.logout({redirectUri: uri});
     },
 
     /**

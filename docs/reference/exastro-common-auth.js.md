@@ -98,15 +98,11 @@ tokenを返します
 - parameter
     - @returns {string} realm
 
-### ※保留※　CommonAuth.getAccessibleWorkspaceId()
-アクセス可能なワークスペースIDを返します<br>
+### CommonAuth.logout(redirectUri)
+ログアウトします<br>
+redirectUriを指定しない場合は、再ログイン後にTOP画面に遷移します
 - parameter
-    - @returns {array} workspace id array
-
-### CommonAuth.logout()
-ログアウトします
-- parameter
-    - なし
+    - @param {string} redirectUri - Optional param
 
 ### CommonAuth.refreshTokenForce()
 tokenを強制的にリフレッシュします<br>
