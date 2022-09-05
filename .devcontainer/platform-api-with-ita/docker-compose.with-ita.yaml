@@ -37,3 +37,10 @@ services:
     ports:
       - "0.0.0.0:3307:3306"
 
+  ita-by-ansible-execute:
+    build:
+      context: ../../../it-automation2-test/.
+
+  ita-by-conductor-synchronize:
+    build:
+      context: ../../../it-automation2-test/.
