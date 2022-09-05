@@ -52,7 +52,7 @@ spec:
     spec:
       containers:
       - name: platform-api
-        image: exastro/exastro-common-auth-platform-api:0.1.0.47d4d2.20220825-163551
+        image: exastro/exastro-common-auth-platform-api:0.1.0.b19e8d.20220905-164910
         env:
         - name: CONFIG_API_PATH
           value: "/etc/exastro-platform/api.conf"
