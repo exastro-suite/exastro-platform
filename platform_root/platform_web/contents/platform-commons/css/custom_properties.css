@@ -1,0 +1,51 @@
+@charset "utf-8";
+/* CSS Document */
+
+:root {
+    /* Main color */
+    --mainColor100: #002B62;
+    --mainColor90: #1A4072;
+    --mainColor80: #335581;
+    --mainColor70: #4D6B91;
+    --mainColor60: #6680A1;
+    --mainColor50: #7F95B1;
+    --mainColor40: #99AAC0;
+    --mainColor30: #B3BFD0;
+    --mainColor20: #CCD5E0;
+    --mainColor10: #E5EAEF;
+    /* Accent color */ 
+    --accentColor100: #FFA500;
+    /* Base color */
+    --baseColor100: #F0F0F0;
+    
+    /* Black */
+    --black100: #1A1B1C;
+    --black90: #313233;
+    --black80: #484949;
+    --black70: #5F5F60;
+    --black60: #767677;
+    --black50: #8D8D8E;
+    --black40: #A3A4A4;
+    --black30: #BABBBB;
+    --black20: #D1D1D2;
+    --black10: #E8E8E8;
+    /* White */
+    --white100: #FFF;
+    
+    /* Button */
+    --buttonColor: #FF821E;
+    /* Focus */
+    --focusColor: #0070FF;
+    --focusBackgroundColor: #E5F1FF;
+    
+    /* Table row color */
+    --rowColor: #FFF;
+    --rowEvenColor: #F0F2F6;
+    --rowHeadColor: #F0F2F6;
+    --rowHeadEvenColor: #E0E6EC;
+    --rowHoverColor: #E0E6EC;
+    --rowHoverHeadColor: #DBE1E9;
+    --rowDiscardColor: #D1D1D1;
+    --rowDiscardHoverColor: #C7C7C7;
+    --rowDiscardTextColor: #888;
+}
