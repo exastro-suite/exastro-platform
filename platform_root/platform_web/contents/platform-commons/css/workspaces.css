@@ -55,12 +55,37 @@ html {
     border: 1px solid black;
 }
 
-.btn_ita{
+.pl_button{
     cursor: pointer;
+}
+.pl_button:hover{
+    cursor: pointer;
+    background-color: silver;
+}
+
+.btn_ita{
     width: 120px;
     height: 30px;
 }
-.btn_ita:hover{
-    cursor: pointer;
-    background-color: silver;
+.btn_ita_big{
+    width: 180px;
+    height: 30px;
+}
+.btn_member {
+    width:120px;
+    height: 30px;
+    padding:3px;
+    font-weight: bold;
+}
+
+.member_name {
+    display: inline-block;
+    margin: 4px; padding: 6px 15px;
+    background-color: #eee;
+    border-radius: 10px;
+    line-height: 1;
+    color: #000;
+}
+.validate_error {
+    color: red;
 }

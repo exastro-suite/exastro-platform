@@ -239,6 +239,22 @@ const CommonAuth = {
     },
 
     /**
+     * Check OrganizationManager - オーガナイゼーション管理者か判定する
+     * @returns true: OrganizationManager / false: other
+     */
+    "isOrganizationManager": function() {
+        try {
+            if( CommonAuth.keycloak.tokenParsed.resource_access[CommonAuth.getRealm() + "-workspaces"].roles.indexOf("_org-manager") !== -1 ) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch(e) {
+            return false;
+        }
+    },
+
+    /**
      * The process of calling token updates on a regular basis - トークンの更新を定期的に呼び出す処理
      */
     "_autoRefreshToken": function() {

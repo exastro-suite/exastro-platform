@@ -1,0 +1,125 @@
+@charset "utf-8";
+/* CSS Document */
+body {
+margin: 0; padding: 0;
+}
+* {
+box-sizing: border-box;
+}
+
+#modalContainer {
+position: fixed;
+left: 0; top: 0;
+z-index: 99999;
+width: 100vw; height: 100vh;
+}
+.modalOverlay {
+position: absolute;
+left: 0; top: 0;
+display: flex;
+flex-direction: column;
+justify-content: center;
+align-items: center;
+width: 100%; height: 100%;
+padding: 16px;
+background-color: rgba( 0,0,0,.5 );
+}
+.modalContainerFocus,
+.modalFocus {
+position: fixed;
+z-index: -1;
+left: 0; top: 0;
+outline: none;
+pointer-events: none;
+}
+.dialog {
+display: flex;
+flex-direction: column;
+width: 640px; height: 100%;
+}
+.dialogMain {
+overflow: hidden;
+display: flex;
+flex-direction: column;
+background-color: #FFF;
+border-radius: 4px;
+box-shadow: 0 0 16px rgba( 0,0,0,.3 );
+}
+.dialogMain > div {
+min-height: 0;
+}
+.dialogHeader {
+flex: 0 0 48px;
+border-bottom: 1px solid #DBDEE0;
+}
+.dialogBody {
+overflow: auto;
+flex: 1 1 auto;
+}
+.dialogFooter {
+flex: 0 0 48px;
+background-color: #DBDEE0;
+}
+
+
+
+
+.dialogHeader {
+height: 48px;
+background-color: var(--mainColor100);
+background-image: linear-gradient( rgba( 255,255,255,.1 ), transparent );
+border-bottom: 4px solid var(--accentColor100);
+}
+.dialogHeaderTitle {
+display: flex;
+align-items: center;
+height: 100%;
+letter-spacing: .25px;
+padding: 0 16px;
+font-size: 16px;
+color: var(--white100);
+}
+.dialogFooterMenuList {
+display: flex;
+gap: 16px;
+height: 100%;
+padding: 0 16px;
+}
+.dialogFooterMenuItem {
+display: flex;
+align-items: center;
+}
+.dialogFooterMenuButton > .inner {
+padding: 0 16px;
+}
+
+.alertMessage {
+height: 100%;
+padding: 16px;
+letter-spacing: .25px;
+line-height: 1.75;
+font-size: 16px;
+}
+.processingContainer {
+position: relative;
+z-index: 0;
+height: 64px;
+}
+.processingContainer::after {
+content: '';
+display: block;
+position: absolute;
+left: 50%; top: 50%;
+z-index: 2;
+transform: translate(-50%,-50%);
+width: calc( 100% - 32px ); height: 16px;
+background-color: #EEE;
+background-image: linear-gradient( -45deg, transparent 25%, rgba( 0,0,0,.1 ) 25%, rgba( 0,0,0,.1 ) 50%, transparent 50%, transparent 75%, rgba( 0,0,0,.1 ) 75% );
+background-size: 32px 32px;
+box-shadow: 0 0 0 2px #CCC;
+border-radius: 8px;
+animation: processingBar .5s linear infinite;
+}
+@keyframes processingBar {
+to { background-position: 32px 0; }
+}

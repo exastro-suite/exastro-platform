@@ -121,4 +121,8 @@ tokenを強制的にリフレッシュします<br>
         });
     ```
 
+### CommonAuth.isOrganizationManager()
+オーガナイゼーション管理者か判定する
+- parameter
+    - @returns true: OrganizationManager / false: other
 

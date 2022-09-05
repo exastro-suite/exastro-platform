@@ -29,3 +29,20 @@ var api_conf = {
         },
     }
 }
+
+var location_conf = {
+    "href": {
+        "workspaces": {
+            "new" : "/{organization_id}/platform/workspaces/_new",
+            "list": "/{organization_id}/platform/workspaces",
+            "detail": "/{organization_id}/platform/workspaces/{workspace_id}",
+            "members": "/{organization_id}/platform/workspaces/{workspace_id}/members",
+            "ita": "/{organization_id}/workspaces/{workspace_id}/ita/"
+        },
+        "menu": {
+            "account_manaagement": "/auth/admin/{organization_id}/console/#/realms/{organization_id}/users", 
+            "role_management": "/auth/admin/{organization_id}/console/#/realms/{organization_id}/clients",        
+            "update_password": "/auth/realms/{organization_id}/account/password",
+        }
+    }
+}
