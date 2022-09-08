@@ -57,8 +57,6 @@ spec:
         env:
         - name: CONFIG_API_PATH
           value: "/etc/exastro-platform/api.conf"
-        - name: PYTHONPATH
-          value: "/app/"
         - name: LISTEN_PORT
           valueFrom:
             configMapKeyRef:

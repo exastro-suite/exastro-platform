@@ -102,6 +102,8 @@ ARG USERNAME
 ARG GROUPNAME
 ARG APP_PATH
 
+ENV PYTHONPATH $APP_PATH/
+
 WORKDIR $APP_PATH
 
 COPY ./platform_root/platform_api/config/httpd.conf/httpd.conf /etc/httpd/conf/httpd.conf
