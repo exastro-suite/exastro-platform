@@ -1,0 +1,160 @@
+<!--
+#   Copyright 2022 NEC Corporation
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+-->
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="format-detection" content="telephone=no,email=no,address=no">
+        <meta name="theme-color" content="#002B62">
+        <title>
+            ワークスペース詳細 / ワークスペース管理 / Exastro Platform
+        </title>
+        <link rel="stylesheet" href="/_/platform-commons/css/workspaces.css">
+
+        <script type="text/javascript" src="/auth/js/keycloak.js"></script>
+        <script type="text/javascript" src="/_/common-auth/js/exastro-common-auth-config.js"></script>
+        <script type="text/javascript" src="/_/common-auth/js/exastro-common-auth.js"></script>
+        <script src="/_/platform-commons/common/js/jquery.js"></script>
+
+        <link rel="stylesheet" href="/_/platform-commons/css/custom_properties.css">
+        <link rel="stylesheet" href="/_/platform-commons/css/common.css">
+        <link rel="stylesheet" href="/_/platform-commons/css/dialog.css">
+
+        <script src="/_/platform-commons/common/js/words.js"></script>
+        <script src="/_/platform-commons/common/js/common.js"></script>
+        <script src="/_/platform-commons/common/js/table.js"></script>
+        <script src="/_/platform-commons/common/js/dialog.js"></script>
+        <script src="/_/platform-commons/common/js/ui.js"></script>
+
+        <script src="/_/platform-commons/js/uri_conf.js"></script>
+        <script src="/_/platform-commons/js/workspaces_detail.js"></script>
+    </head>
+    <body>
+        <div id="container">
+            <div class="containerHeader">
+                <header id="header">
+                    <div class="logo">
+                        <img class="logoImage" src="/_/platform-commons/img/Exastro-logo2-white-rgb.svg" alt="Exastro" style="height:32px; margin:5px 18px;">
+                    </div>
+                    <div class="topicPath">
+                        <ol class="topichPathList">
+                            <li class="topichPathItem"><a class="topichPathLink to_workspace_list" href="#">メインメニュー</a></li>
+                            <li class="topichPathItem"><a class="topichPathLink to_workspace_list" href="#">ワークスペース一覧</a></li>
+                            <li class="topichPathItem"><span class="topichPathCurrent">ワークスペース詳細</span></li>
+                        </ol>
+                    </div>
+                    <div class="headerMenu">
+                        <ul class="headerMenuList">
+                            <li class="userInfomation headerMenuItem">
+                            </li>
+                        </ul>
+                    </div>
+                </header>
+            </div>
+            <div class="containerBody">
+                <aside id="menu" class="">
+                    <div class="menuBody">
+                        <nav class="menuNavi">
+                            <ul class="menuList">
+                                <li class="menuItem"><a class="menuLink current" id="menu_workspace" href="#" tabindex="-1">ワークスペース管理</a></li>
+                                <li class="menuItem"><a class="menuLink" id="menu_account_management" href="#" target="keycloak_management_console" style="display: none;">アカウント管理</a></li>
+                                <li class="menuItem"><a class="menuLink" id="menu_role_management" href="#" target="keycloak_management_console" style="display: none;">ロール管理</a></li>
+                                <li class="menuItem"><a class="menuLink" id="menu_update_password" href="#" target="keycloak_account_console">パスワード変更</a></li>
+                            </ul>
+                        </nav>
+                    </div>
+                </aside>
+                <main id="main">
+                    <div id="content">
+                        <div class="contentHeader">
+                            <h1 class="contentTitle"><span class="contentTitleInner">ワークスペース詳細</span></h1>
+                            <p class="contentMenuInfo">ワークスペースの詳細を確認できます。</p>
+                        </div>
+                        <div class="contentBody">
+                            <div class="contentMenu">
+                                <ul class="contentMenuList">
+                                    <li class="contentMenuItem">
+                                        <a class="contentMenuLink tabOpen" href="#dataList" tabindex="-1">
+                                            <span class="inner">詳細</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <section class="section tabOpen" id="dataList">
+                                <div class="sectionBody">
+                                    <div id="MT" class="tableContainer viewTable">
+                                        <div class="tableHeader">
+                                            <ul class="tableHeaderMainMenuList">
+                                                <li class="tableHeaderMainMenuItem">
+                                                    <button class="pl_button btn_ita_big to_ita"><img src="/_/platform-commons/img/Exastro-ITA-logo1-rgb.png" width="80" height="20"></button>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div class="tableBody">
+                                            <table class="table" width="100%">
+                                                <thead class="thead">
+                                                    <tr class="tHeadTr tr">
+                                                        <th data-id="c1" data-rest="id" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="項目名" width="250px;"><div class="ci">項目名</div></th>
+                                                        <th data-id="c2" data-rest="name" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="設定値"><div class="ci">設定値</div></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody class="tbody">
+                                                    <tr class="tBodyTr tr">
+                                                        <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: left;">ワークスペースID</div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci" id="text_workspace_id">
+                                                        </div></td>
+                                                    </tr>
+                                                    <tr class="tBodyTr tr">
+                                                        <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: left;">ワークスペース名</div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci" id="text_workspace_name">
+                                                        </div></td>
+                                                    </tr>
+                                                    <tr class="tBodyTr tr">
+                                                        <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: left;">説明</div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci"><pre id="text_workspace_description"></pre>
+                                                        </div></td>
+                                                    </tr>
+                                                    <tr class="tBodyTr tr">
+                                                        <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: left;">最終更新日時</div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci" id="text_last_update_date_time">
+                                                        </div></td>
+                                                    </tr>
+                                                    <tr class="tBodyTr tr">
+                                                        <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: left;">メンバー</div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }="" id="text_workspace_member"></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        </div>
+        <svg style="display:none">
+            <defs>
+                <symbol id="icon-menu-account">
+                    <ellipse class="icon-menu" cx="31.94" cy="21.33" rx="20.11" ry="21.33"></ellipse>
+                    <path class="icon-menu" d="M48.13,44.51h-3.02C41.22,46.73,36.73,48,31.94,48s-9.29-1.27-13.18-3.49h-3.02C7.09,44.51,0,51.6,0,60.26v3.77h63.87
+                    v-3.77C63.87,51.6,56.79,44.51,48.13,44.51z"></path>
+                </symbol>
+            </defs>
+        </svg>
+    </body>
+</html>

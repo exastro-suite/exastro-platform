@@ -1,0 +1,106 @@
+#   Copyright 2022 NEC Corporation
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+apiVersion: v1
+kind: Service
+metadata:
+  name: keycloak
+  labels:
+    app: keycloak
+  namespace: exastro-platform
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+  selector:
+    app: keycloak
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: platform-auth
+  labels:
+    name: platform-auth
+  namespace: exastro-platform
+spec:
+  type: ClusterIP
+  ports:
+  - name: http
+    port: 8000
+    targetPort: 8000
+  - name: http-pf-mng
+    port: 8001
+    targetPort: 8001
+  selector:
+    name: platform-auth
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: platform-api
+  labels:
+    name: platform-api
+  namespace: exastro-platform
+spec:
+  type: ClusterIP
+  ports:
+  - name: http
+    port: 8000
+    targetPort: 8000
+  selector:
+    name: platform-api
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: platform-db
+  labels:
+    app: platform-db
+  namespace: exastro-platform
+spec:
+  type: ClusterIP
+  ports:
+    - name: mariadb
+      port: 3306
+      targetPort: 3306
+  selector:
+    app: platform-db
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: platform-web
+  labels:
+    name: platform-web
+  namespace: exastro-platform
+spec:
+  type: ClusterIP
+  ports:
+  - name: http
+    port: 80
+    targetPort: 80
+  selector:
+    name: platform-web
+
+# epoch-required-param
+# {{ image }}:{{ image_tag }}

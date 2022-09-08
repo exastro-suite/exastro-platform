@@ -1,0 +1,46 @@
+version: '3.1'
+services:
+  platform-auth:
+    environment:
+      - ITA_WEB_PROTOCOL=http
+      - ITA_WEB_HOST=ita-web-server
+      - ITA_WEB_PORT=80
+      - ITA_API_PROTOCOL=http
+      - ITA_API_HOST=ita-api-organization
+      - ITA_API_PORT=8000
+      - NO_PROXY=localhost,127.0.0.1,keycloak,platform-auth,platform-api,platform-web,ita-web,ita-api,ita-api-organization,ita-api-admin
+      - no_proxy=localhost,127.0.0.1,keycloak,platform-auth,platform-api,platform-web,ita-web,ita-api,ita-api-organization,ita-api-admin
+  platform-api:
+    environment:
+      - ITA_API_ADMIN_PROTOCOL=http
+      - ITA_API_ADMIN_HOST=ita-api-admin
+      - ITA_API_ADMIN_PORT=8079
+      - NO_PROXY=localhost,127.0.0.1,keycloak,platform-auth,platform-api,platform-web,ita-web,ita-api,ita-api-organization,ita-api-admin
+      - no_proxy=localhost,127.0.0.1,keycloak,platform-auth,platform-api,platform-web,ita-web,ita-api,ita-api-organization,ita-api-admin
+  ita-api-organization:
+    build:
+      context: ../../../it-automation2-test/.
+    volumes:
+      - ../.volumes/storage:/storage
+  ita-api-admin:
+    build:
+      context: ../../../it-automation2-test/.
+    command: "bash -c 'chmod 777 /storage && httpd -D FOREGROUND'"
+    volumes:
+      - ../.volumes/storage:/storage
+  ita-web-server:
+    build:
+      context: ../../../it-automation2-test/.
+  ita-mariadb:
+    build:
+      context: ../../../it-automation2-test/.
+    ports:
+      - "0.0.0.0:3307:3306"
+
+  ita-by-ansible-execute:
+    build:
+      context: ../../../it-automation2-test/.
+
+  ita-by-conductor-synchronize:
+    build:
+      context: ../../../it-automation2-test/.
