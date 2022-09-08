@@ -862,7 +862,7 @@ def __organization_database_create(organization_id, user_id):
     globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
 
     dbinit = DBinit()
-    org_dbinfo = dbinit.generate_dbinfo("ORG")
+    org_dbinfo = dbinit.generate_dbinfo(dbinit.prefix_org_db)
 
     try:
         # organization database 作成
