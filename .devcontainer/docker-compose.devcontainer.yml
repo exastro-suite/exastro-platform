@@ -16,8 +16,6 @@ services:
   platform-auth:
     build:
       target: develop_build
-    user: 1000:1000
-    command: sudo -E httpd -D FOREGROUND
     volumes:
       - ..:/workspace:cached
       - ../platform_root/common_library:/workspace/platform_root/platform_auth/common_library:cached
@@ -55,8 +53,6 @@ services:
   platform-api:
     build:
       target: develop_build
-    user: 1000:1000
-    command: sudo -E httpd -D FOREGROUND
     volumes:
       - ..:/workspace:cached
       - ../platform_root/common_library:/workspace/platform_root/platform_api/common_library:cached
@@ -92,8 +88,6 @@ services:
   platform-web:
     build:
       target: develop_build
-    user: 1000:1000
-    command: sudo -E httpd -D FOREGROUND
     volumes:
       - ..:/workspace:cached
       - ../platform_root/platform_web/config/httpd.conf/httpd.conf:/etc/httpd/conf/httpd.conf:cached
