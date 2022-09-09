@@ -30,7 +30,6 @@ connexion_app = connexion.FlaskApp(__name__, specification_dir='./swagger/')
 connexion_app.add_api('swagger.yaml')
 
 app = connexion_app.app
-app.config.from_envvar('CONFIG_API_PATH')
 globals.init(app)
 
 org_factory = logging.getLogRecordFactory()

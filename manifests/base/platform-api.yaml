@@ -24,17 +24,6 @@ data:
 
 ---
 
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: platform-api-conf
-  namespace: exastro-platform
-data:
-  api.conf: |
-    TZ='Asia/Tokyo'
-
----
-
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -54,8 +43,6 @@ spec:
       - name: platform-api
         image: exastro/exastro-common-auth-platform-api:0.1.0.b19e8d.20220905-164910
         env:
-        - name: CONFIG_API_PATH
-          value: "/etc/exastro-platform/api.conf"
         - name: LISTEN_PORT
           valueFrom:
             configMapKeyRef:
@@ -123,11 +110,3 @@ spec:
             secretKeyRef:
               name: platform-db
               key: MYSQL_ROOT_PASSWORD
-
-        volumeMounts:
-        - name: platform-api-conf
-          mountPath: /etc/exastro-platform
-      volumes:
-      - name: platform-api-conf
-        configMap:
-          name: platform-api-conf
