@@ -47,6 +47,12 @@ ARG USERNAME
 ARG GROUPNAME
 ARG APP_PATH
 
+ENV LISTEN_PORT             80
+ENV APACHE_PID_DIR          /var/run/httpd_$USERNAME/pid
+ENV APACHE_SOCKET_DIR       /var/run/httpd_$USERNAME/socket
+ENV APACHE_USERNAME         $USERNAME
+ENV APACHE_GROUPNAME        $GROUPNAME
+
 RUN dnf config-manager --add-repo=https://download.docker.com/linux/centos/docker-ce.repo \
 &&  dnf install -y \
     sudo \
@@ -77,6 +83,12 @@ FROM    common_build
 ARG USERNAME
 ARG GROUPNAME
 ARG APP_PATH
+
+ENV LISTEN_PORT             80
+ENV APACHE_PID_DIR          /var/run/httpd_$USERNAME/pid
+ENV APACHE_SOCKET_DIR       /var/run/httpd_$USERNAME/socket
+ENV APACHE_USERNAME         $USERNAME
+ENV APACHE_GROUPNAME        $GROUPNAME
 
 COPY ./platform_root/platform_web/contents/ /var/www/html/
 COPY ./platform_root/platform_web/config/httpd.conf/httpd.conf /etc/httpd/conf/httpd.conf
