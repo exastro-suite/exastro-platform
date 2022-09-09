@@ -26,6 +26,8 @@ class DBinit(DBconnector):
     """DBinit
     """
 
+    prefix_org_db = "PLATFORM_ORG"
+
     def generate_dbinfo(self, prefix="") -> DBconnector.DBinfo:
         """generate dbinfo
 

@@ -21,9 +21,21 @@ ARG USERNAME
 ARG GROUPNAME
 ARG APP_PATH
 
-ENV LISTEN_PORT 80
+ENV LISTEN_PORT             80
+ENV APACHE_PID_DIR          /var/run/httpd_$USERNAME/pid
+ENV APACHE_SOCKET_DIR       /var/run/httpd_$USERNAME/socket
+ENV APACHE_USERNAME         $USERNAME
+ENV APACHE_GROUPNAME        $GROUPNAME
 
-RUN dnf install -y httpd
+RUN dnf install -y httpd \
+&&  groupadd $GROUPNAME \
+&&  useradd -m -s /bin/bash -g $GROUPNAME $USERNAME \
+&&  setcap 'cap_net_bind_service=+ep' /usr/sbin/httpd \
+&&  chown $USERNAME:$GROUPNAME /var/log/httpd \
+&&  mkdir -p $APACHE_PID_DIR \
+&&  chown $USERNAME:$GROUPNAME $APACHE_PID_DIR \
+&&  mkdir -p $APACHE_SOCKET_DIR \
+&&  chown $USERNAME:$GROUPNAME $APACHE_SOCKET_DIR
 
 #
 # Build for development
@@ -44,8 +56,6 @@ RUN dnf config-manager --add-repo=https://download.docker.com/linux/centos/docke
     bind-utils \
     iputils \
     docker-ce-cli \
-&&  groupadd $GROUPNAME \
-&&  useradd -m -s /bin/bash -g $GROUPNAME $USERNAME \
 &&  usermod -G wheel $USERNAME \
 &&  echo '%wheel ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers
 
@@ -57,7 +67,7 @@ COPY ./platform_root/platform_web/contents/ /var/www/html/
 COPY ./platform_root/platform_web/config/httpd.conf/httpd.conf /etc/httpd/conf/httpd.conf
 COPY ./platform_root/platform_web/config/httpd.conf/rewrite.conf /etc/httpd/conf.d/rewrite.conf
 
-CMD ["sudo","-E","httpd","-D","FOREGROUND"]
+CMD ["httpd","-D","FOREGROUND"]
 
 #
 # Build for production
@@ -71,5 +81,7 @@ ARG APP_PATH
 COPY ./platform_root/platform_web/contents/ /var/www/html/
 COPY ./platform_root/platform_web/config/httpd.conf/httpd.conf /etc/httpd/conf/httpd.conf
 COPY ./platform_root/platform_web/config/httpd.conf/rewrite.conf /etc/httpd/conf.d/rewrite.conf
+
+USER $USERNAME
 
 CMD ["httpd","-D","FOREGROUND"]
