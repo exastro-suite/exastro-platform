@@ -14,6 +14,7 @@
 version: '3.1'
 services:
   platform-auth:
+    user: 1000:1000
     build:
       dockerfile: ./platform_root/platform_auth/Dockerfile
       context: ../.
@@ -94,6 +95,7 @@ services:
       - KEYCLOAK_DB_USER=keycloak
       - KEYCLOAK_DB_PASSWORD=password
   platform-web:
+    user: 1000:1000
     build:
       dockerfile: ./platform_root/platform_web/Dockerfile
       context: ../.
@@ -106,6 +108,7 @@ services:
       - LISTEN_PORT=80
 
   platform-api:
+    user: 1000:1000
     build:
       dockerfile: ./platform_root/platform_api/Dockerfile
       context: ../.
