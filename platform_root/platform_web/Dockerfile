@@ -21,6 +21,8 @@ ARG USERNAME
 ARG GROUPNAME
 ARG APP_PATH
 
+ENV LISTEN_PORT 80
+
 RUN dnf install -y httpd
 
 #
