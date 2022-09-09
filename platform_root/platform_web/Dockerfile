@@ -22,8 +22,8 @@ ARG GROUPNAME
 ARG APP_PATH
 
 ENV LISTEN_PORT             80
-ENV APACHE_PID_DIR          /var/run/httpd_$USERNAME/pid
-ENV APACHE_SOCKET_DIR       /var/run/httpd_$USERNAME/socket
+ENV APACHE_PID_DIR          /var/run_$USERNAME/httpd/pid
+ENV APACHE_SOCKET_DIR       /var/run_$USERNAME/httpd/socket
 ENV APACHE_USERNAME         $USERNAME
 ENV APACHE_GROUPNAME        $GROUPNAME
 
@@ -48,8 +48,8 @@ ARG GROUPNAME
 ARG APP_PATH
 
 ENV LISTEN_PORT             80
-ENV APACHE_PID_DIR          /var/run/httpd_$USERNAME/pid
-ENV APACHE_SOCKET_DIR       /var/run/httpd_$USERNAME/socket
+ENV APACHE_PID_DIR          /var/run_$USERNAME/httpd/pid
+ENV APACHE_SOCKET_DIR       /var/run_$USERNAME/httpd/socket
 ENV APACHE_USERNAME         $USERNAME
 ENV APACHE_GROUPNAME        $GROUPNAME
 
@@ -85,8 +85,8 @@ ARG GROUPNAME
 ARG APP_PATH
 
 ENV LISTEN_PORT             80
-ENV APACHE_PID_DIR          /var/run/httpd_$USERNAME/pid
-ENV APACHE_SOCKET_DIR       /var/run/httpd_$USERNAME/socket
+ENV APACHE_PID_DIR          /var/run_$USERNAME/httpd/pid
+ENV APACHE_SOCKET_DIR       /var/run_$USERNAME/httpd/socket
 ENV APACHE_USERNAME         $USERNAME
 ENV APACHE_GROUPNAME        $GROUPNAME
 
