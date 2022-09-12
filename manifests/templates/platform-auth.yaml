@@ -25,17 +25,6 @@ data:
 
 ---
 
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: platform-auth-conf
-  namespace: exastro-platform
-data:
-  api.conf: |
-    TZ='Asia/Tokyo'
-
----
-
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -54,9 +43,13 @@ spec:
       containers:
       - name: platform-auth
         image: {{ image }}:{{ image_tag }}
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsUser: 1000
+          runAsGroup: 1000
+          runAsNonRoot: true
         env:
-        - name: CONFIG_API_PATH
-          value: "/etc/exastro-platform/api.conf"
         - name: LISTEN_PORT
           valueFrom:
             configMapKeyRef:
@@ -184,11 +177,3 @@ spec:
             secretKeyRef:
               name: platform-db
               key: PLATFORM_DB_PASSWORD
-
-        volumeMounts:
-        - name: platform-auth-conf
-          mountPath: /etc/exastro-platform
-      volumes:
-      - name: platform-auth-conf
-        configMap:
-          name: platform-auth-conf
