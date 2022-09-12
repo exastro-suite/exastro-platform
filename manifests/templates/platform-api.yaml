@@ -42,6 +42,12 @@ spec:
       containers:
       - name: platform-api
         image: {{ image }}:{{ image_tag }}
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsUser: 1000
+          runAsGroup: 1000
+          runAsNonRoot: true
         env:
         - name: LISTEN_PORT
           valueFrom:
