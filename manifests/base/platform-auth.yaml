@@ -43,6 +43,12 @@ spec:
       containers:
       - name: platform-auth
         image: exastro/exastro-common-auth-platform-auth:0.1.0.47d4d2.20220825-163439
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsUser: 1000
+          runAsGroup: 1000
+          runAsNonRoot: true
         env:
         - name: LISTEN_PORT
           valueFrom:
