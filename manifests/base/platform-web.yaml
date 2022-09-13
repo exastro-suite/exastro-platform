@@ -41,7 +41,7 @@ spec:
     spec:
       containers:
       - name: platform-web
-        image: exastro/exastro-common-auth-platform-web:0.1.0.47d4d2.20220825-163559
+        image: exastro/exastro-common-auth-platform-web:Integration-test.83aff2.20220912-164019
         securityContext:
           allowPrivilegeEscalation: false
           readOnlyRootFilesystem: true

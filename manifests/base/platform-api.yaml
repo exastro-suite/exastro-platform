@@ -41,7 +41,7 @@ spec:
     spec:
       containers:
       - name: platform-api
-        image: exastro/exastro-common-auth-platform-api:0.1.0.b19e8d.20220905-164910
+        image: exastro/exastro-common-auth-platform-api:Integration-test.83aff2.20220912-164127
         securityContext:
           allowPrivilegeEscalation: false
           readOnlyRootFilesystem: true
