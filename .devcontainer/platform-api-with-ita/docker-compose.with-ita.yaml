@@ -41,6 +41,15 @@ services:
     build:
       context: ../../../it-automation2-test/.
 
+  ita-by-ansible-legacy-role-vars-listup:
+    build:
+      context: ../../../it-automation2-test/.
+  ita-by-ansible-towermaster-sync:
+    build:
+      context: ../../../it-automation2-test/.
   ita-by-conductor-synchronize:
+    build:
+      context: ../../../it-automation2-test/.
+  ita-by-menu-create:
     build:
       context: ../../../it-automation2-test/.
