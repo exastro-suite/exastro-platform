@@ -11,9 +11,10 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
-
+import os
 from flask import jsonify
-from datetime import datetime
+from datetime import datetime, timezone
+import pytz
 import random
 import string
 import json
@@ -198,7 +199,7 @@ def response_status(status_code, data, message_id, base_message="", *args):
 
     message = multi_lang.get_text(message_id, base_message, args)
 
-    return jsonify({"result": message_id, "data": data, "message": message, "ts": datetime_to_str(datetime.utcnow())}), status_code
+    return jsonify({"result": message_id, "data": data, "message": message, "ts": datetime_to_str(datetime.now())}), status_code
 
 
 def response_server_error(e):
@@ -218,7 +219,7 @@ def response_server_error(e):
     status_code = 500
     message_id = "500-99999"
     message = multi_lang.get_text(message_id, "システムエラー")
-    return jsonify({"result": "500-99999", "data": None, "message": message, "ts": datetime_to_str(datetime.utcnow())}), status_code
+    return jsonify({"result": "500-99999", "data": None, "message": message, "ts": datetime_to_str(datetime.now())}), status_code
 
 
 def platform_exception_handler(func):
@@ -306,19 +307,41 @@ def get_username(fitstName, LastName, username):
             return fitstName + " " + LastName
 
 
-def datetime_to_str(datetime):
-    """datetime to string
+def datetime_to_str(p_datetime):
+    """datetime to string (ISO format)
 
     Args:
-        datetime (datetime): datetime
+        p_datetime (datetime): datetime
 
     Returns:
-        str: datetime formated string
+        str: datetime formated string (UTC)
     """
-    if datetime.strftime('%z') == "":
-        return datetime.isoformat(timespec='milliseconds') + "Z"
+    if p_datetime is None:
+        return None
+
+    if p_datetime.tzinfo is None:
+        aware_datetime = pytz.timezone(os.environ.get('TZ', 'UTC')).localize(p_datetime)
     else:
-        return datetime.isoformat(timespec='milliseconds')
+        aware_datetime = p_datetime
+
+    utc_datetime = aware_datetime.astimezone(timezone.utc)
+    return utc_datetime.isoformat(timespec='milliseconds').replace('+00:00', 'Z')
+
+
+def str_to_datetime(p_datetime_str):
+    """string to datetime(ISO format)
+
+    Args:
+        p_datetime_str (str): ISO format datetime
+
+    Returns:
+        datetime: datetime (local timezone naive datetime)
+    """
+    if p_datetime_str is None or p_datetime_str == '':
+        return None
+
+    aware_datetime = datetime.fromisoformat(p_datetime_str.replace('Z', '+00:00'))
+    return aware_datetime.astimezone(os.environ.get('TZ', 'UTC')).replace(tzinfo=None)
 
 
 def keycloak_timestamp_to_datetime(keycloak_timestamp):
@@ -334,6 +357,7 @@ def keycloak_timestamp_to_datetime(keycloak_timestamp):
         if keycloak_timestamp is None:
             return None
         else:
+            # keycloakのtimestampはUTC時間ではなくlocal timezoneなので、timezone指定しない
             return datetime.fromtimestamp(keycloak_timestamp / 1000)
     except Exception:
         return None
@@ -352,6 +376,7 @@ def keycloak_timestamp_to_str(keycloak_timestamp):
         if keycloak_timestamp is None:
             return None
         else:
+            # keycloakのtimestampはUTC時間ではなくlocal timezoneなので、timezone指定しない
             return datetime_to_str(datetime.fromtimestamp(keycloak_timestamp / 1000))
     except Exception:
         return None
