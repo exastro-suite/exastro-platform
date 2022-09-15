@@ -31,7 +31,7 @@ $(function(){
                 var row = data.data;
                 $("#text_workspace_id").text(row.id);
                 $("#text_workspace_name").text(row.name);
-                try { $("#text_last_update_date_time").text((new Date(row.last_update_timestamp)).toLocaleString())} catch(e) { }
+                try { $("#text_last_update_date_time").text(fn.date(new Date(row.last_update_timestamp),'yyyy/MM/dd HH:mm:ss'))} catch(e) { }
                 try { $("#text_workspace_description").text(row.informations.description)} catch(e) { }
             }
         }).fail((jqXHR, textStatus, errorThrown) => {
