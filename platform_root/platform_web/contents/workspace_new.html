@@ -39,9 +39,10 @@
         <script src="/_/platform-commons/common/js/dialog.js"></script>
         <script src="/_/platform-commons/common/js/ui.js"></script>
 
+        <script src="/_/platform-commons/js/platform_common.js"></script>
         <script src="/_/platform-commons/js/uri_conf.js"></script>
         <script src="/_/platform-commons/js/workspace_new.js"></script>
-    
+
     </head>
     <body>
         <div id="container">
@@ -125,6 +126,14 @@
                                                             <span class="validate_error" id="message_workspace_name"></span>
                                                         </div></td>
                                                         <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci">最大255文字 / 使用可能文字：全角・半角文字</div></td>
+                                                    </tr>
+                                                    <tr class="tBodyTr tr">
+                                                        <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: left;">環境一覧</div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci">
+                                                            <textarea wrap="soft" rows="4" data-key="environments" data-id="3" data-required="0" data-int-min="0" data-int-max="5000" id="form_workspace_environments" class="tebleEditTextArea textarea input textareaAdjustment" maxlength="5000"></textarea>
+                                                            <span class="validate_error" id="message_workspace_environments"></span>
+                                                        </div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci">1環境 最大40文字 / 使用可能文字：全角・半角文字 / 改行で1環境</div></td>
                                                     </tr>
                                                     <tr class="tBodyTr tr">
                                                         <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: left;">説明</div></td>

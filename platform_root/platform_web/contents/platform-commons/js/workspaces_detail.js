@@ -23,7 +23,7 @@ $(function(){
         }).done(function(data, status, xhr) {
             console.log("RESPONSE GET /api/workspaces_detail:");
             console.log(JSON.stringify(data));
-    
+
             if (xhr.status != 200) {
                 msg = "status:[" + xhr.status + "]\nmessage_id:[" + data.result + "]\n" + data.message;
                 alert(msg);
@@ -31,6 +31,14 @@ $(function(){
                 var row = data.data;
                 $("#text_workspace_id").text(row.id);
                 $("#text_workspace_name").text(row.name);
+                environments = row.informations.environments;
+                env_text = "";
+                environments.forEach(function (value) {
+                    env_text += value.name + "\n";
+                });
+
+                $("#text_workspace_environments").text(env_text);
+
                 try { $("#text_last_update_date_time").text(fn.date(new Date(row.last_update_timestamp),'yyyy/MM/dd HH:mm:ss'))} catch(e) { }
                 try { $("#text_workspace_description").text(row.informations.description)} catch(e) { }
             }
@@ -55,14 +63,14 @@ $(function(){
         }).done(function(data, status, xhr) {
             console.log("RESPONSE GET /api/workspaces/members:");
             console.log(JSON.stringify(data));
-    
+
             if (xhr.status != 200){
                 msg = "status:[" + xhr.status + "]\nmessage_id:[" + data.result + "]\n" + data.message;
                 alert(msg);
             }
             else{
                 memberList = "";
-    
+
                 for(var row of data.data) {
                     if ("name" in row){
                         memberList = memberList + '<span class="member_name">' + fn.cv(row.name,'',true) + "</span>\n";
@@ -70,7 +78,7 @@ $(function(){
                 }
                 $("#text_workspace_member").html(memberList);
             }
-    
+
         }).fail(function(jqXHR, textStatus, errorThrown) {
             console.log("FAIL : RESPONSE GET /api/workspaces/members: jqXHR.status:"+jqXHR.status);
             msg = "status:[" + jqXHR.status + "]\n" + textStatus;
@@ -78,4 +86,3 @@ $(function(){
         });
     }
 });
-

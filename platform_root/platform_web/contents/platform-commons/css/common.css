@@ -1911,7 +1911,7 @@ white-space: nowrap;
 text-overflow: ellipsis;
 }
 .tableFooterTitle {
-padding-left: 16px; 
+padding-left: 16px;
 }
 .tableFooterData {
 margin-left: 12px; padding: 12px;
@@ -2296,7 +2296,7 @@ border-bottom-color: #FFF;
 
 /*
 ##################################################
-   Other input 
+   Other input
 ##################################################
 */
 .inputFaderWrap {
