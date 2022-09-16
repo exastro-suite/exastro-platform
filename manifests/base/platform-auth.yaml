@@ -57,6 +57,11 @@ spec:
           mountPath: /var/run_app_user/httpd/socket
           subPath: httpd-socket
         env:
+        - name: TZ
+          valueFrom:
+            secretKeyRef:
+              name: params-platform-common
+              key: TZ
         - name: LISTEN_PORT
           valueFrom:
             configMapKeyRef:

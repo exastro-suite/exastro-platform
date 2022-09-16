@@ -52,6 +52,11 @@ spec:
             - name: http
               containerPort: 8080
           env:
+            - name: TZ
+              valueFrom:
+                secretKeyRef:
+                  name: params-platform-common
+                  key: TZ
             - name: KEYCLOAK_USER
               valueFrom:
                 secretKeyRef:
