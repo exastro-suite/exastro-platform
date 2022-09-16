@@ -69,6 +69,9 @@ def workspace_create(body, organization_id):
     validate = validation.validate_workspace_name(workspace_name)
     if not validate.ok:
         return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, validate.args)
+    validate = validation.validate_workspace_informations(info)
+    if not validate.ok:
+        return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, validate.args)
 
     db = DBconnector()
     private = db.get_organization_private(organization_id)
