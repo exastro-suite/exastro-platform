@@ -49,6 +49,13 @@ spec:
           runAsUser: 1000
           runAsGroup: 1000
           runAsNonRoot: true
+        volumeMounts:
+        - name: contaier-volume
+          mountPath: /var/run_app_user/httpd/pid
+          subPath: httpd-pid
+        - name: contaier-volume
+          mountPath: /var/run_app_user/httpd/socket
+          subPath: httpd-socket
         env:
         - name: LISTEN_PORT
           valueFrom:
@@ -177,3 +184,6 @@ spec:
             secretKeyRef:
               name: platform-db
               key: PLATFORM_DB_PASSWORD
+      volumes:
+      - name: contaier-volume
+        emptyDir: {}

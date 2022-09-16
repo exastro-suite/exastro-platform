@@ -197,6 +197,71 @@ def validate_workspace_name(workspace_name):
     return result(True)
 
 
+def validate_workspace_informations(workspace_informations):
+    """Validate workspace informations
+
+    Args:
+        workspace_informations (dict): informations
+
+    Returns:
+        result: Validation result
+    """
+    if not isinstance(workspace_informations.get('environments', []), list):
+        return result(
+            False, 400, '400-000002', 'リクエストボディのパラメータ({})が不正です。'.format('informations.environments'),
+            'informations.environments'
+        )
+
+    if len(workspace_informations.get('environments', [])) > const.max_workspace_environments:
+        return result(
+            False, 400, '400-{}012'.format(MSG_FUNCTION_ID), '指定可能な最大数を超えています。',
+            multi_lang.get_text('000-00105', "環境名"),
+            str(const.max_workspace_environments)
+        )
+
+    if len([t for t in workspace_informations.get('environments', []) if not isinstance(t.get('name', None), str)]) > 0:
+        return result(
+            False, 400, '400-000002', 'リクエストボディのパラメータ({})が不正です。'.format('informations.environments'),
+            'informations.environments'
+        )
+
+    if len([t for t in workspace_informations.get('environments', []) if len(t.get('name', '')) == 0]) > 0:
+        return result(
+            False, 400, '400-000002', 'リクエストボディのパラメータ({})が不正です。'.format('informations.environments'),
+            'informations.environments'
+        )
+
+    if len([t for t in workspace_informations.get('environments', []) if len(t.get('name', '')) > const.length_workspace_environment_name]) > 0:
+        return result(
+            False, 400, '400-{}012'.format(MSG_FUNCTION_ID), '指定可能な文字数を超えています。',
+            multi_lang.get_text('000-00105', "環境名"),
+            str(const.length_workspace_description)
+        )
+
+    environment_names = ([x.get('name', '') for x in workspace_informations.get('environments', [])])
+    if len(list(set(environment_names))) != len(environment_names):
+        return result(
+            False, 400, '400-{}019'.format(MSG_FUNCTION_ID), '指定された値が重複しています。',
+            multi_lang.get_text('000-00105', "環境名"),
+            str(const.length_workspace_description)
+        )
+
+    if not isinstance(workspace_informations.get('description', ''), str):
+        return result(
+            False, 400, '400-000002', 'リクエストボディのパラメータ({})が不正です。'.format('informations.description'),
+            'informations.description'
+        )
+
+    if len(workspace_informations.get('description', '')) > const.length_workspace_description:
+        return result(
+            False, 400, '400-{}012'.format(MSG_FUNCTION_ID), '指定可能な文字数を超えています。',
+            multi_lang.get_text('000-00106', "説明"),
+            str(const.length_workspace_description)
+        )
+
+    return result(True)
+
+
 def validate_id_characters(str):
     """validate id characters
 

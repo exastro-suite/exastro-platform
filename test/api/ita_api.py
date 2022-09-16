@@ -13,7 +13,8 @@
 #   limitations under the License.
 
 from flask import Flask, request, jsonify, make_response
-from datetime import datetime
+from datetime import datetime, timezone
+import pytz
 import os
 # import json
 import base64
@@ -34,7 +35,7 @@ def alive():
     Returns:
         Response: HTTP Respose
     """
-    return jsonify({"result": "200", "time": str(datetime.utcnow())}), 200
+    return jsonify({"result": "200", "time": __datetime_to_str(datetime.now())}), 200
 
 
 @app.route('/api/organizations/<string:organization_id>/ita/',
@@ -91,7 +92,7 @@ def call_ita_organizations(organization_id):
             "query_string": "{}".format(query_string),
         },
         "message": "",
-        "ts": __datetime_to_str(datetime.utcnow()),
+        "ts": __datetime_to_str(datetime.now()),
     }
 
     return jsonify(ret), ret_status
@@ -152,7 +153,7 @@ def call_ita_test(organization_id, workspace_id, subpath):
             "query_string": "{}".format(query_string),
         },
         "message": "",
-        "ts": __datetime_to_str(datetime.utcnow()),
+        "ts": __datetime_to_str(datetime.now()),
     }
 
     if subpath == "download":
@@ -173,10 +174,10 @@ def create_workspace(organization_id, workspace_id):
     Returns:
         Response: HTTP Respose
     """
-    return jsonify({"result": "200", "time": str(datetime.utcnow())}), 200
+    return jsonify({"result": "200", "time": __datetime_to_str(datetime.now())}), 200
 
 
-def __datetime_to_str(datetime):
+def __datetime_to_str(p_datetime):
     """datetime to string
 
     Args:
@@ -185,10 +186,16 @@ def __datetime_to_str(datetime):
     Returns:
         str: datetime formated string
     """
-    if datetime.strftime('%z') == "":
-        return datetime.isoformat(timespec='milliseconds') + "Z"
+    if p_datetime is None:
+        return None
+
+    if p_datetime.tzinfo is None:
+        aware_datetime = pytz.timezone(os.environ.get('TZ', 'UTC')).localize(p_datetime)
     else:
-        return datetime.isoformat(timespec='milliseconds')
+        aware_datetime = p_datetime
+
+    utc_datetime = aware_datetime.astimezone(timezone.utc)
+    return utc_datetime.isoformat(timespec='milliseconds').replace('+00:00', 'Z')
 
 
 if __name__ == "__main__":

@@ -19,8 +19,8 @@ metadata:
 data:
   PLATFORM_WEB_PROTOCOL: "http"
   PLATFORM_WEB_HOST: "platform-web"
-  PLATFORM_WEB_PORT: "80"
-  LISTEN_PORT: "80"
+  PLATFORM_WEB_PORT: "8000"
+  LISTEN_PORT: "8000"
 
 ---
 
@@ -41,10 +41,26 @@ spec:
     spec:
       containers:
       - name: platform-web
-        image: exastro/exastro-common-auth-platform-web:0.1.0.47d4d2.20220825-163559
+        image: exastro/exastro-common-auth-platform-web:Integration-test.83aff2.20220912-164019
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsUser: 1000
+          runAsGroup: 1000
+          runAsNonRoot: true
+        volumeMounts:
+        - name: contaier-volume
+          mountPath: /var/run_app_user/httpd/pid
+          subPath: httpd-pid
+        - name: contaier-volume
+          mountPath: /var/run_app_user/httpd/socket
+          subPath: httpd-socket
         env:
         - name: LISTEN_PORT
           valueFrom:
             configMapKeyRef:
               name: platform-web
               key: LISTEN_PORT
+      volumes:
+      - name: contaier-volume
+        emptyDir: {}
