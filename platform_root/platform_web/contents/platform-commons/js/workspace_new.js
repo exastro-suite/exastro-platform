@@ -47,18 +47,17 @@ CommonAuth.onAuthSuccess(() => {
         // 文字数チェック
         // Character count check
         environments = $('#form_workspace_environments').val();
-        env_json = [];
-        err_msg = "";
-        $.each(environments.split(/\r\n|\r|\n/), function(index, val) {
-            if (val){
-                if (val.length > 40){
-                    err_msg = getText("400-00012", "指定可能な文字数を超えています。(項目:{0},最大文字数:{1})", getText("000-00105", "環境名"), "40");
-                    result = false;
-                    return false;
-                }
-            }
-        });
-        $("#message_workspace_environments").text(err_msg);
+        environments_arr = environments.split(/\r\n|\r|\n/).map(i => i.trim()).filter(i => i.length > 0);
+
+        if(environments_arr.filter(i => i.length > 40).length > 0) {
+            $("#message_workspace_environments").text(getText("400-00012", "指定可能な文字数を超えています。(項目:{0},最大文字数:{1})", getText("000-00105", "環境名"), "40"));
+            result = false;
+        } else if(Array.from(new Set(environments_arr)).length !== environments_arr.length) {
+            $("#message_workspace_environments").text(getText("400-00019", "指定された値が重複しています。（項目:{0}）", getText("000-00105", "環境名")));
+            result = false;
+        } else {
+            $("#message_workspace_environments").text("");
+        }
 
         console.log("--- validate check end [" + result + "] ----");
 
@@ -67,12 +66,7 @@ CommonAuth.onAuthSuccess(() => {
 
     function workspace_register() {
         environments = $('#form_workspace_environments').val();
-        env_json = [];
-        $.each(environments.split(/\r\n|\r|\n/), function(index, val) {
-            if (val){
-                env_json.push({"name": val});
-            }
-        });
+        env_json = environments.split(/\r\n|\r|\n/).map(i => i.trim()).filter(i => i.length > 0).map(i => {return {"name": i}});
 
         let reqbody =   {
             "id": $('#form_workspace_id').val(),
