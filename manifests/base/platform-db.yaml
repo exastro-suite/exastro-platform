@@ -50,7 +50,7 @@ spec:
           env:
           - name: TZ
             valueFrom:
-              secretKeyRef:
+              configMapKeyRef:
                 name: params-platform-common
                 key: TZ
           - name: MYSQL_ROOT_PASSWORD
