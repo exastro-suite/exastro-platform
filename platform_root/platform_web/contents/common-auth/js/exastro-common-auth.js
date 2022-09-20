@@ -258,18 +258,24 @@ const CommonAuth = {
      * The process of calling token updates on a regular basis - トークンの更新を定期的に呼び出す処理
      */
     "_autoRefreshToken": function() {
-        let nowTime = (new Date()).getTime();
-        if(CommonAuthConfig.TOKEN_AUTO_REFRESH === -1 || nowTime <= CommonAuth._lastTimeToGetToken + CommonAuthConfig.TOKEN_AUTO_REFRESH * 1000) {
-
-            // Renew the token indefinitely or until a certain amount of time has passed since the last request for the token.
-            // - 無制限またはトークンの最後の要求から一定の時間が経過するまで、トークンを更新します
-
-            DebugConsole.log("CommonAuth", "[CALL] keycloak.updateToken");
-            CommonAuth.keycloak.updateToken(CommonAuthConfig.TOKEN_REFRESH_TIMMING).then((refreshed)=>{
-                if(refreshed) {
-                    DebugConsole.log("CommonAuth", "[INFO] keycloak.token refreshed");
-                }
-            });
+        try {
+            let nowTime = (new Date()).getTime();
+            if(CommonAuthConfig.TOKEN_AUTO_REFRESH === -1 || nowTime <= CommonAuth._lastTimeToGetToken + CommonAuthConfig.TOKEN_AUTO_REFRESH * 1000) {
+    
+                // Renew the token indefinitely or until a certain amount of time has passed since the last request for the token.
+                // - 無制限またはトークンの最後の要求から一定の時間が経過するまで、トークンを更新します
+    
+                DebugConsole.log("CommonAuth", "[CALL] keycloak.updateToken");
+                CommonAuth.keycloak.updateToken(CommonAuthConfig.TOKEN_REFRESH_TIMMING).then((refreshed)=>{
+                    if(refreshed) {
+                        DebugConsole.log("CommonAuth", "[INFO] keycloak.token refreshed");
+                    }
+                }).catch(() => {
+                    CommonAuth.keycloak.logout({redirectUri: location.href});
+                });
+            }
+        } catch(e) {
+            CommonAuth.keycloak.logout({redirectUri: location.href});
         }
     },
 
@@ -278,7 +284,7 @@ const CommonAuth = {
      */
     "_onTokenExpired": function() {
         DebugConsole.log("CommonAuth", "[INFO] keycloak.onTokenExpired");
-        // CommonAuth.keycloak.logout({redirectUri: location.href});
+        CommonAuth.keycloak.logout({redirectUri: location.href});
     },
 
     /**
