@@ -31,7 +31,7 @@ $(function(){
                 var row = data.data;
                 $("#text_workspace_id").text(row.id);
                 $("#text_workspace_name").text(row.name);
-                environments = row.informations.environments;
+                environments = row.informations.environments.sort((env1,env2) => { return env1.name < env2.name? -1: 1 });
                 env_text = "";
                 environments.forEach(function (value) {
                     env_text += value.name + "\n";
@@ -71,7 +71,7 @@ $(function(){
             else{
                 memberList = "";
 
-                for(var row of data.data) {
+                for(var row of data.data.sort((mb1, mb2) => { return mb1.name < mb2.name? -1: 1})) {
                     if ("name" in row){
                         memberList = memberList + '<span class="member_name">' + fn.cv(row.name,'',true) + "</span>\n";
                     }

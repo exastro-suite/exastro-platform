@@ -283,7 +283,7 @@ userInfo() {
         + "ロールがありません"
     + `</li>`);
     } else {
-        for ( const role of roles ) {
+        for ( const role of roles.sort() ) {
             roleList.push(`<li class="userinfoRoleItem">`
                 + fn.cv(role,'',true)
             + `</li>`);
