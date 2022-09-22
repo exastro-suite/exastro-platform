@@ -49,6 +49,11 @@ const CommonAuthConfig = {
     "CHECK_SSO_REDIRECT_URI": (window.location.origin + "/_/common-auth/html/silent-check-sso.html"),
 
     /**
+     * common auth script path
+     */
+    "COMMON_AUTH_SCRIPT_PATH": "/_/common-auth/js",
+
+    /**
      * default language
      */
     "DEFAULT_LANGUAGE": "ja",
