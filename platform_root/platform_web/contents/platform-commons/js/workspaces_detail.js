@@ -7,6 +7,7 @@ $(function(){
         $('.to_ita').on('click',() => { window.location = location_conf.href.workspaces.ita.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{workspace_id}/g, workspace_id); } );
         get_workspace_detail();
         get_workspace_members();
+        finish_onload_progress();
     });
 
     function get_workspace_detail() {
