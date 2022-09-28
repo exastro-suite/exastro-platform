@@ -39,6 +39,7 @@
         <script src="/_/platform-commons/common/js/dialog.js"></script>
         <script src="/_/platform-commons/common/js/ui.js"></script>
 
+        <script src="/_/platform-commons/js/platform_common.js"></script>
         <script src="/_/platform-commons/js/uri_conf.js"></script>
         <script src="/_/platform-commons/js/workspaces_detail.js"></script>
     </head>
@@ -50,7 +51,7 @@
                         <img class="logoImage" src="/_/platform-commons/img/Exastro-logo2-white-rgb.svg" alt="Exastro" style="height:32px; margin:5px 18px;">
                     </div>
                     <div class="topicPath">
-                        <ol class="topichPathList">
+                        <ol class="topichPathList" style="visibility:hidden;">
                             <li class="topichPathItem"><a class="topichPathLink to_workspace_list" href="#">メインメニュー</a></li>
                             <li class="topichPathItem"><a class="topichPathLink to_workspace_list" href="#">ワークスペース一覧</a></li>
                             <li class="topichPathItem"><span class="topichPathCurrent">ワークスペース詳細</span></li>
@@ -68,7 +69,7 @@
                 <aside id="menu" class="">
                     <div class="menuBody">
                         <nav class="menuNavi">
-                            <ul class="menuList">
+                            <ul class="menuList" style="display:none;">
                                 <li class="menuItem"><a class="menuLink current" id="menu_workspace" href="#" tabindex="-1">ワークスペース管理</a></li>
                                 <li class="menuItem"><a class="menuLink" id="menu_account_management" href="#" target="keycloak_management_console" style="display: none;">アカウント管理</a></li>
                                 <li class="menuItem"><a class="menuLink" id="menu_role_management" href="#" target="keycloak_management_console" style="display: none;">ロール管理</a></li>
@@ -77,7 +78,7 @@
                         </nav>
                     </div>
                 </aside>
-                <main id="main">
+                <main id="main" style="visibility:hidden;">
                     <div id="content">
                         <div class="contentHeader">
                             <h1 class="contentTitle"><span class="contentTitleInner">ワークスペース詳細</span></h1>
@@ -151,6 +152,7 @@
                     </div>
                 </main>
             </div>
+            <div class="containerLoading"></div>
         </div>
         <svg style="display:none">
             <defs>
