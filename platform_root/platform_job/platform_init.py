@@ -153,7 +153,7 @@ class platform_init:
         try:
             globals.logger.info(f"[{self.step_count}/{self.step_max}] ### Start func:{inspect.currentframe().f_code.co_name}")
 
-            globals.logger.info("[{self.step_count}/{self.step_max}] - get token:")
+            globals.logger.info(f"[{self.step_count}/{self.step_max}] - get token:")
             # アクセストークン取得
             # get access token
             access_token_response = api_keycloak_tokens.get_user_token(user_name, password, realm)
