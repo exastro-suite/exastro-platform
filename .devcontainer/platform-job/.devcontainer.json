@@ -16,9 +16,9 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the README at:
 // https://github.com/microsoft/vscode-dev-containers/tree/v0.231.6/containers/jekyll
 {
-	"name": "platform-api - exastro-common-auth",
+	"name": "platform-job - exastro-common-auth",
 	"dockerComposeFile": ["../docker-compose.yml","../docker-compose.devcontainer.yml"],
-	"service": "platform-api",
+	"service": "platform-job",
 	// Set *default* container specific settings.json values on container create.
 	"settings": {
 		"terminal.integrated.profiles.linux": {
