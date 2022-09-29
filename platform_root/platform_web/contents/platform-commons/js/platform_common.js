@@ -56,3 +56,15 @@ function appendScript(url) {
     el.src = url;
 	document.body.appendChild(el);
 };
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//   Finish Onload Progress
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+function finish_onload_progress() {
+    $("ol.topichPathList").css("visibility", "");
+    $("ul.menuList").css("display", "");
+    $("#main").css("visibility", "");
+    $(".containerLoading").css("display", "none");
+}
