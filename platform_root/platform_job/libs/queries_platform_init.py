@@ -17,17 +17,17 @@ SQL_INSERT_PLATFORM_PRIVATE = """
         (ID, INFORMATIONS, CREATE_USER, LAST_UPDATE_USER)
     VALUES
         (1, JSON_OBJECT(
-                'TOKEN_CHECK_REALM_ID', '${KEYCLOAK_REALM}',
+                'TOKEN_CHECK_REALM_ID', %(KEYCLOAK_REALM)s,
                 'TOKEN_CHECK_CLIENT_CLIENTID', '_platform',
-                'TOKEN_CHECK_CLIENT_ID', '${CLIENT_ID}',
-                'TOKEN_CHECK_CLIENT_SECRET', '${CLIENT_SECRET}'
+                'TOKEN_CHECK_CLIENT_ID', %(CLIENT_ID)s,
+                'TOKEN_CHECK_CLIENT_SECRET', %(CLIENT_SECRET)s
         ), 'system', 'system')
     ON DUPLICATE KEY UPDATE
         INFORMATIONS=JSON_OBJECT(
-                'TOKEN_CHECK_REALM_ID', '${KEYCLOAK_REALM}',
+                'TOKEN_CHECK_REALM_ID', %(KEYCLOAK_REALM)s,
                 'TOKEN_CHECK_CLIENT_CLIENTID', '_platform',
-                'TOKEN_CHECK_CLIENT_ID', '${CLIENT_ID}',
-                'TOKEN_CHECK_CLIENT_SECRET', '${CLIENT_SECRET}'
+                'TOKEN_CHECK_CLIENT_ID', %(CLIENT_ID)s,
+                'TOKEN_CHECK_CLIENT_SECRET', %(CLIENT_SECRET)s
         )
     ;
 """
