@@ -276,6 +276,44 @@ def get_user_role_mapping(realm_name, user_id, token):
     return request_response
 
 
+def user_realm_role_mapping_create(realm_name, user_id, realm_roles, token):
+    """ユーザーrealmロールマッピング作成 user realm role-mapping create
+
+    Args:
+        realm_name (str): realm name
+        user_id (str): user id
+        realm_roles (array): realm roles array
+        toekn (str): token
+
+    Returns:
+        Response: HTTP Respose (success : .status_code=204)
+    """
+    globals.logger.info(
+        'Create keycloak user realm role-mapping. user_id={}, realm={}, realm_roles={}'.format(user_id, realm_name, realm_roles)
+    )
+
+    header_para = {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer {}".format(token),
+    }
+
+    data_para = realm_roles
+
+    globals.logger.debug("user realm role-mapping post send")
+    # 呼び出し先設定 requests setting
+    api_url = "{}://{}:{}".format(os.environ['API_KEYCLOAK_PROTOCOL'], os.environ['API_KEYCLOAK_HOST'], os.environ['API_KEYCLOAK_PORT'])
+
+    request_response = requests.post(
+        "{}/auth/admin/realms/{}/users/{}/role-mappings/realm".format(api_url, realm_name, user_id),
+        headers=header_para,
+        data=json.dumps(data_para)
+    )
+
+    # globals.logger.debug(request_response.text)
+
+    return request_response
+
+
 def user_reset_password(realm_name, user_id, user_password, token):
     """ユーザパスワード変更 Change user password
     Args:
