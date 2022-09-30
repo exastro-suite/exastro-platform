@@ -64,6 +64,7 @@ class platform_init:
     failed_count = 0
     complete = 0
     skip_count = 0
+    ignore_count = 0
     ok_count = 0
 
     step_count = 0
@@ -86,7 +87,7 @@ class platform_init:
 
         try:
             self.step_count = 1
-            self.step_max = 4
+            self.step_max = 5
 
             # アクセストークンを取得
             # Get an access token
@@ -106,9 +107,20 @@ class platform_init:
 
             self.step_count += 1
 
+            # platform-dbの取得
+            # Platform database get
+            platform_data_row = self.__platform_db_get()
+            if platform_data_row:
+                platform_info = json.loads(platform_data_row["INFORMATIONS"])
+                # globals.logger.debug(f" - platform_info:{platform_info}")
+                ver = platform_info.get("VERSION")
+                globals.logger.info(f"[{self.step_count}/{self.step_max}] [WARNING] platform data exists!: ver.{ver}")
+
+            self.step_count += 1
+
             # platform-dbの登録・更新
             # Platform database insert and update
-            self.__update_db(self.realm, access_token)
+            self.__platform_db_update(self.realm, access_token, platform_data_row)
 
             last_message = "Install successful !!"
 
@@ -133,7 +145,7 @@ class platform_init:
             last_message = "Install failed..."
 
         globals.logger.info("-" * 50)
-        globals.logger.info(f"install status: [OK:{self.ok_count}] [SKIP:{self.skip_count}] [NG:{self.failed_count}]")
+        globals.logger.info(f"install status: [OK:{self.ok_count}] [SKIP:{self.skip_count}] [IGNORE:{self.ignore_count}] [NG:{self.failed_count}]")
         globals.logger.info("-" * 50)
         globals.logger.info(last_message)
 
@@ -223,49 +235,12 @@ class platform_init:
 
                 # 存在した場合はスキップ
                 # skip if present
-                if response.status_code not in [409]:
+                if response.status_code in [409]:
                     globals.logger.info(f"[{self.step_count}/{self.step_max}] -- SKIP: create client:")
                     self.skip_count += 1
                 else:
                     globals.logger.info(f"[{self.step_count}/{self.step_max}] -- OK: create client:")
                     self.ok_count += 1
-
-                # # secretありの場合は、secret値を生成
-                # # If there is a secret, generate a secret value
-                # if client_json.get("clientAuthenticatorType") == "client-secret":
-                #     # client取得
-                #     # client get to keycloak
-                #     response = api_keycloak_clients.clients_get(realm_name, client_json.get("clientId"), token)
-                #     if response.status_code != 200:
-                #         globals.logger.error(f"response.status_code:{response.status_code}")
-                #         globals.logger.error(f"response.text:{response.text}")
-                #         message_id = f"500-{MSG_FUNCTION_ID}003"
-                #         message = multi_lang.get_text(
-                #             message_id,
-                #             "clientの取得に失敗しました(対象ID:{0} client:{1})",
-                #             realm_name,
-                #             client_json.get("clientId")
-                #         )
-                #         raise common.InternalErrorException(message_id=message_id, message=message)
-
-                #     client_info = json.loads(response.text)
-                #     client_id = client_info[0].get("id")
-
-                #     # client secret登録
-                #     # client secret registration to keycloak
-                #     response = api_keycloak_clients.client_secret_create(realm_name, client_id, token)
-                #     if response.status_code != 200:
-                #         globals.logger.error(f"response.status_code:{response.status_code}")
-                #         globals.logger.error(f"response.text:{response.text}")
-                #         message_id = f"500-{MSG_FUNCTION_ID}005"
-                #         message = multi_lang.get_text(
-                #             message_id,
-                #             "client secretの作成に失敗しました(対象ID:{0} client:{1} client_id{2})",
-                #             realm_name,
-                #             client_json.get("clientId"),
-                #             client_id
-                #         )
-                #         raise common.InternalErrorException(message_id=message_id, message=message)
 
         # ステータス更新
         # update status
@@ -384,12 +359,52 @@ class platform_init:
 
         return
 
-    def __update_db(self, realm_name, token):
+    def __platform_db_get(self):
+        """get platform db
+
+        Raises:
+            common.InternalErrorException: _description_
+
+        Returns:
+            row: platform_db data row
+        """
+
+        globals.logger.info(f"[{self.step_count}/{self.step_max}] ### Start func:{inspect.currentframe().f_code.co_name}")
+
+        # platform db 情報取得
+        # get platform db info
+        db = DBconnector()
+        with closing(db.connect_platformdb()) as conn:
+            with conn.cursor() as cursor:
+
+                try:
+                    globals.logger.info(f"[{self.step_count}/{self.step_max}] - get platform-db:")
+                    cursor.execute(queries_platform_init.SQL_SELECT_PLATFORM_PRIVATE)
+
+                    result = cursor.fetchone()
+
+                    globals.logger.info(f"[{self.step_count}/{self.step_max}] -- OK: get platform-db:")
+                    self.ok_count += 1
+
+                except Exception as e:
+                    globals.logger.info(f"[{self.step_count}/{self.step_max}] -- NG: get platform-db:")
+                    globals.logger.error(f"exception:{e.args}")
+                    message_id = f"500-{MSG_FUNCTION_ID}009"
+                    message = multi_lang.get_text(message_id,
+                                                  "get platform-db failed.")
+                    raise common.InternalErrorException(message_id=message_id, message=message)
+
+        globals.logger.info(f"[{self.step_count}/{self.step_max}] ### Succeed func:{inspect.currentframe().f_code.co_name}")
+
+        return result
+
+    def __platform_db_update(self, realm_name, token, platform_data_row):
         """Platform database insert and update
 
         Args:
             realm_name (str): realm name
             user_id (str): user id
+            platform_data_row (dic): platform db data row
 
         Raises:
             common.InternalErrorException: _description_
@@ -445,17 +460,55 @@ class platform_init:
             )
             raise common.InternalErrorException(message_id=message_id, message=message)
 
-        # ステータス更新
-        # update status
+        # バージョン設定（すでに登録済みの情報がある場合は、そのままのバージョンとする）
+        # Version setting (if there is already registered information, the version will remain as is)
+        if platform_data_row:
+            platform_info = json.loads(platform_data_row["INFORMATIONS"])
+            ver = platform_info.get("VERSION")
+        else:
+            globals.logger.info(f"[{self.step_count}/{self.step_max}] - get file version:")
+
+            # ファイルからバージョンを取得
+            # Get version from file
+            file_path = os.environ.get("PYTHONPATH") + "version"
+
+            # ファイルオープン
+            # File open
+            try:
+                with open(file_path, "r", encoding="utf-8") as f:
+                    # リストとして読み込む（改行コードなし）
+                    lines = f.read().splitlines()
+
+                if lines:
+                    globals.logger.info(f"[{self.step_count}/{self.step_max}] -- OK: get file version:")
+                    self.ok_count += 1
+                    ver = lines[0]
+                else:
+                    globals.logger.info(f"[{self.step_count}/{self.step_max}] -- IGNORE: get file version: not data")
+                    self.ignore_count += 1
+                    ver = ""
+            except FileNotFoundError:
+                globals.logger.info(f"[{self.step_count}/{self.step_max}] -- IGNORE: get file version: not found")
+                self.ignore_count += 1
+                ver = ""
+
+        # platform client 情報登録
+        # platform client information registration
         db = DBconnector()
         with closing(db.connect_platformdb()) as conn:
             with conn.cursor() as cursor:
 
-                parameter = {
-                    "KEYCLOAK_REALM": realm_name,
-                    "CLIENT_ID": platform_client_id,
-                    "CLIENT_SECRET": platform_client_secret,
+                infomations = {
+                    "TOKEN_CHECK_REALM_ID": realm_name,
+                    "TOKEN_CHECK_CLIENT_CLIENTID": "_platform",
+                    "TOKEN_CHECK_CLIENT_ID": platform_client_id,
+                    "TOKEN_CHECK_CLIENT_SECRET": platform_client_secret,
+                    "VERSION": ver,
                 }
+                parameter = {
+                    "INFORMATIONS": json.dumps(infomations),
+                }
+
                 try:
                     globals.logger.info(f"[{self.step_count}/{self.step_max}] - insert or update platform-db:")
                     cursor.execute(queries_platform_init.SQL_INSERT_PLATFORM_PRIVATE, parameter)
