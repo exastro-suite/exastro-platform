@@ -17,17 +17,12 @@ metadata:
   name: platform-job
   namespace: exastro-platform
 spec:
-  selector:
-    matchLabels:
-      name: platform-job
   template:
-    metadata:
-      labels:
-        name: platform-job
     spec:
       containers:
       - name: platform-job
         image: exastro/exastro-common-auth-platform-job:0.1.0-20220930-1330
+        args: ["-c", "Python /app/platform_init.py"]
         securityContext:
           allowPrivilegeEscalation: false
           readOnlyRootFilesystem: true
@@ -87,7 +82,7 @@ spec:
             secretKeyRef:
               name: platform-db
               key: MYSQL_ROOT_PASSWORD
-        args: ["-c", "Python /app/platform_init.py"]
+      restartPolicy: Never
       volumes:
       - name: contaier-volume
         emptyDir: {}
