@@ -26,12 +26,12 @@ spec:
         args:
           - |
             python3 /app/platform_init.py
-        # securityContext:
-        #   allowPrivilegeEscalation: false
-        #   readOnlyRootFilesystem: true
-        #   runAsUser: 1000
-        #   runAsGroup: 1000
-        #   runAsNonRoot: true
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsUser: 1000
+          runAsGroup: 1000
+          runAsNonRoot: true
         env:
         - name: TZ
           valueFrom:
@@ -40,6 +40,8 @@ spec:
               key: TZ
         - name: PYTHONIOENCODING
           value: utf-8
+        - name: FLASK_ENV
+          value: "production"
         - name: KEYCLOAK_USER
           valueFrom:
             secretKeyRef:
@@ -96,6 +98,6 @@ spec:
               name: platform-db
               key: MYSQL_ROOT_PASSWORD
       restartPolicy: Never
-      # volumes:
-      # - name: contaier-volume
-      #   emptyDir: {}
+      volumes:
+      - name: contaier-volume
+        emptyDir: {}
