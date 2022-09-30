@@ -25,7 +25,7 @@ spec:
         command: ["sh", "-c"]
         args:
           - |
-            Python /app/platform_init.py
+            python3 /app/platform_init.py
         # securityContext:
         #   allowPrivilegeEscalation: false
         #   readOnlyRootFilesystem: true
