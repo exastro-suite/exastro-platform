@@ -12,22 +12,18 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
+SQL_SELECT_PLATFORM_PRIVATE = """
+    SELECT  *   FROM    T_PLATFORM_PRIVATE
+    WHERE   ID  =   1
+    ;
+"""
+
 SQL_INSERT_PLATFORM_PRIVATE = """
     INSERT INTO T_PLATFORM_PRIVATE
         (ID, INFORMATIONS, CREATE_USER, LAST_UPDATE_USER)
     VALUES
-        (1, JSON_OBJECT(
-                'TOKEN_CHECK_REALM_ID', %(KEYCLOAK_REALM)s,
-                'TOKEN_CHECK_CLIENT_CLIENTID', '_platform',
-                'TOKEN_CHECK_CLIENT_ID', %(CLIENT_ID)s,
-                'TOKEN_CHECK_CLIENT_SECRET', %(CLIENT_SECRET)s
-        ), 'system', 'system')
+        (1, %(INFORMATIONS)s, 'system', 'system')
     ON DUPLICATE KEY UPDATE
-        INFORMATIONS=JSON_OBJECT(
-                'TOKEN_CHECK_REALM_ID', %(KEYCLOAK_REALM)s,
-                'TOKEN_CHECK_CLIENT_CLIENTID', '_platform',
-                'TOKEN_CHECK_CLIENT_ID', %(CLIENT_ID)s,
-                'TOKEN_CHECK_CLIENT_SECRET', %(CLIENT_SECRET)s
-        )
+        INFORMATIONS=%(INFORMATIONS)s
     ;
 """
