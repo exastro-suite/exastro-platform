@@ -63,6 +63,7 @@ USER $USERNAME
 
 RUN mkdir ~/.config
 
+COPY ./platform_root/version /var/www/html/
 COPY ./platform_root/platform_web/contents/ /var/www/html/
 COPY ./platform_root/platform_web/config/httpd.conf/httpd.conf /etc/httpd/conf/httpd.conf
 COPY ./platform_root/platform_web/config/httpd.conf/rewrite.conf /etc/httpd/conf.d/rewrite.conf
@@ -78,6 +79,7 @@ ARG USERNAME
 ARG GROUPNAME
 ARG APP_PATH
 
+COPY ./platform_root/version /var/www/html/
 COPY ./platform_root/platform_web/contents/ /var/www/html/
 COPY ./platform_root/platform_web/config/httpd.conf/httpd.conf /etc/httpd/conf/httpd.conf
 COPY ./platform_root/platform_web/config/httpd.conf/rewrite.conf /etc/httpd/conf.d/rewrite.conf

@@ -86,6 +86,7 @@ RUN mkdir ~/.config
 
 WORKDIR $APP_PATH
 
+COPY ./platform_root/version $APP_PATH/
 COPY ./platform_root/platform_job/ $APP_PATH/
 COPY ./platform_root/common_library/ $APP_PATH/common_library/
 COPY ./platform_root/common_resources/ $APP_PATH/common_resources/
@@ -101,6 +102,7 @@ ARG APP_PATH
 
 WORKDIR $APP_PATH
 
+COPY ./platform_root/version $APP_PATH/
 COPY ./platform_root/platform_job/ $APP_PATH/
 COPY ./platform_root/common_library/ $APP_PATH/common_library/
 COPY ./platform_root/common_resources/ $APP_PATH/common_resources/
