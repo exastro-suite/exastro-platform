@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
       - name: platform-job
-        image: exastro/exastro-common-auth-platform-job:0.1.0-20220930-1330
+        image: exastro/exastro-common-auth-platform-job:0.1.0-20220930-1535
         command: ["sh", "-c"]
         args:
           - |
@@ -40,8 +40,6 @@ spec:
               key: TZ
         - name: PYTHONIOENCODING
           value: utf-8
-        - name: DEBUG
-          value: "false"
         - name: KEYCLOAK_USER
           valueFrom:
             secretKeyRef:
