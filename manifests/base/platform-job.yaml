@@ -22,7 +22,10 @@ spec:
       containers:
       - name: platform-job
         image: exastro/exastro-common-auth-platform-job:0.1.0-20220930-1330
-        args: ["-c", "Python /app/platform_init.py"]
+        command: ["sh", "-c"]
+        args:
+          - |
+            Python /app/platform_init.py
         securityContext:
           allowPrivilegeEscalation: false
           readOnlyRootFilesystem: true
