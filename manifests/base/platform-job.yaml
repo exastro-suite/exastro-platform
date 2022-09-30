@@ -97,7 +97,8 @@ spec:
             secretKeyRef:
               name: platform-db
               key: MYSQL_ROOT_PASSWORD
-      restartPolicy: Never
       volumes:
       - name: contaier-volume
         emptyDir: {}
+      restartPolicy: OnFailure
+  backoffLimit: 0
