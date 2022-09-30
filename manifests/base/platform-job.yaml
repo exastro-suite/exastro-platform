@@ -40,6 +40,16 @@ spec:
               key: TZ
         - name: PYTHONIOENCODING
           value: utf-8
+        - name: KEYCLOAK_USER
+          valueFrom:
+            secretKeyRef:
+              name: keycloak
+              key: KEYCLOAK_USER
+        - name: KEYCLOAK_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: keycloak
+              key: KEYCLOAK_PASSWORD
         - name: API_KEYCLOAK_PROTOCOL
           valueFrom:
             configMapKeyRef:
