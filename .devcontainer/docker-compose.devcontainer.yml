@@ -23,6 +23,7 @@ services:
       - ../platform_root/platform_auth:/app:cached
       - ../platform_root/common_library:/app/common_library:cached
       - ../platform_root/common_resources:/app/common_resources:cached
+      - ../platform_root/version:/app/version:cached
       - ../platform_root/platform_auth/config/httpd.conf/httpd.conf:/etc/httpd/conf/httpd.conf:cached
       - ../platform_root/platform_auth/config/httpd.conf/reverse-proxy.conf:/etc/httpd/conf.d/reverse-proxy.conf:cached
       - ../platform_root/platform_auth/config/httpd.conf/wsgi.conf:/etc/httpd/conf.d/wsgi.conf:cached
@@ -57,6 +58,7 @@ services:
       - ../platform_root/platform_api:/app:cached
       - ../platform_root/common_library:/app/common_library:cached
       - ../platform_root/common_resources:/app/common_resources:cached
+      - ../platform_root/version:/app/version:cached
       - ../platform_root/platform_api/config/httpd.conf/httpd.conf:/etc/httpd/conf/httpd.conf:cached
       - ../platform_root/platform_api/config/httpd.conf/wsgi.conf:/etc/httpd/conf.d/wsgi.conf:cached
       - ~/.netrc:/home/app_user/.netrc
@@ -87,6 +89,7 @@ services:
       - ../platform_root/platform_web/config/httpd.conf/httpd.conf:/etc/httpd/conf/httpd.conf:cached
       - ../platform_root/platform_web/config/httpd.conf/rewrite.conf:/etc/httpd/conf.d/rewrite.conf:cached
       - ../platform_root/platform_web/contents:/var/www/html:cached
+      - ../platform_root/version:/var/www/html/version:cached
       - ~/.netrc:/home/app_user/.netrc
       - ~/.gitconfig:/home/app_user/.gitconfig
       - ./platform-api/.vscode/launch.json:/workspace/.vscode/launch.json
@@ -128,6 +131,7 @@ services:
       - ../platform_root/platform_job:/app:cached
       - ../platform_root/common_library:/app/common_library:cached
       - ../platform_root/common_resources:/app/common_resources:cached
+      - ../platform_root/version:/app/version:cached
       - ~/.netrc:/home/app_user/.netrc
       - ~/.gitconfig:/home/app_user/.gitconfig
       - ./platform-job/.vscode/launch.json:/workspace/.vscode/launch.json
