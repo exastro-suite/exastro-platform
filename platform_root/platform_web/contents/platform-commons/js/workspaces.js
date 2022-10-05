@@ -8,6 +8,7 @@ $(function(){
             $('#new_workspace').css('display','');
         }
         get_workspace_list();
+        finish_onload_progress();
     });
 
     function new_workspace() {

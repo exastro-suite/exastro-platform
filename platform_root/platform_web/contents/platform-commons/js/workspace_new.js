@@ -1,7 +1,7 @@
 CommonAuth.onAuthSuccess(() => {
     new CommonUi(`#container`);
     $('.to_workspace_list').attr('href',location_conf.href.workspaces.list.replace(/{organization_id}/g, CommonAuth.getRealm()));
-
+    finish_onload_progress();
     $('#button_register').on('click',() => {
         $('#button_register').prop('disabled',true);
         if( ! validate_register() ) {
