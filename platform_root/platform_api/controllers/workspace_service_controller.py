@@ -109,21 +109,23 @@ def workspace_create(body, organization_id):
             token = json.loads(token_response.text)["access_token"]
 
             # ws
-            role_name_ws = workspace_id
+            auth_name_ws = [workspace_id, f"{workspace_id}-admin"]
+
             # ws-admin
-            role_name_wsadmin = "{}-admin".format(workspace_id)
+            role_name_wsadmin = f"_{workspace_id}-admin"
 
-            # ロール作成(ws)
-            # create ws role
-            r_create_ws = api_keycloak_clients.client_role_create(
-                realm_name=organization_id, client_uid=private.internal_api_client_id, role_name=role_name_ws, token=token,
-            )
-            if r_create_ws.status_code not in [201, 409]:
-                # 201 Created 以外に、409 already exists は許容する
-                raise common.InternalErrorException(None, f"500-{MSG_FUNCTION_ID}001", "ワークスペースロール作成に失敗しました(対象ID:{})".format(workspace_id))
+            # ロール作成(auth_name_ws)
+            # create auth_name_ws role
+            for role in auth_name_ws:
+                r_create_ws = api_keycloak_clients.client_role_create(
+                    realm_name=organization_id, client_uid=private.internal_api_client_id, role_name=role, token=token,
+                )
+                if r_create_ws.status_code not in [201, 409]:
+                    # 201 Created 以外に、409 already exists は許容する
+                    raise common.InternalErrorException(None, f"500-{MSG_FUNCTION_ID}001", "ワークスペースロール作成に失敗しました(対象ID:{})".format(workspace_id))
 
-            # ロール作成(ws-admin)
-            # create ws-admin role
+            # ロール作成(role_name_wsadmin)
+            # create role_name_wsadmin role
             r_create_wsadmin = api_keycloak_clients.client_role_create(
                 realm_name=organization_id, client_uid=private.user_token_client_id, role_name=role_name_wsadmin, token=token
             )
@@ -131,15 +133,18 @@ def workspace_create(body, organization_id):
                 # 201 Created 以外に、409 already exists は許容する
                 raise common.InternalErrorException(None, f"500-{MSG_FUNCTION_ID}002", "ワークスペース管理者ロール作成に失敗しました(対象ID:{})".format(workspace_id))
 
+            roles_ws = []
             # ws-adminロールにwsロールをcompositeする
             # ws-admin role composite ws
-            r_get_role_ws = api_keycloak_clients.client_role_get(
-                realm_name=organization_id, client_id=private.internal_api_client_id, role_name=role_name_ws, token=token,
-            )
-            if r_get_role_ws.status_code != 200:
-                raise common.InternalErrorException(None, f"500-{MSG_FUNCTION_ID}003", "ワークスペースロールの取得に失敗しました(対象ID:{})".format(workspace_id))
+            for role in auth_name_ws:
+                r_get_role_ws = api_keycloak_clients.client_role_get(
+                    realm_name=organization_id, client_id=private.internal_api_client_id, role_name=role, token=token,
+                )
+                if r_get_role_ws.status_code != 200:
+                    raise common.InternalErrorException(None, f"500-{MSG_FUNCTION_ID}003", "ワークスペースロールの取得に失敗しました(対象ID:{})".format(workspace_id))
 
-            roles_ws = [json.loads(r_get_role_ws.text), ]
+                roles_ws.append(json.loads(r_get_role_ws.text))
+
             r_create_composite = api_keycloak_clients.client_role_composites_create(
                 realm_name=organization_id, client_uid=private.user_token_client_id, role_name=role_name_wsadmin, add_roles=roles_ws, token=token,
             )
