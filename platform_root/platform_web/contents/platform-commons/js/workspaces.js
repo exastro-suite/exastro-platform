@@ -4,7 +4,8 @@ $(function(){
         new CommonUi(`#container`);
         $('.to_workspace_list').attr('href',location_conf.href.workspaces.list.replace(/{organization_id}/g, CommonAuth.getRealm()));
         $('#new_workspace').on('click',() => { new_workspace();});
-        if (CommonAuth.isOrganizationManager()) {
+
+        if (CommonAuth.hasAuthority('_og-ws-mt')) {
             $('#new_workspace').css('display','');
         }
         get_workspace_list();
