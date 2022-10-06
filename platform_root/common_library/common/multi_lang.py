@@ -39,6 +39,7 @@ def get_text(text_id, origin_text, *args):
 
         # text_id存在チェック
         # text_id Existence check
+        text = None
         if (text_id in language.LanguageList.lang_array):
             text = (language.LanguageList.lang_array.get(text_id))
 

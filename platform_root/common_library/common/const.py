@@ -21,6 +21,10 @@ length_workspace_name = 255
 length_workspace_description = 4000
 max_workspace_environments = 1000
 length_workspace_environment_name = 40
+length_role_name = 64
+length_role_description = 4000
+max_role_workspaces = 1000
+
 
 # ロール種別
 # Role Kind
