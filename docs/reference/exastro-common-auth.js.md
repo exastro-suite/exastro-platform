@@ -121,8 +121,14 @@ tokenを強制的にリフレッシュします<br>
         });
     ```
 
-### CommonAuth.isOrganizationManager()
-オーガナイゼーション管理者か判定する
+### ~~CommonAuth.isOrganizationManager()~~
+廃止：オーガナイゼーション管理者か判定する<br>
+※CommonAuth.hasAuthority(authority)で権限チェックを行うこと
 - parameter
     - @returns true: OrganizationManager / false: other
 
+### CommonAuth.hasAuthority(authority)
+権限があるか判定する
+- parameter
+    - @param {string} authority
+    - @returns boolean

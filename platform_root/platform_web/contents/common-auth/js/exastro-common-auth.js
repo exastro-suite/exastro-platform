@@ -247,12 +247,16 @@ const CommonAuth = {
     },
 
     /**
-     * Check OrganizationManager - オーガナイゼーション管理者か判定する
-     * @returns true: OrganizationManager / false: other
+     * check authority - 権限の有無をチェックする
+     * @param {string} authority 
+     * @returns boolean
      */
-    "isOrganizationManager": function() {
+    "hasAuthority": function(authority) {
         try {
             if( CommonAuth.keycloak.tokenParsed.resource_access[CommonAuth.getRealm() + "-workspaces"].roles.indexOf("_org-manager") !== -1 ) {
+                return true;
+            }
+            if( CommonAuth.keycloak.tokenParsed.resource_access[CommonAuth.getRealm() + "-workspaces"].roles.indexOf(authority) !== -1 ) {
                 return true;
             } else {
                 return false;
