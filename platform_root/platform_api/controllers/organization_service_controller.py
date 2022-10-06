@@ -90,6 +90,7 @@ def organization_create(body, retry=None):
     is_CREATE_START = True
     is_REALM_CREATE = True
     is_CLIENT_CREATE = True
+    is_ROLE_SETTING = True
     is_SA_SETTING = True
     is_USER_CREATE = True
     is_USER_ROLE = True
@@ -133,21 +134,29 @@ def organization_create(body, retry=None):
             is_CREATE_START = False
             is_REALM_CREATE = False
             is_CLIENT_CREATE = False
+        elif status == const.ORG_STATUS_ROLE_SETTING:
+            is_CREATE_START = False
+            is_REALM_CREATE = False
+            is_CLIENT_CREATE = False
+            is_ROLE_SETTING = False
         elif status == const.ORG_STATUS_SA_SETTING:
             is_CREATE_START = False
             is_REALM_CREATE = False
             is_CLIENT_CREATE = False
+            is_ROLE_SETTING = False
             is_SA_SETTING = False
         elif status == const.ORG_STATUS_USER_CREATE:
             is_CREATE_START = False
             is_REALM_CREATE = False
             is_CLIENT_CREATE = False
+            is_ROLE_SETTING = False
             is_SA_SETTING = False
             is_USER_CREATE = False
         elif status == const.ORG_STATUS_USER_ROLE:
             is_CREATE_START = False
             is_REALM_CREATE = False
             is_CLIENT_CREATE = False
+            is_ROLE_SETTING = False
             is_SA_SETTING = False
             is_USER_CREATE = False
             is_USER_ROLE = False
@@ -155,6 +164,7 @@ def organization_create(body, retry=None):
             is_CREATE_START = False
             is_REALM_CREATE = False
             is_CLIENT_CREATE = False
+            is_ROLE_SETTING = False
             is_SA_SETTING = False
             is_USER_CREATE = False
             is_USER_ROLE = False
@@ -163,6 +173,7 @@ def organization_create(body, retry=None):
             is_CREATE_START = False
             is_REALM_CREATE = False
             is_CLIENT_CREATE = False
+            is_ROLE_SETTING = False
             is_SA_SETTING = False
             is_USER_CREATE = False
             is_USER_ROLE = False
@@ -172,6 +183,7 @@ def organization_create(body, retry=None):
             is_CREATE_START = False
             is_REALM_CREATE = False
             is_CLIENT_CREATE = False
+            is_ROLE_SETTING = False
             is_SA_SETTING = False
             is_USER_CREATE = False
             is_USER_ROLE = False
@@ -182,6 +194,7 @@ def organization_create(body, retry=None):
             is_CREATE_START = False
             is_REALM_CREATE = False
             is_CLIENT_CREATE = False
+            is_ROLE_SETTING = False
             is_SA_SETTING = False
             is_USER_CREATE = False
             is_USER_ROLE = False
@@ -210,6 +223,11 @@ def organization_create(body, retry=None):
         # Client作成
         # client creation
         __client_create(organization_id, user_id)
+
+    if is_ROLE_SETTING:
+        # Client Role 設定
+        # client Role Setting
+        __client_role_setting(organization_id, user_id)
 
     if is_SA_SETTING:
         # Service Account 設定
@@ -500,104 +518,242 @@ def __client_create(organization_id, user_id):
                 )
                 raise common.InternalErrorException(message_id=message_id, message=message)
 
-        # platform clientの場合は、organization管理者用のロールを作成
-        # For platform client, create a role for organization admin
-        if client_json.get("clientId") == common.get_platform_client_id(organization_id):
-
-            # client取得
-            # client get to keycloak
-            response = api_keycloak_clients.clients_get(organization_id, client_json.get("clientId"), token)
-            if response.status_code != 200:
-                globals.logger.error(f"response.status_code:{response.status_code}")
-                globals.logger.error(f"response.text:{response.text}")
-                message_id = f"500-{MSG_FUNCTION_ID}004"
-                message = multi_lang.get_text(
-                    message_id,
-                    "clientの取得に失敗しました(対象ID:{0} client:{1})",
-                    organization_id,
-                    client_json.get("clientId")
-                )
-                raise common.InternalErrorException(message_id=message_id, message=message)
-
-            client_info = json.loads(response.text)
-            client_id = client_info[0].get("id")
-
-            # client role追加
-            # client role added
-            response = api_keycloak_clients.client_role_create(organization_id, client_id, const.ORG_MNG_ROLE, token)
-            if response.status_code != 200 and \
-               response.status_code != 201 and \
-               response.status_code != 409:    # 409 exists role
-                globals.logger.error(f"response.status_code:{response.status_code}")
-                globals.logger.error(f"response.text:{response.text}")
-                message_id = f"500-{MSG_FUNCTION_ID}008"
-                message = multi_lang.get_text(
-                    message_id,
-                    "client roleの設定に失敗しました(対象ID:{0} client:{1})",
-                    organization_id,
-                    client_json.get("clientId")
-                )
-                raise common.InternalErrorException(message_id=message_id, message=message)
-
-            realm_management_clientid = "realm-management"
-            arr_realm_management_role = ["manage-clients", "manage-users", "view-clients", "view-users"]
-
-            # client 情報取得
-            response = api_keycloak_clients.clients_get(organization_id, realm_management_clientid, token)
-            if response.status_code != 200:
-                globals.logger.error(f"response.status_code:{response.status_code}")
-                globals.logger.error(f"response.text:{response.text}")
-                message_id = f"500-{MSG_FUNCTION_ID}004"
-                message = multi_lang.get_text(
-                    message_id,
-                    "clientの取得に失敗しました(対象ID:{0} client:{1})",
-                    organization_id,
-                    realm_management_clientid
-                )
-                raise common.InternalErrorException(message_id=message_id, message=message)
-
-            client_info = json.loads(response.text)
-            realm_management_client_id = client_info[0].get("id")
-
-            client_roles = []
-
-            for realm_management_role in arr_realm_management_role:
-                # 該当Clientのorganization管理者ロールを取得
-                # Process for the number of organization administrators
-                response = api_keycloak_clients.client_role_get(organization_id, realm_management_client_id, realm_management_role, token)
-                if response.status_code != 200:
-                    globals.logger.error(f"response.status_code:{response.status_code}")
-                    globals.logger.error(f"response.text:{response.text}")
-                    message_id = f"500-{MSG_FUNCTION_ID}011"
-                    message = multi_lang.get_text(
-                        message_id,
-                        "client roleの取得に失敗しました(対象ID:{0} client:{1})",
-                        organization_id,
-                        realm_management_client_id
-                    )
-                    raise common.InternalErrorException(message_id=message_id, message=message)
-
-                client_roles.append(json.loads(response.text))
-
-            # role付与
-            # role grant for client-roles
-            response = api_keycloak_clients.client_role_composites_create(organization_id, client_id, const.ORG_MNG_ROLE, client_roles, token)
-            if response.status_code != 200 and \
-               response.status_code != 204:
-                globals.logger.error(f"response.status_code:{response.status_code}")
-                globals.logger.error(f"response.text:{response.text}")
-                message_id = f"500-{MSG_FUNCTION_ID}007"
-                message = multi_lang.get_text(
-                    message_id,
-                    "client roleのrole設定に失敗しました(対象ID:{0} client:{1})",
-                    organization_id,
-                    client_json.get("clientId")
-                )
-                raise common.InternalErrorException(message_id=message_id, message=message)
-
     # ステータス更新
     # update status
     __update_status(const.ORG_STATUS_CLIENT_CREATE, organization_id, user_id)
+
+    return
+
+
+def __client_role_setting(organization_id, user_id):
+    """client role setting
+
+    Args:
+        organization_id (str): organization id
+        user_id (str): user id
+    """
+
+    globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
+
+    # サービスアカウントのTOKEN取得
+    # Get a service account token
+    token = __get_token()
+
+    # organization管理者用の権限を登録
+    # create a authority for organization admin
+    client_clientid = common.get_platform_client_id(organization_id)
+
+    # client取得
+    # client get to keycloak
+    response = api_keycloak_clients.clients_get(organization_id, client_clientid, token)
+    if response.status_code != 200:
+        globals.logger.error(f"response.status_code:{response.status_code}")
+        globals.logger.error(f"response.text:{response.text}")
+        message_id = f"500-{MSG_FUNCTION_ID}004"
+        message = multi_lang.get_text(
+            message_id,
+            "clientの取得に失敗しました(対象ID:{0} client:{1})",
+            organization_id,
+            client_clientid
+        )
+        raise common.InternalErrorException(message_id=message_id, message=message)
+
+    client_info = json.loads(response.text)
+    client_id = client_info[0].get("id")
+    platform_client_id = client_id
+
+    # オーガナイゼーションロール権限 登録
+    # Organization role authority registration
+    org_auths = [
+        const.ORG_AUTH_UPDATE,
+        const.ORG_AUTH_OWNER_MAINTE,
+        const.ORG_AUTH_ROLE_USER,
+        const.ORG_AUTH_PLAN_MAINTE,
+        const.ORG_AUTH_USAGE_SITUATION,
+        const.ORG_AUTH_USER_MAINTE,
+        const.ORG_AUTH_WS_ROLE_MAINTE,
+        const.ORG_AUTH_WS_ROLE_USER,
+        const.ORG_AUTH_WS_MAINTE,
+    ]
+
+    for org_auth in org_auths:
+        # client role追加
+        # client role added
+        response = api_keycloak_clients.client_role_create(organization_id, client_id, org_auth, token)
+        if response.status_code not in [200, 201, 409]:    # 409 exists role
+            globals.logger.error(f"response.status_code:{response.status_code}")
+            globals.logger.error(f"response.text:{response.text}")
+            message_id = f"500-{MSG_FUNCTION_ID}008"
+            message = multi_lang.get_text(
+                message_id,
+                "client roleの設定に失敗しました(対象ID:{0} client:{1})",
+                organization_id,
+                client_clientid
+            )
+            raise common.InternalErrorException(message_id=message_id, message=message)
+
+    # organization管理者用のロールを作成
+    # create a role for organization admin
+    client_clientid = common.get_user_token_client_id(organization_id)
+
+    # client取得
+    # client get to keycloak
+    response = api_keycloak_clients.clients_get(organization_id, client_clientid, token)
+    if response.status_code != 200:
+        globals.logger.error(f"response.status_code:{response.status_code}")
+        globals.logger.error(f"response.text:{response.text}")
+        message_id = f"500-{MSG_FUNCTION_ID}004"
+        message = multi_lang.get_text(
+            message_id,
+            "clientの取得に失敗しました(対象ID:{0} client:{1})",
+            organization_id,
+            client_clientid
+        )
+        raise common.InternalErrorException(message_id=message_id, message=message)
+
+    client_info = json.loads(response.text)
+    client_id = client_info[0].get("id")
+
+    # オーガナイゼーションロール権限 登録
+    # Organization role authority registration
+    org_roles = [
+        const.ORG_ROLE_ORG_MANAGER,
+        const.ORG_ROLE_PLAN_MANAGER,
+        const.ORG_ROLE_USER_ROLE_MANAGER,
+        const.ORG_ROLE_USER_MANAGER,
+    ]
+
+    role_options = {
+        "attributes": {
+            "kind": [const.ROLE_KIND_ORGANIZATION]
+        }
+    }
+
+    for org_role in org_roles:
+        # client role追加
+        # client role added
+        response = api_keycloak_clients.client_role_create(organization_id, client_id, org_role, token, role_options)
+        if response.status_code not in [200, 201, 409]:    # 409 exists role
+            globals.logger.error(f"response.status_code:{response.status_code}")
+            globals.logger.error(f"response.text:{response.text}")
+            message_id = f"500-{MSG_FUNCTION_ID}008"
+            message = multi_lang.get_text(
+                message_id,
+                "client roleの設定に失敗しました(対象ID:{0} client:{1})",
+                organization_id,
+                client_clientid
+            )
+            raise common.InternalErrorException(message_id=message_id, message=message)
+
+        client_roles = []
+
+        # ロールによって、付与する権限を分ける
+        # Separate privileges to be granted by role
+        if org_role == const.ORG_ROLE_ORG_MANAGER:
+            arr_permissions = const.ORG_PERMISSION_ORG_MANAGER
+        elif org_role == const.ORG_ROLE_PLAN_MANAGER:
+            arr_permissions = const.ORG_PERMISSION_PLAN_MANAGER
+        elif org_role == const.ORG_ROLE_USER_ROLE_MANAGER:
+            arr_permissions = const.ORG_PERMISSION_USER_ROLE_MANAGER
+        elif org_role == const.ORG_ROLE_USER_MANAGER:
+            arr_permissions = const.ORG_PERMISSION_USER_MANAGER
+        else:
+            arr_permissions = []
+
+        for permission in arr_permissions:
+            # 該当Clientのorganization管理者ロールを取得
+            # Process for the number of organization administrators
+            response = api_keycloak_clients.client_role_get(organization_id, platform_client_id, permission, token)
+            if response.status_code != 200:
+                globals.logger.error(f"response.status_code:{response.status_code}")
+                globals.logger.error(f"response.text:{response.text}")
+                message_id = f"500-{MSG_FUNCTION_ID}011"
+                message = multi_lang.get_text(
+                    message_id,
+                    "client roleの取得に失敗しました(対象ID:{0} client:{1})",
+                    organization_id,
+                    common.get_platform_client_id(organization_id)
+                )
+                raise common.InternalErrorException(message_id=message_id, message=message)
+
+            client_roles.append(json.loads(response.text))
+
+        # role付与
+        # role grant for client-roles
+        response = api_keycloak_clients.client_role_composites_create(organization_id, client_id, org_role, client_roles, token)
+        if response.status_code not in [200, 204]:
+            globals.logger.error(f"response.status_code:{response.status_code}")
+            globals.logger.error(f"response.text:{response.text}")
+            message_id = f"500-{MSG_FUNCTION_ID}007"
+            message = multi_lang.get_text(
+                message_id,
+                "client roleのrole設定に失敗しました(対象ID:{0} client:{1})",
+                organization_id,
+                client_clientid
+            )
+            raise common.InternalErrorException(message_id=message_id, message=message)
+
+    # TODO : ユーザー管理機能、ロール管理機能が完成した際は、付与解除
+    # Ungrant when user management function and role management function are completed
+    realm_management_clientid = "realm-management"
+    arr_realm_management_role = ["manage-clients", "manage-users", "view-clients", "view-users"]
+
+    # client 情報取得
+    # get client information
+    response = api_keycloak_clients.clients_get(organization_id, realm_management_clientid, token)
+    if response.status_code != 200:
+        globals.logger.error(f"response.status_code:{response.status_code}")
+        globals.logger.error(f"response.text:{response.text}")
+        message_id = f"500-{MSG_FUNCTION_ID}004"
+        message = multi_lang.get_text(
+            message_id,
+            "clientの取得に失敗しました(対象ID:{0} client:{1})",
+            organization_id,
+            realm_management_clientid
+        )
+        raise common.InternalErrorException(message_id=message_id, message=message)
+
+    client_info = json.loads(response.text)
+    realm_management_client_id = client_info[0].get("id")
+
+    client_roles = []
+
+    for realm_management_role in arr_realm_management_role:
+        # 該当Clientのorganization管理者ロールを取得
+        # Process for the number of organization administrators
+        response = api_keycloak_clients.client_role_get(organization_id, realm_management_client_id, realm_management_role, token)
+        if response.status_code != 200:
+            globals.logger.error(f"response.status_code:{response.status_code}")
+            globals.logger.error(f"response.text:{response.text}")
+            message_id = f"500-{MSG_FUNCTION_ID}011"
+            message = multi_lang.get_text(
+                message_id,
+                "client roleの取得に失敗しました(対象ID:{0} client:{1})",
+                organization_id,
+                realm_management_client_id
+            )
+            raise common.InternalErrorException(message_id=message_id, message=message)
+
+        client_roles.append(json.loads(response.text))
+
+    # role付与
+    # role grant for client-roles
+    response = api_keycloak_clients.client_role_composites_create(organization_id, client_id, const.ORG_ROLE_ORG_MANAGER, client_roles, token)
+    if response.status_code not in [200, 204]:
+        globals.logger.error(f"response.status_code:{response.status_code}")
+        globals.logger.error(f"response.text:{response.text}")
+        message_id = f"500-{MSG_FUNCTION_ID}007"
+        message = multi_lang.get_text(
+            message_id,
+            "client roleのrole設定に失敗しました(対象ID:{0} client:{1})",
+            organization_id,
+            client_clientid
+        )
+        raise common.InternalErrorException(message_id=message_id, message=message)
+
+    # ステータス更新
+    # update status
+    __update_status(const.ORG_STATUS_ROLE_SETTING, organization_id, user_id)
 
     return
 
@@ -735,9 +891,7 @@ def __user_create(organization_id, user_id, org_mng_users):
         # user登録
         # user registration to keycloak
         response = api_keycloak_users.user_create(organization_id, user_json, token)
-        if response.status_code != 200 and \
-           response.status_code != 201 and \
-           response.status_code != 409:    # 409 exists user
+        if response.status_code not in [200, 201, 409]:    # 409 exists user
             globals.logger.error(f"response.status_code:{response.status_code}")
             globals.logger.error(f"response.text:{response.text}")
             message_id = f"500-{MSG_FUNCTION_ID}009"
@@ -771,7 +925,7 @@ def __user_role_create(organization_id, user_id, org_mng_users):
     # Get a service account token
     token = __get_token()
 
-    client_client_id = common.get_platform_client_id(organization_id)
+    client_client_id = common.get_user_token_client_id(organization_id)
 
     # オーガナイゼーション管理者数分処理する
     # Process for the number of organization administrators
@@ -813,7 +967,7 @@ def __user_role_create(organization_id, user_id, org_mng_users):
 
         # 該当Clientのorganization管理者ロールを取得
         # Process for the number of organization administrators
-        response = api_keycloak_clients.client_role_get(organization_id, client_id, const.ORG_MNG_ROLE, token)
+        response = api_keycloak_clients.client_role_get(organization_id, client_id, const.ORG_ROLE_ORG_MANAGER, token)
         if response.status_code != 200:
             globals.logger.error(f"response.status_code:{response.status_code}")
             globals.logger.error(f"response.text:{response.text}")
@@ -831,8 +985,7 @@ def __user_role_create(organization_id, user_id, org_mng_users):
         # user role付与
         # granting user roles to keycloak
         response = api_keycloak_users.user_client_role_mapping_create(organization_id, user_id, client_id, client_roles, token)
-        if response.status_code != 200 and \
-           response.status_code != 204:
+        if response.status_code not in [200, 204]:
             globals.logger.error(f"response.status_code:{response.status_code}")
             globals.logger.error(f"response.text:{response.text}")
             message_id = f"500-{MSG_FUNCTION_ID}012"
@@ -1076,8 +1229,7 @@ def __ita_create(organization_id, user_id):
     api_url = "{}://{}:{}".format(os.environ['ITA_API_ADMIN_PROTOCOL'], os.environ['ITA_API_ADMIN_HOST'], os.environ['ITA_API_ADMIN_PORT'])
     response = requests.post(f"{api_url}/api/organizations/{organization_id}/ita/", headers=header_para, json=json_para)
 
-    if response.status_code != 200 and \
-       response.status_code != 409:
+    if response.status_code not in [200, 409]:
         globals.logger.error(f"response.status_code:{response.status_code}")
         globals.logger.error(f"response.text:{response.text}")
         message_id = f"500-{MSG_FUNCTION_ID}013"
@@ -1118,8 +1270,7 @@ def __realm_enabled(organization_id, user_id):
     # realm登録
     # realm registration to keycloak
     response = api_keycloak_realms.realm_update(organization_id, realm_json, token)
-    if response.status_code != 200 and \
-       response.status_code != 204:
+    if response.status_code not in [200, 204]:
         globals.logger.error(f"response.status_code:{response.status_code}")
         globals.logger.error(f"response.text:{response.text}")
         message_id = f"500-{MSG_FUNCTION_ID}014"
