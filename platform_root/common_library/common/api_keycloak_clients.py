@@ -188,6 +188,8 @@ def client_role_create(realm_name, client_uid, role_name, token, role_options=No
         client_uid (str): client id
         role_name (str): role name
         toekn (str): token
+        description (str): role description
+        kind (str): role kind
 
     Returns:
         Response: HTTP Respose (success : .status_code=204)

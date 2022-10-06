@@ -20,12 +20,14 @@ services:
   ita-api-organization:
     build:
       context: ../../../it-automation2-test/.
+      target: develop_build
     volumes:
       - ../.volumes/storage:/storage
   ita-api-admin:
     build:
       context: ../../../it-automation2-test/.
-    command: "bash -c 'chmod 777 /storage && httpd -D FOREGROUND'"
+      target: develop_build
+    command: "bash -c 'sudo chmod 777 /storage && httpd -D FOREGROUND'"
     volumes:
       - ../.volumes/storage:/storage
   ita-web-server:

@@ -97,6 +97,7 @@ COPY ./platform_root/platform_auth/config/httpd.conf/httpd.conf /etc/httpd/conf/
 COPY ./platform_root/platform_auth/config/httpd.conf/reverse-proxy.conf /etc/httpd/conf.d/reverse-proxy.conf
 COPY ./platform_root/platform_auth/config/httpd.conf/wsgi.conf /etc/httpd/conf.d/wsgi.conf
 
+COPY ./platform_root/version $APP_PATH/
 COPY ./platform_root/platform_auth/ $APP_PATH/
 COPY ./platform_root/common_library/ $APP_PATH/common_library/
 COPY ./platform_root/common_resources/ $APP_PATH/common_resources/
@@ -118,6 +119,7 @@ COPY ./platform_root/platform_auth/config/httpd.conf/httpd.conf /etc/httpd/conf/
 COPY ./platform_root/platform_auth/config/httpd.conf/reverse-proxy.conf /etc/httpd/conf.d/reverse-proxy.conf
 COPY ./platform_root/platform_auth/config/httpd.conf/wsgi.conf /etc/httpd/conf.d/wsgi.conf
 
+COPY ./platform_root/version $APP_PATH/
 COPY ./platform_root/platform_auth/ $APP_PATH/
 COPY ./platform_root/common_library/ $APP_PATH/common_library/
 COPY ./platform_root/common_resources/ $APP_PATH/common_resources/

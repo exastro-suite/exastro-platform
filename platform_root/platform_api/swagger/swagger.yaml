@@ -12,6 +12,8 @@ tags:
   description: ワークスペースに関する操作
 - name: UsersService
   description: ユーザーに関する操作
+- name: RoleService
+  description: ロールに関する操作
 - name: InternalCommonService
   description: 共通(内部用)
 - name: InternalUsersService
@@ -193,6 +195,40 @@ paths:
               schema:
                 $ref: '#/components/schemas/runtimeError'
       x-openapi-router-controller: controllers.workspace_service_controller
+  /api/{organization_id}/platform/roles:
+    post:
+      tags:
+      - RoleService
+      summary: Create a role
+      operationId: role_create
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/roleCreate'
+        required: true
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_1'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+      x-openapi-router-controller: controllers.role_service_controller
   /internal-api/{organization_id}/platform/workspaces/{workspace_id}/roles:
     get:
       tags:
@@ -469,6 +505,20 @@ components:
         options:
           type: object
           description: Organization Add Json Parameter (json of KeyCloak)
+    roleCreate:
+      title: role is a definition of Role resource.
+      type: object
+      properties:
+        name:
+          type: string
+          example: role-1
+        description:
+          type: string
+        kind:
+          type: string
+          example: workspace or organization
+        workspaces:
+          type: array
     role:
       title: role is a definition of Role resource.
       type: object
