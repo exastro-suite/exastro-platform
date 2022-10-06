@@ -72,11 +72,18 @@ def role_create(body, organization_id):
 
         roles_ws.append(json.loads(r_get_role_ws.text))
 
+    role_options = {
+        "description": role_description,
+        "attributes": {
+            "kind": [role_kind]
+        },
+    }
+
     # ロール作成
     # create role
     r_create = api_keycloak_clients.client_role_create(
         realm_name=organization_id, client_uid=private.user_token_client_id, token=token,
-        role_name=role_name, description=role_description, kind=role_kind
+        role_name=role_name, role_options=role_options
     )
     if r_create.status_code not in [201, 409]:
         globals.logger.debug(f"response:{r_create.text}")

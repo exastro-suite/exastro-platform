@@ -180,7 +180,7 @@ def client_role_get(realm_name, client_id, role_name, token):
     return request_response
 
 
-def client_role_create(realm_name, client_uid, role_name, token, description="", kind=""):
+def client_role_create(realm_name, client_uid, role_name, token, role_options=None):
     """クライアントロール作成 user client role create
 
     Args:
@@ -207,10 +207,8 @@ def client_role_create(realm_name, client_uid, role_name, token, description="",
         "name": role_name,
     }
 
-    if description:
-        data_para["description"] = description
-    if kind:
-        data_para["attributes"] = {"kind": [kind, ], }
+    if role_options:
+        data_para.update(role_options)
 
     globals.logger.debug("client role post send")
     # 呼び出し先設定 requests setting
