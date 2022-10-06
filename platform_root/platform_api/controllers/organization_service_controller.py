@@ -565,17 +565,7 @@ def __client_role_setting(organization_id, user_id):
 
     # オーガナイゼーションロール権限 登録
     # Organization role authority registration
-    org_auths = [
-        common_const.ORG_AUTH_UPDATE,
-        common_const.ORG_AUTH_OWNER_MAINTE,
-        common_const.ORG_AUTH_ROLE_USER,
-        common_const.ORG_AUTH_PLAN_MAINTE,
-        common_const.ORG_AUTH_USAGE_SITUATION,
-        common_const.ORG_AUTH_USER_MAINTE,
-        common_const.ORG_AUTH_WS_ROLE_MAINTE,
-        common_const.ORG_AUTH_WS_ROLE_USER,
-        common_const.ORG_AUTH_WS_MAINTE,
-    ]
+    org_auths = common_const.ALL_ORG_AUTHORITIES
 
     for org_auth in org_auths:
         # client role追加
@@ -617,12 +607,7 @@ def __client_role_setting(organization_id, user_id):
 
     # オーガナイゼーションロール権限 登録
     # Organization role authority registration
-    org_roles = [
-        common_const.ORG_ROLE_ORG_MANAGER,
-        common_const.ORG_ROLE_PLAN_MANAGER,
-        common_const.ORG_ROLE_USER_ROLE_MANAGER,
-        common_const.ORG_ROLE_USER_MANAGER,
-    ]
+    org_roles = common_const.ALL_ORG_ROLES
 
     role_options = {
         "attributes": {

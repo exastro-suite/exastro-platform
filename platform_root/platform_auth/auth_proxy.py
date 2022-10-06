@@ -25,6 +25,7 @@ import re
 import globals
 import const
 import common_library.common.common as common
+import common_library.common.const as common_const
 # import api_keycloak_tokens
 import config.auth.auth_pattern as auth_pattern
 # import api_keycloak_call
@@ -234,14 +235,37 @@ class auth_proxy:
 
         token_roles = self.token_decode.get("resource_access").get(self.user_token_client_id)
         globals.logger.debug(f'token_roles={token_roles}')
+
+        roles_str = ""
+        org_roles_str = ""
+
         if token_roles and "roles" in token_roles:
-            roles_str = base64.b64encode("\n".join(token_roles["roles"]).encode()).decode()
-        else:
-            roles_str = ""
+            org_roles = []
+            ws_roles = []
+            # organization role と workspace role で分ける
+            # Separate by organization role and workspace role
+            for token_role in token_roles["roles"]:
+                globals.logger.debug(f'token_role={token_role}')
+                if token_role in common_const.ALL_ORG_ROLES or \
+                   token_role in common_const.ALL_ORG_AUTHORITIES:
+                    # organization roles
+                    org_roles.append(token_role)
+                else:
+                    ws_roles.append(token_role)
+
+            globals.logger.debug(f'ws_roles={ws_roles}')
+            globals.logger.debug(f'org_roles_str={org_roles}')
+
+            if ws_roles:
+                roles_str = base64.b64encode("\n".join(ws_roles).encode()).decode()
+            if org_roles:
+                org_roles_str = base64.b64encode("\n".join(org_roles).encode()).decode()
+
         status_code = 0
         info = {
             "User-Id": self.token_decode.get("sub"),
             "Roles": roles_str,
+            "Org-Roles": org_roles_str,
             "Language": self.token_decode.get("locale"),
         }
         return {"status_code": status_code, "data": info}
