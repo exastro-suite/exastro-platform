@@ -27,6 +27,7 @@ import requests
 from common_library.common import common, api_keycloak_tokens, api_keycloak_realms, api_keycloak_clients, api_keycloak_users, validation
 from common_library.common.db import DBconnector
 from common_library.common.db_init import DBinit
+import common_library.common.const as common_const
 from libs import queries_organizations
 import const
 from common_library.common import multi_lang
@@ -565,15 +566,15 @@ def __client_role_setting(organization_id, user_id):
     # オーガナイゼーションロール権限 登録
     # Organization role authority registration
     org_auths = [
-        const.ORG_AUTH_UPDATE,
-        const.ORG_AUTH_OWNER_MAINTE,
-        const.ORG_AUTH_ROLE_USER,
-        const.ORG_AUTH_PLAN_MAINTE,
-        const.ORG_AUTH_USAGE_SITUATION,
-        const.ORG_AUTH_USER_MAINTE,
-        const.ORG_AUTH_WS_ROLE_MAINTE,
-        const.ORG_AUTH_WS_ROLE_USER,
-        const.ORG_AUTH_WS_MAINTE,
+        common_const.ORG_AUTH_UPDATE,
+        common_const.ORG_AUTH_OWNER_MAINTE,
+        common_const.ORG_AUTH_ROLE_USER,
+        common_const.ORG_AUTH_PLAN_MAINTE,
+        common_const.ORG_AUTH_USAGE_SITUATION,
+        common_const.ORG_AUTH_USER_MAINTE,
+        common_const.ORG_AUTH_WS_ROLE_MAINTE,
+        common_const.ORG_AUTH_WS_ROLE_USER,
+        common_const.ORG_AUTH_WS_MAINTE,
     ]
 
     for org_auth in org_auths:
@@ -617,15 +618,15 @@ def __client_role_setting(organization_id, user_id):
     # オーガナイゼーションロール権限 登録
     # Organization role authority registration
     org_roles = [
-        const.ORG_ROLE_ORG_MANAGER,
-        const.ORG_ROLE_PLAN_MANAGER,
-        const.ORG_ROLE_USER_ROLE_MANAGER,
-        const.ORG_ROLE_USER_MANAGER,
+        common_const.ORG_ROLE_ORG_MANAGER,
+        common_const.ORG_ROLE_PLAN_MANAGER,
+        common_const.ORG_ROLE_USER_ROLE_MANAGER,
+        common_const.ORG_ROLE_USER_MANAGER,
     ]
 
     role_options = {
         "attributes": {
-            "kind": [const.ROLE_KIND_ORGANIZATION]
+            "kind": [common_const.ROLE_KIND_ORGANIZATION]
         }
     }
 
@@ -649,14 +650,14 @@ def __client_role_setting(organization_id, user_id):
 
         # ロールによって、付与する権限を分ける
         # Separate privileges to be granted by role
-        if org_role == const.ORG_ROLE_ORG_MANAGER:
-            arr_permissions = const.ORG_PERMISSION_ORG_MANAGER
-        elif org_role == const.ORG_ROLE_PLAN_MANAGER:
-            arr_permissions = const.ORG_PERMISSION_PLAN_MANAGER
-        elif org_role == const.ORG_ROLE_USER_ROLE_MANAGER:
-            arr_permissions = const.ORG_PERMISSION_USER_ROLE_MANAGER
-        elif org_role == const.ORG_ROLE_USER_MANAGER:
-            arr_permissions = const.ORG_PERMISSION_USER_MANAGER
+        if org_role == common_const.ORG_ROLE_ORG_MANAGER:
+            arr_permissions = common_const.ORG_PERMISSION_ORG_MANAGER
+        elif org_role == common_const.ORG_ROLE_PLAN_MANAGER:
+            arr_permissions = common_const.ORG_PERMISSION_PLAN_MANAGER
+        elif org_role == common_const.ORG_ROLE_USER_ROLE_MANAGER:
+            arr_permissions = common_const.ORG_PERMISSION_USER_ROLE_MANAGER
+        elif org_role == common_const.ORG_ROLE_USER_MANAGER:
+            arr_permissions = common_const.ORG_PERMISSION_USER_MANAGER
         else:
             arr_permissions = []
 
@@ -738,7 +739,7 @@ def __client_role_setting(organization_id, user_id):
 
     # role付与
     # role grant for client-roles
-    response = api_keycloak_clients.client_role_composites_create(organization_id, client_id, const.ORG_ROLE_ORG_MANAGER, client_roles, token)
+    response = api_keycloak_clients.client_role_composites_create(organization_id, client_id, common_const.ORG_ROLE_ORG_MANAGER, client_roles, token)
     if response.status_code not in [200, 204]:
         globals.logger.error(f"response.status_code:{response.status_code}")
         globals.logger.error(f"response.text:{response.text}")
@@ -967,7 +968,7 @@ def __user_role_create(organization_id, user_id, org_mng_users):
 
         # 該当Clientのorganization管理者ロールを取得
         # Process for the number of organization administrators
-        response = api_keycloak_clients.client_role_get(organization_id, client_id, const.ORG_ROLE_ORG_MANAGER, token)
+        response = api_keycloak_clients.client_role_get(organization_id, client_id, common_const.ORG_ROLE_ORG_MANAGER, token)
         if response.status_code != 200:
             globals.logger.error(f"response.status_code:{response.status_code}")
             globals.logger.error(f"response.text:{response.text}")
