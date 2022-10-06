@@ -25,35 +25,3 @@ ORG_STATUS_DB_UPDATE = "Organization DB Update Complete"
 ORG_STATUS_ITA_CREATE = "IT Automation Organization Create Complete"
 ORG_STATUS_REALM_ENABLED = "Realm Enabled Complete"
 ORG_STATUS_CREATE_COMPLETE = "Organization Create Complete"
-
-# ロール種別
-# Role Kind
-ROLE_KIND_ORGANIZATION = "organization"
-ROLE_KIND_WORKSPACE = "workspace"
-
-# オーガナイゼーションロール
-# Organization role
-ORG_ROLE_ORG_MANAGER = "_organization-manager"
-ORG_ROLE_PLAN_MANAGER = "_organization-plan-manager"
-ORG_ROLE_USER_ROLE_MANAGER = "_organization-user-role-manager"
-ORG_ROLE_USER_MANAGER = "_organization-user-manager"
-
-# オーガナイゼーションロール権限
-# Organization role authority
-ORG_AUTH_UPDATE = "_og-upd"
-ORG_AUTH_OWNER_MAINTE = "_og-own-mt"
-ORG_AUTH_ROLE_USER = "_og-role-usr"
-ORG_AUTH_PLAN_MAINTE = "_og-plan-mt"
-ORG_AUTH_USAGE_SITUATION = "_og-usage"
-ORG_AUTH_USER_MAINTE = "_og-usr-mt"
-ORG_AUTH_WS_ROLE_MAINTE = "_og-ws-role-mt"
-ORG_AUTH_WS_ROLE_USER = "_og-ws-role-usr"
-ORG_AUTH_WS_MAINTE = "_og-ws-mt"
-
-# Roleと権限の紐づけ
-# Associating Roles and Permissions
-ORG_PERMISSION_ORG_MANAGER = [ORG_AUTH_UPDATE, ORG_AUTH_OWNER_MAINTE, ORG_AUTH_ROLE_USER, ORG_AUTH_PLAN_MAINTE, ORG_AUTH_USAGE_SITUATION,
-                              ORG_AUTH_USER_MAINTE, ORG_AUTH_WS_ROLE_MAINTE, ORG_AUTH_WS_ROLE_USER, ORG_AUTH_WS_MAINTE]
-ORG_PERMISSION_PLAN_MANAGER = [ORG_AUTH_PLAN_MAINTE, ORG_AUTH_USAGE_SITUATION]
-ORG_PERMISSION_USER_ROLE_MANAGER = [ORG_AUTH_USER_MAINTE, ORG_AUTH_WS_ROLE_MAINTE, ORG_AUTH_WS_ROLE_USER]
-ORG_PERMISSION_USER_MANAGER = [ORG_AUTH_USER_MAINTE, ORG_AUTH_WS_ROLE_USER]
