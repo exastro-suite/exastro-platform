@@ -25,10 +25,21 @@ MSG_FUNCTION_ID = "24"
 
 @common.platform_exception_handler
 def role_create(body, organization_id):
-    organization_id = "org1"
+    """Create creates an role
 
-    r = connexion.request
-    body = r.get_json()
+    Args:
+        body (dict | bytes): _description_
+        organization_id (str): _description_. Defaults to None.
+
+    Returns:
+        InlineResponse2001: _description_
+    """
+
+    body = connexion.request.get_json()
+    if not body:
+        raise common.BadRequestException(
+            message_id='400-000002', message='リクエストボディのパラメータ({})が不正です。'.format('Json')
+        )
 
     role_name = body.get("name")
     role_kind = body.get("kind")
@@ -36,11 +47,18 @@ def role_create(body, organization_id):
     workspaces = body.get("workspaces") if body.get("workspaces") else []
 
     # validation check
-    # validate = validation.validate_workspace_id(workspace_id)
-    # if not validate.ok:
-    #     return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, validate.args)
-
-    # validation check
+    validate = validation.validate_role_name(role_name)
+    if not validate.ok:
+        return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, validate.args)
+    validate = validation.validate_role_kind(role_kind)
+    if not validate.ok:
+        return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, validate.args)
+    validate = validation.validate_role_description(role_description)
+    if not validate.ok:
+        return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, validate.args)
+    validate = validation.validate_role_workspaces(workspaces)
+    if not validate.ok:
+        return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, validate.args)
 
     db = DBconnector()
     private = db.get_organization_private(organization_id)
@@ -106,3 +124,19 @@ def role_create(body, organization_id):
         )
 
     return common.response_200_ok(data=None)
+
+
+@common.platform_exception_handler
+def role_list(organization_id, kind=None):
+    """List returns list of roles
+
+    Args:
+        organization_id (str): _description_
+        kind (str, optional): role kind. Defaults to None.
+
+    Returns:
+        InlineResponse2004: _description_
+    """
+
+    data = {}
+    return common.response_200_ok(data)
