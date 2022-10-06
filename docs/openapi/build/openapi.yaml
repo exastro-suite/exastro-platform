@@ -12,6 +12,8 @@ tags:
     description: ワークスペースに関する操作
   - name: UsersService
     description: ユーザーに関する操作
+  - name: RoleService
+    description: ロールに関する操作
   - name: InternalCommonService
     description: 共通(内部用)
   - name: InternalUsersService
@@ -187,6 +189,142 @@ paths:
                 allOf:
                   - $ref: '#/components/schemas/responseOk'
                   - $ref: '#/components/schemas/memberList'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+  '/api/{organization_id}/platform/roles':
+    get:
+      tags:
+        - RoleService
+      summary: List returns list of roles
+      x-openapi-router-controller: controllers.role_service_controller
+      operationId: role_list
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: kind
+          in: query
+          description: role kind.
+          schema:
+            type: string
+            enum:
+              - workspace
+              - organization
+            example: workspace
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - title: WorkspaceList is a list of workspace resources that users can access.
+                    type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          oneOf:
+                            - $ref: '#/paths/~1api~1%7Borganization_id%7D~1platform~1roles/post/requestBody/content/application~1json/examples/kind%20%3D%20workspace'
+                            - title: role is a definition of Role resource.
+                              type: object
+                              properties:
+                                name:
+                                  type: string
+                                  example: organization-role-1
+                                description:
+                                  type: string
+                                  example: role description
+                                kind:
+                                  type: string
+                                  example: organization
+                                authorities:
+                                  type: array
+                                  items:
+                                    type: object
+                                    properties:
+                                      name:
+                                        type: string
+                                        example: _og-upd
+                              value:
+                                name: organization-role-1
+                                description: role description
+                                kind: organization
+                                authorities:
+                                  - name: _og-upd
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+    post:
+      tags:
+        - RoleService
+      summary: Create creates an role
+      x-openapi-router-controller: controllers.role_service_controller
+      operationId: role_create
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/paths/~1api~1%7Borganization_id%7D~1platform~1roles/post/requestBody/content/application~1json/examples/kind%20%3D%20workspace'
+            examples:
+              kind = workspace:
+                title: role is a definition of Role resource.
+                type: object
+                properties:
+                  name:
+                    type: string
+                    example: role-1
+                  description:
+                    type: string
+                    example: role description
+                  kind:
+                    type: string
+                    example: workspace
+                  workspaces:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          example: workspace-1
+                value:
+                  name: role-1
+                  description: role description
+                  kind: workspace
+                  workspaces:
+                    - id: workspace-1
+        required: true
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        example: null
         default:
           description: An unexpected error response.
           content:

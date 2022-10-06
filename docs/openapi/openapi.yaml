@@ -29,6 +29,8 @@ tags:
   description: ワークスペースに関する操作
 - name: UsersService
   description: ユーザーに関する操作
+- name: RoleService
+  description: ロールに関する操作
 - name: InternalCommonService
   description: 共通(内部用)
 - name: InternalUsersService
@@ -46,6 +48,9 @@ paths:
       $ref: './paths/workspaces.workspace_id.yaml'
   "/api/{organization_id}/platform/workspaces/{workspace_id}/members":
       $ref: './paths/workspaces.workspace_id.members.yaml'
+
+  "/api/{organization_id}/platform/roles":
+      $ref: './paths/roles.yaml'
 
   "/internal-api/{organization_id}/platform/workspaces/{workspace_id}/roles":
       $ref: './paths/internal_workspaces.workspace_id.roles.yaml'
