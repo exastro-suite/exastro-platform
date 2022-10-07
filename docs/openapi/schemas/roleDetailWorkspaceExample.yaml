@@ -12,23 +12,14 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-title: role is a definition of Role resource.
-type: object
-properties:
-  name:
-    type: string
-    example: organization-role-1
-  description:
-    type: string
-    example: "role description"
-  kind:
-    type: string
-    example: organization
-  authorities:
-    type: array
-    items:
-      type: object
-      properties:
-        name:
-          type: string
-          example: _og-upd
+value:
+  {
+    "name": "role-1",
+    "description": "role description",
+    "kind": "workspace",
+    "workspaces": [
+      {
+        "id": "workspace-1"
+      }
+    ]
+  }
