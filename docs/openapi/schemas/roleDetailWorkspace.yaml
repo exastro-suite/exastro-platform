@@ -32,14 +32,3 @@ properties:
         id:
           type: string
           example: workspace-1
-value:
-  {
-    "name": "role-1",
-    "description": "role description",
-    "kind": "workspace",
-    "workspaces": [
-      {
-        "id": "workspace-1"
-      }
-    ]
-  }

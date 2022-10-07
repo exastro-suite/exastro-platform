@@ -27,6 +27,8 @@ tags:
   description: ワークスペースに関する操作
 - name: UsersService
   description: ユーザーに関する操作
+- name: RoleService
+  description: ロールに関する操作
 
 paths:
   "/api/{organization_id}/platform/workspaces":
@@ -35,6 +37,9 @@ paths:
       $ref: './paths/workspaces.workspace_id.yaml'
   "/api/{organization_id}/platform/workspaces/{workspace_id}/members":
       $ref: './paths/workspaces.workspace_id.members.yaml'
+
+  "/api/{organization_id}/platform/roles":
+      $ref: './paths/roles.yaml'
 
 components:
   schemas:

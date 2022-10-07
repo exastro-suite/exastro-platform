@@ -66,10 +66,10 @@ post:
             - $ref: '../schemas/roleDetailWorkspace.yaml'
             # - $ref: '../schemas/roleDetailOrganization.yaml'
         examples:
-          'kind = workspace':
-            $ref: '../schemas/roleDetailWorkspace.yaml'
-          # 'kind = organization':
-          #   $ref: '../schemas/roleDetailOrganization.yaml'
+          workspace:
+            $ref: '../schemas/roleDetailWorkspaceExample.yaml'
+          # organization:
+          #   $ref: '../schemas/roleDetailOrganizationExample.yaml'
     required: true
   responses:
     200:
