@@ -109,10 +109,10 @@ def workspace_create(body, organization_id):
             token = json.loads(token_response.text)["access_token"]
 
             # ws
-            auth_name_ws = [workspace_id, f"{workspace_id}-admin"]
+            auth_name_ws = [workspace_id, common.get_ws_admin_rolename(workspace_id)]
 
             # ws-admin
-            role_name_wsadmin = f"_{workspace_id}-admin"
+            role_name_wsadmin = common.get_ws_admin_rolename(workspace_id)
 
             # ロール作成(auth_name_ws)
             # create auth_name_ws role
