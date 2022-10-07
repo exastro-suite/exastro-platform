@@ -249,13 +249,10 @@ const CommonAuth = {
     /**
      * check authority - 権限の有無をチェックする
      * @param {string} authority 
-     * @returns boolean
+     * @returns {boolean}
      */
     "hasAuthority": function(authority) {
         try {
-            if( CommonAuth.keycloak.tokenParsed.resource_access[CommonAuth.getRealm() + "-workspaces"].roles.indexOf("_org-manager") !== -1 ) {
-                return true;
-            }
             if( CommonAuth.keycloak.tokenParsed.resource_access[CommonAuth.getRealm() + "-workspaces"].roles.indexOf(authority) !== -1 ) {
                 return true;
             } else {
@@ -263,6 +260,34 @@ const CommonAuth = {
             }
         } catch(e) {
             return false;
+        }
+    },
+
+    /**
+     * get accessable workspaces - アクセス可能なワークスペースを返します
+     * @returns {array} array of workspace_id
+     */
+    "getAccessibleWorkspaces": function() {
+        try {
+            return CommonAuth.keycloak.tokenParsed.resource_access[CommonAuth.getRealm() + "-workspaces"].roles.filter(
+                (role) => {return role.substring(0,1) !== '_'});
+        } catch(e) {
+            return [];
+        }
+    },
+
+    /**
+     * get management workspaces - ワークスペース管理者検眼のあるワークスペースを返します
+     * @returns {array} array of workspace_id
+     */
+    "getManagementWorkspaces": function() {
+        try {
+            let workspaces = [];
+            CommonAuth.keycloak.tokenParsed.resource_access[CommonAuth.getRealm() + "-workspaces"].roles.forEach(
+                (role) => { if(role.match(/^_.*-admin$/g)) { workspaces.push(role.replace(/^_/,"").replace(/-admin$/,"")); } });
+            return workspaces;
+        } catch(e) {
+            return [];
         }
     },
 

@@ -20,7 +20,6 @@ AUTH_PATTERN = [
             {
                 "method": ["POST"],
                 "roles": [
-                    {"client": "{org_id}-workspaces", "role": "_org-manager"},
                     {"client": "{org_id}-workspaces", "role": "_og-ws-mt"},
                 ]
             }
@@ -32,7 +31,7 @@ AUTH_PATTERN = [
             {
                 "method": ["*"],
                 "roles": [
-                    {"client": "{org_id}-workspaces", "role": "{ws_id}"}
+                    {"client": "{org_id}-workspaces", "role": "{ws_id}"},
                 ]
             }
         ]
@@ -41,9 +40,32 @@ AUTH_PATTERN = [
         "url": r"^/api/(?P<org_id>[^/][^/]*)/platform/workspaces/(?P<ws_id>[^/][^/]*)($|/.*$)",
         "auth": [
             {
+                "method": ["GET"],
+                "roles": [
+                    {"client": "{org_id}-workspaces", "role": "{ws_id}"},
+                    {"client": "{org_id}-workspaces", "role": "{ws_id}-admin"},
+                    {"client": "{org_id}-workspaces", "role": "_og-ws-mt"},
+                    {"client": "{org_id}-workspaces", "role": "_og-ws-role-mt"},
+                ]
+            },
+            {
+                "method": ["PUT", "PATCH", "DELETE"],
+                "roles": [
+                    {"client": "{org_id}-workspaces", "role": "{ws_id}-admin"},
+                    {"client": "{org_id}-workspaces", "role": "_og-ws-mt"},
+                ]
+            }
+        ]
+    },
+    {
+        "url": r"^/api/(?P<org_id>[^/][^/]*)/platform/roles/($|/.*$)",
+        "auth": [
+            {
                 "method": ["*"],
                 "roles": [
-                    {"client": "{org_id}-workspaces", "role": "{ws_id}"}
+                    {"client": "{org_id}-workspaces", "role": "_.*-admin"},
+                    {"client": "{org_id}-workspaces", "role": "_og-role-usr"},
+                    {"client": "{org_id}-workspaces", "role": "_og-ws-role-mt"},
                 ]
             }
         ]
