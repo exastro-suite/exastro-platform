@@ -25,27 +25,24 @@ import globals
 MSG_FUNCTION_ID = 00
 
 
-def is_workspace_authority(organization_id, workspace_id):
-    """workspace authority check
+def __get_user_authority(organization_id, headers):
+    """get user authority
 
     Args:
         organization_id (str): organization id
-        workspace_id (str): workspace id
+        headers (EnvironHeaders): request headers
 
     Returns:
-        boolean: true:ok false:ng
+        list, list: org_auths, ws_auths
     """
-
-    is_auth = False
-
     client_id = common.get_platform_client_id(organization_id)
 
-    user_id = request.headers.get("User-Id")
+    user_id = headers.get("User-Id")
 
     # ヘッダのRole, Org-Roleの情報をもとに該当のworkspaceが利用可能かチェックする
     # Check if the corresponding workspace is available based on the Role and Org-Role information in the header
-    roles_enc = request.headers.get("Roles")
-    org_roles_enc = request.headers.get("Org-Roles")
+    roles_enc = headers.get("Roles")
+    org_roles_enc = headers.get("Org-Roles")
 
     if org_roles_enc:
         org_roles = base64.b64decode(org_roles_enc.encode()).decode("utf-8")
@@ -137,6 +134,22 @@ def is_workspace_authority(organization_id, workspace_id):
     globals.logger.debug(f"org_auths:{org_auths}")
     globals.logger.debug(f"ws_auths:{ws_auths}")
 
+    return org_auths, ws_auths
+
+
+def __is_workspace_authority(workspace_id, org_auths: list, ws_auths: list):
+    """workspace authority check
+
+    Args:
+        workspace_id (_type_): workspace id
+        org_auths (list): organization auths
+        ws_auths (list): workspace auths
+
+    Returns:
+        boolean: true:ok false:ng
+    """
+    is_auth = False
+
     # オーガナイゼーションロールで、wsに関連するロールがあれば優先的にOKとする
     # In the organization role, if there is a role related to ws, it is given priority as OK
     if const.ORG_AUTH_WS_ROLE_MAINTE in org_auths or \
@@ -151,6 +164,50 @@ def is_workspace_authority(organization_id, workspace_id):
         # workspace role is a oK
         is_auth = True
 
-    globals.logger.debug(f"check auth:{is_auth}")
+    globals.logger.debug(f"check auth:{workspace_id} = {is_auth}")
 
     return is_auth
+
+
+def is_workspace_authority(organization_id, workspace_id):
+    """workspace authority check
+
+    Args:
+        organization_id (str): organization id
+        workspace_id (str): workspace id
+
+    Returns:
+        boolean: true:ok false:ng
+    """
+    is_auth = False
+
+    org_auths, ws_auths = __get_user_authority(organization_id, request.headers)
+
+    is_auth = __is_workspace_authority(workspace_id, org_auths, ws_auths)
+
+    return is_auth
+
+
+def is_workspaces_authority(organization_id, workspace_ids: list):
+    """workspace authority check
+
+    Args:
+        organization_id (str): organization id
+        workspace_ids (list): workspace ids
+
+    Returns:
+        list[dict]: id: workspace_id, is_auth: True:ok False:ng
+    """
+    if len(workspace_ids) < 1:
+        return {}
+
+    org_auths, ws_auths = __get_user_authority(organization_id, request.headers)
+
+    list_is_auth = []
+    for workspace_id in workspace_ids:
+        is_auth = __is_workspace_authority(workspace_id, org_auths, ws_auths)
+        list_is_auth.append(
+            {"id": workspace_id, "is_auth": is_auth}
+        )
+
+    return list_is_auth

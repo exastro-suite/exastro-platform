@@ -225,40 +225,7 @@ paths:
               schema:
                 allOf:
                   - $ref: '#/components/schemas/responseOk'
-                  - title: WorkspaceList is a list of workspace resources that users can access.
-                    type: object
-                    properties:
-                      data:
-                        type: array
-                        items:
-                          oneOf:
-                            - $ref: '#/paths/~1api~1%7Borganization_id%7D~1platform~1roles/post/requestBody/content/application~1json/examples/kind%20%3D%20workspace'
-                            - title: role is a definition of Role resource.
-                              type: object
-                              properties:
-                                name:
-                                  type: string
-                                  example: organization-role-1
-                                description:
-                                  type: string
-                                  example: role description
-                                kind:
-                                  type: string
-                                  example: organization
-                                authorities:
-                                  type: array
-                                  items:
-                                    type: object
-                                    properties:
-                                      name:
-                                        type: string
-                                        example: _og-upd
-                              value:
-                                name: organization-role-1
-                                description: role description
-                                kind: organization
-                                authorities:
-                                  - name: _og-upd
+                  - $ref: '#/components/schemas/roleDetailList'
         default:
           description: An unexpected error response.
           content:
@@ -282,29 +249,9 @@ paths:
           application/json:
             schema:
               oneOf:
-                - $ref: '#/paths/~1api~1%7Borganization_id%7D~1platform~1roles/post/requestBody/content/application~1json/examples/kind%20%3D%20workspace'
+                - $ref: '#/components/schemas/roleDetailWorkspace'
             examples:
-              kind = workspace:
-                title: role is a definition of Role resource.
-                type: object
-                properties:
-                  name:
-                    type: string
-                    example: role-1
-                  description:
-                    type: string
-                    example: role description
-                  kind:
-                    type: string
-                    example: workspace
-                  workspaces:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        id:
-                          type: string
-                          example: workspace-1
+              workspace:
                 value:
                   name: role-1
                   description: role description
@@ -762,3 +709,55 @@ components:
         id:
           type: string
           example: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+    roleDetailList:
+      title: WorkspaceList is a list of workspace resources that users can access.
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            oneOf:
+              - $ref: '#/components/schemas/roleDetailWorkspace'
+              - $ref: '#/components/schemas/roleDetailOrganization'
+    roleDetailOrganization:
+      title: role is a definition of Role resource.
+      type: object
+      properties:
+        name:
+          type: string
+          example: organization-role-1
+        description:
+          type: string
+          example: role description
+        kind:
+          type: string
+          example: organization
+        authorities:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+                example: _og-upd
+    roleDetailWorkspace:
+      title: role is a definition of Role resource.
+      type: object
+      properties:
+        name:
+          type: string
+          example: role-1
+        description:
+          type: string
+          example: role description
+        kind:
+          type: string
+          example: workspace
+        workspaces:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                example: workspace-1
