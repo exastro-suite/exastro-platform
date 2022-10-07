@@ -138,5 +138,26 @@ def role_list(organization_id, kind=None):
         InlineResponse2004: _description_
     """
 
-    data = {}
+    data = [
+        {
+            "name": "role-1",
+            "description": "role description",
+            "kind": "workspace",
+            "workspaces": [
+                {
+                    "id": "workspace-1"
+                }
+            ]
+        },
+        {
+            "name": "organization-role-1",
+            "description": "role description",
+            "kind": "organization",
+            "authorities": [
+                {
+                    "name": "_og-upd"
+                }
+            ]
+        }
+    ]
     return common.response_200_ok(data)
