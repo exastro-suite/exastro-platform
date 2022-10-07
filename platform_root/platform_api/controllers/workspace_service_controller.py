@@ -22,6 +22,7 @@ import base64
 
 from common_library.common import common, api_keycloak_tokens, api_keycloak_users
 from common_library.common import api_keycloak_roles, api_keycloak_clients, api_ita_admin_call, validation
+import common_library.common.const as common_const
 from common_library.common.db import DBconnector
 from libs import queries_workspaces
 
@@ -114,11 +115,20 @@ def workspace_create(body, organization_id):
             # ws-admin
             role_name_wsadmin = common.get_ws_admin_rolename(workspace_id)
 
+            # デフォルトオプション
+            # default option
+            role_options = {
+                "attributes": {
+                    "kind": [common_const.ROLE_KIND_WORKSPACE]
+                }
+            }
+
             # ロール作成(auth_name_ws)
             # create auth_name_ws role
             for role in auth_name_ws:
                 r_create_ws = api_keycloak_clients.client_role_create(
                     realm_name=organization_id, client_uid=private.internal_api_client_id, role_name=role, token=token,
+                    role_options=role_options,
                 )
                 if r_create_ws.status_code not in [201, 409]:
                     # 201 Created 以外に、409 already exists は許容する
@@ -127,7 +137,8 @@ def workspace_create(body, organization_id):
             # ロール作成(role_name_wsadmin)
             # create role_name_wsadmin role
             r_create_wsadmin = api_keycloak_clients.client_role_create(
-                realm_name=organization_id, client_uid=private.user_token_client_id, role_name=role_name_wsadmin, token=token
+                realm_name=organization_id, client_uid=private.user_token_client_id, role_name=role_name_wsadmin, token=token,
+                role_options=role_options,
             )
             if r_create_wsadmin.status_code not in [201, 409]:
                 # 201 Created 以外に、409 already exists は許容する

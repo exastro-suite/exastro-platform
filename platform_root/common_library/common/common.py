@@ -406,3 +406,27 @@ def get_ws_admin_authname(workspace_id):
     """
 
     return f"_{workspace_id}-admin"
+
+
+def get_value_in_json(json, value_key, is_key=True):
+    """json値の配列情報から特定のキー値の右辺値（Value）を取得する
+    Get the right side value (Value) of a specific key value from the json value array information
+
+    Args:
+        json (dict): json value
+        value_key (str): value key
+        is_key (bool, optional): value key enable only return. Defaults to True.
+
+    Returns:
+        array: value list
+    """
+
+    if is_json_format(json):
+        if is_key:
+            val_list = [val.get(value_key) for val in json if val.get(value_key)]
+        else:
+            val_list = [val.get(value_key) for val in json]
+    else:
+        val_list = []
+
+    return val_list
