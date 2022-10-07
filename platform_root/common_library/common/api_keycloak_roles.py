@@ -20,6 +20,45 @@ import requests
 import globals  # 共通的なglobals Common globals
 
 
+def clients_roles_get(realm_name, client_id, token, briefRepresentation=True):
+    """client ロール取得 client roles get
+    Args:
+        realm_name (str): realm name
+        client_id (str): client id (not client-id)
+        toekn (str): token
+        briefRepresentation (bool): True:brief   False:All
+    Returns:
+        Response: HTTP Respose (success : .status_code=200)
+    """
+    globals.logger.info(f'Get keycloak composite-roles. realm_name={realm_name}, client_id={client_id}')
+
+    # 呼び出し先設定
+    # Call destination setting
+    api_url = "{}://{}:{}".format(os.environ['API_KEYCLOAK_PROTOCOL'], os.environ['API_KEYCLOAK_HOST'], os.environ['API_KEYCLOAK_PORT'])
+
+    header_para = {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer {}".format(token),
+    }
+
+    # 今後の追加も考慮して作成
+    # Created with future additions in mind
+    add_query = ""
+    if not briefRepresentation:
+        if add_query:
+            add_query += "&"
+        else:
+            add_query += "?"
+        add_query += f"briefRepresentation={briefRepresentation}"
+
+    globals.logger.debug("client roles get")
+    # 情報取得
+    # information acquisition
+    request_response = requests.get(f"{api_url}/auth/admin/realms/{realm_name}/clients/{client_id}/roles{add_query}", headers=header_para)
+
+    return request_response
+
+
 def clients_composite_roles_get(realm_name, client_id, role_name, token):
     """client 子ロール取得 client composite roles get
     Args:
@@ -41,7 +80,7 @@ def clients_composite_roles_get(realm_name, client_id, role_name, token):
         "Authorization": "Bearer {}".format(token),
     }
 
-    globals.logger.debug("composite-roles post")
+    globals.logger.debug("composite-roles get")
     # 情報取得
     # information acquisition
     request_response = requests.get(f"{api_url}/auth/admin/realms/{realm_name}/clients/{client_id}/roles/{role_name}/composites", headers=header_para)

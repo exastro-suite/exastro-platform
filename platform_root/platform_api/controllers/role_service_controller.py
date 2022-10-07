@@ -14,9 +14,13 @@
 
 import connexion
 import json
+import inspect
 
-from common_library.common import common, api_keycloak_tokens, api_keycloak_clients, validation, check_authority
+from common_library.common import common, api_keycloak_tokens, api_keycloak_clients, api_keycloak_roles
+from common_library.common import validation, check_authority
 from common_library.common.db import DBconnector
+from common_library.common import multi_lang
+import common_library.common.const as common_const
 
 import globals
 
@@ -148,26 +152,140 @@ def role_list(organization_id, kind=None):
         InlineResponse2004: _description_
     """
 
-    data = [
-        {
-            "name": "role-1",
-            "description": "role description",
-            "kind": "workspace",
-            "workspaces": [
-                {
-                    "id": "workspace-1"
-                }
-            ]
-        },
-        {
-            "name": "organization-role-1",
-            "description": "role description",
-            "kind": "organization",
-            "authorities": [
-                {
-                    "name": "_og-upd"
-                }
-            ]
+    globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
+
+    db = DBconnector()
+    private = db.get_organization_private(organization_id)
+
+    # サービスアカウントのTOKEN取得
+    # Get a service account token
+    token_response = api_keycloak_tokens.service_account_get_token(
+        organization_id, private.internal_api_client_clientid, private.internal_api_client_secret,
+    )
+    if token_response.status_code != 200:
+        raise common.AuthException(
+            "client_user_get_token error status:{}, response:{}".format(token_response.status_code, token_response.text)
+        )
+
+    token = json.loads(token_response.text)["access_token"]
+
+    response = api_keycloak_roles.clients_roles_get(
+        realm_name=organization_id, client_id=private.user_token_client_id, token=token, briefRepresentation=False
+    )
+    if response.status_code != 200:
+        globals.logger.error(f"response.status_code:{response.status_code}")
+        globals.logger.error(f"response.text:{response.text}")
+        message_id = f"500-{MSG_FUNCTION_ID}005"
+        message = multi_lang.get_text(
+            message_id,
+            "roleの取得に失敗しました(対象ID:{0} client:{1})",
+            organization_id,
+            private.user_token_client_clientid
+        )
+        raise common.InternalErrorException(message_id=message_id, message=message)
+
+    roles = json.loads(response.text)
+
+    data = []
+
+    # 取得したロールを戻り値に設定
+    # Set the acquired role to the return value
+    for role in roles:
+        globals.logger.debug("attributes:{}".format(role.get("attributes")))
+
+        role_kind_list = role.get("attributes").get("kind")
+        if role_kind_list:
+            role_kind = role_kind_list[0]
+        else:
+            role_kind = ""
+
+        if kind:
+            # 条件フィルタがある場合は、該当のkindと一致しない場合は返却しない
+            # If there is a conditional filter, do not return if the kind does not match
+            if role_kind != kind:
+                continue
+
+        # 共通の戻り値設定
+        # Common return value settin
+        ret_role = {
+            "name": role.get("name"),
+            "description": role.get("description"),
+            "kind": role_kind,
         }
-    ]
+
+        if role.get("composite"):
+            # 子ロールの取得
+            # get composite role
+            response = api_keycloak_roles.clients_composite_roles_get(
+                realm_name=organization_id, client_id=private.user_token_client_id, role_name=role.get("name"), token=token
+            )
+            if response.status_code == 200:
+                composite_roles = json.loads(response.text)
+                globals.logger.debug(f"composite_roles:{composite_roles}")
+
+                for composite_role in composite_roles:
+                    if role_kind == common_const.ROLE_KIND_ORGANIZATION:
+                        # organization role
+                        composite_list = {
+                            "authorities": [
+                                {
+                                    "name": composite_role.get("name")
+                                }
+                            ]
+                        }
+                    elif role_kind == common_const.ROLE_KIND_WORKSPACE:
+                        # workspace role
+                        composite_list = {
+                            "workspaces": [
+                                {
+                                    "id": composite_role.get("name")
+                                }
+                            ]
+                        }
+
+            elif response.status_code == 404:
+                composite_list = None
+            else:
+                globals.logger.error(f"response.status_code:{response.status_code}")
+                globals.logger.error(f"response.text:{response.text}")
+                message_id = f"500-{MSG_FUNCTION_ID}006"
+                message = multi_lang.get_text(
+                    message_id,
+                    "composite roleの取得に失敗しました(対象ID:{0} client:{1})",
+                    organization_id,
+                    private.token_check_client_clientid
+                )
+                raise common.InternalErrorException(message_id=message_id, message=message)
+
+            if composite_list:
+                ret_role.update(composite_list)
+
+        data.append(ret_role)
+
+    globals.logger.debug(f"data:{data}")
+    # data = [
+    #     {
+    #         "name": "role-1",
+    #         "description": "role description",
+    #         "kind": "workspace",
+    #         "workspaces": [
+    #             {
+    #                 "id": "workspace-1"
+    #             }
+    #         ]
+    #     },
+    #     {
+    #         "name": "organization-role-1",
+    #         "description": "role description",
+    #         "kind": "organization",
+    #         "authorities": [
+    #             {
+    #                 "name": "_og-upd"
+    #             }
+    #         ]
+    #     }
+    # ]
+
+    globals.logger.info(f"### Succeed func:{inspect.currentframe().f_code.co_name}")
+
     return common.response_200_ok(data)
