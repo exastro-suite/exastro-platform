@@ -265,6 +265,11 @@ def workspace_list(organization_id, workspace_name=None):
     roles_arr = roles_decode.split("\n")
     globals.logger.debug(f'roles_decode: {roles_decode}')
 
+    org_roles = request.headers.get("Org-Roles")
+    org_roles_decode = base64.b64decode(org_roles.encode()).decode("utf-8")
+    org_roles_arr = org_roles_decode.split("\n")
+    globals.logger.debug(f'org_roles_decode: {org_roles_decode}')
+
     private = DBconnector().get_organization_private(organization_id)
 
     # サービスアカウントのTOKEN取得
@@ -292,6 +297,22 @@ def workspace_list(organization_id, workspace_name=None):
 
     globals.logger.debug(f'posible_workspace_id: {posible_workspace_id}')
 
+    # ユーザのOrgRoleをもとに、権限を取得し全ワークスペースリストにアクセスできるか判定する
+    # Based on the user's OrgRole, determine whether or not the authority can be obtained and the entire workspace list can be accessed
+    posible_all_workspace = False
+    for role in org_roles_arr:
+        response_api = api_keycloak_roles.clients_composite_roles_get(organization_id, private.user_token_client_id, role, token)
+        if response_api.status_code == 200:
+            response_json = json.loads(response_api.text)
+            for composite_role in response_json:
+                if composite_role["name"] in ['_og-ws-role-mt', '_og-ws-mt']:
+                    posible_all_workspace = True
+                    break
+        if posible_all_workspace:
+            break
+
+    globals.logger.debug(f'posible_all_workspace: {posible_all_workspace}')
+
     # workspace list get
     with closing(DBconnector().connect_orgdb(organization_id)) as conn:
         with conn.cursor() as cursor:
@@ -311,7 +332,7 @@ def workspace_list(organization_id, workspace_name=None):
     for row in result:
         # 該当のロールがある場合のみ、設定
         # Set only if there is a corresponding role
-        if row["WORKSPACE_ID"] in posible_workspace_id:
+        if row["WORKSPACE_ID"] in posible_workspace_id or posible_all_workspace:
             row = {
                 "id": row["WORKSPACE_ID"],
                 "name": row["WORKSPACE_NAME"],

@@ -5,6 +5,13 @@ $(function(){
         new CommonUi(`#container`);
         $('.to_workspace_list').attr('href',location_conf.href.workspaces.list.replace(/{organization_id}/g, CommonAuth.getRealm()));
         $('.to_ita').on('click',() => { window.location = location_conf.href.workspaces.ita.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{workspace_id}/g, workspace_id); } );
+
+        if(CommonAuth.getAccessibleWorkspaces().indexOf(workspace_id) !== -1) {
+            $('.to_ita').prop('disabled', false);
+        } else {
+            $('.to_ita').prop('disabled', true);
+            $('.to_ita').css('cursor', 'not-allowed');
+        }
         get_workspace_detail();
         get_workspace_members();
         finish_onload_progress();

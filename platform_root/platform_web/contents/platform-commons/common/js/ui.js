@@ -70,7 +70,8 @@ setUi() {
     if (CommonAuth.hasAuthority("_og-usr-mt")) {
         $("#menu_account_management").css("display", "");
     }
-    if (CommonAuth.hasAuthority("_og-ws-role-mt") || CommonAuth.hasAuthority("_og-ws-role-usr")) {
+    let managementWorkspaces = CommonAuth.getManagementWorkspaces();
+    if (CommonAuth.hasAuthority("_og-ws-role-mt") || CommonAuth.hasAuthority("_og-ws-role-usr") || managementWorkspaces.length > 0) {
         $("#menu_role_management").css("display", "");
     }
     return;

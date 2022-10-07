@@ -131,4 +131,14 @@ tokenを強制的にリフレッシュします<br>
 権限があるか判定する
 - parameter
     - @param {string} authority
-    - @returns boolean
+    - @returns {boolean}
+
+### CommonAuth.getAccessibleWorkspaces()
+アクセス可能なワークスペースを返します
+- parameter
+    - @returns {array} array of workspace_id
+
+### CommonAuth.getAccessibleWorkspaces()
+ワークスペース管理者検眼のあるワークスペースを返します
+- parameter
+    - @returns {array} array of workspace_id

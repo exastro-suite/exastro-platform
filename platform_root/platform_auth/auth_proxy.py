@@ -542,19 +542,24 @@ class auth_proxy:
                 # - methodが一致した時、roleに合致するものが存在するかチェックする
                 for role in auth["roles"]:
                     role_name = role["role"].format(**match_dict)
+                    role_name_re = "^" + role_name + "$"
                     if role.get("client") is None:
                         # If client is not specified, check if there is anything that matches the realm role
                         # - clientの指定が無いときはrealmロールに合致するものが無いかチェックする
-                        if role_name in self.token_decode.get("realm_access", {}).get("roles", []):
-                            globals.logger.info('SUCCEED Is allowed request. Realm-role={}'.format(role_name))
-                            return True
+                        my_roles = self.token_decode.get("realm_access", {}).get("roles", [])
+                        for my_role in my_roles:
+                            if re.match(role_name_re, my_role):
+                                globals.logger.info('SUCCEED Is allowed request. Realm-role={}'.format(role_name))
+                                return True
                     else:
                         # If client is specified, check if there is anything that matches the client role
                         # - clientの指定があるときはclientロールに合致するものが無いかチェックする
                         role_client = role["client"].format(**match_dict)
-                        if role_name in self.token_decode.get("resource_access", {}).get(role_client, {}).get("roles", []):
-                            globals.logger.info('SUCCEED Is allowed request. client-role={}.{}'.format(role_client, role_name))
-                            return True
+                        my_roles = self.token_decode.get("resource_access", {}).get(role_client, {}).get("roles", [])
+                        for my_role in my_roles:
+                            if re.match(role_name_re, my_role):
+                                globals.logger.info('SUCCEED Is allowed request. client-role={}.{}'.format(role_client, role_name))
+                                return True
 
                 # Access is not allowed when the method matches and there is no match for the role
                 # - methodが一致し、roleに合致するものが存在しないときはaccess不可

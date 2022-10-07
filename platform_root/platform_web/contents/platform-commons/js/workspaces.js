@@ -108,6 +108,18 @@ $(function(){
             $('.to_detail').click((event) => { to_detail($(event.currentTarget).attr('data-id')); });
             $('.btn_member').click((event) => { to_members($(event.currentTarget).attr('data-id')); });
             $('.btn_ita').click((event) => { to_ita($(event.currentTarget).attr('data-id')); });
+
+            let accessibleWorkspaces = CommonAuth.getAccessibleWorkspaces();
+
+            $('.btn_ita').each(function(index, element) {
+                let $element = $(element);
+                if(accessibleWorkspaces.indexOf($(element).attr('data-id')) !== -1) {
+                    $(element).prop('disabled', false);
+                } else {
+                    $(element).prop('disabled', true);
+                    $(element).css('cursor', 'not-allowed');
+                }
+            });
         }
     }
 });
