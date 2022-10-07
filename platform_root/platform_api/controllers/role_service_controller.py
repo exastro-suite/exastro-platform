@@ -110,10 +110,13 @@ def role_create(body, organization_id):
         realm_name=organization_id, client_uid=private.user_token_client_id, token=token,
         role_name=role_name, role_options=role_options
     )
-    if r_create.status_code not in [201, 409]:
+    if r_create.status_code == 409:
         globals.logger.debug(f"response:{r_create.text}")
 
-        # 201 Created 以外に、409 already exists は許容する
+        raise common.OtherException(409, None, f"409-{MSG_FUNCTION_ID}001", "指定されたロールはすでに存在しているため作成できません。")
+    elif r_create.status_code not in [201, 409]:
+        globals.logger.debug(f"response:{r_create.text}")
+
         raise common.InternalErrorException(None, f"500-{MSG_FUNCTION_ID}002", "ロール作成に失敗しました(対象ロール:{})".format(role_name))
 
     # ロールにwsロールを紐づける
