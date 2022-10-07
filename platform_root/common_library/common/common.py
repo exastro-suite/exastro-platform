@@ -380,3 +380,29 @@ def keycloak_timestamp_to_str(keycloak_timestamp):
             return datetime_to_str(datetime.fromtimestamp(keycloak_timestamp / 1000))
     except Exception:
         return None
+
+
+def get_ws_admin_rolename(workspace_id):
+    """get workspace admin role name
+
+    Args:
+        workspace_id (str) : workspace id
+
+    Returns:
+        str : workspace admin role name
+    """
+
+    return f"_{workspace_id}-admin"
+
+
+def get_ws_admin_authname(workspace_id):
+    """get workspace admin authority name
+
+    Args:
+        workspace_id (str) : workspace id
+
+    Returns:
+        str : workspace admin authority name
+    """
+
+    return f"_{workspace_id}-admin"
