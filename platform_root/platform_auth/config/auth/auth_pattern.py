@@ -58,7 +58,7 @@ AUTH_PATTERN = [
         ]
     },
     {
-        "url": r"^/api/(?P<org_id>[^/][^/]*)/platform/roles/($|/.*$)",
+        "url": r"^/api/(?P<org_id>[^/][^/]*)/platform/roles($|/.*$)",
         "auth": [
             {
                 "method": ["*"],
