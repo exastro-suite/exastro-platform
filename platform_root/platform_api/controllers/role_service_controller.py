@@ -15,7 +15,7 @@
 import connexion
 import json
 
-from common_library.common import common, api_keycloak_tokens, api_keycloak_clients, validation
+from common_library.common import common, api_keycloak_tokens, api_keycloak_clients, validation, check_authority
 from common_library.common.db import DBconnector
 
 import globals
@@ -60,6 +60,14 @@ def role_create(body, organization_id):
     if not validate.ok:
         return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, validate.args)
 
+    workspace_ids = [w.get("id") for w in workspaces]
+    list_is_auth = check_authority.is_workspaces_authority(organization_id, workspace_ids)
+    for is_auth in list_is_auth:
+        if not is_auth.get("is_auth"):
+            raise common.BadRequestException(
+                message_id=f"400-{MSG_FUNCTION_ID}001", message='指定されたワークスペースを操作対象として指定する権限がありません。'
+            )
+
     db = DBconnector()
     private = db.get_organization_private(organization_id)
 
@@ -78,8 +86,7 @@ def role_create(body, organization_id):
     # ロールに紐づけるwsロールを取得する
     # get ws role
     roles_ws = []
-    for w in workspaces:
-        role_name_ws = w.get("id")
+    for role_name_ws in workspace_ids:
         r_get_role_ws = api_keycloak_clients.client_role_get(
             realm_name=organization_id, client_id=private.internal_api_client_id, role_name=role_name_ws, token=token,
         )
