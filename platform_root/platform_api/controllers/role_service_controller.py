@@ -178,7 +178,7 @@ def role_list(organization_id, kind=None):
         message_id = f"500-{MSG_FUNCTION_ID}005"
         message = multi_lang.get_text(
             message_id,
-            "roleの取得に失敗しました(対象ID:{0} client:{1})",
+            "ロールの取得に失敗しました(対象ID:{0} client:{1})",
             organization_id,
             private.user_token_client_clientid
         )
@@ -252,28 +252,6 @@ def role_list(organization_id, kind=None):
         data.append(ret_role)
 
     globals.logger.debug(f"data:{data}")
-    # data = [
-    #     {
-    #         "name": "role-1",
-    #         "description": "role description",
-    #         "kind": "workspace",
-    #         "workspaces": [
-    #             {
-    #                 "id": "workspace-1"
-    #             }
-    #         ]
-    #     },
-    #     {
-    #         "name": "organization-role-1",
-    #         "description": "role description",
-    #         "kind": "organization",
-    #         "authorities": [
-    #             {
-    #                 "name": "_og-upd"
-    #             }
-    #         ]
-    #     }
-    # ]
 
     globals.logger.info(f"### Succeed func:{inspect.currentframe().f_code.co_name}")
 
