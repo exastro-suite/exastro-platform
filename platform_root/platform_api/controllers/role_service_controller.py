@@ -223,25 +223,20 @@ def role_list(organization_id, kind=None):
                 composite_roles = json.loads(response.text)
                 globals.logger.debug(f"composite_roles:{composite_roles}")
 
+                if role_kind == common_const.ROLE_KIND_ORGANIZATION:
+                    # organization role
+                    composite_list = {"authorities": []}
+                elif role_kind == common_const.ROLE_KIND_WORKSPACE:
+                    # workspace role
+                    composite_list = {"workspaces": []}
+
                 for composite_role in composite_roles:
                     if role_kind == common_const.ROLE_KIND_ORGANIZATION:
                         # organization role
-                        composite_list = {
-                            "authorities": [
-                                {
-                                    "name": composite_role.get("name")
-                                }
-                            ]
-                        }
+                        composite_list["authorities"].append({"name": composite_role.get("name")})
                     elif role_kind == common_const.ROLE_KIND_WORKSPACE:
                         # workspace role
-                        composite_list = {
-                            "workspaces": [
-                                {
-                                    "id": composite_role.get("name")
-                                }
-                            ]
-                        }
+                        composite_list["workspaces"].append({"id": composite_role.get("name")})
 
             elif response.status_code == 404:
                 composite_list = None
