@@ -137,17 +137,19 @@ def __get_user_authority(organization_id, headers):
     return org_auths, ws_auths
 
 
-def __is_workspace_authority(workspace_id, org_auths: list, ws_auths: list):
+def __is_workspace_authority(workspace_id, org_auths: list, ws_auths: list, is_maintenance):
     """workspace authority check
 
     Args:
         workspace_id (_type_): workspace id
         org_auths (list): organization auths
         ws_auths (list): workspace auths
+        is_maintenance (bool): check maintenance is allowed
 
     Returns:
         boolean: true:ok false:ng
     """
+
     is_auth = False
 
     # オーガナイゼーションロールで、wsに関連するロールがあれば優先的にOKとする
@@ -162,19 +164,23 @@ def __is_workspace_authority(workspace_id, org_auths: list, ws_auths: list):
         is_auth = True
     elif workspace_id in ws_auths:
         # workspace role is a oK
-        is_auth = True
+        if not is_maintenance:
+            is_auth = True
+        else:
+            is_auth = False
 
     globals.logger.debug(f"check auth:{workspace_id} = {is_auth}")
 
     return is_auth
 
 
-def is_workspace_authority(organization_id, workspace_id):
+def is_workspace_authority(organization_id, workspace_id, is_maintenance=False):
     """workspace authority check
 
     Args:
         organization_id (str): organization id
         workspace_id (str): workspace id
+        is_maintenance (bool): check maintenance is allowed
 
     Returns:
         boolean: true:ok false:ng
@@ -183,17 +189,18 @@ def is_workspace_authority(organization_id, workspace_id):
 
     org_auths, ws_auths = __get_user_authority(organization_id, request.headers)
 
-    is_auth = __is_workspace_authority(workspace_id, org_auths, ws_auths)
+    is_auth = __is_workspace_authority(workspace_id, org_auths, ws_auths, is_maintenance)
 
     return is_auth
 
 
-def is_workspaces_authority(organization_id, workspace_ids: list):
+def is_workspaces_authority(organization_id, workspace_ids: list, is_maintenance=False):
     """workspace authority check
 
     Args:
         organization_id (str): organization id
         workspace_ids (list): workspace ids
+        is_maintenance (bool): check maintenance is allowed
 
     Returns:
         list[dict]: id: workspace_id, is_auth: True:ok False:ng
@@ -205,7 +212,7 @@ def is_workspaces_authority(organization_id, workspace_ids: list):
 
     list_is_auth = []
     for workspace_id in workspace_ids:
-        is_auth = __is_workspace_authority(workspace_id, org_auths, ws_auths)
+        is_auth = __is_workspace_authority(workspace_id, org_auths, ws_auths, is_maintenance)
         list_is_auth.append(
             {"id": workspace_id, "is_auth": is_auth}
         )

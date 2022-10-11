@@ -65,7 +65,7 @@ def role_create(body, organization_id):
         return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, validate.args)
 
     workspace_ids = [w.get("id") for w in workspaces]
-    list_is_auth = check_authority.is_workspaces_authority(organization_id, workspace_ids)
+    list_is_auth = check_authority.is_workspaces_authority(organization_id, workspace_ids, is_maintenance=True)
     for is_auth in list_is_auth:
         if not is_auth.get("is_auth"):
             raise common.BadRequestException(
