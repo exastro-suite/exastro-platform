@@ -124,6 +124,8 @@ class platform_init:
             # Platform database insert and update
             self.__platform_db_update(self.realm, access_token, platform_data_row)
 
+            self.step_count += 1
+
             # userの更新
             # user update
             self.__user_update(self.realm, access_token)
@@ -546,54 +548,54 @@ class platform_init:
 
         globals.logger.info(f"[{self.step_count}/{self.step_max}] ### Start func:{inspect.currentframe().f_code.co_name}")
 
-        globals.logger.info(f"[{self.step_count}/{self.step_max}] - get user:")
-        # user 情報取得
-        # Get user information
-        response = api_keycloak_users.user_get(realm_name, self.token_user, token)
-        if response.status_code not in [200]:
-            globals.logger.info(f"[{self.step_count}/{self.step_max}] -- NG: get user:")
-            globals.logger.error(f"response.status_code:{response.status_code}")
-            globals.logger.error(f"response.text:{response.text}")
-            message_id = f"500-{MSG_FUNCTION_ID}009"
-            message = multi_lang.get_text(
-                message_id,
-                "get user failed. (realm:{0} user:{1})",
-                realm_name,
-                self.token_user
-            )
-            raise common.InternalErrorException(message_id=message_id, message=message)
+        # globals.logger.info(f"[{self.step_count}/{self.step_max}] - get user:")
+        # # user 情報取得
+        # # Get user information
+        # response = api_keycloak_users.user_get(realm_name, self.token_user, token)
+        # if response.status_code not in [200]:
+        #     globals.logger.info(f"[{self.step_count}/{self.step_max}] -- NG: get user:")
+        #     globals.logger.error(f"response.status_code:{response.status_code}")
+        #     globals.logger.error(f"response.text:{response.text}")
+        #     message_id = f"500-{MSG_FUNCTION_ID}009"
+        #     message = multi_lang.get_text(
+        #         message_id,
+        #         "get user failed. (realm:{0} user:{1})",
+        #         realm_name,
+        #         self.token_user
+        #     )
+        #     raise common.InternalErrorException(message_id=message_id, message=message)
 
-        globals.logger.info(f"[{self.step_count}/{self.step_max}] -- OK: get user:")
-        self.ok_count += 1
+        # globals.logger.info(f"[{self.step_count}/{self.step_max}] -- OK: get user:")
+        # self.ok_count += 1
 
-        user_info = json.loads(response.text)
-        user_id = user_info[0].get("id")
+        # user_info = json.loads(response.text)
+        # user_id = user_info[0].get("id")
 
-        update_user_json = {
-            "requiredActions": [
-                "UPDATE_PASSWORD"
-            ]
-        }
+        # update_user_json = {
+        #     "requiredActions": [
+        #         "UPDATE_PASSWORD"
+        #     ]
+        # }
 
-        globals.logger.info(f"[{self.step_count}/{self.step_max}] - update user:")
-        # user 情報更新：次回ログイン時パスワード更新
-        # Get user information : Password update at next login
-        response = api_keycloak_users.user_update(realm_name, user_id, update_user_json, token)
-        if response.status_code not in [200, 204]:
-            globals.logger.info(f"[{self.step_count}/{self.step_max}] -- NG: update user:")
-            globals.logger.error(f"response.status_code:{response.status_code}")
-            globals.logger.error(f"response.text:{response.text}")
-            message_id = f"500-{MSG_FUNCTION_ID}009"
-            message = multi_lang.get_text(
-                message_id,
-                "update user failed. (realm:{0} user:{1})",
-                realm_name,
-                self.token_user
-            )
-            raise common.InternalErrorException(message_id=message_id, message=message)
+        # globals.logger.info(f"[{self.step_count}/{self.step_max}] - update user:")
+        # # user 情報更新：次回ログイン時パスワード更新
+        # # Get user information : Password update at next login
+        # response = api_keycloak_users.user_update(realm_name, user_id, update_user_json, token)
+        # if response.status_code not in [200, 204]:
+        #     globals.logger.info(f"[{self.step_count}/{self.step_max}] -- NG: update user:")
+        #     globals.logger.error(f"response.status_code:{response.status_code}")
+        #     globals.logger.error(f"response.text:{response.text}")
+        #     message_id = f"500-{MSG_FUNCTION_ID}009"
+        #     message = multi_lang.get_text(
+        #         message_id,
+        #         "update user failed. (realm:{0} user:{1})",
+        #         realm_name,
+        #         self.token_user
+        #     )
+        #     raise common.InternalErrorException(message_id=message_id, message=message)
 
-        globals.logger.info(f"[{self.step_count}/{self.step_max}] -- OK: update user:")
-        self.ok_count += 1
+        # globals.logger.info(f"[{self.step_count}/{self.step_max}] -- OK: update user:")
+        # self.ok_count += 1
 
         # ステータス更新
         # update status
