@@ -22,7 +22,7 @@ from common_library.common.db import DBconnector
 
 import globals
 
-MSG_FUNCTION_ID = "21"
+MSG_FUNCTION_ID = "25"
 
 
 @common.platform_exception_handler

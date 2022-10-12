@@ -50,6 +50,11 @@ ORG_AUTH_WS_ROLE_MAINTE = "_og-ws-role-mt"
 ORG_AUTH_WS_ROLE_USER = "_og-ws-role-usr"
 ORG_AUTH_WS_MAINTE = "_og-ws-mt"
 
+# ワークスペースロール権限
+# workspace role authority
+WS_AUTH_ADMIN = "_{ws_id}-admin"
+WS_AUTH_ADMIN_ANY = "_.*-admin"
+
 # Roleと権限の紐づけ
 # Associating Roles and Permissions
 ORG_PERMISSION_ORG_MANAGER = [ORG_AUTH_UPDATE, ORG_AUTH_OWNER_MAINTE, ORG_AUTH_ROLE_USER, ORG_AUTH_PLAN_MAINTE, ORG_AUTH_USAGE_SITUATION,

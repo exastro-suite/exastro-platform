@@ -13,6 +13,8 @@
 # limitations under the License.
 #
 
+from common_library.common import const
+
 AUTH_PATTERN = [
     {
         "url": r"^/api/(?P<org_id>[^/][^/]*)/platform/workspaces/?$",
@@ -20,7 +22,7 @@ AUTH_PATTERN = [
             {
                 "method": ["POST"],
                 "roles": [
-                    {"client": "{org_id}-workspaces", "role": "_og-ws-mt"},
+                    {"client": "{org_id}-workspaces", "role": const.ORG_AUTH_WS_MAINTE},
                 ]
             }
         ]
@@ -43,16 +45,29 @@ AUTH_PATTERN = [
                 "method": ["GET"],
                 "roles": [
                     {"client": "{org_id}-workspaces", "role": "{ws_id}"},
-                    {"client": "{org_id}-workspaces", "role": "{ws_id}-admin"},
-                    {"client": "{org_id}-workspaces", "role": "_og-ws-mt"},
-                    {"client": "{org_id}-workspaces", "role": "_og-ws-role-mt"},
+                    {"client": "{org_id}-workspaces", "role": const.WS_AUTH_ADMIN},
+                    {"client": "{org_id}-workspaces", "role": const.ORG_AUTH_WS_MAINTE},
+                    {"client": "{org_id}-workspaces", "role": const.ORG_AUTH_WS_ROLE_MAINTE},
                 ]
             },
             {
                 "method": ["PUT", "PATCH", "DELETE"],
                 "roles": [
-                    {"client": "{org_id}-workspaces", "role": "{ws_id}-admin"},
-                    {"client": "{org_id}-workspaces", "role": "_og-ws-mt"},
+                    {"client": "{org_id}-workspaces", "role": const.WS_AUTH_ADMIN},
+                    {"client": "{org_id}-workspaces", "role": const.ORG_AUTH_WS_MAINTE},
+                ]
+            }
+        ]
+    },
+    {
+        "url": r"^/api/(?P<org_id>[^/][^/]*)/platform/users($|/.*$)",
+        "auth": [
+            {
+                "method": ["GET"],
+                "roles": [
+                    {"client": "{org_id}-workspaces", "role": const.WS_AUTH_ADMIN_ANY},
+                    {"client": "{org_id}-workspaces", "role": const.ORG_AUTH_USER_MAINTE},
+                    {"client": "{org_id}-workspaces", "role": const.ORG_AUTH_WS_ROLE_USER},
                 ]
             }
         ]
@@ -63,9 +78,22 @@ AUTH_PATTERN = [
             {
                 "method": ["*"],
                 "roles": [
-                    {"client": "{org_id}-workspaces", "role": "_.*-admin"},
-                    {"client": "{org_id}-workspaces", "role": "_og-role-usr"},
-                    {"client": "{org_id}-workspaces", "role": "_og-ws-role-mt"},
+                    {"client": "{org_id}-workspaces", "role": const.WS_AUTH_ADMIN_ANY},
+                    {"client": "{org_id}-workspaces", "role": const.ORG_AUTH_ROLE_USER},
+                    {"client": "{org_id}-workspaces", "role": const.ORG_AUTH_WS_ROLE_MAINTE},
+                ]
+            }
+        ]
+    },
+    {
+        "url": r"^/api/(?P<org_id>[^/][^/]*)/platform/roles/(?P<role_name>[^/][^/]*)($|/.*$)",
+        "auth": [
+            {
+                "method": ["PUT"],
+                "roles": [
+                    {"client": "{org_id}-workspaces", "role": const.WS_AUTH_ADMIN_ANY},
+                    {"client": "{org_id}-workspaces", "role": const.ORG_AUTH_ROLE_USER},
+                    {"client": "{org_id}-workspaces", "role": const.ORG_AUTH_WS_ROLE_MAINTE},
                 ]
             }
         ]
