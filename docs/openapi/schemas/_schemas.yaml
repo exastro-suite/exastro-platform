@@ -56,3 +56,5 @@ roleDetailOrganization:
   $ref: "./roleDetailOrganization.yaml"
 roleDetailWorkspace:
   $ref: "./roleDetailWorkspace.yaml"
+roleDetailWorkspacePut:
+  $ref: "./roleDetailWorkspacePut.yaml"

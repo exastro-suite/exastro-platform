@@ -278,6 +278,57 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/runtimeError'
+  '/api/{organization_id}/platform/roles/{role_name}':
+    put:
+      tags:
+        - RoleService
+      summary: Update updates an role
+      x-openapi-router-controller: controllers.role_service_controller
+      operationId: role_update
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: role_name
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/roleDetailWorkspacePut'
+            examples:
+              workspace:
+                value:
+                  description: role description
+                  kind: workspace
+                  workspaces:
+                    - id: workspace-1
+        required: true
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        example: null
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
   '/internal-api/{organization_id}/platform/workspaces/{workspace_id}/roles':
     get:
       tags:
@@ -747,6 +798,24 @@ components:
         name:
           type: string
           example: role-1
+        description:
+          type: string
+          example: role description
+        kind:
+          type: string
+          example: workspace
+        workspaces:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                example: workspace-1
+    roleDetailWorkspacePut:
+      title: role is a definition of Role resource.
+      type: object
+      properties:
         description:
           type: string
           example: role description

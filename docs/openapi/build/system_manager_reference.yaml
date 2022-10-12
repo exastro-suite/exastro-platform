@@ -334,6 +334,24 @@ components:
               id:
                 type: string
                 example: workspace-1
+    roleDetailWorkspacePut:
+      title: role is a definition of Role resource.
+      type: object
+      properties:
+        description:
+          type: string
+          example: role description
+        kind:
+          type: string
+          example: workspace
+        workspaces:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                example: workspace-1
   securitySchemes:
     BasicAuth:
       type: http

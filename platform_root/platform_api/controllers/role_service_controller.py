@@ -65,12 +65,11 @@ def role_create(body, organization_id):
         return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, validate.args)
 
     workspace_ids = [w.get("id") for w in workspaces]
-    list_is_auth = check_authority.is_workspaces_authority(organization_id, workspace_ids, is_maintenance=True)
-    for is_auth in list_is_auth:
-        if not is_auth.get("is_auth"):
-            raise common.BadRequestException(
-                message_id=f"400-{MSG_FUNCTION_ID}001", message='指定されたワークスペースを操作対象として指定する権限がありません。'
-            )
+    is_auth = check_authority.is_workspaces_authority(organization_id, workspace_ids, is_maintenance=True)
+    if not is_auth:
+        raise common.BadRequestException(
+            message_id=f"400-{MSG_FUNCTION_ID}001", message='ワークスペースの指定が不正または操作対象として指定する権限がありません。'
+        )
 
     db = DBconnector()
     private = db.get_organization_private(organization_id)
