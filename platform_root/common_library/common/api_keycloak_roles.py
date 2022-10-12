@@ -59,6 +59,48 @@ def clients_roles_get(realm_name, client_id, token, briefRepresentation=True):
     return request_response
 
 
+def clients_role_update(realm_name, client_uid, role_name, token, role_options=None):
+    """client ロール取得 client roles get
+    Args:
+        realm_name (str): realm name
+        client_uid (str): client id (not client-id)
+        role_name (str): role name
+        toekn (str): token
+        role_options (json): role options
+    Returns:
+        Response: HTTP Respose (success : .status_code=200)
+    """
+    globals.logger.info(
+        'Update keycloak client role. client_uid={}, role_name={}'.format(client_uid, role_name)
+    )
+
+    header_para = {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer {}".format(token),
+    }
+
+    data_para = {
+        "name": role_name,
+    }
+
+    if role_options:
+        data_para.update(role_options)
+
+    globals.logger.debug("client role post send")
+    # 呼び出し先設定 requests setting
+    api_url = "{}://{}:{}".format(os.environ['API_KEYCLOAK_PROTOCOL'], os.environ['API_KEYCLOAK_HOST'], os.environ['API_KEYCLOAK_PORT'])
+
+    request_response = requests.put(
+        f"{api_url}/auth/admin/realms/{realm_name}/clients/{client_uid}/roles/{role_name}",
+        headers=header_para,
+        json=data_para
+    )
+
+    # globals.logger.debug(request_response.text)
+
+    return request_response
+
+
 def clients_composite_roles_get(realm_name, client_id, role_name, token):
     """client 子ロール取得 client composite roles get
     Args:
@@ -84,6 +126,43 @@ def clients_composite_roles_get(realm_name, client_id, role_name, token):
     # 情報取得
     # information acquisition
     request_response = requests.get(f"{api_url}/auth/admin/realms/{realm_name}/clients/{client_id}/roles/{role_name}/composites", headers=header_para)
+
+    return request_response
+
+
+def client_role_composites_delete(realm_name, client_uid, role_name, del_roles, token):
+    """クライアントロール子ロール情報削除 client role composites info delete
+
+    Args:
+        realm_name (str): realm name
+        client_uid (str): client uid
+        role_name (str): role name
+        del_roles (array): delete composite roles array
+        toekn (str): token
+
+    Returns:
+        Response: HTTP Respose (success : .status_code=200)
+    """
+    globals.logger.info('Delete keycloak client role composites. client_uid={}, role_name={}'.format(client_uid, role_name))
+
+    header_para = {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer {}".format(token),
+    }
+
+    data_para = [] + del_roles
+
+    globals.logger.debug("client role composite delete send")
+    # 呼び出し先設定 requests setting
+    api_url = "{}://{}:{}".format(os.environ['API_KEYCLOAK_PROTOCOL'], os.environ['API_KEYCLOAK_HOST'], os.environ['API_KEYCLOAK_PORT'])
+
+    request_response = requests.delete(
+        f"{api_url}/auth/admin/realms/{realm_name}/clients/{client_uid}/roles/{role_name}/composites",
+        headers=header_para,
+        json=data_para,
+    )
+
+    # globals.logger.debug(request_response.text)
 
     return request_response
 
