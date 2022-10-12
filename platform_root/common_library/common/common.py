@@ -65,6 +65,20 @@ class NotAllowedException(Exception):
         self.message = message
 
 
+class NotFoundException(Exception):
+    """データなし例外 - Not Found Exception
+
+    Args:
+        Exception (Exception): Exception
+    """
+
+    def __init__(self, data=None, message_id=None, message=None):
+        self.status_code = 404
+        self.data = data
+        self.message_id = message_id
+        self.message = message
+
+
 class InternalErrorException(Exception):
     """Internal Error Exception
 
