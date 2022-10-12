@@ -232,7 +232,7 @@ def is_workspaces_authority(organization_id, workspace_ids: list, is_maintenance
         globals.logger.warn("No workspace specified.")
         return False
 
-    is_auth = False
+    is_auth = True
     for workspace_id in workspace_ids:
         is_wa = __check_ws_auths(workspace_id, ws_auths, is_maintenance)
         if not is_wa:
