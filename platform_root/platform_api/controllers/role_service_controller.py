@@ -300,6 +300,9 @@ def role_update(body, organization_id, role_name):
     workspaces = body.get("workspaces") if body.get("workspaces") else []
 
     # validation check
+    validate = validation.validate_role_name(role_name)
+    if not validate.ok:
+        return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, validate.args)
     validate = validation.validate_role_kind(role_kind)
     if not validate.ok:
         return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, validate.args)
@@ -333,9 +336,9 @@ def role_update(body, organization_id, role_name):
         globals.logger.debug(f"response:{r_cust_role.text}")
         raise common.NotFoundException(None, f"404-{MSG_FUNCTION_ID}001", "ロールが存在しません(対象ID:{})".format(role_name))
 
-    # if r_cust_role.status_code != 200:
-    #    globals.logger.debug(f"response:{r_cust_role.text}")
-    #    raise common.InternalErrorException(None, f"500-{MSG_FUNCTION_ID}001", "ワークスペースロールの取得に失敗しました(対象ID:{})".format(role_name))
+    elif r_cust_role.status_code != 200:
+        globals.logger.debug(f"response:{r_cust_role.text}")
+        raise common.InternalErrorException(None, f"500-{MSG_FUNCTION_ID}001", "ワークスペースロールの取得に失敗しました(対象ID:{})".format(role_name))
 
     # Get composite role before change
     # 変更前のcomposite roleを取得する
@@ -346,29 +349,35 @@ def role_update(body, organization_id, role_name):
         comp_roles = json.loads(r_comp_role.text)
     elif r_comp_role.status_code == 404:
         comp_roles = []
+    else:
+        globals.logger.error(f"response.status_code:{r_comp_role.status_code}")
+        globals.logger.error(f"response.text:{r_comp_role.text}")
+        message_id = f"500-{MSG_FUNCTION_ID}006"
+        message = multi_lang.get_text(
+            message_id,
+            "composite roleの取得に失敗しました(対象ID:{0} client:{1})",
+            organization_id,
+            private.token_check_client_clientid
+        )
+        raise common.InternalErrorException(message_id=message_id, message=message)
 
     # Check if the information before change can be updated
     # 変更前の情報が更新できるかチェックする
     workspace_ids = [w.get("name") for w in comp_roles]
-    list_is_auth = check_authority.is_workspaces_authority(organization_id, workspace_ids, is_maintenance=True)
-    for is_auth in list_is_auth:
-        if not is_auth.get("is_auth"):
-            raise common.BadRequestException(
-                message_id=f"400-{MSG_FUNCTION_ID}001", message='指定されたロールを更新する権限がありません。'
-            )
+    is_auth = check_authority.is_workspaces_authority(organization_id, workspace_ids, is_maintenance=True)
+    if not is_auth and len(comp_roles) > 0:
+        raise common.BadRequestException(
+            message_id=f"400-{MSG_FUNCTION_ID}002", message='指定されたロールを更新する権限がありません。'
+        )
 
     # Check if it can be updated with changed information
     # 変更後の情報で更新できるかチェックする
     workspace_ids = [w.get("id") for w in workspaces]
-    list_is_auth = check_authority.is_workspaces_authority(organization_id, workspace_ids, is_maintenance=True)
-    for is_auth in list_is_auth:
-        if not is_auth.get("is_auth"):
-            raise common.BadRequestException(
-                message_id=f"400-{MSG_FUNCTION_ID}001", message='指定されたワークスペースを操作対象として指定する権限がありません。'
-            )
-
-    # role update
-    # ロールの更新
+    is_auth = check_authority.is_workspaces_authority(organization_id, workspace_ids, is_maintenance=True)
+    if not is_auth:
+        raise common.BadRequestException(
+            message_id=f"400-{MSG_FUNCTION_ID}001", message='ワークスペースの指定が不正または操作対象として指定する権限がありません。'
+        )
 
     # 登録済みの権限から今回登録対象と削除対象を抽出する
     # Extract the current registration target and deletion target from the registered authority
@@ -440,9 +449,9 @@ def role_update(body, organization_id, role_name):
     # 削除対象ロールを削除する
     # Delete the role to be deleted
     r_create_composite = api_keycloak_roles.client_role_composites_delete(
-        realm_name=organization_id, client_uid=private.user_token_client_id, role_name=role_name, add_roles=del_roles, token=token,
+        realm_name=organization_id, client_uid=private.user_token_client_id, role_name=role_name, del_roles=del_roles, token=token,
     )
-    if r_create_composite.status_code != 200:
+    if r_create_composite.status_code != 200 and r_create_composite.status_code != 204:
         globals.logger.error(f"response.status_code:{response.status_code}")
         globals.logger.error(f"response.text:{response.text}")
 
