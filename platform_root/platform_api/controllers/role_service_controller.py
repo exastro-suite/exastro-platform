@@ -274,3 +274,100 @@ def role_list(organization_id, kind=None):
     globals.logger.info(f"### Succeed func:{inspect.currentframe().f_code.co_name}")
 
     return common.response_200_ok(data)
+
+
+@common.platform_exception_handler
+def role_update(body, organization_id, role_name):
+    """Update updates an role
+
+    Args:
+        body (dict | bytes): _description_
+        organization_id (str): _description_. Defaults to None.
+
+    Returns:
+        InlineResponse2001: _description_
+    """
+    globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
+
+    body = connexion.request.get_json()
+    if not body:
+        raise common.BadRequestException(
+            message_id='400-000002', message='リクエストボディのパラメータ({})が不正です。'.format('Json')
+        )
+
+    role_kind = body.get("kind")
+    role_description = body.get("description") if body.get("description") else ""
+    workspaces = body.get("workspaces") if body.get("workspaces") else []
+
+    # validation check
+    validate = validation.validate_role_kind(role_kind)
+    if not validate.ok:
+        return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, validate.args)
+    validate = validation.validate_role_description(role_description)
+    if not validate.ok:
+        return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, validate.args)
+    validate = validation.validate_role_workspaces(workspaces)
+    if not validate.ok:
+        return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, validate.args)
+
+    db = DBconnector()
+    private = db.get_organization_private(organization_id)
+
+    # サービスアカウントのTOKEN取得
+    # Get a service account token
+    token_response = api_keycloak_tokens.service_account_get_token(
+        organization_id, private.internal_api_client_clientid, private.internal_api_client_secret,
+    )
+    if token_response.status_code != 200:
+        raise common.AuthException(
+            "client_user_get_token error status:{}, response:{}".format(token_response.status_code, token_response.text)
+        )
+
+    token = json.loads(token_response.text)["access_token"]
+
+    r_cust_role = api_keycloak_clients.client_role_get(
+        realm_name=organization_id, client_id=private.user_token_client_id, role_name=role_name, token=token,
+    )
+
+    if r_cust_role.status_code == 404:
+        globals.logger.debug(f"response:{r_cust_role.text}")
+        raise common.NotFoundException(None, f"404-{MSG_FUNCTION_ID}001", "ロールが存在しません(対象ID:{})".format(role_name))
+
+    # if r_cust_role.status_code != 200:
+    #    globals.logger.debug(f"response:{r_cust_role.text}")
+    #    raise common.InternalErrorException(None, f"500-{MSG_FUNCTION_ID}001", "ワークスペースロールの取得に失敗しました(対象ID:{})".format(role_name))
+
+    # Get composite role before change
+    # 変更前のcomposite roleを取得する
+    r_comp_role = api_keycloak_roles.clients_composite_roles_get(
+        realm_name=organization_id, client_id=private.user_token_client_id, role_name=role_name, token=token
+    )
+    if r_comp_role.status_code == 200:
+        comp_roles = json.loads(r_comp_role.text)
+    elif r_comp_role.status_code == 404:
+        comp_roles = []
+
+    # Check if the information before change can be updated
+    # 変更前の情報が更新できるかチェックする
+    workspace_ids = [w.get("name") for w in comp_roles]
+    list_is_auth = check_authority.is_workspaces_authority(organization_id, workspace_ids, is_maintenance=True)
+    for is_auth in list_is_auth:
+        if not is_auth.get("is_auth"):
+            raise common.BadRequestException(
+                message_id=f"400-{MSG_FUNCTION_ID}001", message='指定されたロールを更新する権限がありません。'
+            )
+
+    # Check if it can be updated with changed information
+    # 変更後の情報で更新できるかチェックする
+    workspace_ids = [w.get("id") for w in workspaces]
+    list_is_auth = check_authority.is_workspaces_authority(organization_id, workspace_ids, is_maintenance=True)
+    for is_auth in list_is_auth:
+        if not is_auth.get("is_auth"):
+            raise common.BadRequestException(
+                message_id=f"400-{MSG_FUNCTION_ID}001", message='指定されたワークスペースを操作対象として指定する権限がありません。'
+            )
+
+    # role update
+    # ロールの更新
+
+    return common.response_200_ok(data=None)
