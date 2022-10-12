@@ -370,4 +370,86 @@ def role_update(body, organization_id, role_name):
     # role update
     # ロールの更新
 
+    # 登録済みの権限から今回登録対象と削除対象を抽出する
+    # Extract the current registration target and deletion target from the registered authority
+    role_ids = [w.get("name") for w in comp_roles]
+    workspace_ids = [w.get("id") for w in workspaces]
+    roles_ws = []
+    del_roles = []
+
+    # 未登録の抽出(今回登録対象)
+    # unregistered extract(current registration target)
+    for workspace_id in workspace_ids:
+        if workspace_id not in role_ids:
+            # ロールに紐づけるwsロールを取得する
+            # get ws role
+            r_get_role_ws = api_keycloak_clients.client_role_get(
+                realm_name=organization_id, client_id=private.internal_api_client_id, role_name=workspace_id, token=token,
+            )
+            if r_get_role_ws.status_code != 200:
+                globals.logger.error(f"response.status_code:{r_get_role_ws.status_code}")
+                globals.logger.error(f"response.text:{r_get_role_ws.text}")
+
+                raise common.InternalErrorException(None, f"500-{MSG_FUNCTION_ID}001", "ワークスペースロールの取得に失敗しました(対象ID:{0})".format(workspace_id))
+
+            roles_ws.append(json.loads(r_get_role_ws.text))
+
+    # 削除対象の抽出
+    # deletion target extract
+    for comp_role in comp_roles:
+        if comp_role.get("name") not in workspace_ids:
+            del_roles.append(comp_role)
+
+    role_options = {
+        "description": role_description,
+        "attributes": {
+            "kind": [role_kind]
+        },
+    }
+
+    # ロールの更新
+    # role update
+    response = api_keycloak_roles.clients_role_update(
+        realm_name=organization_id, client_uid=private.user_token_client_id, role_name=role_name, token=token, role_options=role_options,
+    )
+    if response.status_code not in [200, 204]:
+        globals.logger.error(f"response.status_code:{response.status_code}")
+        globals.logger.error(f"response.text:{response.text}")
+
+        raise common.InternalErrorException(
+            None,
+            f"500-{MSG_FUNCTION_ID}007",
+            "ロールの更新に失敗しました(対象ロール:{0})".format(role_name)
+        )
+
+    # ロールにwsロールを紐づける
+    # role composite ws
+    r_create_composite = api_keycloak_clients.client_role_composites_create(
+        realm_name=organization_id, client_uid=private.user_token_client_id, role_name=role_name, add_roles=roles_ws, token=token,
+    )
+    if r_create_composite.status_code != 204:
+        globals.logger.error(f"response.status_code:{response.status_code}")
+        globals.logger.error(f"response.text:{response.text}")
+
+        raise common.InternalErrorException(
+            None,
+            f"500-{MSG_FUNCTION_ID}003",
+            "ロールとワークスペースロールの紐づけに失敗しました(対象ロール:{0})".format(role_name)
+        )
+
+    # 削除対象ロールを削除する
+    # Delete the role to be deleted
+    r_create_composite = api_keycloak_roles.client_role_composites_delete(
+        realm_name=organization_id, client_uid=private.user_token_client_id, role_name=role_name, add_roles=del_roles, token=token,
+    )
+    if r_create_composite.status_code != 200:
+        globals.logger.error(f"response.status_code:{response.status_code}")
+        globals.logger.error(f"response.text:{response.text}")
+
+        raise common.InternalErrorException(
+            None,
+            f"500-{MSG_FUNCTION_ID}004",
+            "composite roleの削除に失敗しました(対象ロール:{0})".format(role_name)
+        )
+
     return common.response_200_ok(data=None)
