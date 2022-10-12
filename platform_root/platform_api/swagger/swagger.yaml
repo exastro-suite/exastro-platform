@@ -195,6 +195,34 @@ paths:
               schema:
                 $ref: '#/components/schemas/runtimeError'
       x-openapi-router-controller: controllers.workspace_service_controller
+  /api/{organization_id}/platform/users:
+    get:
+      tags:
+      - UsersService
+      summary: List returns list of users
+      operationId: user_list
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_4'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+      x-openapi-router-controller: controllers.users_service_controller
   /api/{organization_id}/platform/roles:
     get:
       tags:
@@ -227,7 +255,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_4'
+                $ref: '#/components/schemas/inline_response_200_5'
         default:
           description: An unexpected error response.
           content:
@@ -372,7 +400,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_5'
+                $ref: '#/components/schemas/inline_response_200_6'
         default:
           description: An unexpected error response.
           content:
@@ -428,7 +456,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_6'
+                $ref: '#/components/schemas/inline_response_200_4'
         default:
           description: An unexpected error response.
           content:
@@ -854,6 +882,10 @@ components:
     inline_response_200_4:
       allOf:
       - $ref: '#/components/schemas/responseOk'
+      - $ref: '#/components/schemas/userList'
+    inline_response_200_5:
+      allOf:
+      - $ref: '#/components/schemas/responseOk'
       - $ref: '#/components/schemas/roleDetailList'
     platform_roles_body:
       oneOf:
@@ -861,14 +893,10 @@ components:
     roles_role_name_body:
       oneOf:
       - $ref: '#/components/schemas/roleDetailWorkspacePut'
-    inline_response_200_5:
-      allOf:
-      - $ref: '#/components/schemas/responseOk'
-      - $ref: '#/components/schemas/roleList'
     inline_response_200_6:
       allOf:
       - $ref: '#/components/schemas/responseOk'
-      - $ref: '#/components/schemas/userList'
+      - $ref: '#/components/schemas/roleList'
     inline_response_200_7:
       allOf:
       - $ref: '#/components/schemas/responseOk'

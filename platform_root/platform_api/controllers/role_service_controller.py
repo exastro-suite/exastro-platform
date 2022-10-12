@@ -65,12 +65,11 @@ def role_create(body, organization_id):
         return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, validate.args)
 
     workspace_ids = [w.get("id") for w in workspaces]
-    list_is_auth = check_authority.is_workspaces_authority(organization_id, workspace_ids, is_maintenance=True)
-    for is_auth in list_is_auth:
-        if not is_auth.get("is_auth"):
-            raise common.BadRequestException(
-                message_id=f"400-{MSG_FUNCTION_ID}001", message='指定されたワークスペースを操作対象として指定する権限がありません。'
-            )
+    is_auth = check_authority.is_workspaces_authority(organization_id, workspace_ids, is_maintenance=True)
+    if not is_auth:
+        raise common.BadRequestException(
+            message_id=f"400-{MSG_FUNCTION_ID}001", message='ワークスペースの指定が不正または操作対象として指定する権限がありません。'
+        )
 
     db = DBconnector()
     private = db.get_organization_private(organization_id)
@@ -226,14 +225,30 @@ def role_list(organization_id, kind=None):
                 if role_kind in [common_const.ROLE_KIND_ORGANIZATION, common_const.ROLE_KIND_WORKSPACE]:
                     # organization role or workspace role
                     composite_list = {"authorities": []}
+                else:
+                    composite_list = None
+
+                if role_kind == common_const.ROLE_KIND_WORKSPACE:
+                    # workspace role
+                    workspaces = {"workspaces": []}
+                else:
+                    workspaces = None
 
                 for composite_role in composite_roles:
                     if role_kind in [common_const.ROLE_KIND_ORGANIZATION, common_const.ROLE_KIND_WORKSPACE]:
                         # organization role or workspace role
                         composite_list["authorities"].append({"name": composite_role.get("name")})
+                    # ワークスペースかつ"_"以外で始まるnameの場合は、Workspace idと判断して、返却値の設定を行う
+                    # If it is a workspace and the name starts with something other than "_",
+                    # it is determined as Workspace id and the return value is set.
+                    if role_kind == common_const.ROLE_KIND_WORKSPACE and \
+                       composite_role.get("name")[0:1] != "_":
+                        # workspace role
+                        workspaces["workspaces"].append({"id": composite_role.get("name")})
 
             elif response.status_code == 404:
                 composite_list = None
+                workspaces = None
             else:
                 globals.logger.error(f"response.status_code:{response.status_code}")
                 globals.logger.error(f"response.text:{response.text}")
@@ -248,6 +263,9 @@ def role_list(organization_id, kind=None):
 
             if composite_list:
                 ret_role.update(composite_list)
+
+            if workspaces:
+                ret_role.update(workspaces)
 
         data.append(ret_role)
 
