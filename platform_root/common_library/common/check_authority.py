@@ -137,14 +137,11 @@ def __get_user_authority(organization_id, headers):
     return org_auths, ws_auths
 
 
-def __is_workspace_authority(workspace_id, org_auths: list, ws_auths: list, is_maintenance):
+def __check_org_auths(org_auths: list):
     """workspace authority check
 
     Args:
-        workspace_id (_type_): workspace id
         org_auths (list): organization auths
-        ws_auths (list): workspace auths
-        is_maintenance (bool): check maintenance is allowed
 
     Returns:
         boolean: true:ok false:ng
@@ -159,7 +156,27 @@ def __is_workspace_authority(workspace_id, org_auths: list, ws_auths: list, is_m
         # オーガナイゼーションロールに該当あり
         # Applicable to organization role
         is_auth = True
-    elif common.get_ws_admin_authname(workspace_id) in ws_auths:
+
+    globals.logger.debug(f"check org auth: {is_auth}")
+
+    return is_auth
+
+
+def __check_ws_auths(workspace_id, ws_auths: list, is_maintenance):
+    """workspace authority check
+
+    Args:
+        workspace_id (_type_): workspace id
+        ws_auths (list): workspace auths
+        is_maintenance (bool): check maintenance is allowed
+
+    Returns:
+        boolean: true:ok false:ng
+    """
+
+    is_auth = False
+
+    if common.get_ws_admin_authname(workspace_id) in ws_auths:
         # workspace role is a oK (ws admin role)
         is_auth = True
     elif workspace_id in ws_auths:
@@ -169,7 +186,7 @@ def __is_workspace_authority(workspace_id, org_auths: list, ws_auths: list, is_m
         else:
             is_auth = False
 
-    globals.logger.debug(f"check auth:{workspace_id} = {is_auth}")
+    globals.logger.debug(f"check ws auth:{workspace_id} = {is_auth}")
 
     return is_auth
 
@@ -187,9 +204,7 @@ def is_workspace_authority(organization_id, workspace_id, is_maintenance=False):
     """
     is_auth = False
 
-    org_auths, ws_auths = __get_user_authority(organization_id, request.headers)
-
-    is_auth = __is_workspace_authority(workspace_id, org_auths, ws_auths, is_maintenance)
+    is_auth = is_workspaces_authority(organization_id, [workspace_id, ], is_maintenance)
 
     return is_auth
 
@@ -203,18 +218,25 @@ def is_workspaces_authority(organization_id, workspace_ids: list, is_maintenance
         is_maintenance (bool): check maintenance is allowed
 
     Returns:
-        list[dict]: id: workspace_id, is_auth: True:ok False:ng
+        boolean: true:ok false:ng
     """
-    if len(workspace_ids) < 1:
-        return {}
-
     org_auths, ws_auths = __get_user_authority(organization_id, request.headers)
 
-    list_is_auth = []
-    for workspace_id in workspace_ids:
-        is_auth = __is_workspace_authority(workspace_id, org_auths, ws_auths, is_maintenance)
-        list_is_auth.append(
-            {"id": workspace_id, "is_auth": is_auth}
-        )
+    is_org_auth = __check_org_auths(org_auths)
+    if is_org_auth:
+        return True
 
-    return list_is_auth
+    if len(workspace_ids) < 1:
+        # オーガナイゼーションロールを持っていない場合、ワークスペースの未指定はNGとする。
+        # If don't have organization role, It is NG if there is no workspace specified.
+        globals.logger.warn("No workspace specified.")
+        return False
+
+    is_auth = False
+    for workspace_id in workspace_ids:
+        is_wa = __check_ws_auths(workspace_id, ws_auths, is_maintenance)
+        if not is_wa:
+            globals.logger.warn(f"Not authorized to access the workspace :{workspace_id}")
+            is_auth = False
+
+    return is_auth
