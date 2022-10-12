@@ -12,6 +12,28 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
+import connexion
+import json
+import inspect
+
+from common_library.common import common
+
+import globals
 
 MSG_FUNCTION_ID = "21"
 
+
+@common.platform_exception_handler
+def user_list(organization_id):
+    """List returns list of roles
+
+    Args:
+        organization_id (str): organization id
+
+    Returns:
+        InlineResponse2004: _description_
+    """
+
+    globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
+
+    return 'do some magic!'
