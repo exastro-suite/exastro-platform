@@ -24,6 +24,16 @@ properties:
   kind:
     type: string
     example: workspace
+  authorities:
+    type: array
+    items:
+      type: object
+      properties:
+        name:
+          type: string
+      example:
+        - name: _workspace-1-admin
+        - name: workspace-1
   workspaces:
     type: array
     items:
