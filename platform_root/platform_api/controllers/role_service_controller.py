@@ -225,14 +225,30 @@ def role_list(organization_id, kind=None):
                 if role_kind in [common_const.ROLE_KIND_ORGANIZATION, common_const.ROLE_KIND_WORKSPACE]:
                     # organization role or workspace role
                     composite_list = {"authorities": []}
+                else:
+                    composite_list = None
+
+                if role_kind == common_const.ROLE_KIND_WORKSPACE:
+                    # workspace role
+                    workspaces = {"workspaces": []}
+                else:
+                    workspaces = None
 
                 for composite_role in composite_roles:
                     if role_kind in [common_const.ROLE_KIND_ORGANIZATION, common_const.ROLE_KIND_WORKSPACE]:
                         # organization role or workspace role
                         composite_list["authorities"].append({"name": composite_role.get("name")})
+                    # ワークスペースかつ"_"以外で始まるnameの場合は、Workspace idと判断して、返却値の設定を行う
+                    # If it is a workspace and the name starts with something other than "_",
+                    # it is determined as Workspace id and the return value is set.
+                    if role_kind == common_const.ROLE_KIND_WORKSPACE and \
+                       composite_role.get("name")[0:1] != "_":
+                        # workspace role
+                        workspaces["workspaces"].append({"id": composite_role.get("name")})
 
             elif response.status_code == 404:
                 composite_list = None
+                workspaces = None
             else:
                 globals.logger.error(f"response.status_code:{response.status_code}")
                 globals.logger.error(f"response.text:{response.text}")
@@ -247,6 +263,9 @@ def role_list(organization_id, kind=None):
 
             if composite_list:
                 ret_role.update(composite_list)
+
+            if workspaces:
+                ret_role.update(workspaces)
 
         data.append(ret_role)
 
