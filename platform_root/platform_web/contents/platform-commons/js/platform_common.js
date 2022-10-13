@@ -49,13 +49,107 @@ function getText(textId, originText, ...args){
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 function appendScript(url) {
-	var el = document.createElement('script');
+    return new Promise((resolve, reject) => {
+        console.log(`[CALL] appendScript:${url}`);
+        var el = document.createElement('script');
 
-    // 指定されたurlのsrcを組み込む
-    // include the src of the given url
-    el.src = url;
-	document.body.appendChild(el);
+        // 指定されたurlのsrcを組み込む
+        // include the src of the given url
+        el.src = url;
+        el.onload = function() {
+            console.log(`[DONE] appendScript:${url}`);
+            resolve();
+        }
+        el.onerror = function() {
+            console.log(`[ERROR] appendScript:${url}`);
+            reject();
+        }
+        document.body.appendChild(el);
+    });
 };
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//   Language Script
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+function loadLanguageText() {
+    if (CommonAuth.getLanguage() == "en"){
+        return appendScript("/_/platform-commons/js/language/en/text.js");
+    }
+    else{
+        return appendScript("/_/platform-commons/js/language/ja/text.js");
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//   Load Common Contents
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+function loadCommonContents() {
+    return new Promise((resolve, reject) => {
+        Promise.all([
+            loadLanguageText()
+        ]).then(() => {
+            resolve();
+        }).catch((reason) => {
+            reject(reason);
+        });
+    });
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//   Display Topic Path
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+function displayTopicPath(topicPaths) {
+    topicPaths.unshift(
+        {"text":"メインメニュー", "href": location_conf.href.menu.toppage.replace(/{organization_id}/g, CommonAuth.getRealm())}
+    );
+    let $topichPathList = $('.topichPathList');
+    for(let i = 0; i < topicPaths.length; ++i ) {
+        let topicPath = topicPaths[i];
+        if(topicPaths.length > i + 1) {
+            $topichPathList.append(
+                `<li class="topichPathItem"><a class="topichPathLink" href="${topicPath.href}">${fn.cv(topicPath.text,'',true)}</a></li>`
+            );
+        } else {
+            $topichPathList.append(
+                `<li class="topichPathItem"><span class="topichPathCurrent">${fn.cv(topicPath.text,'',true)}</span></li>`
+            );
+        }
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//   Display Menu
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+function displayMenu(curent) {
+    $('.menuList').append(`
+        <li class="menuItem"><a class="menuLink" id="menu_workspace" href="#" tabindex="-1">ワークスペース管理</a></li>
+        <li class="menuItem"><a class="menuLink" id="menu_account_management" href="#" target="keycloak_management_console" style="display: none;">ユーザー管理</a></li>
+        <li class="menuItem"><a class="menuLink" id="menu_role_management" href="#" style="display: none;">ロール管理</a></li>
+        <li class="menuItem"><a class="menuLink" id="menu_update_password" href="#" target="keycloak_account_console">パスワード変更</a></li>
+    `);
+    $(`#${curent}`).addClass("current");
+
+    $('#menu_workspace').attr('href', location_conf.href.workspaces.list.replace(/{organization_id}/g, CommonAuth.getRealm()));
+    $('#menu_account_management').attr('href', location_conf.href.menu.account_manaagement.replace(/{organization_id}/g, CommonAuth.getRealm()));
+    $('#menu_role_management').attr('href', location_conf.href.roles.list.replace(/{organization_id}/g, CommonAuth.getRealm()));
+    $('#menu_update_password').attr('href', location_conf.href.menu.update_password.replace(/{organization_id}/g, CommonAuth.getRealm()));
+
+    if (CommonAuth.hasAuthority("_og-usr-mt")) {
+        $("#menu_account_management").css("display", "");
+    }
+    let adminWorkspaces = CommonAuth.getAdminWorkspaces();
+    if (CommonAuth.hasAuthority("_og-ws-role-mt") || CommonAuth.hasAuthority("_og-ws-role-usr") || adminWorkspaces.length > 0) {
+        $("#menu_role_management").css("display", "");
+    }
+}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -67,4 +161,44 @@ function finish_onload_progress() {
     $("ul.menuList").css("display", "");
     $("#main").css("visibility", "");
     $(".containerLoading").css("display", "none");
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//   API Call
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+function call_api_promise(ajaxparam, api_description, succeed_httpcodes = [200])
+{
+    return new Promise((resolve, reject) => {
+        console.log(`[CALL] ${ajaxparam.type} ${ajaxparam.url}`);
+        $.ajax(ajaxparam).done(
+            function(data, status, xhr) {
+                if(succeed_httpcodes.indexOf(xhr.status) !== -1) {
+                    console.log(`[DONE] ${ajaxparam.type} ${ajaxparam.url}`);
+                    console.log(data);
+                    resolve(data);
+                } else {
+                    let msg = `status:[${xhr.status}]\nmessage_id:[${data.result}]\n${data.message}`;
+                    console.log(`[ERROR] ${ajaxparam.type} ${ajaxparam.url}\n${msg}`);
+                    console.log(ajaxparam);
+                    alert(msg);
+                    reject();
+                }
+            }
+        ).fail(
+            function(jqXHR, textStatus, errorThrown) {
+                let msg;
+                try {
+                    msg = `status:[${jqXHR.status}]`
+                    msg += `\nmessage_id:[${jqXHR.responseJSON.result}]\n${jqXHR.responseJSON.message}`;
+                } catch(e) { }
+
+                console.log(`[ERROR] ${ajaxparam.type} ${ajaxparam.url}\n${msg}`);
+                console.log(ajaxparam);
+                alert(msg);
+                reject();
+            }
+        );
+    });
 }

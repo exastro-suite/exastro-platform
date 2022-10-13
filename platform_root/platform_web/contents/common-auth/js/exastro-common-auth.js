@@ -248,7 +248,7 @@ const CommonAuth = {
 
     /**
      * check authority - 権限の有無をチェックする
-     * @param {string} authority 
+     * @param {string} authority
      * @returns {boolean}
      */
     "hasAuthority": function(authority) {
@@ -280,15 +280,49 @@ const CommonAuth = {
      * get management workspaces - ワークスペース管理者検眼のあるワークスペースを返します
      * @returns {array} array of workspace_id
      */
-    "getManagementWorkspaces": function() {
+    "getAdminWorkspaces": function() {
         try {
             let workspaces = [];
             CommonAuth.keycloak.tokenParsed.resource_access[CommonAuth.getRealm() + "-workspaces"].roles.forEach(
-                (role) => { if(role.match(/^_.*-admin$/g)) { workspaces.push(role.replace(/^_/,"").replace(/-admin$/,"")); } });
+                (role) => { if(CommonAuth.isAdminWorkspaceAuthority(role)) { workspaces.push(CommonAuth.authorityNameToWorkspaceId(role)); } });
             return workspaces;
         } catch(e) {
             return [];
         }
+    },
+
+    /**
+     * Determines if the specified authority is that of a workspace administrator
+     * 指定権限がワークスペース管理者の権限かを判別します
+     * @param {string} authorityName
+     * @returns {boolean} true: workspace admin / false: other
+     */
+    "isAdminWorkspaceAuthority": function (authorityName) {
+        return (authorityName.match(/^_.*-admin$/g)? true: false);
+    },
+
+    /**
+     * Returns the workspace id for which the given workspace admin permission is for
+     * 指定のワークスペース管理者権限が対象とするワークスペースIDを返します
+     * @param {string} authorityName 
+     * @returns {string} workspace_id
+     */
+    "authorityNameToWorkspaceId": function(authorityName) {
+        if(CommonAuth.isAdminWorkspaceAuthority(authorityName)) {
+            return authorityName.replace(/^_/g, "").replace(/-admin$/g,"");
+        } else {
+            return null;
+        }
+    },
+
+    /**
+     * Returns the admin privilege name for the given workspace id
+     * 指定のワークスペースIDの管理者権限名を返します
+     * @param {string} workspace_id 
+     * @returns {string} workspace admin authority name
+     */
+    "workspaceIdToAdminRoleName": function(workspace_id) {
+        return "_" + workspace_id + "-admin";
     },
 
     /**
