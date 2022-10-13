@@ -16,7 +16,7 @@ import connexion
 import json
 import inspect
 
-from common_library.common import common, api_keycloak_tokens, api_keycloak_clients, api_keycloak_roles
+from common_library.common import common, api_keycloak_tokens, api_keycloak_roles
 from common_library.common import validation, check_authority
 from common_library.common.db import DBconnector
 from common_library.common import multi_lang
@@ -90,7 +90,7 @@ def role_create(body, organization_id):
     # get ws role
     roles_ws = []
     for role_name_ws in workspace_ids:
-        r_get_role_ws = api_keycloak_clients.client_role_get(
+        r_get_role_ws = api_keycloak_roles.clients_role_get(
             realm_name=organization_id, client_id=private.internal_api_client_id, role_name=role_name_ws, token=token,
         )
         if r_get_role_ws.status_code != 200:
@@ -109,7 +109,7 @@ def role_create(body, organization_id):
 
     # ロール作成
     # create role
-    r_create = api_keycloak_clients.client_role_create(
+    r_create = api_keycloak_roles.clients_role_create(
         realm_name=organization_id, client_uid=private.user_token_client_id, token=token,
         role_name=role_name, role_options=role_options
     )
@@ -124,7 +124,7 @@ def role_create(body, organization_id):
 
     # ロールにwsロールを紐づける
     # role composite ws
-    r_create_composite = api_keycloak_clients.client_role_composites_create(
+    r_create_composite = api_keycloak_roles.clients_role_composites_create(
         realm_name=organization_id, client_uid=private.user_token_client_id, role_name=role_name, add_roles=roles_ws, token=token,
     )
     if r_create_composite.status_code != 204:
@@ -215,8 +215,8 @@ def role_list(organization_id, kind=None):
         if role.get("composite"):
             # 子ロールの取得
             # get composite role
-            response = api_keycloak_roles.clients_composite_roles_get(
-                realm_name=organization_id, client_id=private.user_token_client_id, role_name=role.get("name"), token=token
+            response = api_keycloak_roles.clients_role_composites_get(
+                realm_name=organization_id, client_uid=private.user_token_client_id, role_name=role.get("name"), token=token
             )
             if response.status_code == 200:
                 composite_roles = json.loads(response.text)
@@ -328,7 +328,7 @@ def role_update(body, organization_id, role_name):
 
     token = json.loads(token_response.text)["access_token"]
 
-    r_cust_role = api_keycloak_clients.client_role_get(
+    r_cust_role = api_keycloak_roles.clients_role_get(
         realm_name=organization_id, client_id=private.user_token_client_id, role_name=role_name, token=token,
     )
 
@@ -342,8 +342,8 @@ def role_update(body, organization_id, role_name):
 
     # Get composite role before change
     # 変更前のcomposite roleを取得する
-    r_comp_role = api_keycloak_roles.clients_composite_roles_get(
-        realm_name=organization_id, client_id=private.user_token_client_id, role_name=role_name, token=token
+    r_comp_role = api_keycloak_roles.clients_role_composites_get(
+        realm_name=organization_id, client_uid=private.user_token_client_id, role_name=role_name, token=token
     )
     if r_comp_role.status_code == 200:
         comp_roles = json.loads(r_comp_role.text)
@@ -392,7 +392,7 @@ def role_update(body, organization_id, role_name):
         if workspace_id not in role_ids:
             # ロールに紐づけるwsロールを取得する
             # get ws role
-            r_get_role_ws = api_keycloak_clients.client_role_get(
+            r_get_role_ws = api_keycloak_roles.clients_role_get(
                 realm_name=organization_id, client_id=private.internal_api_client_id, role_name=workspace_id, token=token,
             )
             if r_get_role_ws.status_code != 200:
@@ -433,7 +433,7 @@ def role_update(body, organization_id, role_name):
 
     # ロールにwsロールを紐づける
     # role composite ws
-    r_create_composite = api_keycloak_clients.client_role_composites_create(
+    r_create_composite = api_keycloak_roles.clients_role_composites_create(
         realm_name=organization_id, client_uid=private.user_token_client_id, role_name=role_name, add_roles=roles_ws, token=token,
     )
     if r_create_composite.status_code != 204:
@@ -448,7 +448,7 @@ def role_update(body, organization_id, role_name):
 
     # 削除対象ロールを削除する
     # Delete the role to be deleted
-    r_create_composite = api_keycloak_roles.client_role_composites_delete(
+    r_create_composite = api_keycloak_roles.clients_role_composites_delete(
         realm_name=organization_id, client_uid=private.user_token_client_id, role_name=role_name, del_roles=del_roles, token=token,
     )
     if r_create_composite.status_code != 200 and r_create_composite.status_code != 204:

@@ -24,7 +24,8 @@ import pymysql.cursors
 import requests
 # import base64
 
-from common_library.common import common, api_keycloak_tokens, api_keycloak_realms, api_keycloak_clients, api_keycloak_users, validation
+from common_library.common import common, validation
+from common_library.common import api_keycloak_tokens, api_keycloak_realms, api_keycloak_clients, api_keycloak_users, api_keycloak_roles
 from common_library.common.db import DBconnector
 from common_library.common.db_init import DBinit
 import common_library.common.const as common_const
@@ -570,7 +571,7 @@ def __client_role_setting(organization_id, user_id):
     for org_auth in org_auths:
         # client role追加
         # client role added
-        response = api_keycloak_clients.client_role_create(organization_id, client_id, org_auth, token)
+        response = api_keycloak_roles.clients_role_create(organization_id, client_id, org_auth, token)
         if response.status_code not in [200, 201, 409]:    # 409 exists role
             globals.logger.error(f"response.status_code:{response.status_code}")
             globals.logger.error(f"response.text:{response.text}")
@@ -618,7 +619,7 @@ def __client_role_setting(organization_id, user_id):
     for org_role in org_roles:
         # client role追加
         # client role added
-        response = api_keycloak_clients.client_role_create(organization_id, client_id, org_role, token, role_options)
+        response = api_keycloak_roles.clients_role_create(organization_id, client_id, org_role, token, role_options)
         if response.status_code not in [200, 201, 409]:    # 409 exists role
             globals.logger.error(f"response.status_code:{response.status_code}")
             globals.logger.error(f"response.text:{response.text}")
@@ -649,7 +650,7 @@ def __client_role_setting(organization_id, user_id):
         for permission in arr_permissions:
             # 該当Clientのorganization管理者ロールを取得
             # Process for the number of organization administrators
-            response = api_keycloak_clients.client_role_get(organization_id, platform_client_id, permission, token)
+            response = api_keycloak_roles.clients_role_get(organization_id, platform_client_id, permission, token)
             if response.status_code != 200:
                 globals.logger.error(f"response.status_code:{response.status_code}")
                 globals.logger.error(f"response.text:{response.text}")
@@ -666,7 +667,7 @@ def __client_role_setting(organization_id, user_id):
 
         # role付与
         # role grant for client-roles
-        response = api_keycloak_clients.client_role_composites_create(organization_id, client_id, org_role, client_roles, token)
+        response = api_keycloak_roles.clients_role_composites_create(organization_id, client_id, org_role, client_roles, token)
         if response.status_code not in [200, 204]:
             globals.logger.error(f"response.status_code:{response.status_code}")
             globals.logger.error(f"response.text:{response.text}")
@@ -707,7 +708,7 @@ def __client_role_setting(organization_id, user_id):
     for realm_management_role in arr_realm_management_role:
         # 該当Clientのorganization管理者ロールを取得
         # Process for the number of organization administrators
-        response = api_keycloak_clients.client_role_get(organization_id, realm_management_client_id, realm_management_role, token)
+        response = api_keycloak_roles.clients_role_get(organization_id, realm_management_client_id, realm_management_role, token)
         if response.status_code != 200:
             globals.logger.error(f"response.status_code:{response.status_code}")
             globals.logger.error(f"response.text:{response.text}")
@@ -724,7 +725,7 @@ def __client_role_setting(organization_id, user_id):
 
     # role付与
     # role grant for client-roles
-    response = api_keycloak_clients.client_role_composites_create(organization_id, client_id, common_const.ORG_ROLE_ORG_MANAGER, client_roles, token)
+    response = api_keycloak_roles.clients_role_composites_create(organization_id, client_id, common_const.ORG_ROLE_ORG_MANAGER, client_roles, token)
     if response.status_code not in [200, 204]:
         globals.logger.error(f"response.status_code:{response.status_code}")
         globals.logger.error(f"response.text:{response.text}")
@@ -818,7 +819,7 @@ def __service_account_setting(organization_id, user_id):
 
     # 該当Clientのorganization管理者ロールを取得
     # Process for the number of organization administrators
-    response = api_keycloak_clients.client_role_get(organization_id, realm_management_client_id, realm_management_role, token)
+    response = api_keycloak_roles.clients_role_get(organization_id, realm_management_client_id, realm_management_role, token)
     if response.status_code != 200:
         globals.logger.error(f"response.status_code:{response.status_code}")
         globals.logger.error(f"response.text:{response.text}")
@@ -953,7 +954,7 @@ def __user_role_create(organization_id, user_id, org_mng_users):
 
         # 該当Clientのorganization管理者ロールを取得
         # Process for the number of organization administrators
-        response = api_keycloak_clients.client_role_get(organization_id, client_id, common_const.ORG_ROLE_ORG_MANAGER, token)
+        response = api_keycloak_roles.clients_role_get(organization_id, client_id, common_const.ORG_ROLE_ORG_MANAGER, token)
         if response.status_code != 200:
             globals.logger.error(f"response.status_code:{response.status_code}")
             globals.logger.error(f"response.text:{response.text}")

@@ -15,7 +15,7 @@
 import json
 import inspect
 
-from common_library.common import common, api_keycloak_tokens, api_keycloak_users, api_keycloak_clients
+from common_library.common import common, api_keycloak_tokens, api_keycloak_users, api_keycloak_roles
 from common_library.common.db import DBconnector
 
 MSG_FUNCTION_ID = "22"
@@ -135,7 +135,7 @@ def __workspace_role_list(organization_id, workspace_id, client_uid, token):
 
     # カスタムロールの中から、workspaceをcompositeしたロールのみを取得
     # Get only composite workspace roles from the custum role list
-    custum_roles_response = api_keycloak_clients.client_role_get(
+    custum_roles_response = api_keycloak_roles.clients_role_get(
         realm_name=organization_id,
         client_id=client_uid,
         role_name="",
@@ -158,7 +158,7 @@ def __workspace_role_list(organization_id, workspace_id, client_uid, token):
         # Get only those contain workspace_id from the composite roles
         role_composites = []
         if pf_role.get("containerId") == client_uid:
-            role_composites_response = api_keycloak_clients.client_role_composites_get(
+            role_composites_response = api_keycloak_roles.clients_role_composites_get(
                 realm_name=organization_id,
                 client_uid=client_uid,
                 role_name=pf_role.get("name"),

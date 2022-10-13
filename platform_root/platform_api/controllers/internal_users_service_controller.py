@@ -17,7 +17,7 @@ import inspect
 from contextlib import closing
 
 from common_library.common import common
-from common_library.common import api_keycloak_tokens, api_keycloak_users, api_keycloak_clients
+from common_library.common import api_keycloak_tokens, api_keycloak_users, api_keycloak_roles
 from common_library.common.db import DBconnector
 from libs import queries_internal_users
 
@@ -81,7 +81,7 @@ def user_workspace_list(organization_id, user_id):
                 # 子ロールがある内容がworkspaceに紐づくのでその内容をチェックする
                 # Since the content with the child role is linked to the workspace, check the content
                 if mapping.get("composite"):
-                    composite_roles_response = api_keycloak_clients.client_role_composites_get(
+                    composite_roles_response = api_keycloak_roles.clients_role_composites_get(
                         organization_id, private.user_token_client_id, mapping["name"], token)
 
                     if composite_roles_response.status_code != 200:
