@@ -138,7 +138,26 @@ tokenを強制的にリフレッシュします<br>
 - parameter
     - @returns {array} array of workspace_id
 
-### CommonAuth.getAccessibleWorkspaces()
+### CommonAuth.getAdminWorkspaces()
 ワークスペース管理者検眼のあるワークスペースを返します
 - parameter
     - @returns {array} array of workspace_id
+
+### CommonAuth.isAdminWorkspaceAuthority
+指定権限がワークスペース管理者の権限かを判別します
+- parameter
+    - @param {string} authorityName
+    - @returns {string} workspace_id
+
+### CommonAuth.authorityNameToWorkspaceId
+指定のワークスペース管理者権限が対象とするワークスペースIDを返します
+- parameter
+    - @param {string} authorityName
+    - @returns {string} workspace_id
+
+### CommonAuth.workspaceIdToAdminRoleName
+指定のワークスペースIDの管理者権限名を返します
+- parameter
+    - @param {string} workspace_id
+    - @returns {string} workspace admin authority name
+

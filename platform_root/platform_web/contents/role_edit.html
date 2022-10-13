@@ -20,7 +20,7 @@
         <meta name="format-detection" content="telephone=no,email=no,address=no">
         <meta name="theme-color" content="#002B62">
         <title>
-            ワークスペース詳細 / ワークスペース管理 / Exastro Platform
+            ロール編集 / ロール管理 / Exastro Platform
         </title>
         <link rel="stylesheet" href="/_/platform-commons/css/platform.css">
 
@@ -41,7 +41,8 @@
 
         <script src="/_/platform-commons/js/platform_common.js"></script>
         <script src="/_/platform-commons/js/uri_conf.js"></script>
-        <script src="/_/platform-commons/js/workspaces_detail.js"></script>
+        <script src="/_/platform-commons/js/role_edit.js"></script>
+
     </head>
     <body>
         <div id="container">
@@ -64,6 +65,9 @@
             </div>
             <div class="containerBody">
                 <aside id="menu" class="">
+                    <!--
+                    <div class="menuHeader"></div>
+                    -->
                     <div class="menuBody">
                         <nav class="menuNavi">
                             <ul class="menuList" style="display:none;">
@@ -74,15 +78,15 @@
                 <main id="main" style="visibility:hidden;">
                     <div id="content">
                         <div class="contentHeader">
-                            <h1 class="contentTitle"><span class="contentTitleInner">ワークスペース詳細</span></h1>
-                            <p class="contentMenuInfo">ワークスペースの詳細を確認できます。</p>
+                            <h1 class="contentTitle"><span class="contentTitleInner">ロール編集</span></h1>
+                            <p class="contentMenuInfo">ロールを編集します。</p>
                         </div>
                         <div class="contentBody">
                             <div class="contentMenu">
                                 <ul class="contentMenuList">
                                     <li class="contentMenuItem">
                                         <a class="contentMenuLink tabOpen" href="#dataList" tabindex="-1">
-                                            <span class="inner">詳細</span>
+                                            <span class="inner">入力</span>
                                         </a>
                                     </li>
                                 </ul>
@@ -90,53 +94,60 @@
                             <section class="section tabOpen" id="dataList">
                                 <div class="sectionBody">
                                     <div id="MT" class="tableContainer viewTable">
-                                        <div class="tableHeader">
-                                            <ul class="tableHeaderMainMenuList">
-                                                <li class="tableHeaderMainMenuItem">
-                                                    <button class="pl_button btn_ita_big to_ita"><img src="/_/platform-commons/img/Exastro-ITA-logo1-rgb.png" width="80" height="20"></button>
-                                                </li>
-                                            </ul>
-                                        </div>
                                         <div class="tableBody">
                                             <table class="table" width="100%">
                                                 <thead class="thead">
                                                     <tr class="tHeadTr tr">
                                                         <th data-id="c1" data-rest="id" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="項目名" width="250px;"><div class="ci">項目名</div></th>
                                                         <th data-id="c2" data-rest="name" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="設定値"><div class="ci">設定値</div></th>
+                                                        <th data-id="c3" data-rest="name" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="備考" width="600px;"><div class="ci">備考</div></th>
                                                     </tr>
                                                 </thead>
                                                 <tbody class="tbody">
                                                     <tr class="tBodyTr tr">
-                                                        <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: left;">ワークスペースID</div></td>
-                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci" id="text_workspace_id">
+                                                        <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: left;">ロール名</div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci" id="form_role_name">
                                                         </div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci"></div></td>
                                                     </tr>
                                                     <tr class="tBodyTr tr">
-                                                        <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: left;">ワークスペース名</div></td>
-                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci" id="text_workspace_name">
+                                                        <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: left;">種類</div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci">
+                                                            workspace
                                                         </div></td>
-                                                    </tr>
-                                                    <tr class="tBodyTr tr">
-                                                        <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: left;">環境一覧</div></td>
-                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci"><pre id="text_workspace_environments"></pre>
-                                                        </div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci">workspace 固定</div></td>
                                                     </tr>
                                                     <tr class="tBodyTr tr">
                                                         <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: left;">説明</div></td>
-                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci" style="overflow: auto;flex: 1 1 auto;"><pre id="text_workspace_description"></pre>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci">
+                                                            <textarea wrap="soft" data-key="remarks" data-id="4" data-required="0" data-int-min="0" data-int-max="255" id="form_role_description" class="tebleEditTextArea textarea input textareaAdjustment" maxlength="4000"></textarea>
                                                         </div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci">最大255文字 / 使用可能文字：全角・半角文字</div></td>
                                                     </tr>
                                                     <tr class="tBodyTr tr">
-                                                        <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: left;">最終更新日時</div></td>
-                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci" id="text_last_update_date_time">
+                                                        <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: left;">使用ワークスペース</div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci">
+                                                            <ul id="workspace_list" style="display:none;">
+                                                                <li style="margin: 2px 0px;" class="workspace_list_item">
+                                                                    <input type="checkbox" class="select_workspace" id="check_${workspace_id}" value="${workspace_id}" ${workspace_checked}/><label for="check_${workspace_id}">${workspace_name}</label>
+                                                                </li>
+                                                            </ul>
+                                                            <span id="workspace_list_notfound">選択可能なワークスペースが存在しません</span>
                                                         </div></td>
-                                                    </tr>
-                                                    <tr class="tBodyTr tr">
-                                                        <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: left;">メンバー</div></td>
-                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }="" id="text_workspace_member"></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci">このロールで使用可能にするワークスペースを選択します</div></td>
                                                     </tr>
                                                 </tbody>
                                             </table>
+                                        </div>
+                                        <div class="tableHeader">
+                                            <ul class="tableHeaderMainMenuList">
+                                                <li class="tableHeaderMainMenuItem">
+                                                    <button data-type="tableNew" data-action="positive" style="width:200px;" class="itaButton tableHeaderMainMenuButton button" id="button_register" disabled><span class="inner"><span class="icon icon-edit"></span>登録</span></button>
+                                                </li>
+                                                <li class="tableHeaderMainMenuItem">
+                                                    <button data-type="tableNew" data-action="positive" style="width:200px;" class="itaButton tableHeaderMainMenuButton button" id="button_delete"><span class="inner"><span class="icon icon-trash"></span>削除</span></button>
+                                                </li>
+                                            </ul>
                                         </div>
                                     </div>
                                 </div>
@@ -147,14 +158,5 @@
             </div>
             <div class="containerLoading"></div>
         </div>
-        <svg style="display:none">
-            <defs>
-                <symbol id="icon-menu-account">
-                    <ellipse class="icon-menu" cx="31.94" cy="21.33" rx="20.11" ry="21.33"></ellipse>
-                    <path class="icon-menu" d="M48.13,44.51h-3.02C41.22,46.73,36.73,48,31.94,48s-9.29-1.27-13.18-3.49h-3.02C7.09,44.51,0,51.6,0,60.26v3.77h63.87
-                    v-3.77C63.87,51.6,56.79,44.51,48.13,44.51z"></path>
-                </symbol>
-            </defs>
-        </svg>
     </body>
 </html>
