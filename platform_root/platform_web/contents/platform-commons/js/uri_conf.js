@@ -27,6 +27,11 @@ var api_conf = {
                 },
             },
         },
+        "roles": {
+            "post": "/api/{organization_id}/platform/roles",
+            "get": "/api/{organization_id}/platform/roles",
+            "put": "/api/{organization_id}/platform/roles/{role_name}",
+        }
     }
 }
 
@@ -36,12 +41,17 @@ var location_conf = {
             "new" : "/{organization_id}/platform/workspaces/_new",
             "list": "/{organization_id}/platform/workspaces",
             "detail": "/{organization_id}/platform/workspaces/{workspace_id}",
-            "members": "/{organization_id}/platform/workspaces/{workspace_id}/members",
             "ita": "/{organization_id}/workspaces/{workspace_id}/ita/"
         },
+        "roles": {
+            "new": "/{organization_id}/platform/roles/_new",
+            "list": "/{organization_id}/platform/roles",
+            "edit": "/{organization_id}/platform/roles/{role_name}"
+        },
         "menu": {
+            "toppage": "/{organization_id}/platform/workspaces",
             "account_manaagement": "/auth/admin/{organization_id}/console/#/realms/{organization_id}/users", 
-            "role_management": "/auth/admin/{organization_id}/console/#/realms/{organization_id}/clients",        
+            //"role_management": "/auth/admin/{organization_id}/console/#/realms/{organization_id}/clients",        
             "update_password": "/auth/realms/{organization_id}/account/password",
         }
     }

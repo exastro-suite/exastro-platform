@@ -20,7 +20,7 @@
         <meta name="format-detection" content="telephone=no,email=no,address=no">
         <meta name="theme-color" content="#002B62">
         <title>
-            ワークスペース一覧 / ワークスペース管理 / Exastro Platform
+            ロール一覧 / ロール管理 / Exastro Platform
         </title>
         <link rel="stylesheet" href="/_/platform-commons/css/platform.css">
 
@@ -41,7 +41,7 @@
 
         <script src="/_/platform-commons/js/platform_common.js"></script>
         <script src="/_/platform-commons/js/uri_conf.js"></script>
-        <script src="/_/platform-commons/js/workspaces.js"></script>
+        <script src="/_/platform-commons/js/roles.js"></script>
 
     </head>
     <body>
@@ -75,8 +75,8 @@
                 <main id="main" style="visibility:hidden;">
                     <div id="content">
                         <div class="contentHeader">
-                            <h1 class="contentTitle"><span class="contentTitleInner">ワークスペース一覧</span></h1>
-                            <p class="contentMenuInfo">ワークスペースをメンテナンス(閲覧/登録)できます。</p>
+                            <h1 class="contentTitle"><span class="contentTitleInner">ロール一覧</span></h1>
+                            <p class="contentMenuInfo">ロールをメンテナンス(閲覧/登録/更新/削除)できます。</p>
                         </div>
                         <div class="contentBody">
                             <div class="contentMenu">
@@ -94,35 +94,41 @@
                                         <div class="tableHeader">
                                             <ul class="tableHeaderMainMenuList">
                                                 <li class="tableHeaderMainMenuItem">
-                                                    <button data-type="tableNew" data-action="positive" style="width:200px; display: none;" class="itaButton tableHeaderMainMenuButton button" id="new_workspace">
+                                                    <button data-type="tableNew" data-action="positive" style="width:200px; display: none;" class="itaButton tableHeaderMainMenuButton button" id="new_role">
                                                         <span class="inner"><span class="icon icon-edit"></span>作成</span></button>
                                                 </li>
                                             </ul>
                                         </div>
                                         <div class="tableBody">
-                                            <table class="table" width="100%" id="workspace_list">
+                                            <table class="table" width="100%" id="roles_list">
                                                 <thead class="thead">
                                                     <tr class="tHeadTr tr">
-                                                        <th data-id="c1" data-rest="id" class="tHeadLeftSticky tHeadTh popup th" rowspan="1" colspan="1" }="" title="ワークスペースID" width="300px;"><div class="ci">ワークスペースID</div></th>
-                                                        <th data-id="c2" data-rest="name" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="ワークスペース名"><div class="ci">ワークスペース名</div></th>
-                                                        <th data-id="c3" data-rest="name" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="説明"><div class="ci">説明</div></th>
-                                                        <th data-id="c4" data-rest="last_update_date_time" title="最終更新日時" class="tHeadTh popup th" rowspan="1" colspan="1" }="" width="200px;"><div class="ci">最終更新日時</div></th>
-                                                        <th data-id="c5" data-rest="name" class="tHeadTh popup th" rowspan="1" colspan="1" }="" width="130px;"><div class="ci"></div></th>
+                                                        <th data-id="c1" data-rest="name" class="tHeadLeftSticky tHeadTh popup th" rowspan="1" colspan="1" }="" title="ロール名" width="300px;"><div class="ci">ロール名</div></th>
+                                                        <th data-id="c2" data-rest="kind" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="種類" width="300px;"><div class="ci">種類</div></th>
+                                                        <th data-id="c3" data-rest="description" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="説明" width="40%"><div class="ci">説明</div></th>
+                                                        <th data-id="c4" data-rest="auth" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="権限 / ワークスペース" width="35%"><div class="ci">権限 / ワークスペース</div></th>
+                                                        <th data-id="c5" data-rest="member" class="tHeadTh popup th" rowspan="1" colspan="1" }="" width="80px"><div class="ci"></div></th>
+                                                        <th data-id="c6" data-rest="member" class="tHeadTh popup th" rowspan="1" colspan="1" }="" width="100px"><div class="ci"></div></th>
                                                     </tr>
                                                 </thead>
                                                 <tbody class="tbody">
-                                                    <tr class="tBodyTr tr datarow" style="cursor:pointer; display:none">
-                                                        <th class="tBodyLeftSticky tBodyTh th to_detail" rowspan="1" colspan="1" }="" data-id="${workspace_id}"><div class="ci" style="text-align: left;">${workspace_id}</div></td>
-                                                        <td class="tBodyTd td to_detail" rowspan="1" colspan="1" }="" data-id="${workspace_id}"><div class="ci">${workspace_name}</div></td>
-                                                        <td class="tBodyTd td to_detail" rowspan="1" colspan="1" }="" data-id="${workspace_id}"><div class="ci">${workspace_description}</div></td>
-                                                        <td class="tBodyTd td to_detail" rowspan="1" colspan="1" }="" data-id="${workspace_id}"><div class="ci" style="text-align: center;">${last_update_date_time}</div></td>
-                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: center;">
-                                                            <button class="pl_button btn_ita" data-id="${workspace_id}" disabled><img src="/_/platform-commons/img/Exastro-ITA-logo1-rgb.png" width="80" height="20"></button>
+                                                    <tr class="tBodyTr tr datarow" style="display:none">
+                                                        <th class="tBodyLeftSticky tBodyTh th to_detail" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: left;">${role_name}</div></td>
+                                                        <td class="tBodyTd td to_detail" rowspan="1" colspan="1" }="" ><div class="ci">${role_kind}</div></td>
+                                                        <td class="tBodyTd td to_detail" rowspan="1" colspan="1" }="" ><div class="ci" style="white-space: pre; overflow: auto; text-overflow: unset;">${role_description}</div></td>
+                                                        <td class="tBodyTd td to_detail" rowspan="1" colspan="1" }="">${role_authority}</td>
+                                                        <td class="tBodyTd td to_detail" rowspan="1" colspan="1" }=""><div class="ci">
+                                                            <button class="pl_button btn_edit" data-id="${role_name}" disabled>
+                                                                <span class="inner"><span class="icon icon-edit"></span>編集</span></button>
+                                                        </div></td>
+                                                        <td class="tBodyTd td to_detail" rowspan="1" colspan="1" }=""><div class="ci">
+                                                            <button class="pl_button btn_member" data-id="${role_name}" disabled>
+                                                                <span class="inner"></span><span class="icon icon-user"></span>ユーザー</span></button>
                                                         </div></td>
                                                     </tr>
                                                     <tr class="tBodyTr tr notfound" style="display:none">
-                                                        <td class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="5" }="" height="50px"><div class="ci" style="text-align: center;">
-                                                            使用可能なワークスペースが存在しません
+                                                        <td class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="6" }="" height="50px"><div class="ci" style="text-align: center;">
+                                                            使用可能なロールが存在しません
                                                         </div></td>
                                                     </tr>
                                                 </tbody>

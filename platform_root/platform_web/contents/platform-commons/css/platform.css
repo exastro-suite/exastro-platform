@@ -73,7 +73,13 @@ html {
 }
 .btn_member {
     width:120px;
-    height: 30px;
+    height: 32px;
+    padding:3px;
+    font-weight: bold;
+}
+.btn_edit {
+    width:80px;
+    height: 32px;
     padding:3px;
     font-weight: bold;
 }
@@ -82,6 +88,14 @@ html {
     display: inline-block;
     margin: 4px; padding: 6px 15px;
     background-color: #eee;
+    border-radius: 10px;
+    line-height: 1;
+    color: #000;
+}
+.auth_item {
+    display: inline-block;
+    margin: 4px; padding: 6px 15px;
+    background-color: #bec;
     border-radius: 10px;
     line-height: 1;
     color: #000;
