@@ -16,7 +16,7 @@ import base64
 import json
 
 from common_library.common import common, const
-from common_library.common import api_keycloak_tokens, api_keycloak_clients
+from common_library.common import api_keycloak_tokens, api_keycloak_roles
 from common_library.common import multi_lang
 from common_library.common.db import DBconnector
 
@@ -86,7 +86,7 @@ def __get_user_authority(organization_id, headers):
     # オーガナイゼーションロールが存在する場合は、composites情報を取得する
     # Get composites information if the organization role exists
     for org_role in org_roles:
-        response = api_keycloak_clients.client_role_composites_get(organization_id, private.user_token_client_id, org_role, token)
+        response = api_keycloak_roles.clients_role_composites_get(organization_id, private.user_token_client_id, org_role, token)
 
         if response.status_code == 404:
             continue
@@ -110,7 +110,7 @@ def __get_user_authority(organization_id, headers):
     # ワークスペースロールが存在する場合は、composites情報を取得する
     # Get composites information if the workspace role exists
     for role in roles:
-        response = api_keycloak_clients.client_role_composites_get(organization_id, private.user_token_client_id, role, token)
+        response = api_keycloak_roles.clients_role_composites_get(organization_id, private.user_token_client_id, role, token)
 
         if response.status_code == 404:
             continue
