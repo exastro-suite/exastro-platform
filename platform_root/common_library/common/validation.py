@@ -316,7 +316,7 @@ def validate_role_kind(role_kind):
             multi_lang.get_text('000-00108', "ロール種別")
         )
 
-    if role_kind not in [const.ROLE_KIND_ORGANIZATION, const.ROLE_KIND_WORKSPACE]:
+    if role_kind not in [const.ROLE_KIND_WORKSPACE]:
         return result(
             False, 400, '400-000002', 'リクエストボディのパラメータ({})が不正です。'.format('kind'),
             'kind'
