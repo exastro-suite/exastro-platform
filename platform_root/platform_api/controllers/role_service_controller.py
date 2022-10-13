@@ -260,12 +260,25 @@ def role_list(organization_id, kind=None):
                     private.token_check_client_clientid
                 )
                 raise common.InternalErrorException(message_id=message_id, message=message)
+        else:
 
-            if composite_list:
-                ret_role.update(composite_list)
+            if role_kind in [common_const.ROLE_KIND_ORGANIZATION, common_const.ROLE_KIND_WORKSPACE]:
+                # organization role or workspace role
+                composite_list = {"authorities": []}
+            else:
+                composite_list = None
 
-            if workspaces:
-                ret_role.update(workspaces)
+            if role_kind == common_const.ROLE_KIND_WORKSPACE:
+                # workspace role
+                workspaces = {"workspaces": []}
+            else:
+                workspaces = None
+
+        if composite_list:
+            ret_role.update(composite_list)
+
+        if workspaces:
+            ret_role.update(workspaces)
 
         data.append(ret_role)
 
