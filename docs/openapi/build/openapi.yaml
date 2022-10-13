@@ -14,6 +14,8 @@ tags:
     description: ユーザーに関する操作
   - name: RoleService
     description: ロールに関する操作
+  - name: RoleMappingsService
+    description: ロール・マッピングに関する操作
   - name: InternalCommonService
     description: 共通(内部用)
   - name: InternalUsersService
@@ -337,6 +339,91 @@ paths:
                   kind: workspace
                   workspaces:
                     - id: workspace-1
+        required: true
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        example: null
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+  '/api/{organization_id}/platform/roles/{role_name}/users':
+    post:
+      tags:
+        - RoleMappingsService
+      summary: Add roles to the user role mapping
+      x-openapi-router-controller: controllers.role_mappings_service_controller
+      operationId: role_user_mapping_create
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: role_name
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/roleMappingUser'
+        required: true
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        example: null
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+    delete:
+      tags:
+        - RoleMappingsService
+      summary: Delete roles from user role mapping
+      x-openapi-router-controller: controllers.role_mappings_service_controller
+      operationId: role_user_mapping_delete
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: role_name
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/roleMappingUser'
         required: true
       responses:
         '200':
@@ -868,3 +955,15 @@ components:
               id:
                 type: string
                 example: workspace-1
+    roleMappingUser:
+      title: userList is list of User resources.
+      type: array
+      items:
+        $ref: '#/components/schemas/user'
+      example:
+        - id: 9baf9af4-ea88-4373-aa66-cb7bb6e316da
+          preferred_username: username-1
+        - id: 2b0ed3cb-74b9-4590-add0-c3cd908a17ed
+          preferred_username: username-2
+        - id: 56e24fc5-2aea-4a02-baee-29dd862c68d6
+          preferred_username: username-3

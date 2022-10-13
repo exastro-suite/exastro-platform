@@ -58,3 +58,5 @@ roleDetailWorkspace:
   $ref: "./roleDetailWorkspace.yaml"
 roleDetailWorkspacePut:
   $ref: "./roleDetailWorkspacePut.yaml"
+roleMappingUser:
+  $ref: "./roleMappingUser.yaml"
