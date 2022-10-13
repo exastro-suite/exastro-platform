@@ -31,6 +31,8 @@ tags:
   description: ユーザーに関する操作
 - name: RoleService
   description: ロールに関する操作
+- name: RoleMappingsService
+  description: ロール・マッピングに関する操作
 - name: InternalCommonService
   description: 共通(内部用)
 - name: InternalUsersService
@@ -56,6 +58,9 @@ paths:
       $ref: './paths/roles.yaml'
   "/api/{organization_id}/platform/roles/{role_name}":
       $ref: './paths/roles.role_name.yaml'
+
+  "/api/{organization_id}/platform/roles/{role_name}/users":
+      $ref: './paths/roles.role_name.users.yaml'
 
   "/internal-api/{organization_id}/platform/workspaces/{workspace_id}/roles":
       $ref: './paths/internal_workspaces.workspace_id.roles.yaml'

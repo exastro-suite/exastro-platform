@@ -14,6 +14,8 @@ tags:
   description: ユーザーに関する操作
 - name: RoleService
   description: ロールに関する操作
+- name: RoleMappingsService
+  description: ロール・マッピングに関する操作
 - name: InternalCommonService
   description: 共通(内部用)
 - name: InternalUsersService
@@ -352,6 +354,87 @@ paths:
               schema:
                 $ref: '#/components/schemas/runtimeError'
       x-openapi-router-controller: controllers.role_service_controller
+  /api/{organization_id}/platform/roles/{role_name}/users:
+    post:
+      tags:
+      - RoleMappingsService
+      summary: Add roles to the user role mapping
+      operationId: role_user_mapping_create
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: role_name
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/roleMappingUser'
+        required: true
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_1'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+      x-openapi-router-controller: controllers.role_mappings_service_controller
+    delete:
+      tags:
+      - RoleMappingsService
+      summary: Delete roles from user role mapping
+      operationId: role_user_mapping_delete
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: role_name
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/roleMappingUser'
+        required: true
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_1'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+      x-openapi-router-controller: controllers.role_mappings_service_controller
   /internal-api/{organization_id}/platform/workspaces/{workspace_id}/roles:
     get:
       tags:
@@ -836,6 +919,10 @@ components:
         kind:
           type: string
           example: workspace
+        authorities:
+          type: array
+          items:
+            $ref: '#/components/schemas/roleDetailWorkspace_authorities'
         workspaces:
           type: array
           items:
@@ -854,6 +941,18 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/roleDetailWorkspace_workspaces'
+    roleMappingUser:
+      title: userList is list of User resources.
+      type: array
+      example:
+      - id: 9baf9af4-ea88-4373-aa66-cb7bb6e316da
+        preferred_username: username-1
+      - id: 2b0ed3cb-74b9-4590-add0-c3cd908a17ed
+        preferred_username: username-2
+      - id: 56e24fc5-2aea-4a02-baee-29dd862c68d6
+        preferred_username: username-3
+      items:
+        $ref: '#/components/schemas/user'
     inline_response_200:
       allOf:
       - $ref: '#/components/schemas/responseOk'
@@ -920,6 +1019,12 @@ components:
         name:
           type: string
           example: _og-upd
+    roleDetailWorkspace_authorities:
+      type: object
+      properties:
+        name:
+          type: string
+      example: "[{\"name\":\"_workspace-1-admin\"},{\"name\":\"workspace-1\"}]"
     roleDetailWorkspace_workspaces:
       type: object
       properties:
