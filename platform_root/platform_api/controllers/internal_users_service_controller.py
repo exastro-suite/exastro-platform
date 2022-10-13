@@ -17,7 +17,7 @@ import inspect
 from contextlib import closing
 
 from common_library.common import common
-from common_library.common import api_keycloak_tokens, api_keycloak_users, api_keycloak_roles
+from common_library.common import api_keycloak_tokens, api_keycloak_roles
 from common_library.common.db import DBconnector
 from libs import queries_internal_users
 
@@ -57,7 +57,7 @@ def user_workspace_list(organization_id, user_id):
 
     # ユーザーロール取得
     # Get user role
-    roles_response = api_keycloak_users.get_user_role_mapping(organization_id, user_id, token)
+    roles_response = api_keycloak_roles.get_user_role_mapping(organization_id, user_id, token)
     if roles_response.status_code == 404:
         return common.response_status(404, None, '404-{}001'.format(MSG_FUNCTION_ID), "ユーザが存在しません")
     elif roles_response.status_code != 200:

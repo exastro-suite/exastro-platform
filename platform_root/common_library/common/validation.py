@@ -395,6 +395,28 @@ def validate_role_workspaces(role_workspaces):
     return result(True)
 
 
+def validate_role_mapping_users(role_users):
+    """_summary_
+
+    Args:
+        role_users (list): users list
+
+    Returns:
+        result: Validation result
+    """
+
+    # 重複チェック
+    # dupulication check
+    usernames = ([x.get('preferred_username', '') for x in role_users])
+    if len(list(set(usernames))) != len(usernames):
+        return result(
+            False, 400, '400-{}019'.format(MSG_FUNCTION_ID), '指定された値が重複しています。',
+            multi_lang.get_text('000-0010X', "preferred_username"),
+        )
+    # TODO: MESSAGE登録
+    return result(True)
+
+
 def validate_id_characters(str):
     """validate id characters
 

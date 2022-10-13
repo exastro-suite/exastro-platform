@@ -20,8 +20,8 @@ import inspect
 import pymysql
 import base64
 
-from common_library.common import common, api_keycloak_tokens, api_keycloak_users
-from common_library.common import api_keycloak_roles, api_ita_admin_call, validation
+from common_library.common import common, validation
+from common_library.common import api_keycloak_tokens, api_keycloak_roles, api_ita_admin_call
 import common_library.common.const as common_const
 from common_library.common.db import DBconnector
 from libs import queries_workspaces
@@ -184,7 +184,7 @@ def workspace_create(body, organization_id):
             wsadmin_users = [dict(t) for t in {tuple(d.items()) for d in wsadmin_users}]
             for wsadmin in wsadmin_users:
                 target_user_id = wsadmin.get("id")
-                r_create_mapping = api_keycloak_users.user_client_role_mapping_create(
+                r_create_mapping = api_keycloak_roles.user_client_role_mapping_create(
                     realm_name=organization_id,
                     user_id=target_user_id,
                     client_id=private.user_token_client_id,
@@ -393,7 +393,7 @@ def workspace_member_list(organization_id, workspace_id):
 
     workspace_users = []
     for role in workspace_roles:
-        users_response = api_keycloak_users.role_uesrs_get(
+        users_response = api_keycloak_roles.role_uesrs_get(
             realm_name=organization_id,
             client_id=private.user_token_client_id,
             role_name=role.get("name"),

@@ -16,8 +16,8 @@ import connexion
 import json
 import inspect
 
-from common_library.common import common, api_keycloak_tokens, api_keycloak_roles
-from common_library.common import validation, check_authority
+from common_library.common import common, api_keycloak_tokens, api_keycloak_roles, api_keycloak_users
+from common_library.common import validation
 from common_library.common.db import DBconnector
 from common_library.common import multi_lang
 import common_library.common.const as common_const
@@ -28,24 +28,137 @@ MSG_FUNCTION_ID = "26"
 
 
 @common.platform_exception_handler
-def role_user_mapping_create(body, organization_id, role_name):  # noqa: E501
-    """Add roles to the user role mapping
+def role_user_mapping_create(body, organization_id, role_name):
+    """ユーザーロールマッピング作成 User Role Mapping Create
 
-     # noqa: E501
+    Args:
+        body (json): 該当ロールに登録するユーザー情報 registration user info.
+                     [{
+                         "id": user id,
+                         "preferred_username" username
+                     }]
+        organization_id (str): organization id
+        role_name (str): role name
 
-    :param body:
-    :type body: list | bytes
-    :param organization_id:
-    :type organization_id: str
-    :param role_name:
-    :type role_name: str
-
-    :rtype: InlineResponse2001
+    Returns:
+        _type_: _description_
     """
-    if connexion.request.is_json:
-        # body = [User.from_dict(d) for d in connexion.request.get_json()]  # noqa: E501
-        pass
-    return 'do some magic!'
+
+    globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
+
+    body = connexion.request.get_json()
+    if not body:
+        raise common.BadRequestException(
+            message_id='400-000002', message='リクエストボディのパラメータ({})が不正です。'.format('Json')
+        )
+
+    validate = validation.validate_role_mapping_users(body)
+    if not validate.ok:
+        return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, validate.args)
+
+    # サービスアカウントのTOKEN取得
+    # Get a service account token
+    token = __get_token(organization_id)
+
+    private = DBconnector().get_organization_private(organization_id)
+
+    # 該当Clientのorganization管理者ロールを取得
+    # Process for the number of organization administrators
+    response = api_keycloak_roles.clients_role_get(organization_id, private.user_token_client_id, role_name, token, True)
+    if response.status_code != 200:
+        globals.logger.error(f"response.status_code:{response.status_code}")
+        globals.logger.error(f"response.text:{response.text}")
+        message_id = f"400-{MSG_FUNCTION_ID}00X"
+        message = multi_lang.get_text(
+            message_id,
+            "client roleの取得に失敗しました(対象ID:{0} client:{1} role:{2})",
+            organization_id,
+            private.user_token_client_clientid,
+            role_name
+        )
+        # TODO : メッセージ登録
+        raise common.BadRequestException(message_id=message_id, message=message)
+
+    client_role = json.loads(response.text)
+    globals.logger.debug(f"client_role:{client_role}")
+    globals.logger.debug("attributes-kind:{}".format(client_role.get("attributes").get("kind")))
+
+    if [common_const.ROLE_KIND_WORKSPACE] != client_role.get("attributes").get("kind"):
+        message_id = f"400-{MSG_FUNCTION_ID}00X"
+        message = multi_lang.get_text(
+            message_id,
+            "対象のロールはworkspaceロールではありません(対象:{0})",
+            role_name
+        )
+        # TODO : メッセージ登録
+        raise common.BadRequestException(message_id=message_id, message=message)
+
+    add_role_mapping = []
+
+    # 件数分処理する
+    # process the number of cases
+    for user in body:
+        if not user.get("preferred_username"):
+            raise common.BadRequestException(
+                message_id='400-000002', message='リクエストボディのパラメータ({})が不正です。'.format('preferred_username')
+            )
+
+        # ユーザーの存在チェック
+        # User existence check
+        response = api_keycloak_users.user_get(
+            realm_name=organization_id, user_name=user.get("preferred_username"), token=token
+        )
+        if response.status_code != 200:
+            globals.logger.error(f"response.status_code:{response.status_code}")
+            globals.logger.error(f"response.text:{response.text}")
+            message_id = f"400-{MSG_FUNCTION_ID}001"
+            message = multi_lang.get_text(
+                message_id,
+                "ユーザー情報の取得に失敗しました(対象:{0})",
+                user.get("preferred_username")
+            )
+            # TODO : メッセージ登録
+            raise common.BadRequestException(message_id=message_id, message=message)
+
+        user_info = json.loads(response.text)
+        if len(user_info) == 0:
+            message_id = f"400-{MSG_FUNCTION_ID}00X"
+            message = multi_lang.get_text(
+                message_id,
+                "該当のユーザーは存在しません(対象:{0})",
+                user.get("preferred_username")
+            )
+            # TODO : メッセージ登録
+            raise common.BadRequestException(message_id=message_id, message=message)
+
+        globals.logger.debug(f"user_info:{user_info}")
+
+        add_role_mapping.append(user_info[0])
+
+    client_roles = [client_role, ]
+
+    # 登録対象分処理する、登録済みはエラーとしない
+    # Process for registration target, registered is not regarded as an error
+    for user_info in add_role_mapping:
+        globals.logger.debug(f"user_info:{user_info}")
+        response = api_keycloak_roles.user_client_role_mapping_create(
+            realm_name=organization_id, user_id=user_info.get("id"), client_id=private.user_token_client_id,
+            client_roles=client_roles, token=token
+        )
+        if response.status_code not in [200, 204]:
+            globals.logger.error(f"response.status_code:{response.status_code}")
+            globals.logger.error(f"response.text:{response.text}")
+            message_id = f"500-{MSG_FUNCTION_ID}00X"
+            message = multi_lang.get_text(
+                message_id,
+                "ロール設定に失敗しました(対象ID:{0} username:{1})",
+                organization_id,
+                user_info.get("preferred_username")
+            )
+            # TODO : メッセージ登録
+            raise common.InternalErrorException(message_id=message_id, message=message)
+
+    return common.response_200_ok(data=None)
 
 
 @common.platform_exception_handler
@@ -67,3 +180,36 @@ def role_user_mapping_delete(body, organization_id, role_name):  # noqa: E501
         # body = [User.from_dict(d) for d in connexion.request.get_json()]  # noqa: E501
         pass
     return 'do some magic!'
+
+
+def __get_token(organization_id):
+    """get a token
+
+    Args:
+        organization_id (str): organization id
+
+    Raises:
+        common.AuthException: _description_
+
+    Returns:
+        str: token
+    """
+
+    private = DBconnector().get_organization_private(organization_id)
+
+    # サービスアカウントのTOKEN取得
+    # Get a service account token
+    token_response = api_keycloak_tokens.service_account_get_token(
+        organization_id, private.internal_api_client_clientid, private.internal_api_client_secret,
+    )
+    if token_response.status_code != 200:
+        message_id = "401-00001"
+        message = multi_lang.get_text(message_id,
+                                      "tokenの取得に失敗しました。 realm:[{0}] client:[{1}]",
+                                      organization_id,
+                                      private.internal_api_client_clientid)
+        raise common.AuthException(message_id=message_id, message=message)
+
+    token = json.loads(token_response.text)["access_token"]
+
+    return token

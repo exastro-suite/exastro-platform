@@ -836,7 +836,7 @@ def __service_account_setting(organization_id, user_id):
 
     # realm-adminのrole付与
     # role grant for realm-admin
-    response = api_keycloak_users.user_client_role_mapping_create(organization_id, sa_user_id, realm_management_client_id, client_roles, token)
+    response = api_keycloak_roles.user_client_role_mapping_create(organization_id, sa_user_id, realm_management_client_id, client_roles, token)
     if response.status_code != 200 and \
        response.status_code != 204:
         globals.logger.error(f"response.status_code:{response.status_code}")
@@ -971,7 +971,7 @@ def __user_role_create(organization_id, user_id, org_mng_users):
 
         # user role付与
         # granting user roles to keycloak
-        response = api_keycloak_users.user_client_role_mapping_create(organization_id, user_id, client_id, client_roles, token)
+        response = api_keycloak_roles.user_client_role_mapping_create(organization_id, user_id, client_id, client_roles, token)
         if response.status_code not in [200, 204]:
             globals.logger.error(f"response.status_code:{response.status_code}")
             globals.logger.error(f"response.text:{response.text}")
