@@ -15,7 +15,7 @@
 import json
 import inspect
 
-from common_library.common import common, api_keycloak_tokens, api_keycloak_users, api_keycloak_roles
+from common_library.common import common, api_keycloak_tokens, api_keycloak_roles
 from common_library.common.db import DBconnector
 
 MSG_FUNCTION_ID = "22"
@@ -94,7 +94,7 @@ def workspace_user_list(organization_id, workspace_id):
 
     workspace_users = []
     for role in workspace_roles:
-        users_response = api_keycloak_users.role_uesrs_get(
+        users_response = api_keycloak_roles.role_uesrs_get(
             realm_name=organization_id,
             client_id=private.user_token_client_id,
             role_name=role.get("name"),
