@@ -20,7 +20,7 @@
         <meta name="format-detection" content="telephone=no,email=no,address=no">
         <meta name="theme-color" content="#002B62">
         <title>
-            ロール編集 / ロール管理 / Exastro Platform
+            ロール付与・解除 / ロール管理 / Exastro Platform
         </title>
         <link rel="stylesheet" href="/_/platform-commons/css/platform.css">
 
@@ -41,7 +41,7 @@
 
         <script src="/_/platform-commons/js/platform_common.js"></script>
         <script src="/_/platform-commons/js/uri_conf.js"></script>
-        <script src="/_/platform-commons/js/role_edit.js"></script>
+        <script src="/_/platform-commons/js/role_user.js"></script>
 
     </head>
     <body>
@@ -65,9 +65,6 @@
             </div>
             <div class="containerBody">
                 <aside id="menu" class="">
-                    <!--
-                    <div class="menuHeader"></div>
-                    -->
                     <div class="menuBody">
                         <nav class="menuNavi">
                             <ul class="menuList" style="display:none;">
@@ -78,20 +75,74 @@
                 <main id="main" style="visibility:hidden;">
                     <div id="content">
                         <div class="contentHeader">
-                            <h1 class="contentTitle"><span class="contentTitleInner">ロール編集</span></h1>
-                            <p class="contentMenuInfo">ロールを編集します。</p>
+                            <h1 class="contentTitle"><span class="contentTitleInner">ロール付与・解除</span></h1>
+                            <p class="contentMenuInfo">ユーザにロールを付与、およびユーザのロールを解除できます。</p>
                         </div>
                         <div class="contentBody">
                             <div class="contentMenu">
                                 <ul class="contentMenuList">
                                     <li class="contentMenuItem">
                                         <a class="contentMenuLink tabOpen" href="#dataList" tabindex="-1">
-                                            <span class="inner">入力</span>
+                                            <span class="inner">ロール付与・解除</span>
+                                        </a>
+                                    </li>
+                                    <li class="contentMenuItem">
+                                        <a class="contentMenuLink" href="#role_detail" tabindex="-1">
+                                            <span class="inner">ロール情報確認</span>
                                         </a>
                                     </li>
                                 </ul>
                             </div>
                             <section class="section tabOpen" id="dataList">
+                                <div class="sectionBody">
+                                    <div id="MT" class="tableContainer viewTable">
+                                        <div class="tableBody">
+                                            <table class="table" width="100%" id="user_list">
+                                                <thead class="thead">
+                                                    <tr class="tHeadTr tr">
+                                                        <th data-id="c1" class="tHeadLeftSticky tHeadTh popup th" rowspan="1" colspan="1" }="" title="選択" width="80px;"><div class="ci">変更前</div></th>
+                                                        <th data-id="c2" class="tHeadLeftSticky tHeadTh popup th" rowspan="1" colspan="1" }="" title="選択" width="40px;"><div class="ci"></div></th>
+                                                        <th data-id="c3" class="tHeadLeftSticky tHeadTh popup th" rowspan="1" colspan="1" }="" title="選択" width="80px;"><div class="ci">変更後</div></th>
+                                                        <th data-id="c4" class="tHeadLeftSticky tHeadTh popup th" rowspan="1" colspan="1" }="" title="ユーザー名"><div class="ci">ユーザー名</div></th>
+                                                        <th data-id="c5" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="ユーザーID" width="350px"><div class="ci">ユーザーID</div></th>
+                                                        <th data-id="c6" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="登録日時" width="200px;"><div class="ci">登録日時</div></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody class="tbody">
+                                                    <tr class="tBodyTr tr datarow" style="display:none" preferred_username='${preferred_username}' data-id="${user_id}">
+                                                        <td class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1" }=""><div class="ci" style="text-align:center">
+                                                            <input type="checkbox" class="form_check_before">
+                                                        </div></td>
+                                                        <td class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1" }=""><div class="ci" style="text-align:center">
+                                                            <span class="icon icon-arrow01_right" style="color:gray"></span>
+                                                        </div></td>
+                                                        <td class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1" }=""><div class="ci" style="text-align:center">
+                                                            <input type="checkbox" class="form_check_after">
+                                                        </div></td>
+                                                        <td class="tBodyLeftSticky tBodyTd td" rowspan="1" colspan="1" }="" ><div class="ci">${user_name}</div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }="" ><div class="ci" style="text-align:center">${user_id}</div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }="" ><div class="ci" style="text-align:center">${create_timestamp}</div></td>
+                                                    </tr>
+                                                    <tr class="tBodyTr tr notfound" style="display:none">
+                                                        <td class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="6" }="" height="50px"><div class="ci" style="text-align: center;">
+                                                            ユーザーが存在しません
+                                                        </div></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <div class="tableHeader">
+                                            <ul class="tableHeaderMainMenuList">
+                                                <li class="tableHeaderMainMenuItem">
+                                                    <button data-type="tableNew" data-action="positive" style="width:200px;" class="itaButton tableHeaderMainMenuButton button" id="button_apply" disabled>
+                                                        <span class="inner"><span class="icon icon-edit"></span>適用</span></button>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+                            <section class="section" id="role_detail">
                                 <div class="sectionBody">
                                     <div id="MT" class="tableContainer viewTable">
                                         <div class="tableBody">
@@ -112,43 +163,25 @@
                                                     </tr>
                                                     <tr class="tBodyTr tr">
                                                         <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: left;">種類</div></td>
-                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci">
-                                                            workspace
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci" id="form_role_kind">
                                                         </div></td>
-                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci">workspace 固定</div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci"></div></td>
                                                     </tr>
                                                     <tr class="tBodyTr tr">
                                                         <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: left;">説明</div></td>
                                                         <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci">
-                                                            <textarea wrap="soft" data-key="remarks" data-id="4" data-required="0" data-int-min="0" data-int-max="255" id="form_role_description" class="tebleEditTextArea textarea input textareaAdjustment" maxlength="4000"></textarea>
+                                                            <textarea wrap="soft" data-key="remarks" data-id="4" data-required="0" data-int-min="0" data-int-max="255" id="form_role_description" class="tebleEditTextArea textarea input textareaAdjustment" readonly style="border:none; overflow: auto;"></textarea>
                                                         </div></td>
-                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci">最大255文字 / 使用可能文字：全角・半角文字</div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci"></div></td>
                                                     </tr>
                                                     <tr class="tBodyTr tr">
-                                                        <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: left;">使用ワークスペース<span class="tHeadRequired" id="workspace_required" style="display:none">必須</span></div></td>
-                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci">
-                                                            <ul id="workspace_list" style="display:none;">
-                                                                <li style="margin: 2px 0px;" class="workspace_list_item">
-                                                                    <input type="checkbox" class="select_workspace" id="check_${workspace_id}" value="${workspace_id}" ${workspace_checked}/><label for="check_${workspace_id}">${workspace_name}</label>
-                                                                </li>
-                                                            </ul>
-                                                            <span id="workspace_list_notfound">選択可能なワークスペースが存在しません<br></span>
-                                                            <span class="validate_error" id="message_workspace"></span>
+                                                        <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: left;">権限 / ワークスペース</div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci" id="form_role_authorities">
                                                         </div></td>
-                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci">このロールで使用可能にするワークスペースを選択します</div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci"></div></td>
                                                     </tr>
                                                 </tbody>
                                             </table>
-                                        </div>
-                                        <div class="tableHeader">
-                                            <ul class="tableHeaderMainMenuList">
-                                                <li class="tableHeaderMainMenuItem">
-                                                    <button data-type="tableNew" data-action="positive" style="width:200px;" class="itaButton tableHeaderMainMenuButton button" id="button_register" disabled><span class="inner"><span class="icon icon-edit"></span>登録</span></button>
-                                                </li>
-                                                <li class="tableHeaderMainMenuItem">
-                                                    <button data-type="tableNew" data-action="positive" style="width:200px;" class="itaButton tableHeaderMainMenuButton button" id="button_delete"><span class="inner"><span class="icon icon-trash"></span>削除</span></button>
-                                                </li>
-                                            </ul>
                                         </div>
                                     </div>
                                 </div>

@@ -31,6 +31,14 @@ var api_conf = {
             "post": "/api/{organization_id}/platform/roles",
             "get": "/api/{organization_id}/platform/roles",
             "put": "/api/{organization_id}/platform/roles/{role_name}",
+            "users": {
+                "get": "/api/{organization_id}/platform/roles/{role_name}/users",
+                "post": "/api/{organization_id}/platform/roles/{role_name}/users",
+                "patch": "/api/{organization_id}/platform/roles/{role_name}/users"
+            },
+        },
+        "users": {
+            "get": "/api/{organization_id}/platform/users",
         }
     }
 }
@@ -46,12 +54,12 @@ var location_conf = {
         "roles": {
             "new": "/{organization_id}/platform/roles/_new",
             "list": "/{organization_id}/platform/roles",
-            "edit": "/{organization_id}/platform/roles/{role_name}"
+            "edit": "/{organization_id}/platform/roles/{role_name}",
+            "user": "/{organization_id}/platform/roles/{role_name}/user"
         },
         "menu": {
             "toppage": "/{organization_id}/platform/workspaces",
             "account_manaagement": "/auth/admin/{organization_id}/console/#/realms/{organization_id}/users", 
-            //"role_management": "/auth/admin/{organization_id}/console/#/realms/{organization_id}/clients",        
             "update_password": "/auth/realms/{organization_id}/account/password",
         }
     }

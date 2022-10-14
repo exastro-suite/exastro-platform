@@ -58,6 +58,7 @@ $(function(){
 
         }).catch((e) => {
             console.log('[ERROR] load_main catch');
+            finish_onload_progress_at_error();
             if(typeof e != "undefined") console.log(e);
             return;
         });
