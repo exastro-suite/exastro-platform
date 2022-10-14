@@ -1,4 +1,4 @@
-#   Copyright 2022 NEC Corporation
+/*  Copyright 2022 NEC Corporation
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -11,13 +11,7 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
-
-default_language = "ja"
-
-length_organization_id = 36
-length_organization_name = 255
-length_workspace_id = 36
-length_workspace_name = 255
-length_workspace_description = 4000
-max_workspace_environments = 1000
-length_workspace_environment_name = 40
+*/
+self.addEventListener('message', (e) => {
+    setInterval(() => { self.postMessage(null); }, e.data );
+});

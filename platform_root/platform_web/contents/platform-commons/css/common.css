@@ -1911,7 +1911,7 @@ white-space: nowrap;
 text-overflow: ellipsis;
 }
 .tableFooterTitle {
-padding-left: 16px; 
+padding-left: 16px;
 }
 .tableFooterData {
 margin-left: 12px; padding: 12px;
@@ -2296,7 +2296,7 @@ border-bottom-color: #FFF;
 
 /*
 ##################################################
-   Other input 
+   Other input
 ##################################################
 */
 .inputFaderWrap {
@@ -2766,3 +2766,24 @@ height: 100%;
 .icon-unknown:before {
   content: "\e907";
 }
+.containerLoading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  left: 50%; top: 50%;
+  transform: translate(-50%,-50%);
+  width: 50%; height: 50%;
+  background-color: rgba( 255,255,255,.5 );
+  border-radius: 16px;
+  }
+  .containerLoading::after {
+  content: '';
+  display: block;
+  width: 80px; height: 80px;
+  border: 24px solid var(--mainColor20);
+  border-bottom-color: var(--mainColor30);
+  border-radius: 50%;
+  animation: loading 1s infinite;
+  }
+  

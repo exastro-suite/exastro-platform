@@ -8,6 +8,7 @@ $(function(){
             $('#new_workspace').css('display','');
         }
         get_workspace_list();
+        finish_onload_progress();
     });
 
     function new_workspace() {
@@ -92,7 +93,7 @@ $(function(){
         
             for(var row of list) {
                 var date = new Date(row.last_update_timestamp);
-                format_last_update_timestamp = date.toLocaleString();
+                format_last_update_timestamp = fn.date(date,'yyyy/MM/dd HH:mm:ss');
     
                 html += data_row_template
                     .replace(/\${workspace_id}/g, fn.cv(row.workspace_id,'',true))

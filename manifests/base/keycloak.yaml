@@ -46,50 +46,55 @@ spec:
         app: keycloak
     spec:
       containers:
-        - name: keycloak
-          image: exastro/exastro-common-auth-keycloak:Integration-test.83aff2.20220912-164136
-          ports:
-            - name: http
-              containerPort: 8080
-          env:
-            - name: KEYCLOAK_USER
-              valueFrom:
-                secretKeyRef:
-                  name: keycloak
-                  key: KEYCLOAK_USER
-            - name: KEYCLOAK_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: keycloak
-                  key: KEYCLOAK_PASSWORD
-            - name: PROXY_ADDRESS_FORWARDING
-              value: "true"
-            - name: DB_VENDOR
-              valueFrom:
-                configMapKeyRef:
-                  name: platform-db
-                  key: DB_VENDOR
-            - name: DB_ADDR
-              valueFrom:
-                configMapKeyRef:
-                  name: platform-db
-                  key: DB_ADDR
-            - name: DB_DATABASE
-              valueFrom:
-                configMapKeyRef:
-                  name: keycloak
-                  key: KEYCLOAK_DB_DATABASE
-            - name: DB_USER
-              valueFrom:
-                secretKeyRef:
-                  name: keycloak
-                  key: KEYCLOAK_DB_USER
-            - name: DB_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: keycloak
-                  key: KEYCLOAK_DB_PASSWORD
-          readinessProbe:
-            httpGet:
-              path: /auth/realms/master
-              port: 8080
+      - name: keycloak
+        image: exastro/exastro-common-auth-keycloak:Integration-test.83aff2.20220912-164136
+        ports:
+        - name: http
+          containerPort: 8080
+        env:
+        - name: TZ
+          valueFrom:
+            configMapKeyRef:
+              name: params-platform-common
+              key: TZ
+        - name: KEYCLOAK_USER
+          valueFrom:
+            secretKeyRef:
+              name: keycloak
+              key: KEYCLOAK_USER
+        - name: KEYCLOAK_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: keycloak
+              key: KEYCLOAK_PASSWORD
+        - name: PROXY_ADDRESS_FORWARDING
+          value: "true"
+        - name: DB_VENDOR
+          valueFrom:
+            configMapKeyRef:
+              name: platform-db
+              key: DB_VENDOR
+        - name: DB_ADDR
+          valueFrom:
+            configMapKeyRef:
+              name: platform-db
+              key: DB_ADDR
+        - name: DB_DATABASE
+          valueFrom:
+            configMapKeyRef:
+              name: keycloak
+              key: KEYCLOAK_DB_DATABASE
+        - name: DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: keycloak
+              key: KEYCLOAK_DB_USER
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: keycloak
+              key: KEYCLOAK_DB_PASSWORD
+        readinessProbe:
+          httpGet:
+            path: /auth/realms/master
+            port: 8080

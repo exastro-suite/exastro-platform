@@ -11,6 +11,7 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
+
 ARG USERNAME=app_user
 ARG GROUPNAME=app_user
 ARG APP_PATH=/app
@@ -21,21 +22,32 @@ ARG USERNAME
 ARG GROUPNAME
 ARG APP_PATH
 
-ENV LISTEN_PORT             80
-ENV APACHE_PID_DIR          /var/run_$USERNAME/httpd/pid
-ENV APACHE_SOCKET_DIR       /var/run_$USERNAME/httpd/socket
+ENV PYTHONPATH              $APP_PATH/
+ENV PYTHONIOENCODING        utf-8
 ENV APACHE_USERNAME         $USERNAME
 ENV APACHE_GROUPNAME        $GROUPNAME
 
-RUN dnf install -y httpd \
+RUN dnf install -y \
+    langpacks-en \
+    wget \
+    unzip \
+    gcc \
+    python39 \
+    python39-devel \
+    python39-mod_wsgi \
+&&  pip3.9 install \
+    requests \
+    pyyaml \
+    Flask \
+    pytz \
+    markdown \
+    PyJWT \
+    python-dotenv \
+    flask-log-request-id \
+    six \
+    pymysql \
 &&  groupadd $GROUPNAME \
-&&  useradd -m -s /bin/bash -g $GROUPNAME $USERNAME \
-&&  setcap 'cap_net_bind_service=+ep' /usr/sbin/httpd \
-&&  chown $USERNAME:$GROUPNAME /var/log/httpd \
-&&  mkdir -p $APACHE_PID_DIR \
-&&  chown $USERNAME:$GROUPNAME $APACHE_PID_DIR \
-&&  mkdir -p $APACHE_SOCKET_DIR \
-&&  chown $USERNAME:$GROUPNAME $APACHE_SOCKET_DIR
+&&  useradd -m -s /bin/bash -g $GROUPNAME $USERNAME
 
 #
 # Build for development
@@ -56,6 +68,15 @@ RUN dnf config-manager --add-repo=https://download.docker.com/linux/centos/docke
     bind-utils \
     iputils \
     docker-ce-cli \
+    jq \
+    nodejs \
+&&  pip3.9 install \
+    debugpy \
+    flake8 \
+    autopep8 \
+&&  npm config set registry http://registry.npmjs.org/ \
+&&  npm -g config set strict-ssl false \
+&&  npm install -g @apidevtools/swagger-cli \
 &&  usermod -G wheel $USERNAME \
 &&  echo '%wheel ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers
 
@@ -63,12 +84,12 @@ USER $USERNAME
 
 RUN mkdir ~/.config
 
-COPY ./platform_root/version /var/www/html/
-COPY ./platform_root/platform_web/contents/ /var/www/html/
-COPY ./platform_root/platform_web/config/httpd.conf/httpd.conf /etc/httpd/conf/httpd.conf
-COPY ./platform_root/platform_web/config/httpd.conf/rewrite.conf /etc/httpd/conf.d/rewrite.conf
+WORKDIR $APP_PATH
 
-CMD ["httpd","-D","FOREGROUND"]
+COPY ./platform_root/version $APP_PATH/
+COPY ./platform_root/platform_job/ $APP_PATH/
+COPY ./platform_root/common_library/ $APP_PATH/common_library/
+COPY ./platform_root/common_resources/ $APP_PATH/common_resources/
 
 #
 # Build for production
@@ -79,11 +100,11 @@ ARG USERNAME
 ARG GROUPNAME
 ARG APP_PATH
 
-COPY ./platform_root/version /var/www/html/
-COPY ./platform_root/platform_web/contents/ /var/www/html/
-COPY ./platform_root/platform_web/config/httpd.conf/httpd.conf /etc/httpd/conf/httpd.conf
-COPY ./platform_root/platform_web/config/httpd.conf/rewrite.conf /etc/httpd/conf.d/rewrite.conf
+WORKDIR $APP_PATH
+
+COPY ./platform_root/version $APP_PATH/
+COPY ./platform_root/platform_job/ $APP_PATH/
+COPY ./platform_root/common_library/ $APP_PATH/common_library/
+COPY ./platform_root/common_resources/ $APP_PATH/common_resources/
 
 USER $USERNAME
-
-CMD ["httpd","-D","FOREGROUND"]

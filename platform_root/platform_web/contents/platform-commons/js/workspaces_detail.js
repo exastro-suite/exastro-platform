@@ -7,6 +7,7 @@ $(function(){
         $('.to_ita').on('click',() => { window.location = location_conf.href.workspaces.ita.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{workspace_id}/g, workspace_id); } );
         get_workspace_detail();
         get_workspace_members();
+        finish_onload_progress();
     });
 
     function get_workspace_detail() {
@@ -23,7 +24,7 @@ $(function(){
         }).done(function(data, status, xhr) {
             console.log("RESPONSE GET /api/workspaces_detail:");
             console.log(JSON.stringify(data));
-    
+
             if (xhr.status != 200) {
                 msg = "status:[" + xhr.status + "]\nmessage_id:[" + data.result + "]\n" + data.message;
                 alert(msg);
@@ -31,7 +32,15 @@ $(function(){
                 var row = data.data;
                 $("#text_workspace_id").text(row.id);
                 $("#text_workspace_name").text(row.name);
-                try { $("#text_last_update_date_time").text((new Date(row.last_update_timestamp)).toLocaleString())} catch(e) { }
+                environments = row.informations.environments.sort((env1,env2) => { return env1.name < env2.name? -1: 1 });
+                env_text = "";
+                environments.forEach(function (value) {
+                    env_text += value.name + "\n";
+                });
+
+                $("#text_workspace_environments").text(env_text);
+
+                try { $("#text_last_update_date_time").text(fn.date(new Date(row.last_update_timestamp),'yyyy/MM/dd HH:mm:ss'))} catch(e) { }
                 try { $("#text_workspace_description").text(row.informations.description)} catch(e) { }
             }
         }).fail((jqXHR, textStatus, errorThrown) => {
@@ -55,22 +64,22 @@ $(function(){
         }).done(function(data, status, xhr) {
             console.log("RESPONSE GET /api/workspaces/members:");
             console.log(JSON.stringify(data));
-    
+
             if (xhr.status != 200){
                 msg = "status:[" + xhr.status + "]\nmessage_id:[" + data.result + "]\n" + data.message;
                 alert(msg);
             }
             else{
                 memberList = "";
-    
-                for(var row of data.data) {
+
+                for(var row of data.data.sort((mb1, mb2) => { return mb1.name < mb2.name? -1: 1})) {
                     if ("name" in row){
                         memberList = memberList + '<span class="member_name">' + fn.cv(row.name,'',true) + "</span>\n";
                     }
                 }
                 $("#text_workspace_member").html(memberList);
             }
-    
+
         }).fail(function(jqXHR, textStatus, errorThrown) {
             console.log("FAIL : RESPONSE GET /api/workspaces/members: jqXHR.status:"+jqXHR.status);
             msg = "status:[" + jqXHR.status + "]\n" + textStatus;
@@ -78,4 +87,3 @@ $(function(){
         });
     }
 });
-

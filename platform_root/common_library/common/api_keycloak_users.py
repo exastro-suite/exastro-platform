@@ -108,6 +108,35 @@ def user_get_by_id(realm_name, user_id, token):
     return request_response
 
 
+def user_update(realm_name, user_id, user_json, token):
+    """ユーザー更新 user update
+    Args:
+        realm_name (str): realm name
+        user_id (str): user id
+        user_json (dict): user create json
+        toekn (str): token
+    Returns:
+        Response: HTTP Respose (success : .status_code=200)
+    """
+    globals.logger.info('Update keycloak user. realm_name={}, user_id={}'.format(realm_name, user_id))
+
+    # 呼び出し先設定
+    # Call destination setting
+    api_url = "{}://{}:{}".format(os.environ['API_KEYCLOAK_PROTOCOL'], os.environ['API_KEYCLOAK_HOST'], os.environ['API_KEYCLOAK_PORT'])
+
+    header_para = {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer {}".format(token),
+    }
+
+    globals.logger.debug("user put")
+    # ユーザ情報取得
+    # User information acquisition
+    request_response = requests.put(f"{api_url}/auth/admin/realms/{realm_name}/users/{user_id}", headers=header_para, json=user_json)
+
+    return request_response
+
+
 def user_role_get(realm_name, user_id, client_id, token):
     """ユーザロール情報取得 user role info get
     Args:
@@ -272,6 +301,44 @@ def get_user_role_mapping(realm_name, user_id, token):
     # ユーザ情報取得
     # User information acquisition
     request_response = requests.get("{}/auth/admin/realms/{}/users/{}/role-mappings".format(api_url, realm_name, user_id), headers=header_para)
+
+    return request_response
+
+
+def user_realm_role_mapping_create(realm_name, user_id, realm_roles, token):
+    """ユーザーrealmロールマッピング作成 user realm role-mapping create
+
+    Args:
+        realm_name (str): realm name
+        user_id (str): user id
+        realm_roles (array): realm roles array
+        toekn (str): token
+
+    Returns:
+        Response: HTTP Respose (success : .status_code=204)
+    """
+    globals.logger.info(
+        'Create keycloak user realm role-mapping. user_id={}, realm={}, realm_roles={}'.format(user_id, realm_name, realm_roles)
+    )
+
+    header_para = {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer {}".format(token),
+    }
+
+    data_para = realm_roles
+
+    globals.logger.debug("user realm role-mapping post send")
+    # 呼び出し先設定 requests setting
+    api_url = "{}://{}:{}".format(os.environ['API_KEYCLOAK_PROTOCOL'], os.environ['API_KEYCLOAK_HOST'], os.environ['API_KEYCLOAK_PORT'])
+
+    request_response = requests.post(
+        "{}/auth/admin/realms/{}/users/{}/role-mappings/realm".format(api_url, realm_name, user_id),
+        headers=header_para,
+        data=json.dumps(data_para)
+    )
+
+    # globals.logger.debug(request_response.text)
 
     return request_response
 

@@ -57,7 +57,7 @@ def alive():
     Returns:
         Response: HTTP Response
     """
-    return jsonify({"result": "200", "time": str(datetime.utcnow())}), 200
+    return jsonify({"result": "200", "time": common.datetime_to_str(datetime.now())}), 200
 
 
 @app.route('/api/platform/<path:subpath>', methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTION"])
@@ -78,7 +78,7 @@ def platform_organization_api_call(subpath):
         dest_url = "{}://{}:{}/api/platform/{}".format(
             os.environ['PLATFORM_API_PROTOCOL'], os.environ['PLATFORM_API_HOST'], os.environ['PLATFORM_API_PORT'], subpath)
 
-        # return jsonify({"result": "200", "time": str(datetime.utcnow())}), 200
+        # return jsonify({"result": "200", "time": str(datetime.now())}), 200
 
         # Common authorization proxy processing call - 共通の認可proxy処理呼び出し
 
@@ -154,7 +154,7 @@ def platform_api_call(organization_id, subpath):
         dest_url = "{}://{}:{}/api/{}/platform/{}".format(
             os.environ['PLATFORM_API_PROTOCOL'], os.environ['PLATFORM_API_HOST'], os.environ['PLATFORM_API_PORT'], organization_id, subpath)
 
-        # return jsonify({"result": "200", "time": str(datetime.utcnow())}), 200
+        # return jsonify({"result": "200", "time": str(datetime.now())}), 200
 
         # Common authorization proxy processing call - 共通の認可proxy処理呼び出し
 

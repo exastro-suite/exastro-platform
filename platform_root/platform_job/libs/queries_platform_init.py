@@ -12,12 +12,18 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-default_language = "ja"
+SQL_SELECT_PLATFORM_PRIVATE = """
+    SELECT  *   FROM    T_PLATFORM_PRIVATE
+    WHERE   ID  =   1
+    ;
+"""
 
-length_organization_id = 36
-length_organization_name = 255
-length_workspace_id = 36
-length_workspace_name = 255
-length_workspace_description = 4000
-max_workspace_environments = 1000
-length_workspace_environment_name = 40
+SQL_INSERT_PLATFORM_PRIVATE = """
+    INSERT INTO T_PLATFORM_PRIVATE
+        (ID, INFORMATIONS, CREATE_USER, LAST_UPDATE_USER)
+    VALUES
+        (1, %(INFORMATIONS)s, 'system', 'system')
+    ON DUPLICATE KEY UPDATE
+        INFORMATIONS=%(INFORMATIONS)s
+    ;
+"""

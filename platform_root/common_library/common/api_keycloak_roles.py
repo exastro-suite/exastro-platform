@@ -47,3 +47,35 @@ def clients_composite_roles_get(realm_name, client_id, role_name, token):
     request_response = requests.get(f"{api_url}/auth/admin/realms/{realm_name}/clients/{client_id}/roles/{role_name}/composites", headers=header_para)
 
     return request_response
+
+
+def realm_role_get(realm_name, role_name, token):
+    """realmロール情報取得 realm role info get
+
+    Args:
+        realm_name (str): realm name
+        role_name (str): role name
+        toekn (str): token
+
+    Returns:
+        Response: HTTP Respose (success : .status_code=200)
+    """
+    globals.logger.info(f'Get keycloak realm role. realm_name={realm_name}, role_name={role_name}')
+
+    header_para = {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer {}".format(token),
+    }
+
+    globals.logger.debug("realm role get send")
+    # 呼び出し先設定 requests setting
+    api_url = "{}://{}:{}".format(os.environ['API_KEYCLOAK_PROTOCOL'], os.environ['API_KEYCLOAK_HOST'], os.environ['API_KEYCLOAK_PORT'])
+
+    request_response = requests.get(
+        "{}/auth/admin/realms/{}/roles/{}".format(api_url, realm_name, role_name),
+        headers=header_para
+    )
+
+    # globals.logger.debug(request_response.text)
+
+    return request_response

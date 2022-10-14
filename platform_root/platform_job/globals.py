@@ -12,12 +12,13 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-default_language = "ja"
+config = None
+logger = None
 
-length_organization_id = 36
-length_organization_name = 255
-length_workspace_id = 36
-length_workspace_name = 255
-length_workspace_description = 4000
-max_workspace_environments = 1000
-length_workspace_environment_name = 40
+
+def init(app):
+    global config
+    global logger
+
+    config = app.config
+    logger = app.logger
