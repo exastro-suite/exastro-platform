@@ -91,7 +91,7 @@ $(function(){
         $('#form_role_kind').text(role.kind);
         $('#form_role_description').val(role.description);
 
-        const authorityTexts = getAuthorityTexts(role, workspaces);
+        const authorityTexts = RolesCommon.getAuthorityTexts(role, workspaces);
         $('#form_role_authorities').html(authorityTexts.map((t) => {return '<span class="auth_item">' + fn.cv(t,'',true) +'</span>'}).join("\n"));
 
         //
@@ -238,53 +238,5 @@ $(function(){
         }).catch(() => {
             $('#button_apply').prop('disabled', false);
         });
-    }
-
-    function getAuthorityTexts(role, workspaces) {
-        const orgAuthText = {
-            "_og-upd":          getText("000-00109", "オーガナイゼーション更新"),
-            "_og-own-mt":       getText("000-00110", "オーガナイゼーション管理者変更"),
-            "_og-role-usr":     getText("000-00111", "オーガナイゼーションロール付与"),
-            "_og-plan-mt":      getText("000-00112", "プラン変更"),
-            "_og-usage":        getText("000-00113", "利用状況確認"),
-            "_og-usr-mt":       getText("000-00114", "ユーザー管理"),
-            "_og-ws-role-mt":   getText("000-00115", "ワークスペースロール管理"),
-            "_og-ws-role-usr":  getText("000-00116", "ワークスペースロール付与"),
-            "_og-ws-mt":        getText("000-00117", "ワークスペース管理"),
-        }
-
-        switch(role.kind) {
-            case 'organization':
-                return role.authorities
-                    .filter((i) => {return orgAuthText[i.name]? true: false})
-                    .map((i) => {return orgAuthText[i.name]? orgAuthText[i.name]: "undefined:" + i.name});
-
-            case 'workspace':
-                if(!role.authorities) return [];
-
-                let roleText = [];
-                role.authorities.forEach((authority) => {
-                    try {
-                        let workspacesIndex = workspaces.findIndex((i) => {return i.id == authority.name});
-                        if( workspacesIndex != -1) {
-                            roleText.push(getText("400-00118", workspaces[workspacesIndex].name + ":使用", workspaces[workspacesIndex].name));
-
-                        } else if(CommonAuth.isAdminWorkspaceAuthority(authority.name)) {
-                            let workspace_id = CommonAuth.authorityNameToWorkspaceId(authority.name);
-                            let workspacesIndex = workspaces.findIndex((i) => {return i.id == workspace_id});
-                            if( workspacesIndex != -1) {
-                                roleText.push(getText("400-00119", workspaces[workspacesIndex].name + ":管理", workspaces[workspacesIndex].name));
-                            } else {
-                                roleText.push(getText("400-00120", "権限の無いワークスペース"));
-                            }
-                        } else {
-                            roleText.push(getText("400-00120", "権限の無いワークスペース"));
-                        }
-                    } catch(e) { console.log(e); return [];}
-                });
-                return Array.from(new Set(roleText)).sort();
-            default:
-                return [];
-        }
     }
 });
