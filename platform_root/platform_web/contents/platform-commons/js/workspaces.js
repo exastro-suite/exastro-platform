@@ -60,7 +60,7 @@ $(function(){
         //
         // display new workspace button
         //
-        if (CommonAuth.hasAuthority('_og-ws-mt')) {
+        if (CommonAuth.hasAuthority(RolesCommon.ORG_AUTH_WS_MAINTE)) {
             $('#new_workspace').css('display','');
             $('#new_workspace').on('click',() => {
                 window.location = location_conf.href.workspaces.new.replace(/{organization_id}/g, CommonAuth.getRealm());

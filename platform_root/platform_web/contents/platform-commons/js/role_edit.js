@@ -121,7 +121,7 @@ $(function(){
 
         workspaceListData = [];
         for(let row of workspaces) {
-            if(CommonAuth.hasAuthority('_og-ws-role-mt') || adminWorkspaces.indexOf(row.id) !== -1) {
+            if(CommonAuth.hasAuthority(RolesCommon.ORG_AUTH_WS_ROLE_MAINTE) || adminWorkspaces.indexOf(row.id) !== -1) {
                 workspaceListData.push({
                     workspace_id: row.id,
                     workspace_name: row.name,
