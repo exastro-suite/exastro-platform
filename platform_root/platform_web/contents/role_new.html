@@ -127,14 +127,15 @@
                                                         <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci">最大255文字 / 使用可能文字：全角・半角文字</div></td>
                                                     </tr>
                                                     <tr class="tBodyTr tr">
-                                                        <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: left;">使用ワークスペース</div></td>
+                                                        <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: left;">使用ワークスペース<span class="tHeadRequired" id="workspace_required" style="display:none">必須</span></div></td>
                                                         <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci">
                                                             <ul id="workspace_list" style="display:none;">
                                                                 <li style="margin: 2px 0px;" class="workspace_list_item">
                                                                     <input type="checkbox" class="select_workspace" id="check_${workspace_id}" value="${workspace_id}"/><label for="check_${workspace_id}">${workspace_name}</label>
                                                                 </li>
                                                             </ul>
-                                                            <span id="workspace_list_notfound">選択可能なワークスペースが存在しません</span>
+                                                            <span id="workspace_list_notfound">選択可能なワークスペースが存在しません<br></span>
+                                                            <span class="validate_error" id="message_workspace"></span>
                                                         </div></td>
                                                         <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci">このロールで使用可能にするワークスペースを選択します</div></td>
                                                     </tr>

@@ -41,13 +41,14 @@ $(function(){
             displayMenu('menu_workspace');
             // Display Topic Path
             displayTopicPath([
-                {"text": "ワークスペース一覧", "href": location_conf.href.workspaces.list.replace(/${organization_id}/g, CommonAuth.getRealm()) }
+                {"text": "ワークスペース一覧", "href": location_conf.href.workspaces.list.replace(/{organization_id}/g, CommonAuth.getRealm()) }
             ]);
 
             display_main(results[1].data);
             finish_onload_progress();
         }).catch((e) => {
             console.log('[ERROR] load_main catch');
+            finish_onload_progress_at_error();
             if(typeof e != "undefined") console.log(e);
             return;
         });

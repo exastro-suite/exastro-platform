@@ -59,6 +59,7 @@ $(function(){
 
         }).catch((e) => {
             console.log('[ERROR] load_main catch');
+            finish_onload_progress_at_error();
             if(typeof e != "undefined") console.log(e);
             return;
         });
@@ -91,7 +92,6 @@ $(function(){
         // role register button
         //
         $('#button_register').prop('disabled',false);
-        $('#button_delete').prop('disabled',false);
         $('#button_register').on('click',() => {
             $('#button_register').prop('disabled',true);
             $('#button_delete').prop('disabled',true);
@@ -102,6 +102,11 @@ $(function(){
             }
             role_register();
         });
+
+        //
+        // role delete button
+        //
+        $('#button_delete').prop('disabled',false);
     }
 
     //
@@ -160,6 +165,9 @@ $(function(){
         $("#workspace_list").html(html);
         $("#workspace_list").css('display', '');
         $("#workspace_list_notfound").css('display', (workspaceListData.length == 0? '': 'none'));
+        if(!CommonAuth.hasAuthority(RolesCommon.ORG_AUTH_WS_ROLE_MAINTE)) {
+            $('#workspace_required').css('display','');
+        }
     }
 
     //
@@ -168,6 +176,17 @@ $(function(){
     function validate_register() {
         console.log("[CALL] validate_register");
         let result=true;
+
+        if(!CommonAuth.hasAuthority(RolesCommon.ORG_AUTH_WS_ROLE_MAINTE)) {
+            if($('.select_workspace:checked').length === 0) {
+                $("#message_workspace").text(
+                    getText("400-00011", "必須項目が不足しています。({0})", getText("000-00102", "ワークスペース名")));
+                result = false;
+            } else {
+                $("#message_workspace").text("");
+            }
+        }
+
         console.log(`[END] validate_register : result=${result}`);
         return result;
     }
