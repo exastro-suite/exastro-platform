@@ -55,7 +55,7 @@ post:
           schema:
             $ref: '../schemas/runtimeError.yaml'
 
-delete:
+patch:
   tags:
     - RoleMappingsService
   summary: Delete roles from user role mapping
