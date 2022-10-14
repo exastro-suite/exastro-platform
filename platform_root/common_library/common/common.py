@@ -251,7 +251,7 @@ def platform_exception_handler(func):
     def inner_func(*args, **kwargs):
         try:
             response = func(*args, **kwargs)
-        except (BadRequestException, AuthException, NotAllowedException, InternalErrorException, OtherException) as err:
+        except (BadRequestException, AuthException, NotAllowedException, NotFoundException, InternalErrorException, OtherException) as err:
             globals.logger.error(f'exception handler:\n status_code:[{err.status_code}]\n message_id:[{err.message_id}]')
             globals.logger.error(''.join(list(traceback.TracebackException.from_exception(err).format())))
             return response_status(err.status_code, err.data, err.message_id, err.message)
