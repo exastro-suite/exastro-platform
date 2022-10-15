@@ -67,11 +67,11 @@ spec:
             configMapKeyRef:
               name: keycloak
               key: API_KEYCLOAK_PORT
-        - name: DB_ADDR
+        - name: DB_HOST
           valueFrom:
             configMapKeyRef:
               name: platform-db
-              key: DB_ADDR
+              key: DB_HOST
         - name: DB_PORT
           valueFrom:
             configMapKeyRef:
@@ -81,7 +81,7 @@ spec:
           valueFrom:
             configMapKeyRef:
               name: platform-db
-              key: PLATFORM_DB_DATABASE
+              key: DB_DATABASE
         - name: DB_USER
           valueFrom:
             secretKeyRef:
@@ -92,11 +92,11 @@ spec:
             secretKeyRef:
               name: platform-db
               key: PLATFORM_DB_PASSWORD
-        - name: MYSQL_ROOT_PASSWORD
+        - name: DB_ROOT_PASSWORD
           valueFrom:
             secretKeyRef:
               name: platform-db
-              key: MYSQL_ROOT_PASSWORD
+              key: DB_ROOT_PASSWORD
       volumes:
       - name: contaier-volume
         emptyDir: {}

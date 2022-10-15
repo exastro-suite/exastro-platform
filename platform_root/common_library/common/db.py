@@ -63,7 +63,7 @@ class DBconnector:
             DBinfo: platformdb dbinfo
         """
         platformdb = self.DBinfo()
-        platformdb.db_host = os.environ.get('DB_ADDR')
+        platformdb.db_host = os.environ.get('DB_HOST')
         platformdb.db_port = 3306
         platformdb.db_database = os.environ.get('DB_DATABASE')
         platformdb.db_user = os.environ.get('DB_USER')
@@ -77,11 +77,11 @@ class DBconnector:
             DBinfo: root dbinfo
         """
         db_root = self.DBinfo()
-        db_root.db_host = os.environ.get('DB_ADDR')
+        db_root.db_host = os.environ.get('DB_HOST')
         db_root.db_port = 3306
         db_root.db_database = ""
         db_root.db_user = "root"
-        db_root.db_password = os.environ.get('MYSQL_ROOT_PASSWORD')
+        db_root.db_password = os.environ.get('DB_ROOT_PASSWORD')
         return db_root
 
     def __get_dbinfo_organization(self, organization_id):

@@ -42,7 +42,7 @@ class DBinit(DBconnector):
         user_password = self.__generate_password()
 
         orgdb = DBconnector.DBinfo()
-        orgdb.db_host = os.environ.get('DB_ADDR')
+        orgdb.db_host = os.environ.get('DB_HOST')
         orgdb.db_port = 3306
         orgdb.db_database = db_name
         orgdb.db_user = user_name
