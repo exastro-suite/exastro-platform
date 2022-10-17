@@ -1,4 +1,5 @@
-#   Copyright 2019 NEC Corporation
+{{/*
+#   Copyright 2022 NEC Corporation
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -11,19 +12,12 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
+*/}}
 
-from pytz import timezone
-
-config = None
-TZ = None
-logger = None
-
-def init(app):
-    global config
-    global TZ
-    global logger
-
-    config = app.config
-    TZ = timezone(config['TZ'])
-    logger = app.logger
-
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: params-{{ template "platform-api.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels: {{ include "platform-api.labels" . | nindent 4 }}
+data: {{ toYaml .Values.extraEnv | nindent 2 }}

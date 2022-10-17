@@ -1,0 +1,140 @@
+apiVersion: v1
+entries:
+  common:
+  - apiVersion: v2
+    appVersion: 1.0.0-beta.1
+    created: "2022-10-18T00:27:27.297376244+09:00"
+    description: A Helm chart for Kubernetes
+    digest: e24124a36103c08e06cd3498736d2c5c7ab3b0749f056b4baf3880977ded9b6c
+    home: https://exastro-suite.github.io/
+    icon: https://exastro-suite.github.io/docs/asset/logo/exastro/Exastro-logomark2-rgb.svg
+    keywords:
+    - exastro
+    - exastro-it-automation
+    maintainers:
+    - email: contact@exastro.jp.nec.com
+      name: NEC Corporation
+    name: common
+    sources:
+    - https://github.com/exastro-suite/exastro-platform
+    type: application
+    urls:
+    - charts/common-0.1.0.tgz
+    version: 0.1.0
+  keycloak:
+  - apiVersion: v2
+    appVersion: 1.0.0-beta.1
+    created: "2022-10-18T00:27:27.298305807+09:00"
+    description: A Helm chart for Kubernetes
+    digest: 08e93c1519338e70e335eb7bf48746033e208d9e9c613f16d7864d46a107a669
+    home: https://exastro-suite.github.io/
+    icon: https://exastro-suite.github.io/docs/asset/logo/exastro/Exastro-logomark2-rgb.svg
+    keywords:
+    - exastro
+    - exastro-it-automation
+    maintainers:
+    - email: contact@exastro.jp.nec.com
+      name: NEC Corporation
+    name: keycloak
+    sources:
+    - https://github.com/exastro-suite/exastro-platform
+    type: application
+    urls:
+    - charts/keycloak-0.1.0.tgz
+    version: 0.1.0
+  mariadb:
+  - apiVersion: v2
+    appVersion: 1.0.0-beta.1
+    created: "2022-10-18T00:27:27.299158312+09:00"
+    description: A Helm chart for Kubernetes
+    digest: d6d9d331be47e8fff640962018ad1db4827c5983f5b51d774a5010b59614bfb9
+    home: https://exastro-suite.github.io/
+    icon: https://exastro-suite.github.io/docs/asset/logo/exastro/Exastro-logomark2-rgb.svg
+    keywords:
+    - exastro
+    - exastro-it-automation
+    maintainers:
+    - email: contact@exastro.jp.nec.com
+      name: NEC Corporation
+    name: mariadb
+    sources:
+    - https://github.com/exastro-suite/exastro-platform
+    type: application
+    urls:
+    - charts/mariadb-0.1.0.tgz
+    version: 0.1.0
+  platform-api:
+  - apiVersion: v2
+    appVersion: 1.0.0-beta.1
+    created: "2022-10-18T00:27:27.300762552+09:00"
+    description: A Helm chart for Kubernetes
+    digest: 216e3c0e25f92b77e4501b5a14badc320299cf1f83ede10a048f0946dd5fd0c1
+    home: https://exastro-suite.github.io/
+    icon: https://exastro-suite.github.io/docs/asset/logo/exastro/Exastro-logomark2-rgb.svg
+    keywords:
+    - exastro
+    - exastro-it-automation
+    maintainers:
+    - email: contact@exastro.jp.nec.com
+      name: NEC Corporation
+    name: platform-api
+    sources:
+    - https://github.com/exastro-suite/exastro-common-auth
+    type: application
+    urls:
+    - charts/platform-api-0.1.0.tgz
+    version: 0.1.0
+  platform-auth:
+  - apiVersion: v2
+    appVersion: 1.0.0-beta.1
+    created: "2022-10-18T00:27:27.302963925+09:00"
+    description: A Helm chart for Kubernetes
+    digest: 53f72222a7f9100b92d7d1cee29951bec34b47f78ff6640becd1278f5f434eb1
+    home: https://exastro-suite.github.io/
+    icon: https://exastro-suite.github.io/docs/asset/logo/exastro/Exastro-logomark2-rgb.svg
+    keywords:
+    - exastro
+    - exastro-it-automation
+    maintainers:
+    - email: contact@exastro.jp.nec.com
+      name: NEC Corporation
+    name: platform-auth
+    sources:
+    - https://github.com/exastro-suite/exastro-common-auth
+    type: application
+    urls:
+    - charts/platform-auth-0.1.0.tgz
+    version: 0.1.0
+  platform-setup:
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2022-10-18T00:27:27.304196745+09:00"
+    description: A Helm chart for Kubernetes
+    digest: f94f165033dd8d2beb647cf2f78573b254661e78a113a5be2d572da53bc9e380
+    name: platform-setup
+    type: application
+    urls:
+    - charts/platform-setup-0.1.0.tgz
+    version: 0.1.0
+  platform-web:
+  - apiVersion: v2
+    appVersion: 1.0.0-beta.1
+    created: "2022-10-18T00:27:27.305414065+09:00"
+    description: A Helm chart for Kubernetes
+    digest: 4edb6410382a65d7abb29831765b881a4e1f8064f528b3bdfc43212d5800023a
+    home: https://exastro-suite.github.io/
+    icon: https://exastro-suite.github.io/docs/asset/logo/exastro/Exastro-logomark2-rgb.svg
+    keywords:
+    - exastro
+    - exastro-it-automation
+    maintainers:
+    - email: contact@exastro.jp.nec.com
+      name: NEC Corporation
+    name: platform-web
+    sources:
+    - https://github.com/exastro-suite/exastro-common-auth
+    type: application
+    urls:
+    - charts/platform-web-0.1.0.tgz
+    version: 0.1.0
+generated: "2022-10-18T00:27:27.29627904+09:00"

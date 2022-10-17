@@ -1,0 +1,25 @@
+apiVersion: v1
+entries:
+  exastro-platform:
+  - apiVersion: v2
+    appVersion: 2.0.1
+    created: "2022-10-18T00:31:46.505467689+09:00"
+    description: Exastro IT Automation is an Open Source Framework for digitizing
+      and centrally managing the system configuration.
+    digest: 787c20c1841833d08d6ffca05d220a3e83bc0ba192bdc61b82fb82f78c4e7543
+    home: https://exastro-suite.github.io/
+    icon: https://exastro-suite.github.io/docs/asset/logo/exastro/Exastro-logomark2-rgb.svg
+    keywords:
+    - exastro
+    - exastro-it-automation
+    maintainers:
+    - email: contact@exastro.jp.nec.com
+      name: NEC Corporation
+    name: exastro-platform
+    sources:
+    - https://github.com/exastro-suite/exastro-common-auth
+    type: application
+    urls:
+    - exastro-platform-0.1.0.tgz
+    version: 0.1.0
+generated: "2022-10-18T00:31:46.489895593+09:00"
