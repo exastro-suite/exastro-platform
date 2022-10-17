@@ -307,7 +307,7 @@ class CheckAuthority():
 
         elif class_role._kind == const.ROLE_KIND_WORKSPACE:
             workspace_ids = [w.get("id") for w in class_role._workspaces]
-            is_auth = self.is_workspaces_authority(workspace_ids, is_maintenance=False)
+            is_auth = self.is_workspaces_authority(workspace_ids, is_maintenance=True)
 
         if not is_auth:
             globals.logger.warn(f"Not authorized to access the role :{class_role._name}")
