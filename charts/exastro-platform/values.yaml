@@ -121,8 +121,6 @@ mariadb:
     tag: "10.9"
     pullPolicy: IfNotPresent
 
-keycloak:
-  image:
     repository: "exastro/keycloak"
     tag: "1.0.2"
     pullPolicy: IfNotPresent

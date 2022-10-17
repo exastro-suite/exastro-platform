@@ -12,7 +12,6 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-apiVersion: v2
 name: exastro-platform
 description: Exastro IT Automation is an Open Source Framework for digitizing and centrally managing the system configuration.
 

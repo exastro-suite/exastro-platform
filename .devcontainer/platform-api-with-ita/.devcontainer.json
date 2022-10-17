@@ -1,0 +1,89 @@
+/*
+#   Copyright 2022 NEC Corporation
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+*/
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the README at:
+// https://github.com/microsoft/vscode-dev-containers/tree/v0.231.6/containers/jekyll
+{
+	"name": "platform-api with ita - exastro-common-auth",
+	"dockerComposeFile": ["../docker-compose.yml","../docker-compose.devcontainer.yml", "../../../it-automation2-test/.devcontainer/docker-compose.yml","./docker-compose.with-ita.yaml"],
+	"service": "platform-api",
+	// Set *default* container specific settings.json values on container create.
+	"settings": {
+		"terminal.integrated.profiles.linux": {
+			"bash": {
+				"path": "/bin/bash"
+			}
+		},
+		"terminal.integrated.defaultProfile.linux": "bash",
+
+		// git menu setting
+		"git.allowNoVerifyCommit": true,
+
+		// thunder-client setting
+		"thunder-client.customLocation": "",
+		"thunder-client.saveToWorkspace": true,
+		"thunder-client.workspaceRelativePath": ".vscode_extensions",
+
+		// python extension setting
+		"python.linting.pylintEnabled": false,
+		"python.linting.flake8Enabled": true,
+
+		"python.linting.lintOnSave": true,
+
+		"python.linting.flake8Args": [
+			"--ignore=W293, W504",
+			"--max-line-length=150",
+			"--max-complexity=20",
+		],
+
+		"python.formatting.provider": "autopep8",
+
+		"python.formatting.autopep8Args": [
+			"--aggressive", "--aggressive",
+		],
+	},
+	// Add the IDs of extensions you want installed when the container is created.
+	"extensions": [
+		"donjayamanne.python-extension-pack",
+		"ms-python.vscode-pylance",
+		"ms-ceintl.vscode-language-pack-ja",
+		"ms-vscode.references-view",
+		"eamodio.gitlens",
+		"mhutchie.git-graph",
+		"42crunch.vscode-openapi",
+		"arjun.swagger-viewer",
+		"redhat.vscode-yaml",
+		"adisreyaj.swagger-snippets",
+		"hediet.vscode-drawio",
+		"oderwat.indent-rainbow",
+		"aaron-bond.better-comments",
+		//"sonarsource.sonarlint-vscode",
+		"mechatroner.rainbow-csv",
+		"ryu1kn.partial-diff",
+		"pkief.material-icon-theme",
+		"rangav.vscode-thunder-client",
+		//"mtxr.sqltools",
+		//"mtxr.sqltools-driver-mysql",
+		"formulahendry.vscode-mysql",
+		"mitchdenny.ecdc",
+	],
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	"forwardPorts": [
+	],
+	// Use 'postCreateCommand' to run commands after the container is created.
+	// "onCreateCommand":"sudo dnf install -y git vim diffutils bind-utils iputils && sudo pip3.9 install flake8 && sudo pip3.9 install autopep8",
+	"workspaceFolder": "/workspace",
+	"overrideCommand": true,
+}
