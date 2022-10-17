@@ -104,7 +104,7 @@ spec:
               configMapKeyRef:
                 name: params-auth-database
                 key: DB_VENDOR
-          - name: DB_HOST
+          - name: DB_ADDR
             valueFrom:
               configMapKeyRef:
                 name: params-auth-database

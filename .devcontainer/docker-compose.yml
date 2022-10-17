@@ -95,7 +95,7 @@ services:
       - ../.volumes/platform-db/data:/var/lib/mysql
     environment:
       - TZ=Asia/Tokyo
-      - DB_ROOT_PASSWORD=password
+      - MARIADB_ROOT_PASSWORD=password
       - KEYCLOAK_DB_DATABASE=keycloak
       - KEYCLOAK_DB_USER=keycloak
       - KEYCLOAK_DB_PASSWORD=password
