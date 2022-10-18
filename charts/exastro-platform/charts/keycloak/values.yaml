@@ -15,7 +15,7 @@ global:
       TZ: "Asia/Tokyo"
       PYTHONIOENCODING: utf-8
       PLATFORM_API_PROTOCOL: "http"
-      PLATFORM_API_HOST: "platform-auth"
+      PLATFORM_API_HOST: "platform-api"
       PLATFORM_API_PORT: "8000"
       PLATFORM_WEB_PROTOCOL: "http"
       PLATFORM_WEB_HOST: "platform-web"
@@ -128,7 +128,7 @@ securityContext:
 
 service:
   name: http
-  type: NodePort
+  type: ClusterIP
   port: 8080
 
 ingress:
@@ -149,11 +149,11 @@ ingress:
 
 resources:
   requests:
-    memory: "256Mi"  #仮決め
-    cpu: "1m"     #仮決め
+    memory: "256Mi"
+    cpu: "1m"
   limits:
-    memory: "2Gi"  #仮決め
-    cpu: "4"     #仮決め
+    memory: "2Gi"
+    cpu: "4"
 
 autoscaling:
   enabled: false

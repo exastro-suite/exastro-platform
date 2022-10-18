@@ -17,7 +17,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: params-{{ template "platform-auth.fullname" . }}
+  name: params-{{ template "platform-auth.name" . }}
   namespace: {{ .Release.Namespace }}
   labels: {{ include "platform-auth.labels" . | nindent 4 }}
 data: {{ toYaml .Values.extraEnv | nindent 2 }}
