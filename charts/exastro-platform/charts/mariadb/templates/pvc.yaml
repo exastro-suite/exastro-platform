@@ -54,7 +54,9 @@ spec:
 {{- end -}}
 
 {{/* Print Exastro Platform PVCs */}}
-{{- $database := default dict .Values.global.databaseDefinition -}}
-{{- if (default false $database.persistence.enabled) -}}
-{{-   include "mariadb.pvc.database" . | nindent 0 -}}
+{{- if .Values.global.databaseDefinition.enabled -}}
+{{-   $database := default dict .Values.global.databaseDefinition -}}
+{{-   if (default false $database.persistence.enabled) -}}
+{{-     include "mariadb.pvc.database" . | nindent 0 -}}
+{{-   end -}}
 {{- end -}}

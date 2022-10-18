@@ -1,0 +1,24 @@
+apiVersion: v1
+entries:
+  exastro-platform:
+  - apiVersion: v2
+    appVersion: 1.0.2
+    created: "2022-10-19T00:12:00.936112175+09:00"
+    description: Exastro Platform is common framework for Exastro suite applications.
+    digest: b7a6b144aaa6d7299170da4f206b0592ae8eade4f7c05032c06ba2ae78ec0ae7
+    home: https://exastro-suite.github.io/
+    icon: https://exastro-suite.github.io/docs/asset/logo/exastro/Exastro-logomark2-rgb.svg
+    keywords:
+    - exastro
+    - exastro-platform
+    maintainers:
+    - email: contact@exastro.jp.nec.com
+      name: NEC Corporation
+    name: exastro-platform
+    sources:
+    - https://github.com/exastro-suite/exastro-platform
+    type: application
+    urls:
+    - exastro-platform-1.0.0.tgz
+    version: 1.0.0
+generated: "2022-10-19T00:12:00.929994052+09:00"

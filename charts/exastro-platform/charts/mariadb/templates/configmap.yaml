@@ -14,6 +14,7 @@
 #   limitations under the License.
 */}}
 
+{{- if .Values.global.databaseDefinition.enabled -}}
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -23,3 +24,4 @@ metadata:
 data:
   custom.cnf: |
 {{ .Values.dbSetup.dbConfInfo.customCnf | indent 4 }}
+{{- end -}}
