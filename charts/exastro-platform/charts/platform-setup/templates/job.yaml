@@ -154,7 +154,7 @@ spec:
           env:
             {{- range $define := .Values.global -}}
             {{-   range $config, $value := $define.config }}
-            {{-     if or (eq $define.name "auth-global") (eq $define.name "keycloak") (eq $define.name "keycloak") }}
+            {{-     if or (eq $define.name "auth-global") (eq $define.name "keycloak") (eq $define.name "keycloak") (eq $define.name "auth-database") }}
             - name: {{ $config }}
               valueFrom:
                 configMapKeyRef:
@@ -163,7 +163,7 @@ spec:
             {{-     end -}}
             {{-   end -}}
             {{-   range $secret, $value := $define.secret }}
-            {{-     if or (eq $define.name "keycloak") (eq $define.name "keycloak") }}
+            {{-     if or (eq $define.name "keycloak") (eq $define.name "keycloak") (eq $define.name "auth-database") }}
             - name: {{ $secret }}
               valueFrom:
                 secretKeyRef:
