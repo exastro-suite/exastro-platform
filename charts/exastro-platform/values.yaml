@@ -98,12 +98,12 @@ platform-auth:
   ingress:
     enabled: true
     hosts:
-      - host: exastro-suite.ae5501a031674d2da37b.japaneast.aksapp.io
+      - host: exastro-suite.example.local
         paths:
           - path: /
             pathType: Prefix
             backend: "http"
-      - host: exastro-suite-mng.ae5501a031674d2da37b.japaneast.aksapp.io
+      - host: exastro-suite-mng.example.local
         paths:
           - path: /
             pathType: Prefix
