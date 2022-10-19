@@ -10,3 +10,4 @@ __pycache__/
 /platform_root/platform_web/contents/version
 /*.sql
 /.private/
+exastro-platform.yaml
