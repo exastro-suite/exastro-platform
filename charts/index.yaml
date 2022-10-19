@@ -3,7 +3,27 @@ entries:
   exastro-platform:
   - apiVersion: v2
     appVersion: 1.0.2
-    created: "2022-10-19T15:04:01.225592516+09:00"
+    created: "2022-10-19T17:22:38.531743727+09:00"
+    description: Exastro Platform is common framework for Exastro suite applications.
+    digest: a52b33f9b7fa21f39ad00809b52f88e87e5bee0ed202b284a7aeda59025e7459
+    home: https://exastro-suite.github.io/
+    icon: https://exastro-suite.github.io/docs/asset/logo/exastro/Exastro-logomark2-rgb.svg
+    keywords:
+    - exastro
+    - exastro-platform
+    maintainers:
+    - email: contact@exastro.jp.nec.com
+      name: NEC Corporation
+    name: exastro-platform
+    sources:
+    - https://github.com/exastro-suite/exastro-platform
+    type: application
+    urls:
+    - exastro-platform-1.0.3.tgz
+    version: 1.0.3
+  - apiVersion: v2
+    appVersion: 1.0.2
+    created: "2022-10-19T17:22:38.525036919+09:00"
     description: Exastro Platform is common framework for Exastro suite applications.
     digest: c82e17a66ed7b082596fd9f32e446c51676bfaa1fae72e62ad592bef9424c564
     home: https://exastro-suite.github.io/
@@ -23,7 +43,7 @@ entries:
     version: 1.0.2
   - apiVersion: v2
     appVersion: 1.0.2
-    created: "2022-10-19T15:04:01.215418561+09:00"
+    created: "2022-10-19T17:22:38.5176622+09:00"
     description: Exastro Platform is common framework for Exastro suite applications.
     digest: 41c0e5789ef777d4b98a62b2dfe01619142eedb1692e97f9256ce5516cfb89bd
     home: https://exastro-suite.github.io/
@@ -43,7 +63,7 @@ entries:
     version: 1.0.1
   - apiVersion: v2
     appVersion: 1.0.2
-    created: "2022-10-19T15:04:01.204200533+09:00"
+    created: "2022-10-19T17:22:38.512111036+09:00"
     description: Exastro Platform is common framework for Exastro suite applications.
     digest: b7a6b144aaa6d7299170da4f206b0592ae8eade4f7c05032c06ba2ae78ec0ae7
     home: https://exastro-suite.github.io/
@@ -61,4 +81,4 @@ entries:
     urls:
     - exastro-platform-1.0.0.tgz
     version: 1.0.0
-generated: "2022-10-19T15:04:01.198132461+09:00"
+generated: "2022-10-19T17:22:38.484794108+09:00"
