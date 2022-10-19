@@ -104,13 +104,13 @@ ingress:
   #    hosts:
   #      - chart-example.local
 
-resources:
-  requests:
-    memory: "256Mi"
-    cpu: "1m"
-  limits:
-    memory: "2Gi"
-    cpu: "4"
+resources: {}
+  # requests:
+  #   memory: "256Mi"
+  #   cpu: "1m"
+  # limits:
+  #   memory: "2Gi"
+  #   cpu: "4"
 
 autoscaling:
   enabled: false
