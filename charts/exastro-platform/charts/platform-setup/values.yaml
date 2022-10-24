@@ -69,7 +69,8 @@ global:
       DB_PORT: "3306"
       DB_DATABASE: "platform"
     secret:
-      DB_ROOT_PASSWORD: ""
+      DB_ADMIN_USER: ""
+      DB_ADMIN_PASSWORD: ""
       DB_USER: ""
       DB_PASSWORD: ""
 
@@ -123,7 +124,7 @@ database:
     #!/bin/bash
     i=1
     echo "HOST: ${DB_HOST}"
-    until mysqladmin ping --host=${DB_HOST} --user=root --password=${DB_ROOT_PASSWORD} --silent; do
+    until mysqladmin ping --host=${DB_HOST} --user=${DB_ADMIN_PASSWORD} --password=${DB_ADMIN_PASSWORD} --silent; do
       echo `date`": Can not connect to Database."
       sleep $i
       i=$(( i * 2 ))
@@ -132,7 +133,7 @@ database:
     exit 0
 
   initializeDatabase: |-
-    mysql --host=${DB_HOST} --user=root --password=${DB_ROOT_PASSWORD} < /createdb.sql
+    mysql --host=${DB_HOST} --user=root --password=${DB_ADMIN_PASSWORD} < /createdb.sql
 
   databaseConfig:
     name: mysqld-conf
