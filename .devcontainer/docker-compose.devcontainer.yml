@@ -38,6 +38,7 @@ services:
     environment:
       - FLASK_ENV=development
       - FLASK_SERVER_PORT=8801
+      - LOG_LEVEL=DEBUG
       - HTTP_PROXY=${HTTP_PROXY}
       - http_proxy=${HTTP_PROXY}
       - HTTPS_PROXY=${HTTPS_PROXY}
@@ -71,6 +72,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
       - FLASK_ENV=development
+      - LOG_LEVEL=DEBUG
       - HTTP_PROXY=${HTTP_PROXY}
       - http_proxy=${HTTP_PROXY}
       - HTTPS_PROXY=${HTTPS_PROXY}

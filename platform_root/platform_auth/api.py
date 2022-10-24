@@ -46,6 +46,8 @@ logging.setLogRecordFactory(ExastroLogRecordFactory(org_factory, request))
 globals.logger = logging.getLogger('root')
 dictLogConf(LOGGING)
 
+globals.logger.setLevel(os.getenv('LOG_LEVEL', 'INFO'))
+
 RequestID(app)
 
 
