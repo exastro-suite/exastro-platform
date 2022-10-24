@@ -65,7 +65,8 @@ def role_create(body, organization_id):
         return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, validate.args)
 
     workspace_ids = [w.get("id") for w in workspaces]
-    is_auth = check_authority.is_workspaces_authority(organization_id, workspace_ids, is_maintenance=True)
+    cauth = check_authority.CheckAuthority(organization_id, connexion.request.headers)
+    is_auth = cauth.is_workspaces_authority(workspace_ids, is_maintenance=True)
     if not is_auth:
         raise common.BadRequestException(
             message_id=f"400-{MSG_FUNCTION_ID}001", message='ワークスペースの指定が不正または操作対象として指定する権限がありません。'
@@ -185,7 +186,7 @@ def role_list(organization_id, kind=None):
 
     roles = json.loads(response.text)
 
-    data = []
+    all_data = []
 
     # 取得したロールを戻り値に設定
     # Set the acquired role to the return value
@@ -280,7 +281,16 @@ def role_list(organization_id, kind=None):
         if workspaces:
             ret_role.update(workspaces)
 
-        data.append(ret_role)
+        all_data.append(ret_role)
+
+    # 許可されているロールを抽出する
+    # Extract roles that allowed to get
+    data = []
+    cauth = check_authority.CheckAuthority(organization_id, connexion.request.headers)
+    for role in all_data:
+        ret = cauth.is_role_authority(role)
+        if ret:
+            data.append(role)
 
     globals.logger.debug(f"data:{data}")
 
@@ -377,7 +387,8 @@ def role_update(body, organization_id, role_name):
     # Check if the information before change can be updated
     # 変更前の情報が更新できるかチェックする
     workspace_ids = [w.get("name") for w in comp_roles]
-    is_auth = check_authority.is_workspaces_authority(organization_id, workspace_ids, is_maintenance=True)
+    cauth = check_authority.CheckAuthority(organization_id, connexion.request.headers)
+    is_auth = cauth.is_workspaces_authority(workspace_ids, is_maintenance=True)
     if not is_auth and len(comp_roles) > 0:
         raise common.BadRequestException(
             message_id=f"400-{MSG_FUNCTION_ID}002", message='指定されたロールを更新する権限がありません。'
@@ -386,7 +397,7 @@ def role_update(body, organization_id, role_name):
     # Check if it can be updated with changed information
     # 変更後の情報で更新できるかチェックする
     workspace_ids = [w.get("id") for w in workspaces]
-    is_auth = check_authority.is_workspaces_authority(organization_id, workspace_ids, is_maintenance=True)
+    is_auth = cauth.is_workspaces_authority(workspace_ids, is_maintenance=True)
     if not is_auth:
         raise common.BadRequestException(
             message_id=f"400-{MSG_FUNCTION_ID}001", message='ワークスペースの指定が不正または操作対象として指定する権限がありません。'

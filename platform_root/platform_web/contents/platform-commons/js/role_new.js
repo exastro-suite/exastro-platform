@@ -48,6 +48,7 @@ $(function(){
 
         }).catch((e) => {
             console.log('[ERROR] load_main catch');
+            finish_onload_progress_at_error();
             if(typeof e != "undefined") console.log(e);
             return;
         });
@@ -87,7 +88,7 @@ $(function(){
 
         workspaceListData = [];
         for(let row of workspaces) {
-            if(CommonAuth.hasAuthority('_og-ws-role-mt') || adminWorkspaces.indexOf(row.id) !== -1) {
+            if(CommonAuth.hasAuthority(RolesCommon.ORG_AUTH_WS_ROLE_MAINTE) || adminWorkspaces.indexOf(row.id) !== -1) {
                 workspaceListData.push({
                     workspace_id: row.id,
                     workspace_name: row.name,
@@ -130,6 +131,9 @@ $(function(){
         $("#workspace_list").html(html);
         $("#workspace_list").css('display', '');
         $("#workspace_list_notfound").css('display', (workspaceListData.length == 0? '': 'none'));
+        if(!CommonAuth.hasAuthority(RolesCommon.ORG_AUTH_WS_ROLE_MAINTE)) {
+            $('#workspace_required').css('display','');
+        }
     }
 
     //
@@ -162,6 +166,15 @@ $(function(){
             $("#message_role_name").text("");
         }
 
+        if(!CommonAuth.hasAuthority(RolesCommon.ORG_AUTH_WS_ROLE_MAINTE)) {
+            if($('.select_workspace:checked').length === 0) {
+                $("#message_workspace").text(
+                    getText("400-00011", "必須項目が不足しています。({0})", getText("000-00102", "ワークスペース名")));
+                result = false;
+            } else {
+                $("#message_workspace").text("");
+            }
+        }
 
         console.log(`[END] validate_register : result=${result}`);
         return result;

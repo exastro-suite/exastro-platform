@@ -565,12 +565,9 @@ components:
       items:
         $ref: '#/components/schemas/user'
       example:
-        - id: 9baf9af4-ea88-4373-aa66-cb7bb6e316da
-          preferred_username: username-1
-        - id: 2b0ed3cb-74b9-4590-add0-c3cd908a17ed
-          preferred_username: username-2
-        - id: 56e24fc5-2aea-4a02-baee-29dd862c68d6
-          preferred_username: username-3
+        - preferred_username: username-1
+        - preferred_username: username-2
+        - preferred_username: username-3
   securitySchemes:
     BasicAuth:
       type: http
