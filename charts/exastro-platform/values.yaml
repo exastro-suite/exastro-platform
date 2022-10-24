@@ -69,7 +69,8 @@ global:
       DB_PORT: "3306"
       DB_DATABASE: "platform"
     secret:
-      DB_ROOT_PASSWORD: ""
+      DB_ADMIN_USER: ""
+      DB_ADMIN_PASSWORD: ""
       DB_USER: ""
       DB_PASSWORD: ""
   databaseDefinition:
@@ -92,7 +93,7 @@ global:
 platform-api:
   image:
     repository: "exastro/exastro-platform-api"
-    tag: "1.0.2"
+    tag: "1.0.4"
 
 platform-auth:
   ingress:
@@ -112,18 +113,18 @@ platform-auth:
     type: ClusterIP
   image:
     repository: "exastro/exastro-platform-auth"
-    tag: "1.0.2"
+    tag: "1.0.4"
 
 platform-setup:
   keycloak:
     image:
       repository: "exastro/exastro-platform-job"
-      tag: "1.0.2"
+      tag: "1.0.4"
 
 platform-web:
   image:
     repository: "exastro/exastro-platform-web"
-    tag: "1.0.2"
+    tag: "1.0.4"
 
 mariadb:
   image:
@@ -141,7 +142,7 @@ mariadb:
 keycloak:
   image:
     repository: "exastro/keycloak"
-    tag: "1.0.2"
+    tag: "1.0.4"
     pullPolicy: IfNotPresent
   resources:
     requests:
