@@ -15,7 +15,7 @@ global:
       TZ: "Asia/Tokyo"
       PYTHONIOENCODING: utf-8
       PLATFORM_API_PROTOCOL: "http"
-      PLATFORM_API_HOST: "platform-auth"
+      PLATFORM_API_HOST: "platform-api"
       PLATFORM_API_PORT: "8000"
       PLATFORM_WEB_PROTOCOL: "http"
       PLATFORM_WEB_HOST: "platform-web"
@@ -69,7 +69,8 @@ global:
       DB_PORT: "3306"
       DB_DATABASE: "platform"
     secret:
-      DB_ROOT_PASSWORD: ""
+      DB_ADMIN_USER: ""
+      DB_ADMIN_PASSWORD: ""
       DB_USER: ""
       DB_PASSWORD: ""
 
@@ -129,7 +130,7 @@ securityContext:
 
 service:
   name: http
-  type: NodePort
+  type: ClusterIP
   port: 8000
 
 ingress:
@@ -148,13 +149,13 @@ ingress:
   #    hosts:
   #      - chart-example.local
 
-resources:
-  requests:
-    memory: "64Mi"  #仮決め
-    cpu: "250m"     #仮決め
-  limits:
-    memory: "64Mi"  #仮決め
-    cpu: "250m"     #仮決め
+resources: {}
+  # requests:
+  #   memory: "64Mi"
+  #   cpu: "250m"
+  # limits:
+  #   memory: "64Mi"
+  #   cpu: "250m"
 
 autoscaling:
   enabled: false

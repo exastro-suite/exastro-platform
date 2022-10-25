@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: {{ template "platform-setup.fullname" . }}
+  name: {{ template "platform-setup.name" . }}
   namespace: {{ .Release.Namespace }}
   labels:
     {{- include "platform-setup.labels" . | nindent 4 }}
@@ -59,7 +59,7 @@ spec:
             - name: {{ $config }}
               valueFrom:
                 configMapKeyRef:
-                  name: params-{{ template "platform-setup.fullname" $ }}
+                  name: params-{{ template "platform-setup.name" $ }}
                   key: {{ $config }}
             {{- end }}
         - name: db-initialize
@@ -96,7 +96,7 @@ spec:
             - name: {{ $config }}
               valueFrom:
                 configMapKeyRef:
-                  name: params-{{ template "platform-setup.fullname" $ }}
+                  name: params-{{ template "platform-setup.name" $ }}
                   key: {{ $config }}
             {{- end }}
           volumeMounts:
@@ -139,7 +139,7 @@ spec:
             - name: {{ $config }}
               valueFrom:
                 configMapKeyRef:
-                  name: params-{{ template "platform-setup.fullname" $ }}
+                  name: params-{{ template "platform-setup.name" $ }}
                   key: {{ $config }}
             {{- end }}
         - name: keycloak-initialize
@@ -154,7 +154,7 @@ spec:
           env:
             {{- range $define := .Values.global -}}
             {{-   range $config, $value := $define.config }}
-            {{-     if or (eq $define.name "auth-global") (eq $define.name "keycloak") (eq $define.name "keycloak") }}
+            {{-     if or (eq $define.name "auth-global") (eq $define.name "keycloak") (eq $define.name "keycloak") (eq $define.name "auth-database") }}
             - name: {{ $config }}
               valueFrom:
                 configMapKeyRef:
@@ -163,7 +163,7 @@ spec:
             {{-     end -}}
             {{-   end -}}
             {{-   range $secret, $value := $define.secret }}
-            {{-     if or (eq $define.name "keycloak") (eq $define.name "keycloak") }}
+            {{-     if or (eq $define.name "keycloak") (eq $define.name "keycloak") (eq $define.name "auth-database") }}
             - name: {{ $secret }}
               valueFrom:
                 secretKeyRef:
@@ -176,7 +176,7 @@ spec:
             - name: {{ $config }}
               valueFrom:
                 configMapKeyRef:
-                  name: params-{{ template "platform-setup.fullname" $ }}
+                  name: params-{{ template "platform-setup.name" $ }}
                   key: {{ $config }}
             {{- end }}
       containers: # we can have one or more containers

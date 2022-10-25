@@ -15,7 +15,7 @@ global:
       TZ: "Asia/Tokyo"
       PYTHONIOENCODING: utf-8
       PLATFORM_API_PROTOCOL: "http"
-      PLATFORM_API_HOST: "platform-auth"
+      PLATFORM_API_HOST: "platform-api"
       PLATFORM_API_PORT: "8000"
       PLATFORM_WEB_PROTOCOL: "http"
       PLATFORM_WEB_HOST: "platform-web"
@@ -69,7 +69,8 @@ global:
       DB_PORT: "3306"
       DB_DATABASE: "platform"
     secret:
-      DB_ROOT_PASSWORD: ""
+      DB_ADMIN_USER: ""
+      DB_ADMIN_PASSWORD: ""
       DB_USER: ""
       DB_PASSWORD: ""
 
@@ -132,7 +133,7 @@ securityContext:
   runAsNonRoot: true
 
 service:
-  type: ClusterIP
+  type: NodePort
   http:
     name: http
     port: 8000
@@ -141,28 +142,35 @@ service:
     port: 8001
 
 ingress:
-  enabled: false
+  enabled: true
+  name: "platform-auth"
   className: ""
   annotations: {}
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
   hosts:
-    - host: chart-example.local
+    - host: exastro-suite.example.local
       paths:
         - path: /
-          pathType: ImplementationSpecific
+          pathType: Prefix
+          backend: "http"
+    - host: exastro-suite-mng.example.local
+      paths:
+        - path: /
+          pathType: Prefix
+          backend: "httpMng"
   tls: []
   #  - secretName: chart-example-tls
   #    hosts:
   #      - chart-example.local
 
-resources:
-  requests:
-    memory: "64Mi"  #仮決め
-    cpu: "250m"     #仮決め
-  limits:
-    memory: "64Mi"  #仮決め
-    cpu: "250m"     #仮決め
+resources: {}
+  # requests:
+  #   memory: "64Mi"
+  #   cpu: "250m"
+  # limits:
+  #   memory: "64Mi"
+  #   cpu: "250m"
 
 autoscaling:
   enabled: false

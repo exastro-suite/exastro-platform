@@ -26,12 +26,17 @@ if [ -f "${PARAM_DUMPFILE}" ]; then
     exit 1
 fi
 
+read -p "Database admin user : " USERNAME
+read -sp "Database admin password : " PASSWORD
+echo
+MYSQL_LOGIN_INFO=" -u ${USERNAME} --password=${PASSWORD}"
+
 # pause keycloak
 docker-compose -p devcontainer pause keycloak
 
 # import db
 docker cp ${PARAM_DUMPFILE_PATH} devcontainer-platform-db-1:${TMPPATH}/${PARAM_DUMPFILE}
-docker exec -it devcontainer-platform-db-1 bash -c "mysql -u root --password=\${DB_ROOT_PASSWORD} < ${TMPPATH}/${PARAM_DUMPFILE}"
+docker exec -it devcontainer-platform-db-1 bash -c "mysql ${MYSQL_LOGIN_INFO} < ${TMPPATH}/${PARAM_DUMPFILE}"
 
 # restart keycloak
 docker-compose -p devcontainer restart keycloak

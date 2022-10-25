@@ -85,7 +85,7 @@ securityContext:
 
 service:
   name: mysql
-  type: NodePort
+  type: ClusterIP
   port: 3306
 
 ingress:
@@ -104,13 +104,13 @@ ingress:
   #    hosts:
   #      - chart-example.local
 
-resources:
-  requests:
-    memory: "256Mi"  #仮決め
-    cpu: "1m"     #仮決め
-  limits:
-    memory: "2Gi"  #仮決め
-    cpu: "4"     #仮決め
+resources: {}
+  # requests:
+  #   memory: "256Mi"
+  #   cpu: "1m"
+  # limits:
+  #   memory: "2Gi"
+  #   cpu: "4"
 
 autoscaling:
   enabled: false

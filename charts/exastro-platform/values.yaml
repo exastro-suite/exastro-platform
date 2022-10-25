@@ -1,4 +1,4 @@
-# Default values for platform-api.
+# Default values for platform.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 global:
@@ -15,7 +15,7 @@ global:
       TZ: "Asia/Tokyo"
       PYTHONIOENCODING: utf-8
       PLATFORM_API_PROTOCOL: "http"
-      PLATFORM_API_HOST: "platform-auth"
+      PLATFORM_API_HOST: "platform-api"
       PLATFORM_API_PORT: "8000"
       PLATFORM_WEB_PROTOCOL: "http"
       PLATFORM_WEB_HOST: "platform-web"
@@ -69,7 +69,8 @@ global:
       DB_PORT: "3306"
       DB_DATABASE: "platform"
     secret:
-      DB_ROOT_PASSWORD: ""
+      DB_ADMIN_USER: ""
+      DB_ADMIN_PASSWORD: ""
       DB_USER: ""
       DB_PASSWORD: ""
   databaseDefinition:
@@ -89,40 +90,64 @@ global:
       # matchExpressions:
       #   - {key: environment, operator: In, values: [dev]}
 
-ingress:
-  enabled: false
-
-service:
-  type: ClusterIP
-
 platform-api:
   image:
     repository: "exastro/exastro-platform-api"
-    tag: "1.0.2"
+    tag: "1.0.4"
 
 platform-auth:
+  ingress:
+    enabled: true
+    hosts:
+      - host: exastro-suite.example.local
+        paths:
+          - path: /
+            pathType: Prefix
+            backend: "http"
+      - host: exastro-suite-mng.example.local
+        paths:
+          - path: /
+            pathType: Prefix
+            backend: "httpMng"
+  service:
+    type: ClusterIP
   image:
     repository: "exastro/exastro-platform-auth"
-    tag: "1.0.2"
+    tag: "1.0.4"
 
 platform-setup:
-  image:
-    repository: "exastro/exastro-platform-job"
-    tag: "1.0.2"
+  keycloak:
+    image:
+      repository: "exastro/exastro-platform-job"
+      tag: "1.0.4"
 
 platform-web:
   image:
     repository: "exastro/exastro-platform-web"
-    tag: "1.0.2"
+    tag: "1.0.4"
 
 mariadb:
   image:
     repository: "mariadb"
     tag: "10.9"
     pullPolicy: IfNotPresent
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "1m"
+    limits:
+      memory: "2Gi"
+      cpu: "4"
 
 keycloak:
   image:
     repository: "exastro/keycloak"
-    tag: "1.0.2"
+    tag: "1.0.4"
     pullPolicy: IfNotPresent
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "1m"
+    limits:
+      memory: "2Gi"
+      cpu: "4"

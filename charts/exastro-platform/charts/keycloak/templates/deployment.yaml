@@ -17,7 +17,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ template "keycloak.fullname" . }}
+  name: {{ template "keycloak.name" . }}
   namespace: {{ .Release.Namespace }}
   labels:
     {{- include "keycloak.labels" . | nindent 4 }}
@@ -76,7 +76,7 @@ spec:
                   name: secret-keycloak
                   key: KEYCLOAK_DB_PASSWORD
       containers:
-        - name: {{ template "keycloak.fullname" . }}
+        - name: {{ template "keycloak.name" . }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ template "keycloak.repository" . }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
