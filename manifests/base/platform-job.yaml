@@ -92,11 +92,16 @@ spec:
             secretKeyRef:
               name: platform-db
               key: PLATFORM_DB_PASSWORD
-        - name: DB_ROOT_PASSWORD
+        - name: DB_ADMIN_USER
           valueFrom:
             secretKeyRef:
               name: platform-db
-              key: DB_ROOT_PASSWORD
+              key: DB_ADMIN_USER
+        - name: DB_ADMIN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: platform-db
+              key: DB_ADMIN_PASSWORD
       volumes:
       - name: contaier-volume
         emptyDir: {}

@@ -53,11 +53,16 @@ spec:
             configMapKeyRef:
               name: params-platform-common
               key: TZ
-        - name: DB_ROOT_PASSWORD
+        - name: DB_ADMIN_USER
           valueFrom:
             secretKeyRef:
               name: platform-db
-              key: DB_ROOT_PASSWORD
+              key: DB_ADMIN_USER
+        - name: DB_ADMIN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: platform-db
+              key: DB_ADMIN_PASSWORD
         - name: KEYCLOAK_DB_DATABASE
           valueFrom:
             configMapKeyRef:

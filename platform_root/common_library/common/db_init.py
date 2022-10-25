@@ -69,7 +69,7 @@ class DBinit(DBconnector):
         Args:
             dbinfo (DBconnector.DBinfo): DBinfo
         """
-        with closing(super().connect_root()) as conn:
+        with closing(super().connect_admin()) as conn:
             with conn.cursor() as cursor:
                 sql = "CREATE DATABASE `{}` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci".format(dbinfo.db_database)
                 cursor.execute(sql)
@@ -88,7 +88,7 @@ class DBinit(DBconnector):
         Args:
             dbinfo (DBconnector.DBinfo): DBinfo
         """
-        with closing(super().connect_root()) as conn:
+        with closing(super().connect_admin()) as conn:
             with conn.cursor() as cursor:
                 sql = "DROP DATABASE IF EXISTS `{}`".format(dbinfo.db_database)
                 cursor.execute(sql)
