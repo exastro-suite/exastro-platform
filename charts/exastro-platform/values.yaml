@@ -26,7 +26,7 @@ global:
       size: 10Gi
       volumeType: hostPath # e.g.) hostPath or AKS
       storageClass: "-" # e.g.) azurefile or - (None)
-      # matchLabels: 
+      # matchLabels:
       #   release: "stable"
       # matchExpressions:
       #   - {key: environment, operator: In, values: [dev]}
@@ -85,7 +85,7 @@ global:
       size: 20Gi
       volumeType: hostPath # e.g.) hostPath or AKS
       storageClass: "-" # e.g.) azurefile or - (None)
-      # matchLabels: 
+      # matchLabels:
       #   release: "stable"
       # matchExpressions:
       #   - {key: environment, operator: In, values: [dev]}
@@ -93,7 +93,7 @@ global:
 platform-api:
   image:
     repository: "exastro/exastro-platform-api"
-    tag: "1.0.4"
+    tag: "1.0.5"
 
 platform-auth:
   ingress:
@@ -113,18 +113,18 @@ platform-auth:
     type: ClusterIP
   image:
     repository: "exastro/exastro-platform-auth"
-    tag: "1.0.4"
+    tag: "1.0.5"
 
 platform-setup:
   keycloak:
     image:
       repository: "exastro/exastro-platform-job"
-      tag: "1.0.4"
+      tag: "1.0.5"
 
 platform-web:
   image:
     repository: "exastro/exastro-platform-web"
-    tag: "1.0.4"
+    tag: "1.0.5"
 
 mariadb:
   image:
@@ -142,7 +142,7 @@ mariadb:
 keycloak:
   image:
     repository: "exastro/keycloak"
-    tag: "1.0.4"
+    tag: "1.0.5"
     pullPolicy: IfNotPresent
   resources:
     requests:
