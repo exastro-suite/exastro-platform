@@ -37,10 +37,10 @@ metadata:
   name: createdb-sql
   namespace: {{ .Release.Namespace }}
   labels: {{ include "platform-setup.labels" . | nindent 4 }}
-data: 
+data:
     createdb.sql: |-
       {{- with .Values.global.keycloakDefinition }}
-      CREATE DATABASE IF NOT EXISTS `{{ .config.KEYCLOAK_DB_DATABASE }}` CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+      CREATE DATABASE IF NOT EXISTS `{{ .config.KEYCLOAK_DB_DATABASE }}` CHARACTER SET utf8 COLLATE utf8_general_ci;
       CREATE USER IF NOT EXISTS '{{ .secret.KEYCLOAK_DB_USER }}'@'%' IDENTIFIED BY '{{ .secret.KEYCLOAK_DB_PASSWORD }}';
       GRANT ALL PRIVILEGES ON `{{ .config.KEYCLOAK_DB_DATABASE }}` . * TO '{{ .secret.KEYCLOAK_DB_USER }}'@'%';
       FLUSH PRIVILEGES;
