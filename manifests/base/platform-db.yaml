@@ -18,9 +18,9 @@ metadata:
   namespace: exastro-platform
 data:
   DB_VENDOR: "mariadb"
-  DB_ADDR: "platform-db"
+  DB_HOST: "platform-db"
   DB_PORT: "3306"
-  PLATFORM_DB_DATABASE: "platform"
+  DB_DATABASE: "platform"
 
 ---
 
@@ -53,11 +53,16 @@ spec:
             configMapKeyRef:
               name: params-platform-common
               key: TZ
-        - name: MYSQL_ROOT_PASSWORD
+        - name: DB_ADMIN_USER
           valueFrom:
             secretKeyRef:
               name: platform-db
-              key: MYSQL_ROOT_PASSWORD
+              key: DB_ADMIN_USER
+        - name: DB_ADMIN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: platform-db
+              key: DB_ADMIN_PASSWORD
         - name: KEYCLOAK_DB_DATABASE
           valueFrom:
             configMapKeyRef:
@@ -73,11 +78,11 @@ spec:
             secretKeyRef:
               name: keycloak
               key: KEYCLOAK_DB_PASSWORD
-        - name: PLATFORM_DB_DATABASE
+        - name: DB_DATABASE
           valueFrom:
             configMapKeyRef:
               name: platform-db
-              key: PLATFORM_DB_DATABASE
+              key: DB_DATABASE
         - name: PLATFORM_DB_USER
           valueFrom:
             secretKeyRef:

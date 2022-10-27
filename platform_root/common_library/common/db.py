@@ -63,26 +63,26 @@ class DBconnector:
             DBinfo: platformdb dbinfo
         """
         platformdb = self.DBinfo()
-        platformdb.db_host = os.environ.get('DB_ADDR')
+        platformdb.db_host = os.environ.get('DB_HOST')
         platformdb.db_port = 3306
         platformdb.db_database = os.environ.get('DB_DATABASE')
         platformdb.db_user = os.environ.get('DB_USER')
         platformdb.db_password = os.environ.get('DB_PASSWORD')
         return platformdb
 
-    def __get_dbinfo_root(self):
-        """get root dbinfo
+    def __get_dbinfo_admin(self):
+        """get admin dbinfo
 
         Returns:
-            DBinfo: root dbinfo
+            DBinfo: admin dbinfo
         """
-        db_root = self.DBinfo()
-        db_root.db_host = os.environ.get('DB_ADDR')
-        db_root.db_port = 3306
-        db_root.db_database = ""
-        db_root.db_user = "root"
-        db_root.db_password = os.environ.get('MYSQL_ROOT_PASSWORD')
-        return db_root
+        db_admin = self.DBinfo()
+        db_admin.db_host = os.environ.get('DB_HOST')
+        db_admin.db_port = 3306
+        db_admin.db_database = ""
+        db_admin.db_user = os.environ.get('DB_ADMIN_USER')
+        db_admin.db_password = os.environ.get('DB_ADMIN_PASSWORD')
+        return db_admin
 
     def __get_dbinfo_organization(self, organization_id):
         """get organization dbinfo
@@ -124,14 +124,14 @@ class DBconnector:
         )
         return conn
 
-    def connect_root(self) -> pymysql.connections.Connection:
-        """connect database at root
+    def connect_admin(self) -> pymysql.connections.Connection:
+        """connect database at admin
 
         Returns:
-            pymysql.connections.Connection: root connection
+            pymysql.connections.Connection: admin connection
         """
-        db_root = self.__get_dbinfo_root()
-        conn = self.connection(db_root)
+        db_admin = self.__get_dbinfo_admin()
+        conn = self.connection(db_admin)
         return conn
 
     def connect_platformdb(self) -> pymysql.connections.Connection:

@@ -74,11 +74,11 @@ spec:
             configMapKeyRef:
               name: platform-db
               key: DB_VENDOR
-        - name: DB_ADDR
+        - name: DB_HOST
           valueFrom:
             configMapKeyRef:
               name: platform-db
-              key: DB_ADDR
+              key: DB_HOST
         - name: DB_DATABASE
           valueFrom:
             configMapKeyRef:

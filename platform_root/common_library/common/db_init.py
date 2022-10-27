@@ -16,7 +16,6 @@ from contextlib import closing
 import os
 import secrets
 import string
-import uuid
 
 from common_library.common.db import DBconnector
 from common_library.common.libs import queries_dbinit
@@ -26,7 +25,7 @@ class DBinit(DBconnector):
     """DBinit
     """
 
-    prefix_org_db = "PLATFORM_ORG"
+    prefix_org_db = "PF_ORG"
 
     def generate_dbinfo(self, prefix="") -> DBconnector.DBinfo:
         """generate dbinfo
@@ -37,17 +36,31 @@ class DBinit(DBconnector):
         Returns:
             DBconnector.DBinfo: dbinfo
         """
-        user_name = prefix + "_" + str(uuid.uuid4()).upper()
+        user_name = prefix + "_" + self.__generate_username()
         db_name = user_name
         user_password = self.__generate_password()
 
         orgdb = DBconnector.DBinfo()
-        orgdb.db_host = os.environ.get('DB_ADDR')
+        orgdb.db_host = os.environ.get('DB_HOST')
         orgdb.db_port = 3306
         orgdb.db_database = db_name
         orgdb.db_user = user_name
         orgdb.db_password = user_password
         return orgdb
+
+    def __generate_username(self):
+        """generate username
+
+        Returns:
+            str: username string
+        """
+        length = 20
+        mysql_available_symbol = ""
+        pass_chars = string.ascii_uppercase + string.digits + mysql_available_symbol
+
+        username = self.__generate_secrets(length, pass_chars)
+
+        return username
 
     def __generate_password(self):
         """generate password
@@ -59,9 +72,18 @@ class DBinit(DBconnector):
         mysql_available_symbol = "!#%&()*+,-./;<=>?@[]^_{|}~"
         pass_chars = string.ascii_letters + string.digits + mysql_available_symbol
 
-        password = ''.join(secrets.choice(pass_chars) for x in range(length))
+        password = self.__generate_secrets(length, pass_chars)
 
         return password
+
+    def __generate_secrets(self, length, pass_chars):
+        """generate secrets
+
+        Returns:
+            str: secrets string
+        """
+        s = ''.join(secrets.choice(pass_chars) for x in range(length))
+        return s
 
     def create_database(self, dbinfo: DBconnector.DBinfo):
         """create database
@@ -69,7 +91,7 @@ class DBinit(DBconnector):
         Args:
             dbinfo (DBconnector.DBinfo): DBinfo
         """
-        with closing(super().connect_root()) as conn:
+        with closing(super().connect_admin()) as conn:
             with conn.cursor() as cursor:
                 sql = "CREATE DATABASE `{}` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci".format(dbinfo.db_database)
                 cursor.execute(sql)
@@ -88,7 +110,7 @@ class DBinit(DBconnector):
         Args:
             dbinfo (DBconnector.DBinfo): DBinfo
         """
-        with closing(super().connect_root()) as conn:
+        with closing(super().connect_admin()) as conn:
             with conn.cursor() as cursor:
                 sql = "DROP DATABASE IF EXISTS `{}`".format(dbinfo.db_database)
                 cursor.execute(sql)
