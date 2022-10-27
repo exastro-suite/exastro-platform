@@ -162,24 +162,100 @@ def role_user_mapping_create(body, organization_id, role_name):
 
 
 @common.platform_exception_handler
-def role_user_mapping_delete(body, organization_id, role_name):  # noqa: E501
+def role_user_mapping_delete(body, organization_id, role_name):
     """Delete roles from user role mapping
 
-     # noqa: E501
+    Args:
+        body (list): requestbody
+        organization_id (str): organization id
+        role_name (str): role name
 
-    :param body:
-    :type body: list | bytes
-    :param organization_id:
-    :type organization_id: str
-    :param role_name:
-    :type role_name: str
-
-    :rtype: InlineResponse2001
+    Returns:
+        InlineResponse2001: _description_
     """
-    if connexion.request.is_json:
-        # body = [User.from_dict(d) for d in connexion.request.get_json()]  # noqa: E501
-        pass
-    return 'do some magic!'
+    globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
+
+    body = connexion.request.get_json()
+    if not body:
+        raise common.BadRequestException(
+            message_id='400-000002', message='リクエストボディのパラメータ({})が不正です。'.format('Json')
+        )
+
+    request_users = body
+
+    private = DBconnector().get_organization_private(organization_id)
+
+    # サービスアカウントのTOKEN取得
+    # Get a service account token
+    token = __get_token(organization_id)
+
+    # ロールの取得
+    # Get role
+    r_role = api_keycloak_roles.clients_role_get(
+        realm_name=organization_id, client_id=private.user_token_client_id, role_name=role_name, token=token,
+    )
+
+    if r_role.status_code == 404:
+        globals.logger.debug(f"response:{r_role.text}")
+        raise common.NotFoundException(None, f"404-{MSG_FUNCTION_ID}001", "ロールが存在しません(対象ID:{})".format(role_name))
+
+    elif r_role.status_code != 200:
+        globals.logger.debug(f"response:{r_role.text}")
+        raise common.InternalErrorException(None, f"500-{MSG_FUNCTION_ID}001", "ワークスペースロールの取得に失敗しました(対象ID:{})".format(role_name))
+
+    roles = [json.loads(r_role.text), ]
+
+    # ユーザーの取得
+    # Get user
+    users = []
+    for user_info in request_users:
+        response = api_keycloak_users.user_get(realm_name=organization_id, user_name=user_info.get("preferred_username"), token=token)
+        if response.status_code != 200:
+            globals.logger.error(f"response.status_code:{response.status_code}")
+            globals.logger.error(f"response.text:{response.text}")
+            message_id = f"500-{MSG_FUNCTION_ID}001"
+            message = multi_lang.get_text(
+                message_id,
+                "ユーザーの取得に失敗しました(対象ID:{0} username:{1})",
+                organization_id,
+                user_info.get("preferred_username")
+            )
+            raise common.InternalErrorException(message_id=message_id, message=message)
+
+        response_user = json.loads(response.text)
+        if len(response_user) < 1:
+            globals.logger.error(f"response.status_code:{response.status_code}")
+            globals.logger.error(f"response.text:{response.text}")
+            message_id = f"500-{MSG_FUNCTION_ID}00X"
+            message = multi_lang.get_text(
+                message_id,
+                "該当のユーザーは存在しません(対象ID:{0} username:{1})",
+                organization_id,
+                user_info.get("preferred_username")
+            )
+            raise common.InternalErrorException(message_id=message_id, message=message)
+
+        users.append(response_user[0])
+
+    # ロール紐づけ削除
+    # delete role mapping
+    for user_info in users:
+        response = api_keycloak_roles.user_client_role_mapping_delete(
+            realm_name=organization_id, user_id=user_info["id"], client_id=private.user_token_client_id, client_roles=roles, token=token,
+        )
+        if response.status_code not in [200, 204]:
+            globals.logger.error(f"response.status_code:{response.status_code}")
+            globals.logger.error(f"response.text:{response.text}")
+            message_id = f"500-{MSG_FUNCTION_ID}001"
+            message = multi_lang.get_text(
+                message_id,
+                "ロールとユーザーの紐づけ削除に失敗しました(対象ID:{0} username:{1})",
+                organization_id,
+                user_info.get("preferred_username")
+            )
+            raise common.InternalErrorException(message_id=message_id, message=message)
+
+    return common.response_200_ok(data=None)
 
 
 def __get_token(organization_id):
