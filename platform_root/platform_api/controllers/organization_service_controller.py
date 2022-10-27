@@ -123,7 +123,7 @@ def organization_create(body, retry=None):
             else:
                 message_id = f"400-{MSG_FUNCTION_ID}002"
                 message = multi_lang.get_text(message_id,
-                                              "指定されたoganization({0})の作成を再開する場合は、パラメータ(retry)を指定する必要があります。",
+                                              "指定されたorganization({0})の作成を再開する場合は、パラメータ(retry)を指定する必要があります。",
                                               organization_id)
                 raise common.BadRequestException(message_id=message_id, message=message)
 
@@ -1222,7 +1222,7 @@ def __ita_create(organization_id, user_id):
         message_id = f"500-{MSG_FUNCTION_ID}013"
         message = multi_lang.get_text(
             message_id,
-            "Exastro IT Automationのoganization作成に失敗しました。(対象ID:{0})",
+            "Exastro IT Automationのorganization作成に失敗しました。(対象ID:{0})",
             organization_id
         )
         raise common.InternalErrorException(message_id=message_id, message=message)
