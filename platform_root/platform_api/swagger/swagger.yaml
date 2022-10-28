@@ -355,6 +355,40 @@ paths:
                 $ref: '#/components/schemas/runtimeError'
       x-openapi-router-controller: controllers.role_service_controller
   /api/{organization_id}/platform/roles/{role_name}/users:
+    get:
+      tags:
+      - RoleMappingsService
+      summary: Get user-role mapping for a role
+      operationId: role_user_mapping_get
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: role_name
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_6'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+      x-openapi-router-controller: controllers.role_mappings_service_controller
     post:
       tags:
       - RoleMappingsService
@@ -483,7 +517,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_6'
+                $ref: '#/components/schemas/inline_response_200_7'
         default:
           description: An unexpected error response.
           content:
@@ -595,7 +629,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_7'
+                $ref: '#/components/schemas/inline_response_200_8'
         default:
           description: An unexpected error response.
           content:
@@ -949,7 +983,20 @@ components:
       - preferred_username: username-2
       - preferred_username: username-3
       items:
-        $ref: '#/components/schemas/user'
+        $ref: '#/components/schemas/roleUser'
+    roleUser:
+      title: role mapping user is a definition of User resource.
+      type: object
+      properties:
+        name:
+          type: string
+          example: firstname lastname
+        firstName:
+          type: string
+        lastName:
+          type: string
+        preferred_username:
+          type: string
     inline_response_200:
       allOf:
       - $ref: '#/components/schemas/responseOk'
@@ -992,8 +1039,18 @@ components:
     inline_response_200_6:
       allOf:
       - $ref: '#/components/schemas/responseOk'
-      - $ref: '#/components/schemas/roleList'
+      - title: roleList is list of Role resources.
+        type: object
+        properties:
+          data:
+            type: array
+            items:
+              $ref: '#/components/schemas/roleUser'
     inline_response_200_7:
+      allOf:
+      - $ref: '#/components/schemas/responseOk'
+      - $ref: '#/components/schemas/roleList'
+    inline_response_200_8:
       allOf:
       - $ref: '#/components/schemas/responseOk'
       - $ref: '#/components/schemas/userWorkspaceList'

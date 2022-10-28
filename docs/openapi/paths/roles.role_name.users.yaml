@@ -12,6 +12,39 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
+get:
+  tags:
+    - RoleMappingsService
+  summary: Get user-role mapping for a role
+  x-openapi-router-controller: controllers.role_mappings_service_controller
+  operationId: role_user_mapping_get
+  parameters:
+    - name: organization_id
+      in: path
+      required: true
+      schema:
+        type: string
+    - name: role_name
+      in: path
+      required: true
+      schema:
+        type: string
+  responses:
+    200:
+      description: A successful response.
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '../schemas/responseOk.yaml'
+              - $ref: '../schemas/roleMappingUserList.yaml'
+    default:
+      description: An unexpected error response.
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'
+
 post:
   tags:
     - RoleMappingsService
@@ -34,6 +67,8 @@ post:
       application/json:
         schema:
           $ref: '../schemas/roleMappingUser.yaml'
+          required:
+            - preferred_username
     required: true
   responses:
     200:

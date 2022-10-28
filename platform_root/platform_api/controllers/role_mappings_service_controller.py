@@ -28,6 +28,30 @@ MSG_FUNCTION_ID = "26"
 
 
 @common.platform_exception_handler
+def role_user_mapping_get(organization_id, role_name):
+    """Get user-role mapping for a role
+
+    Args:
+        organization_id (str): organization id
+        role_name (str): role name
+
+    Returns:
+        _type_: _description_
+    """
+
+    data = [
+        {
+            "name": "firstname lastname",
+            "firstName": "string",
+            "lastName": "string",
+            "preferred_username": "string"
+        }
+    ]
+
+    return common.response_200_ok(data=data)
+
+
+@common.platform_exception_handler
 def role_user_mapping_create(body, organization_id, role_name):
     """ユーザーロールマッピング作成 User Role Mapping Create
 

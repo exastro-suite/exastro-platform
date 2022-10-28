@@ -12,19 +12,10 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-title: userList is list of User resources.
-type: array
-items:
-  $ref: './roleUser.yaml'
-example:
-  [
-    {
-      preferred_username: username-1
-    },
-    {
-      preferred_username: username-2
-    },
-    {
-      preferred_username: username-3
-    }
-  ]
+title: roleList is list of Role resources.
+type: object
+properties:
+  data:
+    type: array
+    items:
+      $ref: './roleUser.yaml'
