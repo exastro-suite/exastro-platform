@@ -39,16 +39,45 @@ def role_user_mapping_get(organization_id, role_name):
         _type_: _description_
     """
 
-    data = [
-        {
-            "name": "firstname lastname",
-            "firstName": "string",
-            "lastName": "string",
-            "preferred_username": "string"
-        }
-    ]
+    globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
 
-    return common.response_200_ok(data=data)
+    private = DBconnector().get_organization_private(organization_id)
+
+    # サービスアカウントのTOKEN取得
+    # Get a service account token
+    token = __get_token(organization_id)
+
+    # ロールの取得
+    # Get role
+    response = api_keycloak_roles.role_uesrs_get(
+        realm_name=organization_id, client_id=private.user_token_client_id, role_name=role_name, token=token,
+    )
+
+    if response.status_code == 404:
+        globals.logger.error(f"response:{response.text}")
+        raise common.NotFoundException(None, f"404-{MSG_FUNCTION_ID}001", "情報が存在しません(Role:{0}, message{1})".format(role_name, response.text))
+
+    elif response.status_code != 200:
+        globals.logger.error(f"response:{response.text}")
+        raise common.InternalErrorException(None, f"500-{MSG_FUNCTION_ID}001", "ロールに紐づいたユーザーの取得に失敗しました(role:{0})".format(role_name))
+
+    role_users = json.loads(response.text)
+
+    ret_role_users = []
+
+    # 件数分処理する
+    # process the number of cases
+    for user in role_users:
+        ret_role_users.append(
+            {
+                "name": common.get_username(user.get("firstName"), user.get("lastName"), user.get("username")),
+                "firstName": user.get("firstName"),
+                "lastName": user.get("lastName"),
+                "preferred_username": user.get("username"),
+            }
+        )
+
+    return common.response_200_ok(data=ret_role_users)
 
 
 @common.platform_exception_handler
@@ -92,7 +121,7 @@ def role_user_mapping_create(body, organization_id, role_name):
     if response.status_code != 200:
         globals.logger.error(f"response.status_code:{response.status_code}")
         globals.logger.error(f"response.text:{response.text}")
-        message_id = f"400-{MSG_FUNCTION_ID}00X"
+        message_id = f"400-{MSG_FUNCTION_ID}001"
         message = multi_lang.get_text(
             message_id,
             "client roleの取得に失敗しました(対象ID:{0} client:{1} role:{2})",
@@ -100,7 +129,6 @@ def role_user_mapping_create(body, organization_id, role_name):
             private.user_token_client_clientid,
             role_name
         )
-        # TODO : メッセージ登録
         raise common.BadRequestException(message_id=message_id, message=message)
 
     client_role = json.loads(response.text)
@@ -108,13 +136,12 @@ def role_user_mapping_create(body, organization_id, role_name):
     globals.logger.debug("attributes-kind:{}".format(client_role.get("attributes").get("kind")))
 
     if [common_const.ROLE_KIND_WORKSPACE] != client_role.get("attributes").get("kind"):
-        message_id = f"400-{MSG_FUNCTION_ID}00X"
+        message_id = f"400-{MSG_FUNCTION_ID}002"
         message = multi_lang.get_text(
             message_id,
             "対象のロールはworkspaceロールではありません(対象:{0})",
             role_name
         )
-        # TODO : メッセージ登録
         raise common.BadRequestException(message_id=message_id, message=message)
 
     add_role_mapping = []
@@ -135,24 +162,22 @@ def role_user_mapping_create(body, organization_id, role_name):
         if response.status_code != 200:
             globals.logger.error(f"response.status_code:{response.status_code}")
             globals.logger.error(f"response.text:{response.text}")
-            message_id = f"400-{MSG_FUNCTION_ID}001"
+            message_id = f"400-{MSG_FUNCTION_ID}003"
             message = multi_lang.get_text(
                 message_id,
                 "ユーザー情報の取得に失敗しました(対象:{0})",
                 user.get("preferred_username")
             )
-            # TODO : メッセージ登録
             raise common.BadRequestException(message_id=message_id, message=message)
 
         user_info = json.loads(response.text)
         if len(user_info) == 0:
-            message_id = f"400-{MSG_FUNCTION_ID}00X"
+            message_id = f"400-{MSG_FUNCTION_ID}004"
             message = multi_lang.get_text(
                 message_id,
                 "該当のユーザーは存在しません(対象:{0})",
                 user.get("preferred_username")
             )
-            # TODO : メッセージ登録
             raise common.BadRequestException(message_id=message_id, message=message)
 
         globals.logger.debug(f"user_info:{user_info}")
@@ -172,14 +197,14 @@ def role_user_mapping_create(body, organization_id, role_name):
         if response.status_code not in [200, 204]:
             globals.logger.error(f"response.status_code:{response.status_code}")
             globals.logger.error(f"response.text:{response.text}")
-            message_id = f"500-{MSG_FUNCTION_ID}00X"
+            message_id = f"500-{MSG_FUNCTION_ID}002"
             message = multi_lang.get_text(
                 message_id,
-                "ロール設定に失敗しました(対象ID:{0} username:{1})",
+                "ロール設定に失敗しました(対象ID:{0} client:{1} username:{2})",
                 organization_id,
+                private.user_token_client_clientid,
                 user_info.get("preferred_username")
             )
-            # TODO : メッセージ登録
             raise common.InternalErrorException(message_id=message_id, message=message)
 
     return common.response_200_ok(data=None)
@@ -220,12 +245,13 @@ def role_user_mapping_delete(body, organization_id, role_name):
     )
 
     if r_role.status_code == 404:
-        globals.logger.debug(f"response:{r_role.text}")
-        raise common.NotFoundException(None, f"404-{MSG_FUNCTION_ID}001", "ロールが存在しません(対象ID:{})".format(role_name))
+        globals.logger.error(f"response:{r_role.text}")
+        raise common.NotFoundException(None, f"404-{MSG_FUNCTION_ID}001", "ロールが存在しません(role:{0})".format(role_name))
 
     elif r_role.status_code != 200:
-        globals.logger.debug(f"response:{r_role.text}")
-        raise common.InternalErrorException(None, f"500-{MSG_FUNCTION_ID}001", "ワークスペースロールの取得に失敗しました(対象ID:{})".format(role_name))
+        globals.logger.error(f"response:{r_role.text}")
+        raise common.InternalErrorException(None, f"500-{MSG_FUNCTION_ID}003",
+                                            "ワークスペースロールの取得に失敗しました(client:{0} role:{1})".format(private.user_token_client_clientid, role_name))
 
     roles = [json.loads(r_role.text), ]
 
@@ -237,7 +263,7 @@ def role_user_mapping_delete(body, organization_id, role_name):
         if response.status_code != 200:
             globals.logger.error(f"response.status_code:{response.status_code}")
             globals.logger.error(f"response.text:{response.text}")
-            message_id = f"500-{MSG_FUNCTION_ID}001"
+            message_id = f"500-{MSG_FUNCTION_ID}004"
             message = multi_lang.get_text(
                 message_id,
                 "ユーザーの取得に失敗しました(対象ID:{0} username:{1})",
@@ -250,7 +276,7 @@ def role_user_mapping_delete(body, organization_id, role_name):
         if len(response_user) < 1:
             globals.logger.error(f"response.status_code:{response.status_code}")
             globals.logger.error(f"response.text:{response.text}")
-            message_id = f"500-{MSG_FUNCTION_ID}00X"
+            message_id = f"500-{MSG_FUNCTION_ID}005"
             message = multi_lang.get_text(
                 message_id,
                 "該当のユーザーは存在しません(対象ID:{0} username:{1})",
@@ -270,7 +296,7 @@ def role_user_mapping_delete(body, organization_id, role_name):
         if response.status_code not in [200, 204]:
             globals.logger.error(f"response.status_code:{response.status_code}")
             globals.logger.error(f"response.text:{response.text}")
-            message_id = f"500-{MSG_FUNCTION_ID}001"
+            message_id = f"500-{MSG_FUNCTION_ID}006"
             message = multi_lang.get_text(
                 message_id,
                 "ロールとユーザーの紐づけ削除に失敗しました(対象ID:{0} username:{1})",
