@@ -129,7 +129,6 @@ def role_user_mapping_create(body, organization_id, role_name):
             private.user_token_client_clientid,
             role_name
         )
-        # TODO : メッセージ登録
         raise common.BadRequestException(message_id=message_id, message=message)
 
     client_role = json.loads(response.text)
@@ -143,7 +142,6 @@ def role_user_mapping_create(body, organization_id, role_name):
             "対象のロールはworkspaceロールではありません(対象:{0})",
             role_name
         )
-        # TODO : メッセージ登録
         raise common.BadRequestException(message_id=message_id, message=message)
 
     add_role_mapping = []
@@ -207,7 +205,6 @@ def role_user_mapping_create(body, organization_id, role_name):
                 private.user_token_client_clientid,
                 user_info.get("preferred_username")
             )
-            # TODO : メッセージ登録
             raise common.InternalErrorException(message_id=message_id, message=message)
 
     return common.response_200_ok(data=None)
