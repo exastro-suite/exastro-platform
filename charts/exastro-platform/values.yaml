@@ -93,7 +93,7 @@ global:
 platform-api:
   image:
     repository: "exastro/exastro-platform-api"
-    tag: "1.0.5"
+    tag: "1.0.6"
 
 platform-auth:
   ingress:
@@ -113,18 +113,18 @@ platform-auth:
     type: ClusterIP
   image:
     repository: "exastro/exastro-platform-auth"
-    tag: "1.0.5"
+    tag: "1.0.6"
 
 platform-setup:
   keycloak:
     image:
       repository: "exastro/exastro-platform-job"
-      tag: "1.0.5"
+      tag: "1.0.6"
 
 platform-web:
   image:
     repository: "exastro/exastro-platform-web"
-    tag: "1.0.5"
+    tag: "1.0.6"
 
 mariadb:
   image:
@@ -142,7 +142,7 @@ mariadb:
 keycloak:
   image:
     repository: "exastro/keycloak"
-    tag: "1.0.5"
+    tag: "1.0.6"
     pullPolicy: IfNotPresent
   resources:
     requests:
