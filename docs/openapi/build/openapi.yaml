@@ -360,6 +360,44 @@ paths:
               schema:
                 $ref: '#/components/schemas/runtimeError'
   '/api/{organization_id}/platform/roles/{role_name}/users':
+    get:
+      tags:
+        - RoleMappingsService
+      summary: Get user-role mapping for a role
+      x-openapi-router-controller: controllers.role_mappings_service_controller
+      operationId: role_user_mapping_get
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: role_name
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - title: roleList is list of Role resources.
+                    type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/roleUser'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
     post:
       tags:
         - RoleMappingsService
@@ -382,6 +420,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/roleMappingUser'
+              required:
+                - preferred_username
         required: true
       responses:
         '200':
@@ -959,8 +999,21 @@ components:
       title: userList is list of User resources.
       type: array
       items:
-        $ref: '#/components/schemas/user'
+        $ref: '#/components/schemas/roleUser'
       example:
         - preferred_username: username-1
         - preferred_username: username-2
         - preferred_username: username-3
+    roleUser:
+      title: role mapping user is a definition of User resource.
+      type: object
+      properties:
+        name:
+          type: string
+          example: firstname lastname
+        firstName:
+          type: string
+        lastName:
+          type: string
+        preferred_username:
+          type: string
