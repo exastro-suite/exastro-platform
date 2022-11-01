@@ -17,6 +17,11 @@ import os
 import pymysql
 import json
 
+from common_library.common import common
+from common_library.common import multi_lang
+
+import globals
+
 
 class DBconnector:
     """database connection class
@@ -103,6 +108,16 @@ class DBconnector:
             orgdb.db_database = result.get('DB_DATABASE')
             orgdb.db_user = result.get('DB_USER')
             orgdb.db_password = result.get('DB_PASSWORD')
+        else:
+            globals.logger.error(f"organization not found id:{organization_id}")
+            message_id = "404-00001"
+            message = multi_lang.get_text(
+                message_id,
+                "organization not found id:{0}",
+                organization_id
+            )
+            raise common.NotFoundException(message_id=message_id, message=message)
+
         return orgdb
 
     def connection(self, dbinfo: DBinfo):

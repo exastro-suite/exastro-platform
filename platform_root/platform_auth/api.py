@@ -197,6 +197,9 @@ def platform_api_call(organization_id, subpath):
                 response.headers[key] = value
         return response
 
+    except common.NotFoundException:
+        raise
+
     except common.AuthException as e:
         globals.logger.error(f'authentication error:{e.args}')
         message_id = "401-00002"
@@ -272,6 +275,9 @@ def ita_workspace_api_call(organization_id, workspace_id, subpath):
             if key.lower().startswith('content-'):
                 response.headers[key] = value
         return response
+
+    except common.NotFoundException:
+        raise
 
     except common.AuthException as e:
         globals.logger.error(f'authentication error:{e.args}')
