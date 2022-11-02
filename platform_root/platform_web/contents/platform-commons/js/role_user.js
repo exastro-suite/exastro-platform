@@ -57,6 +57,16 @@ $(function(){
                 contentType: "application/json",
                 dataType: "json",
             }),
+            // get Role User List
+            call_api_promise({
+                type: "GET",
+                url: api_conf.api.roles.users.get.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{role_name}/g, role_name),
+                headers: {
+                    Authorization: "Bearer " + CommonAuth.getToken(),
+                },
+                contentType: "application/json",
+                dataType: "json",
+            }),
         ]).then(function(results) {
             // Display Menu
             displayMenu('menu_role_management');
@@ -65,7 +75,7 @@ $(function(){
                 {"text": "ロール一覧", "href": location_conf.href.roles.list.replace(/{organization_id}/g, CommonAuth.getRealm()) },
                 {"text": "ロール付与・解除", "href": location_conf.href.roles.edit.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{role_name}/g, role_name) },
             ]);
-            display_main(results[1].data, results[2].data, results[3].data);
+            display_main(results[1].data, results[2].data, results[3].data, results[4].data);
             finish_onload_progress();
         }).catch((e) => {
             console.log('[ERROR] load_main catch');
@@ -75,7 +85,7 @@ $(function(){
         });
     }
 
-    function display_main(users, roles, workspaces) {
+    function display_main(users, roles, workspaces, roles_users) {
         console.log("[CALL] display_main");
 
         //
@@ -94,8 +104,21 @@ $(function(){
         const authorityTexts = RolesCommon.getAuthorityTexts(role, workspaces);
         $('#form_role_authorities').html(authorityTexts.map((t) => {return '<span class="auth_item">' + fn.cv(t,'',true) +'</span>'}).join("\n"));
 
+        // ロールユーザーを配列化 - Array role user
+        if (roles_users.length > 0) {
+            var arr_roles_users = [];
+            for(var key of Object.keys(roles_users)){
+                if(key == "preferred_username"){
+                    // 配列に格納 - Store in array
+                    arr_roles_users.push(roles_users[key]);
+                }
+            }
+        }
+        console.log("roles_users:" + roles_users)
+        console.log("arr_roles_users:" + arr_roles_users)
+
         //
-        // ユーザー一覧の表示
+        // ユーザー一覧の表示 - user list display
         //
         if (users.length == 0) {
             $('#user_list notfound').css('dispaly','');
@@ -104,6 +127,8 @@ $(function(){
             let html = '';
             for(let user of users.sort((a,b) => { return (a.create_timestamp == b.create_timestamp? 0 : (a.create_timestamp < b.create_timestamp)? 1: -1); })) {
                 html += row_template
+                    .replace(/\${user_before_checked}/, (arr_roles_users === undefined) ? '' : (arr_roles_users.includes(user.preferred_username)) ? 'checked':'')
+                    .replace(/\${user_after_checked}/, (arr_roles_users === undefined) ? '' : (arr_roles_users.includes(user.preferred_username)) ? 'checked':'')
                     .replace(/\${preferred_username}/, fn.cv(user.preferred_username,'',true))
                     .replace(/\${user_name}/g, fn.cv(user.name? user.name: user.preferred_username,'',true))
                     .replace(/\${user_id}/g, fn.cv(user.id,'',true))
@@ -114,7 +139,7 @@ $(function(){
         }
 
         //
-        // ボタンの有効化
+        // ボタンの有効化 - bottun enabled
         //
         $('#button_apply').prop('disabled', false);
         $('#button_apply').on('click',() => {
@@ -167,7 +192,7 @@ $(function(){
                     $('#button_apply').prop('disabled', false);
                     return;
                 }
-            } 
+            }
         }
 
         if(post_users.length === 0 && delete_users.length === 0) {
@@ -193,12 +218,12 @@ $(function(){
                         data: JSON.stringify(post_users),
                         contentType: "application/json",
                         dataType: "json",
-                    }            
+                    }
                 ).then(() => {
                     resolve();
                 }).catch((e) => {
                     reject(e);
-                }); 
+                });
             }
         }).then(() => { return new Promise((resolve, reject) => {
             if(delete_users.length === 0) {
@@ -219,7 +244,7 @@ $(function(){
                     resolve();
                 }).catch((e) => {
                     reject(e);
-                }); 
+                });
             }
         })}).then(() => {
             alert("ロールをユーザに適用しました");
