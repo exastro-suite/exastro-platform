@@ -141,7 +141,7 @@ services:
       - DB_PASSWORD=password
       - DB_ADMIN_USER=root
       - DB_ADMIN_PASSWORD=password
-
+      - ENCRYPT_KEY=${ENCRYPT_KEY}
   platform-job:
     user: 1000:1000
     build:
