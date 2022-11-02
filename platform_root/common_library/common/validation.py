@@ -405,9 +405,15 @@ def validate_role_mapping_users(role_users):
         result: Validation result
     """
 
+    usernames = ([x.get('preferred_username', '') for x in role_users if x.get('preferred_username')])
+    if len(usernames) < 1:
+        return result(
+            False, 400, '400-000002', 'リクエストボディのパラメータ({})が不正です。'.format('preferred_username'),
+            multi_lang.get_text('000-0010X', "preferred_username"),
+        )
+
     # 重複チェック
     # dupulication check
-    usernames = ([x.get('preferred_username', '') for x in role_users])
     if len(list(set(usernames))) != len(usernames):
         return result(
             False, 400, '400-{}019'.format(MSG_FUNCTION_ID), '指定された値が重複しています。',
