@@ -107,15 +107,13 @@ $(function(){
         // ロールユーザーを配列化 - Array role user
         if (roles_users.length > 0) {
             var arr_roles_users = [];
-            for(var key of Object.keys(roles_users)){
-                if(key == "preferred_username"){
-                    // 配列に格納 - Store in array
-                    arr_roles_users.push(roles_users[key]);
-                }
+            for(let role_user of roles_users){
+                // 配列に格納 - Store in array
+                arr_roles_users.push(fn.cv(role_user.preferred_username, '', true));
             }
         }
-        console.log("roles_users:" + roles_users)
-        console.log("arr_roles_users:" + arr_roles_users)
+        // console.log("roles_users:" + roles_users)
+        // console.log("arr_roles_users:" + arr_roles_users)
 
         //
         // ユーザー一覧の表示 - user list display
