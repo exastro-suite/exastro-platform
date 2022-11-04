@@ -52,6 +52,7 @@ RUN dnf install -y \
     connexion[swagger-ui] \
     six \
     pymysql \
+    pycryptodome \
 &&  groupadd $GROUPNAME \
 &&  useradd -m -s /bin/bash -g $GROUPNAME $USERNAME \
 &&  setcap 'cap_net_bind_service=+ep' /usr/sbin/httpd \
