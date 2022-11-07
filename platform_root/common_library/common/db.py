@@ -18,6 +18,7 @@ import pymysql
 import json
 
 from common_library.common import common
+from common_library.common import encrypt
 from common_library.common import multi_lang
 
 import globals
@@ -72,7 +73,7 @@ class DBconnector:
         platformdb.db_port = 3306
         platformdb.db_database = os.environ.get('DB_DATABASE')
         platformdb.db_user = os.environ.get('DB_USER')
-        platformdb.db_password = os.environ.get('DB_PASSWORD')
+        platformdb.db_password = encrypt.encrypt_str(os.environ.get('DB_PASSWORD'))
         return platformdb
 
     def __get_dbinfo_admin(self):
@@ -86,7 +87,7 @@ class DBconnector:
         db_admin.db_port = 3306
         db_admin.db_database = ""
         db_admin.db_user = os.environ.get('DB_ADMIN_USER')
-        db_admin.db_password = os.environ.get('DB_ADMIN_PASSWORD')
+        db_admin.db_password = encrypt.encrypt_str(os.environ.get('DB_ADMIN_PASSWORD'))
         return db_admin
 
     def __get_dbinfo_organization(self, organization_id):
@@ -133,7 +134,7 @@ class DBconnector:
             host=dbinfo.db_host,
             database=dbinfo.db_database,
             user=dbinfo.db_user,
-            password=dbinfo.db_password,
+            password=encrypt.decrypt_str(dbinfo.db_password),
             port=dbinfo.db_port,
             cursorclass=pymysql.cursors.DictCursor,
         )
