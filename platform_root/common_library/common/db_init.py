@@ -17,6 +17,7 @@ import os
 import secrets
 import string
 
+from common_library.common import encrypt
 from common_library.common.db import DBconnector
 from common_library.common.libs import queries_dbinit
 
@@ -45,7 +46,7 @@ class DBinit(DBconnector):
         orgdb.db_port = 3306
         orgdb.db_database = db_name
         orgdb.db_user = user_name
-        orgdb.db_password = user_password
+        orgdb.db_password = encrypt.encrypt_str(user_password)
         return orgdb
 
     def __generate_username(self):
@@ -96,7 +97,7 @@ class DBinit(DBconnector):
                 sql = "CREATE DATABASE `{}` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci".format(dbinfo.db_database)
                 cursor.execute(sql)
 
-                sql = "CREATE USER IF NOT EXISTS '{}'@'%' IDENTIFIED BY '{}'".format(dbinfo.db_user, dbinfo.db_password)
+                sql = "CREATE USER IF NOT EXISTS '{}'@'%' IDENTIFIED BY '{}'".format(dbinfo.db_user, encrypt.decrypt_str(dbinfo.db_password))
                 cursor.execute(sql)
 
                 sql = "GRANT ALL PRIVILEGES ON `{}`.* TO '{}'@'%' WITH GRANT OPTION".format(dbinfo.db_database, dbinfo.db_user)
