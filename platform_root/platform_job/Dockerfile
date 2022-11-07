@@ -46,6 +46,7 @@ RUN dnf install -y \
     flask-log-request-id \
     six \
     pymysql \
+    pycryptodome \
 &&  groupadd $GROUPNAME \
 &&  useradd -m -s /bin/bash -g $GROUPNAME $USERNAME
 
