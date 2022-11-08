@@ -179,6 +179,7 @@ class CheckAuthority():
         # オーガナイゼーションロールで、wsに関連するロールがあれば優先的にOKとする
         # In the organization role, if there is a role related to ws, it is given priority as OK
         if const.ORG_AUTH_WS_ROLE_MAINTE in self._org_auths or \
+           const.ORG_AUTH_WS_ROLE_USER in self._org_auths or \
            const.ORG_AUTH_WS_MAINTE in self._org_auths:
             # オーガナイゼーションロールに該当あり
             # Applicable to organization role
