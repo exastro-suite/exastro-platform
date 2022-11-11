@@ -47,10 +47,14 @@ def role_user_mapping_get(organization_id, role_name):
     # Get a service account token
     token = __get_token(organization_id)
 
+    # 該当Clientのorganization管理者ロールを取得
+    # Process for the number of organization administrators
+    client_role = __check_autho_role(connexion.request.headers, private, token, organization_id, role_name, False)
+
     # ロールの取得
     # Get role
     response = api_keycloak_roles.role_uesrs_get(
-        realm_name=organization_id, client_id=private.user_token_client_id, role_name=role_name, token=token,
+        realm_name=organization_id, client_id=private.user_token_client_id, role_name=client_role.get("name"), token=token,
     )
 
     if response.status_code == 404:
@@ -62,8 +66,6 @@ def role_user_mapping_get(organization_id, role_name):
         raise common.InternalErrorException(None, f"500-{MSG_FUNCTION_ID}001", "ロールに紐づいたユーザーの取得に失敗しました(role:{0})".format(role_name))
 
     role_users = json.loads(response.text)
-
-    __check_autho_role(connexion.request.headers, private, token, organization_id, role_name)
 
     ret_role_users = []
 
@@ -119,34 +121,7 @@ def role_user_mapping_create(body, organization_id, role_name):
 
     # 該当Clientのorganization管理者ロールを取得
     # Process for the number of organization administrators
-    response = api_keycloak_roles.clients_role_get(organization_id, private.user_token_client_id, role_name, token, True)
-    if response.status_code != 200:
-        globals.logger.error(f"response.status_code:{response.status_code}")
-        globals.logger.error(f"response.text:{response.text}")
-        message_id = f"400-{MSG_FUNCTION_ID}001"
-        message = multi_lang.get_text(
-            message_id,
-            "client roleの取得に失敗しました(対象ID:{0} client:{1} role:{2})",
-            organization_id,
-            private.user_token_client_clientid,
-            role_name
-        )
-        raise common.BadRequestException(message_id=message_id, message=message)
-
-    client_role = json.loads(response.text)
-    globals.logger.debug(f"client_role:{client_role}")
-    globals.logger.debug("attributes-kind:{0}".format(client_role.get("attributes").get("kind")))
-
-    if [common_const.ROLE_KIND_WORKSPACE] != client_role.get("attributes").get("kind"):
-        message_id = f"400-{MSG_FUNCTION_ID}002"
-        message = multi_lang.get_text(
-            message_id,
-            "対象のロールはworkspaceロールではありません(対象:{0})",
-            role_name
-        )
-        raise common.BadRequestException(message_id=message_id, message=message)
-
-    __check_autho_role(connexion.request.headers, private, token, organization_id, role_name)
+    client_role = __check_autho_role(connexion.request.headers, private, token, organization_id, role_name)
 
     add_role_mapping = []
 
@@ -166,7 +141,7 @@ def role_user_mapping_create(body, organization_id, role_name):
         if response.status_code != 200:
             globals.logger.error(f"response.status_code:{response.status_code}")
             globals.logger.error(f"response.text:{response.text}")
-            message_id = f"400-{MSG_FUNCTION_ID}003"
+            message_id = f"400-{MSG_FUNCTION_ID}004"
             message = multi_lang.get_text(
                 message_id,
                 "ユーザー情報の取得に失敗しました(対象:{0})",
@@ -176,7 +151,7 @@ def role_user_mapping_create(body, organization_id, role_name):
 
         user_info = json.loads(response.text)
         if len(user_info) == 0:
-            message_id = f"400-{MSG_FUNCTION_ID}004"
+            message_id = f"400-{MSG_FUNCTION_ID}005"
             message = multi_lang.get_text(
                 message_id,
                 "該当のユーザーは存在しません(対象:{0})",
@@ -246,46 +221,18 @@ def role_user_mapping_delete(body, organization_id, role_name):
 
     # 該当Clientのorganization管理者ロールを取得
     # Process for the number of organization administrators
-    response = api_keycloak_roles.clients_role_get(organization_id, private.user_token_client_id, role_name, token, True)
-    if response.status_code != 200:
-        globals.logger.error(f"response.status_code:{response.status_code}")
-        globals.logger.error(f"response.text:{response.text}")
-        message_id = f"400-{MSG_FUNCTION_ID}006"
-        message = multi_lang.get_text(
-            message_id,
-            "client roleの取得に失敗しました(対象ID:{0} client:{1} role:{2})",
-            organization_id,
-            private.user_token_client_clientid,
-            role_name
-        )
-        raise common.BadRequestException(message_id=message_id, message=message)
-
-    client_role = json.loads(response.text)
-    globals.logger.debug(f"client_role:{client_role}")
-    globals.logger.debug("attributes-kind:{0}".format(client_role.get("attributes").get("kind")))
-
-    if [common_const.ROLE_KIND_WORKSPACE] != client_role.get("attributes").get("kind"):
-        message_id = f"400-{MSG_FUNCTION_ID}007"
-        message = multi_lang.get_text(
-            message_id,
-            "対象のロールはworkspaceロールではありません(対象:{0})",
-            role_name
-        )
-        raise common.BadRequestException(message_id=message_id, message=message)
-
-    __check_autho_role(connexion.request.headers, private, token, organization_id, role_name)
-
-    request_users = [x.get("preferred_username") for x in body if x.get("preferred_username")]
+    client_role = __check_autho_role(connexion.request.headers, private, token, organization_id, role_name)
 
     # ユーザーの取得
     # Get user
+    request_users = [x.get("preferred_username") for x in body if x.get("preferred_username")]
     users = []
     for username in request_users:
         response = api_keycloak_users.user_get(realm_name=organization_id, user_name=username, token=token)
         if response.status_code != 200:
             globals.logger.error(f"response.status_code:{response.status_code}")
             globals.logger.error(f"response.text:{response.text}")
-            message_id = f"400-{MSG_FUNCTION_ID}008"
+            message_id = f"400-{MSG_FUNCTION_ID}006"
             message = multi_lang.get_text(
                 message_id,
                 "ユーザーの取得に失敗しました(対象ID:{0} username:{1})",
@@ -298,7 +245,7 @@ def role_user_mapping_delete(body, organization_id, role_name):
         if len(response_user) < 1:
             globals.logger.error(f"response.status_code:{response.status_code}")
             globals.logger.error(f"response.text:{response.text}")
-            message_id = f"400-{MSG_FUNCTION_ID}009"
+            message_id = f"400-{MSG_FUNCTION_ID}007"
             message = multi_lang.get_text(
                 message_id,
                 "該当のユーザーは存在しません(対象ID:{0} username:{1})",
@@ -310,6 +257,26 @@ def role_user_mapping_delete(body, organization_id, role_name):
         users.append(response_user[0])
 
     roles = [client_role, ]
+
+    # Requires at least one organization manager
+    if role_name == common_const.ORG_ROLE_ORG_MANAGER:
+        response = api_keycloak_roles.role_uesrs_get(
+            realm_name=organization_id, client_id=private.user_token_client_id, role_name=role_name, token=token,
+        )
+        response_user = json.loads(response.text)
+        og_managers = [u.get("id") for u in response_user]
+        for u in users:
+            if u.get("id") in og_managers:
+                og_managers.remove(u.get("id"))
+
+        if len(og_managers) < 1:
+            message_id = f"400-{MSG_FUNCTION_ID}008"
+            message = multi_lang.get_text(
+                message_id,
+                "{0}は少なくとも1人必要です",
+                role_name
+            )
+            raise common.BadRequestException(message_id=message_id, message=message)
 
     # ロール紐づけ削除
     # delete role mapping
@@ -365,7 +332,7 @@ def __get_token(organization_id):
     return token
 
 
-def __check_autho_role(headers, private, token, organization_id, role_name):
+def __check_autho_role(headers, private, token, organization_id, role_name, is_maintenance=True):
     """Check if role can be updated
 
     Args:
@@ -376,38 +343,67 @@ def __check_autho_role(headers, private, token, organization_id, role_name):
         role_name (_type_): _description_
 
     Returns:
-        boolean: true:ok false:ng
+        dict: client_role
     """
-
-    # Get composite role
-    # composite roleを取得する
-    r_comp_role = api_keycloak_roles.clients_role_composites_get(
-        realm_name=organization_id, client_uid=private.user_token_client_id, role_name=role_name, token=token
-    )
-    if r_comp_role.status_code == 200:
-        comp_roles = json.loads(r_comp_role.text)
-    elif r_comp_role.status_code == 404:
-        comp_roles = []
-    else:
-        globals.logger.error(f"response.status_code:{r_comp_role.status_code}")
-        globals.logger.error(f"response.text:{r_comp_role.text}")
-        message_id = f"500-{MSG_FUNCTION_ID}004"
+    response = api_keycloak_roles.clients_role_get(organization_id, private.user_token_client_id, role_name, token, True)
+    if response.status_code != 200:
+        globals.logger.error(f"response.status_code:{response.status_code}")
+        globals.logger.error(f"response.text:{response.text}")
+        message_id = f"400-{MSG_FUNCTION_ID}001"
         message = multi_lang.get_text(
             message_id,
-            "composite roleの取得に失敗しました(対象ID:{0} client:{1})",
+            "client roleの取得に失敗しました(対象ID:{0} client:{1} role:{2})",
             organization_id,
-            private.token_check_client_clientid
+            private.user_token_client_clientid,
+            role_name
         )
-        raise common.InternalErrorException(message_id=message_id, message=message)
+        raise common.BadRequestException(message_id=message_id, message=message)
 
-    # Check if role can be updated
-    # ロールが更新できるかチェックする
-    workspace_ids = [w.get("name") for w in comp_roles]
+    client_role = json.loads(response.text)
+    globals.logger.debug(f"client_role:{client_role}")
+    globals.logger.debug("attributes-kind:{0}".format(client_role.get("attributes").get("kind")))
+
     cauth = check_authority.CheckAuthority(organization_id, headers)
-    is_auth = cauth.is_workspaces_authority(workspace_ids, is_maintenance=True)
-    if not is_auth and len(comp_roles) > 0:
-        raise common.BadRequestException(
-            message_id=f"400-{MSG_FUNCTION_ID}005", message='指定されたロールを操作する権限がありません。'
-        )
 
-    return True
+    if [common_const.ROLE_KIND_ORGANIZATION] == client_role.get("attributes").get("kind"):
+        role = {
+            "name": client_role.get("name"),
+            "kind": common_const.ROLE_KIND_ORGANIZATION,
+        }
+        is_auth = cauth.is_role_authority(role)
+        if not is_auth:
+            raise common.BadRequestException(
+                message_id=f"400-{MSG_FUNCTION_ID}002", message='指定されたロールを操作する権限がありません。'
+            )
+    else:
+        # Get composite role
+        # composite roleを取得する
+        r_comp_role = api_keycloak_roles.clients_role_composites_get(
+            realm_name=organization_id, client_uid=private.user_token_client_id, role_name=client_role.get("name"), token=token
+        )
+        if r_comp_role.status_code == 200:
+            comp_roles = json.loads(r_comp_role.text)
+        elif r_comp_role.status_code == 404:
+            comp_roles = []
+        else:
+            globals.logger.error(f"response.status_code:{r_comp_role.status_code}")
+            globals.logger.error(f"response.text:{r_comp_role.text}")
+            message_id = f"500-{MSG_FUNCTION_ID}004"
+            message = multi_lang.get_text(
+                message_id,
+                "composite roleの取得に失敗しました(対象ID:{0} client:{1})",
+                organization_id,
+                private.token_check_client_clientid
+            )
+            raise common.InternalErrorException(message_id=message_id, message=message)
+
+        # Check if role can be updated
+        # ロールが更新できるかチェックする
+        workspace_ids = [w.get("name") for w in comp_roles]
+        is_auth = cauth.is_workspaces_authority(workspace_ids, is_maintenance=is_maintenance)
+        if not is_auth and len(comp_roles) > 0:
+            raise common.BadRequestException(
+                message_id=f"400-{MSG_FUNCTION_ID}003", message='指定されたロールを操作する権限がありません。'
+            )
+
+    return client_role
