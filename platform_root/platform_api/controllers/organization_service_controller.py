@@ -638,8 +638,6 @@ def __client_role_setting(organization_id, user_id):
         # Separate privileges to be granted by role
         if org_role == common_const.ORG_ROLE_ORG_MANAGER:
             arr_permissions = common_const.ORG_PERMISSION_ORG_MANAGER
-        elif org_role == common_const.ORG_ROLE_PLAN_MANAGER:
-            arr_permissions = common_const.ORG_PERMISSION_PLAN_MANAGER
         elif org_role == common_const.ORG_ROLE_USER_ROLE_MANAGER:
             arr_permissions = common_const.ORG_PERMISSION_USER_ROLE_MANAGER
         elif org_role == common_const.ORG_ROLE_USER_MANAGER:
