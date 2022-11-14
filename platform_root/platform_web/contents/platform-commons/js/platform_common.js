@@ -232,13 +232,11 @@ const RolesCommon =
     "ORG_AUTH_UPDATE":              "_og-upd",
     "ORG_AUTH_OWNER_MAINTE":        "_og-own-mt",
     "ORG_AUTH_ROLE_USER":           "_og-role-usr",
-    "ORG_AUTH_PLAN_MAINTE":         "_og-plan-mt",
-    "ORG_AUTH_USAGE_SITUATION":     "_og-usage",
     "ORG_AUTH_USER_MAINTE":         "_og-usr-mt",
     "ORG_AUTH_WS_ROLE_MAINTE":      "_og-ws-role-mt",
     "ORG_AUTH_WS_ROLE_USER":        "_og-ws-role-usr",
     "ORG_AUTH_WS_MAINTE":           "_og-ws-mt",
-    
+
     "isAlllowedCreateRole": function() {
         return CommonAuth.hasAuthority(RolesCommon.ORG_AUTH_WS_ROLE_MAINTE) || ( CommonAuth.getAdminWorkspaces().length > 0 );
     },
@@ -260,7 +258,7 @@ const RolesCommon =
                 // オーガナイゼーションロールの編集は不可
                 // Organization role cannot be edited
                 return false;
-                
+
             case RolesCommon.ROLE_KIND_WORKSPACE:
                 if(CommonAuth.hasAuthority(RolesCommon.ORG_AUTH_WS_ROLE_MAINTE)) {
                     // オーガナイゼーションワークスペースロールメンテナンスのロールを持っている場合
@@ -342,8 +340,6 @@ const RolesCommon =
         orgAuthText[RolesCommon.ORG_AUTH_UPDATE]            = getText("000-00109", "オーガナイゼーション更新");
         orgAuthText[RolesCommon.ORG_AUTH_OWNER_MAINTE]      = getText("000-00110", "オーガナイゼーション管理者変更");
         orgAuthText[RolesCommon.ORG_AUTH_ROLE_USER]         = getText("000-00111", "オーガナイゼーションロール付与");
-        orgAuthText[RolesCommon.ORG_AUTH_PLAN_MAINTE]       = getText("000-00112", "プラン変更");
-        orgAuthText[RolesCommon.ORG_AUTH_USAGE_SITUATION]   = getText("000-00113", "利用状況確認");
         orgAuthText[RolesCommon.ORG_AUTH_USER_MAINTE]       = getText("000-00114", "ユーザー管理");
         orgAuthText[RolesCommon.ORG_AUTH_WS_ROLE_MAINTE]    = getText("000-00115", "ワークスペースロール管理");
         orgAuthText[RolesCommon.ORG_AUTH_WS_ROLE_USER]      = getText("000-00116", "ワークスペースロール付与");
