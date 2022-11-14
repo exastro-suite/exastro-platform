@@ -681,7 +681,7 @@ def __client_role_setting(organization_id, user_id):
     # TODO : ユーザー管理機能、ロール管理機能が完成した際は、付与解除
     # Ungrant when user management function and role management function are completed
     realm_management_clientid = "realm-management"
-    arr_realm_management_role = ["manage-clients", "manage-users", "view-clients", "view-users"]
+    arr_realm_management_role = ["manage-users", "view-users"]
 
     # client 情報取得
     # get client information
@@ -723,18 +723,20 @@ def __client_role_setting(organization_id, user_id):
 
     # role付与
     # role grant for client-roles
-    response = api_keycloak_roles.clients_role_composites_create(organization_id, client_id, common_const.ORG_ROLE_ORG_MANAGER, client_roles, token)
-    if response.status_code not in [200, 204]:
-        globals.logger.error(f"response.status_code:{response.status_code}")
-        globals.logger.error(f"response.text:{response.text}")
-        message_id = f"500-{MSG_FUNCTION_ID}007"
-        message = multi_lang.get_text(
-            message_id,
-            "client roleのrole設定に失敗しました(対象ID:{0} client:{1})",
-            organization_id,
-            client_clientid
-        )
-        raise common.InternalErrorException(message_id=message_id, message=message)
+    target_roles = [common_const.ORG_ROLE_ORG_MANAGER, common_const.ORG_ROLE_USER_ROLE_MANAGER, common_const.ORG_ROLE_USER_MANAGER]
+    for target in target_roles:
+        response = api_keycloak_roles.clients_role_composites_create(organization_id, client_id, target, client_roles, token)
+        if response.status_code not in [200, 204]:
+            globals.logger.error(f"response.status_code:{response.status_code}")
+            globals.logger.error(f"response.text:{response.text}")
+            message_id = f"500-{MSG_FUNCTION_ID}007"
+            message = multi_lang.get_text(
+                message_id,
+                "client roleのrole設定に失敗しました(対象ID:{0} client:{1})",
+                organization_id,
+                client_clientid
+            )
+            raise common.InternalErrorException(message_id=message_id, message=message)
 
     # ステータス更新
     # update status
