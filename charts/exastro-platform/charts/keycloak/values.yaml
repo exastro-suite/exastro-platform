@@ -20,6 +20,8 @@ global:
       PLATFORM_WEB_PROTOCOL: "http"
       PLATFORM_WEB_HOST: "platform-web"
       PLATFORM_WEB_PORT: "8000"
+    secret:
+      ENCRYPT_KEY: ""
     persistence:
       enabled: true
       accessMode: ReadWriteMany

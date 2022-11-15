@@ -46,7 +46,7 @@ spec:
             {{-     end -}}
             {{-   end -}}
             {{-   range $secret, $value := $define.secret }}
-            {{-     if or (eq $define.name "auth-database") }}
+            {{-     if or (eq $define.name "auth-global") (eq $define.name "auth-database") }}
             - name: {{ $secret }}
               valueFrom:
                 secretKeyRef:
