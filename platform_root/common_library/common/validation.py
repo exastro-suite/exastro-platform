@@ -25,6 +25,9 @@ RE_ID_USABLE_FIRST_CHARACTER = r'[a-zA-Z]'
 ORG_RESERVED_WORDS = [
     {"text": "master", "re": r"^master$"},
     {"text": "platform", "re": r"^platform$"},
+    {"text": "ita", "re": r"^ita$"},
+    {"text": "oase", "re": r"^oase$"},
+    {"text": "epoch", "re": r"^epoch$"},
     {"text": "account", "re": r"^account$"},
     {"text": "account-console", "re": r"^account-console$"},
     {"text": "admin-cli", "re": r"^admin-cli$"},
