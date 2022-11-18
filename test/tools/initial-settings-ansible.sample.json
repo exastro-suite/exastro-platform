@@ -1,0 +1,38 @@
+{
+    "input_limit_setting": true,
+    "execution_engine_list": [
+        "string"
+    ],
+    "initial_data": {
+        "ansible_automation_controller_host_list": [
+            {
+                "file": {
+                    "ssh_private_key_file": "string"
+                },
+                "parameter": {
+                    "host": "string",
+                    "authentication_method": "string",
+                    "user": "string",
+                    "password": "string",
+                    "ssh_private_key_file": "string",
+                    "passphrase": "string",
+                    "isolated_tower": "string",
+                    "remarks": "string"
+                }
+            }
+        ],
+        "interface_info_ansible": {
+            "parameter": {
+                "execution_engine": "string",
+                "representative_server": "string",
+                "ansible_automation_controller_protocol": "string",
+                "ansible_automation_controller_port": "string",
+                "organization_name": "string",
+                "authentication_token": "string",
+                "delete_runtime_data": "string",
+                "proxy_address": "string",
+                "proxy_port": "string"
+            }
+        }
+    }
+}
