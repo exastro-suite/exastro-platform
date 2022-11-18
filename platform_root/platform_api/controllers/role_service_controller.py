@@ -193,7 +193,7 @@ def role_list(organization_id, kind=None):
     for role in roles:
         globals.logger.debug("attributes:{}".format(role.get("attributes")))
 
-        role_kind_list = role.get("attributes").get("kind")
+        role_kind_list = role.get("attributes", {}).get("kind")
         if role_kind_list:
             role_kind = role_kind_list[0]
         else:

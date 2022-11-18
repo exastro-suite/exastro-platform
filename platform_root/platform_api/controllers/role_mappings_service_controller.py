@@ -365,7 +365,7 @@ def __check_autho_role(headers, private, token, organization_id, role_name, is_m
 
     cauth = check_authority.CheckAuthority(organization_id, headers)
 
-    if [common_const.ROLE_KIND_ORGANIZATION] == client_role.get("attributes").get("kind"):
+    if [common_const.ROLE_KIND_ORGANIZATION] == client_role.get("attributes", {}).get("kind"):
         role = {
             "name": client_role.get("name"),
             "kind": common_const.ROLE_KIND_ORGANIZATION,
