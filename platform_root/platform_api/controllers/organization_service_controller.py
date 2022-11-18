@@ -681,7 +681,6 @@ def __client_role_setting(organization_id, user_id):
     # TODO : ユーザー管理機能、ロール管理機能が完成した際は、付与解除
     # Ungrant when user management function and role management function are completed
     realm_management_clientid = "realm-management"
-    arr_realm_management_role = ["manage-users", "view-users"]
 
     # client 情報取得
     # get client information
@@ -703,7 +702,7 @@ def __client_role_setting(organization_id, user_id):
 
     client_roles = []
 
-    for realm_management_role in arr_realm_management_role:
+    for realm_management_role in common_const.ALL_REALM_MANAGEMENT_ROLE:
         # 該当Clientのorganization管理者ロールを取得
         # Process for the number of organization administrators
         response = api_keycloak_roles.clients_role_get(organization_id, realm_management_client_id, realm_management_role, token)

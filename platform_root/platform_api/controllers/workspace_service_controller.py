@@ -297,6 +297,9 @@ def workspace_list(organization_id, workspace_name=None):
     # Get child role (same role name as workspace name) based on user Roles
     posible_workspace_id = []
     for role in roles_arr:
+        if role in common_const.ALL_ORG_ROLES:
+            continue
+
         response_api = api_keycloak_roles.clients_role_composites_get(organization_id, private.user_token_client_id, role, token)
         if response_api.status_code == 200:
             response_json = json.loads(response_api.text)
@@ -391,6 +394,7 @@ def workspace_member_list(organization_id, workspace_id):
         token=token,
     )
 
+    user_ids = []
     workspace_users = []
     for role in workspace_roles:
         users_response = api_keycloak_roles.role_uesrs_get(
@@ -405,12 +409,15 @@ def workspace_member_list(organization_id, workspace_id):
 
         users = json.loads(users_response.text)
 
-        workspace_users.extend([
-            {
-                "firstName": user.get("firstName", ""),
-                "lastName": user.get("lastName", ""),
-                "name": common.get_username(user.get("firstName"), user.get("lastName"), user.get("username")),
-            } for user in users])
+        for user in users:
+            if user["id"] not in user_ids:
+                user_ids.append(user["id"])
+                workspace_users.append(
+                    {
+                        "firstName": user.get("firstName", ""),
+                        "lastName": user.get("lastName", ""),
+                        "name": common.get_username(user.get("firstName"), user.get("lastName"), user.get("username")),
+                    })
 
     return common.response_200_ok(workspace_users)
 
@@ -447,6 +454,8 @@ def __workspace_role_list(organization_id, workspace_id, client_uid, token):
 
     for pf_role in custum_roles:
         if pf_role.get("composite") is not True:
+            continue
+        if [common_const.ROLE_KIND_WORKSPACE] != pf_role.get("attributes", {}).get("kind"):
             continue
 
         # ロールのcomposites から workspace_id を含むものだけを取得
