@@ -328,7 +328,7 @@ th.w-40 {
   height: 56px;
   line-height: 56px;
   background-position: center center;
-  background-image: url('../img/keyclok-logo.png');
+  background-image: url('../img/exastro-logo.png');
   background-size: 148px 30px;
   background-repeat: no-repeat;
   width: 148px;
@@ -427,6 +427,10 @@ table.kc-authz-table-expanded {
   font-size: 14px;
 }
 
+.input-map input.form-control {
+  width: 50%;
+}
+
 /* Deactivation styles for user-group membership tree models */
 
 div[tree-model] li .deactivate {
@@ -498,4 +502,3 @@ table.credential-data-table td.key {
     text-align: right;
     font-weight: bold;
 }
-
