@@ -19,6 +19,7 @@
     "frontchannelLogout": false,
     "protocol": "openid-connect",
     "attributes": {
+        "post.logout.redirect.uris": "/*",
         "id.token.as.detached.signature": "false",
         "saml.assertion.signature": "false",
         "saml.force.post.binding": "false",
