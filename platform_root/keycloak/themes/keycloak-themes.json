@@ -1,0 +1,18 @@
+{
+    "themes": [{
+        "name" : "base",
+        "types": [ "admin", "account", "login", "email" ]
+    }, {
+        "name" : "keycloak",
+        "types": [ "admin", "account", "login", "common", "email", "welcome" ]
+    }, {
+        "name" : "keycloak.v2",
+        "types": [ "account", "admin" ]
+    }, {
+        "name" : "exastro",
+        "types": [ "admin", "account", "login", "common", "email", "welcome" ]
+    }, {
+        "name" : "exastro.v2",
+        "types": [ "account" ]
+    }]
+}
