@@ -87,43 +87,40 @@ spec:
               configMapKeyRef:
                 name: params-auth-global
                 key: TZ
-          - name: KEYCLOAK_USER
+          - name: KEYCLOAK_ADMIN
             valueFrom:
               secretKeyRef:
                 name: secret-keycloak
                 key: KEYCLOAK_USER
-          - name: KEYCLOAK_PASSWORD
+          - name: KEYCLOAK_ADMIN_PASSWORD
             valueFrom:
               secretKeyRef:
                 name: secret-keycloak
                 key: KEYCLOAK_PASSWORD
-          - name: PROXY_ADDRESS_FORWARDING
-            value: "true"
-          - name: DB_VENDOR
+          - name: KC_DB
             valueFrom:
               configMapKeyRef:
                 name: params-auth-database
                 key: DB_VENDOR
-          - name: DB_ADDR
-            valueFrom:
-              configMapKeyRef:
-                name: params-auth-database
-                key: DB_HOST
-          - name: DB_DATABASE
+          - name: KC_DB_URL
             valueFrom:
               configMapKeyRef:
                 name: params-keycloak
-                key: KEYCLOAK_DB_DATABASE
-          - name: DB_USER
+                key: KEYCLOAK_DB_URL
+          - name: KC_DB_USERNAME
             valueFrom:
               secretKeyRef:
                 name: secret-keycloak
                 key: KEYCLOAK_DB_USER
-          - name: DB_PASSWORD
+          - name: KC_DB_PASSWORD
             valueFrom:
               secretKeyRef:
                 name: secret-keycloak
                 key: KEYCLOAK_DB_PASSWORD
+          - name: KC_PROXY
+            value: "passthrough"
+          - name: KC_HTTP_RELATIVE_PATH
+            value: "/auth"
           ports:
             - name: port-http
               containerPort: {{ .Values.global.keycloakDefinition.config.KEYCLOAK_PORT }}
@@ -135,7 +132,7 @@ spec:
             #   path: /auth/realms/master
             #   port: {{ .Values.global.keycloakDefinition.config.KEYCLOAK_PORT }}
             initialDelaySeconds: 5
-            periodSeconds: 10            
+            periodSeconds: 10
           readinessProbe:
             tcpSocket:
               port: {{ .Values.global.keycloakDefinition.config.KEYCLOAK_PORT }}
@@ -143,7 +140,7 @@ spec:
             #   path: /auth/realms/master
             #   port: {{ .Values.global.keycloakDefinition.config.KEYCLOAK_PORT }}
             initialDelaySeconds: 5
-            periodSeconds: 10            
+            periodSeconds: 10
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}
