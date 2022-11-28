@@ -103,11 +103,16 @@ spec:
               configMapKeyRef:
                 name: params-auth-database
                 key: DB_VENDOR
-          - name: KC_DB_URL
+          - name: KC_DB_URL_HOST
+            valueFrom:
+              configMapKeyRef:
+                name: params-auth-database
+                key: DB_HOST
+          - name: KC_DB_URL_DATABASE
             valueFrom:
               configMapKeyRef:
                 name: params-keycloak
-                key: KEYCLOAK_DB_URL
+                key: KEYCLOAK_DB_DATABASE
           - name: KC_DB_USERNAME
             valueFrom:
               secretKeyRef:

@@ -44,7 +44,6 @@ global:
       KEYCLOAK_PORT: "8080"
       KEYCLOAK_MASTER_REALM: "master"
       KEYCLOAK_DB_DATABASE: "keycloak"
-      KEYCLOAK_DB_URL: "jdbc:mariadb://platform-db/keycloak"
     secret:
       KEYCLOAK_USER: ""
       KEYCLOAK_PASSWORD: ""
