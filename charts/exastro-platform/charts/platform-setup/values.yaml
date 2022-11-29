@@ -28,7 +28,7 @@ global:
       size: 10Gi
       volumeType: hostPath # e.g.) hostPath or AKS
       storageClass: "-" # e.g.) azurefile or - (None)
-      # matchLabels: 
+      # matchLabels:
       #   release: "stable"
       # matchExpressions:
       #   - {key: environment, operator: In, values: [dev]}
@@ -101,10 +101,10 @@ podSecurityContext: {}
 
 volumeMounts:
   mountPath:
-    createDB: 
+    createDB:
       path: /createdb.sql
       subPath: createdb.sql
-    conf: 
+    conf:
       path: /etc/mysql/conf.d
 
 database:
@@ -177,7 +177,7 @@ keycloak:
     #!/bin/bash
     i=1
     echo "HOST: ${API_KEYCLOAK_PROTOCOL}://${API_KEYCLOAK_HOST}:${API_KEYCLOAK_PORT}"
-    until wget --spider -T ${TIMEOUT} ${API_KEYCLOAK_PROTOCOL}://${API_KEYCLOAK_HOST}:${API_KEYCLOAK_PORT}; do
+    until wget --spider -T ${TIMEOUT} ${API_KEYCLOAK_PROTOCOL}://${API_KEYCLOAK_HOST}:${API_KEYCLOAK_PORT}/auth/health; do
       echo `date`": Can not connect to KeyCloak."
       sleep $i
       i=$(( i * 2 ))
@@ -194,4 +194,3 @@ keycloak:
     runAsUser: 1000
     runAsGroup: 1000
     runAsNonRoot: true
-
