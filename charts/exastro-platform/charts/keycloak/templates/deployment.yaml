@@ -137,16 +137,16 @@ spec:
             # httpGet:
             #   path: /auth/realms/master
             #   port: {{ .Values.global.keycloakDefinition.config.KEYCLOAK_PORT }}
-            initialDelaySeconds: 5
-            periodSeconds: 10
+            initialDelaySeconds: 120
+            periodSeconds: 30
           readinessProbe:
             tcpSocket:
               port: {{ .Values.global.keycloakDefinition.config.KEYCLOAK_PORT }}
             # httpGet:
             #   path: /auth/realms/master
             #   port: {{ .Values.global.keycloakDefinition.config.KEYCLOAK_PORT }}
-            initialDelaySeconds: 5
-            periodSeconds: 10
+            initialDelaySeconds: 30
+            periodSeconds: 30
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}
