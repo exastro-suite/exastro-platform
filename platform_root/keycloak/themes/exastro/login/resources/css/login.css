@@ -72,9 +72,9 @@ a#kc-current-locale-link::after {
 }
 
 div.kc-logo-text {
-    background-image: url(../img/Exastro-logo2-white-rgb.svg);
+    /* background-image: url(../img/Exastro-logo2-white-rgb.svg);
     background-repeat: no-repeat;
-    background-size: 280px;
+    background-size: 280px; */
     height: 63px;
     width: 300px;
     margin: 0 auto;
@@ -91,12 +91,17 @@ div.kc-logo-text span {
 }
 
 #kc-header-wrapper {
+    background-image: url(../img/Exastro-logo2-white-rgb.svg);
+    background-repeat: no-repeat;
+    background-size: 380px;
+    background-position: 50%;
     font-size: 29px;
     text-transform: uppercase;
     letter-spacing: 3px;
     line-height: 1.2em;
-    padding: 62px 10px 20px;
+    padding: 162px 10px 20px;
     white-space: normal;
+    margin-top: 10px;
 }
 
 #kc-content {
