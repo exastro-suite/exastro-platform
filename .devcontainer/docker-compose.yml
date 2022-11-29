@@ -77,18 +77,9 @@ services:
     healthcheck:
       test: curl http://localhost:8080/auth/health
     environment:
-      # - KEYCLOAK_USER=admin
-      # - KEYCLOAK_PASSWORD=password
-      # - PROXY_ADDRESS_FORWARDING=true
-      # - DB_VENDOR=mariadb
-      # - DB_ADDR=platform-db
-      # - DB_DATABASE=keycloak
-      # - DB_USER=keycloak
-      # - DB_PASSWORD=password
       - KEYCLOAK_ADMIN=admin
       - KEYCLOAK_ADMIN_PASSWORD=password
       - KC_DB=mariadb
-      # - KC_DB_URL=jdbc:mariadb://platform-db/keycloak
       - KC_DB_URL_HOST=platform-db
       - KC_DB_URL_DATABASE=keycloak
       - KC_DB_USERNAME=keycloak
@@ -96,8 +87,7 @@ services:
       - KC_PROXY=passthrough
       - KC_HTTP_RELATIVE_PATH=/auth
     command:
-      # - start-dev # 開発モードで起動
-      # - start-dev --spi-theme-welcome-theme=exastro
+      # 開発モードで起動
       - start-dev --spi-theme-static-max-age=-1 --spi-theme-cache-themes=false --spi-theme-cache-templates=false
     depends_on:
       platform-db:
