@@ -137,7 +137,7 @@ spec:
             # httpGet:
             #   path: /auth/realms/master
             #   port: {{ .Values.global.keycloakDefinition.config.KEYCLOAK_PORT }}
-            initialDelaySeconds: 120
+            initialDelaySeconds: 600
             periodSeconds: 30
           readinessProbe:
             tcpSocket:
