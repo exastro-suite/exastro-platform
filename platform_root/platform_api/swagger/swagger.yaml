@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: Exastro Platform API
   description: Exastro Platform API
-  version: 1.0.0
+  version: 1.1.0
 servers:
 - url: /
 tags:
@@ -12,6 +12,10 @@ tags:
   description: ワークスペースに関する操作
 - name: UsersService
   description: ユーザーに関する操作
+- name: RoleService
+  description: ロールに関する操作
+- name: RoleMappingsService
+  description: ロール・マッピングに関する操作
 - name: InternalCommonService
   description: 共通(内部用)
 - name: InternalUsersService
@@ -193,6 +197,278 @@ paths:
               schema:
                 $ref: '#/components/schemas/runtimeError'
       x-openapi-router-controller: controllers.workspace_service_controller
+  /api/{organization_id}/platform/users:
+    get:
+      tags:
+      - UsersService
+      summary: List returns list of users
+      operationId: user_list
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_4'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+      x-openapi-router-controller: controllers.users_service_controller
+  /api/{organization_id}/platform/roles:
+    get:
+      tags:
+      - RoleService
+      summary: List returns list of roles
+      operationId: role_list
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: kind
+        in: query
+        description: role kind.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          example: workspace
+          enum:
+          - workspace
+          - organization
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_5'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+      x-openapi-router-controller: controllers.role_service_controller
+    post:
+      tags:
+      - RoleService
+      summary: Create creates an role
+      operationId: role_create
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/platform_roles_body'
+            examples:
+              workspace:
+                value:
+                  name: role-1
+                  description: role description
+                  kind: workspace
+                  workspaces:
+                  - id: workspace-1
+        required: true
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_1'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+      x-openapi-router-controller: controllers.role_service_controller
+  /api/{organization_id}/platform/roles/{role_name}:
+    put:
+      tags:
+      - RoleService
+      summary: Update updates an role
+      operationId: role_update
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: role_name
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/roles_role_name_body'
+            examples:
+              workspace:
+                value:
+                  description: role description
+                  kind: workspace
+                  workspaces:
+                  - id: workspace-1
+        required: true
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_1'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+      x-openapi-router-controller: controllers.role_service_controller
+  /api/{organization_id}/platform/roles/{role_name}/users:
+    get:
+      tags:
+      - RoleMappingsService
+      summary: Get user-role mapping for a role
+      operationId: role_user_mapping_get
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: role_name
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_6'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+      x-openapi-router-controller: controllers.role_mappings_service_controller
+    post:
+      tags:
+      - RoleMappingsService
+      summary: Add roles to the user role mapping
+      operationId: role_user_mapping_create
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: role_name
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/roleMappingUser'
+        required: true
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_1'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+      x-openapi-router-controller: controllers.role_mappings_service_controller
+    patch:
+      tags:
+      - RoleMappingsService
+      summary: Delete roles from user role mapping
+      operationId: role_user_mapping_delete
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: role_name
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/roleMappingUser'
+        required: true
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_1'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+      x-openapi-router-controller: controllers.role_mappings_service_controller
   /internal-api/{organization_id}/platform/workspaces/{workspace_id}/roles:
     get:
       tags:
@@ -241,7 +517,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_4'
+                $ref: '#/components/schemas/inline_response_200_7'
         default:
           description: An unexpected error response.
           content:
@@ -297,7 +573,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_5'
+                $ref: '#/components/schemas/inline_response_200_4'
         default:
           description: An unexpected error response.
           content:
@@ -353,7 +629,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_6'
+                $ref: '#/components/schemas/inline_response_200_8'
         default:
           description: An unexpected error response.
           content:
@@ -637,6 +913,90 @@ components:
         id:
           type: string
           example: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+    roleDetailList:
+      title: WorkspaceList is a list of workspace resources that users can access.
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            oneOf:
+            - $ref: '#/components/schemas/roleDetailWorkspace'
+            - $ref: '#/components/schemas/roleDetailOrganization'
+    roleDetailOrganization:
+      title: role is a definition of Role resource.
+      type: object
+      properties:
+        name:
+          type: string
+          example: organization-role-1
+        description:
+          type: string
+          example: role description
+        kind:
+          type: string
+          example: organization
+        authorities:
+          type: array
+          items:
+            $ref: '#/components/schemas/roleDetailOrganization_authorities'
+    roleDetailWorkspace:
+      title: role is a definition of Role resource.
+      type: object
+      properties:
+        name:
+          type: string
+          example: role-1
+        description:
+          type: string
+          example: role description
+        kind:
+          type: string
+          example: workspace
+        authorities:
+          type: array
+          items:
+            $ref: '#/components/schemas/roleDetailWorkspace_authorities'
+        workspaces:
+          type: array
+          items:
+            $ref: '#/components/schemas/roleDetailWorkspace_workspaces'
+    roleDetailWorkspacePut:
+      title: role is a definition of Role resource.
+      type: object
+      properties:
+        description:
+          type: string
+          example: role description
+        kind:
+          type: string
+          example: workspace
+        workspaces:
+          type: array
+          items:
+            $ref: '#/components/schemas/roleDetailWorkspace_workspaces'
+    roleMappingUser:
+      title: userList is list of User resources.
+      type: array
+      example:
+      - preferred_username: username-1
+      - preferred_username: username-2
+      - preferred_username: username-3
+      items:
+        $ref: '#/components/schemas/roleUser'
+    roleUser:
+      title: role mapping user is a definition of User resource.
+      type: object
+      properties:
+        name:
+          type: string
+          example: firstname lastname
+        firstName:
+          type: string
+        lastName:
+          type: string
+        preferred_username:
+          type: string
     inline_response_200:
       allOf:
       - $ref: '#/components/schemas/responseOk'
@@ -665,12 +1025,32 @@ components:
     inline_response_200_4:
       allOf:
       - $ref: '#/components/schemas/responseOk'
-      - $ref: '#/components/schemas/roleList'
+      - $ref: '#/components/schemas/userList'
     inline_response_200_5:
       allOf:
       - $ref: '#/components/schemas/responseOk'
-      - $ref: '#/components/schemas/userList'
+      - $ref: '#/components/schemas/roleDetailList'
+    platform_roles_body:
+      oneOf:
+      - $ref: '#/components/schemas/roleDetailWorkspace'
+    roles_role_name_body:
+      oneOf:
+      - $ref: '#/components/schemas/roleDetailWorkspacePut'
     inline_response_200_6:
+      allOf:
+      - $ref: '#/components/schemas/responseOk'
+      - title: roleList is list of Role resources.
+        type: object
+        properties:
+          data:
+            type: array
+            items:
+              $ref: '#/components/schemas/roleUser'
+    inline_response_200_7:
+      allOf:
+      - $ref: '#/components/schemas/responseOk'
+      - $ref: '#/components/schemas/roleList'
+    inline_response_200_8:
       allOf:
       - $ref: '#/components/schemas/responseOk'
       - $ref: '#/components/schemas/userWorkspaceList'
@@ -687,5 +1067,22 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/workspace_administrator'
-      example: null
+    roleDetailOrganization_authorities:
+      type: object
+      properties:
+        name:
+          type: string
+          example: _og-upd
+    roleDetailWorkspace_authorities:
+      type: object
+      properties:
+        name:
+          type: string
+      example: "[{\"name\":\"_workspace-1-admin\"},{\"name\":\"workspace-1\"}]"
+    roleDetailWorkspace_workspaces:
+      type: object
+      properties:
+        id:
+          type: string
+          example: workspace-1
 

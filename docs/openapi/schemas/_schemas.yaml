@@ -50,3 +50,15 @@ environment:
   $ref: "./environment.yaml"
 workspace_administrator:
   $ref: "./workspace_administrator.yaml"
+roleDetailList:
+  $ref: "./roleDetailList.yaml"
+roleDetailOrganization:
+  $ref: "./roleDetailOrganization.yaml"
+roleDetailWorkspace:
+  $ref: "./roleDetailWorkspace.yaml"
+roleDetailWorkspacePut:
+  $ref: "./roleDetailWorkspacePut.yaml"
+roleMappingUser:
+  $ref: "./roleMappingUser.yaml"
+roleUser:
+  $ref: "./roleUser.yaml"

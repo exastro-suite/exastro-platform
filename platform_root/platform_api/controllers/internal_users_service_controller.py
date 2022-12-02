@@ -16,8 +16,8 @@ import inspect
 
 from contextlib import closing
 
-from common_library.common import common
-from common_library.common import api_keycloak_tokens, api_keycloak_users, api_keycloak_clients
+from common_library.common import common, const as common_const
+from common_library.common import api_keycloak_tokens, api_keycloak_roles
 from common_library.common.db import DBconnector
 from libs import queries_internal_users
 
@@ -57,7 +57,7 @@ def user_workspace_list(organization_id, user_id):
 
     # ユーザーロール取得
     # Get user role
-    roles_response = api_keycloak_users.get_user_role_mapping(organization_id, user_id, token)
+    roles_response = api_keycloak_roles.get_user_role_mapping(organization_id, user_id, token)
     if roles_response.status_code == 404:
         return common.response_status(404, None, '404-{}001'.format(MSG_FUNCTION_ID), "ユーザが存在しません")
     elif roles_response.status_code != 200:
@@ -75,13 +75,16 @@ def user_workspace_list(organization_id, user_id):
     # Pick up the workspace (child role = workspace_id) assigned to roles
     for key, role_parent in roles.get("clientMappings", {}).items():
         for mapping in role_parent.get("mappings"):
+            if mapping.get("name") in common_const.ALL_ORG_ROLES:
+                continue
+
             # user_token_clinet_idと一致するロールのみチェック
             # Check only roles that match user_token_clinet_id
             if mapping.get("containerId") == private.user_token_client_id:
                 # 子ロールがある内容がworkspaceに紐づくのでその内容をチェックする
                 # Since the content with the child role is linked to the workspace, check the content
                 if mapping.get("composite"):
-                    composite_roles_response = api_keycloak_clients.client_role_composites_get(
+                    composite_roles_response = api_keycloak_roles.clients_role_composites_get(
                         organization_id, private.user_token_client_id, mapping["name"], token)
 
                     if composite_roles_response.status_code != 200:
@@ -92,6 +95,9 @@ def user_workspace_list(organization_id, user_id):
                     composite_roles = json.loads(composite_roles_response.text)
 
                     for role in composite_roles:
+                        if str(role["name"]).startswith("_"):
+                            continue
+
                         # 取得した子ロールが一度取得した内容にある場合は、重複するので読み飛ばし
                         # If the acquired child role is in the acquired content, it will be duplicated and will be skipped.
                         if role["name"] not in workspace_ids:

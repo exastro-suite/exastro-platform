@@ -38,6 +38,7 @@ services:
     environment:
       - FLASK_ENV=development
       - FLASK_SERVER_PORT=8801
+      - LOG_LEVEL=DEBUG
       - HTTP_PROXY=${HTTP_PROXY}
       - http_proxy=${HTTP_PROXY}
       - HTTPS_PROXY=${HTTPS_PROXY}
@@ -71,6 +72,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
       - FLASK_ENV=development
+      - LOG_LEVEL=DEBUG
       - HTTP_PROXY=${HTTP_PROXY}
       - http_proxy=${HTTP_PROXY}
       - HTTPS_PROXY=${HTTPS_PROXY}
@@ -114,8 +116,10 @@ services:
       target: develop_build
     volumes:
       - ..:/workspace:cached
-      - ../platform_root/keycloak/themes/exastro/account:/opt/jboss/keycloak/themes/exastro.v2/account:cached
-      - ../platform_root/keycloak/themes/exastro:/opt/jboss/keycloak/themes/exastro:cached
+      - ../platform_root/keycloak/themes/exastro/account:/opt/keycloak/themes/exastro.v2/account:cached
+      - ../platform_root/keycloak/themes/exastro/admin:/opt/keycloak/themes/exastro.v2/admin:cached
+      - ../platform_root/keycloak/themes/exastro:/opt/keycloak/themes/exastro:cached
+      - ../platform_root/keycloak/themes/keycloak-themes.json:/opt/keycloak/META-INF/keycloak-themes.json:cached
 
   platform-db:
     ports:
@@ -161,10 +165,13 @@ services:
         - http_proxy=${HTTP_PROXY}
         - HTTPS_PROXY=${HTTPS_PROXY}
         - https_proxy=${HTTPS_PROXY}
+    volumes:
+      - ../test/api:/app:cached
     environment:
       - CONFIG_API_PATH=/app/api.conf
       - API_PORT=8000
       - PYTHONIOENCODING=utf-8
+      - FLASK_ENV=development
 
   ita-web:
     build:

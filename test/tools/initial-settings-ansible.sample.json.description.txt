@@ -1,0 +1,59 @@
+{
+    // Input restrictions for "Interface Information" and "Ansible Automation Controller Host List"
+    // 「インターフェース情報」と「Ansible Automation Controllerホスト一覧」の入力制限
+    "input_limit_setting": true,
+
+    // Items that can be selected in "Execution engine" of "Interface information"
+    // "Ansible-Core" or "Ansible Automation Controller" can be specified
+    // 「インターフェース情報」の「実行エンジン」で選択可能な項目
+    //  "Ansible-Core" または "Ansible Automation Controller"が指定可能
+    "execution_engine_list": [
+        "string"
+    ],
+
+    "initial_data": {
+
+        // Initial setting data for "Ansible Automation Controller host list"
+        // * Registered data will be abolished
+        // 「Ansible Automation Controllerホスト一覧」用の初期設定データ
+        //  ※登録済みのデータは廃止される
+        "ansible_automation_controller_host_list": [
+            {
+                "file": {
+
+                    // base64 encode ssh_private_key_file
+                    // ssh_private_key_fileをbase64エンコードした値
+                    "ssh_private_key_file": "string"
+                },
+
+                "parameter": {
+                    // Ansible Automation Controller information
+                    "host": "string",
+                    "authentication_method": "string",
+                    "user": "string",                               //      user / ユーザー
+                    "password": "string",                           //      password / パスワード
+                    "ssh_private_key_file": "string",               //      ssh private key / ssh秘密鍵ファイル
+                    "passphrase": "string",                         //      passphrase / パスフレーズ
+                    "isolated_tower": "string",                     //      isolatedTower
+                    "remarks": "string"                             //      remarks / 備考
+                }
+            }
+        ],
+
+        // Initialization data for "interface information"
+        // 「インターフェース情報」用の初期設定データ
+        "interface_info_ansible": {
+            "parameter": {
+                "execution_engine": "string",                       //      execution engine / 実行エンジン
+                "representative_server": "string",                  //      representative server/ 代表ホスト
+                "ansible_automation_controller_protocol": "string", //      ansible automation controller protocol / プロトコル
+                "ansible_automation_controller_port": "string",     //      ansible automation controller port / ポート
+                "organization_name": "string",                      //      organization name / 組織名
+                "authentication_token": "string",                   //      authentication token / 認証トークン
+                "delete_runtime_data": "string",                    //      delete runtime data / 実行時データ削除
+                "proxy_address": "string",                          //      Proxy/Adress
+                "proxy_port": "string"                              //      Proxy/Port
+            }
+        }
+    }
+}

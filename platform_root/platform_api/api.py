@@ -37,6 +37,8 @@ logging.setLogRecordFactory(ExastroLogRecordFactory(org_factory, request))
 globals.logger = logging.getLogger('root')
 dictLogConf(LOGGING)
 
+globals.logger.setLevel(os.getenv('LOG_LEVEL', 'INFO'))
+
 if __name__ == '__main__':
     connexion_app.run(
         debug=(True if os.environ.get('FLASK_ENV', 'produciton') == 'development' else False),

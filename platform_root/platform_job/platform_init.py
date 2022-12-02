@@ -343,7 +343,7 @@ class platform_init:
         globals.logger.info(f"[{self.step_count}/{self.step_max}] - create realm role mapping:")
         # realm-adminのrole付与
         # role grant for realm-admin
-        response = api_keycloak_users.user_realm_role_mapping_create(realm_name, sa_user_id, realm_roles, token)
+        response = api_keycloak_roles.user_realm_role_mapping_create(realm_name, sa_user_id, realm_roles, token)
         if response.status_code not in [200, 204]:
             globals.logger.info(f"[{self.step_count}/{self.step_max}] -- NG: create realm role mapping:")
             globals.logger.error(f"response.status_code:{response.status_code}")

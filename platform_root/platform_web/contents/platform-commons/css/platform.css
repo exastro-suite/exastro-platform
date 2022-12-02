@@ -1,0 +1,105 @@
+html {
+    width: 1000px;  /* autoによる既定値 */
+}
+
+.list_table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: center;
+}
+.list_table th {
+    font-weight: bold;
+    background-color: #cccccc;
+}
+.list_table th, .list_table td {
+    border: 1px solid gray;
+}
+.list_table td:nth-child(1) {
+    text-align: left;
+}
+.list_table td:nth-child(2) {
+    width: 13%;
+    text-align: center;
+}
+.list_table td:nth-child(3) {
+    width: 25%;
+    text-align: center;
+}
+.list_table td:nth-child(4) {
+    width: 13%;
+    text-align: left;
+}
+.list_table tr:hover {
+    cursor: pointer;
+    background-color: silver;
+}
+
+
+.detail_workspace {
+    width: 70%;
+    border-collapse: collapse;
+    text-align: center;
+}
+.detail_workspace th {
+    font-weight: bold;
+    background-color: #cccccc;
+}
+.detail_workspace th, .detail_workspace td {
+    border: 1px solid gray;
+}
+
+.data_json{
+    width: 100%;
+    height: 120px;
+    overflow: auto;
+    border: 1px solid black;
+}
+
+.pl_button{
+    cursor: pointer;
+}
+.pl_button:hover{
+    cursor: pointer;
+    background-color: silver;
+}
+
+.btn_ita{
+    width: 120px;
+    height: 30px;
+}
+.btn_ita_big{
+    width: 180px;
+    height: 30px;
+}
+.btn_member {
+    width:120px;
+    height: 32px;
+    padding:3px;
+    font-weight: bold;
+}
+.btn_edit {
+    width:80px;
+    height: 32px;
+    padding:3px;
+    font-weight: bold;
+}
+
+.member_name {
+    display: inline-block;
+    margin: 4px; padding: 6px 15px;
+    background-color: #eee;
+    border-radius: 10px;
+    line-height: 1;
+    color: #000;
+}
+.auth_item {
+    display: inline-block;
+    margin: 4px; padding: 6px 15px;
+    background-color: #bec;
+    border-radius: 10px;
+    line-height: 1;
+    color: #000;
+}
+.validate_error {
+    color: red;
+}

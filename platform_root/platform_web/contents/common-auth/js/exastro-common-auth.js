@@ -247,12 +247,13 @@ const CommonAuth = {
     },
 
     /**
-     * Check OrganizationManager - オーガナイゼーション管理者か判定する
-     * @returns true: OrganizationManager / false: other
+     * check authority - 権限の有無をチェックする
+     * @param {string} authority
+     * @returns {boolean}
      */
-    "isOrganizationManager": function() {
+    "hasAuthority": function(authority) {
         try {
-            if( CommonAuth.keycloak.tokenParsed.resource_access[CommonAuth.getRealm() + "-workspaces"].roles.indexOf("_org-manager") !== -1 ) {
+            if( CommonAuth.keycloak.tokenParsed.resource_access[CommonAuth.getRealm() + "-workspaces"].roles.indexOf(authority) !== -1 ) {
                 return true;
             } else {
                 return false;
@@ -260,6 +261,68 @@ const CommonAuth = {
         } catch(e) {
             return false;
         }
+    },
+
+    /**
+     * get accessable workspaces - アクセス可能なワークスペースを返します
+     * @returns {array} array of workspace_id
+     */
+    "getAccessibleWorkspaces": function() {
+        try {
+            return CommonAuth.keycloak.tokenParsed.resource_access[CommonAuth.getRealm() + "-workspaces"].roles.filter(
+                (role) => {return role.substring(0,1) !== '_'});
+        } catch(e) {
+            return [];
+        }
+    },
+
+    /**
+     * get management workspaces - ワークスペース管理者検眼のあるワークスペースを返します
+     * @returns {array} array of workspace_id
+     */
+    "getAdminWorkspaces": function() {
+        try {
+            let workspaces = [];
+            CommonAuth.keycloak.tokenParsed.resource_access[CommonAuth.getRealm() + "-workspaces"].roles.forEach(
+                (role) => { if(CommonAuth.isAdminWorkspaceAuthority(role)) { workspaces.push(CommonAuth.authorityNameToWorkspaceId(role)); } });
+            return workspaces;
+        } catch(e) {
+            return [];
+        }
+    },
+
+    /**
+     * Determines if the specified authority is that of a workspace administrator
+     * 指定権限がワークスペース管理者の権限かを判別します
+     * @param {string} authorityName
+     * @returns {boolean} true: workspace admin / false: other
+     */
+    "isAdminWorkspaceAuthority": function (authorityName) {
+        return (authorityName.match(/^_.*-admin$/g)? true: false);
+    },
+
+    /**
+     * Returns the workspace id for which the given workspace admin permission is for
+     * 指定のワークスペース管理者権限が対象とするワークスペースIDを返します
+     * @param {string} authorityName 
+     * @returns {string} workspace_id
+     */
+    "authorityNameToWorkspaceId": function(authorityName) {
+        if(CommonAuth.isAdminWorkspaceAuthority(authorityName)) {
+            return authorityName.replace(/^_/g, "").replace(/-admin$/g,"");
+        } else {
+            return null;
+        }
+    },
+
+    /**
+     * Returns the admin privilege name for the given workspace id
+     * 指定のワークスペースIDの管理者権限名を返します
+     * @param {string} workspace_id 
+     * @returns {string} workspace admin authority name
+     */
+    "workspaceIdToAdminRoleName": function(workspace_id) {
+        return "_" + workspace_id + "-admin";
     },
 
     /**

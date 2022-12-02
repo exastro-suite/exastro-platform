@@ -65,6 +65,20 @@ class NotAllowedException(Exception):
         self.message = message
 
 
+class NotFoundException(Exception):
+    """データなし例外 - Not Found Exception
+
+    Args:
+        Exception (Exception): Exception
+    """
+
+    def __init__(self, data=None, message_id=None, message=None):
+        self.status_code = 404
+        self.data = data
+        self.message_id = message_id
+        self.message = message
+
+
 class InternalErrorException(Exception):
     """Internal Error Exception
 
@@ -237,7 +251,7 @@ def platform_exception_handler(func):
     def inner_func(*args, **kwargs):
         try:
             response = func(*args, **kwargs)
-        except (BadRequestException, AuthException, NotAllowedException, InternalErrorException, OtherException) as err:
+        except (BadRequestException, AuthException, NotAllowedException, NotFoundException, InternalErrorException, OtherException) as err:
             globals.logger.error(f'exception handler:\n status_code:[{err.status_code}]\n message_id:[{err.message_id}]')
             globals.logger.error(''.join(list(traceback.TracebackException.from_exception(err).format())))
             return response_status(err.status_code, err.data, err.message_id, err.message)
@@ -380,3 +394,53 @@ def keycloak_timestamp_to_str(keycloak_timestamp):
             return datetime_to_str(datetime.fromtimestamp(keycloak_timestamp / 1000))
     except Exception:
         return None
+
+
+def get_ws_admin_rolename(workspace_id):
+    """get workspace admin role name
+
+    Args:
+        workspace_id (str) : workspace id
+
+    Returns:
+        str : workspace admin role name
+    """
+
+    return f"_{workspace_id}-admin"
+
+
+def get_ws_admin_authname(workspace_id):
+    """get workspace admin authority name
+
+    Args:
+        workspace_id (str) : workspace id
+
+    Returns:
+        str : workspace admin authority name
+    """
+
+    return f"_{workspace_id}-admin"
+
+
+def get_value_in_json(json, value_key, is_key=True):
+    """json値の配列情報から特定のキー値の右辺値（Value）を取得する
+    Get the right side value (Value) of a specific key value from the json value array information
+
+    Args:
+        json (dict): json value
+        value_key (str): value key
+        is_key (bool, optional): value key enable only return. Defaults to True.
+
+    Returns:
+        array: value list
+    """
+
+    if is_json_format(json):
+        if is_key:
+            val_list = [val.get(value_key) for val in json if val.get(value_key)]
+        else:
+            val_list = [val.get(value_key) for val in json]
+    else:
+        val_list = []
+
+    return val_list

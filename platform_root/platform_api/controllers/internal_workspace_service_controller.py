@@ -15,7 +15,7 @@
 import json
 import inspect
 
-from common_library.common import common, api_keycloak_tokens, api_keycloak_users, api_keycloak_clients
+from common_library.common import common, api_keycloak_tokens, api_keycloak_roles, const as common_const
 from common_library.common.db import DBconnector
 
 MSG_FUNCTION_ID = "22"
@@ -92,9 +92,10 @@ def workspace_user_list(organization_id, workspace_id):
         token=token,
     )
 
+    user_ids = []
     workspace_users = []
     for role in workspace_roles:
-        users_response = api_keycloak_users.role_uesrs_get(
+        users_response = api_keycloak_roles.role_uesrs_get(
             realm_name=organization_id,
             client_id=private.user_token_client_id,
             role_name=role.get("name"),
@@ -106,16 +107,19 @@ def workspace_user_list(organization_id, workspace_id):
 
         users = json.loads(users_response.text)
 
-        workspace_users.extend([
-            {
-                "id": user["id"],
-                "firstName": user.get("firstName", ""),
-                "lastName": user.get("lastName", ""),
-                "preferred_username": user.get("username", ""),
-                "name": common.get_username(user.get("firstName"), user.get("lastName"), user.get("username")),
-                "enabled": user.get("enabled", False),
-                "create_timestamp": common.keycloak_timestamp_to_str(user.get("createdTimestamp")),
-            } for user in users])
+        for user in users:
+            if user["id"] not in user_ids:
+                user_ids.append(user["id"])
+                workspace_users.append(
+                    {
+                        "id": user["id"],
+                        "firstName": user.get("firstName", ""),
+                        "lastName": user.get("lastName", ""),
+                        "preferred_username": user.get("username", ""),
+                        "name": common.get_username(user.get("firstName"), user.get("lastName"), user.get("username")),
+                        "enabled": user.get("enabled", False),
+                        "create_timestamp": common.keycloak_timestamp_to_str(user.get("createdTimestamp")),
+                    })
 
     return common.response_200_ok(workspace_users)
 
@@ -135,7 +139,7 @@ def __workspace_role_list(organization_id, workspace_id, client_uid, token):
 
     # カスタムロールの中から、workspaceをcompositeしたロールのみを取得
     # Get only composite workspace roles from the custum role list
-    custum_roles_response = api_keycloak_clients.client_role_get(
+    custum_roles_response = api_keycloak_roles.clients_role_get(
         realm_name=organization_id,
         client_id=client_uid,
         role_name="",
@@ -153,12 +157,14 @@ def __workspace_role_list(organization_id, workspace_id, client_uid, token):
     for pf_role in custum_roles:
         if pf_role.get("composite") is not True:
             continue
+        if [common_const.ROLE_KIND_WORKSPACE] != pf_role.get("attributes", {}).get("kind"):
+            continue
 
         # ロールのcomposites から workspace_id を含むものだけを取得
         # Get only those contain workspace_id from the composite roles
         role_composites = []
         if pf_role.get("containerId") == client_uid:
-            role_composites_response = api_keycloak_clients.client_role_composites_get(
+            role_composites_response = api_keycloak_roles.clients_role_composites_get(
                 realm_name=organization_id,
                 client_uid=client_uid,
                 role_name=pf_role.get("name"),

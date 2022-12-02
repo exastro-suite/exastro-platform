@@ -81,49 +81,52 @@ spec:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ template "keycloak.repository" . }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args: ["start-dev"]
           env:
           - name: TZ
             valueFrom:
               configMapKeyRef:
                 name: params-auth-global
                 key: TZ
-          - name: KEYCLOAK_USER
+          - name: KEYCLOAK_ADMIN
             valueFrom:
               secretKeyRef:
                 name: secret-keycloak
                 key: KEYCLOAK_USER
-          - name: KEYCLOAK_PASSWORD
+          - name: KEYCLOAK_ADMIN_PASSWORD
             valueFrom:
               secretKeyRef:
                 name: secret-keycloak
                 key: KEYCLOAK_PASSWORD
-          - name: PROXY_ADDRESS_FORWARDING
-            value: "true"
-          - name: DB_VENDOR
+          - name: KC_DB
             valueFrom:
               configMapKeyRef:
                 name: params-auth-database
                 key: DB_VENDOR
-          - name: DB_ADDR
+          - name: KC_DB_URL_HOST
             valueFrom:
               configMapKeyRef:
                 name: params-auth-database
                 key: DB_HOST
-          - name: DB_DATABASE
+          - name: KC_DB_URL_DATABASE
             valueFrom:
               configMapKeyRef:
                 name: params-keycloak
                 key: KEYCLOAK_DB_DATABASE
-          - name: DB_USER
+          - name: KC_DB_USERNAME
             valueFrom:
               secretKeyRef:
                 name: secret-keycloak
                 key: KEYCLOAK_DB_USER
-          - name: DB_PASSWORD
+          - name: KC_DB_PASSWORD
             valueFrom:
               secretKeyRef:
                 name: secret-keycloak
                 key: KEYCLOAK_DB_PASSWORD
+          - name: KC_PROXY
+            value: "passthrough"
+          - name: KC_HTTP_RELATIVE_PATH
+            value: "/auth"
           ports:
             - name: port-http
               containerPort: {{ .Values.global.keycloakDefinition.config.KEYCLOAK_PORT }}
@@ -134,16 +137,16 @@ spec:
             # httpGet:
             #   path: /auth/realms/master
             #   port: {{ .Values.global.keycloakDefinition.config.KEYCLOAK_PORT }}
-            initialDelaySeconds: 5
-            periodSeconds: 10            
+            initialDelaySeconds: 600
+            periodSeconds: 30
           readinessProbe:
             tcpSocket:
               port: {{ .Values.global.keycloakDefinition.config.KEYCLOAK_PORT }}
             # httpGet:
             #   path: /auth/realms/master
             #   port: {{ .Values.global.keycloakDefinition.config.KEYCLOAK_PORT }}
-            initialDelaySeconds: 5
-            periodSeconds: 10            
+            initialDelaySeconds: 30
+            periodSeconds: 30
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}
