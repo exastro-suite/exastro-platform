@@ -46,6 +46,8 @@ logging.setLogRecordFactory(ExastroLogRecordFactory(org_factory, request))
 globals.logger = logging.getLogger('root')
 dictLogConf(LOGGING)
 
+globals.logger.setLevel(os.getenv('LOG_LEVEL', 'INFO'))
+
 RequestID(app)
 
 
@@ -77,6 +79,82 @@ def platform_organization_api_call(subpath):
         # Destination URL settings - 宛先URLの設定
         dest_url = "{}://{}:{}/api/platform/{}".format(
             os.environ['PLATFORM_API_PROTOCOL'], os.environ['PLATFORM_API_HOST'], os.environ['PLATFORM_API_PORT'], subpath)
+
+        # return jsonify({"result": "200", "time": str(datetime.now())}), 200
+
+        # Common authorization proxy processing call - 共通の認可proxy処理呼び出し
+
+        # サービスアカウントを使うためにClientのSercretを取得
+        # Get Client Sercret to use service account
+        db = DBconnector()
+        private = db.get_platform_private()
+
+        # 取得できない場合は、エラー
+        # If you cannot get it, an error
+        if not private:
+            message_id = "500-11002"
+            message = multi_lang.get_text(
+                message_id, "platform private情報の取得に失敗しました")
+            raise common.InternalErrorException(essage_id=message_id, message=message)
+
+        # realm名設定
+        # Set realm name
+        proxy = auth_proxy.auth_proxy(
+            private.token_check_realm_id,
+            private.token_check_client_clientid,
+            private.token_check_client_secret,
+            private.token_check_client_clientid,
+            private.token_check_client_secret)
+
+        # 各種チェック check
+        response_json = proxy.check_authorization()
+
+        # api呼び出し call api
+        return_api = proxy.call_api(dest_url, response_json.get("data"))
+
+        # 戻り値をそのまま返却
+        # Return the return value as it is
+        response = make_response()
+        response.status_code = return_api.status_code
+        response.data = return_api.content
+        for key, value in return_api.headers.items():
+            if key.lower().startswith('content-'):
+                response.headers[key] = value
+        return response
+
+    except common.AuthException as e:
+        globals.logger.error(f'authentication error:{e.args}')
+        message_id = "401-00002"
+        message = multi_lang.get_text(message_id, "認証に失敗しました。")
+        raise common.AuthException(message_id=message_id, message=message)
+
+    except common.NotAllowedException as e:
+        globals.logger.info(f'permission error:{e.args}')
+        message_id = "403-00001"
+        info = common.multi_lang.get_text(message_id, "permission error")
+        raise common.NotAllowedException(message_id=message_id, message=info)
+
+    except Exception as e:
+        return common.response_server_error(e)
+
+
+@app.route('/api/ita/<path:subpath>', methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTION"])
+@common.platform_exception_handler
+def ita_admin_api_call(subpath):
+    """Call the ita admin API after authorization - 認可後にita admin APIを呼び出します
+
+    Args:
+        subpath (str): subpath
+
+    Returns:
+        Response: HTTP Response
+    """
+    try:
+        globals.logger.info('call ita admin api. method={} subpath={}'.format(request.method, subpath))
+
+        # Destination URL settings - 宛先URLの設定
+        dest_url = "{}://{}:{}/api/ita/{}".format(
+            os.environ['ITA_API_ADMIN_PROTOCOL'], os.environ['ITA_API_ADMIN_HOST'], os.environ['ITA_API_ADMIN_PORT'], subpath)
 
         # return jsonify({"result": "200", "time": str(datetime.now())}), 200
 
@@ -195,6 +273,9 @@ def platform_api_call(organization_id, subpath):
                 response.headers[key] = value
         return response
 
+    except common.NotFoundException:
+        raise
+
     except common.AuthException as e:
         globals.logger.error(f'authentication error:{e.args}')
         message_id = "401-00002"
@@ -270,6 +351,9 @@ def ita_workspace_api_call(organization_id, workspace_id, subpath):
             if key.lower().startswith('content-'):
                 response.headers[key] = value
         return response
+
+    except common.NotFoundException:
+        raise
 
     except common.AuthException as e:
         globals.logger.error(f'authentication error:{e.args}')

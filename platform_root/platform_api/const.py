@@ -16,6 +16,7 @@
 ORG_STATUS_CREATE_START = "Organization Create Start"
 ORG_STATUS_REALM_CREATE = "Realm Create Complete"
 ORG_STATUS_CLIENT_CREATE = "Client Create Complete"
+ORG_STATUS_ROLE_SETTING = "Client Role Setting Complete"
 ORG_STATUS_SA_SETTING = "Service Account Setting Complete"
 ORG_STATUS_USER_CREATE = "Organization User Create Complete"
 ORG_STATUS_USER_ROLE = "Organization User Role Setting Complete"
@@ -24,7 +25,3 @@ ORG_STATUS_DB_UPDATE = "Organization DB Update Complete"
 ORG_STATUS_ITA_CREATE = "IT Automation Organization Create Complete"
 ORG_STATUS_REALM_ENABLED = "Realm Enabled Complete"
 ORG_STATUS_CREATE_COMPLETE = "Organization Create Complete"
-
-# オーガナイゼーション管理者ロール
-# Organization administrator role
-ORG_MNG_ROLE = "_org-manager"

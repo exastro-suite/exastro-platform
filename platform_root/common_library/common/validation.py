@@ -25,6 +25,9 @@ RE_ID_USABLE_FIRST_CHARACTER = r'[a-zA-Z]'
 ORG_RESERVED_WORDS = [
     {"text": "master", "re": r"^master$"},
     {"text": "platform", "re": r"^platform$"},
+    {"text": "ita", "re": r"^ita$"},
+    {"text": "oase", "re": r"^oase$"},
+    {"text": "epoch", "re": r"^epoch$"},
     {"text": "account", "re": r"^account$"},
     {"text": "account-console", "re": r"^account-console$"},
     {"text": "admin-cli", "re": r"^admin-cli$"},
@@ -259,6 +262,167 @@ def validate_workspace_informations(workspace_informations):
             str(const.length_workspace_description)
         )
 
+    return result(True)
+
+
+def validate_role_name(role_name):
+    """Validate role name
+
+    Args:
+        role_name (str): role name
+
+    Returns:
+        result: Validation result
+    """
+    if role_name is None or role_name == "":
+        return result(
+            False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。',
+            multi_lang.get_text('000-00107', "ロール名")
+        )
+
+    if len(role_name) > const.length_role_name:
+        return result(
+            False, 400, '400-{}012'.format(MSG_FUNCTION_ID), '指定可能な文字数を超えています。',
+            multi_lang.get_text('000-00107', "ロール名"),
+            str(const.length_role_name)
+        )
+
+    rlt, chr = validate_id_characters(role_name)
+    if not rlt:
+        return result(
+            False, 400, '400-{}013'.format(MSG_FUNCTION_ID), '指定できない文字が含まれています。',
+            multi_lang.get_text('000-00107', "ロール名"),
+            chr
+        )
+
+    if not re.match(RE_ID_USABLE_FIRST_CHARACTER, role_name):
+        return result(
+            False, 400, '400-{}014'.format(MSG_FUNCTION_ID), '先頭の文字にアルファベット以外が指定されています。',
+            multi_lang.get_text('000-00107', "ロール名")
+        )
+
+    return result(True)
+
+
+def validate_role_kind(role_kind):
+    """Validate role kind
+
+    Args:
+        role_kind (str): role kind
+
+    Returns:
+        result: Validation result
+    """
+    if role_kind is None or role_kind == "":
+        return result(
+            False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。',
+            multi_lang.get_text('000-00108', "ロール種別")
+        )
+
+    if role_kind not in [const.ROLE_KIND_WORKSPACE]:
+        return result(
+            False, 400, '400-000002', 'リクエストボディのパラメータ({})が不正です。'.format('kind'),
+            'kind'
+        )
+
+    return result(True)
+
+
+def validate_role_description(role_description):
+    """Validate role description
+
+    Args:
+        role_description (str): role description
+
+    Returns:
+        result: Validation result
+    """
+    if len(role_description) > const.length_role_description:
+        return result(
+            False, 400, '400-{}012'.format(MSG_FUNCTION_ID), '指定可能な文字数を超えています。',
+            multi_lang.get_text('000-00106', "説明"),
+            str(const.length_role_description)
+        )
+
+    return result(True)
+
+
+def validate_role_workspaces(role_workspaces):
+    """Validate role workspaces
+
+    Args:
+        role_workspaces (list): role workspaces
+
+    Returns:
+        result: Validation result
+    """
+    if not isinstance(role_workspaces, list):
+        return result(
+            False, 400, '400-000002', 'リクエストボディのパラメータ({})が不正です。'.format('workspaces'),
+            'workspaces'
+        )
+
+    if len([t for t in role_workspaces if not isinstance(t.get('id', None), str)]) > 0:
+        return result(
+            False, 400, '400-000002', 'リクエストボディのパラメータ({})が不正です。'.format('workspaces'),
+            'workspaces'
+        )
+
+    if len([t for t in role_workspaces if len(t.get('id', '')) == 0]) > 0:
+        return result(
+            False, 400, '400-000002', 'リクエストボディのパラメータ({})が不正です。'.format('workspaces'),
+            'workspaces'
+        )
+
+    if len(role_workspaces) > const.max_role_workspaces:
+        return result(
+            False, 400, '400-{}012'.format(MSG_FUNCTION_ID), '指定可能な最大数を超えています。',
+            multi_lang.get_text('000-00101', "ワークスペースID"),
+            str(const.max_role_workspaces)
+        )
+
+    if len([t for t in role_workspaces if len(t.get('id', '')) > const.length_workspace_id]) > 0:
+        return result(
+            False, 400, '400-{}012'.format(MSG_FUNCTION_ID), '指定可能な文字数を超えています。',
+            multi_lang.get_text('000-00101', "ワークスペースID"),
+            str(const.length_workspace_id)
+        )
+
+    workspace_ids = ([x.get('id', '') for x in role_workspaces])
+    if len(list(set(workspace_ids))) != len(workspace_ids):
+        return result(
+            False, 400, '400-{}019'.format(MSG_FUNCTION_ID), '指定された値が重複しています。',
+            multi_lang.get_text('000-00101', "ワークスペースID"),
+        )
+
+    return result(True)
+
+
+def validate_role_mapping_users(role_users):
+    """_summary_
+
+    Args:
+        role_users (list): users list
+
+    Returns:
+        result: Validation result
+    """
+
+    usernames = ([x.get('preferred_username', '') for x in role_users if x.get('preferred_username')])
+    if len(usernames) < 1:
+        return result(
+            False, 400, '400-000002', 'リクエストボディのパラメータ({})が不正です。'.format('preferred_username'),
+            multi_lang.get_text('000-0010X', "preferred_username"),
+        )
+
+    # 重複チェック
+    # dupulication check
+    if len(list(set(usernames))) != len(usernames):
+        return result(
+            False, 400, '400-{}019'.format(MSG_FUNCTION_ID), '指定された値が重複しています。',
+            multi_lang.get_text('000-0010X', "preferred_username"),
+        )
+    # TODO: MESSAGE登録
     return result(True)
 
 

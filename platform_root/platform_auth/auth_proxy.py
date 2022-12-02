@@ -25,6 +25,7 @@ import re
 import globals
 import const
 import common_library.common.common as common
+import common_library.common.const as common_const
 # import api_keycloak_tokens
 import config.auth.auth_pattern as auth_pattern
 # import api_keycloak_call
@@ -234,14 +235,37 @@ class auth_proxy:
 
         token_roles = self.token_decode.get("resource_access").get(self.user_token_client_id)
         globals.logger.debug(f'token_roles={token_roles}')
+
+        roles_str = ""
+        org_roles_str = ""
+
         if token_roles and "roles" in token_roles:
-            roles_str = base64.b64encode("\n".join(token_roles["roles"]).encode()).decode()
-        else:
-            roles_str = ""
+            org_roles = []
+            ws_roles = []
+            # organization role と workspace role で分ける
+            # Separate by organization role and workspace role
+            for token_role in token_roles["roles"]:
+                globals.logger.debug(f'token_role={token_role}')
+                if token_role in common_const.ALL_ORG_ROLES or \
+                   token_role in common_const.ALL_ORG_AUTHORITIES:
+                    # organization roles
+                    org_roles.append(token_role)
+                else:
+                    ws_roles.append(token_role)
+
+            globals.logger.debug(f'ws_roles={ws_roles}')
+            globals.logger.debug(f'org_roles_str={org_roles}')
+
+            if ws_roles:
+                roles_str = base64.b64encode("\n".join(ws_roles).encode()).decode()
+            if org_roles:
+                org_roles_str = base64.b64encode("\n".join(org_roles).encode()).decode()
+
         status_code = 0
         info = {
             "User-Id": self.token_decode.get("sub"),
             "Roles": roles_str,
+            "Org-Roles": org_roles_str,
             "Language": self.token_decode.get("locale"),
         }
         return {"status_code": status_code, "data": info}
@@ -518,19 +542,24 @@ class auth_proxy:
                 # - methodが一致した時、roleに合致するものが存在するかチェックする
                 for role in auth["roles"]:
                     role_name = role["role"].format(**match_dict)
+                    role_name_re = "^" + role_name + "$"
                     if role.get("client") is None:
                         # If client is not specified, check if there is anything that matches the realm role
                         # - clientの指定が無いときはrealmロールに合致するものが無いかチェックする
-                        if role_name in self.token_decode.get("realm_access", {}).get("roles", []):
-                            globals.logger.info('SUCCEED Is allowed request. Realm-role={}'.format(role_name))
-                            return True
+                        my_roles = self.token_decode.get("realm_access", {}).get("roles", [])
+                        for my_role in my_roles:
+                            if re.match(role_name_re, my_role):
+                                globals.logger.info('SUCCEED Is allowed request. Realm-role={}'.format(role_name))
+                                return True
                     else:
                         # If client is specified, check if there is anything that matches the client role
                         # - clientの指定があるときはclientロールに合致するものが無いかチェックする
                         role_client = role["client"].format(**match_dict)
-                        if role_name in self.token_decode.get("resource_access", {}).get(role_client, {}).get("roles", []):
-                            globals.logger.info('SUCCEED Is allowed request. client-role={}.{}'.format(role_client, role_name))
-                            return True
+                        my_roles = self.token_decode.get("resource_access", {}).get(role_client, {}).get("roles", [])
+                        for my_role in my_roles:
+                            if re.match(role_name_re, my_role):
+                                globals.logger.info('SUCCEED Is allowed request. client-role={}.{}'.format(role_client, role_name))
+                                return True
 
                 # Access is not allowed when the method matches and there is no match for the role
                 # - methodが一致し、roleに合致するものが存在しないときはaccess不可

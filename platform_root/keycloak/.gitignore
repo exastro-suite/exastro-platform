@@ -1,3 +1,4 @@
 /themes/*
 !/themes/exastro/
 /configuration/*.org
+!/themes/keycloak-themes.json

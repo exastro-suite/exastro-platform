@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: Exastro Platform API
   description: Exastro Platform API
-  version: 1.0.0
+  version: 1.1.0
 servers:
   - url: /
 tags:
@@ -282,6 +282,108 @@ components:
         id:
           type: string
           example: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+    roleDetailList:
+      title: WorkspaceList is a list of workspace resources that users can access.
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            oneOf:
+              - $ref: '#/components/schemas/roleDetailWorkspace'
+              - $ref: '#/components/schemas/roleDetailOrganization'
+    roleDetailOrganization:
+      title: role is a definition of Role resource.
+      type: object
+      properties:
+        name:
+          type: string
+          example: organization-role-1
+        description:
+          type: string
+          example: role description
+        kind:
+          type: string
+          example: organization
+        authorities:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+                example: _og-upd
+    roleDetailWorkspace:
+      title: role is a definition of Role resource.
+      type: object
+      properties:
+        name:
+          type: string
+          example: role-1
+        description:
+          type: string
+          example: role description
+        kind:
+          type: string
+          example: workspace
+        authorities:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+            example:
+              - name: _workspace-1-admin
+              - name: workspace-1
+        workspaces:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                example: workspace-1
+    roleDetailWorkspacePut:
+      title: role is a definition of Role resource.
+      type: object
+      properties:
+        description:
+          type: string
+          example: role description
+        kind:
+          type: string
+          example: workspace
+        workspaces:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                example: workspace-1
+    roleMappingUser:
+      title: userList is list of User resources.
+      type: array
+      items:
+        $ref: '#/components/schemas/roleUser'
+      example:
+        - preferred_username: username-1
+        - preferred_username: username-2
+        - preferred_username: username-3
+    roleUser:
+      title: role mapping user is a definition of User resource.
+      type: object
+      properties:
+        name:
+          type: string
+          example: firstname lastname
+        firstName:
+          type: string
+        lastName:
+          type: string
+        preferred_username:
+          type: string
   securitySchemes:
     BasicAuth:
       type: http

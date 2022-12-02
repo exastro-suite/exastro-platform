@@ -51,6 +51,7 @@ RUN dnf install -y \
     python-dotenv \
     flask-log-request-id \
     pymysql \
+    pycryptodome \
 &&  groupadd $GROUPNAME \
 &&  useradd -m -s /bin/bash -g $GROUPNAME $USERNAME \
 &&  setcap 'cap_net_bind_service=+ep' /usr/sbin/httpd \

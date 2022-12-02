@@ -62,16 +62,6 @@ setUi() {
     fn.setCommonEvents();
     ui.header();
 
-    $("#menu_workspace").attr("href", location_conf.href.workspaces.list.replace(/{organization_id}/g,CommonAuth.getRealm()));
-    $("#menu_account_management").attr("href", location_conf.href.menu.account_manaagement.replace(/{organization_id}/g,CommonAuth.getRealm()));
-    $("#menu_role_management").attr("href", location_conf.href.menu.role_management.replace(/{organization_id}/g,CommonAuth.getRealm()));
-    $("#menu_update_password").attr("href", location_conf.href.menu.update_password.replace(/{organization_id}/g,CommonAuth.getRealm()));
-
-    if (CommonAuth.isOrganizationManager()) {
-        $("#menu_account_management").css("display", "");
-        $("#menu_role_management").css("display", "");
-    }
-
     return;
 
     // // REST API URLs

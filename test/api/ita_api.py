@@ -16,7 +16,7 @@ from flask import Flask, request, jsonify, make_response
 from datetime import datetime, timezone
 import pytz
 import os
-# import json
+import json
 import base64
 
 # User Imports
@@ -174,6 +174,19 @@ def create_workspace(organization_id, workspace_id):
     Returns:
         Response: HTTP Respose
     """
+    return jsonify({"result": "200", "time": __datetime_to_str(datetime.now())}), 200
+
+
+@app.route('/api/ita/<path:subpath>', methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTION"])
+def ita_admin(subpath):
+    globals.logger.info('receved: {} {}'.format(request.method, request.path))
+    globals.logger.debug('request_headers: \n{}'.format(str(request.headers)))
+
+    if request.is_json:
+        globals.logger.debug('request_body(json): \n{}'.format(json.dumps(request.json, indent=2)))
+    else:
+        globals.logger.debug('request_body: \n{}'.format(str(request.data)))
+
     return jsonify({"result": "200", "time": __datetime_to_str(datetime.now())}), 200
 
 
