@@ -49,6 +49,13 @@ services:
   ita-by-ansible-legacy-role-vars-listup:
     build:
       context: ${ITA_REPO_ROOT}
+  ita-by-ansible-legacy-vars-listup:
+    build:
+      context: ${ITA_REPO_ROOT}
+  ita-by-ansible-pioneer-vars-listup:
+    build:
+      context: ${ITA_REPO_ROOT}
+
   ita-by-ansible-towermaster-sync:
     build:
       context: ${ITA_REPO_ROOT}
