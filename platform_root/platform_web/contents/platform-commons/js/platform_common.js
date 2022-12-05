@@ -92,10 +92,51 @@ function loadCommonContents() {
         Promise.all([
             loadLanguageText()
         ]).then(() => {
+            replaceLanguageText();
             resolve();
         }).catch((reason) => {
             reject(reason);
         });
+    });
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//   Display Language Text (html contents)
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+function replaceLanguageText() {
+    //
+    // html element inner text
+    // sample:
+    //  <html-element text-id="text id">default text</html-element>
+    //
+    $("[text-id]").each(function(index, element) {
+        const $element = $(element);
+        try {
+            const textId = $element.attr('text-id');
+            if(typeof textId !== typeof undefined && textId !== false) {
+                $element.text(getText(textId, $element.text()));
+            }
+        } catch { }
+    });
+    //
+    // html element attribute text
+    // sample:
+    //  <html-element attr-field="default text" attr-text-id="attr-field=text id,..."></html-element>
+    //
+    $("[attr-text-id]").each(function(index, element) {
+        const $element = $(element);
+        try {
+            const attrTextId = $element.attr('attr-text-id');
+            if(typeof attrTextId !== typeof undefined && attrTextId !== false) {
+                for(let i of attrTextId.split(",")) {
+                    const attr=i.replace(/=.*$/,"");
+                    const tid=i.replace(/^.*=/,"");
+                    $element.attr(attr, getText(tid, $element.attr(attr)));
+                }
+            }
+        } catch { }
     });
 }
 
