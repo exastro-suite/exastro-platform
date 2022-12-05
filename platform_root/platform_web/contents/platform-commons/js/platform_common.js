@@ -75,10 +75,10 @@ function appendScript(url) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 function loadLanguageText() {
     if (CommonAuth.getLanguage() == "en"){
-        return appendScript("/_/platform-commons/js/language/en/text.js");
+        return appendScript("/_/platform-commons/js/language/en/text.js?ver=__BUILD_VERSION__");
     }
     else{
-        return appendScript("/_/platform-commons/js/language/ja/text.js");
+        return appendScript("/_/platform-commons/js/language/ja/text.js?ver=__BUILD_VERSION__");
     }
 }
 
