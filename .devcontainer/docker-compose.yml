@@ -76,6 +76,8 @@ services:
         - https_proxy=${HTTPS_PROXY}
     healthcheck:
       test: curl http://localhost:8080/auth/health
+      interval: 3s
+      retries: 200
     environment:
       - TZ=Asia/Tokyo
       - KEYCLOAK_ADMIN=admin
@@ -99,6 +101,8 @@ services:
       context: ../.
     healthcheck:
       test: mysqladmin ping --silent && mysql -u $${KEYCLOAK_DB_USER} -p$${KEYCLOAK_DB_PASSWORD} -D $${KEYCLOAK_DB_DATABASE} -e 'select 1;'
+      interval: 3s
+      retries: 200
     volumes:
       - ../.volumes/platform-db/data:/var/lib/mysql
     environment:
