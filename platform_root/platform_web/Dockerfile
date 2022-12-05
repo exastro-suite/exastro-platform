@@ -68,7 +68,7 @@ COPY ./platform_root/platform_web/contents/ /var/www/html/
 COPY ./platform_root/platform_web/config/httpd.conf/httpd.conf /etc/httpd/conf/httpd.conf
 COPY ./platform_root/platform_web/config/httpd.conf/rewrite.conf /etc/httpd/conf.d/rewrite.conf
 
-CMD ["httpd","-D","FOREGROUND"]
+CMD ["httpd","-D","FOREGROUND", "-D", "NO_CACHE_CONTENTS"]
 
 #
 # Build for production
@@ -83,6 +83,12 @@ COPY ./platform_root/version /var/www/html/
 COPY ./platform_root/platform_web/contents/ /var/www/html/
 COPY ./platform_root/platform_web/config/httpd.conf/httpd.conf /etc/httpd/conf/httpd.conf
 COPY ./platform_root/platform_web/config/httpd.conf/rewrite.conf /etc/httpd/conf.d/rewrite.conf
+
+# disable docker build cache
+ADD "https://www.random.org/cgi-bin/randbyte?nbytes=10&format=h" /dev/null
+
+RUN find /var/www/html/ -type f -name '*.html'  -exec sed -i -e "s/ver=__BUILD_VERSION__/ver=$(date '+%Y%m%d-%H%M%S')/g" {} \; \
+&&  find /var/www/html/ -type f -name '*.js'    -exec sed -i -e "s/ver=__BUILD_VERSION__/ver=$(date '+%Y%m%d-%H%M%S')/g" {} \;
 
 USER $USERNAME
 
