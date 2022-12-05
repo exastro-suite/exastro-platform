@@ -3,7 +3,7 @@
 source "`dirname $0`/create-organization.conf"
 
 if [ $# -gt 2 ]; then
-    echo "Usage: `basename $0` [--retry] [organaization info json file]"
+    echo "Usage: `basename $0` [--retry] [organization info json file]"
     exit 1
 fi
 
@@ -25,7 +25,7 @@ done
 
 if [ ! -z "${PARAM_JSON_FILE}" ]; then
     if [ ! -f "${PARAM_JSON_FILE}" ]; then
-        echo "Error: not found organaization info json file : ${PARAM_JSON_FILE}"
+        echo "Error: not found organization info json file : ${PARAM_JSON_FILE}"
         exit 1
     fi
 fi
