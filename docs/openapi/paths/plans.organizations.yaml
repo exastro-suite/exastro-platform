@@ -1,0 +1,31 @@
+post:
+  tags:
+  - PlanService
+  summary: Set plan to the organization
+  x-openapi-router-controller: controllers.plan_service_controller
+  operationId: organization_plan_create
+  parameters:
+  - name: organization_id
+    in: path
+    required: true
+    schema:
+      type: string
+  requestBody:
+    content:
+      application/json:
+        schema:
+          $ref: '../schemas/planMappingOrganization.yaml'
+    required: true
+  responses:
+    200:
+      description: A successful response.
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/responseOk.yaml'
+    default:
+      description: An unexpected error response.
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'

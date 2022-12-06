@@ -1,0 +1,46 @@
+get:
+  tags:
+  - PlanService
+  summary: List returns list of plans
+  x-openapi-router-controller: controllers.plan_service_controller
+  operationId: plan_list
+  responses:
+    200:
+      description: A successful response.
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '../schemas/responseOk.yaml'
+              - $ref: '../schemas/planList.yaml'
+    default:
+      description: An unexpected error response.
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'
+post:
+  tags:
+  - PlanService
+  summary: Create creates an plan
+  x-openapi-router-controller: controllers.plan_service_controller
+  operationId: plan_create
+  requestBody:
+    content:
+      application/json:
+        schema:
+          $ref: '../schemas/plan.yaml'
+    required: true
+  responses:
+    200:
+      description: A successful response.
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/responseOk.yaml'
+    default:
+      description: An unexpected error response.
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'

@@ -25,6 +25,8 @@ servers:
 tags:
 - name: OrganizationService
   description: オーガナイゼーションに関する操作
+- name: PlanService
+  description: プランに関する操作
 - name: WorkspaceService
   description: ワークスペースに関する操作
 - name: UsersService
@@ -43,6 +45,13 @@ tags:
 paths:
   "/api/platform/organizations":
       $ref: './paths/organizations.yaml'
+
+  "/api/platform/{organization_id}/plans":
+      $ref: './paths/plans.organizations.yaml'
+  "/api/platform/plans":
+      $ref: './paths/plans.yaml'
+  "/api/platform/limits":
+      $ref: './paths/limits.yaml'
 
   "/api/{organization_id}/platform/workspaces":
       $ref: './paths/workspaces.yaml'
