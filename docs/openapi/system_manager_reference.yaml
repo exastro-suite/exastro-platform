@@ -25,10 +25,19 @@ servers:
 tags:
 - name: OrganizationService
   description: オーガナイゼーションに関する操作
+- name: PlanService
+  description: プランに関する操作
 
 paths:
   "/api/platform/organizations":
       $ref: './paths/organizations.yaml'
+
+  "/api/platform/{organization_id}/plans":
+      $ref: './paths/plans.organizations.yaml'
+  "/api/platform/plans":
+      $ref: './paths/plans.yaml'
+  "/api/platform/limits":
+      $ref: './paths/limits.yaml'
 
 components:
   schemas:

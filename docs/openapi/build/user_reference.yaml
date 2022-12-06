@@ -301,6 +301,65 @@ components:
           description: Organization Add Json Parameter (json of KeyCloak)
       required:
         - id
+    planMappingOrganization:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: string
+          example: plan-1
+    plan:
+      title: plan is a definition of Plan resource.
+      type: object
+      properties:
+        id:
+          type: string
+          example: plan-1
+        name:
+          type: string
+          example: name of plan
+        informations:
+          type: object
+          properties:
+            description:
+              type: string
+        limits:
+          type: object
+          properties:
+            limit.id:
+              type: number
+          example:
+            platform.workspaces: 100
+            platform.users: 200
+    planList:
+      title: planList is list of Plan resources.
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/plan'
+    limit:
+      title: limit is a definition of Limit resource.
+      type: object
+      properties:
+        id:
+          type: string
+          example: platform.workspaces
+        informations:
+          type: object
+          properties:
+            description:
+              type: string
+    limitList:
+      title: limitList is list of Limit resources.
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/limit'
     role:
       title: role is a definition of Role resource.
       type: object
