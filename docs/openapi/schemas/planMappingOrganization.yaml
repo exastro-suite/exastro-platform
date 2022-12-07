@@ -15,7 +15,12 @@
 type: object
 required:
 - id
+- start_date
 properties:
   id:
     type: string
     example: plan-1
+
+  start_date:
+    type: string
+    example: 2022-12-1
