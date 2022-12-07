@@ -1,0 +1,31 @@
+delete:
+  tags:
+  - PlanService
+  summary: Delete plan to the organization
+  x-openapi-router-controller: controllers.plan_service_controller
+  operationId: organization_plan_delete
+  parameters:
+  - name: organization_id
+    in: path
+    required: true
+    schema:
+      type: string
+  - name: plan_start_date
+    in: path
+    required: true
+    schema:
+      type: string
+      example: 2022-12-1
+  responses:
+    200:
+      description: A successful response.
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/responseOk.yaml'
+    default:
+      description: An unexpected error response.
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'
