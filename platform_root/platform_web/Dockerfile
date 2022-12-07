@@ -61,7 +61,9 @@ RUN dnf config-manager --add-repo=https://download.docker.com/linux/centos/docke
 
 USER $USERNAME
 
-RUN mkdir ~/.config
+RUN mkdir ~/.config \
+&& mkdir ~/.vscode-server \
+&& mkdir ~/.vscode-server-insiders
 
 COPY ./platform_root/version /var/www/html/
 COPY ./platform_root/platform_web/contents/ /var/www/html/
