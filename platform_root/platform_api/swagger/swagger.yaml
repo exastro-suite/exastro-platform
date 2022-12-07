@@ -94,6 +94,42 @@ paths:
               schema:
                 $ref: '#/components/schemas/runtimeError'
       x-openapi-router-controller: controllers.plan_service_controller
+  /api/platform/{organization_id}/plans/{plan_start_date}:
+    delete:
+      tags:
+      - PlanService
+      summary: Delete plan to the organization
+      operationId: organization_plan_delete
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: plan_start_date
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          example: 2022-12-1
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responseOk'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+      x-openapi-router-controller: controllers.plan_service_controller
   /api/platform/plans:
     get:
       tags:
@@ -849,11 +885,15 @@ components:
     planMappingOrganization:
       required:
       - id
+      - start_date
       type: object
       properties:
         id:
           type: string
           example: plan-1
+        start_date:
+          type: string
+          example: 2022-12-1
     plan:
       title: plan is a definition of Plan resource.
       type: object
