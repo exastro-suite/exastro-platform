@@ -84,3 +84,8 @@ services:
       context: ${ITA_REPO_ROOT}
     environment:
       - EXECUTE_INTERVAL=${ITA_BY_INTERVAL}
+  ita-by-menu-export-import:
+    build:
+      context: ${ITA_REPO_ROOT}
+    environment:
+      - EXECUTE_INTERVAL=${ITA_BY_INTERVAL}
