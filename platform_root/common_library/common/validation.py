@@ -426,6 +426,120 @@ def validate_role_mapping_users(role_users):
     return result(True)
 
 
+def validate_plan_id(plan_id):
+    """Validate plan id
+
+    Args:
+        plan_id (str): plan id
+
+    Returns:
+        result: Validation result
+    """
+    if plan_id is None or plan_id == "":
+        return result(
+            False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。',
+            multi_lang.get_text('000-00121', "プランID")
+        )
+
+    if len(plan_id) > const.length_plan_id:
+        return result(
+            False, 400, '400-{}012'.format(MSG_FUNCTION_ID), '指定可能な文字数を超えています。',
+            multi_lang.get_text('000-00121', "プランID"),
+            str(const.length_plan_id)
+        )
+
+    rlt, chr = validate_id_characters(plan_id)
+    if not rlt:
+        return result(
+            False, 400, '400-{}013'.format(MSG_FUNCTION_ID), '指定できない文字が含まれています。',
+            multi_lang.get_text('000-00121', "プランID"),
+            chr
+        )
+
+    if not re.match(RE_ID_USABLE_FIRST_CHARACTER, plan_id):
+        return result(
+            False, 400, '400-{}014'.format(MSG_FUNCTION_ID), '先頭の文字にアルファベット以外が指定されています。',
+            multi_lang.get_text('000-00121', "プランID")
+        )
+
+    return result(True)
+
+
+def validate_plan_name(plan_name):
+    """Validate plan name
+
+    Args:
+        plan_name (str): plan name
+
+    Returns:
+        result: Validation result
+    """
+    if plan_name is None or plan_name == "":
+        return result(
+            False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。',
+            multi_lang.get_text('000-00122', "プラン名")
+        )
+
+    if len(plan_name) > const.length_plan_name:
+        return result(
+            False, 400, '400-{}012'.format(MSG_FUNCTION_ID), '指定可能な文字数を超えています。',
+            multi_lang.get_text('000-00122', "プラン名"),
+            str(const.length_plan_name)
+        )
+
+    return result(True)
+
+
+def validate_plan_informations(plan_informations):
+    """Validate plan informations
+
+    Args:
+        plan_informations (dict): informations
+
+    Returns:
+        result: Validation result
+    """
+    if not isinstance(plan_informations.get('description', ''), str):
+        return result(
+            False, 400, '400-000002', 'リクエストボディのパラメータ({})が不正です。'.format('informations.description'),
+            'informations.description'
+        )
+
+    if len(plan_informations.get('description', '')) > const.length_plan_description:
+        return result(
+            False, 400, '400-{}012'.format(MSG_FUNCTION_ID), '指定可能な文字数を超えています。',
+            multi_lang.get_text('000-00106', "説明"),
+            str(const.length_plan_description)
+        )
+
+    return result(True)
+
+
+def validate_plan_limits(plan_limits):
+    """Validate plan limits
+
+    Args:
+        plan_limits (dict): plan limits
+
+    Returns:
+        result: Validation result
+    """
+    if not any(plan_limits):
+        return result(
+            False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。',
+            multi_lang.get_text('000-00124', "リミット値")
+        )
+
+    no_int = [i for i, v in plan_limits.items() if not validate_int(v)]
+    if len(no_int) > 0:
+        return result(
+            False, 400, '400-{}012'.format(MSG_FUNCTION_ID), '指定可能な文字数を超えています。',
+            multi_lang.get_text('000-00122', "リミット値"),
+        )
+
+    return result(True)
+
+
 def validate_id_characters(str):
     """validate id characters
 
@@ -441,3 +555,20 @@ def validate_id_characters(str):
         return True, None
     else:
         return False, ng[:1]
+
+
+def validate_int(num):
+    """validate int
+
+    Args:
+        num (str): int
+
+    Returns:
+        bool: True=OK / False=NG
+    """
+    try:
+        int(num)
+    except ValueError:
+        return False
+    else:
+        return True
