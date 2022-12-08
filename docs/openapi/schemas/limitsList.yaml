@@ -12,15 +12,24 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-title: limit is a definition of Limit resource.
+title: limitValue is a definition of Limit Value resource.
 type: object
 properties:
-  id:
-    type: string
-    example: platform.workspaces
-  informations:
-    type: object
-    properties:
-      description:
-        type: string
-
+  data:
+    type: array
+    items:
+      type: object
+      properties:
+        organization_id:
+          type: string
+          example: "organization_id"
+        limits:
+          type: object
+          properties:
+            limit.id:
+              type: number
+          example:
+            {
+              platform.workspaces: 100,
+              platform.users: 200
+            }

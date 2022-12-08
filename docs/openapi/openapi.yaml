@@ -37,6 +37,8 @@ tags:
   description: ロール・マッピングに関する操作
 - name: InternalCommonService
   description: 共通(内部用)
+- name: InternalPlanService
+  description: プランに関する操作(内部用)
 - name: InternalUsersService
   description: ユーザーに関する操作(内部用)
 - name: InternalWorkspaceService
@@ -52,8 +54,10 @@ paths:
       $ref: './paths/plans.organizations.plan_start_date.yaml'
   "/api/platform/plans":
       $ref: './paths/plans.yaml'
-  "/api/platform/limits":
-      $ref: './paths/limits.yaml'
+  "/api/platform/plan_items":
+      $ref: './paths/plan_items.yaml'
+  "/api/platform/{organization_id}/limits":
+      $ref: './paths/plans.organizations.limits.yaml'
 
   "/api/{organization_id}/platform/workspaces":
       $ref: './paths/workspaces.yaml'
@@ -72,6 +76,9 @@ paths:
 
   "/api/{organization_id}/platform/roles/{role_name}/users":
       $ref: './paths/roles.role_name.users.yaml'
+
+  "/internal-api/platform/limits":
+      $ref: './paths/internal_plan.limits.yaml'
 
   "/internal-api/{organization_id}/platform/workspaces/{workspace_id}/roles":
       $ref: './paths/internal_workspaces.workspace_id.roles.yaml'

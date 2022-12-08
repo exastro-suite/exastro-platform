@@ -22,14 +22,20 @@ organizationCreate:
   $ref: "./organizationCreate.yaml"
 planMappingOrganization:
   $ref: "./planMappingOrganization.yaml"
+planMappingOrganizationList:
+  $ref: "./planMappingOrganizationList.yaml"
 plan:
   $ref: "./plan.yaml"
 planList:
   $ref: "./planList.yaml"
-limit:
-  $ref: "./limit.yaml"
-limitList:
-  $ref: "./limitList.yaml"
+planItem:
+  $ref: "./planItem.yaml"
+planItemList:
+  $ref: "./planItemList.yaml"
+limits:
+  $ref: "./limits.yaml"
+limitsList:
+  $ref: "./limitsList.yaml"
 role:
   $ref: "./role.yaml"
 roleList:
