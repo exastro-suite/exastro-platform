@@ -30,8 +30,8 @@ MSG_FUNCTION_ID = "27"
 
 
 @common.platform_exception_handler
-def limit_list():
-    """List returns list of limits
+def plan_item_list():
+    """List returns list of plan items
 
     Returns:
         _type_: _description_
@@ -185,6 +185,20 @@ def plan_list():
         data.append(row)
 
     return common.response_200_ok(data)
+
+
+@common.platform_exception_handler
+def organization_plan_get(organization_id):  # noqa: E501
+    """Get plan of the organization
+
+     # noqa: E501
+
+    :param organization_id:
+    :type organization_id: str
+
+    :rtype: InlineResponse200
+    """
+    return 'do some magic!'
 
 
 @common.platform_exception_handler
@@ -357,4 +371,18 @@ def organization_plan_delete(body, organization_id, plan_start_date):
                                               "organizationへのプラン設定に失敗しました(対象ID:{0} Plan:{1})")
                 raise common.InternalErrorException(message_id=message_id, message=message)
 
+    return common.response_200_ok(data=None)
+
+
+@common.platform_exception_handler
+def organization_limits_get(organization_id, limit_id=None):
+    """_summary_
+
+    Args:
+        organization_id (str): organization_id
+        limit_id (str, optional): filter limit id. (prefix match). Defaults to None.
+
+    Returns:
+        response: HTTP Response
+    """
     return common.response_200_ok(data=None)
