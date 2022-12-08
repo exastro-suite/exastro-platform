@@ -27,6 +27,9 @@ max_role_workspaces = 1000
 length_plan_id = 36
 length_plan_name = 255
 length_plan_description = 4000
+max_limit_value = 2147483647
+min_limit_value = -1
+
 
 # ロール種別
 # Role Kind

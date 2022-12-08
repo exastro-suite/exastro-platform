@@ -93,6 +93,17 @@ def plan_create(body):
     with closing(DBconnector().connect_platformdb()) as conn:
         with conn.cursor() as cursor:
 
+            # check limit_id
+            cursor.execute(queries_plans.SQL_QUERY_LIMITS)
+            result_limits = cursor.fetchall()
+            limit_ids = [d.get("LIMIT_ID") for d in result_limits]
+
+            for limit_id, limit_value in limits.items():
+                if limit_id not in limit_ids:
+                    raise common.BadRequestException(
+                        f"400-{MSG_FUNCTION_ID}001", "指定可能なリミットIDではありません。"
+                    )
+
             # insert plan
             informations = {"description": description, }
             parameter = {
@@ -106,8 +117,8 @@ def plan_create(body):
                 cursor.execute(queries_plans.SQL_INSERT_PLAN, parameter)
             except pymysql.err.IntegrityError:
                 # Duplicate PRIMARY KEY
-                return common.response_status(
-                    409, None, f"409-{MSG_FUNCTION_ID}001", "指定されたプランはすでに存在しているため作成できません。"
+                raise common.BadRequestException(
+                    f"400-{MSG_FUNCTION_ID}001", "指定されたプランはすでに存在しているため作成できません。"
                 )
 
             # insert plan_limit
@@ -126,8 +137,8 @@ def plan_create(body):
                 cursor.executemany(queries_plans.SQL_INSERT_PLAN_LIMIT, parameters)
             except pymysql.err.IntegrityError:
                 # Duplicate PRIMARY KEY
-                return common.response_status(
-                    409, None, f"409-{MSG_FUNCTION_ID}002", "指定されたプラン・リミット値はすでに存在しているため作成できません。"
+                raise common.BadRequestException(
+                    f"400-{MSG_FUNCTION_ID}001", "指定されたプラン・リミット値はすでに存在しているため作成できません。"
                 )
 
             conn.commit()
