@@ -38,7 +38,8 @@ FROM    common_build as develop_build
 RUN pip3.9 install debugpy \
 &&  dnf -y install sudo \
 &&  usermod -G wheel $USERNAME \
-&&  echo '%wheel ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers
+&&  echo '%wheel ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers \
+&&  echo "%${GROUPNAME} ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 
 RUN dnf install -y git vim diffutils bind-utils iputils \
 &&  pip3.9 install flake8 \
