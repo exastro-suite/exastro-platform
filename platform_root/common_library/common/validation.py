@@ -566,7 +566,7 @@ def validate_plan_start_date(plan_start_date):
 
     if not validate_date(plan_start_date):
         return result(
-            False, 400, '400-{}020'.format(MSG_FUNCTION_ID), '指定された値が日付形式以外が指定されています。({0})',
+            False, 400, '400-{}020'.format(MSG_FUNCTION_ID), '日付形式以外が指定されています。({0})',
             multi_lang.get_text('000-00125', "プラン開始日")
         )
 

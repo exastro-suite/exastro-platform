@@ -287,9 +287,10 @@ def organization_plan_create(body, organization_id):
                 # Duplicate PRIMARY KEY
                 message_id = f"400-{MSG_FUNCTION_ID}001"
                 message = multi_lang.get_text(message_id,
-                                              "指定されたorganizationのプラン開始日にはすでに別のプランが登録済みのため、登録できません。(対象ID:{0}, Plan:{1})",
+                                              "指定されたorganizationのプラン開始日は、すでに別のプランが登録済みのため、登録できません。(対象ID:{0}, Plan:{1}, プラン開始日:{2})",
                                               organization_id,
-                                              plan_id)
+                                              plan_id,
+                                              plan_start_date)
                 raise common.BadRequestException(message_id=message_id, message=message)
 
             except Exception as e:
@@ -344,7 +345,7 @@ def organization_plan_delete(organization_id, plan_start_date):
                         message_id,
                         "指定されたプラン開始日に該当するorganizationプランが存在しません(対象ID:{0}, プラン開始日:{1})",
                         organization_id,
-                        datetime.strptime(plan_start_date, '%Y-%m-%d')
+                        plan_start_date,
                     )
                     raise common.NotFoundException(message_id=message_id, message=message)
 
