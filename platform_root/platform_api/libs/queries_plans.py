@@ -27,9 +27,9 @@ INSERT INTO T_ORGANIZATION_PLAN (ORGANIZATION_ID, START_TIMESTAMP, PLAN_ID, CREA
 values (%(organization_id)s, %(start_timestamp)s, %(plan_id)s, %(create_user)s, %(last_update_user)s)
 """
 
-SQL_QUERY_LIMITS = """
+SQL_QUERY_PLAN_ITEMS = """
 SELECT *
-FROM T_LIMIT
+FROM T_PLAN_ITEM
 """
 
 SQL_QUERY_PLANS = """
