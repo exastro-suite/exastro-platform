@@ -22,6 +22,11 @@ INSERT INTO T_PLAN_LIMIT (PLAN_ID, LIMIT_ID, LIMIT_VALUE, CREATE_USER, LAST_UPDA
 values (%(plan_id)s, %(limit_id)s, %(limit_value)s, %(create_user)s, %(last_update_user)s)
 """
 
+SQL_INSERT_ORGANIZATION_PLAN = """
+INSERT INTO T_ORGANIZATION_PLAN (ORGANIZATION_ID, START_TIMESTAMP, PLAN_ID, CREATE_USER, LAST_UPDATE_USER)
+values (%(organization_id)s, %(start_timestamp)s, %(plan_id)s, %(create_user)s, %(last_update_user)s)
+"""
+
 SQL_QUERY_LIMITS = """
 SELECT *
 FROM T_LIMIT
@@ -35,4 +40,15 @@ FROM T_PLAN
 SQL_QUERY_PLAN_LIMITS = """
 SELECT *
 FROM T_PLAN_LIMIT
+"""
+
+SQL_QUERY_ORGANIZATION_PLAN = """
+SELECT *
+FROM T_ORGANIZATION_PLAN
+"""
+
+SQL_DELETE_ORGANIZATION_PLAN = """
+DELETE FROM T_ORGANIZATION_PLAN
+WHERE organization_id = %(organization_id)s
+AND start_timestamp = %(start_timestamp)s
 """
