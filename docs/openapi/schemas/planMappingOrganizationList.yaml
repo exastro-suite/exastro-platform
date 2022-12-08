@@ -12,10 +12,10 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-title: limitList is list of Limit resources.
+title: plan item list is list of plan items resources.
 type: object
 properties:
   data:
     type: array
     items:
-      $ref: './limit.yaml'
+      $ref: './planMappingOrganization.yaml'

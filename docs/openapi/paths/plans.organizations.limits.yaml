@@ -1,9 +1,21 @@
 get:
   tags:
   - PlanService
-  summary: List returns list of limits
+  summary: Returns the current limits value
   x-openapi-router-controller: controllers.plan_service_controller
-  operationId: limit_list
+  operationId: current_limits_value_get
+  parameters:
+  - name: organization_id
+    in: path
+    required: true
+    schema:
+      type: string
+  - name: limit_id
+    in: query
+    description: filter limit id. (prefix match)
+    schema:
+      type: string
+      example: platform.workspaces
   responses:
     200:
       description: A successful response.
@@ -12,7 +24,7 @@ get:
           schema:
             allOf:
               - $ref: '../schemas/responseOk.yaml'
-              - $ref: '../schemas/limitList.yaml'
+              - $ref: '../schemas/limits.yaml'
     default:
       description: An unexpected error response.
       content:

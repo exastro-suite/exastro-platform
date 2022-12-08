@@ -36,8 +36,8 @@ paths:
       $ref: './paths/plans.organizations.yaml'
   "/api/platform/plans":
       $ref: './paths/plans.yaml'
-  "/api/platform/limits":
-      $ref: './paths/limits.yaml'
+  "/api/platform/plan_items.yaml":
+      $ref: './paths/plan_items.yaml'
 
 components:
   schemas:

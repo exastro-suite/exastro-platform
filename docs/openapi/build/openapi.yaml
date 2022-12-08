@@ -20,6 +20,8 @@ tags:
     description: ロール・マッピングに関する操作
   - name: InternalCommonService
     description: 共通(内部用)
+  - name: InternalPlanService
+    description: プランに関する操作(内部用)
   - name: InternalUsersService
     description: ユーザーに関する操作(内部用)
   - name: InternalWorkspaceService
@@ -58,6 +60,33 @@ paths:
               schema:
                 $ref: '#/components/schemas/runtimeError'
   '/api/platform/{organization_id}/plans':
+    get:
+      tags:
+        - PlanService
+      summary: Get plan of the organization
+      x-openapi-router-controller: controllers.plan_service_controller
+      operationId: organization_plan_get
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - $ref: '#/components/schemas/planMappingOrganizationList'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
     post:
       tags:
         - PlanService
@@ -168,13 +197,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/runtimeError'
-  /api/platform/limits:
+  /api/platform/plan_items:
     get:
       tags:
         - PlanService
-      summary: List returns list of limits
+      summary: List returns list of plan items
       x-openapi-router-controller: controllers.plan_service_controller
-      operationId: limit_list
+      operationId: plan_item_list
       responses:
         '200':
           description: A successful response.
@@ -183,7 +212,41 @@ paths:
               schema:
                 allOf:
                   - $ref: '#/components/schemas/responseOk'
-                  - $ref: '#/components/schemas/limitList'
+                  - $ref: '#/components/schemas/planItemList'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+  '/api/platform/{organization_id}/limits':
+    get:
+      tags:
+        - PlanService
+      summary: Returns the current limits value
+      x-openapi-router-controller: controllers.plan_service_controller
+      operationId: current_limits_value_get
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: limit_id
+          in: query
+          description: filter limit id. (prefix match)
+          schema:
+            type: string
+            example: platform.workspaces
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - $ref: '#/components/schemas/limits'
         default:
           description: An unexpected error response.
           content:
@@ -619,6 +682,35 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/runtimeError'
+  /internal-api/platform/limits:
+    get:
+      tags:
+        - InternalPlanService
+      summary: Returns the current limits value
+      x-openapi-router-controller: controllers.internal_plan_service_controller
+      operationId: current_limits_value_get
+      parameters:
+        - name: limit_id
+          in: query
+          description: filter limit id. (prefix match)
+          schema:
+            type: string
+            example: platform.workspaces
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - $ref: '#/components/schemas/limitsList'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
   '/internal-api/{organization_id}/platform/workspaces/{workspace_id}/roles':
     get:
       tags:
@@ -883,7 +975,15 @@ components:
           example: plan-1
         start_date:
           type: string
-          example: yyyy-mm-dd
+          example: 2022-12-1
+    planMappingOrganizationList:
+      title: plan item list is list of plan items resources.
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/planMappingOrganization'
     plan:
       title: plan is a definition of Plan resource.
       type: object
@@ -915,8 +1015,8 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/plan'
-    limit:
-      title: limit is a definition of Limit resource.
+    planItem:
+      title: planItem is a definition of plan item resource.
       type: object
       properties:
         id:
@@ -927,14 +1027,46 @@ components:
           properties:
             description:
               type: string
-    limitList:
-      title: limitList is list of Limit resources.
+    planItemList:
+      title: plan item list is list of plan items resources.
       type: object
       properties:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/limit'
+            $ref: '#/components/schemas/planItem'
+    limits:
+      title: limitValue is a definition of Limit Value resource.
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            limit.id:
+              type: number
+          example:
+            platform.workspaces: 100
+            platform.users: 200
+    limitsList:
+      title: limitValue is a definition of Limit Value resource.
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              organization_id:
+                type: string
+                example: organization_id
+              limits:
+                type: object
+                properties:
+                  limit.id:
+                    type: number
+                example:
+                  platform.workspaces: 100
+                  platform.users: 200
     role:
       title: role is a definition of Role resource.
       type: object

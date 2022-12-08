@@ -313,6 +313,14 @@ components:
         start_date:
           type: string
           example: 2022-12-1
+    planMappingOrganizationList:
+      title: plan item list is list of plan items resources.
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/planMappingOrganization'
     plan:
       title: plan is a definition of Plan resource.
       type: object
@@ -344,8 +352,8 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/plan'
-    limit:
-      title: limit is a definition of Limit resource.
+    planItem:
+      title: planItem is a definition of plan item resource.
       type: object
       properties:
         id:
@@ -356,14 +364,46 @@ components:
           properties:
             description:
               type: string
-    limitList:
-      title: limitList is list of Limit resources.
+    planItemList:
+      title: plan item list is list of plan items resources.
       type: object
       properties:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/limit'
+            $ref: '#/components/schemas/planItem'
+    limits:
+      title: limitValue is a definition of Limit Value resource.
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            limit.id:
+              type: number
+          example:
+            platform.workspaces: 100
+            platform.users: 200
+    limitsList:
+      title: limitValue is a definition of Limit Value resource.
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              organization_id:
+                type: string
+                example: organization_id
+              limits:
+                type: object
+                properties:
+                  limit.id:
+                    type: number
+                example:
+                  platform.workspaces: 100
+                  platform.users: 200
     role:
       title: role is a definition of Role resource.
       type: object
