@@ -224,7 +224,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/runtimeError'
       x-openapi-router-controller: controllers.plan_service_controller
-  /api/platform/{organization_id}/limits:
+  /api/{organization_id}/platform/limits:
     get:
       tags:
       - PlanService

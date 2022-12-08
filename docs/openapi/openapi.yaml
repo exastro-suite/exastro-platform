@@ -56,7 +56,7 @@ paths:
       $ref: './paths/plans.yaml'
   "/api/platform/plan_items":
       $ref: './paths/plan_items.yaml'
-  "/api/platform/{organization_id}/limits":
+  "/api/{organization_id}/platform/limits":
       $ref: './paths/plans.organizations.limits.yaml'
 
   "/api/{organization_id}/platform/workspaces":

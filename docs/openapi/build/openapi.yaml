@@ -219,7 +219,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/runtimeError'
-  '/api/platform/{organization_id}/limits':
+  '/api/{organization_id}/platform/limits':
     get:
       tags:
         - PlanService
