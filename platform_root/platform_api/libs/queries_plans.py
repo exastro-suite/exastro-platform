@@ -22,6 +22,11 @@ INSERT INTO T_PLAN_LIMIT (PLAN_ID, LIMIT_ID, LIMIT_VALUE, CREATE_USER, LAST_UPDA
 values (%(plan_id)s, %(limit_id)s, %(limit_value)s, %(create_user)s, %(last_update_user)s)
 """
 
+SQL_QUERY_LIMITS = """
+SELECT *
+FROM T_LIMIT
+"""
+
 SQL_QUERY_PLANS = """
 SELECT *
 FROM T_PLAN
