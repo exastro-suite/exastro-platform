@@ -225,7 +225,7 @@ paths:
         - PlanService
       summary: Returns the current limits value
       x-openapi-router-controller: controllers.plan_service_controller
-      operationId: current_limits_value_get
+      operationId: organization_limits_get
       parameters:
         - name: organization_id
           in: path
@@ -688,7 +688,7 @@ paths:
         - InternalPlanService
       summary: Returns the current limits value
       x-openapi-router-controller: controllers.internal_plan_service_controller
-      operationId: current_limits_value_get
+      operationId: limits_get
       parameters:
         - name: limit_id
           in: query

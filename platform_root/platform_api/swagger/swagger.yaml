@@ -20,6 +20,8 @@ tags:
   description: ロール・マッピングに関する操作
 - name: InternalCommonService
   description: 共通(内部用)
+- name: InternalPlanService
+  description: プランに関する操作(内部用)
 - name: InternalUsersService
   description: ユーザーに関する操作(内部用)
 - name: InternalWorkspaceService
@@ -61,6 +63,33 @@ paths:
                 $ref: '#/components/schemas/runtimeError'
       x-openapi-router-controller: controllers.organization_service_controller
   /api/platform/{organization_id}/plans:
+    get:
+      tags:
+      - PlanService
+      summary: Get plan of the organization
+      operationId: organization_plan_get
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+      x-openapi-router-controller: controllers.plan_service_controller
     post:
       tags:
       - PlanService
@@ -142,7 +171,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200'
+                $ref: '#/components/schemas/inline_response_200_1'
         default:
           description: An unexpected error response.
           content:
@@ -175,19 +204,56 @@ paths:
               schema:
                 $ref: '#/components/schemas/runtimeError'
       x-openapi-router-controller: controllers.plan_service_controller
-  /api/platform/limits:
+  /api/platform/plan_items:
     get:
       tags:
       - PlanService
-      summary: List returns list of limits
-      operationId: limit_list
+      summary: List returns list of plan items
+      operationId: plan_item_list
       responses:
         "200":
           description: A successful response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_1'
+                $ref: '#/components/schemas/inline_response_200_2'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+      x-openapi-router-controller: controllers.plan_service_controller
+  /api/platform/{organization_id}/limits:
+    get:
+      tags:
+      - PlanService
+      summary: Returns the current limits value
+      operationId: organization_limits_get
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: limit_id
+        in: query
+        description: filter limit id. (prefix match)
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          example: platform.workspaces
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_3'
         default:
           description: An unexpected error response.
           content:
@@ -223,7 +289,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_2'
+                $ref: '#/components/schemas/inline_response_200_4'
         default:
           description: An unexpected error response.
           content:
@@ -256,7 +322,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_3'
+                $ref: '#/components/schemas/inline_response_200_5'
         default:
           description: An unexpected error response.
           content:
@@ -291,7 +357,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_4'
+                $ref: '#/components/schemas/inline_response_200_6'
         default:
           description: An unexpected error response.
           content:
@@ -326,7 +392,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_5'
+                $ref: '#/components/schemas/inline_response_200_7'
         default:
           description: An unexpected error response.
           content:
@@ -354,7 +420,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_6'
+                $ref: '#/components/schemas/inline_response_200_8'
         default:
           description: An unexpected error response.
           content:
@@ -394,7 +460,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_7'
+                $ref: '#/components/schemas/inline_response_200_9'
         default:
           description: An unexpected error response.
           content:
@@ -435,7 +501,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_3'
+                $ref: '#/components/schemas/inline_response_200_5'
         default:
           description: An unexpected error response.
           content:
@@ -483,7 +549,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_3'
+                $ref: '#/components/schemas/inline_response_200_5'
         default:
           description: An unexpected error response.
           content:
@@ -518,7 +584,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_8'
+                $ref: '#/components/schemas/inline_response_200_10'
         default:
           description: An unexpected error response.
           content:
@@ -558,7 +624,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_3'
+                $ref: '#/components/schemas/inline_response_200_5'
         default:
           description: An unexpected error response.
           content:
@@ -598,7 +664,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_3'
+                $ref: '#/components/schemas/inline_response_200_5'
         default:
           description: An unexpected error response.
           content:
@@ -606,6 +672,36 @@ paths:
               schema:
                 $ref: '#/components/schemas/runtimeError'
       x-openapi-router-controller: controllers.role_mappings_service_controller
+  /internal-api/platform/limits:
+    get:
+      tags:
+      - InternalPlanService
+      summary: Returns the current limits value
+      operationId: limits_get
+      parameters:
+      - name: limit_id
+        in: query
+        description: filter limit id. (prefix match)
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          example: platform.workspaces
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_11'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+      x-openapi-router-controller: controllers.internal_plan_service_controller
   /internal-api/{organization_id}/platform/workspaces/{workspace_id}/roles:
     get:
       tags:
@@ -654,7 +750,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_9'
+                $ref: '#/components/schemas/inline_response_200_12'
         default:
           description: An unexpected error response.
           content:
@@ -710,7 +806,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_6'
+                $ref: '#/components/schemas/inline_response_200_8'
         default:
           description: An unexpected error response.
           content:
@@ -766,7 +862,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_10'
+                $ref: '#/components/schemas/inline_response_200_13'
         default:
           description: An unexpected error response.
           content:
@@ -808,7 +904,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_3'
+                $ref: '#/components/schemas/inline_response_200_5'
         default:
           description: An unexpected error response.
           content:
@@ -894,6 +990,14 @@ components:
         start_date:
           type: string
           example: 2022-12-1
+    planMappingOrganizationList:
+      title: plan item list is list of plan items resources.
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/planMappingOrganization'
     plan:
       title: plan is a definition of Plan resource.
       type: object
@@ -916,8 +1020,8 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/plan'
-    limit:
-      title: limit is a definition of Limit resource.
+    planItem:
+      title: planItem is a definition of plan item resource.
       type: object
       properties:
         id:
@@ -925,14 +1029,28 @@ components:
           example: platform.workspaces
         informations:
           $ref: '#/components/schemas/plan_informations'
-    limitList:
-      title: limitList is list of Limit resources.
+    planItemList:
+      title: plan item list is list of plan items resources.
       type: object
       properties:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/limit'
+            $ref: '#/components/schemas/planItem'
+    limits:
+      title: limitValue is a definition of Limit Value resource.
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/plan_limits'
+    limitsList:
+      title: limitValue is a definition of Limit Value resource.
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/limitsList_data'
     role:
       title: role is a definition of Role resource.
       type: object
@@ -1188,23 +1306,31 @@ components:
     inline_response_200:
       allOf:
       - $ref: '#/components/schemas/responseOk'
-      - $ref: '#/components/schemas/planList'
+      - $ref: '#/components/schemas/planMappingOrganizationList'
     inline_response_200_1:
       allOf:
       - $ref: '#/components/schemas/responseOk'
-      - $ref: '#/components/schemas/limitList'
+      - $ref: '#/components/schemas/planList'
     inline_response_200_2:
       allOf:
       - $ref: '#/components/schemas/responseOk'
-      - $ref: '#/components/schemas/workspaceList'
+      - $ref: '#/components/schemas/planItemList'
     inline_response_200_3:
+      allOf:
+      - $ref: '#/components/schemas/responseOk'
+      - $ref: '#/components/schemas/limits'
+    inline_response_200_4:
+      allOf:
+      - $ref: '#/components/schemas/responseOk'
+      - $ref: '#/components/schemas/workspaceList'
+    inline_response_200_5:
       allOf:
       - $ref: '#/components/schemas/responseOk'
       - type: object
         properties:
           data:
             type: object
-    inline_response_200_4:
+    inline_response_200_6:
       allOf:
       - $ref: '#/components/schemas/responseOk'
       - title: workspaceDetail is Workspace resources.
@@ -1214,15 +1340,15 @@ components:
             allOf:
             - $ref: '#/components/schemas/workspace'
             - $ref: '#/components/schemas/responseStat'
-    inline_response_200_5:
+    inline_response_200_7:
       allOf:
       - $ref: '#/components/schemas/responseOk'
       - $ref: '#/components/schemas/memberList'
-    inline_response_200_6:
+    inline_response_200_8:
       allOf:
       - $ref: '#/components/schemas/responseOk'
       - $ref: '#/components/schemas/userList'
-    inline_response_200_7:
+    inline_response_200_9:
       allOf:
       - $ref: '#/components/schemas/responseOk'
       - $ref: '#/components/schemas/roleDetailList'
@@ -1232,7 +1358,7 @@ components:
     roles_role_name_body:
       oneOf:
       - $ref: '#/components/schemas/roleDetailWorkspacePut'
-    inline_response_200_8:
+    inline_response_200_10:
       allOf:
       - $ref: '#/components/schemas/responseOk'
       - title: roleList is list of Role resources.
@@ -1242,11 +1368,15 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/roleUser'
-    inline_response_200_9:
+    inline_response_200_11:
+      allOf:
+      - $ref: '#/components/schemas/responseOk'
+      - $ref: '#/components/schemas/limitsList'
+    inline_response_200_12:
       allOf:
       - $ref: '#/components/schemas/responseOk'
       - $ref: '#/components/schemas/roleList'
-    inline_response_200_10:
+    inline_response_200_13:
       allOf:
       - $ref: '#/components/schemas/responseOk'
       - $ref: '#/components/schemas/userWorkspaceList'
@@ -1261,6 +1391,14 @@ components:
         limit.id:
           type: number
       example: "{\"platform.workspaces\":100,\"platform.users\":200}"
+    limitsList_data:
+      type: object
+      properties:
+        organization_id:
+          type: string
+          example: organization_id
+        limits:
+          $ref: '#/components/schemas/plan_limits'
     workspace_informations:
       type: object
       properties:
