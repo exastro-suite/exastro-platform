@@ -228,11 +228,11 @@ def organization_plan_create(body, organization_id):
     # validation check
     validate = validation.validate_plan_id(plan_id)
     if not validate.ok:
-        return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, validate.args)
+        return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
 
     validate = validation.validate_plan_start_date(plan_start_date)
     if not validate.ok:
-        return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, validate.args)
+        return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
 
     # PLAN情報取得
     # get plan info.
@@ -251,13 +251,16 @@ def organization_plan_create(body, organization_id):
 
                 if not result:
                     globals.logger.error(f"plan not found id:{plan_id}")
-                    message_id = "404-{MSG_FUNCTION_ID}001"
+                    message_id = f"404-{MSG_FUNCTION_ID}001"
                     message = multi_lang.get_text(
                         message_id,
                         "プランが存在しません(id:{0})",
                         plan_id
                     )
                     raise common.NotFoundException(message_id=message_id, message=message)
+
+            except common.NotFoundException:
+                raise
 
             except Exception as e:
                 globals.logger.error(f"exception:{e.args}")
@@ -284,9 +287,10 @@ def organization_plan_create(body, organization_id):
                 # Duplicate PRIMARY KEY
                 message_id = f"400-{MSG_FUNCTION_ID}001"
                 message = multi_lang.get_text(message_id,
-                                              "指定されたorganizationのプラン開始日にはすでに別のプランが登録済みのため、登録できません。(対象ID:{0}, Plan:{1})",
+                                              "指定されたorganizationのプラン開始日は、すでに別のプランが登録済みのため、登録できません。(対象ID:{0}, Plan:{1}, プラン開始日:{2})",
                                               organization_id,
-                                              plan_id)
+                                              plan_id,
+                                              plan_start_date)
                 raise common.BadRequestException(message_id=message_id, message=message)
 
             except Exception as e:
@@ -301,11 +305,10 @@ def organization_plan_create(body, organization_id):
 
 
 @common.platform_exception_handler
-def organization_plan_delete(body, organization_id, plan_start_date):
+def organization_plan_delete(organization_id, plan_start_date):
     """Set plan to the organization
 
     Args:
-        body (dict): _description_
         organization_id (str): organization id
         plan_start_date (str): plan start date
 
@@ -317,7 +320,7 @@ def organization_plan_delete(body, organization_id, plan_start_date):
     # validation check
     validate = validation.validate_plan_start_date(plan_start_date)
     if not validate.ok:
-        return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, validate.args)
+        return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
 
     # PLAN情報取得
     # get plan info.
@@ -329,23 +332,25 @@ def organization_plan_delete(body, organization_id, plan_start_date):
                 "organization_id": organization_id,
                 "plan_start_date": datetime.strptime(plan_start_date, '%Y-%m-%d'),
             }
-            where = " WHERE organization_id = %(organization_id)s" \
-                    " AND plan_start_date = %(plan_start_date)s"
+            where = " WHERE organization_id = %(organization_id)s" + \
+                    " AND start_timestamp = %(plan_start_date)s"
             try:
                 cursor.execute(queries_plans.SQL_QUERY_ORGANIZATION_PLAN + where, parameter)
                 result = cursor.fetchone()
 
                 if not result:
                     globals.logger.error(f"organization plan not found id:{organization_id} plan_start_date:{plan_start_date}")
-                    message_id = "404-{MSG_FUNCTION_ID}002"
+                    message_id = f"404-{MSG_FUNCTION_ID}002"
                     message = multi_lang.get_text(
                         message_id,
                         "指定されたプラン開始日に該当するorganizationプランが存在しません(対象ID:{0}, プラン開始日:{1})",
                         organization_id,
-                        datetime.strptime(plan_start_date, '%Y-%m-%d')
+                        plan_start_date,
                     )
                     raise common.NotFoundException(message_id=message_id, message=message)
 
+            except common.NotFoundException:
+                raise
             except Exception as e:
                 globals.logger.error(f"exception:{e.args}")
                 # Duplicate PRIMARY KEY

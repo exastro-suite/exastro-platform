@@ -211,7 +211,7 @@ def response_status(status_code, data, message_id, base_message="", *args):
         response: HTTP Response (HTTP-500)
     """
 
-    message = multi_lang.get_text(message_id, base_message, args)
+    message = multi_lang.get_text(message_id, base_message, *args)
 
     return jsonify({"result": message_id, "data": data, "message": message, "ts": datetime_to_str(datetime.now())}), status_code
 
