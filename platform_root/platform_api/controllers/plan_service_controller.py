@@ -94,7 +94,7 @@ def plan_create(body):
         with conn.cursor() as cursor:
 
             # check limit_id
-            cursor.execute(queries_plans.SQL_QUERY_LIMITS)
+            cursor.execute(queries_plans.SQL_QUERY_PLAN_ITEMS)
             result_limits = cursor.fetchall()
             limit_ids = [d.get("LIMIT_ID") for d in result_limits]
 
