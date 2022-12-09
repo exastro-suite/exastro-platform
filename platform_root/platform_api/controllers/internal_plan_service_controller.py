@@ -16,22 +16,57 @@ import inspect
 
 from contextlib import closing
 
-from common_library.common import common, const as common_const
-from common_library.common import api_keycloak_tokens, api_keycloak_roles
+from common_library.common import common, const
 from common_library.common.db import DBconnector
-#from libs import queries_internal_users
+from libs import queries_internal_plan
 
-MSG_FUNCTION_ID = "XX"
+import globals
+
+MSG_FUNCTION_ID = "28"
 
 @common.platform_exception_handler
-def limits_get(limit_id=None):  # noqa: E501
-    """Returns the current limits value
+def limits_get(limit_id=None):
+    """Returns the current limits value(all organization)
 
-     # noqa: E501
+    Args:
+        limit_id (str, optional): filter limit id. (prefix match). Defaults to None.
 
-    :param limit_id: filter limit id. (prefix match)
-    :type limit_id: str
-
-    :rtype: InlineResponse20011
+    Returns:
+        response: HTTP Response
     """
-    return 'do some magic!'
+    globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
+
+    # plan and plan_limit list get
+    with closing(DBconnector().connect_platformdb()) as conn:
+        with conn.cursor() as cursor:
+
+            cursor.execute(queries_internal_plan.SQL_QUERY_ALL_ORGANIZATION_PLAN_ID)
+            org_plans = cursor.fetchall()
+
+            # Get all plan_ids
+            plan_ids = list(set([r["PLAN_ID"] if r["PLAN_ID"] is not None else const.DEFAULT_PLAN_ID for r in org_plans]))
+
+            # get all limits
+            limits = {}
+
+            parameter = {}
+            where = " WHERE plan_id = %(plan_id)s"
+            if limit_id is not None:
+                parameter["limit_id"] = limit_id
+                where = where + " AND limit_id LIKE CONCAT(%(limit_id)s,'%%')"
+
+            for plan_id in plan_ids:
+                parameter["plan_id"] = plan_id
+
+                cursor.execute(queries_internal_plan.SQL_QUERY_PLAN_LIMITS + where, parameter)
+                plan_limits = cursor.fetchall()
+
+                limits[plan_id] = {plan_limit["LIMIT_ID"]: plan_limit["LIMIT_VALUE"] for plan_limit in plan_limits}
+
+    # make response data
+    data = [{
+            "organization_id": org_plan["ORGANIZATION_ID"],
+            "limits": limits[org_plan["PLAN_ID"] if org_plan["PLAN_ID"] is not None else const.DEFAULT_PLAN_ID]
+            } for org_plan in org_plans]
+
+    return common.response_200_ok(data)
