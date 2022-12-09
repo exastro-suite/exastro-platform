@@ -36,8 +36,13 @@ def plan_item_list():
     Returns:
         _type_: _description_
     """
+    with closing(DBconnector().connect_platformdb()) as conn:
+        with conn.cursor() as cursor:
 
-    data = []
+            cursor.execute(queries_plans.SQL_QUERY_PLAN_ITEMS)
+            plan_items = cursor.fetchall()
+
+    data = [{"id": r["LIMIT_ID"], "informations": json.loads(r["INFORMATIONS"])} for r in plan_items]
     return common.response_200_ok(data)
 
 
