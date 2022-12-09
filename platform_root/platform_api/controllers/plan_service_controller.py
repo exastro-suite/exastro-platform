@@ -188,17 +188,35 @@ def plan_list():
 
 
 @common.platform_exception_handler
-def organization_plan_get(organization_id):  # noqa: E501
+def organization_plan_get(organization_id):
     """Get plan of the organization
 
-     # noqa: E501
+    Args:
+        organization_id (str): organization id
 
-    :param organization_id:
-    :type organization_id: str
-
-    :rtype: InlineResponse200
+    Returns:
+        response: HTTP Response
     """
-    return 'do some magic!'
+    globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
+
+    # plan list get
+    with closing(DBconnector().connect_platformdb()) as conn:
+        with conn.cursor() as cursor:
+
+            parameter = {
+                "organization_id": organization_id,
+            }
+            where = " WHERE organization_id = %(organization_id)s"
+            cursor.execute(queries_plans.SQL_QUERY_ORGANIZATION_PLAN + where, parameter)
+            org_plans = cursor.fetchall()
+
+    data = []
+    for org_plan in org_plans:
+        data.append({
+            "id": org_plan["PLAN_ID"],
+            "start_date": datetime.strftime(org_plan["START_TIMESTAMP"], '%Y-%m-%d')
+        })
+    return common.response_200_ok(data)
 
 
 @common.platform_exception_handler
@@ -390,6 +408,8 @@ def organization_limits_get(organization_id, limit_id=None):
     Returns:
         response: HTTP Response
     """
+    globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
+
     # plan and plan_limit list get
     with closing(DBconnector().connect_platformdb()) as conn:
         with conn.cursor() as cursor:
