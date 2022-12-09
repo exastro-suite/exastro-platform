@@ -265,6 +265,10 @@ def organization_plan_create(body, organization_id):
             message_id='400-000002', message='リクエストボディのパラメータ({0})が不正です。'.format('Json')
         )
 
+    # organizationチェック
+    # check organization
+    DBconnector().get_organization_private(organization_id)
+
     r = connexion.request
     user_id = r.headers.get("User-id")
     plan_id = body.get("id")
@@ -361,6 +365,10 @@ def organization_plan_delete(organization_id, plan_start_date):
         _type_: _description_
     """
     globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
+
+    # organizationチェック
+    # check organization
+    DBconnector().get_organization_private(organization_id)
 
     # validation check
     validate = validation.validate_plan_start_date(plan_start_date)
