@@ -19,7 +19,7 @@ import inspect
 import pymysql
 from datetime import datetime
 
-from common_library.common import common, validation
+from common_library.common import common, validation, const
 from common_library.common.db import DBconnector
 from common_library.common import multi_lang
 from libs import queries_plans
@@ -381,7 +381,7 @@ def organization_plan_delete(organization_id, plan_start_date):
 
 @common.platform_exception_handler
 def organization_limits_get(organization_id, limit_id=None):
-    """_summary_
+    """Returns the current limits value
 
     Args:
         organization_id (str): organization_id
@@ -390,4 +390,38 @@ def organization_limits_get(organization_id, limit_id=None):
     Returns:
         response: HTTP Response
     """
-    return common.response_200_ok(data=None)
+    # plan and plan_limit list get
+    with closing(DBconnector().connect_platformdb()) as conn:
+        with conn.cursor() as cursor:
+
+            parameter = {
+                "organization_id": organization_id,
+            }
+            where = " WHERE organization_id = %(organization_id)s" \
+                    " AND start_timestamp <= CURRENT_TIMESTAMP()" \
+                    " ORDER BY start_timestamp DESC" \
+                    " LIMIT 1"
+            cursor.execute(queries_plans.SQL_QUERY_ORGANIZATION_PLAN + where, parameter)
+            org_plans = cursor.fetchall()
+
+            if len(org_plans) >= 1:
+                plan_id = org_plans[0]["PLAN_ID"]
+            else:
+                plan_id = const.DEFAULT_PLAN_ID
+
+            parameter = {
+                "plan_id": plan_id,
+            }
+            where = " WHERE plan_id = %(plan_id)s"
+            if limit_id is not None:
+                parameter["limit_id"] = limit_id
+                where = where + " AND limit_id LIKE CONCAT(%(limit_id)s,'%%')"
+
+            cursor.execute(queries_plans.SQL_QUERY_PLAN_LIMITS + where, parameter)
+            result_plan_limits = cursor.fetchall()
+
+    data = {}
+    for plan_limit in result_plan_limits:
+        data[plan_limit["LIMIT_ID"]] = plan_limit["LIMIT_VALUE"]
+
+    return common.response_200_ok(data)
