@@ -34,5 +34,5 @@ properties:
     example:
       {
         platform.workspaces: 100,
-        platform.users: 200
+        platform.roles: 200
       }

@@ -1006,7 +1006,7 @@ components:
               type: number
           example:
             platform.workspaces: 100
-            platform.users: 200
+            platform.roles: 200
     planList:
       title: planList is list of Plan resources.
       type: object
@@ -1046,7 +1046,7 @@ components:
               type: number
           example:
             platform.workspaces: 100
-            platform.users: 200
+            platform.roles: 200
     limitsList:
       title: limitValue is a definition of Limit Value resource.
       type: object
@@ -1066,7 +1066,7 @@ components:
                     type: number
                 example:
                   platform.workspaces: 100
-                  platform.users: 200
+                  platform.roles: 200
     role:
       title: role is a definition of Role resource.
       type: object
