@@ -91,8 +91,8 @@ CREATE TABLE IF NOT EXISTS T_PLAN_LIMIT
 
 
 /* test values */
-INSERT INTO T_PLAN_ITEM (LIMIT_ID, INFORMATIONS, CREATE_USER, LAST_UPDATE_USER) VALUES ('platform.workspaces', '{\"description\": \"default limit\"}', 'system', 'system');
-INSERT INTO T_PLAN_ITEM (LIMIT_ID, INFORMATIONS, CREATE_USER, LAST_UPDATE_USER) VALUES ('platform.roles', '{\"description\": \"default limit\"}', 'system', 'system');
+INSERT INTO T_PLAN_ITEM (LIMIT_ID, INFORMATIONS, CREATE_USER, LAST_UPDATE_USER) VALUES ('platform.workspaces', '{\"description\": \"default limit\", \"max\": 1000, \"min\": -1}', 'system', 'system');
+INSERT INTO T_PLAN_ITEM (LIMIT_ID, INFORMATIONS, CREATE_USER, LAST_UPDATE_USER) VALUES ('platform.roles', '{\"description\": \"default limit\", \"max\": 1000, \"min\": -1}', 'system', 'system');
 INSERT INTO T_PLAN (PLAN_ID, PLAN_NAME, INFORMATIONS, CREATE_USER, LAST_UPDATE_USER) VALUES ('_default', '_default plan', '{\"description\": \"default plan\"}', 'system', 'system');
 INSERT INTO T_PLAN_LIMIT (PLAN_ID, LIMIT_ID, LIMIT_VALUE, CREATE_USER, LAST_UPDATE_USER) VALUES ('_default', 'platform.workspaces', 1000, 'system', 'system');
 INSERT INTO T_PLAN_LIMIT (PLAN_ID, LIMIT_ID, LIMIT_VALUE, CREATE_USER, LAST_UPDATE_USER) VALUES ('_default', 'platform.roles', 1000, 'system', 'system');

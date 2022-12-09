@@ -60,10 +60,6 @@ def plan_create(body):
         )
 
     user_id = connexion.request.headers.get("User-id")
-    encode_roles = connexion.request.headers.get("Roles")
-    # roles = base64.b64decode(encode_roles).decode()
-    language = connexion.request.headers.get("Language")
-
     plan_id = body.get("id")
     plan_name = body.get("name")
     limits = body.get("limits") if body.get("limits") else {}
@@ -93,16 +89,41 @@ def plan_create(body):
     with closing(DBconnector().connect_platformdb()) as conn:
         with conn.cursor() as cursor:
 
-            # check limit_id
+            # check limit_id and limit_value
             cursor.execute(queries_plans.SQL_QUERY_PLAN_ITEMS)
             result_limits = cursor.fetchall()
-            limit_ids = [d.get("LIMIT_ID") for d in result_limits]
+            limit_ids = [str(d.get("LIMIT_ID")).lower() for d in result_limits]
 
             for limit_id, limit_value in limits.items():
+                limit_id = str(limit_id).lower()
                 if limit_id not in limit_ids:
-                    raise common.BadRequestException(
-                        f"400-{MSG_FUNCTION_ID}001", "指定可能なリミットIDではありません。"
+                    message_id = f"400-{MSG_FUNCTION_ID}001"
+                    message = multi_lang.get_text(
+                        message_id,
+                        "指定可能なリミットIDではありません。(対象ID:{0})",
+                        limit_id,
                     )
+                    raise common.BadRequestException(message_id=message_id, message=message)
+
+                informations = [d.get("INFORMATIONS") for d in result_limits if d.get("LIMIT_ID") == limit_id][0]
+                json_dict = json.loads(informations)
+                if (json_dict.get("max") and limit_value > int(json_dict.get("max"))) or \
+                   (json_dict.get("min") and limit_value < int(json_dict.get("min"))):
+                    message_id = f"400-{MSG_FUNCTION_ID}001"
+                    message = multi_lang.get_text(
+                        message_id,
+                        "指定可能なリミット値の範囲外です。(対象ID:{0})",
+                        limit_id,
+                    )
+                    raise common.BadRequestException(message_id=message_id, message=message)
+
+            if len(limit_ids) != len(limits):
+                message_id = f"400-{MSG_FUNCTION_ID}001"
+                message = multi_lang.get_text(
+                    message_id,
+                    "値が指定されていないリミットIDがあります。",
+                )
+                raise common.BadRequestException(message_id=message_id, message=message)
 
             # insert plan
             informations = {"description": description, }
@@ -117,9 +138,12 @@ def plan_create(body):
                 cursor.execute(queries_plans.SQL_INSERT_PLAN, parameter)
             except pymysql.err.IntegrityError:
                 # Duplicate PRIMARY KEY
-                raise common.BadRequestException(
-                    f"400-{MSG_FUNCTION_ID}001", "指定されたプランはすでに存在しているため作成できません。"
+                message_id = f"400-{MSG_FUNCTION_ID}001"
+                message = multi_lang.get_text(
+                    message_id,
+                    "指定されたプランはすでに存在しているため作成できません。",
                 )
+                raise common.BadRequestException(message_id=message_id, message=message)
 
             # insert plan_limit
             parameters = []
@@ -137,9 +161,12 @@ def plan_create(body):
                 cursor.executemany(queries_plans.SQL_INSERT_PLAN_LIMIT, parameters)
             except pymysql.err.IntegrityError:
                 # Duplicate PRIMARY KEY
-                raise common.BadRequestException(
-                    f"400-{MSG_FUNCTION_ID}001", "指定されたプラン・リミット値はすでに存在しているため作成できません。"
+                message_id = f"400-{MSG_FUNCTION_ID}001"
+                message = multi_lang.get_text(
+                    message_id,
+                    "指定されたプラン・リミット値はすでに存在しているため作成できません。",
                 )
+                raise common.BadRequestException(message_id=message_id, message=message)
 
             conn.commit()
 

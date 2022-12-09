@@ -536,14 +536,14 @@ def validate_plan_limits(plan_limits):
     if len(no_int) > 0:
         return result(
             False, 400, '400-{}012'.format(MSG_FUNCTION_ID), '指定された値が数値ではありません。',
-            multi_lang.get_text('000-00122', "リミット値"),
+            multi_lang.get_text('000-00124', "リミット値"),
         )
 
-    range_out_mysql_int = [i for i, v in plan_limits.items() if int(v) > const.max_limit_value or int(v) < const.min_limit_value]
+    range_out_mysql_int = [i for i, v in plan_limits.items() if int(v) > const.max_db_int_value or int(v) < const.min_db_int_value]
     if len(range_out_mysql_int) > 0:
         return result(
             False, 400, '400-{}012'.format(MSG_FUNCTION_ID), '指定可能な数値ではありません。',
-            multi_lang.get_text('000-00122', "リミット値"),
+            multi_lang.get_text('000-00124', "リミット値"),
         )
 
     return result(True)
