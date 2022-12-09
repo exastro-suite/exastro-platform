@@ -44,21 +44,32 @@ def limits_get(limit_id=None):
             org_plans = cursor.fetchall()
 
             # Get all plan_ids
-            plan_ids = list(set([r["PLAN_ID"] if r["PLAN_ID"] is not None else const.DEFAULT_PLAN_ID for r in org_plans]))
+            plan_ids = list(set([r["PLAN_ID"] if r["PLAN_ID"] is not None else const.DEFAULT_PLAN_ID for r in org_plans]) | {const.DEFAULT_PLAN_ID})
 
-            # get all limits
+            # Get all limits
             limits = {}
 
-            parameter = {}
-            where = " WHERE plan_id = %(plan_id)s"
+            pln_param = {}
+            pln_where = " WHERE plan_id = %(plan_id)s"
+
+            lmt_param = {}
+            lmt_where = " WHERE plan_id = %(plan_id)s"
             if limit_id is not None:
-                parameter["limit_id"] = limit_id
-                where = where + " AND limit_id LIKE CONCAT(%(limit_id)s,'%%')"
+                lmt_param["limit_id"] = limit_id
+                lmt_where = lmt_where + " AND limit_id LIKE CONCAT(%(limit_id)s,'%%')"
 
             for plan_id in plan_ids:
-                parameter["plan_id"] = plan_id
+                pln_param["plan_id"] = plan_id
+                lmt_param["plan_id"] = plan_id
 
-                cursor.execute(queries_internal_plan.SQL_QUERY_PLAN_LIMITS + where, parameter)
+                # check exists plan
+                cursor.execute(queries_internal_plan.SQL_QUERY_PLANS + pln_where, pln_param)
+                plan = cursor.fetchall()
+                if len(plan) == 0:
+                    continue
+
+                # get limit value
+                cursor.execute(queries_internal_plan.SQL_QUERY_PLAN_LIMITS + lmt_where, lmt_param)
                 plan_limits = cursor.fetchall()
 
                 limits[plan_id] = {plan_limit["LIMIT_ID"]: plan_limit["LIMIT_VALUE"] for plan_limit in plan_limits}
@@ -66,7 +77,7 @@ def limits_get(limit_id=None):
     # make response data
     data = [{
             "organization_id": org_plan["ORGANIZATION_ID"],
-            "limits": limits[org_plan["PLAN_ID"] if org_plan["PLAN_ID"] is not None else const.DEFAULT_PLAN_ID]
+            "limits": limits[org_plan["PLAN_ID"] if org_plan["PLAN_ID"] is not None and org_plan["PLAN_ID"] in limits else const.DEFAULT_PLAN_ID]
             } for org_plan in org_plans]
 
     return common.response_200_ok(data)

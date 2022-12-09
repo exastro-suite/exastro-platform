@@ -226,6 +226,9 @@ def organization_plan_get(organization_id):
     """
     globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
 
+    # check organization
+    DBconnector().get_organization_private(organization_id)
+
     # plan list get
     with closing(DBconnector().connect_platformdb()) as conn:
         with conn.cursor() as cursor:
@@ -444,6 +447,9 @@ def organization_limits_get(organization_id, limit_id=None):
         response: HTTP Response
     """
     globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
+
+    # check organization
+    DBconnector().get_organization_private(organization_id)
 
     # plan and plan_limit list get
     with closing(DBconnector().connect_platformdb()) as conn:
