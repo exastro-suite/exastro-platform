@@ -1390,7 +1390,7 @@ components:
       properties:
         limit.id:
           type: number
-      example: "{\"platform.workspaces\":100,\"platform.users\":200}"
+      example: "{\"platform.workspaces\":100,\"platform.roles\":200}"
     limitsList_data:
       type: object
       properties:
