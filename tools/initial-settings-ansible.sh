@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source "`dirname $0`/initial-settings-ansible.conf"
+source "`dirname $0`/api-auth.conf"
 
 if [ $# -ne 1 ]; then
     echo "Usage: `basename $0` [initialize ita ansible hosts json file]"

@@ -2,31 +2,18 @@
 
 source "`dirname $0`/api-auth.conf"
 
-if [ $# -gt 1 ]; then
-    echo "Usage: `basename $0` [organization-plan info json file]"
-    exit 1
-fi
-
-PARAM_JSON_FILE="$1"
-
-# echo "PARAM_JSON_FILE :[${PARAM_JSON_FILE}]"
-# echo "PARAM_RETRY     :[${PARAM_RETRY}]"
-
-if [ ! -z "${PARAM_JSON_FILE}" ]; then
-    if [ ! -f "${PARAM_JSON_FILE}" ]; then
-        echo "Error: not found organization-plan info json file : ${PARAM_JSON_FILE}"
-        exit 1
-    fi
-fi
-
-BODY_JSON=$(cat "${PARAM_JSON_FILE}")
+echo
+echo "Please enter the organization ID and start date to delete the organization-plan"
+echo
+read -p "organization id : " ORG_ID
+read -p "start date (yyyy-mm-dd) : " START_DATE
 
 echo
 read -p "your username : " USERNAME
 read -sp "your password : " PASSWORD
 
 echo
-read -p "Add an organization-plan, are you sure? (Y/other) : " CONFIRM
+read -p "Delete an organization-plan, are you sure? (Y/other) : " CONFIRM
 if [ "${CONFIRM}" != "Y" -a "${CONFIRM}" != "y" ]; then
     exit 1
 fi
@@ -41,13 +28,13 @@ TEMPFILE_API_CODE="/tmp/`basename $0`.$$.2"
 touch "${TEMPFILE_API_RESPONSE}"
 touch "${TEMPFILE_API_CODE}"
 
-curl ${CURL_OPT} -X POST \
+curl ${CURL_OPT} -X DELETE \
     -u ${USERNAME}:${PASSWORD} \
     -H 'Content-type: application/json' \
     -d "${BODY_JSON}" \
     -o "${TEMPFILE_API_RESPONSE}" \
     -w '%{http_code}\n' \
-    "${CONF_BASE_URL}/api/platform/plans" > "${TEMPFILE_API_CODE}"
+    "${CONF_BASE_URL}/api/platform/${ORG_ID}/plans/${START_DATE}" > "${TEMPFILE_API_CODE}"
 
 RESULT_CURL=$?
 RESULT_CODE=$(cat "${TEMPFILE_API_CODE}")
