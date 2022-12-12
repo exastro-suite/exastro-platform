@@ -23,6 +23,7 @@ from common_library.common import common, validation, const
 from common_library.common.db import DBconnector
 from common_library.common import multi_lang
 from libs import queries_plans
+from libs import bl_plan_service
 
 import globals
 
@@ -241,7 +242,7 @@ def organization_plan_get(organization_id):
             parameter = {
                 "organization_id": organization_id,
             }
-            where = " WHERE organization_id = %(organization_id)s"
+            where = " WHERE organization_id = %(organization_id)s ORDER BY start_TIMESTAMP"
             cursor.execute(queries_plans.SQL_QUERY_ORGANIZATION_PLAN + where, parameter)
             org_plans = cursor.fetchall()
 
@@ -249,7 +250,11 @@ def organization_plan_get(organization_id):
     for org_plan in org_plans:
         data.append({
             "id": org_plan["PLAN_ID"],
-            "start_date": datetime.strftime(org_plan["START_TIMESTAMP"], '%Y-%m-%d')
+            "start_date": datetime.strftime(org_plan["START_TIMESTAMP"], '%Y-%m-%d'),
+            "create_timestamp": common.datetime_to_str(org_plan["CREATE_TIMESTAMP"]),
+            "create_user": org_plan["CREATE_USER"],
+            "last_update_timestamp": common.datetime_to_str(org_plan["LAST_UPDATE_TIMESTAMP"]),
+            "last_update_user": org_plan["LAST_UPDATE_USER"],
         })
     return common.response_200_ok(data)
 
@@ -457,37 +462,6 @@ def organization_limits_get(organization_id, limit_id=None):
     DBconnector().get_organization_private(organization_id)
 
     # plan and plan_limit list get
-    with closing(DBconnector().connect_platformdb()) as conn:
-        with conn.cursor() as cursor:
-
-            parameter = {
-                "organization_id": organization_id,
-            }
-            where = " WHERE organization_id = %(organization_id)s" \
-                    " AND start_timestamp <= CURRENT_TIMESTAMP()" \
-                    " ORDER BY start_timestamp DESC" \
-                    " LIMIT 1"
-            cursor.execute(queries_plans.SQL_QUERY_ORGANIZATION_PLAN + where, parameter)
-            org_plans = cursor.fetchall()
-
-            if len(org_plans) >= 1:
-                plan_id = org_plans[0]["PLAN_ID"]
-            else:
-                plan_id = const.DEFAULT_PLAN_ID
-
-            parameter = {
-                "plan_id": plan_id,
-            }
-            where = " WHERE plan_id = %(plan_id)s"
-            if limit_id is not None:
-                parameter["limit_id"] = limit_id
-                where = where + " AND limit_id LIKE CONCAT(%(limit_id)s,'%%')"
-
-            cursor.execute(queries_plans.SQL_QUERY_PLAN_LIMITS + where, parameter)
-            result_plan_limits = cursor.fetchall()
-
-    data = {}
-    for plan_limit in result_plan_limits:
-        data[plan_limit["LIMIT_ID"]] = plan_limit["LIMIT_VALUE"]
+    data = bl_plan_service.organization_limits_get(organization_id, limit_id)
 
     return common.response_200_ok(data)
