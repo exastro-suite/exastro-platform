@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source "`dirname $0`/create-organization.conf"
+source "`dirname $0`/api-auth.conf"
 
 if [ $# -gt 2 ]; then
     echo "Usage: `basename $0` [--retry] [organization info json file]"

@@ -67,10 +67,10 @@ def organization_create(body, retry=None):
     # validation check
     validate = validation.validate_organization_id(organization_id)
     if not validate.ok:
-        return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, validate.args)
+        return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
     validate = validation.validate_organization_name(organization_name)
     if not validate.ok:
-        return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, validate.args)
+        return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
 
     db = DBconnector()
     with closing(db.connect_platformdb()) as conn:

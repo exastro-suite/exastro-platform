@@ -1,44 +1,39 @@
 #!/bin/bash
 
-source "`dirname $0`/initial-settings-ansible.conf"
+source "`dirname $0`/api-auth.conf"
 
-if [ $# -ne 1 ]; then
-    echo "Usage: `basename $0` [initialize ita ansible hosts json file]"
+if [ $# -gt 1 ]; then
+    echo "Usage: `basename $0` [plan info json file]"
     exit 1
 fi
 
-PARAM_JSON_FILE=$1
+PARAM_JSON_FILE="$1"
 
+# echo "PARAM_JSON_FILE :[${PARAM_JSON_FILE}]"
+# echo "PARAM_RETRY     :[${PARAM_RETRY}]"
 
-# check file exists
-if [ ! -f ${PARAM_JSON_FILE} ]; then
-    echo "ERROR: Not found: ${PARAM_JSON_FILE}"
-    exit 1
-fi
-
-# command check
-which jq &> /dev/null
-COMMAND_WHICH_JQ=$?
-
-if [ ${COMMAND_WHICH_JQ} -eq 0 ]; then
-    # JSON foramat check
-    echo "INFO: Checking JSON file"
-    cat ${PARAM_JSON_FILE} | jq > /dev/null
-    if [ $? -ne 0 ]; then
-        echo "ERROR: JSON file format"
+if [ ! -z "${PARAM_JSON_FILE}" ]; then
+    if [ ! -f "${PARAM_JSON_FILE}" ]; then
+        echo "Error: not found plan info json file : ${PARAM_JSON_FILE}"
         exit 1
     fi
 fi
+
+BODY_JSON=$(cat "${PARAM_JSON_FILE}")
 
 echo
 read -p "your username : " USERNAME
 read -sp "your password : " PASSWORD
 
 echo
-read -p "Initial setting Ansible, are you sure? (Y/other) : " CONFIRM
+read -p "Add an plan, are you sure? (Y/other) : " CONFIRM
 if [ "${CONFIRM}" != "Y" -a "${CONFIRM}" != "y" ]; then
     exit 1
 fi
+
+# echo "POST JSON:"
+# echo "${BODY_JSON}"
+# echo
 
 TEMPFILE_API_RESPONSE="/tmp/`basename $0`.$$.1"
 TEMPFILE_API_CODE="/tmp/`basename $0`.$$.2"
@@ -49,15 +44,16 @@ touch "${TEMPFILE_API_CODE}"
 curl ${CURL_OPT} -X POST \
     -u ${USERNAME}:${PASSWORD} \
     -H 'Content-type: application/json' \
-    -d "@${PARAM_JSON_FILE}" \
+    -d "${BODY_JSON}" \
     -o "${TEMPFILE_API_RESPONSE}" \
     -w '%{http_code}\n' \
-    "${CONF_BASE_URL}/api/ita/initial-settings/ansible/" > "${TEMPFILE_API_CODE}"
+    "${CONF_BASE_URL}/api/platform/plans" > "${TEMPFILE_API_CODE}"
 
 RESULT_CURL=$?
 RESULT_CODE=$(cat "${TEMPFILE_API_CODE}")
 
-if [ ${COMMAND_WHICH_JQ} -eq 0 ]; then
+which jq &> /dev/null
+if [ $? -eq 0 ]; then
     cat "${TEMPFILE_API_RESPONSE}" | jq
     if [ $? -ne 0 ]; then
         cat "${TEMPFILE_API_RESPONSE}"
