@@ -3,29 +3,19 @@ get:
   - InternalPlanService
   summary: Returns the current limits value
   x-openapi-router-controller: controllers.internal_plan_service_controller
-  operationId: limits_get
+  operationId: internal_organization_limits_get
   parameters:
+  - name: organization_id
+    in: path
+    required: true
+    schema:
+      type: string
   - name: limit_id
     in: query
     description: filter limit id. (prefix match)
     schema:
       type: string
       example: platform.workspaces
-  - name: User-Id
-    in: header
-    required: true
-    schema:
-      type: string
-  - name: Roles
-    in: header
-    required: true
-    schema:
-      type: string
-  - name: Language
-    in: header
-    required: true
-    schema:
-      type: string
   responses:
     200:
       description: A successful response.
@@ -34,7 +24,7 @@ get:
           schema:
             allOf:
               - $ref: '../schemas/responseOk.yaml'
-              - $ref: '../schemas/limitsList.yaml'
+              - $ref: '../schemas/limits.yaml'
     default:
       description: An unexpected error response.
       content:

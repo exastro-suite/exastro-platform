@@ -19,10 +19,34 @@ from contextlib import closing
 from common_library.common import common, const
 from common_library.common.db import DBconnector
 from libs import queries_internal_plan
+from libs import bl_plan_service
 
 import globals
 
 MSG_FUNCTION_ID = "28"
+
+
+@common.platform_exception_handler
+def internal_organization_limits_get(organization_id, limit_id=None):
+    """Returns the current limits value
+
+    Args:
+        organization_id (str): organization_id
+        limit_id (str, optional): filter limit id. (prefix match). Defaults to None.
+
+    Returns:
+        response: HTTP Response
+    """
+    globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
+
+    # check organization
+    DBconnector().get_organization_private(organization_id)
+
+    # plan and plan_limit list get
+    data = bl_plan_service.organization_limits_get(organization_id, limit_id)
+
+    return common.response_200_ok(data)
+
 
 @common.platform_exception_handler
 def limits_get(limit_id=None):

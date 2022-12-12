@@ -320,7 +320,9 @@ components:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/planMappingOrganization'
+            allOf:
+              - $ref: '#/components/schemas/planMappingOrganization'
+              - $ref: '#/components/schemas/responseStat'
     plan:
       title: plan is a definition of Plan resource.
       type: object

@@ -77,6 +77,8 @@ paths:
   "/api/{organization_id}/platform/roles/{role_name}/users":
       $ref: './paths/roles.role_name.users.yaml'
 
+  "/internal-api/{organization_id}/platform/limits":
+      $ref: './paths/internal_plans.organizations.limits.yaml'
   "/internal-api/platform/limits":
       $ref: './paths/internal_plan.limits.yaml'
 
