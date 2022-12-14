@@ -22,8 +22,8 @@ from datetime import datetime
 from common_library.common import common, validation, const
 from common_library.common.db import DBconnector
 from common_library.common import multi_lang
+from common_library.common import bl_plan_service
 from libs import queries_plans
-from libs import bl_plan_service
 
 import globals
 
