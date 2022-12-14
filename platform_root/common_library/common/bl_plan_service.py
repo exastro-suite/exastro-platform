@@ -21,7 +21,7 @@ from datetime import datetime
 from common_library.common import common, validation, const
 from common_library.common.db import DBconnector
 from common_library.common import multi_lang
-from libs import queries_plans
+from common_library.common.libs import queries_bl_plan
 
 
 def organization_limits_get(organization_id, limit_id=None):
@@ -45,7 +45,7 @@ def organization_limits_get(organization_id, limit_id=None):
                     " AND start_timestamp <= CURRENT_TIMESTAMP()" \
                     " ORDER BY start_timestamp DESC" \
                     " LIMIT 1"
-            cursor.execute(queries_plans.SQL_QUERY_ORGANIZATION_PLAN + where, parameter)
+            cursor.execute(queries_bl_plan.SQL_QUERY_ORGANIZATION_PLAN + where, parameter)
             org_plans = cursor.fetchall()
 
             if len(org_plans) >= 1:
@@ -61,7 +61,7 @@ def organization_limits_get(organization_id, limit_id=None):
                 parameter["limit_id"] = limit_id
                 where = where + " AND limit_id LIKE CONCAT(%(limit_id)s,'%%')"
 
-            cursor.execute(queries_plans.SQL_QUERY_PLAN_LIMITS + where, parameter)
+            cursor.execute(queries_bl_plan.SQL_QUERY_PLAN_LIMITS + where, parameter)
             result_plan_limits = cursor.fetchall()
 
     data = {}
