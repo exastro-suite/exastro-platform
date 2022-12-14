@@ -21,6 +21,7 @@ from common_library.common import validation, check_authority
 from common_library.common.db import DBconnector
 from common_library.common import multi_lang
 import common_library.common.const as common_const
+from common_library.common import resources
 
 import globals
 
@@ -153,6 +154,9 @@ def role_list(organization_id, kind=None):
     """
 
     globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
+
+    rc = resources.counter(organization_id)
+    globals.logger.info("### roles count :{}".format(rc(common_const.RESOURCE_COUNT_ROLES)))
 
     db = DBconnector()
     private = db.get_organization_private(organization_id)

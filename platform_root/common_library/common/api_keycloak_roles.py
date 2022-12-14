@@ -20,13 +20,16 @@ import requests
 import globals  # 共通的なglobals Common globals
 
 
-def clients_roles_get(realm_name, client_id, token, briefRepresentation=True):
+def clients_roles_get(realm_name, client_id, token, briefRepresentation=True, first=1, max=100, search=""):
     """client ロール取得 client roles get
     Args:
         realm_name (str): realm name
         client_id (str): client id (not client-id)
         toekn (str): token
         briefRepresentation (bool): True:brief   False:All
+        first (int): get data numner
+        max (int): get max count
+        search (str): search words of rolename
     Returns:
         Response: HTTP Respose (success : .status_code=200)
     """
@@ -44,12 +47,34 @@ def clients_roles_get(realm_name, client_id, token, briefRepresentation=True):
     # ロールの詳細取得有無の設定
     # Setting whether to acquire role details
     add_query = ""
+
     if not briefRepresentation:
         if add_query:
             add_query += "&"
         else:
             add_query += "?"
         add_query += f"briefRepresentation={briefRepresentation}"
+
+    if first:
+        if add_query:
+            add_query += "&"
+        else:
+            add_query += "?"
+        add_query += f"first={first}"
+
+    if max:
+        if add_query:
+            add_query += "&"
+        else:
+            add_query += "?"
+        add_query += f"max={max}"
+
+    if search:
+        if add_query:
+            add_query += "&"
+        else:
+            add_query += "?"
+        add_query += f"search={search}"
 
     globals.logger.debug("client roles get")
     # 情報取得

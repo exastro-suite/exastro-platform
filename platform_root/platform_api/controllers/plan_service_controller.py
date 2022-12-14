@@ -19,8 +19,7 @@ import inspect
 import pymysql
 from datetime import datetime
 
-from common_library.common import common, validation, const
-from common_library.common import resources
+from common_library.common import common, validation
 from common_library.common.db import DBconnector
 from common_library.common import multi_lang
 from libs import queries_plans
@@ -91,9 +90,6 @@ def plan_create(body):
     validate = validation.validate_plan_limits(limits)
     if not validate.ok:
         return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
-
-    rc = resources.counter()
-    globals.logger.info("### roles count :{}".format(rc(const.RESOURCE_COUNT_ROLES)))
 
     # DB登録
     #  insert plan and plan_limit
