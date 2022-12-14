@@ -91,3 +91,15 @@ ALL_REALM_MANAGEMENT_ROLE = ["manage-users", "view-users"]
 # plan未設定時のデフォルト
 # Default when plan is not set
 DEFAULT_PLAN_ID = "_default"
+
+# 集計対象リソース
+# Aggregated resource
+RESOURCE_COUNT_WORKSPACES = "platform.workspaces"
+RESOURCE_COUNT_USERS = "platform.users"
+RESOURCE_COUNT_ROLES = "platform.roles"
+
+ALL_RESOURCE_COUNT = [
+    RESOURCE_COUNT_WORKSPACES,
+    RESOURCE_COUNT_USERS,
+    RESOURCE_COUNT_ROLES,
+]
