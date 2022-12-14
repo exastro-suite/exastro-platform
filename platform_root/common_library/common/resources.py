@@ -12,8 +12,13 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
+import inspect
+import json
+
 from common_library.common import common, const
 from common_library.common import multi_lang
+from common_library.common import api_keycloak_tokens, api_keycloak_roles
+from common_library.common.db import DBconnector
 
 import globals
 
@@ -22,26 +27,28 @@ class counter():
     """リソース集計 resource aggregation
     """
 
-    def __init__(self):
-        pass
+    def __init__(self, organization_id):
 
-    def __call__(self, organization_id, kind_resource):
+        self.organization_id = organization_id
+
+    def __call__(self, kind_resource):
         """指定リソースの集計 Aggregation of specified resources
 
         Args:
-            organization_id (str): organization id
+            kind_resource (str): kind resource
 
         Returns:
             int: リソース数 count resources
 
         """
+        globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
 
         if kind_resource == const.RESOURCE_COUNT_WORKSPACES:
-            ret = self.get_resource_count_workspaces(organization_id)
+            ret = self.get_resource_count_workspaces(self.organization_id)
         elif kind_resource == const.RESOURCE_COUNT_USERS:
-            ret = self.get_resource_count_users(organization_id)
+            ret = self.get_resource_count_users(self.organization_id)
         elif kind_resource == const.RESOURCE_COUNT_ROLES:
-            ret = self.get_resource_count_roles(organization_id)
+            ret = self.get_resource_count_roles(self.organization_id)
         else:
             globals.logger.error(f"not support count resource:{kind_resource}")
             message_id = "400-00021"
@@ -88,4 +95,38 @@ class counter():
             int: ロール数 count roles
         """
 
-        return 100
+        db = DBconnector()
+        private = db.get_organization_private(organization_id)
+
+        # サービスアカウントのTOKEN取得
+        # Get a service account token
+        token_response = api_keycloak_tokens.service_account_get_token(
+            organization_id, private.internal_api_client_clientid, private.internal_api_client_secret,
+        )
+        if token_response.status_code != 200:
+            raise common.AuthException(
+                "client_user_get_token error status:{}, response:{}".format(token_response.status_code, token_response.text)
+            )
+
+        token = json.loads(token_response.text)["access_token"]
+
+        response = api_keycloak_roles.clients_roles_get(
+            realm_name=organization_id, client_id=private.user_token_client_id, token=token, briefRepresentation=False
+        )
+        if response.status_code != 200:
+            globals.logger.error(f"response.status_code:{response.status_code}")
+            globals.logger.error(f"response.text:{response.text}")
+            message_id = "500-00010"
+            message = multi_lang.get_text(
+                message_id,
+                "ロールの取得に失敗しました(対象ID:{0} client:{1})",
+                organization_id,
+                private.user_token_client_clientid
+            )
+            raise common.InternalErrorException(message_id=message_id, message=message)
+
+        roles = json.loads(response.text)
+
+        globals.logger.debug(f"roles:{roles}")
+
+        return len(roles)
