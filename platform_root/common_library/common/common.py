@@ -444,3 +444,25 @@ def get_value_in_json(json, value_key, is_key=True):
         val_list = []
 
     return val_list
+
+
+def url_query_appending(query_str, append_str, append_value):
+    """url query string appending
+
+    Args:
+        query_str (str): query strings
+        append_str (str): append keyname
+        append_value (str): append value
+
+    Returns:
+        str: append query string
+    """
+
+    if query_str:
+        query_str += "&"
+    else:
+        query_str += "?"
+
+    query_str += f"{append_str}={append_value}"
+
+    return query_str
