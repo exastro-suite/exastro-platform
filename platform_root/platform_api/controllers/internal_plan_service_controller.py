@@ -18,8 +18,8 @@ from contextlib import closing
 
 from common_library.common import common, const
 from common_library.common.db import DBconnector
+from common_library.common import bl_plan_service
 from libs import queries_internal_plan
-from libs import bl_plan_service
 
 import globals
 
