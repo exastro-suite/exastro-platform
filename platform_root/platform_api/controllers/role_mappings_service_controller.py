@@ -28,12 +28,14 @@ MSG_FUNCTION_ID = "26"
 
 
 @common.platform_exception_handler
-def role_user_mapping_get(organization_id, role_name):
+def role_user_mapping_get(organization_id, role_name, first=0, max=100):
     """Get user-role mapping for a role
 
     Args:
         organization_id (str): organization id
         role_name (str): role name
+        first (int): first result to return
+        max (int): maximum number of results to return
 
     Returns:
         _type_: _description_
@@ -54,7 +56,7 @@ def role_user_mapping_get(organization_id, role_name):
     # ロールの取得
     # Get role
     response = api_keycloak_roles.role_uesrs_get(
-        realm_name=organization_id, client_id=private.user_token_client_id, role_name=client_role.get("name"), token=token,
+        realm_name=organization_id, client_id=private.user_token_client_id, role_name=client_role.get("name"), token=token, first=first, max=max
     )
 
     if response.status_code == 404:
@@ -74,10 +76,13 @@ def role_user_mapping_get(organization_id, role_name):
     for user in role_users:
         ret_role_users.append(
             {
+                "id": user.get("id"),
                 "name": common.get_username(user.get("firstName"), user.get("lastName"), user.get("username")),
                 "firstName": user.get("firstName"),
                 "lastName": user.get("lastName"),
                 "preferred_username": user.get("username"),
+                "enabled": user.get("enabled"),
+                "create_timestamp": common.keycloak_timestamp_to_str(user.get("createdTimestamp"))
             }
         )
 

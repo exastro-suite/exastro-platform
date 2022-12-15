@@ -1860,114 +1860,206 @@ flex: 0 0 32px;
 }
 
 /* Footer */
+/* Footer */
 .tableFooter {
-flex: 0 0 auto;
-background-color: var(--black80);
-background-image: linear-gradient(rgba(255,255,255,.1), rgba(255,255,255,0));
-box-shadow: 0 1px 1px rgb( 255,255,255,.2 ) inset;
-border: 1px solid var(--black100);
-}
-.tableFooterInner {
-display: inline-flex;
-flex-wrap: wrap;
-max-width: 100%;
-}
-.tableFooterBlock {
-flex: 1 1 auto;
-display: inline-flex;
-max-width: 100%;
-background-color: var(--black80);
-background-image: linear-gradient(rgba(255,255,255,.1), rgba(255,255,255,0));
-box-shadow: 0 1px 1px rgb( 255,255,255,.2 ) inset;
-border-right: 1px solid var(--black100);
-}
-.tableFooterBlock:last-child {
-border-right: none;
-}
-.tableFooterList {
-flex: 1 1 auto;
-display: inline-flex;
-height: 40px;
-min-width: 0; max-width: 100%;
-}
-.pagingMove > .tableFooterList {
-flex: 0 0 auto;
-}
-.tableFooterTitle,
-.tableFooterItem {
-overflow: hidden;
-flex: 1 1 auto;
-display: flex;
-justify-content: center;
-align-items: center;
-height: 100%;
-min-width: 0;
-color: var(--white100);
-}
-.footerText {
-overflow: hidden;
-display: block;
-white-space: nowrap;
-text-overflow: ellipsis;
-}
-.tableFooterTitle {
-padding-left: 16px;
-}
-.tableFooterData {
-margin-left: 12px; padding: 12px;
-background-color: rgba( 0,0,0,.1 );
-border-left: 1px solid rgba( 0,0,0,.2 );
-}
-.pagingMove {
-padding: 0 16px;
-}
-.pagingPage {
-overflow: hidden;
-padding: 0 12px;
-white-space: nowrap;
-text-overflow: ellipsis;
-}
-.pagingSeparate {
-padding: 0 4px;
-opacity: .75;
-}
-.pagingMoveButton {
-height: 28px;
-margin: 0 4px; padding: 0 8px;
-background-color: rgba( 255,255,255,.1 );
-border: 1px solid rgba( 0,0,0,.5 );
-border-radius: 4px;
-box-shadow: 0 -1px 1px rgba( 0,0,0,.1 ), 0 1px 1px rgba( 255,255,255,.1 ), 0 1px 1px rgba( 255,255,255,.2 ) inset;
-color: var(--accentColor100);
-cursor: pointer;
-outline: none;
-}
-.pagingMoveButton > .icon {
-display: inline-block;
-}
-.pagingMoveButton:hover,
-.pagingMoveButton:focus {
-background-color: rgba( 255,255,255,.15 );
-}
-.pagingMoveButton:focus {
-outline: 2px solid rgba( 255,255,255,.3 );
-}
-.pagingMoveButton:focus:hover {
-outline: none;
-}
-.pagingMoveButton:active {
-background-color: rgba( 255,255,255,.075 );
-box-shadow: 0 -1px 1px rgba( 0,0,0,.1 ), 0 1px 1px rgba( 255,255,255,.1 ), 0 1px 1px rgba( 0,0,0,.3 ) inset;
-}
-.pagingMoveButton:active > .icon {
-transform: translateY(1px);
-}
-.pagingMoveButton:disabled {
-background-color: rgba( 255,255,255,.05 )!important;
-box-shadow: none!important;
-color: rgba( 0,0,0,.2 )!important;
-cursor: default!important;
-}
+  position: relative;
+  z-index: 5;
+  flex: 0 0 auto;
+  background-color: var(--black80);
+  background-image: linear-gradient(rgba(255,255,255,.1), rgba(255,255,255,0));
+  box-shadow: 0 1px 1px rgb( 255,255,255,.2 ) inset;
+  border: 1px solid var(--black100);
+  }
+  .tableFooterInner {
+  display: inline-flex;
+  flex-wrap: wrap;
+  max-width: 100%;
+  }
+  .tableFooterBlock {
+  flex: 1 1 auto;
+  display: inline-flex;
+  max-width: 100%;
+  background-color: var(--black80);
+  background-image: linear-gradient(rgba(255,255,255,.1), rgba(255,255,255,0));
+  box-shadow: 0 1px 1px rgb( 255,255,255,.2 ) inset;
+  border-right: 1px solid rgba( 0,0,0,.8 );
+  border-left: 1px solid rgba( 255,255,255,.1);
+  }
+  .tableFooterBlock:last-child {
+  border-right: none;
+  }
+  .tableFooterList {
+  flex: 1 1 auto;
+  display: inline-flex;
+  height: 40px;
+  min-width: 0; max-width: 100%;
+  }
+  .pagingMove > .tableFooterList {
+  flex: 0 0 auto;
+  }
+  .tableFooterTitle,
+  .tableFooterItem {
+  flex: 1 1 auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  min-width: 0;
+  color: var(--white100);
+  }
+  .footerText {
+  overflow: hidden;
+  display: block;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  }
+  .tableFooterTitle {
+  padding-left: 16px;
+  }
+  .tableFooterData {
+  margin-left: 12px; padding: 12px;
+  background-color: rgba( 0,0,0,.1 );
+  border-left: 1px solid rgba( 0,0,0,.2 );
+  }
+  .pagingOnePageNum .tableFooterData {
+  padding: 0;
+  }
+  .pagingOnePageNumSelect {
+  position: relative;
+  z-index: 0;
+  }
+  .pagingOnePageNumSelectNumber {
+  position: relative;
+  z-index: 0;
+  min-width: 40px;
+  padding: 12px 28px 12px 12px;
+  letter-spacing: .5px;
+  font-family: "Osaka-mono", "MS Gothic", "monospace";
+  font-size: 16px;
+  cursor: pointer;
+  user-select: none;
+  }
+  .pagingOnePageNumSelectNumber::after {
+  content: '\e95c';
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  right: 6px; top: 0;
+  width: 16px; height: 100%;
+  font-family: 'exastro-ui-icons' !important;
+  font-size: 12px;
+  transition-duration: .2s;
+  }
+  .pagingOnePageNumSelectNumber:hover {
+  background-image: linear-gradient(rgba(255,255,255,.1), rgba(255,255,255,.05));
+  }
+  .pagingOnePageNumSelectNumber:hover::after {
+  transform: translateY(-2px);
+  color: var(--accentColor100);
+  }
+  .pagingOnePageNumSelectList {
+  overflow: auto;
+  display: none;
+  position: absolute;
+  left: 0; bottom: 100%;
+  width: 100%;
+  background-color: var(--black80);
+  background-image: linear-gradient(rgba(255,255,255,.1), rgba(255,255,255,0));
+  border-top: 1px solid rgba( 255,255,255,.1 );
+  color: var(--white100);
+  }
+  .pagingOnePageNumSelectList.pagingOnePageOpen {
+  display: block;
+  }
+  .pagingOnePageNumSelectItem {
+  position: relative;
+  z-index: 0;
+  }
+  .pagingOnePageNumSelectRadio {
+  position: absolute;
+  z-index: -1;
+  opacity: 0;
+  }
+  .pagingOnePageNumSelectLabel {
+  display: block;
+  padding: 8px;
+  border-bottom: 1px solid rgba( 0,0,0,.8 );
+  border-right: 1px solid rgba( 0,0,0,.8 );
+  border-top: 1px solid rgba( 255,255,255,.1 );
+  border-left: 1px solid rgba( 255,255,255,.1 );
+  letter-spacing: .5px;
+  font-family: "Osaka-mono", "MS Gothic", "monospace";
+  font-size: 14px;
+  color: #AAA;
+  cursor: pointer;
+  }
+  .pagingOnePageNumSelectRadio:focus ~ .pagingOnePageNumSelectLabel,
+  .pagingOnePageNumSelectRadio ~ .pagingOnePageNumSelectLabel:hover {
+  background-image: linear-gradient(rgba(255,255,255,.1), rgba(255,255,255,.05));
+  }
+  .pagingOnePageNumSelectRadio:checked ~ .pagingOnePageNumSelectLabel {
+  background-image: linear-gradient(rgba(255,255,255,.2), rgba(255,255,255,.1));
+  border-top-color: rgba( 255,255,255,.3 );
+  color: var(--white100);
+  cursor: default;
+  }
+  .pagingMove {
+  padding: 0 16px;
+  }
+  .pagingPage {
+  overflow: hidden;
+  padding: 0 12px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-family: "Osaka-mono", "MS Gothic", "monospace";
+  }
+  .pagingSeparate {
+  padding: 0 4px;
+  opacity: .75;
+  }
+  .pagingMoveButton {
+  height: 28px;
+  margin: 0 4px; padding: 0 8px;
+  background-color: rgba( 255,255,255,.1 );
+  border: 1px solid rgba( 0,0,0,.5 );
+  border-radius: 4px;
+  box-shadow: 0 -1px 1px rgba( 0,0,0,.1 ), 0 1px 1px rgba( 255,255,255,.1 ), 0 1px 1px rgba( 255,255,255,.2 ) inset;
+  color: var(--accentColor100);
+  cursor: pointer;
+  outline: none;
+  }
+  .pagingMoveButton > .icon {
+  display: inline-block;
+  }
+  .pagingMoveButton:hover,
+  .pagingMoveButton:focus {
+  background-color: rgba( 255,255,255,.15 );
+  }
+  .pagingMoveButton:focus {
+  outline: 2px solid rgba( 255,255,255,.3 );
+  }
+  .pagingMoveButton:focus:hover {
+  outline: none;
+  }
+  .pagingMoveButton:active {
+  background-color: rgba( 255,255,255,.075 );
+  box-shadow: 0 -1px 1px rgba( 0,0,0,.1 ), 0 1px 1px rgba( 255,255,255,.1 ), 0 1px 1px rgba( 0,0,0,.3 ) inset;
+  }
+  .pagingMoveButton:active > .icon {
+  transform: translateY(1px);
+  }
+  .pagingMoveButton:disabled {
+  background-color: rgba( 255,255,255,.05 )!important;
+  box-shadow: none!important;
+  color: rgba( 0,0,0,.2 )!important;
+  cursor: default!important;
+  }
+  .pagingAllNumNumber {
+  letter-spacing: .5px;
+  font-family: "Osaka-mono", "MS Gothic", "monospace";
+  font-size: 16px;
+  }
 
 .tBodyRowMenu  {
 cursor: pointer;
@@ -2643,129 +2735,8 @@ height: 100%;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-.icon-arrow01_left:before {
-  content: "\e927";
-}
-.icon-arrow01_right:before {
-  content: "\e928";
-}
-.icon-ellipsis:before {
-  content: "\e920";
-}
-.icon-ellipsis_v:before {
-  content: "\e921";
-}
-.icon-history:before {
-  content: "\e922";
-}
-.icon-menuGroup:before {
-  content: "\e923";
-}
-.icon-menuList:before {
-  content: "\e924";
-}
-.icon-star:before {
-  content: "\e925";
-}
-.icon-MoveOut:before {
-  content: "\e91f";
-}
-.icon-moveIn:before {
-  content: "\e926";
-}
-.icon-rollback:before {
-  content: "\e91e";
-}
-.icon-first:before {
-  content: "\e91a";
-}
-.icon-prev:before {
-  content: "\e91b";
-}
-.icon-next:before {
-  content: "\e91c";
-}
-.icon-last:before {
-  content: "\e91d";
-}
-.icon-update:before {
-  content: "\e919";
-}
-.icon-branch:before {
-  content: "\e918";
-}
-.icon-detail:before {
-  content: "\e908";
-}
-.icon-cal:before {
-  content: "\e909";
-}
-.icon-cal_off:before {
-  content: "\e90a";
-}
-.icon-edit:before {
-  content: "\e90b";
-}
-.icon-filter:before {
-  content: "\e90c";
-}
-.icon-filter_off:before {
-  content: "\e90d";
-}
-.icon-login:before {
-  content: "\e90e";
-}
-.icon-logout:before {
-  content: "\e90f";
-}
-.icon-download:before {
-  content: "\e910";
-}
-.icon-eye_close:before {
-  content: "\e911";
-}
-.icon-eye_open:before {
-  content: "\e912";
-}
-.icon-gear:before {
-  content: "\e913";
-}
-.icon-link:before {
-  content: "\e914";
-}
-.icon-trash:before {
-  content: "\e915";
-}
-.icon-upload:before {
-  content: "\e916";
-}
-.icon-user:before {
-  content: "\e917";
-}
-.icon-degraded:before {
-  content: "\e900";
-}
-.icon-healthy:before {
-  content: "\e901";
-}
-.icon-missing:before {
-  content: "\e902";
-}
-.icon-outOfSync:before {
-  content: "\e903";
-}
-.icon-progressing:before {
-  content: "\e904";
-}
-.icon-suspended:before {
-  content: "\e905";
-}
-.icon-synced:before {
-  content: "\e906";
-}
-.icon-unknown:before {
-  content: "\e907";
-}
+.icon-exastro:before{content:"\e90e"}.icon-ita:before{content:"\e90f"}.icon-oase:before{content:"\e92a"}.icon-epoch:before{content:"\e92b"}.icon-plus:before{content:"\e92c"}.icon-minus:before{content:"\e92d"}.icon-circle:before{content:"\e92e"}.icon-cross:before{content:"\e92f"}.icon-check:before{content:"\e930"}.icon-copy:before{content:"\e958"}.icon-pause:before{content:"\e931"}.icon-clear:before{content:"\e932"}.icon-lock:before{content:"\e933"}.icon-manual:before{content:"\e934"}.icon-update01:before{content:"\e935"}.icon-update02:before{content:"\e919"}.icon-return:before{content:"\e936"}.icon-search:before{content:"\e937"}.icon-exportImport:before{content:"\e938"}.icon-arrow01_left:before{content:"\e927"}.icon-arrow01_right:before{content:"\e928"}.icon-arrow02_bottom:before{content:"\e95b"}.icon-arrow02_top:before{content:"\e95c"}.icon-ellipsis:before{content:"\e920"}.icon-ellipsis_v:before{content:"\e921"}.icon-history:before{content:"\e922"}.icon-clock:before{content:"\e939"}.icon-menuGroup:before{content:"\e923"}.icon-menuList:before{content:"\e924"}.icon-star:before{content:"\e925"}.icon-logout:before{content:"\e91f"}.icon-login:before{content:"\e926"}.icon-rollback:before{content:"\e91e"}.icon-first:before{content:"\e91a"}.icon-prev:before{content:"\e91b"}.icon-next:before{content:"\e91c"}.icon-last:before{content:"\e91d"}.icon-branch:before{content:"\e918"}.icon-detail:before{content:"\e908"}.icon-cal:before{content:"\e909"}.icon-cal_off:before{content:"\e90a"}.icon-edit:before{content:"\e90b"}.icon-filter:before{content:"\e90c"}.icon-filter_off:before{content:"\e90d"}.icon-eye_close:before{content:"\e911"}.icon-eye_open:before{content:"\e912"}.icon-gear:before{content:"\e913"}.icon-link:before{content:"\e914"}.icon-trash:before{content:"\e915"}.icon-upload:before{content:"\e916"}.icon-download:before{content:"\e910"}.icon-user:before{content:"\e917"}.icon-heartBreak:before{content:"\e900"}.icon-heart:before{content:"\e901"}.icon-missing:before{content:"\e902"}.icon-progressing:before{content:"\e904"}.icon-circle_pause:before{content:"\e905"}.icon-circle_check:before{content:"\e906"}.icon-circle_question:before{content:"\e907"}.icon-circle_doubleExclamation:before{content:"\e93a"}.icon-circle_exclamation:before{content:"\e93b"}.icon-circle_info:before{content:"\e93c"}.icon-circle_top:before{content:"\e903"}.icon-square_prev:before{content:"\e93d"}.icon-square_next:before{content:"\e93e"}.icon-square_pause:before{content:"\e93f"}.icon-stop:before{content:"\e940"}.icon-attention:before{content:"\e94b"}.icon-message:before{content:"\e94c"}.icon-message_q:before{content:"\e94d"}.icon-align_left:before{content:"\e941"}.icon-align_center:before{content:"\e942"}.icon-align_right:before{content:"\e943"}.icon-align_top:before{content:"\e944"}.icon-align_horizonal:before{content:"\e945"}.icon-align_bottom:before{content:"\e946"}.icon-algin_equally_horizonal:before{content:"\e947"}.icon-algin_equally_vertical:before{content:"\e948"}.icon-expansion:before{content:"\e94e"}.icon-shrink:before{content:"\e94f"}.icon-pipeline:before{content:"\e951"}.icon-organization:before{content:"\e956"}.icon-role:before{content:"\e957"}.icon-dashboard:before{content:"\e929"}.icon-note:before{content:"\e949"}.icon-workspace:before{content:"\e94a"}.icon-sort:before{content:"\e950"}.icon-sort_asc:before{content:"\e952"}.icon-sort_desc:before{content:"\e953"}.icon-mouse:before{content:"\e954"}.icon-mouse_left:before{content:"\e955"}.icon-mouse_right:before{content:"\e959"}.icon-mouse_wheel:before{content:"\e95a"}
+
 .containerLoading {
   display: flex;
   align-items: center;
@@ -2776,6 +2747,7 @@ height: 100%;
   width: 50%; height: 50%;
   background-color: rgba( 255,255,255,.5 );
   border-radius: 16px;
+  z-index: 999999;
   }
   .containerLoading::after {
   content: '';
@@ -2786,4 +2758,3 @@ height: 100%;
   border-radius: 50%;
   animation: loading 1s infinite;
   }
-  
