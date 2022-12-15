@@ -20,8 +20,10 @@ import inspect
 import pymysql
 import base64
 
-from common_library.common import common, validation
+from common_library.common import common, validation, multi_lang
 from common_library.common import api_keycloak_tokens, api_keycloak_roles, api_ita_admin_call
+from common_library.common import resources
+from common_library.common import bl_plan_service
 import common_library.common.const as common_const
 from common_library.common.db import DBconnector
 from libs import queries_workspaces
@@ -74,6 +76,22 @@ def workspace_create(body, organization_id):
     if not validate.ok:
         return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
 
+    # plan limits check
+    data = bl_plan_service.organization_limits_get(organization_id, common_const.RESOURCE_COUNT_WORKSPACES)
+    workspace_limits = data.get(common_const.RESOURCE_COUNT_WORKSPACES)
+    if workspace_limits > 0:
+        rc = resources.counter(organization_id)
+        workspace_count = rc(common_const.RESOURCE_COUNT_WORKSPACES)
+
+        if workspace_count >= workspace_limits:
+            globals.logger.error("resource limit exceeded. workspace count:{0} limits: {1}".format(workspace_count, workspace_limits))
+            message_id = f"400-{MSG_FUNCTION_ID}002"
+            message = multi_lang.get_text(
+                message_id,
+                "現在設定されているリソースの制限値を超えているため、新しいワークスペースは作成できません。",
+            )
+            raise common.BadRequestException(message_id=message_id, message=message)
+
     db = DBconnector()
     private = db.get_organization_private(organization_id)
     with closing(db.connect_orgdb(organization_id)) as conn:
@@ -93,9 +111,12 @@ def workspace_create(body, organization_id):
                 cursor.execute(queries_workspaces.SQL_INSERT_WORKSPACE, parameter)
             except pymysql.err.IntegrityError:
                 # Duplicate PRIMARY KEY
-                return common.response_status(
-                    409, None, f"409-{MSG_FUNCTION_ID}001", "指定されたワークスペースはすでに存在しているため作成できません。"
+                message_id = f"409-{MSG_FUNCTION_ID}001"
+                message = multi_lang.get_text(
+                    message_id,
+                    "指定されたワークスペースはすでに存在しているため作成できません。",
                 )
+                raise common.BadRequestException(message_id=message_id, message=message)
 
             # サービスアカウントのTOKEN取得
             # Get a service account token
@@ -132,7 +153,15 @@ def workspace_create(body, organization_id):
                 )
                 if r_create_ws.status_code not in [201, 409]:
                     # 201 Created 以外に、409 already exists は許容する
-                    raise common.InternalErrorException(None, f"500-{MSG_FUNCTION_ID}001", "ワークスペースロール作成に失敗しました(対象ID:{})".format(workspace_id))
+                    globals.logger.error(f"response.status_code:{r_create_ws.status_code}")
+                    globals.logger.error(f"response.text:{r_create_ws.text}")
+                    message_id = f"500-{MSG_FUNCTION_ID}001"
+                    message = multi_lang.get_text(
+                        message_id,
+                        "ワークスペースロール作成に失敗しました(対象ID:{0})",
+                        workspace_id,
+                    )
+                    raise common.InternalErrorException(message_id=message_id, message=message)
 
             # ロール作成(role_name_wsadmin)
             # create role_name_wsadmin role
@@ -142,7 +171,15 @@ def workspace_create(body, organization_id):
             )
             if r_create_wsadmin.status_code not in [201, 409]:
                 # 201 Created 以外に、409 already exists は許容する
-                raise common.InternalErrorException(None, f"500-{MSG_FUNCTION_ID}002", "ワークスペース管理者ロール作成に失敗しました(対象ID:{})".format(workspace_id))
+                globals.logger.error(f"response.status_code:{r_create_wsadmin.status_code}")
+                globals.logger.error(f"response.text:{r_create_wsadmin.text}")
+                message_id = f"500-{MSG_FUNCTION_ID}002"
+                message = multi_lang.get_text(
+                    message_id,
+                    "ワークスペース管理者ロール作成に失敗しました(対象ID:{0})",
+                    workspace_id,
+                )
+                raise common.InternalErrorException(message_id=message_id, message=message)
 
             roles_ws = []
             # ws-adminロールにwsロールをcompositeする
@@ -152,7 +189,15 @@ def workspace_create(body, organization_id):
                     realm_name=organization_id, client_id=private.internal_api_client_id, role_name=role, token=token,
                 )
                 if r_get_role_ws.status_code != 200:
-                    raise common.InternalErrorException(None, f"500-{MSG_FUNCTION_ID}003", "ワークスペースロールの取得に失敗しました(対象ID:{})".format(workspace_id))
+                    globals.logger.error(f"response.status_code:{r_get_role_ws.status_code}")
+                    globals.logger.error(f"response.text:{r_get_role_ws.text}")
+                    message_id = f"500-{MSG_FUNCTION_ID}003"
+                    message = multi_lang.get_text(
+                        message_id,
+                        "ワークスペースロールの取得に失敗しました(対象ID:{0})",
+                        workspace_id,
+                    )
+                    raise common.InternalErrorException(message_id=message_id, message=message)
 
                 roles_ws.append(json.loads(r_get_role_ws.text))
 
@@ -160,11 +205,15 @@ def workspace_create(body, organization_id):
                 realm_name=organization_id, client_uid=private.user_token_client_id, role_name=role_name_wsadmin, add_roles=roles_ws, token=token,
             )
             if r_create_composite.status_code != 204:
-                raise common.InternalErrorException(
-                    None,
-                    f"500-{MSG_FUNCTION_ID}004",
-                    "ワークスペース管理者ロールとワークスペースロールの紐づけに失敗しました(対象ID:{})".format(workspace_id)
+                globals.logger.error(f"response.status_code:{r_create_composite.status_code}")
+                globals.logger.error(f"response.text:{r_create_composite.text}")
+                message_id = f"500-{MSG_FUNCTION_ID}004"
+                message = multi_lang.get_text(
+                    message_id,
+                    "ワークスペース管理者ロールとワークスペースロールの紐づけに失敗しました(対象ID:{0})",
+                    workspace_id,
                 )
+                raise common.InternalErrorException(message_id=message_id, message=message)
 
             # 管理者ユーザーのrole mappingにws-adminロールを追加する
             # Add ws-admin role to administrat users role mapping
@@ -175,7 +224,15 @@ def workspace_create(body, organization_id):
                 token=token,
             )
             if r_get_role_admin.status_code != 200:
-                raise common.InternalErrorException(None, f"500-{MSG_FUNCTION_ID}005", "ワークスペース管理者ロールの取得に失敗しました(対象ID:{})".format(workspace_id))
+                globals.logger.error(f"response.status_code:{r_get_role_admin.status_code}")
+                globals.logger.error(f"response.text:{r_get_role_admin.text}")
+                message_id = f"500-{MSG_FUNCTION_ID}005"
+                message = multi_lang.get_text(
+                    message_id,
+                    "ワークスペース管理者ロールの取得に失敗しました(対象ID:{0})",
+                    workspace_id,
+                )
+                raise common.InternalErrorException(message_id=message_id, message=message)
 
             roles_admin = [json.loads(r_get_role_admin.text), ]
 
@@ -192,24 +249,30 @@ def workspace_create(body, organization_id):
                     token=token,
                 )
                 if r_create_mapping.status_code != 204:
-                    globals.logger.debug(f"response:{r_create_mapping.text}")
-
-                    raise common.InternalErrorException(
-                        None,
-                        f"500-{MSG_FUNCTION_ID}006",
-                        "管理者ユーザーとワークスペース管理者ロールの紐づけに失敗しました(対象ID:{})".format(target_user_id)
+                    globals.logger.error(f"response.status_code:{r_create_mapping.status_code}")
+                    globals.logger.error(f"response.text:{r_create_mapping.text}")
+                    message_id = f"500-{MSG_FUNCTION_ID}006"
+                    message = multi_lang.get_text(
+                        message_id,
+                        "管理者ユーザーとワークスペース管理者ロールの紐づけに失敗しました(対象ID:{0})",
+                        target_user_id,
                     )
+                    raise common.InternalErrorException(message_id=message_id, message=message)
 
             # IT Automation call
             r_create_ita_workspace = api_ita_admin_call.ita_workspace_create(
                 organization_id, workspace_id, role_name_wsadmin, user_id, encode_roles, language,
             )
             if r_create_ita_workspace.status_code != 200:
-                raise common.InternalErrorException(
-                    None,
-                    f"500-{MSG_FUNCTION_ID}007",
-                    "IT Automationのワークスペース作成に失敗しました(対象ID:{})".format(workspace_id)
+                globals.logger.error(f"response.status_code:{r_create_ita_workspace.status_code}")
+                globals.logger.error(f"response.text:{r_create_ita_workspace.text}")
+                message_id = f"500-{MSG_FUNCTION_ID}007"
+                message = multi_lang.get_text(
+                    message_id,
+                    "IT Automationのワークスペース作成に失敗しました(対象ID:{0})",
+                    workspace_id,
                 )
+                raise common.InternalErrorException(message_id=message_id, message=message)
 
             conn.commit()
 
@@ -405,7 +468,15 @@ def workspace_member_list(organization_id, workspace_id):
         )
 
         if users_response.status_code != 200:
-            raise Exception("get user role error status:{}, response:{}".format(users_response.status_code, users_response.text))
+            globals.logger.error(f"response.status_code:{users_response.status_code}")
+            globals.logger.error(f"response.text:{users_response.text}")
+            message_id = f"500-{MSG_FUNCTION_ID}008"
+            message = multi_lang.get_text(
+                message_id,
+                "ワークスペースメンバーの取得に失敗しました(対象ID:{0})",
+                workspace_id,
+            )
+            raise common.InternalErrorException(message_id=message_id, message=message)
 
         users = json.loads(users_response.text)
 
