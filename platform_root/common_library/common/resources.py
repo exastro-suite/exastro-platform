@@ -110,8 +110,10 @@ class counter():
 
         token = json.loads(token_response.text)["access_token"]
 
+        # ロール数は、デフォルト全件、件数を絞っても1件目からの場合は、全件となってしまう
+        # The number of roles is all by default, even if the number of cases is narrowed down, it will be all from the first case
         response = api_keycloak_roles.clients_roles_get(
-            realm_name=organization_id, client_id=private.user_token_client_id, token=token, briefRepresentation=False
+            realm_name=organization_id, client_id=private.user_token_client_id, token=token, briefRepresentation=True
         )
         if response.status_code != 200:
             globals.logger.error(f"response.status_code:{response.status_code}")
@@ -127,6 +129,6 @@ class counter():
 
         roles = json.loads(response.text)
 
-        globals.logger.debug(f"roles:{roles}")
+        # globals.logger.debug(f"roles:{roles}")
 
         return len(roles)

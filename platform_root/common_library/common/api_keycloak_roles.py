@@ -16,11 +16,13 @@
 import os
 import requests
 
+from common_library.common import common
+
 # User Imports
 import globals  # 共通的なglobals Common globals
 
 
-def clients_roles_get(realm_name, client_id, token, briefRepresentation=True, first=1, max=100, search=""):
+def clients_roles_get(realm_name, client_id, token, briefRepresentation=True, first=None, max=None, search=None):
     """client ロール取得 client roles get
     Args:
         realm_name (str): realm name
@@ -49,34 +51,18 @@ def clients_roles_get(realm_name, client_id, token, briefRepresentation=True, fi
     add_query = ""
 
     if not briefRepresentation:
-        if add_query:
-            add_query += "&"
-        else:
-            add_query += "?"
-        add_query += f"briefRepresentation={briefRepresentation}"
+        add_query = common.url_query_appending(add_query, "briefRepresentation", briefRepresentation)
 
     if first:
-        if add_query:
-            add_query += "&"
-        else:
-            add_query += "?"
-        add_query += f"first={first}"
+        add_query = common.url_query_appending(add_query, "first", first)
 
     if max:
-        if add_query:
-            add_query += "&"
-        else:
-            add_query += "?"
-        add_query += f"max={max}"
+        add_query = common.url_query_appending(add_query, "max", max)
 
     if search:
-        if add_query:
-            add_query += "&"
-        else:
-            add_query += "?"
-        add_query += f"search={search}"
+        add_query = common.url_query_appending(add_query, "search", search)
 
-    globals.logger.debug("client roles get")
+    globals.logger.debug(f"client roles get query:{add_query}")
     # 情報取得
     # information acquisition
     request_response = requests.get(f"{api_url}/auth/admin/realms/{realm_name}/clients/{client_id}/roles{add_query}", headers=header_para)
