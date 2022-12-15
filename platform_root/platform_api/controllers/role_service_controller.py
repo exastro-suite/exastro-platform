@@ -21,6 +21,7 @@ from common_library.common import validation, check_authority
 from common_library.common.db import DBconnector
 from common_library.common import multi_lang
 import common_library.common.const as common_const
+from common_library.common import bl_plan_service
 from common_library.common import resources
 
 import globals
@@ -39,6 +40,26 @@ def role_create(body, organization_id):
     Returns:
         InlineResponse2001: _description_
     """
+
+    # 上限チェック
+    # upper limit check
+    # role limit get
+    limits = bl_plan_service.organization_limits_get(organization_id, common_const.RESOURCE_COUNT_ROLES)
+    if common_const.RESOURCE_COUNT_ROLES in limits:
+        # 上限値がある場合にチェックする
+        # Check if there is an upper limit
+        rc = resources.counter(organization_id)
+        globals.logger.info("### roles count :{}".format(rc(common_const.RESOURCE_COUNT_ROLES)))
+
+        if rc(common_const.RESOURCE_COUNT_ROLES) >= limits[common_const.RESOURCE_COUNT_ROLES]:
+            message_id = "400-00022"
+            message = multi_lang.get_text(
+                message_id,
+                "{0}の上限数({1})を超えるため登録できません。",
+                multi_lang.get_text('000-00126', "ロール"),
+                limits[common_const.RESOURCE_COUNT_ROLES]
+            )
+            raise common.BadRequestException(message_id=message_id, message=message)
 
     body = connexion.request.get_json()
     if not body:
@@ -154,9 +175,6 @@ def role_list(organization_id, kind=None):
     """
 
     globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
-
-    rc = resources.counter(organization_id)
-    globals.logger.info("### roles count :{}".format(rc(common_const.RESOURCE_COUNT_ROLES)))
 
     db = DBconnector()
     private = db.get_organization_private(organization_id)
