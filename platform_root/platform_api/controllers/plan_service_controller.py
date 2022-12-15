@@ -115,7 +115,7 @@ def plan_create(body):
                 informations = [d.get("INFORMATIONS") for d in result_limits if d.get("LIMIT_ID") == limit_id][0]
                 json_dict = json.loads(informations)
                 if (json_dict.get("max") and limit_value > int(json_dict.get("max"))) or \
-                   (json_dict.get("min") and limit_value < int(json_dict.get("min"))):
+                   (limit_value < 0):
                     message_id = f"400-{MSG_FUNCTION_ID}001"
                     message = multi_lang.get_text(
                         message_id,
