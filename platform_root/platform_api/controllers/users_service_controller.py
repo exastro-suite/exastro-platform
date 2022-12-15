@@ -26,7 +26,7 @@ MSG_FUNCTION_ID = "25"
 
 
 @common.platform_exception_handler
-def user_list(organization_id):
+def user_list(organization_id, first=0, max=100, search=None):
     """List returns list of roles
 
     Args:
@@ -55,7 +55,7 @@ def user_list(organization_id):
 
     # user 情報取得
     # user get to keycloak
-    response = api_keycloak_users.user_get(realm_name=organization_id, user_name=None, token=token)
+    response = api_keycloak_users.user_get(realm_name=organization_id, user_name=None, token=token, first=first, max=max, search=search)
     if response.status_code != 200:
         globals.logger.error(f"response.status_code:{response.status_code}")
         globals.logger.error(f"response.text:{response.text}")

@@ -16,6 +16,7 @@
 import os
 import json
 import requests
+import urllib
 
 # User Imports
 import globals  # 共通的なglobals Common globals
@@ -49,7 +50,7 @@ def user_create(realm_name, user_json, token):
     return request_response
 
 
-def user_get(realm_name, user_name, token):
+def user_get(realm_name, user_name, token, first=0, max=100, search=None):
     """ユーザ情報取得
     Args:
         realm_name (str): realm name
@@ -69,13 +70,17 @@ def user_get(realm_name, user_name, token):
         "Authorization": "Bearer {}".format(token),
     }
 
+    if user_name is not None:
+        query_params = f'?username={urllib.parse.quote(user_name)}&exact=true'
+    elif search is not None:
+        query_params = f'?search={urllib.parse.quote(search)}&first={first}&max={max}'
+    else:
+        query_params = f"?first={first}&max={max}"
+
     globals.logger.debug("user get")
     # ユーザ情報取得
     # User information acquisition
-    if user_name is None:
-        request_response = requests.get("{}/auth/admin/realms/{}/users".format(api_url, realm_name), headers=header_para)
-    else:
-        request_response = requests.get("{}/auth/admin/realms/{}/users?search={}".format(api_url, realm_name, user_name), headers=header_para)
+    request_response = requests.get(f"{api_url}/auth/admin/realms/{realm_name}/users{query_params}", headers=header_para)
 
     return request_response
 

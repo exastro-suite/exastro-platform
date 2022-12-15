@@ -29,6 +29,21 @@ get:
       required: true
       schema:
         type: string
+    - name: first
+      in: query
+      description: first result to return
+      schema:
+        type: integer
+        example: 0
+        default: 0
+        minimum: 0
+    - name: max
+      in: query
+      description: maximum number of results to return
+      schema:
+        type: integer
+        example: 100
+        default: 100
   responses:
     200:
       description: A successful response.
