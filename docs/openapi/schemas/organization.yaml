@@ -20,21 +20,15 @@ properties:
     example: org1
   name:
     type: string
-    example: organization of org1
-
+    example: name of org1
+  active_plan_id:
+    type: string
+    example: plan-1
   organization_managers:
     type: array
     items:
-      $ref: "./userCreate.yaml"
-
-  organization_plan:
+      $ref: "./usernameOnly.yaml"
+  organization_plans:
     type: array
     items:
-      $ref: "./planMappingOrganization.yaml"
-
-  options:
-    type: object
-    description: Organization Add Json Parameter (json of KeyCloak)
-
-required:
-  - id
+      $ref: './planMappingOrganization.yaml'
