@@ -12,6 +12,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
+from contextlib import closing
 import inspect
 import json
 
@@ -19,6 +20,7 @@ from common_library.common import common, const
 from common_library.common import multi_lang
 from common_library.common import api_keycloak_tokens, api_keycloak_roles
 from common_library.common.db import DBconnector
+from common_library.common.libs import queries_resources
 
 import globals
 
@@ -71,7 +73,23 @@ class counter():
             int: ワークスペース数 count workspaces
         """
 
-        return 0
+        with closing(DBconnector().connect_orgdb(organization_id)) as conn:
+            with conn.cursor() as cursor:
+                try:
+                    cursor.execute(queries_resources.SQL_QUERY_COUNT_WORKSPACES)
+                    result = cursor.fetchone()
+                    count = int(result.get("COUNT"))
+                except Exception as e:
+                    globals.logger.error(f"exception:{e.args}")
+                    message_id = "500-00011"
+                    message = multi_lang.get_text(
+                        message_id,
+                        "ワークスペースの集計に失敗しました(対象ID:{0})",
+                        organization_id,
+                    )
+                    raise common.InternalErrorException(message_id=message_id, message=message)
+
+        return count
 
     def get_resource_count_users(self, organization_id):
         """ユーザー数の取得 Get roll count

@@ -429,6 +429,26 @@ paths:
           required: true
           schema:
             type: string
+        - name: first
+          in: query
+          description: first result to return
+          schema:
+            type: integer
+            example: 0
+            default: 0
+            minimum: 0
+        - name: max
+          in: query
+          description: maximum number of results to return
+          schema:
+            type: integer
+            example: 100
+            default: 100
+        - name: search
+          in: query
+          description: 'A String contained in username, first or last name, or email'
+          schema:
+            type: string
       responses:
         '200':
           description: A successful response.
@@ -596,6 +616,21 @@ paths:
           required: true
           schema:
             type: string
+        - name: first
+          in: query
+          description: first result to return
+          schema:
+            type: integer
+            example: 0
+            default: 0
+            minimum: 0
+        - name: max
+          in: query
+          description: maximum number of results to return
+          schema:
+            type: integer
+            example: 100
+            default: 100
       responses:
         '200':
           description: A successful response.
@@ -1449,6 +1484,9 @@ components:
       title: role mapping user is a definition of User resource.
       type: object
       properties:
+        id:
+          type: string
+          format: uuid
         name:
           type: string
           example: firstname lastname
@@ -1458,3 +1496,8 @@ components:
           type: string
         preferred_username:
           type: string
+        enabled:
+          type: boolean
+        create_timestamp:
+          type: string
+          format: date-time

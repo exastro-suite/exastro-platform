@@ -16,6 +16,14 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
+//   Paging
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+const DEFAULT_ROWS_PER_PAGE = 100;
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
 //   Get Text Multi Language Support
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -207,15 +215,23 @@ function finish_onload_progress() {
     $("ol.topichPathList").css("visibility", "");
     $("ul.menuList").css("display", "");
     $("#main").css("visibility", "");
-    $(".containerLoading").css("display", "none");
+    hide_progress();
 }
 
 function finish_onload_progress_at_error() {
     $("ol.topichPathList").css("visibility", "");
     displayMenu(null);
     $("ul.menuList").css("display", "");
+    hide_progress();
+}
+
+function show_progress() {
+    $(".containerLoading").css("display", "");
+}
+function hide_progress() {
     $(".containerLoading").css("display", "none");
 }
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -256,6 +272,68 @@ function call_api_promise(ajaxparam, api_description, succeed_httpcodes = [200])
             }
         );
     });
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//   Common Dialog
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+function alertMessage(title, message, onclose = null) {
+    const dialog = new Dialog({
+        mode: 'modeless',
+        position: 'center',
+        width: 'auto',
+        header: {
+            title: title,
+        },
+        footer: {
+            button: {
+                close: { text: "閉じる", action: "normal" }
+            }
+        },
+    },
+    {
+        close: function() {
+            dialog.close();
+            if(onclose !== null) {
+                onclose();
+            }
+        }
+    });
+    dialog.open('<div class="alertMessage" style="margin-left: 30px; margin-right: 30px;">'+ message +'</div>');
+}
+
+function confirmMessage(title, message, onOk = null, onCancel = null) {
+    const dialog = new Dialog({
+        mode: 'modeless',
+        position: 'center',
+        width: 'auto',
+        header: {
+            title: title,
+        },
+        footer: {
+            button: {
+                ok: { text: "ＯＫ", action: "positive" },
+                cancel: { text: "キャンセル", action: "normal" }
+            }
+        },
+    },
+    {
+        ok: function() {
+            dialog.close();
+            if(onOk !== null) {
+                onOk();
+            }
+        },
+        cancel: function() {
+            dialog.close();
+            if(onCancel !== null) {
+                onCancel();
+            }
+        }
+    });
+    dialog.open('<div class="alertMessage" style="margin-left: 30px; margin-right: 30px;">'+ message +'</div>');
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

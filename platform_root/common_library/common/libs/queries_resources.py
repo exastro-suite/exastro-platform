@@ -12,23 +12,8 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-title: role mapping user is a definition of User resource.
-type: object
-properties:
-  id:
-    type: string
-    format: uuid
-  name:
-    type: string
-    example: firstname lastname
-  firstName:
-    type: string
-  lastName:
-    type: string
-  preferred_username:
-    type: string
-  enabled:
-    type: boolean
-  create_timestamp:
-    type: string
-    format: date-time
+SQL_QUERY_COUNT_WORKSPACES = """
+SELECT COUNT(*) AS COUNT
+FROM T_WORKSPACE
+"""
+
