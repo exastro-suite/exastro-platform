@@ -85,10 +85,12 @@ def workspace_create(body, organization_id):
 
         if workspace_count >= workspace_limits:
             globals.logger.error("resource limit exceeded. workspace count:{0} limits: {1}".format(workspace_count, workspace_limits))
-            message_id = f"400-{MSG_FUNCTION_ID}002"
+            message_id = "400-00022"
             message = multi_lang.get_text(
                 message_id,
-                "現在設定されているリソースの制限値を超えているため、新しいワークスペースは作成できません。",
+                "{0}の上限数({1})を超えるため、新しい{0}は作成できません。",
+                multi_lang.get_text('000-00127', "ワークスペース"),
+                workspace_limits
             )
             raise common.BadRequestException(message_id=message_id, message=message)
 

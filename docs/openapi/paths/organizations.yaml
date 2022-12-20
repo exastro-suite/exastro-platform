@@ -1,3 +1,24 @@
+get:
+  tags:
+  - OrganizationService
+  summary: List returns list of organization
+  x-openapi-router-controller: controllers.organization_service_controller
+  operationId: organization_list
+  responses:
+    200:
+      description: A successful response.
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '../schemas/responseOk.yaml'
+              - $ref: '../schemas/organizationList.yaml'
+    default:
+      description: An unexpected error response.
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'
 post:
   tags:
   - OrganizationService

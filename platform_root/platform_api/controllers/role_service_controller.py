@@ -55,7 +55,7 @@ def role_create(body, organization_id):
             message_id = "400-00022"
             message = multi_lang.get_text(
                 message_id,
-                "{0}の上限数({1})を超えるため登録できません。",
+                "{0}の上限数({1})を超えるため、新しい{0}は作成できません。",
                 multi_lang.get_text('000-00126', "ロール"),
                 limits[common_const.RESOURCE_COUNT_ROLES]
             )

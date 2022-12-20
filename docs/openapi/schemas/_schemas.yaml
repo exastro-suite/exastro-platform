@@ -18,8 +18,12 @@ responseStat:
   $ref: "./responseStat.yaml"
 runtimeError:
   $ref: "./runtimeError.yaml"
+organization:
+  $ref: "./organization.yaml"
 organizationCreate:
   $ref: "./organizationCreate.yaml"
+organizationList:
+  $ref: "./organizationList.yaml"
 planMappingOrganization:
   $ref: "./planMappingOrganization.yaml"
 planMappingOrganizationList:
@@ -40,6 +44,8 @@ role:
   $ref: "./role.yaml"
 roleList:
   $ref: "./roleList.yaml"
+usernameOnly:
+  $ref: "./usernameOnly.yaml"
 user:
   $ref: "./user.yaml"
 userList:

@@ -12,29 +12,10 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-title: organization is a definition of Organization resource.
+title: roleList is list of Role resources.
 type: object
 properties:
-  id:
-    type: string
-    example: org1
-  name:
-    type: string
-    example: organization of org1
-
-  organization_managers:
+  data:
     type: array
     items:
-      $ref: "./userCreate.yaml"
-
-  organization_plan:
-    type: array
-    items:
-      $ref: "./planMappingOrganization.yaml"
-
-  options:
-    type: object
-    description: Organization Add Json Parameter (json of KeyCloak)
-
-required:
-  - id
+      $ref: './organization.yaml'
