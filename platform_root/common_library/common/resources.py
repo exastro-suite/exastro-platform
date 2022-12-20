@@ -131,7 +131,7 @@ class counter():
         # ロール数は、デフォルト全件、件数を絞っても1件目からの場合は、全件となってしまう
         # The number of roles is all by default, even if the number of cases is narrowed down, it will be all from the first case
         response = api_keycloak_roles.clients_roles_get(
-            realm_name=organization_id, client_id=private.user_token_client_id, token=token, briefRepresentation=True
+            realm_name=organization_id, client_id=private.user_token_client_id, token=token, briefRepresentation=False
         )
         if response.status_code != 200:
             globals.logger.error(f"response.status_code:{response.status_code}")
@@ -149,4 +149,16 @@ class counter():
 
         # globals.logger.debug(f"roles:{roles}")
 
-        return len(roles)
+        workspace_roles = []
+
+        for pf_role in roles:
+            if pf_role.get("composite") is not True:
+                continue
+            if [const.ROLE_KIND_WORKSPACE] != pf_role.get("attributes", {}).get("kind"):
+                continue
+
+            workspace_roles.append(pf_role)
+
+        globals.logger.debug(f"workspace_roles:{workspace_roles}")
+
+        return len(workspace_roles)
