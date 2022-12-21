@@ -12,7 +12,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-import connexion
+# import connexion
 import json
 import inspect
 
@@ -87,3 +87,17 @@ def user_list(organization_id, first=0, max=100, search=None):
     globals.logger.info(f"### Succeed func:{inspect.currentframe().f_code.co_name}")
 
     return common.response_200_ok(data)
+
+
+def user_create(body, organization_id):  # noqa: E501
+    """Create creates user
+    
+    Args:
+        body (dict | bytes): _description_
+        organization_id (str): _description_. Defaults to None.
+
+    Returns:
+        InlineResponse2001: _description_
+    """
+
+    return common.response_200_ok(None)
