@@ -277,7 +277,75 @@ def organization_create(body, retry=None):
 @common.platform_exception_handler
 def organization_list():
 
-    return common.response_200_ok(None)
+    # サービスアカウントのTOKEN取得
+    # Get a service account token
+    token = __get_token()
+
+    # 全realm取得
+    # all realm by keycloak
+    response = api_keycloak_realms.realms_get(token)
+
+    if response.status_code != 200:
+        globals.logger.error(f"response.status_code:{response.status_code}")
+        globals.logger.error(f"response.text:{response.text}")
+        message_id = f"500-{MSG_FUNCTION_ID}018"
+        message = multi_lang.get_text(message_id,
+                                      "realm情報の取得に失敗しました。"
+                                      )
+        raise common.InternalErrorException(message_id=message_id, message=message)
+
+    keycloak_realms = json.loads(response.text)
+
+    db = DBconnector()
+    with closing(db.connect_platformdb()) as conn:
+        with conn.cursor(pymysql.cursors.DictCursor) as cursor:
+
+            # DB取得
+            # select organization
+            cursor.execute(queries_organizations.SQL_QUERY_ORGANIZATIONS)
+
+            result = cursor.fetchall()
+
+    ret_realms = []
+
+    # オーガナイゼーションごとの情報を返却値に設定する
+    # Set the information for each organization to the return value
+    if len(result) > 0:
+
+        for row in result:
+            if row.get("INFORMATIONS"):
+                org_informations = json.loads(row.get("INFORMATIONS"))
+            else:
+                org_informations = {
+                    "status": "unkonwn"
+                }
+
+            keycloak_org = common.get_item(keycloak_realms, "id", row.get("ORGANIZATION_ID"))
+
+            ret_realm = {
+                "id": row.get("ORGANIZATION_ID"),
+                "name": row.get("ORGANIZATION_NAME"),
+                "organization_managers": [
+                    {
+                        "username": "string"
+                    }
+                ],
+                "active_plan": {
+                    "id": "plan-1"
+                },
+                "plans": [
+                    {
+                        "id": "plan-1",
+                        "start_date": "2022-12-1"
+                    }
+                ],
+                "status": org_informations.get("status"),
+                "enabled": keycloak_org.get("enabled"),
+            }
+
+            ret_realms.append(ret_realm)
+
+    return common.response_200_ok(ret_realms)
 
 
 def __create_start(organization_id, organization_name, options, user_id):

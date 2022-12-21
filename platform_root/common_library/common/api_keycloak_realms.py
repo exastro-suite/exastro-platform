@@ -81,3 +81,32 @@ def realm_update(realm_id, realm_json, token):
     # 応答をそのまま返却
     # return response as is
     return request_response
+
+
+def realms_get(token):
+    """realm取得
+
+    Args:
+        toekn (str): token
+
+    Returns:
+        Response: HTTP Respose (success : .status_code=200)
+    """
+    globals.logger.info('Get keycloak realms.')
+
+    header_para = {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer {}".format(token),
+    }
+
+    globals.logger.debug("realms get send")
+    # 呼び出し先設定
+    # Call destination setting
+    api_url = "{}://{}:{}".format(os.environ['API_KEYCLOAK_PROTOCOL'], os.environ['API_KEYCLOAK_HOST'], os.environ['API_KEYCLOAK_PORT'])
+    request_response = requests.get(f"{api_url}/auth/admin/realms", headers=header_para)
+
+    globals.logger.debug(request_response.text)
+
+    # 応答をそのまま返却
+    # return response as is
+    return request_response
