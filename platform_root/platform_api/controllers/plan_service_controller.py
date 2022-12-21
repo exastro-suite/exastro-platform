@@ -233,30 +233,8 @@ def organization_plan_get(organization_id):
     """
     globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
 
-    # check organization
-    DBconnector().get_organization_private(organization_id)
+    data = bl_plan_service.organization_plan_get(organization_id)
 
-    # plan list get
-    with closing(DBconnector().connect_platformdb()) as conn:
-        with conn.cursor() as cursor:
-
-            parameter = {
-                "organization_id": organization_id,
-            }
-            where = " WHERE organization_id = %(organization_id)s ORDER BY start_TIMESTAMP"
-            cursor.execute(queries_plans.SQL_QUERY_ORGANIZATION_PLAN + where, parameter)
-            org_plans = cursor.fetchall()
-
-    data = []
-    for org_plan in org_plans:
-        data.append({
-            "id": org_plan["PLAN_ID"],
-            "start_date": datetime.strftime(org_plan["START_TIMESTAMP"], '%Y-%m-%d'),
-            "create_timestamp": common.datetime_to_str(org_plan["CREATE_TIMESTAMP"]),
-            "create_user": org_plan["CREATE_USER"],
-            "last_update_timestamp": common.datetime_to_str(org_plan["LAST_UPDATE_TIMESTAMP"]),
-            "last_update_user": org_plan["LAST_UPDATE_USER"],
-        })
     return common.response_200_ok(data)
 
 

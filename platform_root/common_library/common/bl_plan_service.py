@@ -13,14 +13,10 @@
 #   limitations under the License.
 
 from contextlib import closing
-import json
-import inspect
-import pymysql
 from datetime import datetime
 
-from common_library.common import common, validation, const
+from common_library.common import common, const
 from common_library.common.db import DBconnector
-from common_library.common import multi_lang
 from common_library.common.libs import queries_bl_plan
 
 
@@ -67,5 +63,43 @@ def organization_limits_get(organization_id, limit_id=None):
     data = {}
     for plan_limit in result_plan_limits:
         data[plan_limit["LIMIT_ID"]] = plan_limit["LIMIT_VALUE"]
+
+    return data
+
+
+def organization_plan_get(organization_id):
+    """organization plan get
+
+    Args:
+        organization_id (str): organization id
+
+    Returns:
+        dict: organization plan info. list
+    """
+
+    # check organization
+    DBconnector().get_organization_private(organization_id)
+
+    # plan list get
+    with closing(DBconnector().connect_platformdb()) as conn:
+        with conn.cursor() as cursor:
+
+            parameter = {
+                "organization_id": organization_id,
+            }
+            where = " WHERE organization_id = %(organization_id)s ORDER BY start_TIMESTAMP"
+            cursor.execute(queries_bl_plan.SQL_QUERY_ORGANIZATION_PLAN + where, parameter)
+            org_plans = cursor.fetchall()
+
+    data = []
+    for org_plan in org_plans:
+        data.append({
+            "id": org_plan["PLAN_ID"],
+            "start_date": datetime.strftime(org_plan["START_TIMESTAMP"], '%Y-%m-%d'),
+            "create_timestamp": common.datetime_to_str(org_plan["CREATE_TIMESTAMP"]),
+            "create_user": org_plan["CREATE_USER"],
+            "last_update_timestamp": common.datetime_to_str(org_plan["LAST_UPDATE_TIMESTAMP"]),
+            "last_update_user": org_plan["LAST_UPDATE_USER"],
+        })
 
     return data
