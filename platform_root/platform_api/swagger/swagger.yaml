@@ -476,6 +476,39 @@ paths:
               schema:
                 $ref: '#/components/schemas/runtimeError'
       x-openapi-router-controller: controllers.users_service_controller
+    post:
+      tags:
+      - UsersService
+      summary: Create creates user
+      operationId: user_create
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/platform_users_body'
+        required: true
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_6'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+      x-openapi-router-controller: controllers.users_service_controller
   /api/{organization_id}/platform/roles:
     get:
       tags:
@@ -1525,6 +1558,9 @@ components:
       allOf:
       - $ref: '#/components/schemas/responseOk'
       - $ref: '#/components/schemas/userList'
+    platform_users_body:
+      oneOf:
+      - $ref: '#/components/schemas/userCreate'
     inline_response_200_10:
       allOf:
       - $ref: '#/components/schemas/responseOk'
