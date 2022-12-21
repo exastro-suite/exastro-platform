@@ -59,3 +59,46 @@ get:
         application/json:
           schema:
             $ref: '../schemas/runtimeError.yaml'
+post:
+  tags:
+  - UsersService
+  summary: Create creates user
+  x-openapi-router-controller: controllers.users_service_controller
+  operationId: user_create
+  parameters:
+  - name: organization_id
+    in: path
+    required: true
+    schema:
+      type: string
+  requestBody:
+    content:
+      application/json:
+        schema:
+          oneOf:
+            - $ref: '../schemas/userCreate.yaml'
+        #examples:
+          #workspace:
+            #$ref: '../schemas/roleDetailWorkspaceExample.yaml'
+          # organization:
+          #   $ref: '../schemas/roleDetailOrganizationExample.yaml'
+    required: true
+  responses:
+    200:
+      description: A successful response.
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '../schemas/responseOk.yaml'
+              - type: object
+                properties:
+                  data:
+                    type: object
+                    example: null
+    default:
+      description: An unexpected error response.
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'
