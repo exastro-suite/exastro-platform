@@ -27,10 +27,12 @@ properties:
     items:
       $ref: "./userCreate.yaml"
 
-  organization_plan:
-    type: array
-    items:
-      $ref: "./planMappingOrganization.yaml"
+  plan:
+    type: object
+    properties:
+      id:
+        type: string
+        example: plan-1
 
   options:
     type: object

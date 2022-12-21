@@ -274,6 +274,12 @@ def organization_create(body, retry=None):
     return common.response_200_ok(None)
 
 
+@common.platform_exception_handler
+def organization_list():
+
+    return common.response_200_ok(None)
+
+
 def __create_start(organization_id, organization_name, options, user_id):
     """Create Start to data insert
 
