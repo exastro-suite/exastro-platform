@@ -1060,14 +1060,17 @@ components:
         name:
           type: string
           example: name of org1
-        active_plan_id:
-          type: string
-          example: plan-1
         organization_managers:
           type: array
           items:
             $ref: '#/components/schemas/usernameOnly'
-        organization_plans:
+        active_plan:
+          type: object
+          properties:
+            id:
+              type: string
+              example: plan-1
+        plans:
           type: array
           items:
             $ref: '#/components/schemas/planMappingOrganization'
@@ -1085,10 +1088,12 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/userCreate'
-        organization_plan:
-          type: array
-          items:
-            $ref: '#/components/schemas/planMappingOrganization'
+        plan:
+          type: object
+          properties:
+            id:
+              type: string
+              example: plan-1
         options:
           type: object
           description: Organization Add Json Parameter (json of KeyCloak)

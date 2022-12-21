@@ -21,14 +21,17 @@ properties:
   name:
     type: string
     example: name of org1
-  active_plan_id:
-    type: string
-    example: plan-1
   organization_managers:
     type: array
     items:
       $ref: "./usernameOnly.yaml"
-  organization_plans:
+  active_plan:
+    type: object
+    properties:
+      id:
+        type: string
+        example: plan-1
+  plans:
     type: array
     items:
       $ref: './planMappingOrganization.yaml'
