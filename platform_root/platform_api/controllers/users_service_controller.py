@@ -19,6 +19,9 @@ import inspect
 from common_library.common import common, api_keycloak_tokens, api_keycloak_users
 from common_library.common import multi_lang
 from common_library.common.db import DBconnector
+import common_library.common.const as common_const
+from common_library.common import bl_plan_service
+from common_library.common import resources
 
 import globals
 
@@ -89,7 +92,7 @@ def user_list(organization_id, first=0, max=100, search=None):
     return common.response_200_ok(data)
 
 
-def user_create(body, organization_id):  # noqa: E501
+def user_create(body, organization_id):
     """Create creates user
     
     Args:
@@ -98,6 +101,28 @@ def user_create(body, organization_id):  # noqa: E501
 
     Returns:
         InlineResponse2001: _description_
+    """
+
+    """
+    # 上限チェック
+    # uper limit check
+    # users limit get
+    limits = bl_plan_service.organization_limits_get(organization_id, common_const.RESOURCE_COUNT_USERS)
+    if common_const.RESOURCE_COUNT_USERS in limits:
+        # 上限値がある場合にチェックする
+        # Check if there is an upper limit
+        rc = resources.counter(organization_id)
+        globals.logger.info("### users count :{}".format(rc(common_const.RESOURCE_COUNT_USERS)))
+
+        if rc(common_const.RESOURCE_COUNT_USERS) >= limits[common_const.RESOURCE_COUNT_USERS]:
+            message_id = "400-00022"
+            message = multi_lang.get_text(
+                message_id,
+                "{0}の上限数({1})を超えるため、新しい{0}は作成できません。",
+                multi_lang.get_text('000-00000', "ユーザ"),
+                limits[common_const.RESOURCE_COUNT_USERS]
+            )
+            raise common.BadRequestException(message_id=message_id, message=message)
     """
 
     return common.response_200_ok(None)
