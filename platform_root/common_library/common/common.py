@@ -466,3 +466,24 @@ def url_query_appending(query_str, append_str, append_value):
     query_str += f"{append_str}={append_value}"
 
     return query_str
+
+
+def get_item(json_items, key_name, match_value):
+    """json項目から該当キーの値で一致している情報を取得する
+        Get information that matches the value of the corresponding key from the json item
+
+    Args:
+        json_items (dict): json
+        key_name (str): key name
+        match_value (str): match value
+
+    Returns:
+        dict: マッチしたJson item 、マッチしない場合はNone
+            the matched Json item, or None if not matched
+    """
+
+    for item in json_items:
+        if item[key_name] == match_value:
+            return item
+
+    return None
