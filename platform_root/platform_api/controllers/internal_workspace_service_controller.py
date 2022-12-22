@@ -95,31 +95,42 @@ def workspace_user_list(organization_id, workspace_id):
     user_ids = []
     workspace_users = []
     for role in workspace_roles:
-        users_response = api_keycloak_roles.role_uesrs_get(
-            realm_name=organization_id,
-            client_id=private.user_token_client_id,
-            role_name=role.get("name"),
-            token=token,
-        )
+        get_first = 0
+        get_max = 100
 
-        if users_response.status_code != 200:
-            raise Exception("get user role error status:{}, response:{}".format(users_response.status_code, users_response.text))
+        while True:
+            users_response = api_keycloak_roles.role_uesrs_get(
+                realm_name=organization_id,
+                client_id=private.user_token_client_id,
+                role_name=role.get("name"),
+                token=token,
+                first=get_first,
+                max=get_max
+            )
 
-        users = json.loads(users_response.text)
+            if users_response.status_code != 200:
+                raise Exception("get user role error status:{}, response:{}".format(users_response.status_code, users_response.text))
 
-        for user in users:
-            if user["id"] not in user_ids:
-                user_ids.append(user["id"])
-                workspace_users.append(
-                    {
-                        "id": user["id"],
-                        "firstName": user.get("firstName", ""),
-                        "lastName": user.get("lastName", ""),
-                        "preferred_username": user.get("username", ""),
-                        "name": common.get_username(user.get("firstName"), user.get("lastName"), user.get("username")),
-                        "enabled": user.get("enabled", False),
-                        "create_timestamp": common.keycloak_timestamp_to_str(user.get("createdTimestamp")),
-                    })
+            users = json.loads(users_response.text)
+
+            for user in users:
+                if user["id"] not in user_ids:
+                    user_ids.append(user["id"])
+                    workspace_users.append(
+                        {
+                            "id": user["id"],
+                            "firstName": user.get("firstName", ""),
+                            "lastName": user.get("lastName", ""),
+                            "preferred_username": user.get("username", ""),
+                            "name": common.get_username(user.get("firstName"), user.get("lastName"), user.get("username")),
+                            "enabled": user.get("enabled", False),
+                            "create_timestamp": common.keycloak_timestamp_to_str(user.get("createdTimestamp")),
+                        })
+
+            if len(users) < get_max:
+                break
+
+            get_first = get_first + get_max
 
     return common.response_200_ok(workspace_users)
 

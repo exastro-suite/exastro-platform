@@ -462,35 +462,46 @@ def workspace_member_list(organization_id, workspace_id):
     user_ids = []
     workspace_users = []
     for role in workspace_roles:
-        users_response = api_keycloak_roles.role_uesrs_get(
-            realm_name=organization_id,
-            client_id=private.user_token_client_id,
-            role_name=role.get("name"),
-            token=token,
-        )
+        get_first = 0
+        get_max = 100
 
-        if users_response.status_code != 200:
-            globals.logger.error(f"response.status_code:{users_response.status_code}")
-            globals.logger.error(f"response.text:{users_response.text}")
-            message_id = f"500-{MSG_FUNCTION_ID}008"
-            message = multi_lang.get_text(
-                message_id,
-                "ワークスペースメンバーの取得に失敗しました(対象ID:{0})",
-                workspace_id,
+        while True:
+            users_response = api_keycloak_roles.role_uesrs_get(
+                realm_name=organization_id,
+                client_id=private.user_token_client_id,
+                role_name=role.get("name"),
+                token=token,
+                first=get_first,
+                max=get_max
             )
-            raise common.InternalErrorException(message_id=message_id, message=message)
 
-        users = json.loads(users_response.text)
+            if users_response.status_code != 200:
+                globals.logger.error(f"response.status_code:{users_response.status_code}")
+                globals.logger.error(f"response.text:{users_response.text}")
+                message_id = f"500-{MSG_FUNCTION_ID}008"
+                message = multi_lang.get_text(
+                    message_id,
+                    "ワークスペースメンバーの取得に失敗しました(対象ID:{0})",
+                    workspace_id,
+                )
+                raise common.InternalErrorException(message_id=message_id, message=message)
 
-        for user in users:
-            if user["id"] not in user_ids:
-                user_ids.append(user["id"])
-                workspace_users.append(
-                    {
-                        "firstName": user.get("firstName", ""),
-                        "lastName": user.get("lastName", ""),
-                        "name": common.get_username(user.get("firstName"), user.get("lastName"), user.get("username")),
-                    })
+            users = json.loads(users_response.text)
+
+            for user in users:
+                if user["id"] not in user_ids:
+                    user_ids.append(user["id"])
+                    workspace_users.append(
+                        {
+                            "firstName": user.get("firstName", ""),
+                            "lastName": user.get("lastName", ""),
+                            "name": common.get_username(user.get("firstName"), user.get("lastName"), user.get("username")),
+                        })
+
+            if len(users) < get_max:
+                break
+
+            get_first = get_first + get_max
 
     return common.response_200_ok(workspace_users)
 
