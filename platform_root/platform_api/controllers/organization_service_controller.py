@@ -74,6 +74,12 @@ def organization_create(body, retry=None):
     if not validate.ok:
         return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
 
+    plan_id = body.get("plan", {}).get("id")
+    if "id" in body.get("plan", {}):
+        validate = validation.validate_plan_id(plan_id)
+        if not validate.ok:
+            return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
+
     db = DBconnector()
     with closing(db.connect_platformdb()) as conn:
         with conn.cursor(pymysql.cursors.DictCursor) as cursor:
@@ -89,6 +95,15 @@ def organization_create(body, retry=None):
 
             result = cursor.fetchall()
 
+            if plan_id is not None and not bl_plan_service.exists_plan(cursor, plan_id):
+                message_id = f"404-{MSG_FUNCTION_ID}001"
+                message = multi_lang.get_text(
+                    message_id,
+                    "プランが存在しません(id:{0})",
+                    plan_id
+                )
+                raise common.NotFoundException(message_id=message_id, message=message)
+
     # ステータス判断で実施する項目を判断、初期は全実行
     # Determine the items to be implemented by status judgment, initially all execution
     is_CREATE_START = True
@@ -101,6 +116,7 @@ def organization_create(body, retry=None):
     is_DB_CREATE = True
     is_DB_UPDATE = True
     is_ITA_CREATE = True
+    is_PLAN_CREATE = True
     is_REALM_ENABLED = True
     is_CREATE_COMPLETE = True
 
@@ -194,6 +210,18 @@ def organization_create(body, retry=None):
             is_DB_CREATE = False
             is_DB_UPDATE = False
             is_ITA_CREATE = False
+        elif status == const.ORG_STATUS_PLAN_CREATE:
+            is_CREATE_START = False
+            is_REALM_CREATE = False
+            is_CLIENT_CREATE = False
+            is_ROLE_SETTING = False
+            is_SA_SETTING = False
+            is_USER_CREATE = False
+            is_USER_ROLE = False
+            is_DB_CREATE = False
+            is_DB_UPDATE = False
+            is_ITA_CREATE = False
+            is_PLAN_CREATE = False
         elif status == const.ORG_STATUS_REALM_ENABLED:
             is_CREATE_START = False
             is_REALM_CREATE = False
@@ -205,6 +233,7 @@ def organization_create(body, retry=None):
             is_DB_CREATE = False
             is_DB_UPDATE = False
             is_ITA_CREATE = False
+            is_PLAN_CREATE = False
             is_REALM_ENABLED = False
         elif status == const.ORG_STATUS_CREATE_COMPLETE:
             message_id = f"400-{MSG_FUNCTION_ID}001"
@@ -262,6 +291,11 @@ def organization_create(body, retry=None):
         # Organization Database 作成
         # Organization Database creation
         __ita_create(organization_id, user_id)
+
+    if is_PLAN_CREATE:
+        # Organization Plan 作成
+        # Organization Plan creation
+        __organization_plan_create(organization_id, plan_id, user_id)
 
     if is_REALM_ENABLED:
         # realm 有効化
@@ -1359,6 +1393,24 @@ def __ita_create(organization_id, user_id):
     # ステータス更新
     # update status
     __update_status(const.ORG_STATUS_ITA_CREATE, organization_id, user_id)
+
+    return
+
+
+def __organization_plan_create(organization_id, plan_id, user_id):
+    """organization plan create
+
+    Args:
+        organization_id (str): organization id
+        plan_id (str): plan id
+        user_id (str): user id
+    """
+    if plan_id is not None:
+        bl_plan_service.organization_plan_create(user_id, organization_id, plan_id, datetime.date.today().strftime('%Y-%m-%d'))
+
+    # ステータス更新
+    # update status
+    __update_status(const.ORG_STATUS_PLAN_CREATE, organization_id, user_id)
 
     return
 

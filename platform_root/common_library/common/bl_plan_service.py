@@ -14,10 +14,16 @@
 
 from contextlib import closing
 from datetime import datetime
+import pymysql
 
 from common_library.common import common, const
 from common_library.common.db import DBconnector
+from common_library.common import multi_lang
 from common_library.common.libs import queries_bl_plan
+
+import globals
+
+MSG_FUNCTION_ID = "29"
 
 
 def organization_limits_get(organization_id, limit_id=None):
@@ -103,3 +109,94 @@ def organization_plan_get(organization_id):
         })
 
     return data
+
+
+def exists_plan(platform_db_cursor, plan_id):
+    parameter = {
+        "plan_id": plan_id,
+    }
+
+    where = " WHERE plan_id = %(plan_id)s"
+    platform_db_cursor.execute(queries_bl_plan.SQL_QUERY_PLANS + where, parameter)
+    result = platform_db_cursor.fetchone()
+
+    if not result:
+        return False
+    else:
+        return True
+
+
+def organization_plan_create(user_id, organization_id, plan_id, plan_start_date):
+    """oraganaization plan create
+
+    Args:
+        user_id (str): user id
+        organization_id (str): organization id
+        plan_id (str): plan id
+        plan_start_date (str): plan start date (%Y-%m-%d)
+
+    Raises:
+        common.NotFoundException: _description_
+        common.InternalErrorException: _description_
+        common.BadRequestException: _description_
+        common.InternalErrorException: _description_
+    """
+    # PLAN情報取得
+    # get plan info.
+    db = DBconnector()
+    with closing(db.connect_platformdb()) as conn:
+        with conn.cursor() as cursor:
+
+            try:
+                if not exists_plan(cursor, plan_id):
+                    globals.logger.error(f"plan not found id:{plan_id}")
+                    message_id = f"404-{MSG_FUNCTION_ID}001"
+                    message = multi_lang.get_text(
+                        message_id,
+                        "プランが存在しません(id:{0})",
+                        plan_id
+                    )
+                    raise common.NotFoundException(message_id=message_id, message=message)
+
+            except common.NotFoundException:
+                raise
+
+            except Exception as e:
+                globals.logger.error(f"exception:{e.args}")
+                # Duplicate PRIMARY KEY
+                message_id = f"500-{MSG_FUNCTION_ID}001"
+                message = multi_lang.get_text(message_id,
+                                              "organizationへのプラン設定に失敗しました(対象ID:{0} Plan:{1})")
+                raise common.InternalErrorException(message_id=message_id, message=message)
+
+            parameter = {
+                "organization_id": organization_id,
+                "start_timestamp": datetime.strptime(plan_start_date, '%Y-%m-%d'),
+                "plan_id": plan_id,
+                "create_user": user_id,
+                "last_update_user": user_id,
+            }
+
+            try:
+                cursor.execute(queries_bl_plan.SQL_INSERT_ORGANIZATION_PLAN, parameter)
+
+                conn.commit()
+
+            except pymysql.err.IntegrityError:
+                # Duplicate PRIMARY KEY
+                message_id = f"400-{MSG_FUNCTION_ID}001"
+                message = multi_lang.get_text(message_id,
+                                              "指定されたorganizationのプラン開始日は、すでに別のプランが登録済みのため、登録できません。(対象ID:{0}, Plan:{1}, プラン開始日:{2})",
+                                              organization_id,
+                                              plan_id,
+                                              plan_start_date)
+                raise common.BadRequestException(message_id=message_id, message=message)
+
+            except Exception as e:
+                globals.logger.error(f"exception:{e.args}")
+                # Duplicate PRIMARY KEY
+                message_id = f"500-{MSG_FUNCTION_ID}001"
+                message = multi_lang.get_text(message_id,
+                                              "organizationへのプラン設定に失敗しました(対象ID:{0} Plan:{1})")
+                raise common.InternalErrorException(message_id=message_id, message=message)
+
