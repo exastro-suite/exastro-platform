@@ -362,7 +362,7 @@ def organization_list():
                 )
 
             plans = []
-            activ_plan = None
+            active_plan = {}
             point_plan_date = None
             for org_plan in org_plans:
                 # Active plan check
@@ -371,10 +371,14 @@ def organization_list():
                     # Separate checks for the first time or the second and subsequent times
                     if point_plan_date:
                         if point_plan_date <= org_plan.get("start_date"):
-                            activ_plan = org_plan
+                            active_plan = {
+                                "id": org_plan.get("id")
+                            }
                             point_plan_date = org_plan.get("start_date")
                     else:
-                        activ_plan = org_plan
+                        active_plan = {
+                            "id": org_plan.get("id")
+                        }
                         point_plan_date = org_plan.get("start_date")
 
                 plan = {
@@ -387,9 +391,7 @@ def organization_list():
                 "id": organization_id,
                 "name": row.get("ORGANIZATION_NAME"),
                 "organization_managers": organization_managers,
-                "active_plan": {
-                    "id": activ_plan.get("id")
-                },
+                "active_plan": active_plan,
                 "plans": plans,
                 "status": org_informations.get("status"),
                 "enabled": keycloak_org.get("enabled"),
