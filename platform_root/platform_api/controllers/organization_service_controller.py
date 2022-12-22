@@ -22,12 +22,14 @@ import inspect
 import pymysql
 import pymysql.cursors
 import requests
+import datetime
 # import base64
 
 from common_library.common import common, validation
 from common_library.common import api_keycloak_tokens, api_keycloak_realms, api_keycloak_clients, api_keycloak_users, api_keycloak_roles
 from common_library.common.db import DBconnector
 from common_library.common.db_init import DBinit
+from common_library.common import bl_plan_service
 import common_library.common.const as common_const
 from libs import queries_organizations
 import const
@@ -42,12 +44,12 @@ MSG_FUNCTION_ID = "23"
 def organization_create(body, retry=None):
     """Create creates an organization
 
-    :param body:
-    :type body: dict | bytes
-    :param retry:
-    :type retry: str
+    Args:
+        body (dict): create organization info.
+        retry (str, optional): 1 to retry. Defaults to None.
 
-    :rtype: ResponseOk
+    Returns:
+        response: HTTP Response
     """
 
     r = connexion.request
@@ -276,8 +278,126 @@ def organization_create(body, retry=None):
 
 @common.platform_exception_handler
 def organization_list():
+    """organization info. list
 
-    return common.response_200_ok(None)
+    Returns:
+        response: HTTP Response
+    """
+
+    # サービスアカウントのTOKEN取得
+    # Get a service account token
+    token = __get_token()
+
+    # 全realm取得
+    # all realm by keycloak
+    response = api_keycloak_realms.realms_get(token)
+
+    if response.status_code != 200:
+        globals.logger.error(f"response.status_code:{response.status_code}")
+        globals.logger.error(f"response.text:{response.text}")
+        message_id = f"500-{MSG_FUNCTION_ID}018"
+        message = multi_lang.get_text(message_id,
+                                      "realm情報の取得に失敗しました。"
+                                      )
+        raise common.InternalErrorException(message_id=message_id, message=message)
+
+    keycloak_realms = json.loads(response.text)
+
+    db = DBconnector()
+    with closing(db.connect_platformdb()) as conn:
+        with conn.cursor(pymysql.cursors.DictCursor) as cursor:
+
+            # DB取得
+            # select organization
+            cursor.execute(queries_organizations.SQL_QUERY_ORGANIZATIONS)
+
+            result = cursor.fetchall()
+
+    ret_realms = []
+
+    # オーガナイゼーションごとの情報を返却値に設定する
+    # Set the information for each organization to the return value
+    if len(result) > 0:
+
+        for row in result:
+            organization_id = row.get("ORGANIZATION_ID")
+
+            if row.get("INFORMATIONS"):
+                org_informations = json.loads(row.get("INFORMATIONS"))
+            else:
+                org_informations = {
+                    "status": "unkonwn"
+                }
+
+            keycloak_org = common.get_item(keycloak_realms, "id", organization_id)
+
+            org_plans = bl_plan_service.organization_plan_get(organization_id)
+
+            private = DBconnector().get_organization_private(organization_id)
+
+            users_response = api_keycloak_roles.role_uesrs_get(
+                realm_name=organization_id,
+                client_id=private.user_token_client_id,
+                role_name=common_const.ORG_ROLE_ORG_MANAGER,
+                token=token,
+            )
+
+            if users_response.status_code != 200:
+                raise Exception("get user role error status:{}, response:{}".format(users_response.status_code, users_response.text))
+
+            users = json.loads(users_response.text)
+
+            organization_managers = []
+            for user in users:
+                organization_managers.append(
+                    {
+                        "firstName": user.get("firstName", ""),
+                        "lastName": user.get("lastName", ""),
+                        "email": user.get("email", ""),
+                        "name": common.get_username(user.get("firstName"), user.get("lastName"), user.get("username")),
+                        "username": user.get("username", ""),
+                        "enabled": user.get("enabled", False),
+                        "create_timestamp": common.keycloak_timestamp_to_str(user.get("createdTimestamp")),
+                    }
+                )
+
+            plans = []
+            activ_plan = None
+            point_plan_date = None
+            for org_plan in org_plans:
+                # Active plan check
+                if datetime.datetime.strptime(org_plan.get("start_date"), '%Y-%m-%d').date() <= datetime.date.today():
+                    # 初回か2回目以降かでチェックを分ける
+                    # Separate checks for the first time or the second and subsequent times
+                    if point_plan_date:
+                        if point_plan_date <= org_plan.get("start_date"):
+                            activ_plan = org_plan
+                            point_plan_date = org_plan.get("start_date")
+                    else:
+                        activ_plan = org_plan
+                        point_plan_date = org_plan.get("start_date")
+
+                plan = {
+                    "id": org_plan.get("id"),
+                    "start_date": org_plan.get("start_date"),
+                }
+                plans.append(plan)
+
+            ret_realm = {
+                "id": organization_id,
+                "name": row.get("ORGANIZATION_NAME"),
+                "organization_managers": organization_managers,
+                "active_plan": {
+                    "id": activ_plan.get("id")
+                },
+                "plans": plans,
+                "status": org_informations.get("status"),
+                "enabled": keycloak_org.get("enabled"),
+            }
+
+            ret_realms.append(ret_realm)
+
+    return common.response_200_ok(ret_realms)
 
 
 def __create_start(organization_id, organization_name, options, user_id):
