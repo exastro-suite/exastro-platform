@@ -275,72 +275,8 @@ def organization_plan_create(body, organization_id):
     if not validate.ok:
         return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
 
-    # PLAN情報取得
-    # get plan info.
-    db = DBconnector()
-    with closing(db.connect_platformdb()) as conn:
-        with conn.cursor() as cursor:
-
-            parameter = {
-                "plan_id": plan_id,
-                "plan_start_date": plan_start_date,
-            }
-            where = " WHERE plan_id = %(plan_id)s"
-            try:
-                cursor.execute(queries_plans.SQL_QUERY_PLANS + where, parameter)
-                result = cursor.fetchone()
-
-                if not result:
-                    globals.logger.error(f"plan not found id:{plan_id}")
-                    message_id = f"404-{MSG_FUNCTION_ID}001"
-                    message = multi_lang.get_text(
-                        message_id,
-                        "プランが存在しません(id:{0})",
-                        plan_id
-                    )
-                    raise common.NotFoundException(message_id=message_id, message=message)
-
-            except common.NotFoundException:
-                raise
-
-            except Exception as e:
-                globals.logger.error(f"exception:{e.args}")
-                # Duplicate PRIMARY KEY
-                message_id = f"500-{MSG_FUNCTION_ID}001"
-                message = multi_lang.get_text(message_id,
-                                              "organizationへのプラン設定に失敗しました(対象ID:{0} Plan:{1})")
-                raise common.InternalErrorException(message_id=message_id, message=message)
-
-            parameter = {
-                "organization_id": organization_id,
-                "start_timestamp": datetime.strptime(plan_start_date, '%Y-%m-%d'),
-                "plan_id": plan_id,
-                "create_user": user_id,
-                "last_update_user": user_id,
-            }
-
-            try:
-                cursor.execute(queries_plans.SQL_INSERT_ORGANIZATION_PLAN, parameter)
-
-                conn.commit()
-
-            except pymysql.err.IntegrityError:
-                # Duplicate PRIMARY KEY
-                message_id = f"400-{MSG_FUNCTION_ID}001"
-                message = multi_lang.get_text(message_id,
-                                              "指定されたorganizationのプラン開始日は、すでに別のプランが登録済みのため、登録できません。(対象ID:{0}, Plan:{1}, プラン開始日:{2})",
-                                              organization_id,
-                                              plan_id,
-                                              plan_start_date)
-                raise common.BadRequestException(message_id=message_id, message=message)
-
-            except Exception as e:
-                globals.logger.error(f"exception:{e.args}")
-                # Duplicate PRIMARY KEY
-                message_id = f"500-{MSG_FUNCTION_ID}001"
-                message = multi_lang.get_text(message_id,
-                                              "organizationへのプラン設定に失敗しました(対象ID:{0} Plan:{1})")
-                raise common.InternalErrorException(message_id=message_id, message=message)
+    # PLAN情報設定
+    bl_plan_service.organization_plan_create(user_id, organization_id, plan_id, plan_start_date)
 
     return common.response_200_ok(data=None)
 
