@@ -18,7 +18,7 @@ import json
 
 from common_library.common import common, const
 from common_library.common import multi_lang
-from common_library.common import api_keycloak_tokens, api_keycloak_roles
+from common_library.common import api_keycloak_tokens, api_keycloak_roles, api_keycloak_users
 from common_library.common.db import DBconnector
 from common_library.common.libs import queries_resources
 
@@ -91,6 +91,33 @@ class counter():
 
         return count
 
+    def __get_token(self, organization_private):
+        """get a token
+
+        Args:
+            organization_id (str): organization id
+
+        Raises:
+            common.AuthException: _description_
+
+        Returns:
+            str: token
+        """
+
+        # サービスアカウントのTOKEN取得
+        # Get a service account token
+        token_response = api_keycloak_tokens.service_account_get_token(
+            organization_private.organization_id, organization_private.internal_api_client_clientid, organization_private.internal_api_client_secret,
+        )
+        if token_response.status_code != 200:
+            raise common.AuthException(
+                "client_user_get_token error status:{}, response:{}".format(token_response.status_code, token_response.text)
+            )
+
+        token = json.loads(token_response.text)["access_token"]
+
+        return token
+
     def get_resource_count_users(self, organization_id):
         """ユーザー数の取得 Get roll count
 
@@ -101,7 +128,29 @@ class counter():
             int: ユーザー数 count users
         """
 
-        return 0
+        private = DBconnector().get_organization_private(organization_id)
+
+        # サービスアカウントのTOKEN取得
+        # Get a service account token
+        token = self.__get_token(private)
+
+        response = api_keycloak_users.user_count_get(
+            realm_name=private.organization_id, token=token,
+        )
+        if response.status_code != 200:
+            globals.logger.error(f"response.status_code:{response.status_code}")
+            globals.logger.error(f"response.text:{response.text}")
+            message_id = "500-00012"
+            message = multi_lang.get_text(
+                message_id,
+                "ユーザー数の取得に失敗しました(対象ID:{0})",
+                private.organization_id,
+            )
+            raise common.InternalErrorException(message_id=message_id, message=message)
+
+        users_count = json.loads(response.text)
+
+        return users_count
 
     def get_resource_count_roles(self, organization_id):
         """ロール数の取得 Get roll count
@@ -113,25 +162,16 @@ class counter():
             int: ロール数 count roles
         """
 
-        db = DBconnector()
-        private = db.get_organization_private(organization_id)
+        private = DBconnector().get_organization_private(organization_id)
 
         # サービスアカウントのTOKEN取得
         # Get a service account token
-        token_response = api_keycloak_tokens.service_account_get_token(
-            organization_id, private.internal_api_client_clientid, private.internal_api_client_secret,
-        )
-        if token_response.status_code != 200:
-            raise common.AuthException(
-                "client_user_get_token error status:{}, response:{}".format(token_response.status_code, token_response.text)
-            )
-
-        token = json.loads(token_response.text)["access_token"]
+        token = self.__get_token(private)
 
         # ロール数は、デフォルト全件、件数を絞っても1件目からの場合は、全件となってしまう
         # The number of roles is all by default, even if the number of cases is narrowed down, it will be all from the first case
         response = api_keycloak_roles.clients_roles_get(
-            realm_name=organization_id, client_id=private.user_token_client_id, token=token, briefRepresentation=False
+            realm_name=private.organization_id, client_id=private.user_token_client_id, token=token, briefRepresentation=False
         )
         if response.status_code != 200:
             globals.logger.error(f"response.status_code:{response.status_code}")
@@ -140,7 +180,7 @@ class counter():
             message = multi_lang.get_text(
                 message_id,
                 "ロールの取得に失敗しました(対象ID:{0} client:{1})",
-                organization_id,
+                private.organization_id,
                 private.user_token_client_clientid
             )
             raise common.InternalErrorException(message_id=message_id, message=message)
