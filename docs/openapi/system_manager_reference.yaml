@@ -27,6 +27,8 @@ tags:
   description: オーガナイゼーションに関する操作
 - name: PlanService
   description: プランに関する操作
+- name: UsageService
+  description: リソース使用量に関する操作
 
 paths:
   "/api/platform/organizations":
@@ -38,6 +40,9 @@ paths:
       $ref: './paths/plans.yaml'
   "/api/platform/plan_items.yaml":
       $ref: './paths/plan_items.yaml'
+
+  "/api/platform/usages":
+      $ref: './paths/usages.yaml'
 
 components:
   schemas:

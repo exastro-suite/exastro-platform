@@ -12,6 +12,8 @@ tags:
     description: ユーザーに関する操作
   - name: RoleService
     description: ロールに関する操作
+  - name: UsageService
+    description: リソース使用量に関する操作
 paths:
   '/api/{organization_id}/platform/workspaces':
     get:
@@ -238,6 +240,40 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/runtimeError'
+  '/api/{organization_id}/platform/usages':
+    get:
+      tags:
+        - UsageService
+      summary: Returns the current value of resource
+      x-openapi-router-controller: controllers.usage_service_controller
+      operationId: organization_usage_get
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: id
+          in: query
+          description: filter id. (prefix match)
+          schema:
+            type: string
+            example: platform.workspaces
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - $ref: '#/components/schemas/usageList'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
 components:
   schemas:
     responseOk:
@@ -444,6 +480,63 @@ components:
                 example:
                   platform.workspaces: 100
                   platform.roles: 200
+    usage:
+      title: usage is a definition of current value resource.
+      type: object
+      properties:
+        id:
+          type: string
+          example: platform.workspaces
+        current_value:
+          type: number
+          example: 100
+    usageList:
+      title: usageList is list of usage resources.
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/usage'
+          example:
+            - id: platform.workspaces
+              current_value: 100
+            - id: platform.users
+              current_value: 200
+            - id: platform.roles
+              current_value: 300
+    usageOrganizationList:
+      title: usageList is list of usage resources.
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              organization_id:
+                type: string
+              usages:
+                type: array
+                items:
+                  $ref: '#/components/schemas/usage'
+          example:
+            - organization_id: organization_1
+              usages:
+                - id: platform.workspaces
+                  current_value: 101
+                - id: platform.users
+                  current_value: 102
+                - id: platform.roles
+                  current_value: 103
+            - organization_id: organization_2
+              usages:
+                - id: platform.workspaces
+                  current_value: 201
+                - id: platform.users
+                  current_value: 202
+                - id: platform.roles
+                  current_value: 203
     role:
       title: role is a definition of Role resource.
       type: object

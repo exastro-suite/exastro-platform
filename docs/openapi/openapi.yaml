@@ -27,6 +27,8 @@ tags:
   description: オーガナイゼーションに関する操作
 - name: PlanService
   description: プランに関する操作
+- name: UsageService
+  description: リソース使用量に関する操作
 - name: WorkspaceService
   description: ワークスペースに関する操作
 - name: UsersService
@@ -58,6 +60,11 @@ paths:
       $ref: './paths/plan_items.yaml'
   "/api/{organization_id}/platform/limits":
       $ref: './paths/plans.organizations.limits.yaml'
+
+  "/api/platform/usages":
+      $ref: './paths/usages.yaml'
+  "/api/{organization_id}/platform/usages":
+      $ref: './paths/usages.organizations.yaml'
 
   "/api/{organization_id}/platform/workspaces":
       $ref: './paths/workspaces.yaml'
