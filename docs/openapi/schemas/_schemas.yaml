@@ -40,6 +40,12 @@ limits:
   $ref: "./limits.yaml"
 limitsList:
   $ref: "./limitsList.yaml"
+usage:
+  $ref: "./usage.yaml"
+usageList:
+  $ref: "./usageList.yaml"
+usageOrganizationList:
+  $ref: "./usageOrganizationList.yaml"
 role:
   $ref: "./role.yaml"
 roleList:

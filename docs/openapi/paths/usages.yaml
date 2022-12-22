@@ -1,0 +1,32 @@
+get:
+  tags:
+  - UsageService
+  summary: List returns list of usage
+  x-openapi-router-controller: controllers.usage_service_controller
+  operationId: usage_list
+  parameters:
+  - name: organization_id
+    in: query
+    schema:
+      type: string
+  - name: id
+    in: query
+    description: filter id. (prefix match)
+    schema:
+      type: string
+      example: platform.workspaces
+  responses:
+    200:
+      description: A successful response.
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '../schemas/responseOk.yaml'
+              - $ref: '../schemas/usageOrganizationList.yaml'
+    default:
+      description: An unexpected error response.
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'

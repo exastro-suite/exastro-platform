@@ -1,0 +1,33 @@
+get:
+  tags:
+  - UsageService
+  summary: Returns the current value of resource
+  x-openapi-router-controller: controllers.usage_service_controller
+  operationId: organization_usage_get
+  parameters:
+  - name: organization_id
+    in: path
+    required: true
+    schema:
+      type: string
+  - name: id
+    in: query
+    description: filter id. (prefix match)
+    schema:
+      type: string
+      example: platform.workspaces
+  responses:
+    200:
+      description: A successful response.
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '../schemas/responseOk.yaml'
+              - $ref: '../schemas/usageList.yaml'
+    default:
+      description: An unexpected error response.
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'
