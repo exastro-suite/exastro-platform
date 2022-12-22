@@ -515,7 +515,6 @@ z-index: 9999;
 right: 8px; top: 60px;
 width: 304px;
 max-height: calc( 100vh - 76px );
-min-height: calc( 640px - 76px );
 background-color: var(--white100);
 box-shadow: 0 0 16px rgba( 0,0,0,.3 );
 border-radius: 0 0 8px 8px;
@@ -619,7 +618,18 @@ padding: 8px;
 .userInfoMenuButton {
 width: 100%;
 height: 32px;
-line-height: 32px;
+line-height: 31px;
+text-align: left;
+font-size: 13px;
+}
+.userInfoMenuButton > .inner {
+padding: 0 16px;
+}
+.userInfoMenuButton .icon {
+margin-right: 12px;
+vertical-align: -2px;
+font-size: 16px;
+opacity: .7;
 }
 
 /*
