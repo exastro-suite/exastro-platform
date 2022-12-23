@@ -94,6 +94,10 @@ ALL_REALM_MANAGEMENT_ROLE = ["manage-users", "view-users"]
 # Default when plan is not set
 DEFAULT_PLAN_ID = "_default"
 
+# planのstart_datetimeの書式
+# Format Datetime Plan start_datetime
+FORMAT_DATETIME_PLAN_START_DATETIME = "%Y-%m-%d %H:%M:%S"
+
 # 集計対象リソース
 # Aggregated resource
 RESOURCE_COUNT_WORKSPACES = "platform.workspaces"

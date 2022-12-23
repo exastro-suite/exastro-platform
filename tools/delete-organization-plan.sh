@@ -3,10 +3,10 @@
 source "`dirname $0`/api-auth.conf"
 
 echo
-echo "Please enter the organization ID and start date to delete the organization-plan"
+echo "Please enter the organization ID and start datetime to delete the organization-plan"
 echo
 read -p "organization id : " ORG_ID
-read -p "start date (yyyy-mm-dd) : " START_DATE
+read -p "start datetime (yyyy-mm-dd hh:mm:ss) : " START_DATETIME
 
 echo
 read -p "your username : " USERNAME
@@ -34,7 +34,7 @@ curl ${CURL_OPT} -X DELETE \
     -d "${BODY_JSON}" \
     -o "${TEMPFILE_API_RESPONSE}" \
     -w '%{http_code}\n' \
-    "${CONF_BASE_URL}/api/platform/${ORG_ID}/plans/${START_DATE}" > "${TEMPFILE_API_CODE}"
+    "${CONF_BASE_URL}/api/platform/${ORG_ID}/plans/${START_DATETIME}" > "${TEMPFILE_API_CODE}"
 
 RESULT_CURL=$?
 RESULT_CODE=$(cat "${TEMPFILE_API_CODE}")

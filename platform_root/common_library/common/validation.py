@@ -549,25 +549,25 @@ def validate_plan_limits(plan_limits):
     return result(True)
 
 
-def validate_plan_start_date(plan_start_date):
-    """Validate plan_start_date
+def validate_plan_start_datetime(plan_start_datetime):
+    """Validate plan_start_datetime
 
     Args:
-        plan_start_date (str): plan start date
+        plan_start_datetime (str): plan start datetime
 
     Returns:
         result: Validation result
     """
-    if plan_start_date is None or plan_start_date == "":
+    if plan_start_datetime is None or plan_start_datetime == "":
         return result(
             False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
-            multi_lang.get_text('000-00125', "プラン開始日")
+            multi_lang.get_text('000-00125', "プラン開始日時")
         )
 
-    if not validate_date(plan_start_date):
+    if not validate_datetime(plan_start_datetime):
         return result(
-            False, 400, '400-{}020'.format(MSG_FUNCTION_ID), '日付形式以外が指定されています。({0})',
-            multi_lang.get_text('000-00125', "プラン開始日")
+            False, 400, '400-{}020'.format(MSG_FUNCTION_ID), '日時形式以外が指定されています。({0})',
+            multi_lang.get_text('000-00125', "プラン開始日時")
         )
 
     return result(True)
@@ -607,17 +607,17 @@ def validate_int(num):
         return True
 
 
-def validate_date(date_string, format='%Y-%m-%d'):
-    """validate date
+def validate_datetime(datetime_string, format=const.FORMAT_DATETIME_PLAN_START_DATETIME):
+    """validate datetime
 
     Args:
-        date_string (str): date string
+        datetime_string (str): datetime string
 
     Returns:
         bool: True=OK / False=NG
     """
     try:
-        datetime.strptime(date_string, format)
+        datetime.strptime(datetime_string, format)
     except ValueError:
         return False
     else:
