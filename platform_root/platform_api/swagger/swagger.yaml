@@ -873,6 +873,27 @@ paths:
         schema:
           type: string
           example: platform.workspaces
+      - name: User_Id
+        in: header
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: Roles
+        in: header
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: Language
+        in: header
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
       responses:
         "200":
           description: A successful response.
