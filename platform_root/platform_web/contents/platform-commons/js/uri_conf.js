@@ -39,6 +39,9 @@ var api_conf = {
         },
         "users": {
             "get": "/api/{organization_id}/platform/users",
+            "post": "/api/{organization_id}/platform/users",
+            "get": "/api/{organization_id}/platform/users",
+            "put": "/api/{organization_id}/platform/users/{user_id}",
         }
     }
 }
@@ -57,9 +60,13 @@ var location_conf = {
             "edit": "/{organization_id}/platform/roles/{role_name}",
             "user": "/{organization_id}/platform/roles/{role_name}/user"
         },
+        "users": {
+            "new": "/{organization_id}/platform/users/_new",
+            "list": "/{organization_id}/platform/users",
+            "edit": "/{organization_id}/platform/users/{user_id}",
+        },
         "menu": {
             "toppage": "/{organization_id}/platform/workspaces",
-            "account_manaagement": "/auth/admin/{organization_id}/console/#/realms/{organization_id}/users", 
             "update_password": "/auth/realms/{organization_id}/account/password",
         }
     }

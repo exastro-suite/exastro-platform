@@ -15,12 +15,187 @@
 -->
 <html>
     <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="format-detection" content="telephone=no,email=no,address=no">
+        <meta name="theme-color" content="#002B62">
         <title>
-            platform-web welcome users
+            ユーザー一覧 / ユーザー管理 / Exastro Platform
         </title>
+        <link rel="stylesheet" href="/_/platform-commons/css/platform.css?ver=__BUILD_VERSION__">
+
+        <script type="text/javascript" src="/auth/js/keycloak.js?ver=__BUILD_VERSION__"></script>
+        <script type="text/javascript" src="/_/common-auth/js/exastro-common-auth-config.js?ver=__BUILD_VERSION__"></script>
+        <script type="text/javascript" src="/_/common-auth/js/exastro-common-auth.js?ver=__BUILD_VERSION__"></script>
+        <script src="/_/platform-commons/common/js/jquery.js?ver=__BUILD_VERSION__"></script>
+
+        <link rel="stylesheet" href="/_/platform-commons/css/custom_properties.css?ver=__BUILD_VERSION__">
+        <link rel="stylesheet" href="/_/platform-commons/css/common.css?ver=__BUILD_VERSION__">
+        <link rel="stylesheet" href="/_/platform-commons/css/dialog.css?ver=__BUILD_VERSION__">
+
+        <script src="/_/platform-commons/common/js/words.js?ver=__BUILD_VERSION__"></script>
+        <script src="/_/platform-commons/common/js/common.js?ver=__BUILD_VERSION__"></script>
+        <script src="/_/platform-commons/common/js/table.js?ver=__BUILD_VERSION__"></script>
+        <script src="/_/platform-commons/common/js/dialog.js?ver=__BUILD_VERSION__"></script>
+        <script src="/_/platform-commons/common/js/ui.js?ver=__BUILD_VERSION__"></script>
+
+        <script src="/_/platform-commons/js/platform_common.js?ver=__BUILD_VERSION__"></script>
+        <script src="/_/platform-commons/js/uri_conf.js?ver=__BUILD_VERSION__"></script>
+        <script src="/_/platform-commons/js/users.js?ver=__BUILD_VERSION__"></script>
+
     </head>
     <body>
-        <h1>platform-web welcome users</h1>
-        <hr/>
+        <div id="container">
+            <div class="containerHeader">
+                <header id="header">
+                    <div class="logo">
+                        <img class="logoImage" src="/_/platform-commons/img/Exastro-logo2-white-rgb.svg?ver=__BUILD_VERSION__" alt="Exastro" style="height:32px; margin:5px 18px;">
+                    </div>
+                    <div class="topicPath">
+                        <ol class="topichPathList" style="visibility:hidden;">
+                        </ol>
+                    </div>
+                    <div class="headerMenu">
+                        <ul class="headerMenuList">
+                            <li class="userInfomation headerMenuItem">
+                            </li>
+                        </ul>
+                    </div>
+                </header>
+            </div>
+            <div class="containerBody">
+                <aside id="menu" class="">
+                    <div class="menuBody">
+                        <nav class="menuNavi">
+                            <ul class="menuList" style="display:none;">
+                            </ul>
+                        </nav>
+                    </div>
+                </aside>
+                <main id="main" style="visibility:hidden;">
+                    <div id="content">
+                        <div class="contentHeader">
+                            <h1 class="contentTitle"><span class="contentTitleInner">ユーザー一覧</span></h1>
+                            <p class="contentMenuInfo">ユーザーをメンテナンス(閲覧/登録/更新/削除)できます。</p>
+                        </div>
+                        <div class="contentBody">
+                            <div class="contentMenu">
+                                <ul class="contentMenuList">
+                                    <li class="contentMenuItem">
+                                        <a class="contentMenuLink tabOpen" href="#dataList" tabindex="-1">
+                                            <span class="inner">一覧</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <section class="section tabOpen" id="dataList">
+                                <div class="sectionBody">
+                                    <div id="MT" class="tableContainer viewTable">
+                                        <div class="tableHeader">
+                                            <ul class="tableHeaderMainMenuList">
+                                                <li class="tableHeaderMainMenuItem">
+                                                    <button data-type="tableNew" data-action="positive" style="width:200px; display: none;" class="itaButton tableHeaderMainMenuButton button" id="new_user">
+                                                        <span class="inner"><span class="icon icon-edit"></span>作成</span></button>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div class="tableHeader">
+                                            <div class="operationMenu">
+                                                <ul class="tableHeaderMainMenuList">
+                                                    <li class="operationMenuItem">
+                                                        <button title="フィルター" data-action="positive" data-type="tableEdit" class="itaButton tableHeaderMainMenuButton button button-filter" id="filter">
+                                                            <span class="inner">
+                                                                <span class="iconButtonIcon icon icon-filter"></span>
+                                                                <span class="iconButtonBody">フィルター</span>
+                                                                <span class="buttonMinWidth"></span>
+                                                            </span>
+                                                        </button>
+                                                    </li>
+                                                    <li class="operationMenuItem">
+                                                        <input type="text" value="" class="inputText input text-filter" maxlength="128" size="256" id="textFilter">
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <div class="tableBody">
+                                            <table class="table" width="100%" id="users_list">
+                                                <thead class="thead">
+                                                    <tr class="tHeadTr tr">
+                                                        <th class="tHeadLeftSticky tHeadTh popup th" rowspan="1" colspan="1" }="" title="削除" width="80px;"><div class="ci">削除</div></th>
+                                                        <th data-id="c1" data-rest="user_id" class="tHeadLeftSticky tHeadTh popup th" rowspan="1" colspan="1" }="" title="ユーザーID" width="210px;"><div class="ci">ユーザーID</div></th>
+                                                        <th data-id="c2" data-rest="username" class="tHeadLeftSticky tHeadTh popup th" rowspan="1" colspan="1" }="" title="ユーザー名"><div class="ci">ユーザー名</div></th>
+                                                        <th data-id="c3" data-rest="email" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="Eメール"><div class="ci">Eメール</div></th>
+                                                        <th data-id="c4" data-rest="firstName" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="姓" width="15%"><div class="ci">姓</div></th>
+                                                        <th data-id="c5" data-rest="lastName" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="名" width="15%"><div class="ci">名</div></th>
+                                                        <th data-id="c6" data-rest="enabled" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="有効" width="80px;"><div class="ci">有効</div></th>
+                                                        <th data-id="c7" data-rest="create_timestamp" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="作成日時" width="200px;"><div class="ci">作成日時</div></th>
+                                                        <th data-id="c8" data-rest="action" class="tHeadTh popup th" rowspan="1" colspan="1" }="" width="100px"><div class="ci"></div></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody class="tbody">
+                                                    <tr class="tBodyTr tr datarow-template" style="display:none" username='${username}' data-id="${user_id}">
+                                                        <td class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1" }=""><div class="ci" style="text-align:center">
+                                                            <input type="checkbox" class="form_check_revoke">
+                                                        </div></td>
+                                                        <th class="tBodyLeftSticky tBodyTh th to_detail" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: left;">${user_id}</div></td>
+                                                        <th class="tBodyLeftSticky tBodyTh th to_detail" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: left;">${username}</div></td>
+                                                        <td class="tBodyTd td to_detail" rowspan="1" colspan="1" }="" ><div class="ci" style="white-space: pre; overflow: auto; text-overflow: unset;">${email}</div></td>
+                                                        <td class="tBodyTd td to_detail" rowspan="1" colspan="1" }="" ><div class="ci" style="white-space: pre; overflow: auto; text-overflow: unset;">${firstName}</div></td>
+                                                        <td class="tBodyTd td to_detail" rowspan="1" colspan="1" }="" style="text-align: left;">${lastName}</td>
+                                                        <td class="tBodyTd td to_detail" rowspan="1" colspan="1" }="" style="text-align: center;"><input type="checkbox" class="form_check_revoke" disabled ${enabled}></td>
+                                                        <td class="tBodyTd td to_detail" rowspan="1" colspan="1" }="" style="text-align: center;">${create_timestamp}</td>
+                                                        <td class="tBodyTd td to_detail" rowspan="1" colspan="1" }="" style="text-align: left;"><div class="ci">
+                                                            <button class="pl_button btn_edit" data-id="${user_id}" disabled>
+                                                                <span class="inner"><span class="icon icon-edit"></span>編集</span></button>
+                                                        </div></td>
+                                                    </tr>
+                                                    <tr class="tBodyTr tr notfound" style="display:none">
+                                                        <td class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="6" }="" height="50px"><div class="ci" style="text-align: center;">
+                                                            ユーザーが存在しません
+                                                        </div></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <div class="tableFooter">
+                                            <div class="tableFooterInner">
+                                                <div class="tableFooterBlock pagingMove" id="user_list_pager">
+                                                    <ul class="tableFooterList">
+                                                        <li class="tableFooterItem">
+                                                            <button class="pagingMoveButton" data-type="first" disabled><span class=" icon icon-first"></span></button>
+                                                        </li>
+                                                        <li class="tableFooterItem">
+                                                            <button class="pagingMoveButton" data-type="prev" disabled><span class=" icon icon-prev"></span></button>
+                                                        </li>
+                                                        <li class="tableFooterItem">
+                                                            <div class="pagingPage">
+                                                                <span class="pagingCurrentPage">1</span>
+                                                                <span class="pagingPageJumpNumber">ページ</span>
+                                                            </div>
+                                                        </li>
+                                                        <li class="tableFooterItem">
+                                                            <button class="pagingMoveButton" data-type="next"><span class=" icon icon-next"></span></button>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="tableHeader">
+                                            <ul class="tableHeaderMainMenuList">
+                                                <li class="tableHeaderMainMenuItem">
+                                                    <button id="button_apply" data-action="positive" style="width:200px;" class="itaButton tableHeaderMainMenuButton button" disabled>
+                                                        <span class="inner"><span class="icon icon-trash"></span>削除</span></button>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+                        </div>
+                    </div>
+                </main>
+            </div>
+            <div class="containerLoading"></div>
+        </div>
     </body>
 </html>
