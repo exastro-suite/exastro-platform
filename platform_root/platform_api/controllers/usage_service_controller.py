@@ -43,7 +43,7 @@ def organization_usage_get(organization_id, id=None):
     DBconnector().get_organization_private(organization_id)
 
     if id:
-        ids = [id, ]
+        ids = [i for i in common_const.ALL_RESOURCE_COUNT if i.startswith(id)]
     else:
         ids = common_const.ALL_RESOURCE_COUNT
 
@@ -85,7 +85,7 @@ def usage_list(organization_id=None, id=None):
             organization_ids.append(row["ORGANIZATION_ID"])
 
     if id:
-        ids = [id, ]
+        ids = [i for i in common_const.ALL_RESOURCE_COUNT if i.startswith(id)]
     else:
         ids = common_const.ALL_RESOURCE_COUNT
 
