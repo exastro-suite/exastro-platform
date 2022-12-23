@@ -42,7 +42,7 @@ def organization_usage_get(organization_id, id=None):
     # check organization
     DBconnector().get_organization_private(organization_id)
 
-    if id is not None:
+    if id:
         ids = [id, ]
     else:
         ids = common_const.ALL_RESOURCE_COUNT
@@ -69,7 +69,7 @@ def usage_list(organization_id=None, id=None):
     """
     globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
 
-    if organization_id is not None:
+    if organization_id:
         organization_ids = [organization_id,]
     else:
         with closing(DBconnector().connect_platformdb()) as conn:
@@ -84,7 +84,7 @@ def usage_list(organization_id=None, id=None):
         for row in result:
             organization_ids.append(row["ORGANIZATION_ID"])
 
-    if id is not None:
+    if id:
         ids = [id, ]
     else:
         ids = common_const.ALL_RESOURCE_COUNT
