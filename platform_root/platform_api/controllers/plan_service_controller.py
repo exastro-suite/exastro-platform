@@ -62,9 +62,13 @@ def plan_create(body):
 
     body = connexion.request.get_json()
     if not body:
-        raise common.BadRequestException(
-            message_id='400-000002', message='リクエストボディのパラメータ({0})が不正です。'.format('Json')
+        message_id = "400-000002"
+        message = multi_lang.get_text(
+            message_id,
+            "リクエストボディのパラメータ({0})が不正です。",
+            'Json',
         )
+        raise common.BadRequestException(message_id=message_id, message=message)
 
     user_id = connexion.request.headers.get("User-id")
     plan_id = body.get("id")
@@ -116,7 +120,7 @@ def plan_create(body):
                 json_dict = json.loads(informations)
                 if (json_dict.get("max") and limit_value > int(json_dict.get("max"))) or \
                    (limit_value < 0):
-                    message_id = f"400-{MSG_FUNCTION_ID}001"
+                    message_id = f"400-{MSG_FUNCTION_ID}002"
                     message = multi_lang.get_text(
                         message_id,
                         "指定可能なリミット値の範囲外です。(対象ID:{0})",
@@ -125,7 +129,7 @@ def plan_create(body):
                     raise common.BadRequestException(message_id=message_id, message=message)
 
             if len(limit_ids) != len(limits):
-                message_id = f"400-{MSG_FUNCTION_ID}001"
+                message_id = f"400-{MSG_FUNCTION_ID}003"
                 message = multi_lang.get_text(
                     message_id,
                     "値が指定されていないリミットIDがあります。",
@@ -145,12 +149,22 @@ def plan_create(body):
                 cursor.execute(queries_plans.SQL_INSERT_PLAN, parameter)
             except pymysql.err.IntegrityError:
                 # Duplicate PRIMARY KEY
-                message_id = f"400-{MSG_FUNCTION_ID}001"
+                message_id = f"400-{MSG_FUNCTION_ID}004"
                 message = multi_lang.get_text(
                     message_id,
-                    "指定されたプランはすでに存在しているため作成できません。",
+                    "指定されたプランはすでに存在しているため作成できません(Plan:{0})",
+                    plan_id,
                 )
                 raise common.BadRequestException(message_id=message_id, message=message)
+            except Exception as e:
+                globals.logger.error(f"exception:{e.args}")
+                message_id = f"500-{MSG_FUNCTION_ID}001"
+                message = multi_lang.get_text(
+                    message_id,
+                    "プランの作成に失敗しました(Plan:{0})",
+                    plan_id,
+                )
+                raise common.InternalErrorException(message_id=message_id, message=message)
 
             # insert plan_limit
             parameters = []
@@ -168,12 +182,22 @@ def plan_create(body):
                 cursor.executemany(queries_plans.SQL_INSERT_PLAN_LIMIT, parameters)
             except pymysql.err.IntegrityError:
                 # Duplicate PRIMARY KEY
-                message_id = f"400-{MSG_FUNCTION_ID}001"
+                message_id = f"400-{MSG_FUNCTION_ID}005"
                 message = multi_lang.get_text(
                     message_id,
-                    "指定されたプラン・リミット値はすでに存在しているため作成できません。",
+                    "指定されたプラン・リミット値はすでに存在しているため作成できません(Plan:{0})",
+                    plan_id,
                 )
                 raise common.BadRequestException(message_id=message_id, message=message)
+            except Exception as e:
+                globals.logger.error(f"exception:{e.args}")
+                message_id = f"500-{MSG_FUNCTION_ID}002"
+                message = multi_lang.get_text(
+                    message_id,
+                    "プラン・リミット値の作成に失敗しました(Plan:{0})",
+                    plan_id,
+                )
+                raise common.InternalErrorException(message_id=message_id, message=message)
 
             conn.commit()
 
@@ -253,9 +277,13 @@ def organization_plan_create(body, organization_id):
 
     body = connexion.request.get_json()
     if not body:
-        raise common.BadRequestException(
-            message_id='400-000002', message='リクエストボディのパラメータ({0})が不正です。'.format('Json')
+        message_id = "400-000002"
+        message = multi_lang.get_text(
+            message_id,
+            "リクエストボディのパラメータ({0})が不正です。",
+            'Json',
         )
+        raise common.BadRequestException(message_id=message_id, message=message)
 
     # organizationチェック
     # check organization
@@ -334,10 +362,13 @@ def organization_plan_delete(organization_id, plan_start_date):
                 raise
             except Exception as e:
                 globals.logger.error(f"exception:{e.args}")
-                # Duplicate PRIMARY KEY
-                message_id = f"500-{MSG_FUNCTION_ID}001"
-                message = multi_lang.get_text(message_id,
-                                              "organizationへのプラン設定に失敗しました(対象ID:{0} Plan:{1})")
+                message_id = f"500-{MSG_FUNCTION_ID}003"
+                message = multi_lang.get_text(
+                    message_id,
+                    "organizationに設定されているプランの取得に失敗しました(対象ID:{0} プラン開始日:{1})",
+                    organization_id,
+                    plan_start_date,
+                )
                 raise common.InternalErrorException(message_id=message_id, message=message)
 
             parameter = {
@@ -351,10 +382,13 @@ def organization_plan_delete(organization_id, plan_start_date):
 
             except Exception as e:
                 globals.logger.error(f"exception:{e.args}")
-                # Duplicate PRIMARY KEY
-                message_id = f"500-{MSG_FUNCTION_ID}001"
-                message = multi_lang.get_text(message_id,
-                                              "organizationへのプラン設定に失敗しました(対象ID:{0} Plan:{1})")
+                message_id = f"500-{MSG_FUNCTION_ID}004"
+                message = multi_lang.get_text(
+                    message_id,
+                    "organizationに設定されているプランの削除に失敗しました(対象ID:{0} プラン開始日:{1})",
+                    organization_id,
+                    plan_start_date,
+                )
                 raise common.InternalErrorException(message_id=message_id, message=message)
 
     return common.response_200_ok(data=None)
