@@ -63,9 +63,13 @@ def role_create(body, organization_id):
 
     body = connexion.request.get_json()
     if not body:
-        raise common.BadRequestException(
-            message_id='400-000002', message='リクエストボディのパラメータ({})が不正です。'.format('Json')
+        message_id = "400-000002"
+        message = multi_lang.get_text(
+            message_id,
+            "リクエストボディのパラメータ({0})が不正です。",
+            'Json',
         )
+        raise common.BadRequestException(message_id=message_id, message=message)
 
     role_name = body.get("name")
     role_kind = body.get("kind")
@@ -336,9 +340,13 @@ def role_update(body, organization_id, role_name):
 
     body = connexion.request.get_json()
     if not body:
-        raise common.BadRequestException(
-            message_id='400-000002', message='リクエストボディのパラメータ({})が不正です。'.format('Json')
+        message_id = "400-000002"
+        message = multi_lang.get_text(
+            message_id,
+            "リクエストボディのパラメータ({0})が不正です。",
+            'Json',
         )
+        raise common.BadRequestException(message_id=message_id, message=message)
 
     role_kind = body.get("kind")
     role_description = body.get("description") if body.get("description") else ""

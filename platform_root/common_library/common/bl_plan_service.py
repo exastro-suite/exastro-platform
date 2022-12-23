@@ -154,7 +154,7 @@ def organization_plan_create(user_id, organization_id, plan_id, plan_start_date)
                     message = multi_lang.get_text(
                         message_id,
                         "プランが存在しません(id:{0})",
-                        plan_id
+                        plan_id,
                     )
                     raise common.NotFoundException(message_id=message_id, message=message)
 
@@ -163,10 +163,13 @@ def organization_plan_create(user_id, organization_id, plan_id, plan_start_date)
 
             except Exception as e:
                 globals.logger.error(f"exception:{e.args}")
-                # Duplicate PRIMARY KEY
                 message_id = f"500-{MSG_FUNCTION_ID}001"
-                message = multi_lang.get_text(message_id,
-                                              "organizationへのプラン設定に失敗しました(対象ID:{0} Plan:{1})")
+                message = multi_lang.get_text(
+                    message_id,
+                    "organizationへ設定するプランの取得に失敗しました(対象ID:{0} Plan:{1})",
+                    organization_id,
+                    plan_id,
+                )
                 raise common.InternalErrorException(message_id=message_id, message=message)
 
             parameter = {
@@ -185,18 +188,22 @@ def organization_plan_create(user_id, organization_id, plan_id, plan_start_date)
             except pymysql.err.IntegrityError:
                 # Duplicate PRIMARY KEY
                 message_id = f"400-{MSG_FUNCTION_ID}001"
-                message = multi_lang.get_text(message_id,
-                                              "指定されたorganizationのプラン開始日は、すでに別のプランが登録済みのため、登録できません。(対象ID:{0}, Plan:{1}, プラン開始日:{2})",
-                                              organization_id,
-                                              plan_id,
-                                              plan_start_date)
+                message = multi_lang.get_text(
+                    message_id,
+                    "指定されたorganizationのプラン開始日は、すでに別のプランが登録済みのため、登録できません。(対象ID:{0}, Plan:{1}, プラン開始日:{2})",
+                    organization_id,
+                    plan_id,
+                    plan_start_date,
+                )
                 raise common.BadRequestException(message_id=message_id, message=message)
 
             except Exception as e:
                 globals.logger.error(f"exception:{e.args}")
-                # Duplicate PRIMARY KEY
-                message_id = f"500-{MSG_FUNCTION_ID}001"
-                message = multi_lang.get_text(message_id,
-                                              "organizationへのプラン設定に失敗しました(対象ID:{0} Plan:{1})")
+                message_id = f"500-{MSG_FUNCTION_ID}002"
+                message = multi_lang.get_text(
+                    message_id,
+                    "organizationへのプラン設定に失敗しました(対象ID:{0} Plan:{1})",
+                    organization_id,
+                    plan_id,
+                )
                 raise common.InternalErrorException(message_id=message_id, message=message)
-
