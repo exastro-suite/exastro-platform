@@ -49,6 +49,7 @@ $(function(){
         //
         // register button
         //
+        $('#button_register').prop('disabled',false);
         $('#button_register').on('click',() => {
             $('#button_register').prop('disabled',true);
             if( ! validate_register() ) {
@@ -112,13 +113,8 @@ $(function(){
 
         let reqbody =   {
             "username": $('#form_user_username').val(),
-            "credentials": [
-                {
-                    "type": "password",
-                    "value": $('#form_user_password').val(),
-                    "temporary": ($('#form_user_password_temporary').checked) ? true : false,
-                }
-            ],
+            "password": $('#form_user_password').val(),
+            "password_temporary": ($('#form_user_password_temporary').checked) ? true : false,
             "email": $('#form_user_email').val(),
             "firstName": $('#form_user_first_name').val(),
             "lastName": $('#form_user_last_name').val(),
