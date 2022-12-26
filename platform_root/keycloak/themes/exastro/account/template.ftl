@@ -25,8 +25,7 @@
     </#if>
 </head>
 <body class="admin-console user ${bodyClass}">
-        
-    <header class="navbar navbar-default navbar-pf navbar-main header">
+    <header class="navbar navbar-default navbar-pf navbar-main header ifra-hidden" style="display:none">
         <nav class="navbar" role="navigation">
             <div class="navbar-header">
                 <div class="container">
@@ -55,9 +54,8 @@
             </div>
         </nav>
     </header>
-
     <div class="container">
-        <div class="bs-sidebar col-sm-3">
+        <div class="bs-sidebar col-sm-3 ifra-hidden" style="display:none">
             <ul>
                 <li class="<#if active=='account'>active</#if>"><a href="${url.accountUrl}">${msg("account")}</a></li>
                 <#if features.passwordUpdateSupported><li class="<#if active=='password'>active</#if>"><a href="${url.passwordUrl}">${msg("password")}</a></li></#if>
@@ -69,7 +67,6 @@
                 <#if realm.userManagedAccessAllowed && features.authorization><li class="<#if active=='authorization'>active</#if>"><a href="${url.resourceUrl}">${msg("myResources")}</a></li></#if>
             </ul>
         </div>
-
         <div class="col-sm-9 content-area">
             <#if message?has_content>
                 <div class="alert alert-${message.type}">
@@ -84,5 +81,14 @@
     </div>
 
 </body>
+<script language="javascript">
+window.addEventListener('DOMContentLoaded', (event) => {
+    if(location.pathname.split('/')[3] == 'master') {
+        document.querySelectorAll('.ifra-hidden').forEach(function(elm) {
+            elm.style.display = '';
+        })
+    }
+});
+</script>
 </html>
 </#macro>

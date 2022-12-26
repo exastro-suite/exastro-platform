@@ -182,7 +182,6 @@ function displayMenu(curent) {
         <li class="menuItem"><a class="menuLink" id="menu_workspace" href="#" tabindex="-1">ワークスペース管理</a></li>
         <li class="menuItem"><a class="menuLink" id="menu_account_management" href="#" target="keycloak_management_console" style="display: none;">ユーザー管理</a></li>
         <li class="menuItem"><a class="menuLink" id="menu_role_management" href="#" style="display: none;">ロール管理</a></li>
-        <li class="menuItem"><a class="menuLink" id="menu_update_password" href="#" target="keycloak_account_console">パスワード変更</a></li>
     `);
     if(curent != null) {
         $(`#${curent}`).addClass("current");
@@ -191,7 +190,6 @@ function displayMenu(curent) {
     $('#menu_workspace').attr('href', location_conf.href.workspaces.list.replace(/{organization_id}/g, CommonAuth.getRealm()));
     $('#menu_account_management').attr('href', location_conf.href.menu.account_manaagement.replace(/{organization_id}/g, CommonAuth.getRealm()));
     $('#menu_role_management').attr('href', location_conf.href.roles.list.replace(/{organization_id}/g, CommonAuth.getRealm()));
-    $('#menu_update_password').attr('href', location_conf.href.menu.update_password.replace(/{organization_id}/g, CommonAuth.getRealm()));
 
     if (CommonAuth.hasAuthority("_og-usr-mt")) {
         $("#menu_account_management").css("display", "");

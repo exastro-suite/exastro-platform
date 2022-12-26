@@ -612,8 +612,15 @@ border-top: none;
 .userInfoMenu {
 background-color: var(--black10);
 }
-.userInfoMenuItem {
+.userInfoMenuList {
+display: flex;
+flex-direction: column;
+gap: 8px;
 padding: 8px;
+border-bottom: 1px solid rgba(0,0,0,.2);
+}
+.userInfoMenuList:last-child {
+border-bottom: none;
 }
 .userInfoMenuButton {
 width: 100%;
