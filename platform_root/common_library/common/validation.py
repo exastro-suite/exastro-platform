@@ -17,12 +17,15 @@ from datetime import datetime
 
 from common_library.common import multi_lang
 import common_library.common.const as const
+from email_validator import validate_email, EmailNotValidError
+
 
 
 MSG_FUNCTION_ID = "00"
 
 RE_ID_USABLE_CHARACTERS = r'[a-zA-Z0-9_-]'
 RE_ID_USABLE_FIRST_CHARACTER = r'[a-zA-Z]'
+RE_EMAIL_USABLE_CHARACTERS = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
 
 ORG_RESERVED_WORDS = [
     {"text": "master", "re": r"^master$"},
@@ -663,7 +666,7 @@ def validate_user_name(user_name):
     return result(True)
 
 
-# def validate_user_email(user_email):
+def validate_user_email(user_email):
     """Validate user email
 
     Args:
@@ -672,6 +675,35 @@ def validate_user_name(user_name):
     Returns:
         result: Validation result
     """
+    if user_email is None or user_email == "":
+        return result(
+            False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
+            multi_lang.get_text('000-00128', "email")
+        )
+
+    if len(user_email) > const.length_user_email:
+        return result(
+            False, 400, '400-{}012'.format(MSG_FUNCTION_ID), '指定可能な文字数を超えています。(項目:{0},最大文字数:{1})',
+            multi_lang.get_text('000-00128', "email"),
+            str(const.length_user_email)
+        )
+
+    # if not re.match(RE_EMAIL_USABLE_CHARACTERS, user_email):
+    #     return result(
+    #         False, 400, '400-{}014'.format(MSG_FUNCTION_ID), '先頭の文字にアルファベット以外が指定されています。({0})',
+    #         multi_lang.get_text('000-00128', "email")
+    #     )
+    try:
+        # Check that the email address is valid.
+        validate_email(user_email, check_deliverability=False, allow_smtputf8=False)
+
+    except EmailNotValidError:
+        return result(
+            False, 400, '400-{}014'.format(MSG_FUNCTION_ID), 'メールアドレスの形式に誤りがあります。({0})',
+            multi_lang.get_text('000-00128', "email")
+        )
+
+    return result(True)
 
 
 def validate_user_firstName(user_firstName):

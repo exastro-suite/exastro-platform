@@ -134,18 +134,17 @@ def user_create(body, organization_id):
         )
 
     user_name = body.get("username")
-    # user_email = body.get("email")
+    user_email = body.get("email")
     user_firstName = body.get("firstName")
     user_lastName = body.get("lastName")
-    # user_credentials = body.get("credentials")
 
     # validation check
     validate = validation.validate_user_name(user_name)
     if not validate.ok:
         return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
-    # validate = validation.validate_user_email(user_email)
-    # if not validate.ok:
-        # return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
+    validate = validation.validate_user_email(user_email)
+    if not validate.ok:
+        return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
     validate = validation.validate_user_firstName(user_firstName)
     if not validate.ok:
         return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
@@ -170,8 +169,23 @@ def user_create(body, organization_id):
 
     # ユーザー作成
     # create user
+    user_json = {
+        "username": user_name,
+        "email": user_email,
+        "firstName": user_firstName,
+        "lastName": user_lastName,
+        "credentials": [
+            {
+                "type": "password",
+                "value": body.get("password"),
+                "temporary": body.get("password_temporary")
+            }
+        ],
+        "enabled": body.get("enabled")
+    }
+
     u_create = api_keycloak_users.user_create(
-        realm_name=organization_id, user_json=body, token=token
+        realm_name=organization_id, user_json=user_json, token=token
     )
     if u_create.status_code == 409:
         globals.logger.debug(f"response:{u_create.text}")
@@ -180,6 +194,6 @@ def user_create(body, organization_id):
     elif u_create.status_code not in [201, 409]:
         globals.logger.debug(f"response:{u_create.text}")
 
-        raise common.InternalErrorException(None, f"500-{MSG_FUNCTION_ID}002", "ユーザー作成に失敗しました(対象ユーザー:{})".format(user_name))
+        raise common.InternalErrorException(None, f"500-{MSG_FUNCTION_ID}002", "ユーザー作成に失敗しました(対象ユーザー:{})".format(user_json["username"]))
 
     return common.response_200_ok(None)

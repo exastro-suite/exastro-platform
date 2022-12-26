@@ -30,6 +30,7 @@ length_plan_description = 4000
 max_db_int_value = 2147483647
 min_db_int_value = -2147483647
 length_user_name = 255
+length_user_email = 255
 length_user_firstName = 255
 length_user_lastName = 255
 

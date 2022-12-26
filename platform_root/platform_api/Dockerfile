@@ -53,6 +53,7 @@ RUN dnf install -y \
     six \
     pymysql \
     pycryptodome \
+    email-validator \
 &&  groupadd $GROUPNAME \
 &&  useradd -m -s /bin/bash -g $GROUPNAME $USERNAME \
 &&  setcap 'cap_net_bind_service=+ep' /usr/sbin/httpd \
