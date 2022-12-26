@@ -42,6 +42,13 @@ if [ -z "${PARAM_JSON_FILE}" ]; then
     read -p "organization manager's first name : " ORG_MNG_FIRST_NAME
     read -p "organization manager's last name : " ORG_MNG_LAST_NAME
     read -p "organization manager's initial password : " ORG_MNG_PASSWORD
+    read -p "organization plan id (optional) : " ORG_PLAN
+
+    if [ -n "${ORG_PLAN}" ]; then
+        BODY_JSON_PLAN='"plan":{"id":"'"${ORG_PLAN}"'"},'
+    else
+        BODY_JSON_PLAN=''
+    fi
 
     BODY_JSON=$(
         cat << EOF
@@ -67,6 +74,7 @@ if [ -z "${PARAM_JSON_FILE}" ]; then
                     "enabled": true
                 }
             ],
+            ${BODY_JSON_PLAN}
             "options": {}
         }
 EOF

@@ -10,12 +10,12 @@ delete:
     required: true
     schema:
       type: string
-  - name: plan_start_date
+  - name: plan_start_datetime
     in: path
     required: true
     schema:
       type: string
-      example: 2022-12-1
+      example: '2022-12-01 00:00:00'
   responses:
     200:
       description: A successful response.

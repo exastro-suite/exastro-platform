@@ -22,6 +22,10 @@ import urllib
 import globals  # 共通的なglobals Common globals
 
 
+def __get_keycloak_api_url():
+    return "{}://{}:{}".format(os.environ['API_KEYCLOAK_PROTOCOL'], os.environ['API_KEYCLOAK_HOST'], os.environ['API_KEYCLOAK_PORT'])
+
+
 def user_create(realm_name, user_json, token):
     """ユーザー作成 user create
     Args:
@@ -35,7 +39,7 @@ def user_create(realm_name, user_json, token):
 
     # 呼び出し先設定
     # Call destination setting
-    api_url = "{}://{}:{}".format(os.environ['API_KEYCLOAK_PROTOCOL'], os.environ['API_KEYCLOAK_HOST'], os.environ['API_KEYCLOAK_PORT'])
+    api_url = __get_keycloak_api_url()
 
     header_para = {
         "Content-Type": "application/json",
@@ -63,7 +67,7 @@ def user_get(realm_name, user_name, token, first=0, max=100, search=None):
 
     # 呼び出し先設定
     # Call destination setting
-    api_url = "{}://{}:{}".format(os.environ['API_KEYCLOAK_PROTOCOL'], os.environ['API_KEYCLOAK_HOST'], os.environ['API_KEYCLOAK_PORT'])
+    api_url = __get_keycloak_api_url()
 
     header_para = {
         "Content-Type": "application/json",
@@ -85,6 +89,42 @@ def user_get(realm_name, user_name, token, first=0, max=100, search=None):
     return request_response
 
 
+def user_count_get(realm_name, token, user_name=None, search=None):
+    """ユーザー数取得 users count
+    Args:
+        realm_name (str): realm name
+        toekn (str): token
+        user_name (str): user name (Noneの時はすべて取得 None is specifies no criteria)
+        search (str): search (Noneの時はすべて取得 None is specifies no criteria)
+    Returns:
+        Response: HTTP Respose (success : .status_code=200)
+    """
+    globals.logger.info('Get keycloak users count. realm_name={}, user_name={}, search={}'.format(realm_name, user_name, search))
+
+    # 呼び出し先設定
+    # Call destination setting
+    api_url = __get_keycloak_api_url()
+
+    header_para = {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer {}".format(token),
+    }
+
+    if user_name is not None:
+        query_params = f'?username={urllib.parse.quote(user_name)}'
+    elif search is not None:
+        query_params = f'?search={urllib.parse.quote(search)}'
+    else:
+        query_params = ""
+
+    globals.logger.debug("users count get")
+    # ユーザー数取得
+    # users count acquisition
+    request_response = requests.get(f"{api_url}/auth/admin/realms/{realm_name}/users/count{query_params}", headers=header_para)
+
+    return request_response
+
+
 def user_get_by_id(realm_name, user_id, token):
     """ユーザ情報取得(user id指定) User information acquisition (user id specified)
     Args:
@@ -98,7 +138,7 @@ def user_get_by_id(realm_name, user_id, token):
 
     # 呼び出し先設定
     # Call destination setting
-    api_url = "{}://{}:{}".format(os.environ['API_KEYCLOAK_PROTOCOL'], os.environ['API_KEYCLOAK_HOST'], os.environ['API_KEYCLOAK_PORT'])
+    api_url = __get_keycloak_api_url()
 
     header_para = {
         "Content-Type": "application/json",
@@ -127,7 +167,7 @@ def user_update(realm_name, user_id, user_json, token):
 
     # 呼び出し先設定
     # Call destination setting
-    api_url = "{}://{}:{}".format(os.environ['API_KEYCLOAK_PROTOCOL'], os.environ['API_KEYCLOAK_HOST'], os.environ['API_KEYCLOAK_PORT'])
+    api_url = __get_keycloak_api_url()
 
     header_para = {
         "Content-Type": "application/json",
@@ -156,7 +196,7 @@ def user_reset_password(realm_name, user_id, user_password, token):
 
     # 呼び出し先設定
     # Call destination setting
-    api_url = "{}://{}:{}".format(os.environ['API_KEYCLOAK_PROTOCOL'], os.environ['API_KEYCLOAK_HOST'], os.environ['API_KEYCLOAK_PORT'])
+    api_url = __get_keycloak_api_url()
 
     header_para = {
         "Content-Type": "application/json",
@@ -194,7 +234,7 @@ def service_account_user_get(realm_name, client_id, token):
 
     # 呼び出し先設定
     # Call destination setting
-    api_url = "{}://{}:{}".format(os.environ['API_KEYCLOAK_PROTOCOL'], os.environ['API_KEYCLOAK_HOST'], os.environ['API_KEYCLOAK_PORT'])
+    api_url = __get_keycloak_api_url()
 
     header_para = {
         "Content-Type": "application/json",

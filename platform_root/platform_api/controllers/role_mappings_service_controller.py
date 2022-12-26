@@ -110,9 +110,13 @@ def role_user_mapping_create(body, organization_id, role_name):
 
     body = connexion.request.get_json()
     if not body:
-        raise common.BadRequestException(
-            message_id='400-000002', message='リクエストボディのパラメータ({0})が不正です。'.format('Json')
+        message_id = "400-000002"
+        message = multi_lang.get_text(
+            message_id,
+            "リクエストボディのパラメータ({0})が不正です。",
+            'Json',
         )
+        raise common.BadRequestException(message_id=message_id, message=message)
 
     validate = validation.validate_role_mapping_users(body)
     if not validate.ok:
@@ -134,9 +138,13 @@ def role_user_mapping_create(body, organization_id, role_name):
     # process the number of cases
     for user in body:
         if not user.get("preferred_username"):
-            raise common.BadRequestException(
-                message_id='400-000002', message='リクエストボディのパラメータ({0})が不正です。'.format('preferred_username')
+            message_id = "400-000002"
+            message = multi_lang.get_text(
+                message_id,
+                "リクエストボディのパラメータ({0})が不正です。",
+                'preferred_username',
             )
+            raise common.BadRequestException(message_id=message_id, message=message)
 
         # ユーザーの存在チェック
         # User existence check
@@ -210,9 +218,13 @@ def role_user_mapping_delete(body, organization_id, role_name):
 
     body = connexion.request.get_json()
     if not body:
-        raise common.BadRequestException(
-            message_id='400-000002', message='リクエストボディのパラメータ({0})が不正です。'.format('Json')
+        message_id = "400-000002"
+        message = multi_lang.get_text(
+            message_id,
+            "リクエストボディのパラメータ({0})が不正です。",
+            'Json',
         )
+        raise common.BadRequestException(message_id=message_id, message=message)
 
     validate = validation.validate_role_mapping_users(body)
     if not validate.ok:
