@@ -139,7 +139,7 @@ $(function(){
                     .replace(/\${email}/g, fn.cv(user.email,'',true))
                     .replace(/\${firstName}/g, fn.cv(user.firstName,'',true))
                     .replace(/\${lastName}/g, fn.cv(user.lastName,'',true))
-                    .replace(/\${enabled}/g, (user.enabled) ? 'checked' : '')
+                    .replace(/\${enabled}/g, (user.enabled) ? '<span class="icon icon-check"></span>' : '')
                     .replace(/\${create_timestamp}/g, fn.date(new Date(user.create_timestamp),'yyyy/MM/dd HH:mm:ss'))
                 $("#users_list tbody").append(row_html);
             }
