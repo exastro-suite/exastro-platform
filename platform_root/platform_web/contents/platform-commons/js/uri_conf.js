@@ -67,7 +67,12 @@ var location_conf = {
         },
         "menu": {
             "toppage": "/{organization_id}/platform/workspaces",
+        },
+        "account": {
+            "main_page": "/{organization_id}/platform/account",
+            "account_edit": "/auth/realms/{organization_id}/account/",
             "update_password": "/auth/realms/{organization_id}/account/password",
+            "two_factor_auth": "/auth/realms/{organization_id}/account/totp"
         }
     }
 }

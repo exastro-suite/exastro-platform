@@ -400,24 +400,24 @@ def organization_list():
             point_plan_date = None
             for org_plan in org_plans:
                 # Active plan check
-                if datetime.datetime.strptime(org_plan.get("start_date"), '%Y-%m-%d').date() <= datetime.date.today():
+                if datetime.datetime.strptime(org_plan.get("start_datetime"), common_const.FORMAT_DATETIME_PLAN_START_DATETIME) <= datetime.datetime.now():
                     # 初回か2回目以降かでチェックを分ける
                     # Separate checks for the first time or the second and subsequent times
                     if point_plan_date:
-                        if point_plan_date <= org_plan.get("start_date"):
+                        if point_plan_date <= org_plan.get("start_datetime"):
                             active_plan = {
                                 "id": org_plan.get("id")
                             }
-                            point_plan_date = org_plan.get("start_date")
+                            point_plan_date = org_plan.get("start_datetime")
                     else:
                         active_plan = {
                             "id": org_plan.get("id")
                         }
-                        point_plan_date = org_plan.get("start_date")
+                        point_plan_date = org_plan.get("start_datetime")
 
                 plan = {
                     "id": org_plan.get("id"),
-                    "start_date": org_plan.get("start_date"),
+                    "start_datetime": org_plan.get("start_datetime"),
                 }
                 plans.append(plan)
 
@@ -1406,7 +1406,8 @@ def __organization_plan_create(organization_id, plan_id, user_id):
         user_id (str): user id
     """
     if plan_id is not None:
-        bl_plan_service.organization_plan_create(user_id, organization_id, plan_id, datetime.date.today().strftime('%Y-%m-%d'))
+        bl_plan_service.organization_plan_create(
+            user_id, organization_id, plan_id, datetime.datetime.now().strftime(common_const.FORMAT_DATETIME_PLAN_START_DATETIME))
 
     # ステータス更新
     # update status

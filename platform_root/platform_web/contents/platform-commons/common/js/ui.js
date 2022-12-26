@@ -236,8 +236,13 @@ headerMenu() {
     //     window.location.href = fn.getWorkspaceChangeUrl( workspaceId );
     // });
 
+    // アカウント管理
+    ui.$.header.find('.userInfoMenuButton[data-type=account]').on('click', function(){
+        window.location.href = location_conf.href.account.main_page.replace(/{organization_id}/g, CommonAuth.getRealm());
+    });
+
     // ログアウト
-    ui.$.header.find('.userInfoMenuButton').on('click', function(){
+    ui.$.header.find('.userInfoMenuButton[data-type=logout]').on('click', function(){
         // CommonAuth.logout({ redirectUri: ui.params.path });
         CommonAuth.logout();
     });
@@ -307,9 +312,15 @@ userInfo() {
             <div class="userInfoBody">
                 <ul class="userInfoMenuList">
                     <li class="userInfoMenuItem">
+                        ${fn.html.button(fn.html.icon('gear') + 'アカウント管理', ['userInfoMenuButton', 'itaButton'], { type: 'account', action: 'default'})}
+                    </li>
+                </ul>
+
+                <ul class="userInfoMenuList">
+                    <li class="userInfoMenuItem">
                         ${fn.html.button(fn.html.icon('logout') + 'ログアウト', ['userInfoMenuButton', 'itaButton'], { type: 'logout', action: 'positive'})}
                     </li>
-                </div>
+                </ul>
             </div>
         </div>
     </div>`;

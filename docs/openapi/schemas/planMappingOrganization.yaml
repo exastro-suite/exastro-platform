@@ -15,12 +15,12 @@
 type: object
 required:
 - id
-- start_date
+- start_datetime
 properties:
   id:
     type: string
     example: plan-1
 
-  start_date:
+  start_datetime:
     type: string
-    example: 2022-12-1
+    example: '2022-12-01 00:00:00'
