@@ -180,7 +180,7 @@ function displayTopicPath(topicPaths) {
 function displayMenu(curent) {
     $('.menuList').append(`
         <li class="menuItem"><a class="menuLink" id="menu_workspace" href="#" tabindex="-1">ワークスペース管理</a></li>
-        <li class="menuItem"><a class="menuLink" id="menu_account_management" href="#" target="keycloak_management_console" style="display: none;">ユーザー管理</a></li>
+        <li class="menuItem"><a class="menuLink" id="menu_account_management" href="#" style="display: none;">ユーザー管理</a></li>
         <li class="menuItem"><a class="menuLink" id="menu_role_management" href="#" style="display: none;">ロール管理</a></li>
     `);
     if(curent != null) {
@@ -188,7 +188,7 @@ function displayMenu(curent) {
     }
 
     $('#menu_workspace').attr('href', location_conf.href.workspaces.list.replace(/{organization_id}/g, CommonAuth.getRealm()));
-    $('#menu_account_management').attr('href', location_conf.href.menu.account_manaagement.replace(/{organization_id}/g, CommonAuth.getRealm()));
+    $('#menu_account_management').attr('href', location_conf.href.users.list.replace(/{organization_id}/g, CommonAuth.getRealm()));
     $('#menu_role_management').attr('href', location_conf.href.roles.list.replace(/{organization_id}/g, CommonAuth.getRealm()));
 
     if (CommonAuth.hasAuthority("_og-usr-mt")) {
@@ -497,5 +497,32 @@ const RolesCommon =
             default:
                 return [];
         }
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//   User Common
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+const UsersCommon =
+{
+
+    "isAlllowedCreateUser": function() {
+        return CommonAuth.hasAuthority(RolesCommon.ORG_AUTH_USER_MAINTE) || ( CommonAuth.getAdminWorkspaces().length > 0 );
+    },
+
+    "isSystemUser": function (user) {
+        return user.preferred_username.match(/^_/)? true: false;
+    },
+
+    "isAllowedEditUser": function(user) {
+
+        if(UsersCommon.isSystemUser(user)) {
+            // システムで生成したロールは編集不可とする
+            // System-generated roles are non-editable
+            return false;
+        }
+        return true;
     }
 }
