@@ -22,6 +22,8 @@ organization:
   $ref: "./organization.yaml"
 organizationCreate:
   $ref: "./organizationCreate.yaml"
+organizationUserCreate:
+  $ref: "./organizationUserCreate.yaml"
 organizationList:
   $ref: "./organizationList.yaml"
 planMappingOrganization:

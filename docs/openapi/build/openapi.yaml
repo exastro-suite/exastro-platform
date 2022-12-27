@@ -1209,7 +1209,7 @@ components:
         organization_managers:
           type: array
           items:
-            $ref: '#/components/schemas/userCreate'
+            $ref: '#/components/schemas/organizationUserCreate'
         plan:
           type: object
           properties:
@@ -1221,6 +1221,30 @@ components:
           description: Organization Add Json Parameter (json of KeyCloak)
       required:
         - id
+    organizationUserCreate:
+      title: organization-user is a definition of User resource.
+      type: object
+      properties:
+        username:
+          type: string
+          example: user-id
+        email:
+          type: string
+          example: user e-mail address
+        firstName:
+          type: string
+        lastName:
+          type: string
+        credentials:
+          type: array
+          items:
+            $ref: '#/components/schemas/userCredentials'
+        requiredActions:
+          $ref: '#/components/schemas/userRequiredActions'
+        enabled:
+          type: boolean
+      required:
+        - username
     organizationList:
       title: roleList is list of Role resources.
       type: object
