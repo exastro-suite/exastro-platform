@@ -387,7 +387,13 @@ def role_update(body, organization_id, role_name):
 
     if r_cust_role.status_code == 404:
         globals.logger.debug(f"response:{r_cust_role.text}")
-        raise common.NotFoundException(None, f"404-{MSG_FUNCTION_ID}001", "ロールが存在しません(対象ID:{})".format(role_name))
+        message_id = f"404-{MSG_FUNCTION_ID}001"
+        message = multi_lang.get_text(
+            message_id,
+            "ロールが存在しません(対象ID:{0})",
+            role_name,
+        )
+        raise common.NotFoundException(message_id=message_id, message=message)
 
     elif r_cust_role.status_code != 200:
         globals.logger.debug(f"response:{r_cust_role.text}")

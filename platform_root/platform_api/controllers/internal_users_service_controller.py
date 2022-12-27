@@ -16,7 +16,7 @@ import inspect
 
 from contextlib import closing
 
-from common_library.common import common, const as common_const
+from common_library.common import common, const as common_const, multi_lang
 from common_library.common import api_keycloak_tokens, api_keycloak_roles
 from common_library.common.db import DBconnector
 from libs import queries_internal_users
@@ -59,7 +59,13 @@ def user_workspace_list(organization_id, user_id):
     # Get user role
     roles_response = api_keycloak_roles.get_user_role_mapping(organization_id, user_id, token)
     if roles_response.status_code == 404:
-        return common.response_status(404, None, '404-{}001'.format(MSG_FUNCTION_ID), "ユーザが存在しません")
+        globals.logger.error(f"response:{roles_response.text}")
+        message_id = f"404-{MSG_FUNCTION_ID}001"
+        message = multi_lang.get_text(
+            message_id,
+            "ユーザが存在しません"
+        )
+        raise common.NotFoundException(message_id=message_id, message=message)
     elif roles_response.status_code != 200:
         raise Exception("get user role-mapping error status:{}, response:{}".format(roles_response.status_code, roles_response.text))
 

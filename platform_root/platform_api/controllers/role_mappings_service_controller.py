@@ -61,7 +61,14 @@ def role_user_mapping_get(organization_id, role_name, first=0, max=100):
 
     if response.status_code == 404:
         globals.logger.error(f"response:{response.text}")
-        raise common.NotFoundException(None, f"404-{MSG_FUNCTION_ID}001", "情報が存在しません(Role:{0}, message{1})".format(role_name, response.text))
+        message_id = f"404-{MSG_FUNCTION_ID}001"
+        message = multi_lang.get_text(
+            message_id,
+            "情報が存在しません(Role:{0}, message{1})",
+            role_name,
+            response.text,
+        )
+        raise common.NotFoundException(message_id=message_id, message=message)
 
     elif response.status_code != 200:
         globals.logger.error(f"response:{response.text}")
