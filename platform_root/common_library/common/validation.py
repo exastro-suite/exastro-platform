@@ -20,7 +20,6 @@ import common_library.common.const as const
 from email_validator import validate_email, EmailNotValidError
 
 
-
 MSG_FUNCTION_ID = "00"
 
 RE_ID_USABLE_CHARACTERS = r'[a-zA-Z0-9_-]'

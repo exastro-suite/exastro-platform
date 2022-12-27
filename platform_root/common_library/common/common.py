@@ -19,6 +19,7 @@ import random
 import string
 import json
 from functools import wraps
+from typing import cast
 
 import globals
 from common_library.common import multi_lang
@@ -192,6 +193,20 @@ def response_200_ok(data):
     """
     status_code = 200
     return response_status(status_code, data, "000-00000", "SUCCESS")
+
+
+def response_validation_error(validate):
+    """Validation error レスポンス Validation error response
+
+    Args:
+        validate (validation.result): 戻り値 return values
+
+    Returns:
+        response: HTTP Response
+    """
+    from common_library.common import validation
+    validate = cast(validation.result, validate)
+    return response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
 
 
 def response_status(status_code, data, message_id, base_message="", *args):
