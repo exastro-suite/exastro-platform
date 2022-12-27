@@ -19,6 +19,7 @@ import random
 import string
 import json
 from functools import wraps
+from typing import cast
 
 import globals
 from common_library.common import multi_lang
@@ -192,6 +193,20 @@ def response_200_ok(data):
     """
     status_code = 200
     return response_status(status_code, data, "000-00000", "SUCCESS")
+
+
+def response_validation_error(validate):
+    """Validation error レスポンス Validation error response
+
+    Args:
+        validate (validation.result): 戻り値 return values
+
+    Returns:
+        response: HTTP Response
+    """
+    from common_library.common import validation
+    validate = cast(validation.result, validate)
+    return response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
 
 
 def response_status(status_code, data, message_id, base_message="", *args):
@@ -487,3 +502,61 @@ def get_item(json_items, key_name, match_value):
             return item
 
     return None
+
+
+def is_boolean(val):
+    """bool値判断 bool value judgement
+
+    Args:
+        val (obje): true/falseオブジェクト true/false object
+
+    Returns:
+        bool: True:boolean, False:not boolean
+    """
+    try:
+        # Exceptionで引っかかるときはすべてbool意外と判断
+        # When it gets caught in Exception, it is judged that boolean is unexpected
+        val_to_boolean(val)
+
+    except Exception:
+        return False
+    return True
+
+
+def val_to_boolean(val):
+    """bool値変換 bool value convert
+
+    Args:
+        val (obj): true/falseオブジェクト true/false object
+
+    Returns:
+        bool: bool value
+    """
+    # 値がbool値の場合は、そのまま返却する
+    # If the value is a bool value, return it as is
+    if type(val) == bool:
+        return val
+    elif type(val) == str:
+        if val.upper() == "TRUE":
+            return True
+        elif val.upper() == "FALSE":
+            return False
+        else:
+            raise TypeError
+    else:
+        raise TypeError
+
+
+def get_response_error_message(res):
+    """response textのエラーメッセージ取得
+
+    Args:
+        res (str): http response text
+
+    Returns:
+        str: error message value
+    """
+
+    json_text = json.loads(res)
+
+    return json_text.get("errorMessage")

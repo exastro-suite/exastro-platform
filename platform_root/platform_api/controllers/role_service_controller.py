@@ -79,16 +79,16 @@ def role_create(body, organization_id):
     # validation check
     validate = validation.validate_role_name(role_name)
     if not validate.ok:
-        return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
+        return common.response_validation_error(validate)
     validate = validation.validate_role_kind(role_kind)
     if not validate.ok:
-        return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
+        return common.response_validation_error(validate)
     validate = validation.validate_role_description(role_description)
     if not validate.ok:
-        return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
+        return common.response_validation_error(validate)
     validate = validation.validate_role_workspaces(workspaces)
     if not validate.ok:
-        return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
+        return common.response_validation_error(validate)
 
     workspace_ids = [w.get("id") for w in workspaces]
     cauth = check_authority.CheckAuthority(organization_id, connexion.request.headers)
@@ -355,16 +355,16 @@ def role_update(body, organization_id, role_name):
     # validation check
     validate = validation.validate_role_name(role_name)
     if not validate.ok:
-        return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
+        return common.response_validation_error(validate)
     validate = validation.validate_role_kind(role_kind)
     if not validate.ok:
-        return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
+        return common.response_validation_error(validate)
     validate = validation.validate_role_description(role_description)
     if not validate.ok:
-        return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
+        return common.response_validation_error(validate)
     validate = validation.validate_role_workspaces(workspaces)
     if not validate.ok:
-        return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
+        return common.response_validation_error(validate)
 
     db = DBconnector()
     private = db.get_organization_private(organization_id)
@@ -387,7 +387,13 @@ def role_update(body, organization_id, role_name):
 
     if r_cust_role.status_code == 404:
         globals.logger.debug(f"response:{r_cust_role.text}")
-        raise common.NotFoundException(None, f"404-{MSG_FUNCTION_ID}001", "ロールが存在しません(対象ID:{})".format(role_name))
+        message_id = f"404-{MSG_FUNCTION_ID}001"
+        message = multi_lang.get_text(
+            message_id,
+            "ロールが存在しません(対象ID:{0})",
+            role_name,
+        )
+        raise common.NotFoundException(message_id=message_id, message=message)
 
     elif r_cust_role.status_code != 200:
         globals.logger.debug(f"response:{r_cust_role.text}")

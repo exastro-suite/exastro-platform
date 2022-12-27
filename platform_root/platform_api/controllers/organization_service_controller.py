@@ -69,16 +69,16 @@ def organization_create(body, retry=None):
     # validation check
     validate = validation.validate_organization_id(organization_id)
     if not validate.ok:
-        return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
+        return common.response_validation_error(validate)
     validate = validation.validate_organization_name(organization_name)
     if not validate.ok:
-        return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
+        return common.response_validation_error(validate)
 
     plan_id = body.get("plan", {}).get("id")
     if "id" in body.get("plan", {}):
         validate = validation.validate_plan_id(plan_id)
         if not validate.ok:
-            return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
+            return common.response_validation_error(validate)
 
     db = DBconnector()
     with closing(db.connect_platformdb()) as conn:

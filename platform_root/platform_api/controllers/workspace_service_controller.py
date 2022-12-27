@@ -68,13 +68,13 @@ def workspace_create(body, organization_id):
     # validation check
     validate = validation.validate_workspace_id(workspace_id)
     if not validate.ok:
-        return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
+        return common.response_validation_error(validate)
     validate = validation.validate_workspace_name(workspace_name)
     if not validate.ok:
-        return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
+        return common.response_validation_error(validate)
     validate = validation.validate_workspace_informations(info)
     if not validate.ok:
-        return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
+        return common.response_validation_error(validate)
 
     # plan limits check
     data = bl_plan_service.organization_limits_get(organization_id, common_const.RESOURCE_COUNT_WORKSPACES)
@@ -321,7 +321,12 @@ def workspace_info(organization_id, workspace_id):
 
         return common.response_200_ok(data)
     else:
-        return common.response_status(404, None, f"404-{MSG_FUNCTION_ID}001", "ワークスペース情報が存在しません")
+        message_id = f"404-{MSG_FUNCTION_ID}001"
+        message = multi_lang.get_text(
+            message_id,
+            "ワークスペース情報が存在しません",
+        )
+        raise common.NotFoundException(message_id=message_id, message=message)
 
 
 @common.platform_exception_handler
