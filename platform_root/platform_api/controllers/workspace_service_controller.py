@@ -68,13 +68,13 @@ def workspace_create(body, organization_id):
     # validation check
     validate = validation.validate_workspace_id(workspace_id)
     if not validate.ok:
-        return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
+        return common.response_validation_error(validate)
     validate = validation.validate_workspace_name(workspace_name)
     if not validate.ok:
-        return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
+        return common.response_validation_error(validate)
     validate = validation.validate_workspace_informations(info)
     if not validate.ok:
-        return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
+        return common.response_validation_error(validate)
 
     # plan limits check
     data = bl_plan_service.organization_limits_get(organization_id, common_const.RESOURCE_COUNT_WORKSPACES)

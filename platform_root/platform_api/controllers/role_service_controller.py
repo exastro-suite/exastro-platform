@@ -79,16 +79,16 @@ def role_create(body, organization_id):
     # validation check
     validate = validation.validate_role_name(role_name)
     if not validate.ok:
-        return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
+        return common.response_validation_error(validate)
     validate = validation.validate_role_kind(role_kind)
     if not validate.ok:
-        return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
+        return common.response_validation_error(validate)
     validate = validation.validate_role_description(role_description)
     if not validate.ok:
-        return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
+        return common.response_validation_error(validate)
     validate = validation.validate_role_workspaces(workspaces)
     if not validate.ok:
-        return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
+        return common.response_validation_error(validate)
 
     workspace_ids = [w.get("id") for w in workspaces]
     cauth = check_authority.CheckAuthority(organization_id, connexion.request.headers)
@@ -355,16 +355,16 @@ def role_update(body, organization_id, role_name):
     # validation check
     validate = validation.validate_role_name(role_name)
     if not validate.ok:
-        return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
+        return common.response_validation_error(validate)
     validate = validation.validate_role_kind(role_kind)
     if not validate.ok:
-        return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
+        return common.response_validation_error(validate)
     validate = validation.validate_role_description(role_description)
     if not validate.ok:
-        return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
+        return common.response_validation_error(validate)
     validate = validation.validate_role_workspaces(workspaces)
     if not validate.ok:
-        return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
+        return common.response_validation_error(validate)
 
     db = DBconnector()
     private = db.get_organization_private(organization_id)

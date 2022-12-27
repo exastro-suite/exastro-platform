@@ -120,7 +120,7 @@ def role_user_mapping_create(body, organization_id, role_name):
 
     validate = validation.validate_role_mapping_users(body)
     if not validate.ok:
-        return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
+        return common.response_validation_error(validate)
 
     # サービスアカウントのTOKEN取得
     # Get a service account token
@@ -228,7 +228,7 @@ def role_user_mapping_delete(body, organization_id, role_name):
 
     validate = validation.validate_role_mapping_users(body)
     if not validate.ok:
-        return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
+        return common.response_validation_error(validate)
 
     private = DBconnector().get_organization_private(organization_id)
 

@@ -85,16 +85,16 @@ def plan_create(body):
     # validation check
     validate = validation.validate_plan_id(plan_id)
     if not validate.ok:
-        return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
+        return common.response_validation_error(validate)
     validate = validation.validate_plan_name(plan_name)
     if not validate.ok:
-        return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
+        return common.response_validation_error(validate)
     validate = validation.validate_plan_informations(info)
     if not validate.ok:
-        return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
+        return common.response_validation_error(validate)
     validate = validation.validate_plan_limits(limits)
     if not validate.ok:
-        return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
+        return common.response_validation_error(validate)
 
     # DB登録
     #  insert plan and plan_limit
@@ -298,11 +298,11 @@ def organization_plan_create(body, organization_id):
     # validation check
     validate = validation.validate_plan_id(plan_id)
     if not validate.ok:
-        return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
+        return common.response_validation_error(validate)
 
     validate = validation.validate_plan_start_datetime(plan_start_datetime)
     if not validate.ok:
-        return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
+        return common.response_validation_error(validate)
 
     # PLAN情報設定
     bl_plan_service.organization_plan_create(user_id, organization_id, plan_id, plan_start_datetime)
@@ -330,7 +330,7 @@ def organization_plan_delete(organization_id, plan_start_datetime):
     # validation check
     validate = validation.validate_plan_start_datetime(plan_start_datetime)
     if not validate.ok:
-        return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
+        return common.response_validation_error(validate)
 
     # PLAN情報取得
     # get plan info.
