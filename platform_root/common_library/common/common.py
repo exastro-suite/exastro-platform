@@ -487,3 +487,61 @@ def get_item(json_items, key_name, match_value):
             return item
 
     return None
+
+
+def is_boolean(val):
+    """bool値判断 bool value judgement
+
+    Args:
+        val (obje): true/falseオブジェクト true/false object
+
+    Returns:
+        bool: True:boolean, False:not boolean
+    """
+    try:
+        # Exceptionで引っかかるときはすべてbool意外と判断
+        # When it gets caught in Exception, it is judged that boolean is unexpected
+        val_to_boolean(val)
+
+    except Exception:
+        return False
+    return True
+
+
+def val_to_boolean(val):
+    """bool値変換 bool value convert
+
+    Args:
+        val (obj): true/falseオブジェクト true/false object
+
+    Returns:
+        bool: bool value
+    """
+    # 値がbool値の場合は、そのまま返却する
+    # If the value is a bool value, return it as is
+    if type(val) == bool:
+        return val
+    elif type(val) == str:
+        if val.upper() == "TRUE":
+            return True
+        elif val.upper() == "FALSE":
+            return False
+        else:
+            raise TypeError
+    else:
+        raise TypeError
+
+
+def get_response_error_message(res):
+    """response textのエラーメッセージ取得
+
+    Args:
+        res (str): http response text
+
+    Returns:
+        str: error message value
+    """
+
+    json_text = json.loads(res)
+
+    return json_text.get("errorMessage")
