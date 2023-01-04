@@ -200,10 +200,9 @@ def user_create(body, organization_id):
         message_id = f"409-{MSG_FUNCTION_ID}001"
         message = multi_lang.get_text(
             message_id,
-            "指定されたユーザーはすでに存在しているため作成できません。",
-            u_create.text)
+            "指定されたユーザーはすでに存在しているため作成できません。")
 
-        raise common.OtherException(409, None, f"409-{MSG_FUNCTION_ID}001", "指定されたユーザーはすでに存在しているため作成できません。")
+        raise common.OtherException(message_id=message_id, message=message)
     elif u_create.status_code == 400:
         globals.logger.debug(f"response:{u_create.text}")
         message_id = f"400-{MSG_FUNCTION_ID}001"
@@ -215,7 +214,12 @@ def user_create(body, organization_id):
 
     elif u_create.status_code != 201:
         globals.logger.debug(f"response:{u_create.text}")
+        message_id = f"500-{MSG_FUNCTION_ID}002"
+        message = multi_lang.get_text(
+            message_id,
+            "ユーザー作成に失敗しました(対象ユーザー:{0})",
+            common.get_response_error_message(u_create.text))
 
-        raise common.InternalErrorException(None, f"500-{MSG_FUNCTION_ID}002", "ユーザー作成に失敗しました(対象ユーザー:{})".format(user_json["username"]))
+        raise common.InternalErrorException(message_id=message_id, message=message)
 
     return common.response_200_ok(None)

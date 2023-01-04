@@ -15,7 +15,7 @@
 import re
 from datetime import datetime
 
-from common_library.common import multi_lang
+from common_library.common import common, multi_lang
 import common_library.common.const as const
 from email_validator import validate_email, EmailNotValidError
 
@@ -690,7 +690,7 @@ def validate_user_email(user_email):
 
     except EmailNotValidError:
         return result(
-            False, 400, '400-{}014'.format(MSG_FUNCTION_ID), 'メールアドレスの形式に誤りがあります。({0})',
+            False, 400, '400-{}023'.format(MSG_FUNCTION_ID), 'メールアドレスの形式に誤りがあります。({0})',
             multi_lang.get_text('000-00128', "email")
         )
 
@@ -736,6 +736,44 @@ def validate_user_lastName(user_lastName):
             False, 400, '400-{}012'.format(MSG_FUNCTION_ID), '指定可能な文字数を超えています。(項目:{0},最大文字数:{1})',
             multi_lang.get_text('000-00131', "姓"),
             str(const.length_user_lastName)
+        )
+
+    return result(True)
+
+
+def validate_password_temporary(password_temporary):
+    """Validate password temporary
+
+    Args:
+        password_temporary (str): password temporary
+
+    Returns:
+        result: Validation result
+    """
+
+    if not (common.is_boolean(password_temporary)):
+        return result(
+            False, 400, '400-00024', 'True/False 以外が指定されています。({0})',
+            multi_lang.get_text('000-00133', "password_temporary"),
+        )
+
+    return result(True)
+
+
+def validate_user_enabled(user_enabled):
+    """Validate user enabled
+
+    Args:
+        user_enabled (bool): user enabled
+
+    Returns:
+        result: Validation result
+    """
+
+    if not (common.is_boolean(user_enabled)):
+        return result(
+            False, 400, '400-00024', 'True/False 以外が指定されています。({0})',
+            multi_lang.get_text('000-00134', "enabled"),
         )
 
     return result(True)
