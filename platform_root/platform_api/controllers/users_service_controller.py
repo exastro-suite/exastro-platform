@@ -137,8 +137,8 @@ def user_create(body, organization_id):
     user_email = body.get("email")
     user_firstName = body.get("firstName")
     user_lastName = body.get("lastName")
-    password_temporary = body.get("password_temporary")
-    user_enabled = body.get("enabled")
+    password_temporary = body.get("password_temporary", "True")
+    user_enabled = body.get("enabled", "True")
 
     # validation check
     validate = validation.validate_user_name(user_name)
@@ -202,7 +202,7 @@ def user_create(body, organization_id):
             message_id,
             "指定されたユーザーはすでに存在しているため作成できません。")
 
-        raise common.OtherException(message_id=message_id, message=message)
+        raise common.BadRequestException(message_id=message_id, message=message)
     elif u_create.status_code == 400:
         globals.logger.debug(f"response:{u_create.text}")
         message_id = f"400-{MSG_FUNCTION_ID}001"
