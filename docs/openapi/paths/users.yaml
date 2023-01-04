@@ -75,13 +75,7 @@ post:
     content:
       application/json:
         schema:
-          oneOf:
-            - $ref: '../schemas/userCreate.yaml'
-        #examples:
-          #workspace:
-            #$ref: '../schemas/roleDetailWorkspaceExample.yaml'
-          # organization:
-          #   $ref: '../schemas/roleDetailOrganizationExample.yaml'
+          $ref: '../schemas/userCreate.yaml'
     required: true
   responses:
     200:

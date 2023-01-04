@@ -618,6 +618,12 @@ components:
         username:
           type: string
           example: user-id
+        password:
+          type: string
+          example: password
+        password_temporary:
+          type: boolean
+          default: true
         email:
           type: string
           example: user e-mail address
@@ -625,16 +631,12 @@ components:
           type: string
         lastName:
           type: string
-        credentials:
-          type: array
-          items:
-            $ref: '#/components/schemas/userCredentials'
-        requiredActions:
-          $ref: '#/components/schemas/userRequiredActions'
         enabled:
           type: boolean
+          default: true
       required:
         - username
+        - password
     userCredentials:
       title: userCredentials is Credentials of User resources.
       type: object

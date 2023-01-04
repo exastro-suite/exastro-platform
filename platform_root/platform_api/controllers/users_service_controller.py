@@ -137,6 +137,8 @@ def user_create(body, organization_id):
     user_email = body.get("email")
     user_firstName = body.get("firstName")
     user_lastName = body.get("lastName")
+    password_temporary = body.get("password_temporary")
+    user_enabled = body.get("enabled")
 
     # validation check
     validate = validation.validate_user_name(user_name)
@@ -149,6 +151,12 @@ def user_create(body, organization_id):
     if not validate.ok:
         return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
     validate = validation.validate_user_lastName(user_lastName)
+    if not validate.ok:
+        return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
+    validate = validation.validate_password_temporary(password_temporary)
+    if not validate.ok:
+        return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
+    validate = validation.validate_user_enabled(user_enabled)
     if not validate.ok:
         return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
 
@@ -189,20 +197,29 @@ def user_create(body, organization_id):
     )
     if u_create.status_code == 409:
         globals.logger.debug(f"response:{u_create.text}")
+        message_id = f"409-{MSG_FUNCTION_ID}001"
+        message = multi_lang.get_text(
+            message_id,
+            "指定されたユーザーはすでに存在しているため作成できません。")
 
-        raise common.OtherException(409, None, f"409-{MSG_FUNCTION_ID}001", "指定されたユーザーはすでに存在しているため作成できません。")
+        raise common.OtherException(message_id=message_id, message=message)
     elif u_create.status_code == 400:
         globals.logger.debug(f"response:{u_create.text}")
         message_id = f"400-{MSG_FUNCTION_ID}001"
         message = multi_lang.get_text(
             message_id,
             "ユーザー作成に失敗しました({0})",
-            u_create.text)
+            common.get_response_error_message(u_create.text))
         raise common.BadRequestException(message_id=message_id, message=message)
 
     elif u_create.status_code != 201:
         globals.logger.debug(f"response:{u_create.text}")
+        message_id = f"500-{MSG_FUNCTION_ID}002"
+        message = multi_lang.get_text(
+            message_id,
+            "ユーザー作成に失敗しました(対象ユーザー:{0})",
+            common.get_response_error_message(u_create.text))
 
-        raise common.InternalErrorException(None, f"500-{MSG_FUNCTION_ID}002", "ユーザー作成に失敗しました(対象ユーザー:{})".format(user_json["username"]))
+        raise common.InternalErrorException(message_id=message_id, message=message)
 
     return common.response_200_ok(None)
