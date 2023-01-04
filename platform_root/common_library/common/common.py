@@ -556,7 +556,9 @@ def get_response_error_message(res):
     Returns:
         str: error message value
     """
+    try:
+        json_text = json.loads(res)
 
-    json_text = json.loads(res)
-
-    return json_text.get("errorMessage")
+        return json_text.get("errorMessage")
+    except Exception:
+        return None
