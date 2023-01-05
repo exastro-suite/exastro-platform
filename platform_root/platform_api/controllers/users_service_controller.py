@@ -20,9 +20,9 @@ from common_library.common import common, api_keycloak_tokens, api_keycloak_user
 from common_library.common import validation
 from common_library.common import multi_lang
 from common_library.common.db import DBconnector
-# import common_library.common.const as common_const
-# from common_library.common import bl_plan_service
-# from common_library.common import resources
+import common_library.common.const as common_const
+from common_library.common import bl_plan_service
+from common_library.common import resources
 
 import globals
 
@@ -105,7 +105,6 @@ def user_create(body, organization_id):
         InlineResponse2001: _description_
     """
 
-    """
     # 上限チェック
     # uper limit check
     # users limit get
@@ -121,11 +120,10 @@ def user_create(body, organization_id):
             message = multi_lang.get_text(
                 message_id,
                 "{0}の上限数({1})を超えるため、新しい{0}は作成できません。",
-                multi_lang.get_text('000-00128', "ユーザー名"),
+                multi_lang.get_text('000-00135', "ユーザー"),
                 limits[common_const.RESOURCE_COUNT_USERS]
             )
             raise common.BadRequestException(message_id=message_id, message=message)
-    """
 
     body = connexion.request.get_json()
     if not body:
