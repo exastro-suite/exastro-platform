@@ -69,6 +69,12 @@ AUTH_PATTERN = [
                     {"client": "{org_id}-workspaces", "role": const.ORG_AUTH_USER_MAINTE},
                     {"client": "{org_id}-workspaces", "role": const.ORG_AUTH_WS_ROLE_USER},
                 ]
+            },
+            {
+                "method": ["POST"],
+                "roles": [
+                    {"client": "{org_id}-workspaces", "role": const.ORG_AUTH_USER_MAINTE},
+                ]
             }
         ]
     },
