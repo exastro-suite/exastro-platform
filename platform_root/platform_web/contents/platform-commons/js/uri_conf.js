@@ -42,6 +42,7 @@ var api_conf = {
             "post": "/api/{organization_id}/platform/users",
             "get": "/api/{organization_id}/platform/users",
             "put": "/api/{organization_id}/platform/users/{user_id}",
+            "delete": "/api/{organization_id}/platform/users/{user_id}",
         }
     }
 }

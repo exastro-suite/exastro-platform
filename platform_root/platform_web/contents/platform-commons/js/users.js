@@ -144,14 +144,28 @@ $(function(){
                 $("#users_list tbody").append(row_html);
             }
 
+
             //
-            // display edit user button
+            // edit user
             //
-            $('#users_list .btn_edit').on('click',function() {
-                window.location = location_conf.href.users.edit.replace('{organization_id}',CommonAuth.getRealm()).replace('{id}',$(this).attr('data-id'));
+            $('#users_list .to_detail').on('click', function() {
+                let user_id = $(this).attr('data-id');
+                if (user_id != undefined){
+                    window.location = location_conf.href.users.edit.replace('{organization_id}',CommonAuth.getRealm()).replace('{user_id}',user_id);
+                }
             });
 
-            $('#users_list .btn_edit').each(function(index, element) {
+            //
+            // delete user
+            //
+            $('#users_list .btn_delete').on('click', function() {
+                if (confirm("delete ok"))
+                {
+
+                }
+            });
+
+            $('#users_list .btn_delete').each(function(index, element) {
                 const $element = $(element);
                 const id = $element.attr('data-id');
                 const usersIndex = users.findIndex((i) => {return i.id == id});

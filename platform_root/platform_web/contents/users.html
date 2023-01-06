@@ -121,32 +121,28 @@
                                             <table class="table" width="100%" id="users_list">
                                                 <thead class="thead">
                                                     <tr class="tHeadTr tr">
-                                                        <th class="tHeadLeftSticky tHeadTh popup th" rowspan="1" colspan="1" }="" title="削除" width="80px;"><div class="ci">削除</div></th>
-                                                        <th data-id="c1" data-rest="user_id" class="tHeadLeftSticky tHeadTh popup th" rowspan="1" colspan="1" }="" title="ユーザーID" width="210px;"><div class="ci">ユーザーID</div></th>
-                                                        <th data-id="c2" data-rest="username" class="tHeadLeftSticky tHeadTh popup th" rowspan="1" colspan="1" }="" title="ユーザー名"><div class="ci">ユーザー名</div></th>
-                                                        <th data-id="c3" data-rest="email" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="Eメール"><div class="ci">Eメール</div></th>
-                                                        <th data-id="c4" data-rest="firstName" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="姓" width="15%"><div class="ci">姓</div></th>
-                                                        <th data-id="c5" data-rest="lastName" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="名" width="15%"><div class="ci">名</div></th>
-                                                        <th data-id="c6" data-rest="enabled" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="有効" width="80px;"><div class="ci">有効</div></th>
+                                                        <th data-id="c1" data-rest="username" class="tHeadLeftSticky tHeadTh popup th" rowspan="1" colspan="1" }="" title="ユーザー名" width="210px;"><div class="ci">ユーザー名</div></th>
+                                                        <th data-id="c2" data-rest="email" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="Eメール"><div class="ci">Eメール</div></th>
+                                                        <th data-id="c3" data-rest="firstName" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="姓" width="200px"><div class="ci">姓</div></th>
+                                                        <th data-id="c4" data-rest="lastName" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="名" width="200px"><div class="ci">名</div></th>
+                                                        <th data-id="c5" data-rest="enabled" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="有効" width="80px;"><div class="ci">有効</div></th>
+                                                        <th data-id="c6" data-rest="user_id" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="ユーザーID" width="210px;"><div class="ci">ユーザーID</div></th>
                                                         <th data-id="c7" data-rest="create_timestamp" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="作成日時" width="200px;"><div class="ci">作成日時</div></th>
                                                         <th data-id="c8" data-rest="action" class="tHeadTh popup th" rowspan="1" colspan="1" }="" width="100px"><div class="ci"></div></th>
                                                     </tr>
                                                 </thead>
                                                 <tbody class="tbody">
                                                     <tr class="tBodyTr tr datarow-template" style="display:none" username='${username}' data-id="${user_id}">
-                                                        <td class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1" }=""><div class="ci" style="text-align:center">
-                                                            <input type="checkbox" class="form_check_revoke">
-                                                        </div></td>
-                                                        <th class="tBodyLeftSticky tBodyTh th to_detail" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: left;">${user_id}</div></td>
-                                                        <th class="tBodyLeftSticky tBodyTh th to_detail" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: left;">${username}</div></td>
-                                                        <td class="tBodyTd td to_detail" rowspan="1" colspan="1" }=""><div class="ci">${email}</div></td>
-                                                        <td class="tBodyTd td to_detail" rowspan="1" colspan="1" }=""><div class="ci">${firstName}</div></td>
-                                                        <td class="tBodyTd td to_detail" rowspan="1" colspan="1" }=""><div class="ci">${lastName}</div></td>
-                                                        <td class="tBodyTd td to_detail" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: center;">${enabled}</td>
-                                                        <td class="tBodyTd td to_detail" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: center;">${create_timestamp}</div></td>
+                                                        <th class="tBodyLeftSticky tBodyTh th to_detail" data-id="${user_id}" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: left;">${username}</div></td>
+                                                        <td class="tBodyTd td to_detail" data-id="${user_id}" rowspan="1" colspan="1" }=""><div class="ci">${email}</div></td>
+                                                        <td class="tBodyTd td to_detail" data-id="${user_id}" rowspan="1" colspan="1" }=""><div class="ci">${firstName}</div></td>
+                                                        <td class="tBodyTd td to_detail" data-id="${user_id}" rowspan="1" colspan="1" }=""><div class="ci">${lastName}</div></td>
+                                                        <td class="tBodyTd td to_detail" data-id="${user_id}" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: center;">${enabled}</td>
+                                                        <td class="tBodyTd th to_detail" data-id="${user_id}" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: left;">${user_id}</div></td>
+                                                        <td class="tBodyTd td to_detail" data-id="${user_id}" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: center;">${create_timestamp}</div></td>
                                                         <td class="tBodyTd td to_detail" rowspan="1" colspan="1" }=""><div class="ci">
-                                                            <button class="pl_button btn_edit" data-id="${user_id}" disabled>
-                                                                <span class="inner"><span class="icon icon-edit"></span>編集</span></button>
+                                                            <button class="pl_button btn_delete" data-id="${user_id}" disabled>
+                                                                <span class="inner"><span class="icon icon-trash"></span>削除</span></button>
                                                         </div></td>
                                                     </tr>
                                                     <tr class="tBodyTr tr notfound" style="display:none">
