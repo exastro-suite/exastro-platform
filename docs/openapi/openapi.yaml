@@ -20,7 +20,28 @@ info:
   version: 1.2.0
 
 servers:
-- url: /
+  - url: "{protocol}://{host}"
+    description: API endpoint
+    variables:
+      protocol:
+        enum:
+          - http
+          - https
+        default: https
+      host:
+        default: localhost
+  - url: "{protocol}://{host}:{port}"
+    description: API endpoint (Development)
+    variables:
+      protocol:
+        enum:
+          - http
+          - https
+        default: https
+      host:
+        default: localhost
+      port:
+        default: '38000'
 
 tags:
 - name: OrganizationService
@@ -102,3 +123,14 @@ paths:
 components:
   schemas:
     $ref: './schemas/_schemas.yaml'
+
+  securitySchemes:
+    $ref: './schemas/_securitySchemes.yaml'
+
+  responses:
+    UnauthorizedError:
+      description: Access token is missing or invalid
+
+security:
+- BearerAuth: []
+- BasicAuth: []
