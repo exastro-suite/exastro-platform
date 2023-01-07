@@ -4,7 +4,28 @@ info:
   description: Exastro Platform API
   version: 1.1.0
 servers:
-  - url: /
+  - url: 'https://{host}'
+    description: API endpoint
+    variables:
+      host:
+        default: localhost
+  - url: 'http://{host}'
+    description: API endpoint
+    variables:
+      host:
+        default: localhost
+  - url: '{protocol}://{host}:{port}'
+    description: API endpoint (Development)
+    variables:
+      protocol:
+        enum:
+          - http
+          - https
+        default: https
+      host:
+        default: localhost
+      port:
+        default: '38000'
 tags:
   - name: OrganizationService
     description: オーガナイゼーションに関する操作
@@ -1017,3 +1038,19 @@ components:
           type: string
         preferred_username:
           type: string
+  securitySchemes:
+    BearerAuth:
+      description: Credentials or access token for API
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    BasicAuth:
+      description: Value converted from ID/Password in base64
+      type: http
+      scheme: basic
+  responses:
+    UnauthorizedError:
+      description: Access token is missing or invalid
+security:
+  - BearerAuth: []
+  - BasicAuth: []
