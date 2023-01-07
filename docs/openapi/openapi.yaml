@@ -20,16 +20,24 @@ info:
   version: 1.1.0
 
 servers:
-  - url: "https://{host}:{port}"
+  - url: "{protocol}://{host}"
     description: API endpoint
     variables:
+      protocol:
+        enum:
+          - http
+          - https
+        default: https
       host:
         default: localhost
-      port:
-        default: '38000'
-  - url: "http://{host}:{port}"
-    description: API endpoint
+  - url: "{protocol}://{host}:{port}"
+    description: API endpoint (Development)
     variables:
+      protocol:
+        enum:
+          - http
+          - https
+        default: https
       host:
         default: localhost
       port:
