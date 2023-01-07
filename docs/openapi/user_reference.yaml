@@ -20,7 +20,20 @@ info:
   version: 1.1.0
 
 servers:
-- url: /
+  - url: "https://{host}:{port}"
+    description: API endpoint
+    variables:
+      host:
+        default: localhost
+      port:
+        default: '38000'
+  - url: "http://{host}:{port}"
+    description: API endpoint
+    variables:
+      host:
+        default: localhost
+      port:
+        default: '38000'
 
 tags:
 - name: WorkspaceService
