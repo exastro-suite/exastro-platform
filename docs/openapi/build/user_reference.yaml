@@ -178,6 +178,91 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/runtimeError'
+  '/api/{organization_id}/platform/users':
+    get:
+      tags:
+        - UsersService
+      summary: List returns list of users
+      x-openapi-router-controller: controllers.users_service_controller
+      operationId: user_list
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: first
+          in: query
+          description: first result to return
+          schema:
+            type: integer
+            example: 0
+            default: 0
+            minimum: 0
+        - name: max
+          in: query
+          description: maximum number of results to return
+          schema:
+            type: integer
+            example: 100
+            default: 100
+        - name: search
+          in: query
+          description: 'A String contained in username, first or last name, or email'
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - $ref: '#/components/schemas/userList'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+    post:
+      tags:
+        - UsersService
+      summary: Create creates user
+      x-openapi-router-controller: controllers.users_service_controller
+      operationId: user_create
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/userCreate'
+        required: true
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        example: null
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
   '/api/{organization_id}/platform/roles':
     get:
       tags:
