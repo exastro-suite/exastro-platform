@@ -400,7 +400,8 @@ def organization_list():
             point_plan_date = None
             for org_plan in org_plans:
                 # Active plan check
-                if datetime.datetime.strptime(org_plan.get("start_datetime"), common_const.FORMAT_DATETIME_PLAN_START_DATETIME) <= datetime.datetime.now():
+                if datetime.datetime.strptime(org_plan.get("start_datetime"),
+                                              common_const.FORMAT_DATETIME_PLAN_START_DATETIME) <= datetime.datetime.now():
                     # 初回か2回目以降かでチェックを分ける
                     # Separate checks for the first time or the second and subsequent times
                     if point_plan_date:

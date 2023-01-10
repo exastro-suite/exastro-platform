@@ -79,6 +79,7 @@ def user_list(organization_id, first=0, max=100, search=None):
             "id": user["id"],
             "firstName": user.get("firstName", ""),
             "lastName": user.get("lastName", ""),
+            "email": user.get("email", ""),
             "preferred_username": user.get("username", ""),
             "name": common.get_username(user.get("firstName"), user.get("lastName"), user.get("username")),
             "enabled": user.get("enabled", False),
@@ -96,7 +97,7 @@ def user_list(organization_id, first=0, max=100, search=None):
 @common.platform_exception_handler
 def user_create(body, organization_id):
     """Create creates user
-    
+
     Args:
         body (dict | bytes): _description_
         organization_id (str): _description_. Defaults to None.
