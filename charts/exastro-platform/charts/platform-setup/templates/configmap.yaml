@@ -136,4 +136,14 @@ data:
         LAST_UPDATE_USER VARCHAR(40),
         PRIMARY KEY (PLAN_ID, LIMIT_ID)
       );
+
+      /* plan values */
+      INSERT INTO `{{ .config.DB_DATABASE }}`.`T_PLAN_ITEM` (LIMIT_ID, INFORMATIONS, CREATE_USER, LAST_UPDATE_USER) VALUES ('platform.workspaces', '{\"description\": \"default limit\", \"max\": 1000}', 'system', 'system');
+      INSERT INTO `{{ .config.DB_DATABASE }}`.`T_PLAN_ITEM` (LIMIT_ID, INFORMATIONS, CREATE_USER, LAST_UPDATE_USER) VALUES ('platform.roles', '{\"description\": \"default limit\", \"max\": 1000}', 'system', 'system');
+      INSERT INTO `{{ .config.DB_DATABASE }}`.`T_PLAN_ITEM` (LIMIT_ID, INFORMATIONS, CREATE_USER, LAST_UPDATE_USER) VALUES ('platform.users', '{\"description\": \"default limit\", \"max\": 10000}', 'system', 'system');
+      INSERT INTO `{{ .config.DB_DATABASE }}`.`T_PLAN` (PLAN_ID, PLAN_NAME, INFORMATIONS, CREATE_USER, LAST_UPDATE_USER) VALUES ('_default', '_default plan', '{\"description\": \"default plan\"}', 'system', 'system');
+      INSERT INTO `{{ .config.DB_DATABASE }}`.`T_PLAN_LIMIT` (PLAN_ID, LIMIT_ID, LIMIT_VALUE, CREATE_USER, LAST_UPDATE_USER) VALUES ('_default', 'platform.workspaces', 100, 'system', 'system');
+      INSERT INTO `{{ .config.DB_DATABASE }}`.`T_PLAN_LIMIT` (PLAN_ID, LIMIT_ID, LIMIT_VALUE, CREATE_USER, LAST_UPDATE_USER) VALUES ('_default', 'platform.roles', 1000, 'system', 'system');
+      INSERT INTO `{{ .config.DB_DATABASE }}`.`T_PLAN_LIMIT` (PLAN_ID, LIMIT_ID, LIMIT_VALUE, CREATE_USER, LAST_UPDATE_USER) VALUES ('_default', 'platform.users', 10000, 'system', 'system');
+      /* plan values */
       {{- end -}}
