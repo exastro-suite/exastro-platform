@@ -68,6 +68,7 @@ var location_conf = {
         },
         "menu": {
             "toppage": "/{organization_id}/platform/workspaces",
+            "account_manaagement": "/auth/admin/{organization_id}/console/#/realms/{organization_id}/users",
         },
         "account": {
             "main_page": "/{organization_id}/platform/account",
