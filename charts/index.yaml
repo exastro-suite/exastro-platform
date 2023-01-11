@@ -3,7 +3,27 @@ entries:
   exastro-platform:
   - apiVersion: v2
     appVersion: 1.2.0
-    created: "2022-12-02T14:26:13.237428079+09:00"
+    created: "2023-01-11T14:11:36.551752732+09:00"
+    description: Exastro Platform is common framework for Exastro suite applications.
+    digest: 9c4459422323dafcfd4db5222cdcf4e1b964f9795d0112255236a2ccf3f8fa63
+    home: https://exastro-suite.github.io/
+    icon: https://exastro-suite.github.io/docs/asset/logo/exastro/Exastro-logomark2-rgb.svg
+    keywords:
+    - exastro
+    - exastro-platform
+    maintainers:
+    - email: contact@exastro.jp.nec.com
+      name: NEC Corporation
+    name: exastro-platform
+    sources:
+    - https://github.com/exastro-suite/exastro-platform
+    type: application
+    urls:
+    - exastro-platform-1.2.1.tgz
+    version: 1.2.1
+  - apiVersion: v2
+    appVersion: 1.2.0
+    created: "2023-01-11T14:11:36.523740081+09:00"
     description: Exastro Platform is common framework for Exastro suite applications.
     digest: 76153abc190ac37541c12ddbe67467f723faddccda47885c520ab5d7f98341ea
     home: https://exastro-suite.github.io/
@@ -23,7 +43,7 @@ entries:
     version: 1.2.0
   - apiVersion: v2
     appVersion: 1.1.0
-    created: "2022-12-02T14:26:13.232451434+09:00"
+    created: "2023-01-11T14:11:36.508044045+09:00"
     description: Exastro Platform is common framework for Exastro suite applications.
     digest: 8f8399b18b285b1142896cdcabcd402f86fcc980f8f299df199d6350da46d4d1
     home: https://exastro-suite.github.io/
@@ -42,8 +62,8 @@ entries:
     - exastro-platform-1.1.0.tgz
     version: 1.1.0
   - apiVersion: v2
-    appVersion: 1.0.5
-    created: "2022-12-02T14:26:13.227786637+09:00"
+    appVersion: 1.0.6
+    created: "2023-01-11T14:11:36.474613046+09:00"
     description: Exastro Platform is common framework for Exastro suite applications.
     digest: fa544072041bacf7c8ee580b16030b6a4c66a2ee9288374dc5f25aa468390fcc
     home: https://exastro-suite.github.io/
@@ -63,7 +83,7 @@ entries:
     version: 1.0.6
   - apiVersion: v2
     appVersion: 1.0.6
-    created: "2022-10-28T16:42:22.13632794+09:00"
+    created: "2023-01-11T14:11:36.46052573+09:00"
     description: Exastro Platform is common framework for Exastro suite applications.
     digest: 3aa4e8e752fc3c5f9db30d277dad9037fc2e5ec7c44e19432b2fc7396cb23aaa
     home: https://exastro-suite.github.io/
@@ -83,7 +103,7 @@ entries:
     version: 1.0.5
   - apiVersion: v2
     appVersion: 1.0.4
-    created: "2022-12-02T14:26:13.219502058+09:00"
+    created: "2023-01-11T14:11:36.438624395+09:00"
     description: Exastro Platform is common framework for Exastro suite applications.
     digest: 6ff3395439941b3563d5413c7bf44fa6eddfabded181f1c1719de5cc8848058a
     home: https://exastro-suite.github.io/
@@ -103,7 +123,7 @@ entries:
     version: 1.0.4
   - apiVersion: v2
     appVersion: 1.0.2
-    created: "2022-12-02T14:26:13.214059134+09:00"
+    created: "2023-01-11T14:11:36.407839361+09:00"
     description: Exastro Platform is common framework for Exastro suite applications.
     digest: a52b33f9b7fa21f39ad00809b52f88e87e5bee0ed202b284a7aeda59025e7459
     home: https://exastro-suite.github.io/
@@ -123,7 +143,7 @@ entries:
     version: 1.0.3
   - apiVersion: v2
     appVersion: 1.0.2
-    created: "2022-12-02T14:26:13.20658294+09:00"
+    created: "2023-01-11T14:11:36.382175919+09:00"
     description: Exastro Platform is common framework for Exastro suite applications.
     digest: c82e17a66ed7b082596fd9f32e446c51676bfaa1fae72e62ad592bef9424c564
     home: https://exastro-suite.github.io/
@@ -143,7 +163,7 @@ entries:
     version: 1.0.2
   - apiVersion: v2
     appVersion: 1.0.2
-    created: "2022-12-02T14:26:13.197858889+09:00"
+    created: "2023-01-11T14:11:36.357942949+09:00"
     description: Exastro Platform is common framework for Exastro suite applications.
     digest: 41c0e5789ef777d4b98a62b2dfe01619142eedb1692e97f9256ce5516cfb89bd
     home: https://exastro-suite.github.io/
@@ -163,7 +183,7 @@ entries:
     version: 1.0.1
   - apiVersion: v2
     appVersion: 1.0.2
-    created: "2022-12-02T14:26:13.193099849+09:00"
+    created: "2023-01-11T14:11:36.342612672+09:00"
     description: Exastro Platform is common framework for Exastro suite applications.
     digest: b7a6b144aaa6d7299170da4f206b0592ae8eade4f7c05032c06ba2ae78ec0ae7
     home: https://exastro-suite.github.io/
@@ -181,4 +201,4 @@ entries:
     urls:
     - exastro-platform-1.0.0.tgz
     version: 1.0.0
-generated: "2022-12-02T14:26:13.18736037+09:00"
+generated: "2023-01-11T14:11:36.309955434+09:00"
