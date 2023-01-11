@@ -78,6 +78,7 @@
 		//"mtxr.sqltools-driver-mysql",
 		"mitchdenny.ecdc",
 		"moshfeu.compare-folders",
+		"ms-vsliveshare.vsliveshare",
 	],
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	"forwardPorts": [
