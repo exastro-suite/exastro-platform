@@ -44,16 +44,26 @@ servers:
         default: '38000'
 
 tags:
+- name: PlanService
+  description: プランに関する操作
+- name: UsageService
+  description: リソース使用量に関する操作
 - name: WorkspaceService
   description: ワークスペースに関する操作
 - name: UsersService
   description: ユーザーに関する操作
 - name: RoleService
   description: ロールに関する操作
-- name: UsageService
-  description: リソース使用量に関する操作
+- name: RoleMappingsService
+  description: ロール・マッピングに関する操作
 
 paths:
+  "/api/{organization_id}/platform/limits":
+      $ref: './paths/plans.organizations.limits.yaml'
+
+  "/api/{organization_id}/platform/usages":
+      $ref: './paths/usages.organizations.yaml'
+
   "/api/{organization_id}/platform/workspaces":
       $ref: './paths/workspaces.yaml'
   "/api/{organization_id}/platform/workspaces/{workspace_id}":
@@ -66,9 +76,11 @@ paths:
 
   "/api/{organization_id}/platform/roles":
       $ref: './paths/roles.yaml'
+  "/api/{organization_id}/platform/roles/{role_name}":
+      $ref: './paths/roles.role_name.yaml'
 
-  "/api/{organization_id}/platform/usages":
-      $ref: './paths/usages.organizations.yaml'
+  "/api/{organization_id}/platform/roles/{role_name}/users":
+      $ref: './paths/roles.role_name.users.yaml'
 
 components:
   schemas:

@@ -27,15 +27,87 @@ servers:
       port:
         default: '38000'
 tags:
+  - name: PlanService
+    description: プランに関する操作
+  - name: UsageService
+    description: リソース使用量に関する操作
   - name: WorkspaceService
     description: ワークスペースに関する操作
   - name: UsersService
     description: ユーザーに関する操作
   - name: RoleService
     description: ロールに関する操作
-  - name: UsageService
-    description: リソース使用量に関する操作
+  - name: RoleMappingsService
+    description: ロール・マッピングに関する操作
 paths:
+  '/api/{organization_id}/platform/limits':
+    get:
+      tags:
+        - PlanService
+      summary: Returns the current limits value
+      x-openapi-router-controller: controllers.plan_service_controller
+      operationId: organization_limits_get
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: limit_id
+          in: query
+          description: filter limit id. (prefix match)
+          schema:
+            type: string
+            example: platform.workspaces
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - $ref: '#/components/schemas/limits'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+  '/api/{organization_id}/platform/usages':
+    get:
+      tags:
+        - UsageService
+      summary: Returns the current value of resource
+      x-openapi-router-controller: controllers.usage_service_controller
+      operationId: organization_usage_get
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: id
+          in: query
+          description: filter id. (prefix match)
+          schema:
+            type: string
+            example: platform.workspaces
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - $ref: '#/components/schemas/usageList'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
   '/api/{organization_id}/platform/workspaces':
     get:
       tags:
@@ -346,25 +418,38 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/runtimeError'
-  '/api/{organization_id}/platform/usages':
-    get:
+  '/api/{organization_id}/platform/roles/{role_name}':
+    put:
       tags:
-        - UsageService
-      summary: Returns the current value of resource
-      x-openapi-router-controller: controllers.usage_service_controller
-      operationId: organization_usage_get
+        - RoleService
+      summary: Update updates an role
+      x-openapi-router-controller: controllers.role_service_controller
+      operationId: role_update
       parameters:
         - name: organization_id
           in: path
           required: true
           schema:
             type: string
-        - name: id
-          in: query
-          description: filter id. (prefix match)
+        - name: role_name
+          in: path
+          required: true
           schema:
             type: string
-            example: platform.workspaces
+      requestBody:
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/roleDetailWorkspacePut'
+            examples:
+              workspace:
+                value:
+                  description: role description
+                  kind: workspace
+                  workspaces:
+                    - id: workspace-1
+        required: true
       responses:
         '200':
           description: A successful response.
@@ -373,7 +458,151 @@ paths:
               schema:
                 allOf:
                   - $ref: '#/components/schemas/responseOk'
-                  - $ref: '#/components/schemas/usageList'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        example: null
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+  '/api/{organization_id}/platform/roles/{role_name}/users':
+    get:
+      tags:
+        - RoleMappingsService
+      summary: Get user-role mapping for a role
+      x-openapi-router-controller: controllers.role_mappings_service_controller
+      operationId: role_user_mapping_get
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: role_name
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: first
+          in: query
+          description: first result to return
+          schema:
+            type: integer
+            example: 0
+            default: 0
+            minimum: 0
+        - name: max
+          in: query
+          description: maximum number of results to return
+          schema:
+            type: integer
+            example: 100
+            default: 100
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - title: roleList is list of Role resources.
+                    type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/roleUser'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+    post:
+      tags:
+        - RoleMappingsService
+      summary: Add roles to the user role mapping
+      x-openapi-router-controller: controllers.role_mappings_service_controller
+      operationId: role_user_mapping_create
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: role_name
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/roleMappingUser'
+              required:
+                - preferred_username
+        required: true
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        example: null
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+    patch:
+      tags:
+        - RoleMappingsService
+      summary: Delete roles from user role mapping
+      x-openapi-router-controller: controllers.role_mappings_service_controller
+      operationId: role_user_mapping_delete
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: role_name
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/roleMappingUser'
+        required: true
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        example: null
         default:
           description: An unexpected error response.
           content:
