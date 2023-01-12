@@ -16,7 +16,7 @@ from contextlib import closing
 import inspect
 import json
 
-from common_library.common import common, const
+from common_library.common import common, const, validation
 from common_library.common import multi_lang
 from common_library.common import api_keycloak_tokens, api_keycloak_roles, api_keycloak_users
 from common_library.common.db import DBconnector
@@ -192,8 +192,12 @@ class counter():
         workspace_roles = []
 
         for pf_role in roles:
-            if pf_role.get("composite") is not True:
+            # systemで作成したロールは除く
+            # Except roles created by system
+            if pf_role.get("name")[:1] == "_":
                 continue
+            # kind "workspace"以外は除く
+            # Except for kind "workspace"
             if [const.ROLE_KIND_WORKSPACE] != pf_role.get("attributes", {}).get("kind"):
                 continue
 
