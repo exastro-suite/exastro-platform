@@ -192,8 +192,12 @@ class counter():
         workspace_roles = []
 
         for pf_role in roles:
-            if pf_role.get("composite") is not True:
+            # systemで作成したロールは除く
+            # Except roles created by system
+            if pf_role.get("name")[:1] == "_":
                 continue
+            # kind "workspace"以外は除く
+            # Except for kind "workspace"
             if [const.ROLE_KIND_WORKSPACE] != pf_role.get("attributes", {}).get("kind"):
                 continue
 
