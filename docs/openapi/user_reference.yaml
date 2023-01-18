@@ -44,6 +44,8 @@ servers:
         default: '38000'
 
 tags:
+- name: TokenService
+  description: tokenに関する操作
 - name: PlanService
   description: プランに関する操作
 - name: UsageService
@@ -58,6 +60,11 @@ tags:
   description: ロール・マッピングに関する操作
 
 paths:
+  "/auth/realms/{organization_id}/protocol/openid-connect/token":
+      $ref: './paths/protocol.openid-connect.token.yaml'
+  "/api/{organization_id}/platform/users/_current/refresh_tokens":
+      $ref: './paths/user.current.refresh_tokens.yaml'
+
   "/api/{organization_id}/platform/limits":
       $ref: './paths/plans.organizations.limits.yaml'
 

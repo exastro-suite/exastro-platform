@@ -4,10 +4,36 @@ info:
   description: Exastro Platform API
   version: 1.2.0
 servers:
-- url: /
+- url: "https://{host}"
+  description: API endpoint
+  variables:
+    host:
+      default: localhost
+- url: "http://{host}"
+  description: API endpoint
+  variables:
+    host:
+      default: localhost
+- url: "{protocol}://{host}:{port}"
+  description: API endpoint (Development)
+  variables:
+    protocol:
+      enum:
+      - http
+      - https
+      default: https
+    host:
+      default: localhost
+    port:
+      default: "38000"
+security:
+- BearerAuth: []
+- BasicAuth: []
 tags:
 - name: OrganizationService
   description: オーガナイゼーションに関する操作
+- name: TokenService
+  description: tokenに関する操作
 - name: PlanService
   description: プランに関する操作
 - name: UsageService
@@ -83,6 +109,102 @@ paths:
               schema:
                 $ref: '#/components/schemas/runtimeError'
       x-openapi-router-controller: controllers.organization_service_controller
+  /auth/realms/{organization_id}/protocol/openid-connect/token:
+    post:
+      tags:
+      - TokenService
+      summary: create token
+      operationId: token_create
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/openidconnect_token_body'
+            examples:
+              create refresh token:
+                value: "client_id=_{organization_id}_api&grant_type=password&scope=openid+offline_access&username={username}&password={password}"
+              create refresh token - two factor authentication:
+                value: "client_id=_{organization_id}_api&grant_type=password&scope=openid+offline_access&username={username}&password={password}&totp={one_time_password}"
+              create access token:
+                value: "client_id=_{organization_id}_api&grant_type=refresh_token&refresh_token={refresh_token}"
+        required: true
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/tokenResponseOK'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/tokenResponseError'
+      x-openapi-router-controller: controllers.token_service_controller
+  /api/{organization_id}/platform/users/_current/refresh_tokens:
+    get:
+      tags:
+      - TokenService
+      summary: List returns refresh token
+      operationId: refresh_token_list
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_1'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+      x-openapi-router-controller: controllers.token_service_controller
+    delete:
+      tags:
+      - TokenService
+      summary: delete refresh token
+      operationId: refresh_token_delete
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_2'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+      x-openapi-router-controller: controllers.token_service_controller
   /api/platform/{organization_id}/plans:
     get:
       tags:
@@ -103,7 +225,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_1'
+                $ref: '#/components/schemas/inline_response_200_3'
         default:
           description: An unexpected error response.
           content:
@@ -192,7 +314,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_2'
+                $ref: '#/components/schemas/inline_response_200_4'
         default:
           description: An unexpected error response.
           content:
@@ -237,7 +359,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_3'
+                $ref: '#/components/schemas/inline_response_200_5'
         default:
           description: An unexpected error response.
           content:
@@ -274,7 +396,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_4'
+                $ref: '#/components/schemas/inline_response_200_6'
         default:
           description: An unexpected error response.
           content:
@@ -311,7 +433,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_5'
+                $ref: '#/components/schemas/inline_response_200_7'
         default:
           description: An unexpected error response.
           content:
@@ -348,7 +470,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_6'
+                $ref: '#/components/schemas/inline_response_200_8'
         default:
           description: An unexpected error response.
           content:
@@ -384,7 +506,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_7'
+                $ref: '#/components/schemas/inline_response_200_9'
         default:
           description: An unexpected error response.
           content:
@@ -417,7 +539,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_8'
+                $ref: '#/components/schemas/inline_response_200_2'
         default:
           description: An unexpected error response.
           content:
@@ -452,7 +574,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_9'
+                $ref: '#/components/schemas/inline_response_200_10'
         default:
           description: An unexpected error response.
           content:
@@ -487,7 +609,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_10'
+                $ref: '#/components/schemas/inline_response_200_11'
         default:
           description: An unexpected error response.
           content:
@@ -544,7 +666,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_11'
+                $ref: '#/components/schemas/inline_response_200_12'
         default:
           description: An unexpected error response.
           content:
@@ -577,7 +699,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_8'
+                $ref: '#/components/schemas/inline_response_200_2'
         default:
           description: An unexpected error response.
           content:
@@ -617,7 +739,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_12'
+                $ref: '#/components/schemas/inline_response_200_13'
         default:
           description: An unexpected error response.
           content:
@@ -658,7 +780,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_8'
+                $ref: '#/components/schemas/inline_response_200_2'
         default:
           description: An unexpected error response.
           content:
@@ -706,7 +828,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_8'
+                $ref: '#/components/schemas/inline_response_200_2'
         default:
           description: An unexpected error response.
           content:
@@ -762,7 +884,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_13'
+                $ref: '#/components/schemas/inline_response_200_14'
         default:
           description: An unexpected error response.
           content:
@@ -802,7 +924,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_8'
+                $ref: '#/components/schemas/inline_response_200_2'
         default:
           description: An unexpected error response.
           content:
@@ -842,7 +964,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_8'
+                $ref: '#/components/schemas/inline_response_200_2'
         default:
           description: An unexpected error response.
           content:
@@ -900,7 +1022,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_4'
+                $ref: '#/components/schemas/inline_response_200_6'
         default:
           description: An unexpected error response.
           content:
@@ -951,7 +1073,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_14'
+                $ref: '#/components/schemas/inline_response_200_15'
         default:
           description: An unexpected error response.
           content:
@@ -1007,7 +1129,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_15'
+                $ref: '#/components/schemas/inline_response_200_16'
         default:
           description: An unexpected error response.
           content:
@@ -1063,7 +1185,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_11'
+                $ref: '#/components/schemas/inline_response_200_12'
         default:
           description: An unexpected error response.
           content:
@@ -1119,7 +1241,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_16'
+                $ref: '#/components/schemas/inline_response_200_17'
         default:
           description: An unexpected error response.
           content:
@@ -1161,7 +1283,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_8'
+                $ref: '#/components/schemas/inline_response_200_2'
         default:
           description: An unexpected error response.
           content:
@@ -1682,46 +1804,167 @@ components:
         create_timestamp:
           type: string
           format: date-time
+    tokenAccessRequestBody:
+      title: create access token request parameter.
+      required:
+      - client_id
+      - grant_type
+      - refresh_token
+      type: object
+      properties:
+        client_id:
+          type: string
+        grant_type:
+          type: string
+          example: refresh_token
+        refresh_token:
+          type: string
+    tokenRefreshRequestBody1:
+      title: create refresh token request parameter.
+      required:
+      - client_id
+      - grant_type
+      - password
+      - scope
+      - username
+      type: object
+      properties:
+        client_id:
+          type: string
+          example: "_{organization_id}_api"
+        grant_type:
+          type: string
+          example: password
+        scope:
+          type: string
+          example: openid offline_access
+        username:
+          type: string
+        password:
+          type: string
+          example: password
+    tokenRefreshRequestBody2:
+      title: create refresh token request parameter.
+      required:
+      - client_id
+      - grant_type
+      - password
+      - scope
+      - username
+      type: object
+      properties:
+        client_id:
+          type: string
+          example: "_{organization_id}_api"
+        grant_type:
+          type: string
+          example: password
+        scope:
+          type: string
+          example: openid offline_access
+        username:
+          type: string
+        password:
+          type: string
+          example: password
+        totp:
+          type: string
+          example: "123456"
+    tokenResponseOK:
+      title: A successful create token.
+      type: object
+      properties:
+        access_token:
+          type: string
+        expires_in:
+          type: integer
+        refresh_token:
+          type: string
+        id_token:
+          type: string
+        not-before-policy:
+          type: integer
+        session_state:
+          type: string
+          format: uuid
+        scope:
+          type: string
+          example: openid profile offline_access email
+      example:
+        access_token: access_token
+        refresh_token: refresh_token
+        not-before-policy: 6
+        scope: openid profile offline_access email
+        id_token: id_token
+        session_state: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        expires_in: 0
+    tokenResponseError:
+      title: A successful create token.
+      type: object
+      properties:
+        error:
+          type: string
+          example: invalid_grant
+        error_description:
+          type: string
+          example: Invalid user credentials
+    tokenRefreshList:
+      title: roleList is list of Role resources.
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/tokenRefreshList_data'
     inline_response_200:
       allOf:
       - $ref: '#/components/schemas/responseOk'
       - $ref: '#/components/schemas/organizationList'
+    openidconnect_token_body:
+      oneOf:
+      - $ref: '#/components/schemas/tokenRefreshRequestBody1'
+      - $ref: '#/components/schemas/tokenRefreshRequestBody2'
+      - $ref: '#/components/schemas/tokenAccessRequestBody'
     inline_response_200_1:
       allOf:
       - $ref: '#/components/schemas/responseOk'
-      - $ref: '#/components/schemas/planMappingOrganizationList'
+      - $ref: '#/components/schemas/tokenRefreshList'
     inline_response_200_2:
-      allOf:
-      - $ref: '#/components/schemas/responseOk'
-      - $ref: '#/components/schemas/planList'
-    inline_response_200_3:
-      allOf:
-      - $ref: '#/components/schemas/responseOk'
-      - $ref: '#/components/schemas/planItemList'
-    inline_response_200_4:
-      allOf:
-      - $ref: '#/components/schemas/responseOk'
-      - $ref: '#/components/schemas/limits'
-    inline_response_200_5:
-      allOf:
-      - $ref: '#/components/schemas/responseOk'
-      - $ref: '#/components/schemas/usageOrganizationList'
-    inline_response_200_6:
-      allOf:
-      - $ref: '#/components/schemas/responseOk'
-      - $ref: '#/components/schemas/usageList'
-    inline_response_200_7:
-      allOf:
-      - $ref: '#/components/schemas/responseOk'
-      - $ref: '#/components/schemas/workspaceList'
-    inline_response_200_8:
       allOf:
       - $ref: '#/components/schemas/responseOk'
       - type: object
         properties:
           data:
             type: object
+    inline_response_200_3:
+      allOf:
+      - $ref: '#/components/schemas/responseOk'
+      - $ref: '#/components/schemas/planMappingOrganizationList'
+    inline_response_200_4:
+      allOf:
+      - $ref: '#/components/schemas/responseOk'
+      - $ref: '#/components/schemas/planList'
+    inline_response_200_5:
+      allOf:
+      - $ref: '#/components/schemas/responseOk'
+      - $ref: '#/components/schemas/planItemList'
+    inline_response_200_6:
+      allOf:
+      - $ref: '#/components/schemas/responseOk'
+      - $ref: '#/components/schemas/limits'
+    inline_response_200_7:
+      allOf:
+      - $ref: '#/components/schemas/responseOk'
+      - $ref: '#/components/schemas/usageOrganizationList'
+    inline_response_200_8:
+      allOf:
+      - $ref: '#/components/schemas/responseOk'
+      - $ref: '#/components/schemas/usageList'
     inline_response_200_9:
+      allOf:
+      - $ref: '#/components/schemas/responseOk'
+      - $ref: '#/components/schemas/workspaceList'
+    inline_response_200_10:
       allOf:
       - $ref: '#/components/schemas/responseOk'
       - title: workspaceDetail is Workspace resources.
@@ -1731,15 +1974,15 @@ components:
             allOf:
             - $ref: '#/components/schemas/workspace'
             - $ref: '#/components/schemas/responseStat'
-    inline_response_200_10:
-      allOf:
-      - $ref: '#/components/schemas/responseOk'
-      - $ref: '#/components/schemas/memberList'
     inline_response_200_11:
       allOf:
       - $ref: '#/components/schemas/responseOk'
-      - $ref: '#/components/schemas/userList'
+      - $ref: '#/components/schemas/memberList'
     inline_response_200_12:
+      allOf:
+      - $ref: '#/components/schemas/responseOk'
+      - $ref: '#/components/schemas/userList'
+    inline_response_200_13:
       allOf:
       - $ref: '#/components/schemas/responseOk'
       - $ref: '#/components/schemas/roleDetailList'
@@ -1749,7 +1992,7 @@ components:
     roles_role_name_body:
       oneOf:
       - $ref: '#/components/schemas/roleDetailWorkspacePut'
-    inline_response_200_13:
+    inline_response_200_14:
       allOf:
       - $ref: '#/components/schemas/responseOk'
       - title: roleList is list of Role resources.
@@ -1759,15 +2002,15 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/roleUser'
-    inline_response_200_14:
-      allOf:
-      - $ref: '#/components/schemas/responseOk'
-      - $ref: '#/components/schemas/limitsList'
     inline_response_200_15:
       allOf:
       - $ref: '#/components/schemas/responseOk'
-      - $ref: '#/components/schemas/roleList'
+      - $ref: '#/components/schemas/limitsList'
     inline_response_200_16:
+      allOf:
+      - $ref: '#/components/schemas/responseOk'
+      - $ref: '#/components/schemas/roleList'
+    inline_response_200_17:
       allOf:
       - $ref: '#/components/schemas/responseOk'
       - $ref: '#/components/schemas/userWorkspaceList'
@@ -1836,4 +2079,34 @@ components:
         id:
           type: string
           example: workspace-1
+    tokenRefreshList_data:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        start_timestamp:
+          type: string
+          format: date-time
+        lastaccess_timestamp:
+          type: string
+          format: date-time
+        expire_timestamp:
+          type: string
+          format: date-time
+  responses:
+    UnauthorizedError:
+      description: Access token is missing or invalid
+  securitySchemes:
+    BearerAuth:
+      type: http
+      description: Credentials or access token for API
+      scheme: bearer
+      bearerFormat: JWT
+      x-bearerInfoFunc: swagger_server.controllers.authorization_controller.check_BearerAuth
+    BasicAuth:
+      type: http
+      description: Value converted from ID/Password in base64
+      scheme: basic
+      x-basicInfoFunc: swagger_server.controllers.authorization_controller.check_BasicAuth
 
