@@ -113,6 +113,10 @@ platform-auth:
             backend: "httpMng"
   service:
     type: ClusterIP
+    # http:
+    #   nodePort: 30080
+    # httpMng:
+    #   nodePort: 30081
   image:
     repository: "exastro/exastro-platform-auth"
     tag: "1.2.0"
