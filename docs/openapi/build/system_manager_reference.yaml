@@ -863,6 +863,123 @@ components:
         create_timestamp:
           type: string
           format: date-time
+    tokenAccessRequestBody:
+      title: create access token request parameter.
+      type: object
+      properties:
+        client_id:
+          type: string
+        grant_type:
+          type: string
+          example: refresh_token
+        refresh_token:
+          type: string
+      required:
+        - client_id
+        - grant_type
+        - refresh_token
+    tokenRefreshRequestBody1:
+      title: create refresh token request parameter.
+      type: object
+      properties:
+        client_id:
+          type: string
+          example: '_{organization_id}_api'
+        grant_type:
+          type: string
+          example: password
+        scope:
+          type: string
+          example: openid offline_access
+        username:
+          type: string
+        password:
+          type: string
+          example: password
+      required:
+        - client_id
+        - grant_type
+        - username
+        - password
+        - scope
+    tokenRefreshRequestBody2:
+      title: create refresh token request parameter.
+      type: object
+      properties:
+        client_id:
+          type: string
+          example: '_{organization_id}_api'
+        grant_type:
+          type: string
+          example: password
+        scope:
+          type: string
+          example: openid offline_access
+        username:
+          type: string
+        password:
+          type: string
+          example: password
+        totp:
+          type: string
+          example: 123456
+      required:
+        - client_id
+        - grant_type
+        - username
+        - password
+        - scope
+    tokenResponseOK:
+      title: A successful create token.
+      type: object
+      properties:
+        access_token:
+          type: string
+        expires_in:
+          type: integer
+        refresh_token:
+          type: string
+        id_token:
+          type: string
+        not-before-policy:
+          type: integer
+        session_state:
+          type: string
+          format: uuid
+        scope:
+          type: string
+          example: openid profile offline_access email
+    tokenResponseError:
+      title: A successful create token.
+      type: object
+      properties:
+        error:
+          type: string
+          example: invalid_grant
+        error_description:
+          type: string
+          example: Invalid user credentials
+    tokenRefreshList:
+      title: roleList is list of Role resources.
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                format: uuid
+              start_timestamp:
+                type: string
+                format: date-time
+              lastaccess_timestamp:
+                type: string
+                format: date-time
+              expire_timestamp:
+                type: string
+                format: date-time
   securitySchemes:
     BearerAuth:
       description: Credentials or access token for API
