@@ -28,18 +28,7 @@ post:
     content:
       application/x-www-form-urlencoded:
         schema:
-          oneOf:
-            - $ref: '../schemas/tokenRefreshRequestBody1.yaml'
-            - $ref: '../schemas/tokenRefreshRequestBody2.yaml'
-            - $ref: '../schemas/tokenAccessRequestBody.yaml'
-        examples:
-          create refresh token:
-            $ref: '../schemas/tokenRefreshRequestBody1Example.yaml'
-          create refresh token - two factor authentication:
-            $ref: '../schemas/tokenRefreshRequestBody2Example.yaml'
-          create access token:
-            $ref: '../schemas/tokenAccessRequestBodyExample.yaml'
-    required: true
+          $ref: '../schemas/tokenRequestBody.yaml'
   responses:
     200:
       description: A successful response.
