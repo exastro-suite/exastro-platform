@@ -92,12 +92,8 @@ roleMappingUser:
   $ref: "./roleMappingUser.yaml"
 roleUser:
   $ref: "./roleUser.yaml"
-tokenAccessRequestBody:
-  $ref: "./tokenAccessRequestBody.yaml"
-tokenRefreshRequestBody1:
-  $ref: "./tokenRefreshRequestBody1.yaml"
-tokenRefreshRequestBody2:
-  $ref: "./tokenRefreshRequestBody2.yaml"
+tokenRequestBody:
+  $ref: "./tokenRequestBody.yaml"
 tokenResponseOK:
   $ref: "./tokenResponseOK.yaml"
 tokenResponseError:

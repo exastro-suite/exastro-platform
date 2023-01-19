@@ -122,18 +122,7 @@ paths:
         content:
           application/x-www-form-urlencoded:
             schema:
-              oneOf:
-                - $ref: '#/components/schemas/tokenRefreshRequestBody1'
-                - $ref: '#/components/schemas/tokenRefreshRequestBody2'
-                - $ref: '#/components/schemas/tokenAccessRequestBody'
-            examples:
-              create refresh token:
-                value: 'client_id=_{organization_id}_api&grant_type=password&scope=openid+offline_access&username={username}&password={password}'
-              create refresh token - two factor authentication:
-                value: 'client_id=_{organization_id}_api&grant_type=password&scope=openid+offline_access&username={username}&password={password}&totp={one_time_password}'
-              create access token:
-                value: 'client_id=_{organization_id}_api&grant_type=refresh_token&refresh_token={refresh_token}'
-        required: true
+              $ref: '#/components/schemas/tokenRequestBody'
       responses:
         '200':
           description: A successful response.
@@ -1834,72 +1823,34 @@ components:
         create_timestamp:
           type: string
           format: date-time
-    tokenAccessRequestBody:
-      title: create access token request parameter.
-      type: object
-      properties:
-        client_id:
-          type: string
-        grant_type:
-          type: string
-          example: refresh_token
-        refresh_token:
-          type: string
-      required:
-        - client_id
-        - grant_type
-        - refresh_token
-    tokenRefreshRequestBody1:
+    tokenRequestBody:
       title: create refresh token request parameter.
       type: object
       properties:
         client_id:
           type: string
-          example: '_{organization_id}_api'
+          example: '_{organization_id}-api'
         grant_type:
           type: string
-          example: password
+          description: '"password" or "refresh_token"'
         scope:
           type: string
           example: openid offline_access
+          description: Specified when grant_type = "password"
         username:
           type: string
+          description: Specified when grant_type = "password"
         password:
           type: string
           example: password
-      required:
-        - client_id
-        - grant_type
-        - username
-        - password
-        - scope
-    tokenRefreshRequestBody2:
-      title: create refresh token request parameter.
-      type: object
-      properties:
-        client_id:
-          type: string
-          example: '_{organization_id}_api'
-        grant_type:
-          type: string
-          example: password
-        scope:
-          type: string
-          example: openid offline_access
-        username:
-          type: string
-        password:
-          type: string
-          example: password
+          description: Specified when grant_type = "password"
         totp:
           type: string
           example: 123456
-      required:
-        - client_id
-        - grant_type
-        - username
-        - password
-        - scope
+          description: one time password. Specified when grant_type = "password" and two-fatctor-authnication
+        refresh_token:
+          type: string
+          description: Specified when grant_type = "refresh_token"
     tokenResponseOK:
       title: A successful create token.
       type: object

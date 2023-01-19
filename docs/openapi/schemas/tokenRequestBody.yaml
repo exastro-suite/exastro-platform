@@ -17,24 +17,25 @@ type: object
 properties:
   client_id:
     type: string
-    example: _{organization_id}_api
+    example: _{organization_id}-api
   grant_type:
     type: string
-    example: password
+    description: '"password" or "refresh_token"'
   scope:
     type: string
     example: openid offline_access
+    description: 'Specified when grant_type = "password"'
   username:
     type: string
+    description: 'Specified when grant_type = "password"'
   password:
     type: string
     example: password
+    description: 'Specified when grant_type = "password"'
   totp:
     type: string
     example: 123456
-required:
-  - client_id
-  - grant_type
-  - username
-  - password
-  - scope
+    description: 'one time password. Specified when grant_type = "password" and two-fatctor-authnication'
+  refresh_token:
+    type: string
+    description: 'Specified when grant_type = "refresh_token"'
