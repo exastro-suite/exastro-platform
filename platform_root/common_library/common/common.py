@@ -316,6 +316,18 @@ def get_platform_client_id(organization_id):
     return f"{organization_id}-workspaces"
 
 
+def get_api_token_client_id(organization_id):
+    """get api token client id
+
+    Args:
+        organization_id (str) : organization id
+
+    Returns:
+        str : api token client
+    """
+    return f"_{organization_id}-api"
+
+
 def get_username(fitstName, LastName, username):
     """get username
 
