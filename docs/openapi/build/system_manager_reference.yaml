@@ -405,6 +405,22 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/organization'
+    organizationSetting:
+      title: organizationSetting is a definition of oraganaization setting resource.
+      type: object
+      properties:
+        token:
+          type: object
+          properties:
+            refresh_token_max_lifespan_enabled:
+              type: boolean
+              example: true
+            refresh_token_max_lifespan_days:
+              type: integer
+              example: 365
+            access_token_lifespan_minutes:
+              type: integer
+              example: 1440
     planMappingOrganization:
       type: object
       required:
