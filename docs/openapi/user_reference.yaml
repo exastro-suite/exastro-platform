@@ -46,6 +46,8 @@ servers:
 tags:
 - name: TokenService
   description: tokenに関する操作
+- name: OrganizationService
+  description: オーガナイゼーションに関する操作
 - name: PlanService
   description: プランに関する操作
 - name: UsageService
@@ -64,6 +66,9 @@ paths:
       $ref: './paths/protocol.openid-connect.token.yaml'
   "/api/{organization_id}/platform/users/_current/refresh_tokens":
       $ref: './paths/user.current.refresh_tokens.yaml'
+
+  "/api/{organization_id}/platform/setting":
+      $ref: './paths/organization.setting.yaml'
 
   "/api/{organization_id}/platform/limits":
       $ref: './paths/plans.organizations.limits.yaml'
