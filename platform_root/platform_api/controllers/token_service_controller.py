@@ -111,14 +111,68 @@ def token_create(organization_id):  # noqa: E501
 def refresh_token_delete(organization_id):  # noqa: E501
     """delete refresh token
 
-     # noqa: E501
+    Args:
+        organization_id (str): organization id
 
-    :param organization_id:
-    :type organization_id: str
-
-    :rtype: InlineResponse2002
+    Returns:
+        _type_: _description_
     """
-    return 'do some magic!'
+    try:
+        globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
+
+        # call keycloak token api
+        redirect_response = requests.delete(
+            f"{os.environ['API_KEYCLOAK_PROTOCOL']}://{os.environ['API_KEYCLOAK_HOST']}:{os.environ['API_KEYCLOAK_PORT']}/api/{organization_id}/platform/users/_current/refresh_tokens",
+            data=request.form,
+            headers={"Content-Type": request.content_type},
+        )
+
+        if redirect_response.status_code == 200:
+            # When the token is successfully issued - tokenの　に成功した時
+            # Write refresh_token information - refresh_tokenの情報を書き込む
+
+            # Decode refresh_token - refresh_tokenをデコードする
+            # refresh_token = json.loads(redirect_response.text)["refresh_token"]
+            # refresh_token_decode = jwt.decode(refresh_token, options={"verify_signature": False})
+
+            # Extract expiration date of refresh_token - refresh_tokenの有効期限を取り出す
+            # try:
+            #     refresh_token_expire = common.keycloak_timestamp_to_datetime(refresh_token_decode['exp'] * 1000)
+            # except Exception:
+            #     refresh_token_expire = None
+
+            # globals.logger.info(f"create refresh token user_id={refresh_token_decode['sub']} session_id={refresh_token_decode['sid']} expire_timestamp={common.datetime_to_str(refresh_token_expire)}")
+
+            # delete T_REFRESH_TOKEN - T_REFRESH_TOKENを削除
+            db = DBconnector()
+            with closing(db.connect_orgdb(organization_id)) as conn:
+                with conn.cursor() as cursor:
+                    parameter = {
+                        "organization_id": organization_id
+                    }
+                    cursor.execute(queries_token.SQL_DELETE_REFRESH_TOKEN, parameter)
+
+                    conn.commit()
+
+        # remake response header
+        excluded_headers = ['content-encoding', 'content-length', 'connection', 'keep-alive', 'proxy-authenticate',
+                            'proxy-authorization', 'te', 'trailers', 'transfer-encoding', 'Upgrade']
+        headers = [
+            (k, v) for k, v in redirect_response.raw.headers.items()
+            if k.lower() not in excluded_headers
+        ]
+
+        return Response(redirect_response.content, redirect_response.status_code, headers)
+
+    except Exception as e:
+        # When an error occurs, respond in the same format as keycloak (openid-connect format)
+        # エラー発生時はkeycloakと同じ形式(openid-connect format)で応答する
+        import traceback
+        info = e.__class__.__name__
+        globals.logger.error(f'last call:[{info}] Exception:{e.args}')
+        globals.logger.error(''.join(list(traceback.TracebackException.from_exception(e).format())))
+        status_code = 500
+        return {"error": "server error", "error_description": "server error"}, status_code
 
 
 def refresh_token_list(organization_id):  # noqa: E501
