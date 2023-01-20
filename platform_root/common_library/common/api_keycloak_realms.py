@@ -14,6 +14,7 @@
 
 # import inspect
 import os
+import inspect
 import requests
 
 # User Imports
@@ -83,6 +84,10 @@ def realm_update(realm_id, realm_json, token):
     return request_response
 
 
+def __get_keycloak_api_url():
+    return "{}://{}:{}".format(os.environ['API_KEYCLOAK_PROTOCOL'], os.environ['API_KEYCLOAK_HOST'], os.environ['API_KEYCLOAK_PORT'])
+
+
 def realms_get(token):
     """realm取得
 
@@ -102,10 +107,40 @@ def realms_get(token):
     globals.logger.debug("realms get send")
     # 呼び出し先設定
     # Call destination setting
-    api_url = "{}://{}:{}".format(os.environ['API_KEYCLOAK_PROTOCOL'], os.environ['API_KEYCLOAK_HOST'], os.environ['API_KEYCLOAK_PORT'])
+    api_url = __get_keycloak_api_url()
     request_response = requests.get(f"{api_url}/auth/admin/realms", headers=header_para)
 
     globals.logger.debug(request_response.text)
+
+    # 応答をそのまま返却
+    # return response as is
+    return request_response
+
+
+def realm_get(realm_name, token):
+    """realm取得
+
+    Args:
+        realm_name (str): realm name
+        toekn (str): token
+
+    Returns:
+        Response: HTTP Respose (success : .status_code=200)
+    """
+    globals.logger.info(f"# func:{inspect.currentframe().f_code.co_name}")
+
+    header_para = {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer {}".format(token),
+    }
+
+    api_url = __get_keycloak_api_url()
+
+    # 呼び出し先設定
+    # Call destination setting
+    request_response = requests.get(f"{api_url}/auth/admin/realms/{realm_name}", headers=header_para)
+
+    globals.logger.info(f"# Succeed func:{inspect.currentframe().f_code.co_name}")
 
     # 応答をそのまま返却
     # return response as is
