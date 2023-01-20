@@ -618,7 +618,7 @@ def __client_create(organization_id, user_id):
     # Get a service account token
     token = __get_token()
 
-    templates = ["template_client_internal_api.json", "template_client_token_check.json", "template_client_user_token.json"]
+    templates = ["template_client_internal_api.json", "template_client_token_check.json", "template_client_user_token.json", "template_client_api_token.json"]
 
     for template_path in templates:
         # templatesの取得
@@ -1220,6 +1220,7 @@ def __organization_database_update(organization_id, user_id):
     user_token_client_clientid = common.get_user_token_client_id(organization_id)
     internal_api_client_clientid = common.get_platform_client_id(organization_id)
     token_check_client_clientid = common.get_token_authentication_client_id(organization_id)
+    api_token_client_clientid = common.get_api_token_client_id(organization_id)
 
     # 該当Client情報を取得
     # get client infomations
@@ -1271,6 +1272,22 @@ def __organization_database_update(organization_id, user_id):
 
     response_json = json.loads(response.text)
     token_check_client_id = response_json[0].get("id")
+
+    response = api_keycloak_clients.clients_get(organization_id, api_token_client_clientid, token)
+    if response.status_code != 200:
+        globals.logger.error(f"response.status_code:{response.status_code}")
+        globals.logger.error(f"response.text:{response.text}")
+        message_id = f"500-{MSG_FUNCTION_ID}014"
+        message = multi_lang.get_text(
+            message_id,
+            "clientの取得に失敗しました(対象ID:{0} client:{1})",
+            organization_id,
+            api_token_client_clientid
+        )
+        raise common.InternalErrorException(message_id=message_id, message=message)
+
+    response_json = json.loads(response.text)
+    api_token_client_id = response_json[0].get("id")
 
     # 該当Client secret情報を取得
     # get client secret
@@ -1343,6 +1360,8 @@ def __organization_database_update(organization_id, user_id):
         "TOKEN_CHECK_CLIENT_CLIENTID": token_check_client_clientid,
         "TOKEN_CHECK_CLIENT_ID": token_check_client_id,
         "TOKEN_CHECK_CLIENT_SECRET": token_check_client_secret,
+        "API_TOKEN_CLIENT_CLIENTID": api_token_client_clientid,
+        "API_TOKEN_CLIENT_ID": api_token_client_id,
     }
 
     # organization private table update
