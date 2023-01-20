@@ -1527,3 +1527,32 @@ def __update_organization_private(infomations, organization_id, user_id):
                 raise common.InternalErrorException(message_id=message_id, message=message)
 
     return
+
+
+def organization_setting_get(organization_id):  # noqa: E501
+    """get an organization settings
+
+     # noqa: E501
+
+    :param organization_id:
+    :type organization_id: str
+
+    :rtype: InlineResponse2001
+    """
+    return 'do some magic!'
+
+
+def organization_setting_update(body, organization_id):  # noqa: E501
+    """Update an organization settings
+
+     # noqa: E501
+
+    :param body:
+    :type body: dict | bytes
+    :param organization_id:
+    :type organization_id: str
+
+    :rtype: ResponseOk
+    """
+    return 'do some magic!'
+

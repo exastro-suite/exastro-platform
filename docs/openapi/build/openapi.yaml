@@ -105,6 +105,68 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/runtimeError'
+  '/api/{organization_id}/platform/setting':
+    get:
+      tags:
+        - OrganizationService
+      summary: get an organization settings
+      x-openapi-router-controller: controllers.organization_service_controller
+      operationId: organization_setting_get
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/organizationSetting'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+    patch:
+      tags:
+        - OrganizationService
+      summary: Update an organization settings
+      x-openapi-router-controller: controllers.organization_service_controller
+      operationId: organization_setting_update
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/organizationSetting'
+        required: true
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responseOk'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
   '/auth/realms/{organization_id}/protocol/openid-connect/token':
     post:
       tags:
@@ -1365,6 +1427,22 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/organization'
+    organizationSetting:
+      title: organizationSetting is a definition of oraganaization setting resource.
+      type: object
+      properties:
+        token:
+          type: object
+          properties:
+            refresh_token_max_lifespan_enabled:
+              type: boolean
+              example: true
+            refresh_token_max_lifespan_days:
+              type: integer
+              example: 365
+            access_token_lifespan_minutes:
+              type: integer
+              example: 1440
     planMappingOrganization:
       type: object
       required:

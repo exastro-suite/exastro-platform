@@ -72,6 +72,8 @@ tags:
 paths:
   "/api/platform/organizations":
       $ref: './paths/organizations.yaml'
+  "/api/{organization_id}/platform/setting":
+      $ref: './paths/organization.setting.yaml'
 
   "/auth/realms/{organization_id}/protocol/openid-connect/token":
       $ref: './paths/protocol.openid-connect.token.yaml'
