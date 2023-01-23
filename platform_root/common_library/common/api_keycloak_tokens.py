@@ -190,7 +190,7 @@ def user_token_introspect(client_id, client_secret, realm_name, access_token, ke
 
 
 def offline_sessions_delete(realm_name, user_id, client_id, token):
-    """offline-session (refresh token)取得 Get offline-session
+    """offline-session (refresh token)削除 Delete offline-session
 
     Args:
         realm_name (str): realm name

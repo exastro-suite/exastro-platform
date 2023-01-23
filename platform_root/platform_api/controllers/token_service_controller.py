@@ -11,27 +11,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from flask import render_template, request, Response
+from flask import request, Response
 import os
-import connexion
 from contextlib import closing
 import json
 import inspect
-import pymysql
-import pymysql.cursors
 import requests
-import datetime
-# import base64
 import jwt
 
-from common_library.common import common, validation
-from common_library.common import api_keycloak_tokens, api_keycloak_realms, api_keycloak_clients, api_keycloak_users, api_keycloak_roles
+from common_library.common import common
+from common_library.common import api_keycloak_tokens, api_keycloak_realms
 from common_library.common.db import DBconnector
-from common_library.common.db_init import DBinit
-from common_library.common import bl_plan_service
-import common_library.common.const as common_const
+# from common_library.common.db_init import DBinit
+# from common_library.common import bl_plan_service
+# import common_library.common.const as common_const
 from libs import queries_token
-import const
 from common_library.common import multi_lang
 
 import globals
@@ -149,7 +143,6 @@ def refresh_token_delete(organization_id):  # noqa: E501
         )
         raise common.InternalErrorException(message_id=message_id, message=message)
 
-    globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
     # When the token is successfully deleted - tokenの削除に成功した時
     # Delete refresh_token information - refresh_tokenの情報を削除する
 
