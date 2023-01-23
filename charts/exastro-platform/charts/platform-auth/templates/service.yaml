@@ -28,9 +28,15 @@ spec:
       protocol: TCP
       port: {{ .Values.service.http.port }}
       targetPort: port-http
+      {{- if .Values.service.http.nodePort }}
+      nodePort: {{ .Values.service.http.nodePort }}
+      {{- end }}
     - name: {{ .Values.service.httpMng.name }}
       protocol: TCP
       port: {{ .Values.service.httpMng.port }}
       targetPort: port-mng
+      {{- if .Values.service.http.nodePort }}
+      nodePort: {{ .Values.service.httpMng.nodePort }}
+      {{- end }}
   selector:
     {{- include "platform-auth.selectorLabels" . | nindent 4 }}
