@@ -199,6 +199,11 @@ class DBconnector:
         token_check_client_secret: str
         """system-XXX-auth secret"""
 
+        api_token_client_clientid: str
+        """_XXX-api clientid"""
+        api_token_client_id: str
+        """_XXX-api ID"""
+
         def __init__(self):
             self.organization_id = ""
             self.user_token_client_clientid = ""
@@ -209,6 +214,8 @@ class DBconnector:
             self.token_check_client_clientid = ""
             self.token_check_client_id = ""
             self.token_check_client_secret = ""
+            self.api_token_client_clientid = ""
+            self.api_token_client_id = ""
 
     def get_organization_private(self, organization_id) -> organization_private:
         """get organization_private informations
@@ -240,7 +247,8 @@ class DBconnector:
                 data.internal_api_client_clientid = json_dict.get("INTERNAL_API_CLIENT_CLIENTID")
                 data.internal_api_client_id = json_dict.get("INTERNAL_API_CLIENT_ID")
                 data.internal_api_client_secret = json_dict.get("INTERNAL_API_CLIENT_SECRET")
-
+                data.api_token_client_clientid = json_dict.get("API_TOKEN_CLIENT_CLIENTID")
+                data.api_token_client_id = json_dict.get("API_TOKEN_CLIENT_ID")
         return data
 
     class platform_private:

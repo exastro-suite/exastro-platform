@@ -1529,30 +1529,101 @@ def __update_organization_private(infomations, organization_id, user_id):
     return
 
 
+@common.platform_exception_handler
 def organization_setting_get(organization_id):  # noqa: E501
     """get an organization settings
 
-     # noqa: E501
+    Args:
+        organization_id (str): organization id
 
-    :param organization_id:
-    :type organization_id: str
-
-    :rtype: InlineResponse2001
+    Returns:
+        response: HTTP Response
     """
-    return 'do some magic!'
+
+    return common.response_200_ok(None)
 
 
+@common.platform_exception_handler
 def organization_setting_update(body, organization_id):  # noqa: E501
-    """Update an organization settings
+    """update an organization settings
 
-     # noqa: E501
+    Args:
+        body (dict): organization setting.
+        organization_id (str): organization id
 
-    :param body:
-    :type body: dict | bytes
-    :param organization_id:
-    :type organization_id: str
-
-    :rtype: ResponseOk
+    Returns:
+        response: HTTP Response
     """
-    return 'do some magic!'
 
+    # validation check
+    validate = validation.validate_organization_setting(body)
+    if not validate.ok:
+        return common.response_validation_error(validate)
+
+    # get client
+    db = DBconnector()
+    private = db.get_organization_private(organization_id)
+
+    # サービスアカウントのTOKEN取得
+    # Get a service account token
+    token_response = api_keycloak_tokens.service_account_get_token(
+        organization_id, private.internal_api_client_clientid, private.internal_api_client_secret,
+    )
+    if token_response.status_code != 200:
+        raise common.AuthException(
+            "client_user_get_token error status:{}, response:{}".format(token_response.status_code, token_response.text)
+        )
+    token = json.loads(token_response.text)["access_token"]
+
+    # make keycloak parameter
+    realm_updete = False
+    realm_json = {}
+    api_client_update = False
+    api_client_json = {}
+
+    if "token" in body:
+        realm_updete = True
+        realm_json["offlineSessionMaxLifespanEnabled"] = body["token"]["refresh_token_max_lifespan_enabled"]
+        if realm_json["offlineSessionMaxLifespanEnabled"]:
+            realm_json["offlineSessionMaxLifespan"] = body["token"]["refresh_token_max_lifespan_days"] * 24 * 60 * 60
+            realm_json["offlineSessionIdleTimeout"] = body["token"]["refresh_token_max_lifespan_days"] * 24 * 60 * 60
+        else:
+            realm_json["offlineSessionMaxLifespan"] = 999999999
+            realm_json["offlineSessionIdleTimeout"] = 999999999
+
+        api_client_update = True
+        if "attributes" not in api_client_json:
+            api_client_json["attributes"] = {}
+
+        api_client_json["attributes"]["access.token.lifespan"] = body["token"]["access_token_lifespan_minutes"] * 60
+        api_client_json["attributes"]["client.session.max.lifespan"] = body["token"]["access_token_lifespan_minutes"] * 60
+        api_client_json["attributes"]["client.session.idle.timeout"] = body["token"]["access_token_lifespan_minutes"] * 60
+
+    if realm_updete:
+        # realm更新
+        # realm update to keycloak
+        response = api_keycloak_realms.realm_update(organization_id, realm_json, token)
+        if response.status_code != 200 and response.status_code != 204:
+            globals.logger.error(f"response.status_code:{response.status_code}")
+            globals.logger.error(f"response.text:{response.text}")
+            message_id = f"500-{MSG_FUNCTION_ID}019"
+            message = multi_lang.get_text(
+                message_id,
+                "realmの更新に失敗しました(対象ID:{0})",
+                organization_id)
+            raise common.InternalErrorException(message_id=message_id, message=message)
+
+    if api_client_update:
+        # api client更新
+        response = api_keycloak_clients.client_update(organization_id, private.api_token_client_id, api_client_json, token)
+        if response.status_code != 200 and response.status_code != 204:
+            globals.logger.error(f"response.status_code:{response.status_code}")
+            globals.logger.error(f"response.text:{response.text}")
+            message_id = f"500-{MSG_FUNCTION_ID}020"
+            message = multi_lang.get_text(
+                message_id,
+                "clientの更新に失敗しました(対象ID:{0}.{1})",
+                organization_id, private.api_token_client_clientid)
+            raise common.InternalErrorException(message_id=message_id, message=message)
+
+    return common.response_200_ok(None)

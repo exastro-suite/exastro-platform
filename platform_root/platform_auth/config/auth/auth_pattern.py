@@ -157,4 +157,15 @@ AUTH_PATTERN = [
             }
         ]
     },
+    {
+        "url": r"^/api/(?P<org_id>[^/][^/]*)/platform/setting($|/.*$)",
+        "auth": [
+            {
+                "method": ["*"],
+                "roles": [
+                    {"client": "{org_id}-workspaces", "role": const.ORG_AUTH_UPDATE},
+                ]
+            }
+        ]
+    }
 ]
