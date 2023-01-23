@@ -11,27 +11,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from flask import render_template, request, Response
+from flask import request, Response
 import os
-import connexion
 from contextlib import closing
 import json
 import inspect
-import pymysql
-import pymysql.cursors
 import requests
-import datetime
-# import base64
 import jwt
 
-from common_library.common import common, validation
-from common_library.common import api_keycloak_tokens, api_keycloak_realms, api_keycloak_clients, api_keycloak_users, api_keycloak_roles
+from common_library.common import common
+from common_library.common import api_keycloak_tokens, api_keycloak_realms
 from common_library.common.db import DBconnector
-from common_library.common.db_init import DBinit
-from common_library.common import bl_plan_service
-import common_library.common.const as common_const
+# from common_library.common.db_init import DBinit
+# from common_library.common import bl_plan_service
+# import common_library.common.const as common_const
 from libs import queries_token
-import const
 from common_library.common import multi_lang
 
 import globals
@@ -110,17 +104,61 @@ def token_create(organization_id):  # noqa: E501
         return {"error": "server error", "error_description": "server error"}, status_code
 
 
+@common.platform_exception_handler
 def refresh_token_delete(organization_id):  # noqa: E501
     """delete refresh token
 
-     # noqa: E501
+    Args:
+        organization_id (str): organization id
 
-    :param organization_id:
-    :type organization_id: str
-
-    :rtype: InlineResponse2002
+    Returns:
+        response: HTTP Response
     """
-    return 'do some magic!'
+
+    globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
+
+    # ログインユーザーの情報を取得
+    # Get login user information
+    user_id = request.headers.get("User-Id")
+
+    # サービスアカウントのTOKEN取得
+    # Get a service account token
+    token = __get_token(organization_id)
+
+    private = DBconnector().get_organization_private(organization_id)
+
+    # call keycloak token api
+    response = api_keycloak_tokens.offline_sessions_delete(organization_id, user_id, private.api_token_client_clientid, token)
+
+    if response.status_code not in [200, 204, 404]:
+        globals.logger.error(f"response.status_code:{response.status_code}")
+        globals.logger.error(f"response.text:{response.text}")
+        message_id = f"500-{MSG_FUNCTION_ID}001"
+        message = multi_lang.get_text(
+            message_id,
+            "offline sessionの削除に失敗しました(対象ID:{0} user:{1} client:{2})",
+            organization_id,
+            user_id,
+            private.api_token_client_clientid,
+        )
+        raise common.InternalErrorException(message_id=message_id, message=message)
+
+    # When the token is successfully deleted - tokenの削除に成功した時
+    # Delete refresh_token information - refresh_tokenの情報を削除する
+
+    # delete T_REFRESH_TOKEN - T_REFRESH_TOKENを削除
+    db = DBconnector()
+    with closing(db.connect_orgdb(organization_id)) as conn:
+        with conn.cursor() as cursor:
+            parameter = {
+                "user_id": user_id
+            }
+            where = "WHERE USER_ID = %(user_id)s"
+            cursor.execute(queries_token.SQL_DELETE_REFRESH_TOKEN + where, parameter)
+
+            conn.commit()
+
+    return common.response_200_ok(None)
 
 
 @common.platform_exception_handler
