@@ -110,6 +110,7 @@ def token_create(organization_id):  # noqa: E501
         return {"error": "server error", "error_description": "server error"}, status_code
 
 
+@common.platform_exception_handler
 def refresh_token_delete(organization_id):  # noqa: E501
     """delete refresh token
 
@@ -117,64 +118,54 @@ def refresh_token_delete(organization_id):  # noqa: E501
         organization_id (str): organization id
 
     Returns:
-        _type_: _description_
+        response: HTTP Response
     """
-    try:
-        globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
 
-        # call keycloak token api
-        redirect_response = requests.delete(
-            f"{os.environ['API_KEYCLOAK_PROTOCOL']}://{os.environ['API_KEYCLOAK_HOST']}:{os.environ['API_KEYCLOAK_PORT']}/api/{organization_id}/platform/users/_current/refresh_tokens",
-            data=request.form,
-            headers={"Content-Type": request.content_type},
+    globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
+
+    # ログインユーザーの情報を取得
+    # Get login user information
+    user_id = request.headers.get("User-Id")
+
+    # サービスアカウントのTOKEN取得
+    # Get a service account token
+    token = __get_token(organization_id)
+
+    private = DBconnector().get_organization_private(organization_id)
+
+    # call keycloak token api
+    response = api_keycloak_tokens.offline_sessions_delete(organization_id, user_id, private.api_token_client_clientid, token)
+
+    if response.status_code not in [200, 204, 404]:
+        globals.logger.error(f"response.status_code:{response.status_code}")
+        globals.logger.error(f"response.text:{response.text}")
+        message_id = f"500-{MSG_FUNCTION_ID}001"
+        message = multi_lang.get_text(
+            message_id,
+            "offline sessionの削除に失敗しました(対象ID:{0} user:{1} client:{2})",
+            organization_id,
+            user_id,
+            private.api_token_client_clientid,
         )
+        raise common.InternalErrorException(message_id=message_id, message=message)
 
-        if redirect_response.status_code == 200:
-            # When the token is successfully issued - tokenの　に成功した時
-            # Write refresh_token information - refresh_tokenの情報を書き込む
+    globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
+    # When the token is successfully deleted - tokenの削除に成功した時
+    # Delete refresh_token information - refresh_tokenの情報を削除する
 
-            # Decode refresh_token - refresh_tokenをデコードする
-            # refresh_token = json.loads(redirect_response.text)["refresh_token"]
-            # refresh_token_decode = jwt.decode(refresh_token, options={"verify_signature": False})
+    # delete T_REFRESH_TOKEN - T_REFRESH_TOKENを削除
+    db = DBconnector()
+    with closing(db.connect_orgdb(organization_id)) as conn:
+        with conn.cursor() as cursor:
+            parameter = {
+                "user_id": user_id
+            }
+            where = "WHERE USER_ID = %(user_id)s"
+            cursor.execute(queries_token.SQL_DELETE_REFRESH_TOKEN + where, parameter)
 
-            # Extract expiration date of refresh_token - refresh_tokenの有効期限を取り出す
-            # try:
-            #     refresh_token_expire = common.keycloak_timestamp_to_datetime(refresh_token_decode['exp'] * 1000)
-            # except Exception:
-            #     refresh_token_expire = None
+            conn.commit()
 
-            # globals.logger.info(f"create refresh token user_id={refresh_token_decode['sub']} session_id={refresh_token_decode['sid']} expire_timestamp={common.datetime_to_str(refresh_token_expire)}")
-
-            # delete T_REFRESH_TOKEN - T_REFRESH_TOKENを削除
-            db = DBconnector()
-            with closing(db.connect_orgdb(organization_id)) as conn:
-                with conn.cursor() as cursor:
-                    parameter = {
-                        "organization_id": organization_id
-                    }
-                    cursor.execute(queries_token.SQL_DELETE_REFRESH_TOKEN, parameter)
-
-                    conn.commit()
-
-        # remake response header
-        excluded_headers = ['content-encoding', 'content-length', 'connection', 'keep-alive', 'proxy-authenticate',
-                            'proxy-authorization', 'te', 'trailers', 'transfer-encoding', 'Upgrade']
-        headers = [
-            (k, v) for k, v in redirect_response.raw.headers.items()
-            if k.lower() not in excluded_headers
-        ]
-
-        return Response(redirect_response.content, redirect_response.status_code, headers)
-
-    except Exception as e:
-        # When an error occurs, respond in the same format as keycloak (openid-connect format)
-        # エラー発生時はkeycloakと同じ形式(openid-connect format)で応答する
-        import traceback
-        info = e.__class__.__name__
-        globals.logger.error(f'last call:[{info}] Exception:{e.args}')
-        globals.logger.error(''.join(list(traceback.TracebackException.from_exception(e).format())))
-        status_code = 500
-        return {"error": "server error", "error_description": "server error"}, status_code
+    return common.response_200_ok(None)
 
 
 @common.platform_exception_handler

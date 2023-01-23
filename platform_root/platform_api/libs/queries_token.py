@@ -17,14 +17,11 @@ INSERT INTO T_REFRESH_TOKEN (USER_ID, SESSION_ID, EXPIRE_TIMESTAMP, CREATE_USER,
 values (%(user_id)s, %(session_id)s, %(expire_timestamp)s, %(create_user)s, %(last_update_user)s)
 """
 
-<<<<<<< HEAD
 SQL_DELETE_REFRESH_TOKEN = """
 DELETE FROM T_REFRESH_TOKEN
-WHERE user_id = 
 """
-=======
+
 SQL_QUERY_REFRESH_TOKEN = """
 SELECT *
 FROM T_REFRESH_TOKEN
 """
->>>>>>> upstream/1.3
