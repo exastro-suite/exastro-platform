@@ -249,10 +249,6 @@ class DBconnector:
                 data.internal_api_client_secret = json_dict.get("INTERNAL_API_CLIENT_SECRET")
                 data.api_token_client_clientid = json_dict.get("API_TOKEN_CLIENT_CLIENTID")
                 data.api_token_client_id = json_dict.get("API_TOKEN_CLIENT_ID")
-<<<<<<< HEAD
-=======
-
->>>>>>> upstream/1.3
         return data
 
     class platform_private:
