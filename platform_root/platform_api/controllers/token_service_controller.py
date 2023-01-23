@@ -278,7 +278,7 @@ def refresh_token_list(organization_id):
                 "id": offline_session.get("id"),
                 "start_timestamp": common.datetime_to_str(common.keycloak_timestamp_to_datetime(offline_session.get("start"))),
                 "lastaccess_timestamp": common.datetime_to_str(common.keycloak_timestamp_to_datetime(offline_session.get("lastAccess"))),
-                "expire_timestamp": expire_timestamp,
+                "expire_timestamp": common.datetime_to_str(expire_timestamp),
             }
 
             data.append(row)

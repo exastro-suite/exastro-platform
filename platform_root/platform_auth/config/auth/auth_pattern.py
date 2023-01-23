@@ -79,6 +79,11 @@ AUTH_PATTERN = [
         ]
     },
     {
+        "url": r"^/api/(?P<org_id>[^/][^/]*)/platform/users/_current/refresh_tokens$",
+        # do not regulate - 規制しない
+        "auth": []
+    },
+    {
         "url": r"^/api/(?P<org_id>[^/][^/]*)/platform/roles($|/.*$)",
         "auth": [
             {
