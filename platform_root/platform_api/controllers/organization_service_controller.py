@@ -1539,8 +1539,55 @@ def organization_setting_get(organization_id):  # noqa: E501
     Returns:
         response: HTTP Response
     """
+    private = DBconnector().get_organization_private(organization_id)
 
-    return common.response_200_ok(None)
+    # サービスアカウントのTOKEN取得
+    # Get a service account token
+    token_response = api_keycloak_tokens.service_account_get_token(
+        organization_id, private.internal_api_client_clientid, private.internal_api_client_secret,
+    )
+    if token_response.status_code != 200:
+        raise common.AuthException(
+            "client_user_get_token error status:{}, response:{}".format(token_response.status_code, token_response.text)
+        )
+    token = json.loads(token_response.text)["access_token"]
+
+    # realm取得
+    # get realm to keycloak
+    realm_response = api_keycloak_realms.realm_get(organization_id, token)
+    if realm_response.status_code != 200:
+        globals.logger.error(f"response.status_code:{realm_response.status_code}")
+        globals.logger.error(f"response.text:{realm_response.text}")
+        message_id = f"500-{MSG_FUNCTION_ID}018"
+        message = multi_lang.get_text(
+            message_id,
+            "realm情報の取得に失敗しました。")
+        raise common.InternalErrorException(message_id=message_id, message=message)
+
+    realm_response_json = json.loads(realm_response.text)
+
+    client_response = api_keycloak_clients.clients_get(organization_id, private.api_token_client_clientid, token)
+    if client_response.status_code != 200:
+        globals.logger.error(f"response.status_code:{client_response.status_code}")
+        globals.logger.error(f"response.text:{client_response.text}")
+        message_id = f"500-{MSG_FUNCTION_ID}004"
+        message = multi_lang.get_text(
+            message_id,
+            "clientの取得に失敗しました(対象ID:{0} client:{1})",
+            organization_id, private.api_token_client_clientid)
+        raise common.InternalErrorException(message_id=message_id, message=message)
+
+    client_response_json = json.loads(client_response.text)[0]
+
+    data = {'token': {}}
+
+    data['token']['refresh_token_max_lifespan_enabled'] = realm_response_json['offlineSessionMaxLifespanEnabled']
+    if realm_response_json['offlineSessionMaxLifespanEnabled']:
+        data['token']['refresh_token_max_lifespan_days'] = int(realm_response_json['offlineSessionMaxLifespan']  / 24 / 60 / 60)
+
+    data['token']['access_token_lifespan_minutes'] = int(int(client_response_json["attributes"]["access.token.lifespan"]) / 60)
+
+    return common.response_200_ok(data)
 
 
 @common.platform_exception_handler
