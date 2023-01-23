@@ -777,3 +777,43 @@ def validate_user_enabled(user_enabled):
         )
 
     return result(True)
+
+
+def validate_organization_setting(body):
+    """Validate organization setting
+
+    Args:
+        body (dict): body json
+
+    Returns:
+        result: Validation result
+    """
+    if "token" in body:
+        if "refresh_token_max_lifespan_enabled" not in body["token"]:
+            return result(
+                False, 400, '400-00011', '必須項目が不足しています。({0})',
+                "token.refresh_token_max_lifespan_enabled",
+            )
+
+        # The type check for body["token"]["refresh_token_max_lifespan_enabled"] is omitted because it is performed by openapi (connexion)
+        # body["token"]["refresh_token_max_lifespan_enabled"]のtypeチェックはopenapi(connexion)で実施されているので割愛する
+
+        if body["token"]["refresh_token_max_lifespan_enabled"] and "refresh_token_max_lifespan_days" not in body["token"]:
+            return result(
+                False, 400, '400-00011', '必須項目が不足しています。({0})',
+                "token.refresh_token_max_lifespan_days",
+            )
+
+        # The range check of body["token"]["refresh_token_max_lifespan_days"] is omitted because it is performed by openapi (connexion)
+        # body["token"]["refresh_token_max_lifespan_days"]の範囲チェックはopenapi(connexion)で実施されているので割愛する
+
+        if "access_token_lifespan_minutes" not in body["token"]:
+            return result(
+                False, 400, '400-00011', '必須項目が不足しています。({0})',
+                "token.access_token_lifespan_minutes",
+            )
+
+        # The range check of body["token"]["access_token_lifespan_minutes"] is omitted because it is performed by openapi (connexion)
+        # body["token"]["access_token_lifespan_minutes"]の範囲チェックはopenapi(connexion)で実施されているので割愛する
+
+    return result(True)

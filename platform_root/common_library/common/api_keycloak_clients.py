@@ -49,6 +49,36 @@ def client_create(realm_name, client_json, token):
     return request_response
 
 
+def client_update(realm_name, client_uid, client_json, token):
+    """クライアント作成 client create
+
+    Args:
+        realm_name (str): realm name
+        client_uid (str): client id (uuid)
+        client_json (disct): client update parameter
+        toekn (str): token
+
+    Returns:
+        Response: HTTP Respose (success : .status_code=200)
+    """
+    globals.logger.info('Put keycloak clients. client_id={}'.format(client_uid))
+
+    header_para = {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer {}".format(token),
+    }
+
+    # 呼び出し先設定 requests setting
+    api_url = "{}://{}:{}".format(os.environ['API_KEYCLOAK_PROTOCOL'], os.environ['API_KEYCLOAK_HOST'], os.environ['API_KEYCLOAK_PORT'])
+
+    request_response = requests.put(f"{api_url}/auth/admin/realms/{realm_name}/clients/{client_uid}",
+                                     headers=header_para,
+                                     json=client_json,
+                                     )
+
+    return request_response
+
+
 def clients_get(realm_name, client_id, token):
     """クライアント情報取得 client info get
 
