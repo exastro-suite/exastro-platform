@@ -24,7 +24,7 @@ import traceback
 
 import globals
 # import const
-from common_library.common import common, api_keycloak_tokens, api_keycloak_clients, api_keycloak_users, api_keycloak_roles
+from common_library.common import common, api_keycloak_tokens, api_keycloak_realms, api_keycloak_clients, api_keycloak_users, api_keycloak_roles
 from common_library.common.exastro_logging import ExastroLogRecordFactory, LOGGING
 from common_library.common.db import DBconnector
 from common_library.common import multi_lang
@@ -59,6 +59,7 @@ class platform_init:
 
     # add client name
     platform_client_clientid = None
+    platform_api_clientid = None
 
     token_user = os.environ.get("KEYCLOAK_USER")
     token_pass = os.environ.get("KEYCLOAK_PASSWORD")
@@ -89,11 +90,16 @@ class platform_init:
 
         try:
             self.step_count = 1
-            self.step_max = 6
+            self.step_max = 7
 
             # アクセストークンを取得
             # Get an access token
             access_token = self.__access_token_get(self.realm, self.token_user, self.token_pass)
+
+            self.step_count += 1
+
+            # platform用realm設定
+            self.__realm_setting(self.realm, access_token)
 
             self.step_count += 1
 
@@ -199,6 +205,43 @@ class platform_init:
         except Exception:
             raise
 
+    def __realm_setting(self, realm_name, token):
+        """realm setting
+
+        Args:
+            realm_name (str): realm name
+            token (str): keycloak access token
+        """
+        globals.logger.info(f"[{self.step_count}/{self.step_max}] ### Start func:{inspect.currentframe().f_code.co_name}")
+
+        # templatesの取得
+        # get a templates
+        with app.app_context():
+            realm_json = render_template("template_platform_realm_setting.json")
+            realm_json = json.loads(realm_json)
+
+        # realmの更新
+        # update realm
+        response = api_keycloak_realms.realm_update(realm_name, realm_json, token)
+        if response.status_code not in [200, 204]:
+            globals.logger.info(f"[{self.step_count}/{self.step_max}] -- NG: update realm:")
+            globals.logger.error(f"response.status_code:{response.status_code}")
+            globals.logger.error(f"response.text:{response.text}")
+            message_id = f"500-{MSG_FUNCTION_ID}011"
+            message = multi_lang.get_text(
+                message_id,
+                "realm update failed. (realm:{0})",
+                realm_name
+            )
+            raise common.InternalErrorException(message_id=message_id, message=message)
+
+        globals.logger.info(f"[{self.step_count}/{self.step_max}] -- OK: update realm:")
+        self.ok_count += 1
+
+        globals.logger.info(f"[{self.step_count}/{self.step_max}] ### Succeed func:{inspect.currentframe().f_code.co_name}")
+
+        return
+
     def __client_create(self, realm_name, token):
         """client create
 
@@ -209,7 +252,7 @@ class platform_init:
 
         globals.logger.info(f"[{self.step_count}/{self.step_max}] ### Start func:{inspect.currentframe().f_code.co_name}")
 
-        templates = ["template_platform_client.json"]
+        templates = ["template_platform_client.json", "template_platform_api_token.json"]
 
         with app.app_context():
             for template_path in templates:
@@ -221,6 +264,8 @@ class platform_init:
 
                 if template_path == "template_platform_client.json":
                     self.platform_client_clientid = client_json.get("clientId")
+                elif template_path == "template_platform_api_token.json":
+                    self.platform_api_clientid = client_json.get("clientId")
 
                 # globals.logger.debug(f"client_json:{client_json}")
 
@@ -468,6 +513,30 @@ class platform_init:
             )
             raise common.InternalErrorException(message_id=message_id, message=message)
 
+        globals.logger.info(f"[{self.step_count}/{self.step_max}] - get client:")
+        # 該当Client情報を取得
+        # get client infomations
+        response = api_keycloak_clients.clients_get(realm_name, self.platform_api_clientid, token)
+        if response.status_code not in [200]:
+            globals.logger.info(f"[{self.step_count}/{self.step_max}] -- NG: get client:")
+            globals.logger.error(f"response.status_code:{response.status_code}")
+            globals.logger.error(f"response.text:{response.text}")
+            message_id = f"500-{MSG_FUNCTION_ID}003"
+            message = multi_lang.get_text(
+                message_id,
+                "get client failed. (realm:{0} cliest:{1})",
+                realm_name,
+                self.platform_api_clientid
+            )
+            raise common.InternalErrorException(message_id=message_id, message=message)
+
+        globals.logger.info(f"[{self.step_count}/{self.step_max}] -- OK: get client:")
+        self.ok_count += 1
+
+        response_json = json.loads(response.text)
+        globals.logger.debug(f"-- clients_get:{response_json}")
+        platform_api_client_id = response_json[0].get("id")
+
         # バージョン設定（すでに登録済みの情報がある場合は、そのままのバージョンとする）
         # Version setting (if there is already registered information, the version will remain as is)
         if platform_data_row:
@@ -508,9 +577,11 @@ class platform_init:
 
                 infomations = {
                     "TOKEN_CHECK_REALM_ID": realm_name,
-                    "TOKEN_CHECK_CLIENT_CLIENTID": "_platform",
+                    "TOKEN_CHECK_CLIENT_CLIENTID": self.platform_client_clientid,
                     "TOKEN_CHECK_CLIENT_ID": platform_client_id,
                     "TOKEN_CHECK_CLIENT_SECRET": platform_client_secret,
+                    "API_TOKEN_CLIENT_CLIENTID": self.platform_api_clientid,
+                    "API_TOKEN_CLIENT_ID": platform_api_client_id,
                     "VERSION": ver,
                 }
                 parameter = {

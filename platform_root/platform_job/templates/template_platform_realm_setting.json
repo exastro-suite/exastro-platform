@@ -1,0 +1,5 @@
+{
+    "offlineSessionIdleTimeout": 31536000,
+    "offlineSessionMaxLifespanEnabled": true,
+    "offlineSessionMaxLifespan": 31536000
+}

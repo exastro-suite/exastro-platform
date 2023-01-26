@@ -20,8 +20,5 @@
             "enabled": true
         }
     ],
-    "plan": {
-        "id": "plan-1"
-    },
     "options": {}
 }
