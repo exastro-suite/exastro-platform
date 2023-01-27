@@ -73,7 +73,7 @@ def openid_connect_token(organization_id):
     """
 
     # proxy destination
-    if request.form.get('client_id') == '_' + organization_id + '-api' \
+    if (request.form.get('client_id') == f"_{organization_id}-api" or (organization_id == 'master' and request.form.get('client_id') == '_platform-api')) \
         and request.form.get('grant_type') == 'password' \
             and 'offline_access' in request.form.get('scope'):
         # case get refresh token
