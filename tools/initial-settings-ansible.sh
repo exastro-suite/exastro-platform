@@ -31,6 +31,14 @@ if [ ${COMMAND_WHICH_JQ} -eq 0 ]; then
 fi
 
 echo
+read -p "organization id : " ORG_ID
+
+if [ "${ORG_ID}" == "" ]; then
+    echo "please enter organization id ... retry the $0"
+    exit 1
+fi
+
+echo
 read -p "your username : " USERNAME
 read -sp "your password : " PASSWORD
 
@@ -52,7 +60,7 @@ curl ${CURL_OPT} -X POST \
     -d "@${PARAM_JSON_FILE}" \
     -o "${TEMPFILE_API_RESPONSE}" \
     -w '%{http_code}\n' \
-    "${CONF_BASE_URL}/api/ita/initial-settings/ansible/" > "${TEMPFILE_API_CODE}"
+    "${CONF_BASE_URL}/api/ita/${ORG_ID}/initial-settings/ansible/" > "${TEMPFILE_API_CODE}"
 
 RESULT_CURL=$?
 RESULT_CODE=$(cat "${TEMPFILE_API_CODE}")
