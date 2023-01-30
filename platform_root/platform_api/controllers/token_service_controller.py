@@ -70,18 +70,33 @@ def token_create(organization_id):  # noqa: E501
 
             # write to T_REFRESH_TOKEN - T_REFRESH_TOKENに書き込む
             db = DBconnector()
-            with closing(db.connect_orgdb(organization_id)) as conn:
-                with conn.cursor() as cursor:
-                    parameter = {
-                        "user_id": refresh_token_decode['sub'],
-                        "session_id": refresh_token_decode['sid'],
-                        "expire_timestamp": refresh_token_expire,
-                        "create_user": refresh_token_decode['sub'],
-                        "last_update_user": refresh_token_decode['sub']
-                    }
-                    cursor.execute(queries_token.SQL_INSERT_REFRESH_TOKEN, parameter)
+            if organization_id == "master":
+                with closing(db.connect_platformdb()) as conn:
+                    with conn.cursor() as cursor:
+                        parameter = {
+                            "user_id": refresh_token_decode['sub'],
+                            "session_id": refresh_token_decode['sid'],
+                            "expire_timestamp": refresh_token_expire,
+                            "create_user": refresh_token_decode['sub'],
+                            "last_update_user": refresh_token_decode['sub']
+                        }
+                        cursor.execute(queries_token.SQL_INSERT_REFRESH_TOKEN, parameter)
 
-                    conn.commit()
+                        conn.commit()
+
+            else:
+                with closing(db.connect_orgdb(organization_id)) as conn:
+                    with conn.cursor() as cursor:
+                        parameter = {
+                            "user_id": refresh_token_decode['sub'],
+                            "session_id": refresh_token_decode['sid'],
+                            "expire_timestamp": refresh_token_expire,
+                            "create_user": refresh_token_decode['sub'],
+                            "last_update_user": refresh_token_decode['sub']
+                        }
+                        cursor.execute(queries_token.SQL_INSERT_REFRESH_TOKEN, parameter)
+
+                        conn.commit()
 
         # remake response header
         excluded_headers = ['content-encoding', 'content-length', 'connection', 'keep-alive', 'proxy-authenticate',

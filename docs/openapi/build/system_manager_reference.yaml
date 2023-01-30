@@ -27,6 +27,8 @@ servers:
       port:
         default: '30081'
 tags:
+  - name: TokenService
+    description: tokenに関する操作
   - name: OrganizationService
     description: オーガナイゼーションに関する操作
   - name: PlanService
@@ -34,6 +36,29 @@ tags:
   - name: UsageService
     description: リソース使用量に関する操作
 paths:
+  /auth/realms/master/protocol/openid-connect/token:
+    post:
+      tags:
+        - TokenService
+      summary: create token for system manager
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/tokenRequestBody'
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/tokenResponseOK'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/tokenResponseError'
   /api/platform/organizations:
     get:
       tags:
@@ -225,7 +250,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/runtimeError'
-  /api/platform/plan_items.yaml:
+  /api/platform/plan_items:
     get:
       tags:
         - PlanService

@@ -44,6 +44,8 @@ servers:
         default: '30081'
 
 tags:
+- name: TokenService
+  description: tokenに関する操作
 - name: OrganizationService
   description: オーガナイゼーションに関する操作
 - name: PlanService
@@ -52,6 +54,9 @@ tags:
   description: リソース使用量に関する操作
 
 paths:
+  "/auth/realms/master/protocol/openid-connect/token":
+      $ref: './paths/protocol.openid-connect.token.master.yaml'
+
   "/api/platform/organizations":
       $ref: './paths/organizations.yaml'
 
@@ -61,7 +66,7 @@ paths:
       $ref: './paths/plans.organizations.plan_start_datetime.yaml'
   "/api/platform/plans":
       $ref: './paths/plans.yaml'
-  "/api/platform/plan_items.yaml":
+  "/api/platform/plan_items":
       $ref: './paths/plan_items.yaml'
 
   "/api/platform/usages":
