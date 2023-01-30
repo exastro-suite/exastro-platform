@@ -3,24 +3,11 @@
 source "`dirname $0`/api-auth.conf"
 
 echo
-echo "Please enter the organization ID and start datetime to delete the organization-plan"
-echo
 read -p "organization id : " ORG_ID
-read -p "start datetime (yyyy-mm-dd hh:mm:ss) : " START_DATETIME
 
 echo
 read -p "your username : " USERNAME
 read -sp "your password : " PASSWORD
-
-echo
-read -p "Delete an organization-plan, are you sure? (Y/other) : " CONFIRM
-if [ "${CONFIRM}" != "Y" -a "${CONFIRM}" != "y" ]; then
-    exit 1
-fi
-
-# echo "POST JSON:"
-# echo "${BODY_JSON}"
-# echo
 
 TEMPFILE_API_RESPONSE="/tmp/`basename $0`.$$.1"
 TEMPFILE_API_CODE="/tmp/`basename $0`.$$.2"
@@ -28,13 +15,21 @@ TEMPFILE_API_CODE="/tmp/`basename $0`.$$.2"
 touch "${TEMPFILE_API_RESPONSE}"
 touch "${TEMPFILE_API_CODE}"
 
-curl ${CURL_OPT} -X DELETE \
-    -u ${USERNAME}:${PASSWORD} \
-    -H 'Content-type: application/json' \
-    -d "${BODY_JSON}" \
-    -o "${TEMPFILE_API_RESPONSE}" \
-    -w '%{http_code}\n' \
-    "${CONF_BASE_URL}/api/platform/${ORG_ID}/plans/${START_DATETIME}" > "${TEMPFILE_API_CODE}"
+if [ ${ORG_ID} -eq 0 ]; then
+    curl ${CURL_OPT} -X GET \
+        -u ${USERNAME}:${PASSWORD} \
+        -H 'Content-type: application/json' \
+        -w '%{http_code}\n' \
+        -o "${TEMPFILE_API_RESPONSE}" \
+        "${CONF_BASE_URL}/api/platform/usages" > "${TEMPFILE_API_CODE}"
+else
+    curl ${CURL_OPT} -X GET \
+        -u ${USERNAME}:${PASSWORD} \
+        -H 'Content-type: application/json' \
+        -w '%{http_code}\n' \
+        -o "${TEMPFILE_API_RESPONSE}" \
+        "${CONF_BASE_URL}/api/platform/usages?organization_id=${ORG_ID}" > "${TEMPFILE_API_CODE}"
+fi
 
 RESULT_CURL=$?
 RESULT_CODE=$(cat "${TEMPFILE_API_CODE}")
