@@ -12,11 +12,12 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-BasicAuth:
-  type: http
-  scheme: basic
-  description: Value converted from ID/Password in base64
 BearerAuth:
+  description: Credentials or access token for API
   type: http
   scheme: bearer
-  description: Credentials or access token for API
+  bearerFormat: JWT
+BasicAuth:
+  description: Value converted from ID/Password in base64
+  type: http
+  scheme: basic

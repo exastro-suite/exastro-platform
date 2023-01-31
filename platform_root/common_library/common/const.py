@@ -24,6 +24,15 @@ length_workspace_environment_name = 40
 length_role_name = 64
 length_role_description = 255
 max_role_workspaces = 1000
+length_plan_id = 36
+length_plan_name = 255
+length_plan_description = 4000
+max_db_int_value = 2147483647
+min_db_int_value = -2147483647
+length_user_name = 255
+length_user_email = 255
+length_user_firstName = 100
+length_user_lastName = 100
 
 
 # ロール種別
@@ -42,6 +51,7 @@ ORG_ROLE_USER_MANAGER = "_organization-user-manager"
 ORG_AUTH_UPDATE = "_og-upd"
 ORG_AUTH_OWNER_MAINTE = "_og-own-mt"
 ORG_AUTH_ROLE_USER = "_og-role-usr"
+ORG_AUTH_USAGE_SITUATION = "_og-usage"
 ORG_AUTH_USER_MAINTE = "_og-usr-mt"
 ORG_AUTH_WS_ROLE_MAINTE = "_og-ws-role-mt"
 ORG_AUTH_WS_ROLE_USER = "_og-ws-role-usr"
@@ -54,8 +64,8 @@ WS_AUTH_ADMIN_ANY = "_.*-admin"
 
 # Roleと権限の紐づけ
 # Associating Roles and Permissions
-ORG_PERMISSION_ORG_MANAGER = [ORG_AUTH_UPDATE, ORG_AUTH_OWNER_MAINTE, ORG_AUTH_ROLE_USER, ORG_AUTH_USER_MAINTE, ORG_AUTH_WS_ROLE_MAINTE,
-                              ORG_AUTH_WS_ROLE_USER, ORG_AUTH_WS_MAINTE]
+ORG_PERMISSION_ORG_MANAGER = [ORG_AUTH_UPDATE, ORG_AUTH_OWNER_MAINTE, ORG_AUTH_ROLE_USER, ORG_AUTH_USAGE_SITUATION,
+                              ORG_AUTH_USER_MAINTE, ORG_AUTH_WS_ROLE_MAINTE, ORG_AUTH_WS_ROLE_USER, ORG_AUTH_WS_MAINTE]
 ORG_PERMISSION_USER_ROLE_MANAGER = [ORG_AUTH_USER_MAINTE, ORG_AUTH_WS_ROLE_MAINTE, ORG_AUTH_WS_ROLE_USER]
 ORG_PERMISSION_USER_MANAGER = [ORG_AUTH_USER_MAINTE, ORG_AUTH_WS_ROLE_USER]
 
@@ -73,6 +83,7 @@ ALL_ORG_AUTHORITIES = [
     ORG_AUTH_UPDATE,
     ORG_AUTH_OWNER_MAINTE,
     ORG_AUTH_ROLE_USER,
+    ORG_AUTH_USAGE_SITUATION,
     ORG_AUTH_USER_MAINTE,
     ORG_AUTH_WS_ROLE_MAINTE,
     ORG_AUTH_WS_ROLE_USER,
@@ -82,3 +93,23 @@ ALL_ORG_AUTHORITIES = [
 # keycloak realm-managementロール 登録
 # keycloak realm-management role
 ALL_REALM_MANAGEMENT_ROLE = ["manage-users", "view-users"]
+
+# plan未設定時のデフォルト
+# Default when plan is not set
+DEFAULT_PLAN_ID = "_default"
+
+# planのstart_datetimeの書式
+# Format Datetime Plan start_datetime
+FORMAT_DATETIME_PLAN_START_DATETIME = "%Y-%m-%d %H:%M:%S"
+
+# 集計対象リソース
+# Aggregated resource
+RESOURCE_COUNT_WORKSPACES = "platform.workspaces"
+RESOURCE_COUNT_USERS = "platform.users"
+RESOURCE_COUNT_ROLES = "platform.roles"
+
+ALL_RESOURCE_COUNT = [
+    RESOURCE_COUNT_WORKSPACES,
+    RESOURCE_COUNT_USERS,
+    RESOURCE_COUNT_ROLES,
+]

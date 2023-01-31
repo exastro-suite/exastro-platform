@@ -21,6 +21,8 @@ from common_library.common import validation, check_authority
 from common_library.common.db import DBconnector
 from common_library.common import multi_lang
 import common_library.common.const as common_const
+from common_library.common import bl_plan_service
+from common_library.common import resources
 
 import globals
 
@@ -39,11 +41,35 @@ def role_create(body, organization_id):
         InlineResponse2001: _description_
     """
 
+    # 上限チェック
+    # upper limit check
+    # role limit get
+    limits = bl_plan_service.organization_limits_get(organization_id, common_const.RESOURCE_COUNT_ROLES)
+    if common_const.RESOURCE_COUNT_ROLES in limits:
+        # 上限値がある場合にチェックする
+        # Check if there is an upper limit
+        rc = resources.counter(organization_id)
+        globals.logger.info("### roles count :{}".format(rc(common_const.RESOURCE_COUNT_ROLES)))
+
+        if rc(common_const.RESOURCE_COUNT_ROLES) >= limits[common_const.RESOURCE_COUNT_ROLES]:
+            message_id = "400-00022"
+            message = multi_lang.get_text(
+                message_id,
+                "{0}の上限数({1})を超えるため、新しい{0}は作成できません。",
+                multi_lang.get_text('000-00126', "ロール"),
+                limits[common_const.RESOURCE_COUNT_ROLES]
+            )
+            raise common.BadRequestException(message_id=message_id, message=message)
+
     body = connexion.request.get_json()
     if not body:
-        raise common.BadRequestException(
-            message_id='400-000002', message='リクエストボディのパラメータ({})が不正です。'.format('Json')
+        message_id = "400-000002"
+        message = multi_lang.get_text(
+            message_id,
+            "リクエストボディのパラメータ({0})が不正です。",
+            'Json',
         )
+        raise common.BadRequestException(message_id=message_id, message=message)
 
     role_name = body.get("name")
     role_kind = body.get("kind")
@@ -53,16 +79,16 @@ def role_create(body, organization_id):
     # validation check
     validate = validation.validate_role_name(role_name)
     if not validate.ok:
-        return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, validate.args)
+        return common.response_validation_error(validate)
     validate = validation.validate_role_kind(role_kind)
     if not validate.ok:
-        return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, validate.args)
+        return common.response_validation_error(validate)
     validate = validation.validate_role_description(role_description)
     if not validate.ok:
-        return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, validate.args)
+        return common.response_validation_error(validate)
     validate = validation.validate_role_workspaces(workspaces)
     if not validate.ok:
-        return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, validate.args)
+        return common.response_validation_error(validate)
 
     workspace_ids = [w.get("id") for w in workspaces]
     cauth = check_authority.CheckAuthority(organization_id, connexion.request.headers)
@@ -314,9 +340,13 @@ def role_update(body, organization_id, role_name):
 
     body = connexion.request.get_json()
     if not body:
-        raise common.BadRequestException(
-            message_id='400-000002', message='リクエストボディのパラメータ({})が不正です。'.format('Json')
+        message_id = "400-000002"
+        message = multi_lang.get_text(
+            message_id,
+            "リクエストボディのパラメータ({0})が不正です。",
+            'Json',
         )
+        raise common.BadRequestException(message_id=message_id, message=message)
 
     role_kind = body.get("kind")
     role_description = body.get("description") if body.get("description") else ""
@@ -325,16 +355,16 @@ def role_update(body, organization_id, role_name):
     # validation check
     validate = validation.validate_role_name(role_name)
     if not validate.ok:
-        return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, validate.args)
+        return common.response_validation_error(validate)
     validate = validation.validate_role_kind(role_kind)
     if not validate.ok:
-        return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, validate.args)
+        return common.response_validation_error(validate)
     validate = validation.validate_role_description(role_description)
     if not validate.ok:
-        return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, validate.args)
+        return common.response_validation_error(validate)
     validate = validation.validate_role_workspaces(workspaces)
     if not validate.ok:
-        return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, validate.args)
+        return common.response_validation_error(validate)
 
     db = DBconnector()
     private = db.get_organization_private(organization_id)
@@ -357,7 +387,13 @@ def role_update(body, organization_id, role_name):
 
     if r_cust_role.status_code == 404:
         globals.logger.debug(f"response:{r_cust_role.text}")
-        raise common.NotFoundException(None, f"404-{MSG_FUNCTION_ID}001", "ロールが存在しません(対象ID:{})".format(role_name))
+        message_id = f"404-{MSG_FUNCTION_ID}001"
+        message = multi_lang.get_text(
+            message_id,
+            "ロールが存在しません(対象ID:{0})",
+            role_name,
+        )
+        raise common.NotFoundException(message_id=message_id, message=message)
 
     elif r_cust_role.status_code != 200:
         globals.logger.debug(f"response:{r_cust_role.text}")

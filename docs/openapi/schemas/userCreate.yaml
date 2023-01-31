@@ -18,6 +18,12 @@ properties:
   username:
     type: string
     example: user-id
+  password:
+    type: string
+    example: password
+  password_temporary:
+    type: boolean
+    default: true
   email:
     type: string
     example: user e-mail address
@@ -25,13 +31,9 @@ properties:
     type: string
   lastName:
     type: string
-  credentials:
-    type: array
-    items:
-      $ref: "./userCredentials.yaml"
-  requiredActions:
-    $ref: "./userRequiredActions.yaml"
   enabled:
     type: boolean
+    default: true
 required:
   - username
+  - password

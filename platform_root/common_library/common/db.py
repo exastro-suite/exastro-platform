@@ -177,6 +177,9 @@ class DBconnector:
         """organization_private info
         """
 
+        organization_id: str
+        """organization_id"""
+
         user_token_client_clientid: str
         """XXX clientid"""
         user_token_client_id: str
@@ -196,7 +199,13 @@ class DBconnector:
         token_check_client_secret: str
         """system-XXX-auth secret"""
 
+        api_token_client_clientid: str
+        """_XXX-api clientid"""
+        api_token_client_id: str
+        """_XXX-api ID"""
+
         def __init__(self):
+            self.organization_id = ""
             self.user_token_client_clientid = ""
             self.user_token_client_id = ""
             self.internal_api_client_clientid = ""
@@ -205,6 +214,8 @@ class DBconnector:
             self.token_check_client_clientid = ""
             self.token_check_client_id = ""
             self.token_check_client_secret = ""
+            self.api_token_client_clientid = ""
+            self.api_token_client_id = ""
 
     def get_organization_private(self, organization_id) -> organization_private:
         """get organization_private informations
@@ -223,10 +234,11 @@ class DBconnector:
                 cursor.execute(self.SQL_ORGANIZATION_PRIVATE_INFO)
                 result = cursor.fetchone()
 
-                infoormations = result.get("INFORMATIONS")
-                json_dict = json.loads(infoormations)
+                informations = result.get("INFORMATIONS")
+                json_dict = json.loads(informations)
 
                 data = self.organization_private()
+                data.organization_id = organization_id
                 data.user_token_client_clientid = json_dict.get("USER_TOKEN_CLIENT_CLIENTID")
                 data.user_token_client_id = json_dict.get("USER_TOKEN_CLIENT_ID")
                 data.token_check_client_clientid = json_dict.get("TOKEN_CHECK_CLIENT_CLIENTID")
@@ -235,7 +247,8 @@ class DBconnector:
                 data.internal_api_client_clientid = json_dict.get("INTERNAL_API_CLIENT_CLIENTID")
                 data.internal_api_client_id = json_dict.get("INTERNAL_API_CLIENT_ID")
                 data.internal_api_client_secret = json_dict.get("INTERNAL_API_CLIENT_SECRET")
-
+                data.api_token_client_clientid = json_dict.get("API_TOKEN_CLIENT_CLIENTID")
+                data.api_token_client_id = json_dict.get("API_TOKEN_CLIENT_ID")
         return data
 
     class platform_private:
@@ -271,8 +284,8 @@ class DBconnector:
                 cursor.execute(self.SQL_PLATFORM_PRIVATE_INFO)
                 result = cursor.fetchone()
 
-                infoormations = result.get("INFORMATIONS")
-                json_dict = json.loads(infoormations)
+                informations = result.get("INFORMATIONS")
+                json_dict = json.loads(informations)
 
                 data = self.platform_private()
                 data.token_check_realm_id = json_dict.get("TOKEN_CHECK_REALM_ID")

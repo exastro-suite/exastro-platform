@@ -28,7 +28,7 @@ global:
       size: 10Gi
       volumeType: hostPath # e.g.) hostPath or AKS
       storageClass: "-" # e.g.) azurefile or - (None)
-      # matchLabels: 
+      # matchLabels:
       #   release: "stable"
       # matchExpressions:
       #   - {key: environment, operator: In, values: [dev]}
@@ -135,13 +135,15 @@ securityContext:
   runAsNonRoot: true
 
 service:
-  type: NodePort
+  type: ClusterIP
   http:
     name: http
     port: 8000
+    # nodePort: 30080
   httpMng:
     name: http-pf-mng
     port: 8001
+    # nodePort: 30081
 
 ingress:
   enabled: true

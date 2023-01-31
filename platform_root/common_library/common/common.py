@@ -19,6 +19,7 @@ import random
 import string
 import json
 from functools import wraps
+from typing import cast
 
 import globals
 from common_library.common import multi_lang
@@ -194,6 +195,20 @@ def response_200_ok(data):
     return response_status(status_code, data, "000-00000", "SUCCESS")
 
 
+def response_validation_error(validate):
+    """Validation error レスポンス Validation error response
+
+    Args:
+        validate (validation.result): 戻り値 return values
+
+    Returns:
+        response: HTTP Response
+    """
+    from common_library.common import validation
+    validate = cast(validation.result, validate)
+    return response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
+
+
 def response_status(status_code, data, message_id, base_message="", *args):
     """サーバーレスポンス共通 Server response common
 
@@ -211,7 +226,7 @@ def response_status(status_code, data, message_id, base_message="", *args):
         response: HTTP Response (HTTP-500)
     """
 
-    message = multi_lang.get_text(message_id, base_message, args)
+    message = multi_lang.get_text(message_id, base_message, *args)
 
     return jsonify({"result": message_id, "data": data, "message": message, "ts": datetime_to_str(datetime.now())}), status_code
 
@@ -299,6 +314,18 @@ def get_platform_client_id(organization_id):
     """
 
     return f"{organization_id}-workspaces"
+
+
+def get_api_token_client_id(organization_id):
+    """get api token client id
+
+    Args:
+        organization_id (str) : organization id
+
+    Returns:
+        str : api token client
+    """
+    return f"_{organization_id}-api"
 
 
 def get_username(fitstName, LastName, username):
@@ -444,3 +471,106 @@ def get_value_in_json(json, value_key, is_key=True):
         val_list = []
 
     return val_list
+
+
+def url_query_appending(query_str, append_str, append_value):
+    """url query string appending
+
+    Args:
+        query_str (str): query strings
+        append_str (str): append keyname
+        append_value (str): append value
+
+    Returns:
+        str: append query string
+    """
+
+    if query_str:
+        query_str += "&"
+    else:
+        query_str += "?"
+
+    query_str += f"{append_str}={append_value}"
+
+    return query_str
+
+
+def get_item(json_items, key_name, match_value):
+    """json項目から該当キーの値で一致している情報を取得する
+        Get information that matches the value of the corresponding key from the json item
+
+    Args:
+        json_items (dict): json
+        key_name (str): key name
+        match_value (str): match value
+
+    Returns:
+        dict: マッチしたJson item 、マッチしない場合はNone
+            the matched Json item, or None if not matched
+    """
+
+    for item in json_items:
+        if item[key_name] == match_value:
+            return item
+
+    return None
+
+
+def is_boolean(val):
+    """bool値判断 bool value judgement
+
+    Args:
+        val (obje): true/falseオブジェクト true/false object
+
+    Returns:
+        bool: True:boolean, False:not boolean
+    """
+    try:
+        # Exceptionで引っかかるときはすべてbool意外と判断
+        # When it gets caught in Exception, it is judged that boolean is unexpected
+        val_to_boolean(val)
+
+    except Exception:
+        return False
+    return True
+
+
+def val_to_boolean(val):
+    """bool値変換 bool value convert
+
+    Args:
+        val (obj): true/falseオブジェクト true/false object
+
+    Returns:
+        bool: bool value
+    """
+    # 値がbool値の場合は、そのまま返却する
+    # If the value is a bool value, return it as is
+    if type(val) == bool:
+        return val
+    elif type(val) == str:
+        if val.upper() == "TRUE":
+            return True
+        elif val.upper() == "FALSE":
+            return False
+        else:
+            raise TypeError
+    else:
+        raise TypeError
+
+
+def get_response_error_message(res):
+    """response textのエラーメッセージ取得
+
+    Args:
+        res (str): http response text
+
+    Returns:
+        str: error message value
+    """
+    try:
+        json_text = json.loads(res)
+
+        return json_text.get("errorMessage")
+    except Exception:
+        return None

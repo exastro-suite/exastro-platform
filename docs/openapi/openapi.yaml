@@ -17,14 +17,41 @@ openapi: 3.0.3
 info:
   title: Exastro Platform API
   description: Exastro Platform API
-  version: 1.1.0
+  version: 1.3.0
 
 servers:
-- url: /
+  - url: "https://{host}"
+    description: API endpoint
+    variables:
+      host:
+        default: localhost
+  - url: "http://{host}"
+    description: API endpoint
+    variables:
+      host:
+        default: localhost
+  - url: "{protocol}://{host}:{port}"
+    description: API endpoint (Development)
+    variables:
+      protocol:
+        enum:
+          - http
+          - https
+        default: https
+      host:
+        default: localhost
+      port:
+        default: '30080'
 
 tags:
 - name: OrganizationService
   description: オーガナイゼーションに関する操作
+- name: TokenService
+  description: tokenに関する操作
+- name: PlanService
+  description: プランに関する操作
+- name: UsageService
+  description: リソース使用量に関する操作
 - name: WorkspaceService
   description: ワークスペースに関する操作
 - name: UsersService
@@ -35,6 +62,8 @@ tags:
   description: ロール・マッピングに関する操作
 - name: InternalCommonService
   description: 共通(内部用)
+- name: InternalPlanService
+  description: プランに関する操作(内部用)
 - name: InternalUsersService
   description: ユーザーに関する操作(内部用)
 - name: InternalWorkspaceService
@@ -43,6 +72,29 @@ tags:
 paths:
   "/api/platform/organizations":
       $ref: './paths/organizations.yaml'
+  "/api/{organization_id}/platform/setting":
+      $ref: './paths/organization.setting.yaml'
+
+  "/auth/realms/{organization_id}/protocol/openid-connect/token":
+      $ref: './paths/protocol.openid-connect.token.yaml'
+  "/api/{organization_id}/platform/users/_current/refresh_tokens":
+      $ref: './paths/user.current.refresh_tokens.yaml'
+
+  "/api/platform/{organization_id}/plans":
+      $ref: './paths/plans.organizations.yaml'
+  "/api/platform/{organization_id}/plans/{plan_start_datetime}":
+      $ref: './paths/plans.organizations.plan_start_datetime.yaml'
+  "/api/platform/plans":
+      $ref: './paths/plans.yaml'
+  "/api/platform/plan_items":
+      $ref: './paths/plan_items.yaml'
+  "/api/{organization_id}/platform/limits":
+      $ref: './paths/plans.organizations.limits.yaml'
+
+  "/api/platform/usages":
+      $ref: './paths/usages.yaml'
+  "/api/{organization_id}/platform/usages":
+      $ref: './paths/usages.organizations.yaml'
 
   "/api/{organization_id}/platform/workspaces":
       $ref: './paths/workspaces.yaml'
@@ -62,6 +114,11 @@ paths:
   "/api/{organization_id}/platform/roles/{role_name}/users":
       $ref: './paths/roles.role_name.users.yaml'
 
+  "/internal-api/{organization_id}/platform/limits":
+      $ref: './paths/internal_plans.organizations.limits.yaml'
+  "/internal-api/platform/limits":
+      $ref: './paths/internal_plan.limits.yaml'
+
   "/internal-api/{organization_id}/platform/workspaces/{workspace_id}/roles":
       $ref: './paths/internal_workspaces.workspace_id.roles.yaml'
   "/internal-api/{organization_id}/platform/workspaces/{workspace_id}/users":
@@ -75,3 +132,22 @@ paths:
 components:
   schemas:
     $ref: './schemas/_schemas.yaml'
+
+  securitySchemes:
+    BearerAuth:
+      description: Credentials or access token for API
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    BasicAuth:
+      description: Value converted from ID/Password in base64
+      type: http
+      scheme: basic
+
+  responses:
+    UnauthorizedError:
+      description: Access token is missing or invalid
+
+security:
+- BearerAuth: []
+- BasicAuth: []

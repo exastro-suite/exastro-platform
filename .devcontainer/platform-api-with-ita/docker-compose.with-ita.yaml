@@ -20,6 +20,13 @@ services:
       - ITA_API_ADMIN_PORT=8079
       - NO_PROXY=localhost,127.0.0.1,keycloak,platform-auth,platform-api,platform-web,ita-web,ita-api,ita-api-organization,ita-api-admin
       - no_proxy=localhost,127.0.0.1,keycloak,platform-auth,platform-api,platform-web,ita-web,ita-api,ita-api-organization,ita-api-admin
+  ita-init-containers:
+    # busybox:latest を使用してしまうと、backyard系の処理が含まれてしまうため別イメージに変えている。
+    # docker-compose.with-ita.by-disable.yaml で使用している busybox:latestを、devcontainerが統合してしまうのだろうとおもう
+    image: busybox:stable
+    volumes:
+      - ../.volumes/storage:/storage
+    command: "sh -c 'chmod 777 /storage'"
   ita-api-organization:
     build:
       context: ${ITA_REPO_ROOT}
@@ -30,7 +37,6 @@ services:
     build:
       context: ${ITA_REPO_ROOT}
       target: develop_build
-    command: "bash -c 'sudo chmod 777 /storage && httpd -D FOREGROUND'"
     volumes:
       - ../.volumes/storage:/storage
   ita-web-server:
@@ -45,16 +51,52 @@ services:
   ita-by-ansible-execute:
     build:
       context: ${ITA_REPO_ROOT}
+    environment:
+      - EXECUTE_INTERVAL=${ITA_BY_INTERVAL}
 
   ita-by-ansible-legacy-role-vars-listup:
     build:
       context: ${ITA_REPO_ROOT}
+    environment:
+      - EXECUTE_INTERVAL=${ITA_BY_INTERVAL}
+  ita-by-ansible-legacy-vars-listup:
+    build:
+      context: ${ITA_REPO_ROOT}
+    environment:
+      - EXECUTE_INTERVAL=${ITA_BY_INTERVAL}
+  ita-by-ansible-pioneer-vars-listup:
+    build:
+      context: ${ITA_REPO_ROOT}
+    environment:
+      - EXECUTE_INTERVAL=${ITA_BY_INTERVAL}
+
   ita-by-ansible-towermaster-sync:
     build:
       context: ${ITA_REPO_ROOT}
+    environment:
+      - EXECUTE_INTERVAL=${ITA_BY_INTERVAL}
+  ita-by-collector:
+    build:
+      context: ${ITA_REPO_ROOT}
+    environment:
+      - EXECUTE_INTERVAL=${ITA_BY_INTERVAL}
   ita-by-conductor-synchronize:
     build:
       context: ${ITA_REPO_ROOT}
+    environment:
+      - EXECUTE_INTERVAL=${ITA_BY_INTERVAL}
   ita-by-menu-create:
     build:
       context: ${ITA_REPO_ROOT}
+    environment:
+      - EXECUTE_INTERVAL=${ITA_BY_INTERVAL}
+  ita-by-menu-export-import:
+    build:
+      context: ${ITA_REPO_ROOT}
+    environment:
+      - EXECUTE_INTERVAL=${ITA_BY_INTERVAL}
+  ita-by-excel-export-import:
+    build:
+      context: ${ITA_REPO_ROOT}
+    environment:
+      - EXECUTE_INTERVAL=${ITA_BY_INTERVAL}

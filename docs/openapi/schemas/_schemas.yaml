@@ -18,12 +18,44 @@ responseStat:
   $ref: "./responseStat.yaml"
 runtimeError:
   $ref: "./runtimeError.yaml"
+organization:
+  $ref: "./organization.yaml"
 organizationCreate:
   $ref: "./organizationCreate.yaml"
+organizationUserCreate:
+  $ref: "./organizationUserCreate.yaml"
+organizationList:
+  $ref: "./organizationList.yaml"
+organizationSetting:
+  $ref: "./organizationSetting.yaml"
+planMappingOrganization:
+  $ref: "./planMappingOrganization.yaml"
+planMappingOrganizationList:
+  $ref: "./planMappingOrganizationList.yaml"
+plan:
+  $ref: "./plan.yaml"
+planList:
+  $ref: "./planList.yaml"
+planItem:
+  $ref: "./planItem.yaml"
+planItemList:
+  $ref: "./planItemList.yaml"
+limits:
+  $ref: "./limits.yaml"
+limitsList:
+  $ref: "./limitsList.yaml"
+usage:
+  $ref: "./usage.yaml"
+usageList:
+  $ref: "./usageList.yaml"
+usageOrganizationList:
+  $ref: "./usageOrganizationList.yaml"
 role:
   $ref: "./role.yaml"
 roleList:
   $ref: "./roleList.yaml"
+usernameOnly:
+  $ref: "./usernameOnly.yaml"
 user:
   $ref: "./user.yaml"
 userList:
@@ -62,3 +94,11 @@ roleMappingUser:
   $ref: "./roleMappingUser.yaml"
 roleUser:
   $ref: "./roleUser.yaml"
+tokenRequestBody:
+  $ref: "./tokenRequestBody.yaml"
+tokenResponseOK:
+  $ref: "./tokenResponseOK.yaml"
+tokenResponseError:
+  $ref: "./tokenResponseError.yaml"
+tokenRefreshList:
+  $ref: "./tokenRefreshList.yaml"

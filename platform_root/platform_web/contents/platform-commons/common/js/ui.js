@@ -28,16 +28,16 @@ class CommonUi {
 */
 constructor() {
     const ui = this;
-    
+
     // Debug mode menu name
     ui.debugModeName = '__debug__';
-    
+
     // Common parameter
     ui.params = {};
-    ui.params.dir = '/_/ita';    
+    ui.params.dir = '/_/ita';
     ui.params.path = fn.getPathname();
     ui.params.menuNameRest = fn.getParams().menu;
-    
+
     // Start ui
     ui.setUi();
 }
@@ -48,7 +48,7 @@ constructor() {
 */
 setUi() {
     const ui = this;
-  
+
     // jQuery cacch
     ui.$ = {};
     ui.$.window = $( window ),
@@ -57,7 +57,7 @@ setUi() {
     ui.$.header = $('#header');
     ui.$.menu = $('#menu');
     ui.$.content = $('#content');
-        
+
     // Set common events
     fn.setCommonEvents();
     ui.header();
@@ -75,23 +75,23 @@ setUi() {
     // if ( ui.params.menuNameRest && ui.params.menuNameRest !== ui.debugModeName ) {
     //     restApiUrls.push(`/menu/${ui.params.menuNameRest}/info/`);
     // }
-    
+
     // fn.fetch( restApiUrls ).then(function( result ){
     //     if ( result ) {
     //         ui.rest = {};
     //         ui.rest.user = result[0],
     //         ui.rest.menuGroups = result[1].menu_groups,
     //         ui.rest.panel = result[2];
-            
+
     //         ui.sideMenu();
     //         ui.header();
-            
+
     //         if ( result[3] ) {
     //             ui.rest.info = result[3];
-                
+
     //             // 権限フラグ
     //             ui.flag = fn.editFlag( ui.rest.info.menu_info );
-                
+
     //             // sheet_typeによって分ける
     //             switch ( ui.rest.info.menu_info.sheet_type ) {
     //                 case undefined:
@@ -155,7 +155,7 @@ setUi() {
 
 header() {
     const ui = this;
-    
+
     // ui.topicPath();
     ui.headerMenu();
 }
@@ -177,7 +177,7 @@ topicPath() {
         topics.push({ href: `${ui.params.path}?menu=${ui.currentSecondaryGroup.link}`, title: ui.currentSecondaryGroup.title });
         title.push( ui.currentSecondaryGroup.title );
     }
-    
+
     const list = [];
     if ( topics.length ) {
         for ( const topic of topics ) {
@@ -187,14 +187,14 @@ topicPath() {
     } else {
         list.push(`<li class="topichPathItem"><span class="topichPathCurrent">${WD.UI.MainMenu}</span></li>`);
     }
-    
+
     const html = `
     <ol class="topichPathList">
         ${list.join('')}
     </ol>`;
-    
+
     ui.$.header.find('.topicPath').html( html );
-    
+
     title.push('Exastro IT Automation');
     document.title = title.join(' / ');
 }
@@ -210,13 +210,13 @@ headerMenu() {
     <ul class="headerMenuList">
         <li class="userInfomation headerMenuItem">${ui.userInfo()}</li>
     </ul>`;
-    
+
     ui.$.header.find('.headerMenu').html( html );
-    
+
     ui.$.header.find('.headerMenuButton').on('click', function(){
         const $button = $( this ),
               $userInfo = $button.next('.userInfoContainer');
-        
+
         if ( $userInfo.is('.open') ) {
             $userInfo.removeClass('open');
         } else {
@@ -229,15 +229,20 @@ headerMenu() {
             });
         }
     });
-    
+
     // ワークスペース切替
     // ui.$.header.find('.userInfoWorkspaceButton').on('click', function(){
     //     const workspaceId =  $( this ).attr('data-workspace');
-    //     window.location.href = fn.getWorkspaceChangeUrl( workspaceId );        
+    //     window.location.href = fn.getWorkspaceChangeUrl( workspaceId );
     // });
-    
+
+    // アカウント管理
+    ui.$.header.find('.userInfoMenuButton[data-type=account]').on('click', function(){
+        window.location.href = location_conf.href.account.main_page.replace(/{organization_id}/g, CommonAuth.getRealm());
+    });
+
     // ログアウト
-    ui.$.header.find('.userInfoMenuButton').on('click', function(){
+    ui.$.header.find('.userInfoMenuButton[data-type=logout]').on('click', function(){
         // CommonAuth.logout({ redirectUri: ui.params.path });
         CommonAuth.logout();
     });
@@ -266,7 +271,7 @@ userInfo() {
     //         + `<button class="userInfoWorkspaceButton" data-workspace="${work}">${work}</button>`
     //     + `</li>`);
     // }
-    
+
     const roleList = [];
     if( roles.length === 0 ) {
         roleList.push(`<li class="userinfoRoleItem">`
@@ -279,7 +284,7 @@ userInfo() {
             + `</li>`);
         }
     }
-    
+
     return `
     <button class="headerMenuButton">
         <span class="icon icon-user"></span>
@@ -293,7 +298,10 @@ userInfo() {
             </div>
         </div>
         <div class="userInfoBlock userInfoRole">
-            <div class="userInfoTitle">ロール一覧</div>
+            <div class="userInfoTitle">
+                <span class=" icon icon-role"></span>
+                ロール一覧
+            </div>
             <div class="userInfoBody">
                 <ul class="userInfoRoleList">
                     ${roleList.join('')}
@@ -304,13 +312,19 @@ userInfo() {
             <div class="userInfoBody">
                 <ul class="userInfoMenuList">
                     <li class="userInfoMenuItem">
-                        ${fn.html.button('ログアウト', ['userInfoMenuButton', 'itaButton'], { type: 'logout', action: 'positive'})}
+                        ${fn.html.button(fn.html.icon('gear') + 'アカウント管理', ['userInfoMenuButton', 'itaButton'], { type: 'account', action: 'default'})}
                     </li>
-                </div>
+                </ul>
+
+                <ul class="userInfoMenuList">
+                    <li class="userInfoMenuItem">
+                        ${fn.html.button(fn.html.icon('logout') + 'ログアウト', ['userInfoMenuButton', 'itaButton'], { type: 'logout', action: 'positive'})}
+                    </li>
+                </ul>
             </div>
         </div>
     </div>`;
-} 
+}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -320,34 +334,34 @@ userInfo() {
 
 sideMenu() {
     const ui = this;
-    
+
     const menus = [
         { name: 'menuMain', icon: 'menuList'},
         { name: 'menuGroup', icon: 'menuGroup'},
         { name: 'menuFavorite', icon: 'star'},
         { name: 'menuHistory', icon: 'history'}
     ];
-    
+
     // Menu tab
     ui.menuTab = fn.storage.get('menuTab');
     if ( !ui.menuTab || ui.menuTab === '#menuGroup') ui.menuTab = '#menuMain';
-    
+
     // Secondary(Child) menu
     ui.menuSecondaryToggleSpeed = 300;
     ui.menuSecondary = fn.storage.get('subMenuOpen');
     if ( !ui.menuSecondary ) ui.menuSecondary = [];
-    
+
     // メニュー構造作成
     ui.createMenuGroupList();
-    
+
     const tab = [],
           body = [];
-    
+
     for ( const menu of menus ) {
         tab.push(`<li class="menuTabItem"><a class="menuTabLink" href="#${menu.name}"><span class="icon icon-${menu.icon}"></span></a></li>`);
         body.push(`<div class="menuBlock" id="${menu.name}">${ui[ menu.name ]()}</div>`);
     }
-    
+
     ui.$.menu.html(`
     <div class="menuHeader">
         <div class="menuTab">
@@ -362,23 +376,23 @@ sideMenu() {
     <div class="menuBody">
         ${body.join('')}
     </div>`);
-    
+
     // Menu tab event
     ui.$.menu.find(`.menuTabLink[href="${ui.menuTab}"]`).addClass('tabOpen').attr('tabindex', -1 );
     ui.$.menu.find( ui.menuTab ).addClass('tabOpen');
-    
+
     ui.$.menu.find('.menuTabLink').on('click', function( e ){
         e.preventDefault();
-        
+
         const $link = $( this );
         ui.menuTab = $link.attr('href');
         ui.$.menu.find('.tabOpen').removeClass('tabOpen').removeAttr('tabindex');
         $link.addClass('tabOpen').attr('tabindex', -1 );
         $( ui.menuTab ).addClass('tabOpen');
         fn.storage.set('menuTab', ui.menuTab );
-        
+
     });
-    
+
     // Menu toggle
     ui.$.menu.find('.menuToggleButton').on('click', function( e ){
         if ( !ui.$.menu.is('.close') ) {
@@ -387,15 +401,15 @@ sideMenu() {
             ui.$.menu.removeClass('close');
         }
     });
-    
+
     // Menu accordion
     ui.$.menu.find('.menuSecondaryToggleButton').on('click', function( e ){
         e.preventDefault();
-        
+
         const $button = $( this ),
               menuId = $button.attr('data-id'),
               $menu = $button.next('.menuSecondaryList');
-        
+
         if ( $button.is('.open') ) {
             $button.removeClass('open');
             $menu.stop(0,0).slideUp( ui.menuSecondaryToggleSpeed );
@@ -415,15 +429,15 @@ sideMenu() {
 */
 createMenuGroupList() {
     const ui = this;
-    
-    // メニューグループリストの作成    
+
+    // メニューグループリストの作成
     ui.menuGroupList = [];
     ui.currentMenuGroupList = null;
     const childs = [];
-    
+
     // 配列のディープコピー
     const tempMenuGroups = $.extend( true, [], ui.rest.menuGroups );
-    
+
     // 親と子を分ける
     for ( const menuGroup of tempMenuGroups ) {
         if ( menuGroup.parent_id === null ) {
@@ -432,7 +446,7 @@ createMenuGroupList() {
             childs.push( menuGroup );
         }
     }
-    
+
     // 親に子を追加（開いているメニュー・各メインメニュー・カレントチェック）
     for ( const parent of ui.menuGroupList ) {
         for ( const child of childs ) {
@@ -456,7 +470,7 @@ createMenuGroupList() {
             }
         }
         ui.dispSeqSort( parent.menus );
-  
+
         parent.main_menu_rest = null;
         let subRest = null;
         for ( const menu of parent.menus ) {
@@ -481,11 +495,11 @@ createMenuGroupList() {
 */
 sideMenuBody( title, icon, list, panel ) {
     const ui = this;
-    
+
     const iconImage = ( fn.cv( panel, false ) )?
         `<img class="menuTitleIconImage" src="data:;base64,${panel}" alt="${title}">`:
         `<span class="icon icon-${icon}"></span>`;
-    
+
     return `
     <div class="menuTitle">
         <div class="menuTitleIcon">
@@ -508,8 +522,8 @@ sideMenuBody( title, icon, list, panel ) {
 ##################################################
 */
 menuMain() {
-    const ui = this;    
-    
+    const ui = this;
+
     if ( ui.params.menuNameRest && ui.currentMenuGroupList ) {
         const menuGroupName = fn.cv( ui.currentMenuGroupList.menu_group_name, '', true ),
               menuGroupPanel = fn.cv( ui.rest.panel[ ui.currentMenuGroupList.id ], ''),
@@ -589,7 +603,7 @@ menuMain() {
 */
 menuGroup(){
     const ui = this;
-    
+
     const list = [];
     for ( const menuGroup of ui.menuGroupList ) {
         if ( menuGroup.parent_id === null ) {
@@ -597,7 +611,7 @@ menuGroup(){
             list.push(`<li class="menuItem"><a class="menuLink" href="${ui.params.path}?menu=${menuGroup.main_menu_rest}">${title}</a></li>`);
         }
     }
-    
+
     return ui.sideMenuBody( WD.UI.MenuGroup, 'menuGroup', list.join(''));
 }
 /*
@@ -681,17 +695,17 @@ commonContainer( title, info, body ) {
 */
 contentTab( list ) {
     const ui = this;
-    
+
     const tab = [],
           section = [];
-    
+
     for ( const item of list ) {
         tab.push(`<li class="contentMenuItem"><a class="contentMenuLink" href="#${item.name}"><span class="inner">${item.title}</span></a></li>`);
-        
+
         const sectionBody = ( item.type !== 'blank' )? ui[item.name](): '';
         section.push(`<section class="section" id="${item.name}"><div class="sectionBody">${sectionBody}</div></section>`);
     }
-    
+
     return `
     <div class="contentMenu">
         <ul class="contentMenuList">
@@ -707,13 +721,13 @@ contentTab( list ) {
 */
 contentTabEvent( openTab = '#dataList') {
     const ui = this;
-    
+
     ui.$.content.find(`.contentMenuLink[href="${openTab}"]`).addClass('tabOpen').attr('tabindex', -1 );
     ui.$.content.find( openTab ).addClass('tabOpen');
-    
+
     ui.$.content.find('.contentMenuLink').on('click', function( e ){
         e.preventDefault();
-        
+
         const $link = $( this ),
               tab = $link.attr('href');
         ui.$.content.find('.tabOpen').removeClass('tabOpen').removeAttr('tabindex');
@@ -724,12 +738,12 @@ contentTabEvent( openTab = '#dataList') {
 // 指定のタブを開く
 contentTabOpen( openTab ) {
     const ui = this;
-    
+
     const $link = ui.$.content.find(`.contentMenuLink[href="${openTab}"]`);
-    
+
     ui.$.content.find('.tabOpen').removeClass('tabOpen').removeAttr('tabindex');
     $link.addClass('tabOpen').attr('tabindex', -1 );
-    
+
     ui.$.content.find(`.contentMenuLink[href="${openTab}"]`).addClass('tabOpen').attr('tabindex', -1 );
     ui.$.content.find( openTab ).addClass('tabOpen');
 }
@@ -751,7 +765,7 @@ mainMenu() {
 
 debugMenu() {
     const ui = this;
-    
+
     const contentTab = [
         { name: 'GET', title: 'GET', type: 'blank' },
         { name: 'POST', title: 'POST', type: 'blank' },
@@ -759,13 +773,13 @@ debugMenu() {
 
     ui.$.content.html( ui.commonContainer('REST API Tester', 'Check REST API.', ui.contentTab( contentTab ) ) );
     ui.contentTabEvent('#GET');
-    
+
     ui.$.content.find('#GET .sectionBody').html(`
     <div class="debugContainer">
         <div class="debugHeader">${fn.html.inputText('', '', 'getUrl', '', { before: '/api/{organization_id}/workspaces/{workspace_id}/ita'})}</div>
         <div class="debugBody">${fn.html.textarea( null, '', 'getResult')}</div>
     </div>`);
-    
+
     $('#getUrl').on('change', function(){
         const value = $( this ).val();
         fn.fetch( value ).then(function( result ){
@@ -784,38 +798,38 @@ debugMenu() {
 
 defaultMenu() {
     const ui = this;
-    
+
     const contentTab = [
         { name: 'dataList', title: WD.UI.List, type: 'blank' },
         { name: 'changeHistory', title: WD.UI.ChangeHistory, type: 'blank' },
         { name: 'dataDownload', title: WD.UI.AllDownload }
     ];
-    
+
     const title = ui.currentPage.title,
           menuInfo = fn.cv( ui.rest.info.menu_info.menu_info, '');
-    
+
     ui.$.content.html( ui.commonContainer( title, menuInfo, ui.contentTab( contentTab ) ) );
     ui.contentTabEvent('#dataList');
-    
+
     // 一覧
     const $dataList = ui.$.content.find('#dataList');
     ui.mainTable = new DataTable('MT', 'view', ui.rest.info, ui.params );
     $dataList.find('.sectionBody').html( ui.mainTable.setup() );
-    
+
     // 履歴
     const $history = ui.$.content.find('#changeHistory');
     ui.historyTable = new DataTable('HT', 'history', ui.rest.info, ui.params );
     $history.find('.sectionBody').html( ui.historyTable.setup() );
-    
+
     // 全件ダウンロード・ファイル一括登録
     const $download = ui.$.content.find('#dataDownload');
     $download.find('.operationButton').on('click', function(){
         const $button = $( this ),
               type = $button.attr('data-type');
-        
+
         const downloadFile = function( type, url, fileName ){
             $button.prop('disabled', true );
-            
+
             fn.fetch( url ).then(function( result ){
                 fn.download( type, result, fileName );
                 fn.disabledTimer( $button, false, 1000 );
@@ -824,7 +838,7 @@ defaultMenu() {
                 location.replace('system_error/');
             });
         };
-        
+
         switch ( type ) {
             case 'allDwonloadExcel':
                 downloadFile('excel', `/menu/${ui.params.menuNameRest}/excel/`, ui.currentPage.title + '_all');
@@ -846,19 +860,19 @@ defaultMenu() {
             break;
         }
     });
-    
+
     // 一覧 個別履歴ボタン
     ui.mainTable.$.container.on('click', '.tBodyRowMenuUi', function(){
         const $button = $( this ),
               uuid = $button.attr('data-id');
-        
+
         ui.contentTabOpen('#changeHistory');
         $history.find('.tableHeaderMainMenuInput').val( uuid ).trigger('input');
-        
+
         ui.historyTable.$.header.find('.itaButton').prop('disabled', false );
         ui.historyTable.workStart('filter');
         ui.historyTable.workerPost('history', uuid );
-        
+
     });
 }
 /*
@@ -871,18 +885,18 @@ dataDownload() {
         { title: WD.UI.AllDownloadExcel, description: WD.UI.AllDownloadExcelText, type: 'allDwonloadExcel'},
         { title: WD.UI.AllDownloadJson, description: WD.UI.AllDownloadJsonText, type: 'allDwonloadJson'}
     ];
-    
+
     if ( this.flag.insert ) {
         list.push({ title: WD.UI.NewDownloadExcel, description: WD.UI.NewDownloadExcelText, type: 'newDwonloadExcel'});
-    } 
-    
+    }
+
     list.push({ title: WD.UI.AllDownloadHistoryExcel, description: WD.UI.AllDownloadHistoryExcelText, type: 'allHistoryDwonloadExcel'});
-    
+
     if ( this.flag.edit ) {
         list.push({ title: WD.UI.ExcelUpload, description: WD.UI.ExcelUploadText, type: 'excelUpload', action: 'positive'});
         list.push({ title: WD.UI.JsonUpload, description: WD.UI.JsonUploadText, type: 'jsonUpload', action: 'positive'});
     }
-    
+
     const html = [];
     for ( const item of list ) {
         const attr = { type: item.type };
@@ -892,7 +906,7 @@ dataDownload() {
             + `<div class="operationDescription">${item.description}</div>`
         + `</div>`);
     }
-    
+
     return html.join('');
 }
 /*
@@ -902,28 +916,28 @@ dataDownload() {
 */
 fileRegister( $button, type ) {
     const ui = this;
-    
+
     const fileType = ( type === 'excel')? 'base64': 'json',
           fileMime = ( type === 'excel')? 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'application/json',
           restUrl = ( type === 'excel')? `excel/maintenance/`: `maintenance/all/`;
-    
+
     // ボタンを無効
     $button.prop('disabled', true );
-    
+
     // ファイル選択
     fn.fileSelect( fileType, null, fileMime ).then(function( selectFile ){
         const postData = ( type === 'excel')? { excel: selectFile.base64 }: selectFile.json;
-        
+
         // 登録するか確認する
         const buttons = {
             ok: { text: '一括登録開始', action: 'positive'},
             cancel: { text: 'キャンセル', action: 'normal'}
         };
-        
+
         const table = { tbody: []};
         table.tbody.push(['ファイルネーム', selectFile.name ]);
         table.tbody.push(['ファイルサイズ', selectFile.size.toLocaleString() + ' byte']);
-        
+
         if ( fileType === 'json') {
             try {
                 table.tbody.push(['件数', selectFile.json.length.toLocaleString() ]);
@@ -931,12 +945,12 @@ fileRegister( $button, type ) {
                 throw new Error('JSONの形式が正しくありません。');
             }
         }
-        
+
         fn.alert('一括登録確認', fn.html.table( table, 'fileSelectTable', 1 ), 'confirm', buttons ).then( function( flag ){
             if ( flag ) {
-            
+
                 const processing = fn.processingModal('一括登録処理中');
-                
+
                 // POST（登録）
                 fn.fetch(`/menu/${ui.params.menuNameRest}/${restUrl}`, null, 'POST', postData ).then(function( result ){
                     // 登録成功
@@ -973,12 +987,12 @@ fileRegister( $button, type ) {
 
 createMenu( mode ) {
     const ui = this;
-    
+
     const assets = [
         { type: 'js', url: '/_/ita/js/create_menu.js'},
         { type: 'css', url: '/_/ita/css/create_menu.css'}
     ];
-    
+
     fn.loadAssets( assets ).then(function(){
         const createMenu = new CreateMenu('#content');
         createMenu.setup();
@@ -993,13 +1007,13 @@ createMenu( mode ) {
 
 condcutor( mode ) {
     const ui = this;
-    
+
     const assets = [
         { type: 'js', url: '/_/ita/js/conductor.js'},
         { type: 'css', url: '/_/ita/css/editor_common.css'},
         { type: 'css', url: '/_/ita/css/conductor.css'}
     ];
-    
+
     fn.loadAssets( assets ).then(function(){
         const conductor = new Conductor('#content', mode );
         conductor.setup();

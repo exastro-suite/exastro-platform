@@ -16,17 +16,22 @@
 import os
 import requests
 
+from common_library.common import common
+
 # User Imports
 import globals  # 共通的なglobals Common globals
 
 
-def clients_roles_get(realm_name, client_id, token, briefRepresentation=True):
+def clients_roles_get(realm_name, client_id, token, briefRepresentation=True, first=None, max=None, search=None):
     """client ロール取得 client roles get
     Args:
         realm_name (str): realm name
         client_id (str): client id (not client-id)
         toekn (str): token
         briefRepresentation (bool): True:brief   False:All
+        first (int): get data numner
+        max (int): get max count
+        search (str): search words of rolename
     Returns:
         Response: HTTP Respose (success : .status_code=200)
     """
@@ -44,14 +49,20 @@ def clients_roles_get(realm_name, client_id, token, briefRepresentation=True):
     # ロールの詳細取得有無の設定
     # Setting whether to acquire role details
     add_query = ""
-    if not briefRepresentation:
-        if add_query:
-            add_query += "&"
-        else:
-            add_query += "?"
-        add_query += f"briefRepresentation={briefRepresentation}"
 
-    globals.logger.debug("client roles get")
+    if not briefRepresentation:
+        add_query = common.url_query_appending(add_query, "briefRepresentation", briefRepresentation)
+
+    if first:
+        add_query = common.url_query_appending(add_query, "first", first)
+
+    if max:
+        add_query = common.url_query_appending(add_query, "max", max)
+
+    if search:
+        add_query = common.url_query_appending(add_query, "search", search)
+
+    globals.logger.debug(f"client roles get query:{add_query}")
     # 情報取得
     # information acquisition
     request_response = requests.get(f"{api_url}/auth/admin/realms/{realm_name}/clients/{client_id}/roles{add_query}", headers=header_para)
@@ -359,13 +370,15 @@ def user_role_get(realm_name, user_id, client_id, token):
     return request_response
 
 
-def role_uesrs_get(realm_name, client_id, role_name, token):
+def role_uesrs_get(realm_name, client_id, role_name, token, first=0, max=100):
     """ロール毎のユーザ情報リスト取得 get user info list for each role
     Args:
         realm_name (str): realm name
         client_id (str): client id
         role_name (str): role name
         token (str): token
+        first (int): first result to return
+        max (int): maximum number of results to return
     Returns:
         Response: HTTP Respose (success : .status_code=200 / notfound : .status_code=404)
     """
@@ -382,7 +395,7 @@ def role_uesrs_get(realm_name, client_id, role_name, token):
     # 呼び出し先設定 call destination setting
     api_url = "{}://{}:{}".format(os.environ['API_KEYCLOAK_PROTOCOL'], os.environ['API_KEYCLOAK_HOST'], os.environ['API_KEYCLOAK_PORT'])
     request_response = requests.get(
-        "{}/auth/admin/realms/{}/clients/{}/roles/{}/users".format(api_url, realm_name, client_id, role_name),
+        "{}/auth/admin/realms/{}/clients/{}/roles/{}/users?first={}&max={}".format(api_url, realm_name, client_id, role_name, first, max),
         headers=header_para
     )
     # globals.logger.debug(request_response.text)

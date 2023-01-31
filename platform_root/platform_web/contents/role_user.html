@@ -22,26 +22,26 @@
         <title>
             ロール付与・解除 / ロール管理 / Exastro Platform
         </title>
-        <link rel="stylesheet" href="/_/platform-commons/css/platform.css">
+        <link rel="stylesheet" href="/_/platform-commons/css/platform.css?ver=__BUILD_VERSION__">
 
-        <script type="text/javascript" src="/auth/js/keycloak.js"></script>
-        <script type="text/javascript" src="/_/common-auth/js/exastro-common-auth-config.js"></script>
-        <script type="text/javascript" src="/_/common-auth/js/exastro-common-auth.js"></script>
-        <script src="/_/platform-commons/common/js/jquery.js"></script>
+        <script type="text/javascript" src="/auth/js/keycloak.js?ver=__BUILD_VERSION__"></script>
+        <script type="text/javascript" src="/_/common-auth/js/exastro-common-auth-config.js?ver=__BUILD_VERSION__"></script>
+        <script type="text/javascript" src="/_/common-auth/js/exastro-common-auth.js?ver=__BUILD_VERSION__"></script>
+        <script src="/_/platform-commons/common/js/jquery.js?ver=__BUILD_VERSION__"></script>
 
-        <link rel="stylesheet" href="/_/platform-commons/css/custom_properties.css">
-        <link rel="stylesheet" href="/_/platform-commons/css/common.css">
-        <link rel="stylesheet" href="/_/platform-commons/css/dialog.css">
+        <link rel="stylesheet" href="/_/platform-commons/css/custom_properties.css?ver=__BUILD_VERSION__">
+        <link rel="stylesheet" href="/_/platform-commons/css/common.css?ver=__BUILD_VERSION__">
+        <link rel="stylesheet" href="/_/platform-commons/css/dialog.css?ver=__BUILD_VERSION__">
 
-        <script src="/_/platform-commons/common/js/words.js"></script>
-        <script src="/_/platform-commons/common/js/common.js"></script>
-        <script src="/_/platform-commons/common/js/table.js"></script>
-        <script src="/_/platform-commons/common/js/dialog.js"></script>
-        <script src="/_/platform-commons/common/js/ui.js"></script>
+        <script src="/_/platform-commons/common/js/words.js?ver=__BUILD_VERSION__"></script>
+        <script src="/_/platform-commons/common/js/common.js?ver=__BUILD_VERSION__"></script>
+        <script src="/_/platform-commons/common/js/table.js?ver=__BUILD_VERSION__"></script>
+        <script src="/_/platform-commons/common/js/dialog.js?ver=__BUILD_VERSION__"></script>
+        <script src="/_/platform-commons/common/js/ui.js?ver=__BUILD_VERSION__"></script>
 
-        <script src="/_/platform-commons/js/platform_common.js"></script>
-        <script src="/_/platform-commons/js/uri_conf.js"></script>
-        <script src="/_/platform-commons/js/role_user.js"></script>
+        <script src="/_/platform-commons/js/platform_common.js?ver=__BUILD_VERSION__"></script>
+        <script src="/_/platform-commons/js/uri_conf.js?ver=__BUILD_VERSION__"></script>
+        <script src="/_/platform-commons/js/role_user.js?ver=__BUILD_VERSION__"></script>
 
     </head>
     <body>
@@ -96,46 +96,74 @@
                             <section class="section tabOpen" id="dataList">
                                 <div class="sectionBody">
                                     <div id="MT" class="tableContainer viewTable">
+                                        <div class="tableHeader">
+                                            <ul class="tableHeaderMainMenuList">
+                                                <li class="operationMenuItem">
+                                                    <button title="付与" id="button_append_modal_open" data-action="positive" class="itaButton tableHeaderMainMenuButton button" style="width:200px;">
+                                                        <span class="inner">
+                                                            <span class="iconButtonIcon icon icon-plus"></span>
+                                                            <span class="iconButtonBody">付与</span>
+                                                        </span>
+                                                    </button>
+                                                </li>
+                                            </ul>
+                                        </div>
+
                                         <div class="tableBody">
-                                            <table class="table" width="100%" id="user_list">
+                                            <table class="table" width="100%" id="role_user_list">
                                                 <thead class="thead">
                                                     <tr class="tHeadTr tr">
-                                                        <th data-id="c1" class="tHeadLeftSticky tHeadTh popup th" rowspan="1" colspan="1" }="" title="選択" width="80px;"><div class="ci">変更前</div></th>
-                                                        <th data-id="c2" class="tHeadLeftSticky tHeadTh popup th" rowspan="1" colspan="1" }="" title="選択" width="40px;"><div class="ci"></div></th>
-                                                        <th data-id="c3" class="tHeadLeftSticky tHeadTh popup th" rowspan="1" colspan="1" }="" title="選択" width="80px;"><div class="ci">変更後</div></th>
-                                                        <th data-id="c4" class="tHeadLeftSticky tHeadTh popup th" rowspan="1" colspan="1" }="" title="ユーザー名"><div class="ci">ユーザー名</div></th>
-                                                        <th data-id="c5" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="ユーザーID" width="350px"><div class="ci">ユーザーID</div></th>
-                                                        <th data-id="c6" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="登録日時" width="200px;"><div class="ci">登録日時</div></th>
+                                                        <th class="tHeadLeftSticky tHeadTh popup th" rowspan="1" colspan="1" }="" title="解除" width="80px;"><div class="ci">解除</div></th>
+                                                        <th class="tHeadLeftSticky tHeadTh popup th" rowspan="1" colspan="1" }="" title="ユーザー名"><div class="ci">ユーザー名</div></th>
+                                                        <th class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="名"><div class="ci">名</div></th>
+                                                        <th class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="姓"><div class="ci">姓</div></th>
                                                     </tr>
                                                 </thead>
                                                 <tbody class="tbody">
-                                                    <tr class="tBodyTr tr datarow" style="display:none" preferred_username='${preferred_username}' data-id="${user_id}">
+                                                    <tr class="tBodyTr tr datarow-template" style="display:none" preferred_username='${preferred_username}' data-id="${user_id}">
                                                         <td class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1" }=""><div class="ci" style="text-align:center">
-                                                            <input type="checkbox" class="form_check_before" ${user_before_checked} onclick="return false;" disabled>
+                                                            <input type="checkbox" class="form_check_revoke">
                                                         </div></td>
-                                                        <td class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1" }=""><div class="ci" style="text-align:center">
-                                                            <span class="icon icon-arrow01_right" style="color:gray"></span>
-                                                        </div></td>
-                                                        <td class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1" }=""><div class="ci" style="text-align:center">
-                                                            <input type="checkbox" class="form_check_after" ${user_after_checked}>
-                                                        </div></td>
-                                                        <td class="tBodyLeftSticky tBodyTd td" rowspan="1" colspan="1" }="" ><div class="ci">${user_name}</div></td>
-                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }="" ><div class="ci" style="text-align:center">${user_id}</div></td>
-                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }="" ><div class="ci" style="text-align:center">${create_timestamp}</div></td>
+                                                        <td class="tBodyLeftSticky tBodyTd td" rowspan="1" colspan="1" }="" ><div class="ci">${preferred_username}</div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }="" ><div class="ci">${firstName}</div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }="" ><div class="ci">${lastName}</div></td>
                                                     </tr>
                                                     <tr class="tBodyTr tr notfound" style="display:none">
-                                                        <td class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="6" }="" height="50px"><div class="ci" style="text-align: center;">
+                                                        <td class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="4" }="" height="50px"><div class="ci" style="text-align: center;">
                                                             ユーザーが存在しません
                                                         </div></td>
                                                     </tr>
                                                 </tbody>
                                             </table>
                                         </div>
+                                        <div class="tableFooter">
+                                            <div class="tableFooterInner">
+                                                <div class="tableFooterBlock pagingMove" id="role_user_list_pager">
+                                                    <ul class="tableFooterList">
+                                                        <li class="tableFooterItem">
+                                                            <button class="pagingMoveButton" data-type="first" disabled><span class=" icon icon-first"></span></button>
+                                                        </li>
+                                                        <li class="tableFooterItem">
+                                                            <button class="pagingMoveButton" data-type="prev" disabled><span class=" icon icon-prev"></span></button>
+                                                        </li>
+                                                        <li class="tableFooterItem">
+                                                            <div class="pagingPage">
+                                                                <span class="pagingCurrentPage">1</span>
+                                                                <span class="pagingPageJumpNumber">ページ</span>
+                                                            </div>
+                                                        </li>
+                                                        <li class="tableFooterItem">
+                                                            <button class="pagingMoveButton" data-type="next"><span class=" icon icon-next"></span></button>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
                                         <div class="tableHeader">
                                             <ul class="tableHeaderMainMenuList">
                                                 <li class="tableHeaderMainMenuItem">
-                                                    <button data-type="tableNew" data-action="positive" style="width:200px;" class="itaButton tableHeaderMainMenuButton button" id="button_apply" disabled>
-                                                        <span class="inner"><span class="icon icon-edit"></span>適用</span></button>
+                                                    <button id="button_apply" data-action="positive" style="width:200px;" class="itaButton tableHeaderMainMenuButton button" disabled>
+                                                        <span class="inner"><span class="icon icon-edit"></span>解除</span></button>
                                                 </li>
                                             </ul>
                                         </div>
@@ -191,6 +219,85 @@
                 </main>
             </div>
             <div class="containerLoading"></div>
+        </div>
+        <!--
+            Dialog
+        -->
+        <div class="dialog-template" style="display: none">
+            <div id="role_user_grant_dialog">
+                <div class="tableContainer" style="width: 90vw; height:60vh;">
+                    <div class="tableHeader">
+                        <div class="operationMenu">
+                            <ul class="tableHeaderMainMenuList">
+                                <li class="operationMenuItem">
+                                    <button title="フィルター" data-action="positive" data-type="tableEdit" class="itaButton tableHeaderMainMenuButton button button-filter">
+                                        <span class="inner">
+                                            <span class="iconButtonIcon icon icon-filter"></span>
+                                            <span class="iconButtonBody">フィルター</span>
+                                            <span class="buttonMinWidth"></span>
+                                        </span>
+                                    </button>
+                                </li>
+                                <li class="operationMenuItem">
+                                    <input type="text" value="" class="inputText input text-filter" maxlength="128" size="256">
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="tableBody">
+                        <table class="table mainTable tableReady user_list" width="100%" table-mode="input">
+                            <thead class="thead">
+                                <tr class="tHeadTr headerTr tr">
+                                    <th data-id="c1" class="tHeadLeftSticky tHeadTh popup th" rowspan="1" colspan="1" }="" title="付与" width="80px;"><div class="ci">付与</div></th>
+                                    <th data-id="c2" class="tHeadLeftSticky tHeadTh popup th" rowspan="1" colspan="1" }="" title="ユーザー名"><div class="ci">ユーザー名</div></th>
+                                    <th data-id="c3" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="名"><div class="ci">名</div></th>
+                                    <th data-id="c3" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="姓"><div class="ci">姓</div></th>
+                                    <th data-id="c4" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="登録日時" width="200px;"><div class="ci">登録日時</div></th>
+                                </tr>
+                            </thead>
+                            <tbody class="tbody">
+                                <tr class="tBodyTr tr datarow-template" style="display:none" preferred_username='${preferred_username}' data-id="${user_id}">
+                                    <td class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1" }=""><div class="ci" style="text-align:center">
+                                        <input type="checkbox" class="form_check_grant">
+                                    </div></td>
+                                    <td class="tBodyLeftSticky tBodyTd td" rowspan="1" colspan="1" }="" ><div class="ci">${preferred_username}</div></td>
+                                    <td class="tBodyTd td" rowspan="1" colspan="1" }="" ><div class="ci">${firstName}</div></td>
+                                    <td class="tBodyTd td" rowspan="1" colspan="1" }="" ><div class="ci">${lastName}</div></td>
+                                    <td class="tBodyTd td" rowspan="1" colspan="1" }="" ><div class="ci" style="text-align:center">${create_timestamp}</div></td>
+                                </tr>
+                                <tr class="tBodyTr tr notfound" style="display:none">
+                                    <td class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="6" }="" height="50px"><div class="ci" style="text-align: center;">
+                                        ユーザーが存在しません
+                                    </div></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="tableFooter">
+                        <div class="tableFooterInner">
+                            <div class="tableFooterBlock pagingMove">
+                                <ul class="tableFooterList">
+                                    <li class="tableFooterItem">
+                                        <button class="pagingMoveButton" data-type="first" disabled><span class=" icon icon-first"></span></button>
+                                    </li>
+                                    <li class="tableFooterItem">
+                                        <button class="pagingMoveButton" data-type="prev" disabled><span class=" icon icon-prev"></span></button>
+                                    </li>
+                                    <li class="tableFooterItem">
+                                        <div class="pagingPage">
+                                            <span class="pagingCurrentPage">1</span>
+                                            <span class="pagingPageJumpNumber">ページ</span>
+                                        </div>
+                                    </li>
+                                    <li class="tableFooterItem">
+                                        <button class="pagingMoveButton" data-type="next"><span class=" icon icon-next"></span></button>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </body>
 </html>

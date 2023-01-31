@@ -16,8 +16,9 @@
 WSGI main module
 """
 # from crypt import methods
-from flask import Flask, request, jsonify, make_response
+from flask import Flask, request, Response, jsonify, make_response
 import os
+import requests
 from datetime import datetime
 from dotenv import load_dotenv  # python-dotenv
 import logging
@@ -60,6 +61,44 @@ def alive():
         Response: HTTP Response
     """
     return jsonify({"result": "200", "time": common.datetime_to_str(datetime.now())}), 200
+
+
+@app.route('/auth/realms/<string:organization_id>/protocol/openid-connect/token', methods=["POST"])
+def openid_connect_token(organization_id):
+    """get token
+    Args:
+        organization_id (str): organization id
+    Returns:
+        Response: HTTP Response
+    """
+
+    # proxy destination
+    if (request.form.get('client_id') == f"_{organization_id}-api" or (organization_id == 'master' and request.form.get('client_id') == '_platform-api')) \
+        and request.form.get('grant_type') == 'password' \
+            and 'offline_access' in request.form.get('scope'):
+        # case get refresh token
+        # call platform api
+        proxy_location_origin = f"{os.environ['PLATFORM_API_PROTOCOL']}://{os.environ['PLATFORM_API_HOST']}:{os.environ['PLATFORM_API_PORT']}"
+    else:
+        # case other
+        # call keycloak
+        proxy_location_origin = f"{os.environ['KEYCLOAK_PROTOCOL']}://{os.environ['KEYCLOAK_HOST']}:{os.environ['KEYCLOAK_PORT']}"
+
+    redirect_response = requests.post(
+        f"{proxy_location_origin}/auth/realms/{organization_id}/protocol/openid-connect/token",
+        data=request.form,
+        headers={"Content-Type": request.content_type, "User-Id": "-"},
+    )
+
+    # remake response header
+    excluded_headers = ['content-encoding', 'content-length', 'connection', 'keep-alive', 'proxy-authenticate',
+                        'proxy-authorization', 'te', 'trailers', 'transfer-encoding', 'upgrade']
+    headers = [
+        (k, v) for k, v in redirect_response.raw.headers.items()
+        if k.lower() not in excluded_headers
+    ]
+
+    return Response(redirect_response.content, redirect_response.status_code, headers)
 
 
 @app.route('/api/platform/<path:subpath>', methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTION"])

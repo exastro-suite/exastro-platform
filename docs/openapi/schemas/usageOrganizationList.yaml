@@ -1,0 +1,45 @@
+#   Copyright 2022 NEC Corporation
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+
+title: usageList is list of usage resources.
+type: object
+properties:
+  data:
+    type: array
+    items:
+      type: object
+      properties:
+        organization_id:
+          type: string
+        usages:
+          type: array
+          items:
+            $ref: './usage.yaml'
+    example:
+      - organization_id: organization_1
+        usages:
+          - id: platform.workspaces
+            current_value: 101
+          - id: platform.users
+            current_value: 102
+          - id: platform.roles
+            current_value: 103
+      - organization_id: organization_2
+        usages:
+          - id: platform.workspaces
+            current_value: 201
+          - id: platform.users
+            current_value: 202
+          - id: platform.roles
+            current_value: 203

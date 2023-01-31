@@ -95,7 +95,7 @@ global:
 platform-api:
   image:
     repository: "exastro/exastro-platform-api"
-    tag: "1.1.0"
+    tag: "1.2.0"
 
 platform-auth:
   ingress:
@@ -113,20 +113,24 @@ platform-auth:
             backend: "httpMng"
   service:
     type: ClusterIP
+    # http:
+    #   nodePort: 30080
+    # httpMng:
+    #   nodePort: 30081
   image:
     repository: "exastro/exastro-platform-auth"
-    tag: "1.1.0"
+    tag: "1.2.0"
 
 platform-setup:
   keycloak:
     image:
       repository: "exastro/exastro-platform-job"
-      tag: "1.1.0"
+      tag: "1.2.0"
 
 platform-web:
   image:
     repository: "exastro/exastro-platform-web"
-    tag: "1.1.0"
+    tag: "1.2.0"
 
 mariadb:
   image:
@@ -144,7 +148,7 @@ mariadb:
 keycloak:
   image:
     repository: "exastro/keycloak"
-    tag: "1.1.0"
+    tag: "1.2.0"
     pullPolicy: IfNotPresent
   resources:
     requests:

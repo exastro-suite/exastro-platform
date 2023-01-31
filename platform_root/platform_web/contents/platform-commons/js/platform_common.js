@@ -16,6 +16,14 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
+//   Paging
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+const DEFAULT_ROWS_PER_PAGE = 100;
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
 //   Get Text Multi Language Support
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -75,10 +83,10 @@ function appendScript(url) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 function loadLanguageText() {
     if (CommonAuth.getLanguage() == "en"){
-        return appendScript("/_/platform-commons/js/language/en/text.js");
+        return appendScript("/_/platform-commons/js/language/en/text.js?ver=__BUILD_VERSION__");
     }
     else{
-        return appendScript("/_/platform-commons/js/language/ja/text.js");
+        return appendScript("/_/platform-commons/js/language/ja/text.js?ver=__BUILD_VERSION__");
     }
 }
 
@@ -92,10 +100,51 @@ function loadCommonContents() {
         Promise.all([
             loadLanguageText()
         ]).then(() => {
+            replaceLanguageText();
             resolve();
         }).catch((reason) => {
             reject(reason);
         });
+    });
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//   Display Language Text (html contents)
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+function replaceLanguageText() {
+    //
+    // html element inner text
+    // sample:
+    //  <html-element text-id="text id">default text</html-element>
+    //
+    $("[text-id]").each(function(index, element) {
+        const $element = $(element);
+        try {
+            const textId = $element.attr('text-id');
+            if(typeof textId !== typeof undefined && textId !== false) {
+                $element.text(getText(textId, $element.text()));
+            }
+        } catch { }
+    });
+    //
+    // html element attribute text
+    // sample:
+    //  <html-element attr-field="default text" attr-text-id="attr-field=text id,..."></html-element>
+    //
+    $("[attr-text-id]").each(function(index, element) {
+        const $element = $(element);
+        try {
+            const attrTextId = $element.attr('attr-text-id');
+            if(typeof attrTextId !== typeof undefined && attrTextId !== false) {
+                for(let i of attrTextId.split(",")) {
+                    const attr=i.replace(/=.*$/,"");
+                    const tid=i.replace(/^.*=/,"");
+                    $element.attr(attr, getText(tid, $element.attr(attr)));
+                }
+            }
+        } catch { }
     });
 }
 
@@ -133,7 +182,6 @@ function displayMenu(curent) {
         <li class="menuItem"><a class="menuLink" id="menu_workspace" href="#" tabindex="-1">ワークスペース管理</a></li>
         <li class="menuItem"><a class="menuLink" id="menu_account_management" href="#" target="keycloak_management_console" style="display: none;">ユーザー管理</a></li>
         <li class="menuItem"><a class="menuLink" id="menu_role_management" href="#" style="display: none;">ロール管理</a></li>
-        <li class="menuItem"><a class="menuLink" id="menu_update_password" href="#" target="keycloak_account_console">パスワード変更</a></li>
     `);
     if(curent != null) {
         $(`#${curent}`).addClass("current");
@@ -141,8 +189,8 @@ function displayMenu(curent) {
 
     $('#menu_workspace').attr('href', location_conf.href.workspaces.list.replace(/{organization_id}/g, CommonAuth.getRealm()));
     $('#menu_account_management').attr('href', location_conf.href.menu.account_manaagement.replace(/{organization_id}/g, CommonAuth.getRealm()));
+    // $('#menu_account_management').attr('href', location_conf.href.users.list.replace(/{organization_id}/g, CommonAuth.getRealm()));
     $('#menu_role_management').attr('href', location_conf.href.roles.list.replace(/{organization_id}/g, CommonAuth.getRealm()));
-    $('#menu_update_password').attr('href', location_conf.href.menu.update_password.replace(/{organization_id}/g, CommonAuth.getRealm()));
 
     if (CommonAuth.hasAuthority("_og-usr-mt")) {
         $("#menu_account_management").css("display", "");
@@ -166,15 +214,23 @@ function finish_onload_progress() {
     $("ol.topichPathList").css("visibility", "");
     $("ul.menuList").css("display", "");
     $("#main").css("visibility", "");
-    $(".containerLoading").css("display", "none");
+    hide_progress();
 }
 
 function finish_onload_progress_at_error() {
     $("ol.topichPathList").css("visibility", "");
     displayMenu(null);
     $("ul.menuList").css("display", "");
+    hide_progress();
+}
+
+function show_progress() {
+    $(".containerLoading").css("display", "");
+}
+function hide_progress() {
     $(".containerLoading").css("display", "none");
 }
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -219,6 +275,68 @@ function call_api_promise(ajaxparam, api_description, succeed_httpcodes = [200])
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
+//   Common Dialog
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+function alertMessage(title, message, onclose = null) {
+    const dialog = new Dialog({
+        mode: 'modeless',
+        position: 'center',
+        width: 'auto',
+        header: {
+            title: title,
+        },
+        footer: {
+            button: {
+                close: { text: "閉じる", action: "normal" }
+            }
+        },
+    },
+    {
+        close: function() {
+            dialog.close();
+            if(onclose !== null) {
+                onclose();
+            }
+        }
+    });
+    dialog.open('<div class="alertMessage" style="margin-left: 30px; margin-right: 30px;">'+ message +'</div>');
+}
+
+function confirmMessage(title, message, onOk = null, onCancel = null) {
+    const dialog = new Dialog({
+        mode: 'modeless',
+        position: 'center',
+        width: 'auto',
+        header: {
+            title: title,
+        },
+        footer: {
+            button: {
+                ok: { text: "ＯＫ", action: "positive" },
+                cancel: { text: "キャンセル", action: "normal" }
+            }
+        },
+    },
+    {
+        ok: function() {
+            dialog.close();
+            if(onOk !== null) {
+                onOk();
+            }
+        },
+        cancel: function() {
+            dialog.close();
+            if(onCancel !== null) {
+                onCancel();
+            }
+        }
+    });
+    dialog.open('<div class="alertMessage" style="margin-left: 30px; margin-right: 30px;">'+ message +'</div>');
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
 //   Role Common
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -232,6 +350,7 @@ const RolesCommon =
     "ORG_AUTH_UPDATE":              "_og-upd",
     "ORG_AUTH_OWNER_MAINTE":        "_og-own-mt",
     "ORG_AUTH_ROLE_USER":           "_og-role-usr",
+    "ORG_AUTH_USAGE_SITUATION":     "_og-usage",
     "ORG_AUTH_USER_MAINTE":         "_og-usr-mt",
     "ORG_AUTH_WS_ROLE_MAINTE":      "_og-ws-role-mt",
     "ORG_AUTH_WS_ROLE_USER":        "_og-ws-role-usr",
@@ -340,6 +459,7 @@ const RolesCommon =
         orgAuthText[RolesCommon.ORG_AUTH_UPDATE]            = getText("000-00109", "オーガナイゼーション更新");
         orgAuthText[RolesCommon.ORG_AUTH_OWNER_MAINTE]      = getText("000-00110", "オーガナイゼーション管理者変更");
         orgAuthText[RolesCommon.ORG_AUTH_ROLE_USER]         = getText("000-00111", "オーガナイゼーションロール付与");
+        orgAuthText[RolesCommon.ORG_AUTH_USAGE_SITUATION]   = getText("000-00113", "利用状況確認");
         orgAuthText[RolesCommon.ORG_AUTH_USER_MAINTE]       = getText("000-00114", "ユーザー管理");
         orgAuthText[RolesCommon.ORG_AUTH_WS_ROLE_MAINTE]    = getText("000-00115", "ワークスペースロール管理");
         orgAuthText[RolesCommon.ORG_AUTH_WS_ROLE_USER]      = getText("000-00116", "ワークスペースロール付与");
@@ -378,5 +498,32 @@ const RolesCommon =
             default:
                 return [];
         }
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//   User Common
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+const UsersCommon =
+{
+
+    "isAlllowedCreateUser": function() {
+        return CommonAuth.hasAuthority(RolesCommon.ORG_AUTH_USER_MAINTE) || ( CommonAuth.getAdminWorkspaces().length > 0 );
+    },
+
+    "isSystemUser": function (user) {
+        return user.preferred_username.match(/^_/)? true: false;
+    },
+
+    "isAllowedEditUser": function(user) {
+
+        if(UsersCommon.isSystemUser(user)) {
+            // システムで生成したロールは編集不可とする
+            // System-generated roles are non-editable
+            return false;
+        }
+        return true;
     }
 }

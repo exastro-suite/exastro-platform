@@ -14,10 +14,15 @@
 
 # import inspect
 import os
+import inspect
 import requests
 
 # User Imports
 import globals  # 共通的なglobals Common globals
+
+
+def __get_keycloak_api_url():
+    return "{}://{}:{}".format(os.environ['API_KEYCLOAK_PROTOCOL'], os.environ['API_KEYCLOAK_HOST'], os.environ['API_KEYCLOAK_PORT'])
 
 
 def __get_token(realm_name, data_para):
@@ -35,7 +40,7 @@ def __get_token(realm_name, data_para):
     """
     # 呼び出し先設定
     # Call destination setting
-    api_url = "{}://{}:{}".format(os.environ['API_KEYCLOAK_PROTOCOL'], os.environ['API_KEYCLOAK_HOST'], os.environ['API_KEYCLOAK_PORT'])
+    api_url = __get_keycloak_api_url()
 
     header_para = {
         "Content-Type": "application/x-www-form-urlencoded",
@@ -163,7 +168,7 @@ def user_token_introspect(client_id, client_secret, realm_name, access_token, ke
 
     # 呼び出し先設定
     # Call destination setting
-    api_url = "{}://{}:{}".format(os.environ['API_KEYCLOAK_PROTOCOL'], os.environ['API_KEYCLOAK_HOST'], os.environ['API_KEYCLOAK_PORT'])
+    api_url = __get_keycloak_api_url()
 
     header_para = {
         "Content-Type": "application/x-www-form-urlencoded"
@@ -181,4 +186,84 @@ def user_token_introspect(client_id, client_secret, realm_name, access_token, ke
         data="&".join(data_para)
     )
 
+    return request_response
+
+
+def offline_sessions_delete(realm_name, user_id, client_id, token):
+    """offline-session (refresh token)削除 Delete offline-session
+
+    Args:
+        realm_name (str): realm name
+        user_id (str): user id
+        client_id (str): client id(not client name)
+        toekn (str): token
+
+    Raises:
+        Exception: error
+
+    Returns:
+        Response: HTTP Respose (success : .status_code=200, token=json.loads(.text)["access_token"])
+    """
+    globals.logger.info(f"# func:{inspect.currentframe().f_code.co_name}")
+    globals.logger.info(f' realm_name={realm_name}, user_id={user_id}, client_id={client_id}')
+
+    # 呼び出し先設定
+    # Call destination setting
+    api_url = __get_keycloak_api_url()
+
+    header_para = {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer {}".format(token),
+    }
+
+    # offline-session (refresh token)削除
+    # Delete offline-session
+    request_response = requests.delete(
+        f"{api_url}/auth/admin/realms/{realm_name}/users/{user_id}/consents/{client_id}",
+        headers=header_para
+    )
+
+    globals.logger.info(f"# Succeed func:{inspect.currentframe().f_code.co_name}")
+
+    return request_response
+
+
+def offline_sessions_get(realm_name, user_id, client_id, token):
+    """offline-session (refresh token)取得 Get offline-session
+
+    Args:
+        realm_name (str): realm name
+        user_id (str): user id
+        client_id (str): client id(not client name)
+        toekn (str): token
+
+    Raises:
+        Exception: error
+
+    Returns:
+        Response: HTTP Respose (success : .status_code=200, token=json.loads(.text)["access_token"])
+    """
+    globals.logger.info(f"# func:{inspect.currentframe().f_code.co_name}")
+    globals.logger.info(f' realm_name={realm_name}, user_id={user_id}, client_id={client_id}')
+
+    # 呼び出し先設定
+    # Call destination setting
+    api_url = __get_keycloak_api_url()
+
+    header_para = {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer {}".format(token),
+    }
+
+    # offline-session (refresh token)取得
+    # Get offline-session
+    request_response = requests.get(
+        f"{api_url}/auth/admin/realms/{realm_name}/users/{user_id}/offline-sessions/{client_id}",
+        headers=header_para
+    )
+
+    globals.logger.info(f"# Succeed func:{inspect.currentframe().f_code.co_name}")
+
+    # 下位の取得ロジックを呼びだし
+    # Call the lower acquisition logic
     return request_response

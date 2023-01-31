@@ -79,11 +79,14 @@ RUN dnf config-manager --add-repo=https://download.docker.com/linux/centos/docke
 &&  npm -g config set strict-ssl false \
 &&  npm install -g @apidevtools/swagger-cli \
 &&  usermod -G wheel $USERNAME \
-&&  echo '%wheel ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers
+&&  echo '%wheel ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers \
+&&  echo "%${GROUPNAME} ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 
 USER $USERNAME
 
-RUN mkdir ~/.config
+RUN mkdir ~/.config \
+&& mkdir ~/.vscode-server \
+&& mkdir ~/.vscode-server-insiders
 
 WORKDIR $APP_PATH
 

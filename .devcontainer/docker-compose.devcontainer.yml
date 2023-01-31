@@ -35,6 +35,8 @@ services:
       - ~/.config/git/ignore:/home/app_user/.config/git/ignore
       - ${TALISMAN_HOME}:${TALISMAN_HOME}
       - /var/run/docker.sock:/var/run/docker.sock
+      - ../.vscode_extensions/platform-auth/.vscode-server/extensions:/home/app_user/.vscode-server/extensions
+      - ../.vscode_extensions/platform-auth/.vscode-server-insiders/extensions:/home/app_user/.vscode-server-insiders/extensions
     environment:
       - FLASK_ENV=development
       - FLASK_SERVER_PORT=8801
@@ -48,6 +50,7 @@ services:
       - SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
       - SSL_CERT_DIR=/etc/ssl/certs
       - NODE_EXTRA_CA_CERTS=/etc/ssl/certs/ca-certificates.crt
+      - NODE_TLS_REJECT_UNAUTHORIZED=${NODE_TLS_REJECT_UNAUTHORIZED:-1}
 
   platform-api:
     build:
@@ -70,6 +73,8 @@ services:
       - ~/.config/git/ignore:/home/app_user/.config/git/ignore
       - ${TALISMAN_HOME}:${TALISMAN_HOME}
       - /var/run/docker.sock:/var/run/docker.sock
+      - ../.vscode_extensions/platform-api/.vscode-server/extensions:/home/app_user/.vscode-server/extensions
+      - ../.vscode_extensions/platform-api/.vscode-server-insiders/extensions:/home/app_user/.vscode-server-insiders/extensions
     environment:
       - FLASK_ENV=development
       - LOG_LEVEL=DEBUG
@@ -82,6 +87,7 @@ services:
       - SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
       - SSL_CERT_DIR=/etc/ssl/certs
       - NODE_EXTRA_CA_CERTS=/etc/ssl/certs/ca-certificates.crt
+      - NODE_TLS_REJECT_UNAUTHORIZED=${NODE_TLS_REJECT_UNAUTHORIZED:-1}
 
   platform-web:
     build:
@@ -100,6 +106,8 @@ services:
       - ~/.config/git/ignore:/home/app_user/.config/git/ignore
       - ${TALISMAN_HOME}:${TALISMAN_HOME}
       - /var/run/docker.sock:/var/run/docker.sock
+      - ../.vscode_extensions/platform-web/.vscode-server/extensions:/home/app_user/.vscode-server/extensions
+      - ../.vscode_extensions/platform-web/.vscode-server-insiders/extensions:/home/app_user/.vscode-server-insiders/extensions
     environment:
       - HTTP_PROXY=${HTTP_PROXY}
       - http_proxy=${HTTP_PROXY}
@@ -110,6 +118,7 @@ services:
       - SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
       - SSL_CERT_DIR=/etc/ssl/certs
       - NODE_EXTRA_CA_CERTS=/etc/ssl/certs/ca-certificates.crt
+      - NODE_TLS_REJECT_UNAUTHORIZED=${NODE_TLS_REJECT_UNAUTHORIZED:-1}
 
   keycloak:
     build:
@@ -144,6 +153,8 @@ services:
       - ~/.config/git/ignore:/home/app_user/.config/git/ignore
       - ${TALISMAN_HOME}:${TALISMAN_HOME}
       - /var/run/docker.sock:/var/run/docker.sock
+      - ../.vscode_extensions/platform-job/.vscode-server/extensions:/home/app_user/.vscode-server/extensions
+      - ../.vscode_extensions/platform-job/.vscode-server-insiders/extensions:/home/app_user/.vscode-server-insiders/extensions
     environment:
       - FLASK_ENV=development
       - HTTP_PROXY=${HTTP_PROXY}
@@ -155,6 +166,7 @@ services:
       - SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
       - SSL_CERT_DIR=/etc/ssl/certs
       - NODE_EXTRA_CA_CERTS=/etc/ssl/certs/ca-certificates.crt
+      - NODE_TLS_REJECT_UNAUTHORIZED=${NODE_TLS_REJECT_UNAUTHORIZED:-1}
 
   ita-api:
     build:

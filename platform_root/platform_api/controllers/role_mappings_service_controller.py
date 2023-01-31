@@ -28,12 +28,14 @@ MSG_FUNCTION_ID = "26"
 
 
 @common.platform_exception_handler
-def role_user_mapping_get(organization_id, role_name):
+def role_user_mapping_get(organization_id, role_name, first=0, max=100):
     """Get user-role mapping for a role
 
     Args:
         organization_id (str): organization id
         role_name (str): role name
+        first (int): first result to return
+        max (int): maximum number of results to return
 
     Returns:
         _type_: _description_
@@ -54,12 +56,19 @@ def role_user_mapping_get(organization_id, role_name):
     # ロールの取得
     # Get role
     response = api_keycloak_roles.role_uesrs_get(
-        realm_name=organization_id, client_id=private.user_token_client_id, role_name=client_role.get("name"), token=token,
+        realm_name=organization_id, client_id=private.user_token_client_id, role_name=client_role.get("name"), token=token, first=first, max=max
     )
 
     if response.status_code == 404:
         globals.logger.error(f"response:{response.text}")
-        raise common.NotFoundException(None, f"404-{MSG_FUNCTION_ID}001", "情報が存在しません(Role:{0}, message{1})".format(role_name, response.text))
+        message_id = f"404-{MSG_FUNCTION_ID}001"
+        message = multi_lang.get_text(
+            message_id,
+            "情報が存在しません(Role:{0}, message{1})",
+            role_name,
+            response.text,
+        )
+        raise common.NotFoundException(message_id=message_id, message=message)
 
     elif response.status_code != 200:
         globals.logger.error(f"response:{response.text}")
@@ -74,10 +83,13 @@ def role_user_mapping_get(organization_id, role_name):
     for user in role_users:
         ret_role_users.append(
             {
+                "id": user.get("id"),
                 "name": common.get_username(user.get("firstName"), user.get("lastName"), user.get("username")),
                 "firstName": user.get("firstName"),
                 "lastName": user.get("lastName"),
                 "preferred_username": user.get("username"),
+                "enabled": user.get("enabled"),
+                "create_timestamp": common.keycloak_timestamp_to_str(user.get("createdTimestamp"))
             }
         )
 
@@ -105,13 +117,17 @@ def role_user_mapping_create(body, organization_id, role_name):
 
     body = connexion.request.get_json()
     if not body:
-        raise common.BadRequestException(
-            message_id='400-000002', message='リクエストボディのパラメータ({0})が不正です。'.format('Json')
+        message_id = "400-000002"
+        message = multi_lang.get_text(
+            message_id,
+            "リクエストボディのパラメータ({0})が不正です。",
+            'Json',
         )
+        raise common.BadRequestException(message_id=message_id, message=message)
 
     validate = validation.validate_role_mapping_users(body)
     if not validate.ok:
-        return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, validate.args)
+        return common.response_validation_error(validate)
 
     # サービスアカウントのTOKEN取得
     # Get a service account token
@@ -129,9 +145,13 @@ def role_user_mapping_create(body, organization_id, role_name):
     # process the number of cases
     for user in body:
         if not user.get("preferred_username"):
-            raise common.BadRequestException(
-                message_id='400-000002', message='リクエストボディのパラメータ({0})が不正です。'.format('preferred_username')
+            message_id = "400-000002"
+            message = multi_lang.get_text(
+                message_id,
+                "リクエストボディのパラメータ({0})が不正です。",
+                'preferred_username',
             )
+            raise common.BadRequestException(message_id=message_id, message=message)
 
         # ユーザーの存在チェック
         # User existence check
@@ -205,13 +225,17 @@ def role_user_mapping_delete(body, organization_id, role_name):
 
     body = connexion.request.get_json()
     if not body:
-        raise common.BadRequestException(
-            message_id='400-000002', message='リクエストボディのパラメータ({0})が不正です。'.format('Json')
+        message_id = "400-000002"
+        message = multi_lang.get_text(
+            message_id,
+            "リクエストボディのパラメータ({0})が不正です。",
+            'Json',
         )
+        raise common.BadRequestException(message_id=message_id, message=message)
 
     validate = validation.validate_role_mapping_users(body)
     if not validate.ok:
-        return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, validate.args)
+        return common.response_validation_error(validate)
 
     private = DBconnector().get_organization_private(organization_id)
 

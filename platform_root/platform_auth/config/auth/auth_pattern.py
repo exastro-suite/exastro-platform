@@ -69,8 +69,19 @@ AUTH_PATTERN = [
                     {"client": "{org_id}-workspaces", "role": const.ORG_AUTH_USER_MAINTE},
                     {"client": "{org_id}-workspaces", "role": const.ORG_AUTH_WS_ROLE_USER},
                 ]
+            },
+            {
+                "method": ["POST"],
+                "roles": [
+                    {"client": "{org_id}-workspaces", "role": const.ORG_AUTH_USER_MAINTE},
+                ]
             }
         ]
+    },
+    {
+        "url": r"^/api/(?P<org_id>[^/][^/]*)/platform/users/_current/refresh_tokens$",
+        # do not regulate - 規制しない
+        "auth": []
     },
     {
         "url": r"^/api/(?P<org_id>[^/][^/]*)/platform/roles($|/.*$)",
@@ -140,4 +151,26 @@ AUTH_PATTERN = [
             }
         ]
     },
+    {
+        "url": r"^/api/(?P<org_id>[^/][^/]*)/platform/usages($|/.*$)",
+        "auth": [
+            {
+                "method": ["GET"],
+                "roles": [
+                    {"client": "{org_id}-workspaces", "role": const.ORG_AUTH_USAGE_SITUATION},
+                ]
+            }
+        ]
+    },
+    {
+        "url": r"^/api/(?P<org_id>[^/][^/]*)/platform/setting($|/.*$)",
+        "auth": [
+            {
+                "method": ["*"],
+                "roles": [
+                    {"client": "{org_id}-workspaces", "role": const.ORG_AUTH_UPDATE},
+                ]
+            }
+        ]
+    }
 ]

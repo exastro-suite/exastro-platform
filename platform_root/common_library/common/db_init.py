@@ -131,6 +131,7 @@ class DBinit(DBconnector):
             with conn.cursor() as cursor:
                 cursor.execute(queries_dbinit.SQL_CREATE_ORGANIZATION_PRIVATE)
                 cursor.execute(queries_dbinit.SQL_CREATE_WORKSPACE)
+                cursor.execute(queries_dbinit.SQL_CREATE_REFRESH_TOKEN)
         return
 
     def insert_organization_dbinfo(self, dbinfo: DBconnector.DBinfo, organization_id, user_id):

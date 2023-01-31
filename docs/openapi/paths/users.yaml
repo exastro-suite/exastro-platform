@@ -24,6 +24,26 @@ get:
     required: true
     schema:
       type: string
+  - name: first
+    in: query
+    description: first result to return
+    schema:
+      type: integer
+      example: 0
+      default: 0
+      minimum: 0
+  - name: max
+    in: query
+    description: maximum number of results to return
+    schema:
+      type: integer
+      example: 100
+      default: 100
+  - name: search
+    in: query
+    description: A String contained in username, first or last name, or email
+    schema:
+      type: string
   responses:
     200:
       description: A successful response.
@@ -33,6 +53,43 @@ get:
             allOf:
               - $ref: '../schemas/responseOk.yaml'
               - $ref: '../schemas/userList.yaml'
+    default:
+      description: An unexpected error response.
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'
+post:
+  tags:
+  - UsersService
+  summary: Create creates user
+  x-openapi-router-controller: controllers.users_service_controller
+  operationId: user_create
+  parameters:
+  - name: organization_id
+    in: path
+    required: true
+    schema:
+      type: string
+  requestBody:
+    content:
+      application/json:
+        schema:
+          $ref: '../schemas/userCreate.yaml'
+    required: true
+  responses:
+    200:
+      description: A successful response.
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '../schemas/responseOk.yaml'
+              - type: object
+                properties:
+                  data:
+                    type: object
+                    example: null
     default:
       description: An unexpected error response.
       content:

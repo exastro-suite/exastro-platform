@@ -2,12 +2,42 @@ openapi: 3.0.3
 info:
   title: Exastro Platform API
   description: Exastro Platform API
-  version: 1.1.0
+  version: 1.3.0
 servers:
-- url: /
+- url: "https://{host}"
+  description: API endpoint
+  variables:
+    host:
+      default: localhost
+- url: "http://{host}"
+  description: API endpoint
+  variables:
+    host:
+      default: localhost
+- url: "{protocol}://{host}:{port}"
+  description: API endpoint (Development)
+  variables:
+    protocol:
+      enum:
+      - http
+      - https
+      default: https
+    host:
+      default: localhost
+    port:
+      default: "30080"
+# security:
+# - BearerAuth: []
+# - BasicAuth: []
 tags:
 - name: OrganizationService
   description: オーガナイゼーションに関する操作
+- name: TokenService
+  description: tokenに関する操作
+- name: PlanService
+  description: プランに関する操作
+- name: UsageService
+  description: リソース使用量に関する操作
 - name: WorkspaceService
   description: ワークスペースに関する操作
 - name: UsersService
@@ -18,12 +48,33 @@ tags:
   description: ロール・マッピングに関する操作
 - name: InternalCommonService
   description: 共通(内部用)
+- name: InternalPlanService
+  description: プランに関する操作(内部用)
 - name: InternalUsersService
   description: ユーザーに関する操作(内部用)
 - name: InternalWorkspaceService
   description: ワークスペースに関する操作(内部用)
 paths:
   /api/platform/organizations:
+    get:
+      tags:
+      - OrganizationService
+      summary: List returns list of organization
+      operationId: organization_list
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+      x-openapi-router-controller: controllers.organization_service_controller
     post:
       tags:
       - OrganizationService
@@ -58,6 +109,428 @@ paths:
               schema:
                 $ref: '#/components/schemas/runtimeError'
       x-openapi-router-controller: controllers.organization_service_controller
+  /api/{organization_id}/platform/setting:
+    get:
+      tags:
+      - OrganizationService
+      summary: get an organization settings
+      operationId: organization_setting_get
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_1'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+      x-openapi-router-controller: controllers.organization_service_controller
+    patch:
+      tags:
+      - OrganizationService
+      summary: Update an organization settings
+      operationId: organization_setting_update
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/organizationSetting'
+        required: true
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responseOk'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+      x-openapi-router-controller: controllers.organization_service_controller
+  /auth/realms/{organization_id}/protocol/openid-connect/token:
+    post:
+      tags:
+      - TokenService
+      summary: create token
+      operationId: token_create
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/tokenRequestBody'
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/tokenResponseOK'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/tokenResponseError'
+      x-openapi-router-controller: controllers.token_service_controller
+  /api/{organization_id}/platform/users/_current/refresh_tokens:
+    get:
+      tags:
+      - TokenService
+      summary: List returns refresh token
+      operationId: refresh_token_list
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_2'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+      x-openapi-router-controller: controllers.token_service_controller
+    delete:
+      tags:
+      - TokenService
+      summary: delete refresh token
+      operationId: refresh_token_delete
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_3'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+      x-openapi-router-controller: controllers.token_service_controller
+  /api/platform/{organization_id}/plans:
+    get:
+      tags:
+      - PlanService
+      summary: Get plan of the organization
+      operationId: organization_plan_get
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_4'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+      x-openapi-router-controller: controllers.plan_service_controller
+    post:
+      tags:
+      - PlanService
+      summary: Set plan to the organization
+      operationId: organization_plan_create
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/planMappingOrganization'
+        required: true
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responseOk'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+      x-openapi-router-controller: controllers.plan_service_controller
+  /api/platform/{organization_id}/plans/{plan_start_datetime}:
+    delete:
+      tags:
+      - PlanService
+      summary: Delete plan to the organization
+      operationId: organization_plan_delete
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: plan_start_datetime
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          example: 2022-12-01 00:00:00
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responseOk'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+      x-openapi-router-controller: controllers.plan_service_controller
+  /api/platform/plans:
+    get:
+      tags:
+      - PlanService
+      summary: List returns list of plans
+      operationId: plan_list
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_5'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+      x-openapi-router-controller: controllers.plan_service_controller
+    post:
+      tags:
+      - PlanService
+      summary: Create creates an plan
+      operationId: plan_create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/plan'
+        required: true
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responseOk'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+      x-openapi-router-controller: controllers.plan_service_controller
+  /api/platform/plan_items:
+    get:
+      tags:
+      - PlanService
+      summary: List returns list of plan items
+      operationId: plan_item_list
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_6'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+      x-openapi-router-controller: controllers.plan_service_controller
+  /api/{organization_id}/platform/limits:
+    get:
+      tags:
+      - PlanService
+      summary: Returns the current limits value
+      operationId: organization_limits_get
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: limit_id
+        in: query
+        description: filter limit id. (prefix match)
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          example: platform.workspaces
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_7'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+      x-openapi-router-controller: controllers.plan_service_controller
+  /api/platform/usages:
+    get:
+      tags:
+      - UsageService
+      summary: List returns list of usage
+      operationId: usage_list
+      parameters:
+      - name: organization_id
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: id
+        in: query
+        description: filter id. (prefix match)
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          example: platform.workspaces
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_8'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+      x-openapi-router-controller: controllers.usage_service_controller
+  /api/{organization_id}/platform/usages:
+    get:
+      tags:
+      - UsageService
+      summary: Returns the current value of resource
+      operationId: organization_usage_get
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: id
+        in: query
+        description: filter id. (prefix match)
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          example: platform.workspaces
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_9'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+      x-openapi-router-controller: controllers.usage_service_controller
   /api/{organization_id}/platform/workspaces:
     get:
       tags:
@@ -86,7 +559,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200'
+                $ref: '#/components/schemas/inline_response_200_10'
         default:
           description: An unexpected error response.
           content:
@@ -119,7 +592,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_1'
+                $ref: '#/components/schemas/inline_response_200_3'
         default:
           description: An unexpected error response.
           content:
@@ -154,7 +627,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_2'
+                $ref: '#/components/schemas/inline_response_200_11'
         default:
           description: An unexpected error response.
           content:
@@ -189,7 +662,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_3'
+                $ref: '#/components/schemas/inline_response_200_12'
         default:
           description: An unexpected error response.
           content:
@@ -211,13 +684,75 @@ paths:
         explode: false
         schema:
           type: string
+      - name: first
+        in: query
+        description: first result to return
+        required: false
+        style: form
+        explode: true
+        schema:
+          minimum: 0
+          type: integer
+          example: 0
+          default: 0
+      - name: max
+        in: query
+        description: maximum number of results to return
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+          example: 100
+          default: 100
+      - name: search
+        in: query
+        description: "A String contained in username, first or last name, or email"
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
       responses:
         "200":
           description: A successful response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_4'
+                $ref: '#/components/schemas/inline_response_200_13'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+      x-openapi-router-controller: controllers.users_service_controller
+    post:
+      tags:
+      - UsersService
+      summary: Create creates user
+      operationId: user_create
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/userCreate'
+        required: true
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_3'
         default:
           description: An unexpected error response.
           content:
@@ -257,7 +792,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_5'
+                $ref: '#/components/schemas/inline_response_200_14'
         default:
           description: An unexpected error response.
           content:
@@ -298,7 +833,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_1'
+                $ref: '#/components/schemas/inline_response_200_3'
         default:
           description: An unexpected error response.
           content:
@@ -346,7 +881,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_1'
+                $ref: '#/components/schemas/inline_response_200_3'
         default:
           description: An unexpected error response.
           content:
@@ -375,13 +910,34 @@ paths:
         explode: false
         schema:
           type: string
+      - name: first
+        in: query
+        description: first result to return
+        required: false
+        style: form
+        explode: true
+        schema:
+          minimum: 0
+          type: integer
+          example: 0
+          default: 0
+      - name: max
+        in: query
+        description: maximum number of results to return
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+          example: 100
+          default: 100
       responses:
         "200":
           description: A successful response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_6'
+                $ref: '#/components/schemas/inline_response_200_15'
         default:
           description: An unexpected error response.
           content:
@@ -421,7 +977,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_1'
+                $ref: '#/components/schemas/inline_response_200_3'
         default:
           description: An unexpected error response.
           content:
@@ -461,7 +1017,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_1'
+                $ref: '#/components/schemas/inline_response_200_3'
         default:
           description: An unexpected error response.
           content:
@@ -469,6 +1025,115 @@ paths:
               schema:
                 $ref: '#/components/schemas/runtimeError'
       x-openapi-router-controller: controllers.role_mappings_service_controller
+  /internal-api/{organization_id}/platform/limits:
+    get:
+      tags:
+      - InternalPlanService
+      summary: Returns the current limits value
+      operationId: internal_organization_limits_get
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: limit_id
+        in: query
+        description: filter limit id. (prefix match)
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          example: platform.workspaces
+      - name: User_Id
+        in: header
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: Roles
+        in: header
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: Language
+        in: header
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_7'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+      x-openapi-router-controller: controllers.internal_plan_service_controller
+  /internal-api/platform/limits:
+    get:
+      tags:
+      - InternalPlanService
+      summary: Returns the current limits value
+      operationId: limits_get
+      parameters:
+      - name: limit_id
+        in: query
+        description: filter limit id. (prefix match)
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          example: platform.workspaces
+      - name: User_Id
+        in: header
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: Roles
+        in: header
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: Language
+        in: header
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_16'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+      x-openapi-router-controller: controllers.internal_plan_service_controller
   /internal-api/{organization_id}/platform/workspaces/{workspace_id}/roles:
     get:
       tags:
@@ -517,7 +1182,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_7'
+                $ref: '#/components/schemas/inline_response_200_17'
         default:
           description: An unexpected error response.
           content:
@@ -573,7 +1238,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_4'
+                $ref: '#/components/schemas/inline_response_200_13'
         default:
           description: An unexpected error response.
           content:
@@ -629,7 +1294,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_8'
+                $ref: '#/components/schemas/inline_response_200_18'
         default:
           description: An unexpected error response.
           content:
@@ -671,7 +1336,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_1'
+                $ref: '#/components/schemas/inline_response_200_3'
         default:
           description: An unexpected error response.
           content:
@@ -726,6 +1391,26 @@ components:
           format: date-time
         data:
           type: object
+    organization:
+      title: organization is a definition of Organization resource.
+      type: object
+      properties:
+        id:
+          type: string
+          example: org1
+        name:
+          type: string
+          example: name of org1
+        organization_managers:
+          type: array
+          items:
+            $ref: '#/components/schemas/usernameOnly'
+        active_plan:
+          $ref: '#/components/schemas/organization_active_plan'
+        plans:
+          type: array
+          items:
+            $ref: '#/components/schemas/planMappingOrganization'
     organizationCreate:
       title: organization is a definition of Organization resource.
       required:
@@ -741,10 +1426,175 @@ components:
         organization_managers:
           type: array
           items:
-            $ref: '#/components/schemas/userCreate'
+            $ref: '#/components/schemas/organizationUserCreate'
+        plan:
+          $ref: '#/components/schemas/organization_active_plan'
         options:
           type: object
           description: Organization Add Json Parameter (json of KeyCloak)
+    organizationUserCreate:
+      title: organization-user is a definition of User resource.
+      required:
+      - username
+      type: object
+      properties:
+        username:
+          type: string
+          example: user-id
+        email:
+          type: string
+          example: user e-mail address
+        firstName:
+          type: string
+        lastName:
+          type: string
+        credentials:
+          type: array
+          items:
+            $ref: '#/components/schemas/userCredentials'
+        requiredActions:
+          $ref: '#/components/schemas/userRequiredActions'
+        enabled:
+          type: boolean
+    organizationList:
+      title: roleList is list of Role resources.
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/organization'
+    organizationSetting:
+      title: organizationSetting is a definition of oraganaization setting resource.
+      type: object
+      properties:
+        token:
+          $ref: '#/components/schemas/organizationSetting_token'
+    planMappingOrganization:
+      required:
+      - id
+      - start_datetime
+      type: object
+      properties:
+        id:
+          type: string
+          example: plan-1
+        start_datetime:
+          type: string
+          example: 2022-12-01 00:00:00
+    planMappingOrganizationList:
+      title: plan item list is list of plan items resources.
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            allOf:
+            - $ref: '#/components/schemas/planMappingOrganization'
+            - $ref: '#/components/schemas/responseStat'
+    plan:
+      title: plan is a definition of Plan resource.
+      type: object
+      properties:
+        id:
+          type: string
+          example: plan-1
+        name:
+          type: string
+          example: name of plan
+        informations:
+          $ref: '#/components/schemas/plan_informations'
+        limits:
+          $ref: '#/components/schemas/plan_limits'
+    planList:
+      title: planList is list of Plan resources.
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/plan'
+    planItem:
+      title: planItem is a definition of plan item resource.
+      type: object
+      properties:
+        id:
+          type: string
+          example: platform.workspaces
+        informations:
+          $ref: '#/components/schemas/plan_informations'
+    planItemList:
+      title: plan item list is list of plan items resources.
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/planItem'
+    limits:
+      title: limitValue is a definition of Limit Value resource.
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/plan_limits'
+    limitsList:
+      title: limitValue is a definition of Limit Value resource.
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/limitsList_data'
+    usage:
+      title: usage is a definition of current value resource.
+      type: object
+      properties:
+        id:
+          type: string
+          example: platform.workspaces
+        current_value:
+          type: number
+          example: 100
+    usageList:
+      title: usageList is list of usage resources.
+      type: object
+      properties:
+        data:
+          type: array
+          example:
+          - id: platform.workspaces
+            current_value: 100
+          - id: platform.users
+            current_value: 200
+          - id: platform.roles
+            current_value: 300
+          items:
+            $ref: '#/components/schemas/usage'
+    usageOrganizationList:
+      title: usageList is list of usage resources.
+      type: object
+      properties:
+        data:
+          type: array
+          example:
+          - organization_id: organization_1
+            usages:
+            - id: platform.workspaces
+              current_value: 101
+            - id: platform.users
+              current_value: 102
+            - id: platform.roles
+              current_value: 103
+          - organization_id: organization_2
+            usages:
+            - id: platform.workspaces
+              current_value: 201
+            - id: platform.users
+              current_value: 202
+            - id: platform.roles
+              current_value: 203
+          items:
+            $ref: '#/components/schemas/usageOrganizationList_data'
     role:
       title: role is a definition of Role resource.
       type: object
@@ -760,6 +1610,12 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/role'
+    usernameOnly:
+      title: username of User resource.
+      type: object
+      properties:
+        username:
+          type: string
     user:
       title: user is a definition of User resource.
       type: object
@@ -792,12 +1648,19 @@ components:
     userCreate:
       title: user is a definition of User resource.
       required:
+      - password
       - username
       type: object
       properties:
         username:
           type: string
           example: user-id
+        password:
+          type: string
+          example: password
+        password_temporary:
+          type: boolean
+          default: true
         email:
           type: string
           example: user e-mail address
@@ -805,14 +1668,9 @@ components:
           type: string
         lastName:
           type: string
-        credentials:
-          type: array
-          items:
-            $ref: '#/components/schemas/userCredentials'
-        requiredActions:
-          $ref: '#/components/schemas/userRequiredActions'
         enabled:
           type: boolean
+          default: true
     userCredentials:
       title: userCredentials is Credentials of User resources.
       type: object
@@ -988,6 +1846,9 @@ components:
       title: role mapping user is a definition of User resource.
       type: object
       properties:
+        id:
+          type: string
+          format: uuid
         name:
           type: string
           example: firstname lastname
@@ -997,18 +1858,137 @@ components:
           type: string
         preferred_username:
           type: string
+        enabled:
+          type: boolean
+        create_timestamp:
+          type: string
+          format: date-time
+    tokenRequestBody:
+      title: create refresh token request parameter.
+      type: object
+      properties:
+        client_id:
+          type: string
+          example: "_{organization_id}-api"
+        grant_type:
+          type: string
+          description: '"password" or "refresh_token"'
+        scope:
+          type: string
+          description: Specified when grant_type = "password"
+          example: openid offline_access
+        username:
+          type: string
+          description: Specified when grant_type = "password"
+        password:
+          type: string
+          description: Specified when grant_type = "password"
+          example: password
+        totp:
+          type: string
+          description: one time password. Specified when grant_type = "password" and
+            two-fatctor-authnication
+          example: "123456"
+        refresh_token:
+          type: string
+          description: Specified when grant_type = "refresh_token"
+    tokenResponseOK:
+      title: A successful create token.
+      type: object
+      properties:
+        access_token:
+          type: string
+        expires_in:
+          type: integer
+        refresh_token:
+          type: string
+        id_token:
+          type: string
+        not-before-policy:
+          type: integer
+        session_state:
+          type: string
+          format: uuid
+        scope:
+          type: string
+          example: openid profile offline_access email
+      example:
+        access_token: access_token
+        refresh_token: refresh_token
+        not-before-policy: 6
+        scope: openid profile offline_access email
+        id_token: id_token
+        session_state: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        expires_in: 0
+    tokenResponseError:
+      title: A successful create token.
+      type: object
+      properties:
+        error:
+          type: string
+          example: invalid_grant
+        error_description:
+          type: string
+          example: Invalid user credentials
+    tokenRefreshList:
+      title: roleList is list of Role resources.
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/tokenRefreshList_data'
     inline_response_200:
       allOf:
       - $ref: '#/components/schemas/responseOk'
-      - $ref: '#/components/schemas/workspaceList'
+      - $ref: '#/components/schemas/organizationList'
     inline_response_200_1:
       allOf:
       - $ref: '#/components/schemas/responseOk'
       - type: object
         properties:
           data:
-            type: object
+            $ref: '#/components/schemas/organizationSetting'
     inline_response_200_2:
+      allOf:
+      - $ref: '#/components/schemas/responseOk'
+      - $ref: '#/components/schemas/tokenRefreshList'
+    inline_response_200_3:
+      allOf:
+      - $ref: '#/components/schemas/responseOk'
+      - type: object
+        properties:
+          data:
+            type: object
+    inline_response_200_4:
+      allOf:
+      - $ref: '#/components/schemas/responseOk'
+      - $ref: '#/components/schemas/planMappingOrganizationList'
+    inline_response_200_5:
+      allOf:
+      - $ref: '#/components/schemas/responseOk'
+      - $ref: '#/components/schemas/planList'
+    inline_response_200_6:
+      allOf:
+      - $ref: '#/components/schemas/responseOk'
+      - $ref: '#/components/schemas/planItemList'
+    inline_response_200_7:
+      allOf:
+      - $ref: '#/components/schemas/responseOk'
+      - $ref: '#/components/schemas/limits'
+    inline_response_200_8:
+      allOf:
+      - $ref: '#/components/schemas/responseOk'
+      - $ref: '#/components/schemas/usageOrganizationList'
+    inline_response_200_9:
+      allOf:
+      - $ref: '#/components/schemas/responseOk'
+      - $ref: '#/components/schemas/usageList'
+    inline_response_200_10:
+      allOf:
+      - $ref: '#/components/schemas/responseOk'
+      - $ref: '#/components/schemas/workspaceList'
+    inline_response_200_11:
       allOf:
       - $ref: '#/components/schemas/responseOk'
       - title: workspaceDetail is Workspace resources.
@@ -1018,15 +1998,15 @@ components:
             allOf:
             - $ref: '#/components/schemas/workspace'
             - $ref: '#/components/schemas/responseStat'
-    inline_response_200_3:
+    inline_response_200_12:
       allOf:
       - $ref: '#/components/schemas/responseOk'
       - $ref: '#/components/schemas/memberList'
-    inline_response_200_4:
+    inline_response_200_13:
       allOf:
       - $ref: '#/components/schemas/responseOk'
       - $ref: '#/components/schemas/userList'
-    inline_response_200_5:
+    inline_response_200_14:
       allOf:
       - $ref: '#/components/schemas/responseOk'
       - $ref: '#/components/schemas/roleDetailList'
@@ -1036,7 +2016,7 @@ components:
     roles_role_name_body:
       oneOf:
       - $ref: '#/components/schemas/roleDetailWorkspacePut'
-    inline_response_200_6:
+    inline_response_200_15:
       allOf:
       - $ref: '#/components/schemas/responseOk'
       - title: roleList is list of Role resources.
@@ -1046,14 +2026,68 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/roleUser'
-    inline_response_200_7:
+    inline_response_200_16:
+      allOf:
+      - $ref: '#/components/schemas/responseOk'
+      - $ref: '#/components/schemas/limitsList'
+    inline_response_200_17:
       allOf:
       - $ref: '#/components/schemas/responseOk'
       - $ref: '#/components/schemas/roleList'
-    inline_response_200_8:
+    inline_response_200_18:
       allOf:
       - $ref: '#/components/schemas/responseOk'
       - $ref: '#/components/schemas/userWorkspaceList'
+    organization_active_plan:
+      type: object
+      properties:
+        id:
+          type: string
+          example: plan-1
+    organizationSetting_token:
+      type: object
+      properties:
+        refresh_token_max_lifespan_enabled:
+          type: boolean
+          example: true
+        refresh_token_max_lifespan_days:
+          maximum: 1095
+          minimum: 1
+          type: integer
+          example: 365
+        access_token_lifespan_minutes:
+          maximum: 10080
+          minimum: 1
+          type: integer
+          example: 1440
+    plan_informations:
+      type: object
+      properties:
+        description:
+          type: string
+    plan_limits:
+      type: object
+      properties:
+        limit.id:
+          type: number
+      example: "{\"platform.workspaces\":100,\"platform.roles\":200}"
+    limitsList_data:
+      type: object
+      properties:
+        organization_id:
+          type: string
+          example: organization_id
+        limits:
+          $ref: '#/components/schemas/plan_limits'
+    usageOrganizationList_data:
+      type: object
+      properties:
+        organization_id:
+          type: string
+        usages:
+          type: array
+          items:
+            $ref: '#/components/schemas/usage'
     workspace_informations:
       type: object
       properties:
@@ -1085,4 +2119,34 @@ components:
         id:
           type: string
           example: workspace-1
+    tokenRefreshList_data:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        start_timestamp:
+          type: string
+          format: date-time
+        lastaccess_timestamp:
+          type: string
+          format: date-time
+        expire_timestamp:
+          type: string
+          format: date-time
+  responses:
+    UnauthorizedError:
+      description: Access token is missing or invalid
+  securitySchemes:
+    BearerAuth:
+      type: http
+      description: Credentials or access token for API
+      scheme: bearer
+      bearerFormat: JWT
+      x-bearerInfoFunc: swagger_server.controllers.authorization_controller.check_BearerAuth
+    BasicAuth:
+      type: http
+      description: Value converted from ID/Password in base64
+      scheme: basic
+      x-basicInfoFunc: swagger_server.controllers.authorization_controller.check_BasicAuth
 
