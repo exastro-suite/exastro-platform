@@ -56,6 +56,8 @@ tags:
 paths:
   "/auth/realms/master/protocol/openid-connect/token":
       $ref: './paths/protocol.openid-connect.token.master.yaml'
+  "/api/platform/users/_current/refresh_tokens":
+      $ref: './paths/user.current.refresh_tokens.platform.yaml'
 
   "/api/platform/organizations":
       $ref: './paths/organizations.yaml'

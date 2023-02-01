@@ -59,6 +59,53 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/tokenResponseError'
+  /api/platform/users/_current/refresh_tokens:
+    get:
+      tags:
+        - TokenService
+      summary: List returns refresh token for system manager
+      x-openapi-router-controller: controllers.token_service_controller
+      operationId: refresh_token_list_for_mng
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - $ref: '#/components/schemas/tokenRefreshList'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+    delete:
+      tags:
+        - TokenService
+      summary: delete refresh token for system manager
+      x-openapi-router-controller: controllers.token_service_controller
+      operationId: refresh_token_delete_for_mng
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        example: null
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
   /api/platform/organizations:
     get:
       tags:
