@@ -12,6 +12,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 import time
+import datetime
 import pymysql
 import os
 import json
@@ -39,6 +40,11 @@ def wait_until_connect_to_db(host, user, password, database):
     Returns:
         Connection: Database Connection
     """
+    start_time = datetime.datetime.now()
+    timeout_seconds_connect_db = int(os.environ.get("TIMEOUT_SECONDS_CONNECT_DB", "-1"))
+
+    globals.logger.info(f'WAIT UNTIL CONNECT DATABASE({user}@{host}/{database})...')
+
     while True:
         try:
             conn = pymysql.connect(
@@ -50,8 +56,10 @@ def wait_until_connect_to_db(host, user, password, database):
                 cursorclass=pymysql.cursors.DictCursor,
             )
             break
-
         except Exception:
+            if timeout_seconds_connect_db != -1 and datetime.datetime.now() > start_time + datetime.timedelta(seconds=timeout_seconds_connect_db):
+                raise Exception(f"Connection to database timed out : {timeout_seconds_connect_db}s")
+
             time.sleep(WAIT_INTERVAL)
 
     return conn
@@ -104,7 +112,7 @@ def get_db_data_version(conn, lock=False):
         return result.get("VERSION")
 
 
-def update_db_data_version(conn, version):
+def update_db_data_version(conn, version, update_user='system'):
     """Update Database data version
 
     Args:
@@ -113,18 +121,50 @@ def update_db_data_version(conn, version):
     """
     with conn.cursor() as cursor:
         globals.logger.info(f'UPDATE DATABASE VERSION : {version}')
-        cursor.execute(queries_common.UPDATE_VERSION_TABLE, {"version": version})
+        cursor.execute(queries_common.UPDATE_VERSION_TABLE, {"version": version, "last_update_user": update_user})
+
+
+def insert_migration_history(version, result, message=None, create_user='system'):
+    """Insert migration history
+
+    Args:
+        version (str): version
+        result (str): "START" or "SUCCEED" or "FAILED"
+        message (str): Error Message
+        create_user (str, optional): user. Defaults to 'system'.
+    """
+    message_substr = message[:4095] if message is not None else None
+
+    with closing(connect_platform_db()) as conn:
+        with conn.cursor() as cursor:
+            cursor.execute(
+                queries_common.INSERT_MIGRATION_HISTORY,
+                {
+                    "version": version,
+                    "result": result,
+                    "message": message_substr,
+                    "create_user": create_user,
+                    "last_update_user": create_user
+                }
+            )
+            conn.commit()
 
 
 def wait_until_keycloak_to_start():
     """wait until keycloak to start
     """
-    globals.logger.info(f'WAIT UNTIL KEYCLOAK TO START ...')
+    globals.logger.info('WAIT UNTIL KEYCLOAK TO START ...')
+
+    start_time = datetime.datetime.now()
+    timeout_seconds_keycloak_start = int(os.environ.get("TIMEOUT_SECONDS_KEYCLOAK_START", "-1"))
 
     with closing(connect_platform_db()) as conn:
         informations = __get_platform_informations(conn)
 
     while True:
+        if timeout_seconds_keycloak_start != -1 and datetime.datetime.now() > start_time + datetime.timedelta(seconds=timeout_seconds_keycloak_start):
+            raise Exception(f"keycloak start timed out : {timeout_seconds_keycloak_start}s")
+
         try:
             health_response = api_keycloak_server.health()
             if health_response.status_code != 200:

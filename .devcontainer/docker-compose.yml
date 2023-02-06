@@ -65,6 +65,11 @@ services:
     ports:
       - "0.0.0.0:8000:8000"
       - "0.0.0.0:8001:8001"
+
+    depends_on:
+      platform-migration-2:
+        condition: service_completed_successfully
+
   keycloak:
     build:
       dockerfile: ./platform_root/keycloak/Dockerfile
@@ -96,12 +101,8 @@ services:
       platform-migration-1:
         condition: service_completed_successfully
   platform-db:
-    # build:
-    #   dockerfile: ./platform_root/platform_db/Dockerfile
-    #   context: ../.
     image: mariadb:10.4.8
     healthcheck:
-      # test: mysqladmin ping --silent && mysql -u $${KEYCLOAK_DB_USER} -p$${KEYCLOAK_DB_PASSWORD} -D $${KEYCLOAK_DB_DATABASE} -e 'select 1;'
       test: mysqladmin ping --silent && mysql -u root -p$${MYSQL_ROOT_PASSWORD} -e 'select 1;'
       interval: 3s
       retries: 200
@@ -111,9 +112,6 @@ services:
     environment:
       - TZ=Asia/Tokyo
       - MYSQL_ROOT_PASSWORD=password
-      # - KEYCLOAK_DB_DATABASE=keycloak
-      # - KEYCLOAK_DB_USER=keycloak
-      # - KEYCLOAK_DB_PASSWORD=password
   platform-web:
     user: 1000:1000
     build:
@@ -180,6 +178,8 @@ services:
       - KEYCLOAK_DB_DATABASE=keycloak
       - KEYCLOAK_DB_USER=keycloak
       - KEYCLOAK_DB_PASSWORD=password
+      # - TIMEOUT_SECONDS_CONNECT_DB=600
+      # - TIMEOUT_SECONDS_KEYCLOAK_START=600
   platform-migration-2:
     user: 1000:1000
     build:
@@ -209,6 +209,8 @@ services:
       - KEYCLOAK_DB_USER=keycloak
       - KEYCLOAK_DB_PASSWORD=password
       - KEYCLOAK_VERSION=20.0
+      # - TIMEOUT_SECONDS_CONNECT_DB=600
+      # - TIMEOUT_SECONDS_KEYCLOAK_START=600
       - ENCRYPT_KEY=${ENCRYPT_KEY}
     depends_on:
       platform-migration-1:

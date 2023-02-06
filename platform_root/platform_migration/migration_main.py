@@ -69,6 +69,8 @@ def __main():
             system_version = f.readline().strip()
 
         if system_version == db_data_version:
+            # Exit without doing anything because the versions match
+            # バージョンが一致しているので、なにもせず終了する
             globals.logger.info(f'SKIP : platform maigration_main : Data and System versions match : {system_version}')
             return 0
 
@@ -81,32 +83,55 @@ def __main():
         migrations_path = os.path.join(os.path.dirname(__file__), MIGRATIONS_DIR_NAME)
         migrations = [os.path.basename(f).replace('_', '.') for f in os.listdir(migrations_path) if os.path.isdir(os.path.join(migrations_path, f))]
 
+        # Process from oldest migration
+        # migrationの古い順から処理する
         for migration in sorted(migrations, key=version.parse):
+
             with closing(migration_common.connect_platform_db()) as conn:
 
+                # Lock the version table when executing a migration
+                # migrationを実行するに当たってversionテーブルをロックする
                 db_data_version = migration_common.get_db_data_version(conn, lock=True)
 
+                # Exclude migrations that exceed the applied version or version file
+                # 適用済みのversionもしくはversionファイルを超えるmigrationは対象外にする
                 if version.parse(migration) > version.parse(db_data_version) \
                         and version.parse(migration) <= version.parse(system_version):
 
                     try:
                         globals.logger.info(f'* migration({migration}) START')
+                        migration_common.insert_migration_history(migration, "START", create_user=system_version)
+
+                        # call migration
+                        # migrationを呼出す
                         migration_module = import_module(f"{MIGRATIONS_DIR_NAME}.{migration.replace('.', '_')}.migration")
                         result = migration_module.main()
 
+                        # Exit with an error if the result is non-zero
+                        # 結果が0以外の時はエラーで終了する
                         if result != 0:
                             conn.rollback()
                             globals.logger.error(f'* migration({migration}): Error return:{result}')
+                            migration_common.insert_migration_history(migration, "FAILED", f'migration result = {result}', create_user=system_version)
                             return result
 
-                        migration_common.update_db_data_version(conn, migration)
+                        # Proceed to version of successful migration
+                        # 成功したmigrationのversionに進める
+                        migration_common.update_db_data_version(conn, migration, update_user=system_version)
                         conn.commit()
 
                         globals.logger.info(f'* migration({migration}): Succeed')
-                    except Exception as e:
+                        migration_common.insert_migration_history(migration, "SUCCEED", create_user=system_version)
+
+                    except Exception as err:
                         globals.logger.error(f'* migration({migration}): Failed')
                         conn.rollback()
-                        raise e
+                        migration_common.insert_migration_history(
+                            migration,
+                            "FAILED",
+                            ''.join(list(traceback.TracebackException.from_exception(err).format())),
+                            create_user=system_version)
+                        raise err
                 else:
                     globals.logger.info(f'* migration({migration}): Skip')
 
@@ -114,8 +139,10 @@ def __main():
         # 全てのmigrationが成功したらdatabaseのversionをシステムのversionに合わせる
         with closing(migration_common.connect_platform_db()) as conn:
             db_data_version = migration_common.get_db_data_version(conn, lock=True)
-            migration_common.update_db_data_version(conn, system_version)
-            conn.commit()
+            if db_data_version != system_version:
+                migration_common.update_db_data_version(conn, system_version, update_user=system_version)
+                conn.commit()
+                migration_common.insert_migration_history(system_version, "SUCCEED", "Update to System Version", create_user=system_version)
 
         globals.logger.info('SUCCEED : platform maigration_main')
         return 0
