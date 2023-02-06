@@ -1,0 +1,107 @@
+/*
+#   Copyright 2022 NEC Corporation
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+*/
+{
+    // IntelliSense を使用して利用可能な属性を学べます。
+    // 既存の属性の説明をホバーして表示します。
+    // 詳細情報は次を確認してください: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "migration_main.py",
+        "type": "python",
+        "request": "launch",
+        "program": "/app/migration_main.py",
+        "cwd": "/app",
+        "pathMappings": [
+          {
+            "localRoot": "${workspaceFolder}/platform_root/platform_migration",
+            "remoteRoot": "/app"
+          }
+        ],
+        "args": [
+            "run",
+            "--no-debugger"
+        ],
+        "noDebug": true,
+        "jinja": true,
+        "justMyCode": true
+      },
+      {
+        "name": "initialize_db_main.py",
+        "type": "python",
+        "request": "launch",
+        "program": "/app/initialize_db_main.py",
+        "cwd": "/app",
+        "pathMappings": [
+          {
+            "localRoot": "${workspaceFolder}/platform_root/platform_migration",
+            "remoteRoot": "/app"
+          }
+        ],
+        "args": [
+            "run",
+            "--no-debugger"
+        ],
+        "noDebug": true,
+        "jinja": true,
+        "justMyCode": true
+      },
+      {
+        "name": "[DEBUG] migration_main.py",
+        "type": "python",
+        "request": "launch",
+        "program": "/app/migration_main.py",
+        "cwd": "/app",
+        "pathMappings": [
+          {
+            "localRoot": "${workspaceFolder}/platform_root/platform_migration",
+            "remoteRoot": "/app"
+          }
+        ],
+        "args": [
+            "run",
+            "--no-debugger"
+        ],
+        "env": {
+          "LOG_LEVEL": "DEBUG"
+        },
+        "jinja": true,
+        "justMyCode": true
+      },
+      {
+        "name": "[DEBUG] initialize_db_main.py",
+        "type": "python",
+        "request": "launch",
+        "program": "/app/initialize_db_main.py",
+        "cwd": "/app",
+        "pathMappings": [
+          {
+            "localRoot": "${workspaceFolder}/platform_root/platform_migration",
+            "remoteRoot": "/app"
+          }
+        ],
+        "args": [
+            "run",
+            "--no-debugger"
+        ],
+        "env": {
+          "LOG_LEVEL": "DEBUG"
+        },
+        "jinja": true,
+        "justMyCode": true
+      },
+ ]
+}
