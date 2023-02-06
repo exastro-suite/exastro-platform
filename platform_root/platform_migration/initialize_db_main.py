@@ -77,7 +77,7 @@ def __main():
 
             conn.commit()
 
-        globals.logger.info('FINISH : platform initialize_db_main')
+        globals.logger.info('SUCCEED : platform initialize_db_main')
         return 0
     except Exception as err:
         globals.logger.error(''.join(list(traceback.TracebackException.from_exception(err).format())))
