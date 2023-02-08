@@ -59,7 +59,7 @@ def __main():
                 migration_common.wait_until_connect_to_db(
                     os.environ.get("DB_HOST"),
                     os.environ.get("DB_ADMIN_USER"),
-                    os.environ.get("DB_PASSWORD"),
+                    os.environ.get("DB_ADMIN_PASSWORD"),
                     None)) as conn:
 
             db_data_version = migration_common.get_db_data_version(conn)

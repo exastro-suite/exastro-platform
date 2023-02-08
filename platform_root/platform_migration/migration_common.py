@@ -209,7 +209,7 @@ def wait_until_keycloak_to_start():
             time.sleep(WAIT_INTERVAL)
             continue
 
-    globals.logger.info(f'KEYCLOAK STARTED')
+    globals.logger.info('KEYCLOAK STARTED')
     return
 
 
