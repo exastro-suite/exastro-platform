@@ -203,6 +203,8 @@ def wait_until_keycloak_to_start():
             if ".".join(serverinfo["systemInfo"]["version"].split(".")[:2]) == os.environ.get("KEYCLOAK_VERSION"):
                 break
 
+            time.sleep(WAIT_INTERVAL)
+
         # except Exception as err:
         #     globals.logger.debug(''.join(list(traceback.TracebackException.from_exception(err).format())))
         except Exception:
