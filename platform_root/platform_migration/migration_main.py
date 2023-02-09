@@ -51,13 +51,13 @@ MIGRATIONS_DIR_NAME = "migrations"
 
 
 def __main():
-    """platform maigration main
+    """platform migration main
 
     Returns:
         int: result(0=succeed / other=failed)
     """
     try:
-        globals.logger.info('START : platform maigration_main')
+        globals.logger.info('START : platform migration_main')
 
         # get database data version
         with closing(migration_common.connect_platform_db()) as conn:
@@ -71,7 +71,7 @@ def __main():
         if system_version == db_data_version:
             # Exit without doing anything because the versions match
             # バージョンが一致しているので、なにもせず終了する
-            globals.logger.info(f'SKIP : platform maigration_main : Data and System versions match : {system_version}')
+            globals.logger.info(f'SKIP : platform migration_main : Data and System versions match : {system_version}')
             return 0
 
         # wait until keycloak to start
@@ -144,7 +144,7 @@ def __main():
                 conn.commit()
                 migration_common.insert_migration_history(system_version, "SUCCEED", "Update to System Version", create_user=system_version)
 
-        globals.logger.info('SUCCEED : platform maigration_main')
+        globals.logger.info('SUCCEED : platform migration_main')
         return 0
 
     except Exception as err:
