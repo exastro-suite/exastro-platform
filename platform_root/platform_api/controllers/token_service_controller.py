@@ -455,7 +455,7 @@ def __make_refresh_tokens_list(offline_sessions, result_token_lists, realm_info,
 
             data.append(row)
 
-        return data
+    return data
 
 
 def __get_token(organization_id):
