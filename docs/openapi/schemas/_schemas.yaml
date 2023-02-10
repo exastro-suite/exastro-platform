@@ -102,3 +102,13 @@ tokenResponseError:
   $ref: "./tokenResponseError.yaml"
 tokenRefreshList:
   $ref: "./tokenRefreshList.yaml"
+systemConfig:
+  $ref: "./systemConfig.yaml"
+systemConfigList:
+  $ref: "./systemConfigList.yaml"
+systemConfigCreate:
+  $ref: "./systemConfigCreate.yaml"
+systemConfigUpdate:
+  $ref: "./systemConfigUpdate.yaml"
+systemConfigValue:
+  $ref: "./systemConfigValue.yaml"

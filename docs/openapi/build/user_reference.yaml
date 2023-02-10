@@ -1447,6 +1447,71 @@ components:
               expire_timestamp:
                 type: string
                 format: date-time
+    systemConfig:
+      title: system config is a definition of system config resource.
+      type: object
+      properties:
+        key:
+          type: string
+          description: config key
+        value:
+          type: string
+          description: config value
+        description:
+          type: string
+          description: config description
+      example:
+        key: platform.max_organization
+        value: 100
+        description: platform max organization
+    systemConfigList:
+      title: system config list is list of system config resources.
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/systemConfig'
+    systemConfigCreate:
+      title: system config value is a definition of system config resource.
+      type: array
+      items:
+        $ref: '#/components/schemas/systemConfig'
+        required:
+          - key
+          - value
+      example:
+        - key: platform.max_organization
+          value: 100
+          description: platform max organization
+    systemConfigUpdate:
+      example:
+        value: 100
+        description: max organization
+      required:
+        - value
+      title: system config is a definition of system config resource.
+      type: object
+      properties:
+        value:
+          type: string
+          description: config value
+        description:
+          type: string
+          description: config description
+    systemConfigValue:
+      title: system config is a definition of system config resource.
+      type: object
+      properties:
+        value:
+          type: string
+          description: config value
+        description:
+          type: string
+          description: config description
+      example:
+        value: 100
+        description: ''
   securitySchemes:
     BearerAuth:
       description: Credentials or access token for API
