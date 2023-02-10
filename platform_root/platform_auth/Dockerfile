@@ -106,7 +106,7 @@ COPY ./platform_root/platform_auth/ $APP_PATH/
 COPY ./platform_root/common_library/ $APP_PATH/common_library/
 COPY ./platform_root/common_resources/ $APP_PATH/common_resources/
 
-CMD ["httpd","-D","FOREGROUND"]
+CMD ["/app/start_httpd.sh"]
 
 #
 # Build for production
@@ -130,4 +130,4 @@ COPY ./platform_root/common_resources/ $APP_PATH/common_resources/
 
 USER $USERNAME
 
-CMD ["httpd","-D","FOREGROUND"]
+CMD ["/app/start_httpd.sh"]
