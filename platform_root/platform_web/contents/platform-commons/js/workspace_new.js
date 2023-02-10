@@ -140,6 +140,7 @@ $(function(){
             }
         }
 
+        show_progress();
         call_api_promise(
             {
                 type: "POST",
@@ -152,9 +153,12 @@ $(function(){
                 dataType: "json",
             }
         ).then(() => {
-            alert("ワークスペースを作成しました");
-            window.location = location_conf.href.workspaces.list.replace(/{organization_id}/g, CommonAuth.getRealm());
+            hide_progress();
+            alertMessage("処理結果", "ワークスペースを作成しました",() => {
+                window.location = location_conf.href.workspaces.list.replace(/{organization_id}/g, CommonAuth.getRealm());
+            });
         }).catch(() => {
+            hide_progress();
             $('#button_register').prop('disabled',false);
         })
     }
