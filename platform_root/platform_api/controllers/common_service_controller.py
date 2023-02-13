@@ -27,57 +27,7 @@ import globals
 MSG_FUNCTION_ID = "20"
 
 
-@common.platform_exception_handler
-def alive():
-    """死活監視
-
-    Returns:
-        Response: HTTP Respose
-    """
-    return common.response_200_ok(None)
-
-
-@common.platform_exception_handler
-def internal_settings_system_config_create(body):  # noqa: E501
-    """Create creates an system config value
-
-    Args:
-        body (_type_): _description_
-
-    Returns:
-        _type_: _description_
-    """
-    return 'do some magic!'
-
-
-@common.platform_exception_handler
-def internal_settings_system_config_delete(config_key):  # noqa: E501
-    """delete an system config value settings
-
-    Args:
-        config_key (_type_): _description_
-
-    Returns:
-        _type_: _description_
-    """
-    return 'do some magic!'
-
-
-@common.platform_exception_handler
-def internal_settings_system_config_item(config_key):  # noqa: E501
-    """Returns the system config key value
-
-    Args:
-        config_key (_type_): _description_
-
-    Returns:
-        _type_: _description_
-    """
-    return 'do some magic!'
-
-
-@common.platform_exception_handler
-def internal_settings_system_config_list():  # noqa: E501
+def settings_system_config_list():  # noqa: E501
     """Returns the current system config value
 
     Returns:
@@ -86,8 +36,7 @@ def internal_settings_system_config_list():  # noqa: E501
     return 'do some magic!'
 
 
-@common.platform_exception_handler
-def internal_settings_system_config_update(body, config_key):  # noqa: E501
+def settings_system_config_update(body, config_key):  # noqa: E501
     """Update an system config value settings
 
     Args:

@@ -1206,6 +1206,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/responseOk'
+        '409':
+          description: Duplicate key error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeErrorConflict'
         default:
           description: An unexpected error response.
           content:
@@ -1575,6 +1581,22 @@ components:
           type: integer
           format: int32
           example: 500
+        message:
+          type: string
+          example: Error Message
+        ts:
+          type: string
+          format: date-time
+        data:
+          type: object
+          example: null
+    runtimeErrorConflict:
+      type: object
+      properties:
+        result:
+          type: integer
+          format: int32
+          example: 409
         message:
           type: string
           example: Error Message

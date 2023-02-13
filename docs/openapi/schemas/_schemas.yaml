@@ -18,6 +18,8 @@ responseStat:
   $ref: "./responseStat.yaml"
 runtimeError:
   $ref: "./runtimeError.yaml"
+runtimeErrorConflict:
+  $ref: "./runtimeErrorConflict.yaml"
 organization:
   $ref: "./organization.yaml"
 organizationCreate:

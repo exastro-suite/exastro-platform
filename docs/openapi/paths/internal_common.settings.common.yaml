@@ -53,6 +53,12 @@ post:
         application/json:
           schema:
             $ref: '../schemas/responseOk.yaml'
+    409:
+      description: Duplicate key error response.
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeErrorConflict.yaml'
     default:
       description: An unexpected error response.
       content:

@@ -453,6 +453,22 @@ components:
         data:
           type: object
           example: null
+    runtimeErrorConflict:
+      type: object
+      properties:
+        result:
+          type: integer
+          format: int32
+          example: 409
+        message:
+          type: string
+          example: Error Message
+        ts:
+          type: string
+          format: date-time
+        data:
+          type: object
+          example: null
     organization:
       title: organization is a definition of Organization resource.
       type: object
