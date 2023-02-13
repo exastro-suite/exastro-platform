@@ -16,10 +16,10 @@ import json
 import inspect
 
 from contextlib import closing
-from common_library.common import common, const as common_const, multi_lang
+
+from common_library.common import common, validation, multi_lang
 from common_library.common.db import DBconnector
 from common_library.common import bl_common_service
-from libs import queries_internal_plan
 
 import globals
 
@@ -127,6 +127,15 @@ def internal_settings_system_config_update(body, config_key):  # noqa: E501
 
     r = connexion.request
     user_id = r.headers.get("User-id")
+
+    # validation check
+    validate = validation.validate_system_config_value(body.get("value"))
+    if not validate.ok:
+        return common.response_validation_error(validate)
+
+    validate = validation.validate_system_config_description(body.get("description"))
+    if not validate.ok:
+        return common.response_validation_error(validate)
 
     # update config
     with closing(DBconnector().connect_platformdb()) as conn:

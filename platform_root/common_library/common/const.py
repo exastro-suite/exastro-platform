@@ -33,6 +33,9 @@ length_user_name = 255
 length_user_email = 255
 length_user_firstName = 100
 length_user_lastName = 100
+length_system_config_key = 100
+length_system_config_value = 4000
+length_system_config_description = 255
 
 
 # ロール種別
