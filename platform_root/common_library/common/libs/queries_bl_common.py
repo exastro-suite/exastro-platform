@@ -12,4 +12,12 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-SQL_QUERY_PLAN_LIMITS = """SELECT * FROM M_SYSTEM_CONFIG"""
+SQL_QUERY_SELECT_SYSTEM_CONFIG = """SELECT * FROM M_SYSTEM_CONFIG"""
+
+SQL_QUERY_UPDATE_SYSTEM_CONFIG = """UPDATE M_SYSTEM_CONFIG
+                                    SET CONFIG_VALUE = %(config_value)s
+                                    ,   DESCRIPTION = %(description)s
+                                    ,   LAST_UPDATE_USER = %(last_update_user)s
+                                    WHERE CONFIG_KEY = %(config_key)s"""
+
+SQL_QUERY_DELETE_SYSTEM_CONFIG = """DELETE FROM M_SYSTEM_CONFIG WHERE CONFIG_KEY = %(config_key)s"""

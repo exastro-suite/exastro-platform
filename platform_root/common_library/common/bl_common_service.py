@@ -34,12 +34,12 @@ def settings_system_config_list(config_key=None):
         with conn.cursor() as cursor:
 
             if config_key is not None:
-                sql_stmt = queries_bl_common.SQL_QUERY_PLAN_LIMITS + ' WHERE CONFIG_KEY = %(config_key)s'
+                sql_stmt = queries_bl_common.SQL_QUERY_SELECT_SYSTEM_CONFIG + ' WHERE CONFIG_KEY = %(config_key)s'
                 parameter = {
                     "config_key": config_key,
                 }
             else:
-                sql_stmt = queries_bl_common.SQL_QUERY_PLAN_LIMITS
+                sql_stmt = queries_bl_common.SQL_QUERY_SELECT_SYSTEM_CONFIG
                 parameter = {}
 
             cursor.execute(sql_stmt, parameter)
@@ -57,3 +57,52 @@ def settings_system_config_list(config_key=None):
     else:
         return [{"key": r.get("CONFIG_KEY"), "value": r.get("CONFIG_VALUE"), "description": r.get("DESCRIPTION")}
                 for r in system_configs]
+
+
+def settings_system_config_update(conn, user_id, data, config_key):
+    """update setting system config
+
+    Args:
+        conn (Connection): database connection
+        user_id (str): update user id
+        data (dict): update data
+        config_key (str): config key
+
+    Returns:
+        int: update row count
+    """
+    with conn.cursor() as cursor:
+
+        parameter = {
+            "config_key": config_key,
+            "config_value": data.get("value"),
+            "description": data.get("description"),
+            "last_update_user": user_id
+        }
+
+        cursor.execute(queries_bl_common.SQL_QUERY_UPDATE_SYSTEM_CONFIG, parameter)
+
+        return cursor.rowcount
+
+
+def settings_system_config_delete(conn, user_id, config_key):
+    """update setting system config
+
+    Args:
+        conn (Connection): database connection
+        user_id (str): update user id
+        config_key (str): config key
+
+    Returns:
+        int: delete row count
+    """
+    with conn.cursor() as cursor:
+
+        parameter = {
+            "config_key": config_key
+        }
+
+        cursor.execute(queries_bl_common.SQL_QUERY_DELETE_SYSTEM_CONFIG, parameter)
+
+        return cursor.rowcount
+
