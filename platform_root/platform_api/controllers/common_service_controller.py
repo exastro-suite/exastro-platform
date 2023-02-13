@@ -12,11 +12,8 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 import connexion
-
-import json
 import inspect
 from contextlib import closing
-
 from common_library.common.db import DBconnector
 from common_library.common import common, validation, multi_lang
 from common_library.common import bl_common_service
@@ -30,7 +27,7 @@ def settings_system_config_list():  # noqa: E501
     """Returns the current system config value
 
     Returns:
-        _type_: _description_
+        response: HTTP Response
     """
     globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
 
