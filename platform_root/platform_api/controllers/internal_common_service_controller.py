@@ -16,10 +16,9 @@ import json
 import inspect
 
 from contextlib import closing
-
-from common_library.common import common, const
+from common_library.common import common, const as common_const, multi_lang
 from common_library.common.db import DBconnector
-from common_library.common import bl_plan_service
+from common_library.common import bl_common_service
 from libs import queries_internal_plan
 
 import globals
@@ -73,7 +72,18 @@ def internal_settings_system_config_item(config_key):  # noqa: E501
     Returns:
         _type_: _description_
     """
-    return 'do some magic!'
+    globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
+
+    # plan and plan_limit list get
+    data = bl_common_service.settings_system_config_list(config_key)
+
+    if data is not None:
+        return common.response_200_ok(data)
+    else:
+        raise common.NotFoundException(
+            message_id=f"404-{MSG_FUNCTION_ID}001",
+            message=multi_lang.get_text(f"404-{MSG_FUNCTION_ID}001", "設定が存在しません(key:{0})", config_key)
+        )
 
 
 @common.platform_exception_handler
@@ -83,7 +93,12 @@ def internal_settings_system_config_list():  # noqa: E501
     Returns:
         _type_: _description_
     """
-    return 'do some magic!'
+    globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
+
+    # plan and plan_limit list get
+    data = bl_common_service.settings_system_config_list()
+
+    return common.response_200_ok(data)
 
 
 @common.platform_exception_handler
