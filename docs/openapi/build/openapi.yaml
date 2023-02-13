@@ -2251,16 +2251,15 @@ components:
         key:
           type: string
           description: config key
+          example: platform.max_organization
         value:
           type: string
           description: config value
+          example: '100'
         description:
           type: string
           description: config description
-      example:
-        key: platform.max_organization
-        value: 100
-        description: platform max organization
+          example: platform max organization
     systemConfigList:
       title: system config list is list of system config resources.
       type: object
@@ -2279,11 +2278,11 @@ components:
           - value
       example:
         - key: platform.max_organization
-          value: 100
+          value: '100'
           description: platform max organization
     systemConfigUpdate:
       example:
-        value: 100
+        value: '100'
         description: max organization
       required:
         - value
