@@ -817,3 +817,72 @@ def validate_organization_setting(body):
         # body["token"]["access_token_lifespan_minutes"]の範囲チェックはopenapi(connexion)で実施されているので割愛する
 
     return result(True)
+
+
+def validate_system_config_key(config_key):
+    """validate system config key
+
+    Args:
+        config_key (str): system config key
+
+    Returns:
+        result: Validation result
+    """
+    if config_key is None or config_key == "":
+        return result(
+            False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
+            multi_lang.get_text('000-00136', "システム設定名")
+        )
+
+    if len(config_key) > const.length_system_config_key:
+        return result(
+            False, 400, '400-{}012'.format(MSG_FUNCTION_ID), '指定可能な文字数を超えています。(項目:{0},最大文字数:{1})',
+            multi_lang.get_text('000-00136', "システム設定名"),
+            str(const.length_system_config_key)
+        )
+
+    return result(True)
+
+
+def validate_system_config_value(config_value):
+    """validate system config value
+
+    Args:
+        config_value (str): system config value
+
+    Returns:
+        result: Validation result
+    """
+    if config_value is None or config_value == "":
+        return result(
+            False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
+            multi_lang.get_text('000-00137', "システム設定値")
+        )
+
+    if len(config_value) > const.length_system_config_value:
+        return result(
+            False, 400, '400-{}012'.format(MSG_FUNCTION_ID), '指定可能な文字数を超えています。(項目:{0},最大文字数:{1})',
+            multi_lang.get_text('000-00137', "システム設定値"),
+            str(const.length_system_config_value)
+        )
+
+    return result(True)
+
+
+def validate_system_config_description(description):
+    """validate system config description
+
+    Args:
+        description (str): system config description
+
+    Returns:
+        result: Validation result
+    """
+    if description is not None and len(description) > const.length_system_config_description:
+        return result(
+            False, 400, '400-{}012'.format(MSG_FUNCTION_ID), '指定可能な文字数を超えています。(項目:{0},最大文字数:{1})',
+            multi_lang.get_text('000-00138', "システム設定値説明"),
+            str(const.length_system_config_description)
+        )
+
+    return result(True)
