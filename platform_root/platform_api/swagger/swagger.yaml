@@ -2198,16 +2198,15 @@ components:
         key:
           type: string
           description: config key
+          example: platform.max_organization
         value:
           type: string
           description: config value
+          example: "100"
         description:
           type: string
           description: config description
-      example:
-        key: platform.max_organization
-        value: 100
-        description: platform max organization
+          example: platform max organization
     systemConfigList:
       title: system config list is list of system config resources.
       type: object
@@ -2221,7 +2220,7 @@ components:
       type: array
       example:
       - key: platform.max_organization
-        value: 100
+        value: "100"
         description: platform max organization
       items:
         $ref: '#/components/schemas/systemConfig'
@@ -2238,7 +2237,7 @@ components:
           type: string
           description: config description
       example:
-        value: 100
+        value: "100"
         description: max organization
     systemConfigValue:
       title: system config is a definition of system config resource.
@@ -2348,7 +2347,10 @@ components:
     inline_response_200_17:
       allOf:
       - $ref: '#/components/schemas/responseOk'
-      - $ref: '#/components/schemas/systemConfig'
+      - type: object
+        properties:
+          data:
+            $ref: '#/components/schemas/systemConfig'
     inline_response_200_18:
       allOf:
       - $ref: '#/components/schemas/responseOk'
