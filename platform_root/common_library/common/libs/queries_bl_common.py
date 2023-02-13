@@ -12,6 +12,11 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
+SQL_INSERT_PLAN_LIMITS = """
+INSERT INTO M_SYSTEM_CONFIG (CONFIG_KEY, CONFIG_VALUE, DESCRIPTION)
+values (%(key)s, %(value)s, %(description)s)
+"""
+
 SQL_QUERY_SELECT_SYSTEM_CONFIG = """SELECT * FROM M_SYSTEM_CONFIG"""
 
 SQL_QUERY_UPDATE_SYSTEM_CONFIG = """UPDATE M_SYSTEM_CONFIG
