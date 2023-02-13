@@ -14,7 +14,7 @@
 
 $ref: './systemConfigValue.yaml'
 example:
-  value: 100
-  description: max organization
+  value: "100"
+  description: "max organization"
 required:
   - value

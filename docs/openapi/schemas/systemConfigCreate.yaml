@@ -22,8 +22,8 @@ items:
 example:
   [
     {
-      key: platform.max_organization,
-      value: 100,
-      description: platform max organization
+      key: "platform.max_organization",
+      value: "100",
+      description: "platform max organization"
     }
   ]
