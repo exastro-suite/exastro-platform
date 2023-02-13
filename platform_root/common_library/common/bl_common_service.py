@@ -12,38 +12,17 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-import json
-import inspect
-
 from contextlib import closing
+from datetime import datetime
+import pymysql
 
-from common_library.common import common, const
+from common_library.common import common, const as common_const
 from common_library.common.db import DBconnector
-from common_library.common import bl_plan_service
-from libs import queries_internal_plan
+from common_library.common import multi_lang
+from common_library.common.libs import queries_bl_plan
+
 
 import globals
 
-MSG_FUNCTION_ID = "32"
+MSG_FUNCTION_ID = "33"
 
-
-def settings_system_config_list():  # noqa: E501
-    """Returns the current system config value
-
-    Returns:
-        _type_: _description_
-    """
-    return 'do some magic!'
-
-
-def settings_system_config_update(body, config_key):  # noqa: E501
-    """Update an system config value settings
-
-    Args:
-        body (_type_): _description_
-        config_key (_type_): _description_
-
-    Returns:
-        _type_: _description_
-    """
-    return 'do some magic!'
