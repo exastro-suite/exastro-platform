@@ -1240,7 +1240,11 @@ paths:
               schema:
                 allOf:
                   - $ref: '#/components/schemas/responseOk'
-                  - $ref: '#/components/schemas/systemConfig'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        $ref: '#/components/schemas/systemConfig'
         default:
           description: An unexpected error response.
           content:

@@ -33,7 +33,11 @@ get:
           schema:
             allOf:
               - $ref: '../schemas/responseOk.yaml'
-              - $ref: '../schemas/systemConfig.yaml'
+              - type: object
+                properties:
+                  data:
+                    type: object
+                    $ref: '../schemas/systemConfig.yaml'
     default:
       description: An unexpected error response.
       content:
