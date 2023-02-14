@@ -41,7 +41,7 @@ def settings_system_config_create(conn, user_id, body):
         cursor.execute(queries_bl_common.SQL_INSERT_SYSTEM_CONFIG, parameter)
 
 
-def settings_system_config_list(config_key=None):
+def settings_system_config_list(conn, config_key=None):
     """get setting system config list
 
     Args:
@@ -52,20 +52,19 @@ def settings_system_config_list(config_key=None):
     """
 
     # system config list get
-    with closing(DBconnector().connect_platformdb()) as conn:
-        with conn.cursor() as cursor:
+    with conn.cursor() as cursor:
 
-            if config_key is not None:
-                sql_stmt = queries_bl_common.SQL_QUERY_SELECT_SYSTEM_CONFIG + ' WHERE CONFIG_KEY = %(config_key)s'
-                parameter = {
-                    "config_key": config_key,
-                }
-            else:
-                sql_stmt = queries_bl_common.SQL_QUERY_SELECT_SYSTEM_CONFIG
-                parameter = {}
+        if config_key is not None:
+            sql_stmt = queries_bl_common.SQL_QUERY_SELECT_SYSTEM_CONFIG + ' WHERE CONFIG_KEY = %(config_key)s'
+            parameter = {
+                "config_key": config_key,
+            }
+        else:
+            sql_stmt = queries_bl_common.SQL_QUERY_SELECT_SYSTEM_CONFIG
+            parameter = {}
 
-            cursor.execute(sql_stmt, parameter)
-            system_configs = cursor.fetchall()
+        cursor.execute(sql_stmt, parameter)
+        system_configs = cursor.fetchall()
 
     if config_key is not None:
         if len(system_configs) < 1:
@@ -89,12 +88,8 @@ def settings_system_config_update(conn, user_id, data, config_key):
         user_id (str): update user id
         data (dict): update data
         config_key (str): config key
-
-    Returns:
-        int: update row count
     """
     with conn.cursor() as cursor:
-
         parameter = {
             "config_key": config_key,
             "config_value": data.get("value"),
@@ -103,8 +98,6 @@ def settings_system_config_update(conn, user_id, data, config_key):
         }
 
         cursor.execute(queries_bl_common.SQL_QUERY_UPDATE_SYSTEM_CONFIG, parameter)
-
-        return cursor.rowcount
 
 
 def settings_system_config_delete(conn, user_id, config_key):
@@ -119,11 +112,7 @@ def settings_system_config_delete(conn, user_id, config_key):
         int: delete row count
     """
     with conn.cursor() as cursor:
-
         parameter = {
             "config_key": config_key
         }
-
         cursor.execute(queries_bl_common.SQL_QUERY_DELETE_SYSTEM_CONFIG, parameter)
-
-        return cursor.rowcount

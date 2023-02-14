@@ -102,8 +102,7 @@ def internal_settings_system_config_delete(config_key):  # noqa: E501
 
     # delete config
     with closing(DBconnector().connect_platformdb()) as conn:
-        delete_row_count = bl_common_service.settings_system_config_delete(conn, user_id, config_key)
-        globals.logger.debug(f'settings_system_config_delete return : {delete_row_count}')
+        bl_common_service.settings_system_config_delete(conn, user_id, config_key)
         conn.commit()
 
     return common.response_200_ok(None)
@@ -122,7 +121,8 @@ def internal_settings_system_config_item(config_key):  # noqa: E501
     globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
 
     # config list get
-    data = bl_common_service.settings_system_config_list(config_key)
+    with closing(DBconnector().connect_platformdb()) as conn:
+        data = bl_common_service.settings_system_config_list(conn, config_key)
 
     if data is not None:
         return common.response_200_ok(data)
@@ -143,7 +143,8 @@ def internal_settings_system_config_list():  # noqa: E501
     globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
 
     # config list get
-    data = bl_common_service.settings_system_config_list()
+    with closing(DBconnector().connect_platformdb()) as conn:
+        data = bl_common_service.settings_system_config_list(conn)
 
     return common.response_200_ok(data)
 
@@ -173,14 +174,17 @@ def internal_settings_system_config_update(body, config_key):  # noqa: E501
     if not validate.ok:
         return common.response_validation_error(validate)
 
-    # update config
     with closing(DBconnector().connect_platformdb()) as conn:
-        update_row_count = bl_common_service.settings_system_config_update(conn, user_id, body, config_key)
-        if update_row_count == 0:
+        # exists check
+        data = bl_common_service.settings_system_config_list(conn, config_key)
+        if data is None:
             raise common.NotFoundException(
                 message_id=f"404-{MSG_FUNCTION_ID}001",
                 message=multi_lang.get_text(f"404-{MSG_FUNCTION_ID}001", "設定が存在しません(key:{0})", config_key)
             )
+
+        # update config
+        bl_common_service.settings_system_config_update(conn, user_id, body, config_key)
 
         conn.commit()
 
