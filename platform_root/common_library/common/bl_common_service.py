@@ -19,6 +19,28 @@ from common_library.common.libs import queries_bl_common
 MSG_FUNCTION_ID = "33"
 
 
+def settings_system_config_create(conn, user_id, body):
+    """get setting system config list
+
+    Args:
+        
+
+    Returns:
+        dict: data item for response
+    """
+    with conn.cursor() as cursor:
+
+        parameter = {
+            "key": body.get("key"),
+            "value": body.get("value"),
+            "description": body.get("description"),
+            "create_user": user_id,
+            "last_update_user": user_id
+        }
+
+        cursor.execute(queries_bl_common.SQL_INSERT_SYSTEM_CONFIG, parameter)
+
+
 def settings_system_config_list(conn, config_key=None):
     """get setting system config list
 

@@ -14,6 +14,7 @@
 import connexion
 import json
 import inspect
+import pymysql
 
 from contextlib import closing
 
@@ -41,12 +42,47 @@ def internal_settings_system_config_create(body):  # noqa: E501
     """Create creates an system config value
 
     Args:
-        body (_type_): _description_
+        body (dict): _description_
 
     Returns:
         _type_: _description_
     """
-    return 'do some magic!'
+    globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
+
+    r = connexion.request
+    user_id = r.headers.get("User-id")
+
+    # validation check
+    for i in body:
+        validate = validation.validate_system_config_key(i.get("key"))
+        if not validate.ok:
+            return common.response_validation_error(validate)
+
+        validate = validation.validate_system_config_value(i.get("value"))
+        if not validate.ok:
+            return common.response_validation_error(validate)
+
+        validate = validation.validate_system_config_description(i.get("description"))
+        if not validate.ok:
+            return common.response_validation_error(validate)
+
+    # DBへ書き込む
+    db = DBconnector()
+    with closing(db.connect_platformdb()) as conn:
+        try:
+            for i in body:
+                bl_common_service.settings_system_config_create(conn, user_id, i)
+        except pymysql.err.IntegrityError:
+            conn.rollback()
+            raise common.OtherException(
+                409,
+                None,
+                f"409-{MSG_FUNCTION_ID}001",
+                multi_lang.get_text(f"409-{MSG_FUNCTION_ID}001", "指定された設定値はすでに存在しているため作成できません。"))
+
+        conn.commit()
+
+    return common.response_200_ok(data=None)
 
 
 @common.platform_exception_handler
