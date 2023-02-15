@@ -12,7 +12,6 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 import connexion
-import json
 import inspect
 import pymysql
 
@@ -29,7 +28,7 @@ MSG_FUNCTION_ID = "20"
 
 @common.platform_exception_handler
 def alive():
-    """死活監視
+    """死活監視 Life and death monitoring
 
     Returns:
         Response: HTTP Respose
@@ -38,14 +37,14 @@ def alive():
 
 
 @common.platform_exception_handler
-def internal_settings_system_config_create(body):  # noqa: E501
+def internal_settings_system_config_create(body):
     """Create creates an system config value
 
     Args:
-        body (dict): _description_
+        body (dict): http request body
 
     Returns:
-        _type_: _description_
+        response: HTTP Response
     """
     globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
 
@@ -67,10 +66,13 @@ def internal_settings_system_config_create(body):  # noqa: E501
             return common.response_validation_error(validate)
 
     # DBへ書き込む
+    # write to DB
     db = DBconnector()
     with closing(db.connect_platformdb()) as conn:
+        key = ""
         try:
             for i in body:
+                key = i.get("key")
                 bl_common_service.settings_system_config_create(conn, user_id, i)
         except pymysql.err.IntegrityError:
             conn.rollback()
@@ -78,7 +80,7 @@ def internal_settings_system_config_create(body):  # noqa: E501
                 409,
                 None,
                 f"409-{MSG_FUNCTION_ID}001",
-                multi_lang.get_text(f"409-{MSG_FUNCTION_ID}001", "指定された設定値はすでに存在しているため作成できません。"))
+                multi_lang.get_text(f"409-{MSG_FUNCTION_ID}001", "指定された設定値はすでに存在しているため作成できません。(key:{0})", key))
 
         conn.commit()
 
@@ -86,14 +88,14 @@ def internal_settings_system_config_create(body):  # noqa: E501
 
 
 @common.platform_exception_handler
-def internal_settings_system_config_delete(config_key):  # noqa: E501
+def internal_settings_system_config_delete(config_key):
     """delete an system config value settings
 
     Args:
-        config_key (_type_): _description_
+        config_key (str): config key
 
     Returns:
-        _type_: _description_
+        response: HTTP Response
     """
     globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
 
@@ -102,6 +104,14 @@ def internal_settings_system_config_delete(config_key):  # noqa: E501
 
     # delete config
     with closing(DBconnector().connect_platformdb()) as conn:
+        # exists check
+        data = bl_common_service.settings_system_config_list(conn, config_key)
+        if data is None:
+            raise common.NotFoundException(
+                message_id=f"404-{MSG_FUNCTION_ID}001",
+                message=multi_lang.get_text(f"404-{MSG_FUNCTION_ID}001", "設定が存在しません(key:{0})", config_key)
+            )
+
         bl_common_service.settings_system_config_delete(conn, user_id, config_key)
         conn.commit()
 
@@ -109,7 +119,7 @@ def internal_settings_system_config_delete(config_key):  # noqa: E501
 
 
 @common.platform_exception_handler
-def internal_settings_system_config_item(config_key):  # noqa: E501
+def internal_settings_system_config_item(config_key):
     """Returns the system config key value
 
     Args:
@@ -134,7 +144,7 @@ def internal_settings_system_config_item(config_key):  # noqa: E501
 
 
 @common.platform_exception_handler
-def internal_settings_system_config_list():  # noqa: E501
+def internal_settings_system_config_list():
     """Returns the current system config value
 
     Returns:
@@ -150,7 +160,7 @@ def internal_settings_system_config_list():  # noqa: E501
 
 
 @common.platform_exception_handler
-def internal_settings_system_config_update(body, config_key):  # noqa: E501
+def internal_settings_system_config_update(body, config_key):
     """Update an system config value settings
 
     Args:
