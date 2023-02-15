@@ -177,6 +177,60 @@ def refresh_token_delete(organization_id):  # noqa: E501
 
 
 @common.platform_exception_handler
+def refresh_token_delete_for_mng():  # noqa: E501
+    """delete refresh token
+
+    Returns:
+        response: HTTP Response
+    """
+
+    globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
+
+    # ログインユーザーの情報を取得
+    # Get login user information
+    user_id = request.headers.get("User-Id")
+
+    # サービスアカウントのTOKEN取得
+    # Get a service account token
+    token = __get_token_pf()
+
+    private = DBconnector().get_platform_private()
+
+    # call keycloak token api
+    response = api_keycloak_tokens.offline_sessions_delete(private.token_check_realm_id, user_id, private.api_token_client_clientid, token)
+
+    if response.status_code not in [200, 204, 404]:
+        globals.logger.error(f"response.status_code:{response.status_code}")
+        globals.logger.error(f"response.text:{response.text}")
+        message_id = f"500-{MSG_FUNCTION_ID}001"
+        message = multi_lang.get_text(
+            message_id,
+            "offline sessionの削除に失敗しました(対象ID:{0} user:{1} client:{2})",
+            private.token_check_realm_id,
+            user_id,
+            private.api_token_client_clientid,
+        )
+        raise common.InternalErrorException(message_id=message_id, message=message)
+
+    # When the token is successfully deleted - tokenの削除に成功した時
+    # Delete refresh_token information - refresh_tokenの情報を削除する
+
+    # delete T_REFRESH_TOKEN - T_REFRESH_TOKENを削除
+    db = DBconnector()
+    with closing(db.connect_platformdb()) as conn:
+        with conn.cursor() as cursor:
+            parameter = {
+                "user_id": user_id
+            }
+            where = "WHERE USER_ID = %(user_id)s"
+            cursor.execute(queries_token.SQL_DELETE_REFRESH_TOKEN + where, parameter)
+
+            conn.commit()
+
+    return common.response_200_ok(None)
+
+
+@common.platform_exception_handler
 def refresh_token_list(organization_id):
     """refresh token list
 
@@ -253,6 +307,109 @@ def refresh_token_list(organization_id):
 
     # 取得したrefresh tokenの一覧を返却する
     # Return the list of acquired refresh tokens
+    data = __make_refresh_tokens_list(offline_sessions, result_token_lists, realm_info, user_id)
+
+    globals.logger.info(f"### Succeed func:{inspect.currentframe().f_code.co_name}")
+
+    return common.response_200_ok(data)
+
+
+@common.platform_exception_handler
+def refresh_token_list_for_mng():  # noqa: E501
+    """refresh token list
+
+    Args:
+        organization_id (str): organization id
+
+    Returns:
+        response: HTTP Response
+    """
+    globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
+
+    # ログインユーザーの情報を取得
+    # Get login user information
+    user_id = request.headers.get("User-Id")
+
+    # サービスアカウントのTOKEN取得
+    # Get a service account token
+    token = __get_token_pf()
+
+    private = DBconnector().get_platform_private()
+
+    # offline refresh tokenの取得
+    # get a offline refresh token
+    response = api_keycloak_tokens.offline_sessions_get(private.token_check_realm_id, user_id, private.api_token_client_id, token)
+    if response.status_code == 404:
+        # 404の場合は、正常終了 dataなしを返却
+        # In case of 404, return normal end no data
+        return common.response_200_ok([])
+    elif response.status_code != 200:
+        globals.logger.error(f"response.status_code:{response.status_code}")
+        globals.logger.error(f"response.text:{response.text}")
+        message_id = f"400-{MSG_FUNCTION_ID}001"
+        message = multi_lang.get_text(
+            message_id,
+            "offline sessionの取得に失敗しました(対象ID:{0} user:{1} client:{2})",
+            private.token_check_realm_id,
+            user_id,
+            private.api_token_client_clientid,
+        )
+        raise common.BadRequestException(message_id=message_id, message=message)
+
+    offline_sessions = json.loads(response.text)
+
+    # offline refresh tokenの取得
+    # get a offline refresh token
+    response = api_keycloak_realms.realm_get(private.token_check_realm_id, token)
+    if response.status_code != 200:
+        globals.logger.error(f"response.status_code:{response.status_code}")
+        globals.logger.error(f"response.text:{response.text}")
+        message_id = f"400-{MSG_FUNCTION_ID}002"
+        message = multi_lang.get_text(
+            message_id,
+            "realm情報の取得に失敗しました(対象ID:{0}",
+            private.token_check_realm_id,
+        )
+        raise common.BadRequestException(message_id=message_id, message=message)
+
+    realm_info = json.loads(response.text)
+
+    # DataBaseに格納した有効期限を取得する
+    # Get expiration date stored in DataBase
+    # plan and plan_limit list get
+    with closing(DBconnector().connect_platformdb()) as conn:
+        with conn.cursor() as cursor:
+            parameter = {
+                "user_id": user_id,
+            }
+            where = " WHERE USER_ID = %(user_id)s" \
+                    " ORDER BY CREATE_TIMESTAMP ASC"
+            cursor.execute(queries_token.SQL_QUERY_REFRESH_TOKEN + where, parameter)
+            result_token_lists = cursor.fetchall()
+
+    # 取得したrefresh tokenの一覧を返却する
+    # Return the list of acquired refresh tokens
+    data = __make_refresh_tokens_list(offline_sessions, result_token_lists, realm_info, user_id)
+
+    globals.logger.info(f"### Succeed func:{inspect.currentframe().f_code.co_name}")
+
+    return common.response_200_ok(data)
+
+
+def __make_refresh_tokens_list(offline_sessions, result_token_lists, realm_info, user_id):
+    """make the list of refresh tokens
+
+    Args:
+        offline_sessions (array): offline sessions
+        result_token_lists (array): token lists
+        realm_info (dict): realm info
+        user_id (str): user id
+
+    Returns:
+        array: the list of refresh tokens
+    """
+    # 取得したrefresh tokenの一覧を返却する
+    # Return the list of acquired refresh tokens
     data = []
     for offline_session in offline_sessions:
         # user_idが一致する情報のみ取得
@@ -298,9 +455,7 @@ def refresh_token_list(organization_id):
 
             data.append(row)
 
-    globals.logger.info(f"### Succeed func:{inspect.currentframe().f_code.co_name}")
-
-    return common.response_200_ok(data)
+    return data
 
 
 def __get_token(organization_id):
@@ -329,6 +484,36 @@ def __get_token(organization_id):
                                       "tokenの取得に失敗しました。 realm:[{0}] client:[{1}]",
                                       organization_id,
                                       private.internal_api_client_clientid)
+        raise common.AuthException(message_id=message_id, message=message)
+
+    token = json.loads(token_response.text)["access_token"]
+
+    return token
+
+
+def __get_token_pf():
+    """get a token
+
+    Raises:
+        common.AuthException: _description_
+
+    Returns:
+        str: token
+    """
+
+    private = DBconnector().get_platform_private()
+
+    # サービスアカウントのTOKEN取得
+    # Get a service account token
+    token_response = api_keycloak_tokens.service_account_get_token(
+        private.token_check_realm_id, private.token_check_client_clientid, private.token_check_client_secret,
+    )
+    if token_response.status_code != 200:
+        message_id = "401-00001"
+        message = multi_lang.get_text(message_id,
+                                      "tokenの取得に失敗しました。 realm:[{0}] client:[{1}]",
+                                      private.token_check_realm_id,
+                                      private.token_check_client_clientid)
         raise common.AuthException(message_id=message_id, message=message)
 
     token = json.loads(token_response.text)["access_token"]

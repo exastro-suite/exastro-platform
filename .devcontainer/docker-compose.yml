@@ -62,9 +62,16 @@ services:
       - DB_USER=app_user
       - DB_PASSWORD=password
       - ENCRYPT_KEY=${ENCRYPT_KEY}
+      - EXTERNAL_URL=${EXTERNAL_URL:-}
+      - EXTERNAL_URL_MNG=${EXTERNAL_URL_MNG:-}
     ports:
       - "0.0.0.0:8000:8000"
       - "0.0.0.0:8001:8001"
+
+    depends_on:
+      platform-migration-2:
+        condition: service_completed_successfully
+
   keycloak:
     build:
       dockerfile: ./platform_root/keycloak/Dockerfile
@@ -93,24 +100,20 @@ services:
       # 開発モードで起動
       - start-dev --spi-theme-static-max-age=-1 --spi-theme-cache-themes=false --spi-theme-cache-templates=false
     depends_on:
-      platform-db:
-        condition: service_healthy
+      platform-migration-1:
+        condition: service_completed_successfully
   platform-db:
-    build:
-      dockerfile: ./platform_root/platform_db/Dockerfile
-      context: ../.
+    image: mariadb:10.4.8
     healthcheck:
-      test: mysqladmin ping --silent && mysql -u $${KEYCLOAK_DB_USER} -p$${KEYCLOAK_DB_PASSWORD} -D $${KEYCLOAK_DB_DATABASE} -e 'select 1;'
+      test: mysqladmin ping --silent && mysql -u root -p$${MYSQL_ROOT_PASSWORD} -e 'select 1;'
       interval: 3s
       retries: 200
     volumes:
       - ../.volumes/platform-db/data:/var/lib/mysql
+      - ../platform_root/platform_db/conf/my.cnf:/etc/mysql/conf.d/my.cnf
     environment:
       - TZ=Asia/Tokyo
       - MYSQL_ROOT_PASSWORD=password
-      - KEYCLOAK_DB_DATABASE=keycloak
-      - KEYCLOAK_DB_USER=keycloak
-      - KEYCLOAK_DB_PASSWORD=password
   platform-web:
     user: 1000:1000
     build:
@@ -154,17 +157,42 @@ services:
       - DB_ADMIN_USER=root
       - DB_ADMIN_PASSWORD=password
       - ENCRYPT_KEY=${ENCRYPT_KEY}
-  platform-job:
+  platform-migration-1:
     user: 1000:1000
     build:
-      dockerfile: ./platform_root/platform_job/Dockerfile
+      dockerfile: ./platform_root/platform_migration/Dockerfile
       context: ../.
       args:
         - HTTP_PROXY=${HTTP_PROXY}
         - http_proxy=${HTTP_PROXY}
         - HTTPS_PROXY=${HTTPS_PROXY}
         - https_proxy=${HTTPS_PROXY}
-    command: python3 /app/platform_init.py
+    command: python3 /app/initialize_db_main.py
+    environment:
+      - TZ=Asia/Tokyo
+      - PYTHONIOENCODING=utf-8
+      - DB_HOST=platform-db
+      - DB_DATABASE=platform
+      - DB_USER=app_user
+      - DB_PASSWORD=password
+      - DB_ADMIN_USER=root
+      - DB_ADMIN_PASSWORD=password
+      - KEYCLOAK_DB_DATABASE=keycloak
+      - KEYCLOAK_DB_USER=keycloak
+      - KEYCLOAK_DB_PASSWORD=password
+      # - TIMEOUT_SECONDS_CONNECT_DB=600
+      # - TIMEOUT_SECONDS_KEYCLOAK_START=600
+  platform-migration-2:
+    user: 1000:1000
+    build:
+      dockerfile: ./platform_root/platform_migration/Dockerfile
+      context: ../.
+      args:
+        - HTTP_PROXY=${HTTP_PROXY}
+        - http_proxy=${HTTP_PROXY}
+        - HTTPS_PROXY=${HTTPS_PROXY}
+        - https_proxy=${HTTPS_PROXY}
+    command: python3 /app/migration_main.py
     environment:
       - TZ=Asia/Tokyo
       - PYTHONIOENCODING=utf-8
@@ -179,9 +207,44 @@ services:
       - DB_PASSWORD=password
       - DB_ADMIN_USER=root
       - DB_ADMIN_PASSWORD=password
+      - KEYCLOAK_DB_DATABASE=keycloak
+      - KEYCLOAK_DB_USER=keycloak
+      - KEYCLOAK_DB_PASSWORD=password
+      # - TIMEOUT_SECONDS_CONNECT_DB=600
+      # - TIMEOUT_SECONDS_KEYCLOAK_START=600
       - ENCRYPT_KEY=${ENCRYPT_KEY}
     depends_on:
-      platform-db:
-        condition: service_healthy
-      keycloak:
-        condition: service_healthy
+      platform-migration-1:
+        condition: service_completed_successfully
+
+  # platform-job:
+  #   user: 1000:1000
+  #   build:
+  #     dockerfile: ./platform_root/platform_job/Dockerfile
+  #     context: ../.
+  #     args:
+  #       - HTTP_PROXY=${HTTP_PROXY}
+  #       - http_proxy=${HTTP_PROXY}
+  #       - HTTPS_PROXY=${HTTPS_PROXY}
+  #       - https_proxy=${HTTPS_PROXY}
+  #   command: python3 /app/platform_init.py
+  #   environment:
+  #     - TZ=Asia/Tokyo
+  #     - PYTHONIOENCODING=utf-8
+  #     - KEYCLOAK_USER=admin
+  #     - KEYCLOAK_PASSWORD=password
+  #     - API_KEYCLOAK_HOST=keycloak
+  #     - API_KEYCLOAK_PROTOCOL=http
+  #     - API_KEYCLOAK_PORT=8080
+  #     - DB_HOST=platform-db
+  #     - DB_DATABASE=platform
+  #     - DB_USER=app_user
+  #     - DB_PASSWORD=password
+  #     - DB_ADMIN_USER=root
+  #     - DB_ADMIN_PASSWORD=password
+  #     - ENCRYPT_KEY=${ENCRYPT_KEY}
+  #   depends_on:
+  #     platform-db:
+  #       condition: service_healthy
+  #     keycloak:
+  #       condition: service_healthy

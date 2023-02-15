@@ -79,6 +79,9 @@ paths:
       $ref: './paths/protocol.openid-connect.token.yaml'
   "/api/{organization_id}/platform/users/_current/refresh_tokens":
       $ref: './paths/user.current.refresh_tokens.yaml'
+  "/api/platform/users/_current/refresh_tokens":
+      $ref: './paths/user.current.refresh_tokens.platform.yaml'
+
 
   "/api/platform/{organization_id}/plans":
       $ref: './paths/plans.organizations.yaml'

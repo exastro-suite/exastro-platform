@@ -11,6 +11,7 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
+
 ARG USERNAME=app_user
 ARG GROUPNAME=app_user
 ARG APP_PATH=/app
@@ -22,21 +23,14 @@ ARG GROUPNAME
 ARG APP_PATH
 
 ENV PYTHONPATH              $APP_PATH/
-ENV LISTEN_PORT             8000
-ENV LISTEN_PORT_PF_MNG      8001
 ENV PYTHONIOENCODING        utf-8
-ENV APACHE_PID_DIR          /var/run_$USERNAME/httpd/pid
-ENV APACHE_SOCKET_DIR       /var/run_$USERNAME/httpd/socket
-ENV APACHE_USERNAME         $USERNAME
-ENV APACHE_GROUPNAME        $GROUPNAME
+ENV KEYCLOAK_VERSION        "20.0"
 
 RUN dnf install -y \
     langpacks-en \
     wget \
     unzip \
-    httpd \
     gcc \
-    httpd-devel \
     python39 \
     python39-devel \
     python39-mod_wsgi \
@@ -46,20 +40,15 @@ RUN dnf install -y \
     Flask \
     pytz \
     markdown \
-    requests \
     PyJWT \
     python-dotenv \
     flask-log-request-id \
+    six \
     pymysql \
     pycryptodome \
+    packaging \
 &&  groupadd $GROUPNAME \
-&&  useradd -m -s /bin/bash -g $GROUPNAME $USERNAME \
-&&  setcap 'cap_net_bind_service=+ep' /usr/sbin/httpd \
-&&  chown $USERNAME:$GROUPNAME /var/log/httpd \
-&&  mkdir -p $APACHE_PID_DIR \
-&&  chown $USERNAME:$GROUPNAME $APACHE_PID_DIR \
-&&  mkdir -p $APACHE_SOCKET_DIR \
-&&  chown $USERNAME:$GROUPNAME $APACHE_SOCKET_DIR
+&&  useradd -m -s /bin/bash -g $GROUPNAME $USERNAME
 
 #
 # Build for development
@@ -81,10 +70,14 @@ RUN dnf config-manager --add-repo=https://download.docker.com/linux/centos/docke
     iputils \
     docker-ce-cli \
     jq \
+    nodejs \
 &&  pip3.9 install \
     debugpy \
     flake8 \
     autopep8 \
+&&  npm config set registry http://registry.npmjs.org/ \
+&&  npm -g config set strict-ssl false \
+&&  npm install -g @apidevtools/swagger-cli \
 &&  usermod -G wheel $USERNAME \
 &&  echo '%wheel ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers \
 &&  echo "%${GROUPNAME} ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
@@ -97,16 +90,10 @@ RUN mkdir ~/.config \
 
 WORKDIR $APP_PATH
 
-COPY ./platform_root/platform_auth/config/httpd.conf/httpd.conf /etc/httpd/conf/httpd.conf
-COPY ./platform_root/platform_auth/config/httpd.conf/reverse-proxy.conf /etc/httpd/conf.d/reverse-proxy.conf
-COPY ./platform_root/platform_auth/config/httpd.conf/wsgi.conf /etc/httpd/conf.d/wsgi.conf
-
 COPY ./platform_root/version $APP_PATH/
-COPY ./platform_root/platform_auth/ $APP_PATH/
+COPY ./platform_root/platform_migration/ $APP_PATH/
 COPY ./platform_root/common_library/ $APP_PATH/common_library/
 COPY ./platform_root/common_resources/ $APP_PATH/common_resources/
-
-CMD ["/app/start_httpd.sh"]
 
 #
 # Build for production
@@ -119,15 +106,9 @@ ARG APP_PATH
 
 WORKDIR $APP_PATH
 
-COPY ./platform_root/platform_auth/config/httpd.conf/httpd.conf /etc/httpd/conf/httpd.conf
-COPY ./platform_root/platform_auth/config/httpd.conf/reverse-proxy.conf /etc/httpd/conf.d/reverse-proxy.conf
-COPY ./platform_root/platform_auth/config/httpd.conf/wsgi.conf /etc/httpd/conf.d/wsgi.conf
-
 COPY ./platform_root/version $APP_PATH/
-COPY ./platform_root/platform_auth/ $APP_PATH/
+COPY ./platform_root/platform_migration/ $APP_PATH/
 COPY ./platform_root/common_library/ $APP_PATH/common_library/
 COPY ./platform_root/common_resources/ $APP_PATH/common_resources/
 
 USER $USERNAME
-
-CMD ["/app/start_httpd.sh"]

@@ -263,12 +263,18 @@ class DBconnector:
         """_platform ID"""
         token_check_client_secret: str
         """_platform secret"""
+        api_token_client_clientid: str
+        """_XXX-api clientid"""
+        api_token_client_id: str
+        """_XXX-api ID"""
 
         def __init__(self):
             self.token_check_realm_id = ""
             self.token_check_client_clientid = ""
             self.token_check_client_id = ""
             self.token_check_client_secret = ""
+            self.api_token_client_clientid = ""
+            self.api_token_client_id = ""
 
     def get_platform_private(self) -> platform_private:
         """get platform_private informations
@@ -292,5 +298,7 @@ class DBconnector:
                 data.token_check_client_clientid = json_dict.get("TOKEN_CHECK_CLIENT_CLIENTID")
                 data.token_check_client_id = json_dict.get("TOKEN_CHECK_CLIENT_ID")
                 data.token_check_client_secret = json_dict.get("TOKEN_CHECK_CLIENT_SECRET")
+                data.api_token_client_clientid = json_dict.get("API_TOKEN_CLIENT_CLIENTID")
+                data.api_token_client_id = json_dict.get("API_TOKEN_CLIENT_ID")
 
         return data

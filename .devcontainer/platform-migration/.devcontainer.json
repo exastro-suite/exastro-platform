@@ -16,9 +16,9 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the README at:
 // https://github.com/microsoft/vscode-dev-containers/tree/v0.231.6/containers/jekyll
 {
-	"name": "exastro-platform - platform-auth",
+	"name": "exastro-platform - platform-migration",
 	"dockerComposeFile": ["../docker-compose.yml","../docker-compose.devcontainer.yml"],
-	"service": "platform-auth",
+	"service": "platform-migration-2",
 	// Set *default* container specific settings.json values on container create.
 	"settings": {
 		"terminal.integrated.profiles.linux": {
@@ -76,7 +76,7 @@
 		"rangav.vscode-thunder-client",
 		//"mtxr.sqltools",
 		//"mtxr.sqltools-driver-mysql",
-		"formulahendry.vscode-mysql",
+		//"formulahendry.vscode-mysql",
 		"mitchdenny.ecdc",
 		"ms-vsliveshare.vsliveshare",
 	],
@@ -86,7 +86,6 @@
 	// Use 'postCreateCommand' to run commands after the container is created.
 	// "onCreateCommand":"sudo dnf install -y git vim diffutils bind-utils iputils && sudo pip3.9 install flake8 && sudo pip3.9 install autopep8",
 	"postCreateCommand": "sudo chmod -R 777 /home/app_user/.vscode-server && sudo chmod 777 /home/app_user/.vscode-server-insiders",
-	"postAttachCommand": "sudo -E /app/start_httpd.sh -D MOD_WSGI_DISABLE",
 	"workspaceFolder": "/workspace",
 	"overrideCommand": true,
 }
