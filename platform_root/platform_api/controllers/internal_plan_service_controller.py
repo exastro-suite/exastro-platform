@@ -11,12 +11,13 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
-import json
+import connexion
 import inspect
+import pymysql
 
 from contextlib import closing
 
-from common_library.common import common, const
+from common_library.common import common, const, validation, multi_lang
 from common_library.common.db import DBconnector
 from common_library.common import bl_plan_service
 from libs import queries_internal_plan
@@ -117,6 +118,42 @@ def plan_item_create(body):  # noqa: E501
     Returns:
         response: HTTP Response
     """
+    globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
+
+    r = connexion.request
+    user_id = r.headers.get("User-id")
+
+    # validation parameters
+    for plan_item in body:
+        validate = validation.validate_limit_id(plan_item.get("id"))
+        if not validate.ok:
+            return common.response_validation_error(validate)
+
+        validate = validation.validate_plan_item_description(plan_item.get("informations", {}).get("description"))
+        if not validate.ok:
+            return common.response_validation_error(validate)
+
+        validate = validation.validate_plan_item_default(
+            plan_item.get("informations", {}).get("default"),
+            plan_item.get("informations", {}).get("max"))
+        if not validate.ok:
+            return common.response_validation_error(validate)
+
+    # write to database
+    with closing(DBconnector().connect_platformdb()) as conn:
+        for plan_item in body:
+            try:
+                bl_plan_service.plan_item_create(conn, user_id, plan_item)
+
+            except pymysql.err.IntegrityError:
+                conn.rollback()
+                raise common.OtherException(
+                    409,
+                    None,
+                    f"409-{MSG_FUNCTION_ID}001",
+                    multi_lang.get_text(f"409-{MSG_FUNCTION_ID}001", "指定されたリミットIDはすでに存在しているため作成できません。(limit_id:{0})", plan_item.get("limit_id")))
+
+        conn.commit()
 
     return common.response_200_ok(None)
 

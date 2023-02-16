@@ -886,3 +886,71 @@ def validate_system_config_description(description):
         )
 
     return result(True)
+
+
+def validate_limit_id(limit_id):
+    """validate limit id
+
+    Args:
+        limit_id (str): limit id
+
+    Returns:
+        result: Validation result
+    """
+    if limit_id is None or limit_id == "":
+        return result(
+            False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
+            multi_lang.get_text('000-00123', "リミットID")
+        )
+
+    if len(limit_id) > const.length_limit_id:
+        return result(
+            False, 400, '400-{}012'.format(MSG_FUNCTION_ID), '指定可能な文字数を超えています。(項目:{0},最大文字数:{1})',
+            multi_lang.get_text('000-00123', "リミットID"),
+            str(const.length_limit_id)
+        )
+
+    return result(True)
+
+
+def validate_plan_item_description(description):
+    """validate plan item description
+
+    Args:
+        description (str): plan item description
+
+    Returns:
+        result: Validation result
+    """
+    if description is not None and len(description) > const.length_plan_item_description:
+        return result(
+            False, 400, '400-{}012'.format(MSG_FUNCTION_ID), '指定可能な文字数を超えています。(項目:{0},最大文字数:{1})',
+            multi_lang.get_text('000-00139', "プラン項目説明"),
+            str(const.length_plan_item_description)
+        )
+
+    return result(True)
+
+
+def validate_plan_item_default(default, max):
+    """validate plan item validate
+
+    Args:
+        default (int): default plan limit
+        max (int): plan item max limit
+
+    Returns:
+        result: Validation result
+    """
+    if default is None:
+        return result(
+            False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
+            multi_lang.get_text('000-00140', "プラン項目デフォルト値")
+        )
+
+    if max is not None and default > max:
+        return result(
+            False, 400, '400-{}025'.format(MSG_FUNCTION_ID), '指定した最大値を超えるデフォルト値を指定することはできません。'
+        )
+
+    return result(True)

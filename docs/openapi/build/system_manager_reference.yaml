@@ -642,6 +642,12 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/planItem'
+      example:
+        - id: platform.workspaces
+          informations:
+            description: max workspaces
+            max: 1000
+            default: 100
     planItemFields:
       title: planItem is a definition of plan item resource.
       type: object
