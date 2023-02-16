@@ -1414,6 +1414,123 @@ paths:
               schema:
                 $ref: '#/components/schemas/runtimeError'
       x-openapi-router-controller: controllers.internal_plan_service_controller
+  /internal-api/platform/plan_items:
+    post:
+      tags:
+      - InternalPlanService
+      summary: Create a plan items
+      operationId: plan_item_create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/planItemList'
+        required: true
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responseOk'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+      x-openapi-router-controller: controllers.internal_plan_service_controller
+  /internal-api/platform/plan_items/{plan_item_id}:
+    get:
+      tags:
+      - InternalPlanService
+      summary: Returns of plan item
+      operationId: internal_plan_item_get
+      parameters:
+      - name: plan_item_id
+        in: path
+        description: plan item key
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_19'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+      x-openapi-router-controller: controllers.internal_plan_service_controller
+    put:
+      tags:
+      - InternalPlanService
+      summary: Update a plan item
+      operationId: internal_plan_item_update
+      parameters:
+      - name: plan_item_id
+        in: path
+        description: plan item key
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/planItemFields'
+        required: true
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responseOk'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+      x-openapi-router-controller: controllers.internal_plan_service_controller
+    delete:
+      tags:
+      - InternalPlanService
+      summary: Delete a plan item
+      operationId: internal_plan_item_delete
+      parameters:
+      - name: plan_item_id
+        in: path
+        description: plan item key
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responseOk'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+      x-openapi-router-controller: controllers.internal_plan_service_controller
   /internal-api/{organization_id}/platform/workspaces/{workspace_id}/roles:
     get:
       tags:
@@ -1462,7 +1579,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_19'
+                $ref: '#/components/schemas/inline_response_200_20'
         default:
           description: An unexpected error response.
           content:
@@ -1574,7 +1691,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_20'
+                $ref: '#/components/schemas/inline_response_200_21'
         default:
           description: An unexpected error response.
           content:
@@ -1769,21 +1886,24 @@ components:
             $ref: '#/components/schemas/plan'
     planItem:
       title: planItem is a definition of plan item resource.
-      type: object
-      properties:
-        id:
-          type: string
-          example: platform.workspaces
-        informations:
-          $ref: '#/components/schemas/plan_informations'
+      allOf:
+      - type: object
+        properties:
+          id:
+            type: string
+            example: platform.workspaces
+      - $ref: '#/components/schemas/planItemFields'
     planItemList:
       title: plan item list is list of plan items resources.
+      type: array
+      items:
+        $ref: '#/components/schemas/planItem'
+    planItemFields:
+      title: planItem is a definition of plan item resource.
       type: object
       properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/planItem'
+        informations:
+          $ref: '#/components/schemas/planItemFields_informations'
     limits:
       title: limitValue is a definition of Limit Value resource.
       type: object
@@ -2285,7 +2405,10 @@ components:
     inline_response_200_6:
       allOf:
       - $ref: '#/components/schemas/responseOk'
-      - $ref: '#/components/schemas/planItemList'
+      - type: object
+        properties:
+          data:
+            $ref: '#/components/schemas/planItemList'
     inline_response_200_7:
       allOf:
       - $ref: '#/components/schemas/responseOk'
@@ -2358,8 +2481,15 @@ components:
     inline_response_200_19:
       allOf:
       - $ref: '#/components/schemas/responseOk'
-      - $ref: '#/components/schemas/roleList'
+      - type: object
+        properties:
+          data:
+            $ref: '#/components/schemas/planItem'
     inline_response_200_20:
+      allOf:
+      - $ref: '#/components/schemas/responseOk'
+      - $ref: '#/components/schemas/roleList'
+    inline_response_200_21:
       allOf:
       - $ref: '#/components/schemas/responseOk'
       - $ref: '#/components/schemas/userWorkspaceList'
@@ -2396,6 +2526,17 @@ components:
         limit.id:
           type: number
       example: "{\"platform.workspaces\":100,\"platform.roles\":200}"
+    planItemFields_informations:
+      type: object
+      properties:
+        description:
+          type: string
+        max:
+          type: integer
+          example: 10000
+        default:
+          type: integer
+          example: 1000
     limitsList_data:
       type: object
       properties:

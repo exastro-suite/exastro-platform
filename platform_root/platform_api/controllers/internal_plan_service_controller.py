@@ -105,3 +105,56 @@ def limits_get(limit_id=None):
             } for org_plan in org_plans]
 
     return common.response_200_ok(data)
+
+
+@common.platform_exception_handler
+def plan_item_create(body):  # noqa: E501
+    """Create a plan items
+
+    Args:
+        body (dict): Request body
+
+    Returns:
+        response: HTTP Response
+    """
+    return common.response_200_ok(None)
+
+
+@common.platform_exception_handler
+def internal_plan_item_get(plan_item_id):  # noqa: E501
+    """Returns of plan item
+
+    Args:
+        plan_item_id (str): plan item id
+
+    Returns:
+        response: HTTP Response
+    """
+    return common.response_200_ok(None)
+
+
+@common.platform_exception_handler
+def internal_plan_item_update(body, plan_item_id):  # noqa: E501
+    """Update a plan item
+
+    Args:
+        body (dict): Request body
+        plan_item_id (str): plan item id
+
+    Returns:
+        response: HTTP Response
+    """
+    return common.response_200_ok(None)
+
+
+@common.platform_exception_handler
+def internal_plan_item_delete(plan_item_id):  # noqa: E501
+    """Delete a plan item
+
+    Args:
+        plan_item_id (str): plan item id
+
+    Returns:
+        response: HTTP Response
+    """
+    return common.response_200_ok(None)
