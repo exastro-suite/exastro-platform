@@ -1897,6 +1897,12 @@ components:
     planItemList:
       title: plan item list is list of plan items resources.
       type: array
+      example:
+      - id: platform.workspaces
+        informations:
+          description: max workspaces
+          max: 1000
+          default: 100
       items:
         $ref: '#/components/schemas/planItem'
     planItemFields:

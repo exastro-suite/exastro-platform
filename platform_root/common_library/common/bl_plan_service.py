@@ -15,6 +15,7 @@
 from contextlib import closing
 from datetime import datetime
 import pymysql
+import json
 
 from common_library.common import common, const as common_const
 from common_library.common.db import DBconnector
@@ -208,3 +209,34 @@ def organization_plan_create(user_id, organization_id, plan_id, plan_start_datet
                     plan_id,
                 )
                 raise common.InternalErrorException(message_id=message_id, message=message)
+
+
+def plan_item_create(conn, user_id, plan_item):
+
+    with conn.cursor() as cursor:
+
+        default = plan_item.get("informations", {}).get("default")
+
+        informations = {
+            "description": plan_item.get("informations", {}).get("description"),
+            "max": plan_item.get("informations", {}).get("max")
+        }
+
+        # insert t_plan_item
+        parameter = {
+            "limit_id": plan_item.get("id"),
+            "informations": json.dumps(informations),
+            "create_user": user_id
+        }
+
+        cursor.execute(queries_bl_plan.SQL_INSERT_PLAN_ITEM, parameter)
+
+        # insert default plan
+        parameter = {
+            "plan_id": common_const.DEFAULT_PLAN_ID,
+            "limit_id": plan_item.get("id"),
+            "limit_value": default,
+            "create_user": user_id
+        }
+
+        cursor.execute(queries_bl_plan.SQL_INSERT_PLAN_LIMIT, parameter)
