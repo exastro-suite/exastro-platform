@@ -635,6 +635,7 @@ components:
             id:
               type: string
               example: platform.workspaces
+              description: limit id
         - $ref: '#/components/schemas/planItemFields'
     planItemList:
       title: plan item list is list of plan items resources.

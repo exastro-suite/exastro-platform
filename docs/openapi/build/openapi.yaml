@@ -1432,7 +1432,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/runtimeError'
-  '/internal-api/platform/plan_items/{plan_item_id}':
+  '/internal-api/platform/plan_items/{limit_id}':
     get:
       tags:
         - InternalPlanService
@@ -1440,12 +1440,12 @@ paths:
       x-openapi-router-controller: controllers.internal_plan_service_controller
       operationId: internal_plan_item_get
       parameters:
-        - name: plan_item_id
+        - name: limit_id
           in: path
           required: true
           schema:
             type: string
-          description: plan item key
+          description: limit id
       responses:
         '200':
           description: A successful response.
@@ -1472,12 +1472,12 @@ paths:
       x-openapi-router-controller: controllers.internal_plan_service_controller
       operationId: internal_plan_item_update
       parameters:
-        - name: plan_item_id
+        - name: limit_id
           in: path
           required: true
           schema:
             type: string
-          description: plan item key
+          description: limit id
       requestBody:
         content:
           application/json:
@@ -1504,12 +1504,12 @@ paths:
       x-openapi-router-controller: controllers.internal_plan_service_controller
       operationId: internal_plan_item_delete
       parameters:
-        - name: plan_item_id
+        - name: limit_id
           in: path
           required: true
           schema:
             type: string
-          description: plan item key
+          description: limit id
       responses:
         '200':
           description: A successful response.
@@ -1893,6 +1893,7 @@ components:
             id:
               type: string
               example: platform.workspaces
+              description: limit id
         - $ref: '#/components/schemas/planItemFields'
     planItemList:
       title: plan item list is list of plan items resources.
