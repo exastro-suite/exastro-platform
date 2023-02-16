@@ -1,0 +1,25 @@
+post:
+  tags:
+  - InternalPlanService
+  summary: Create a plan items
+  x-openapi-router-controller: controllers.internal_plan_service_controller
+  operationId: plan_item_create
+  requestBody:
+    content:
+      application/json:
+        schema:
+          $ref: '../schemas/planItemList.yaml'
+    required: true
+  responses:
+    200:
+      description: A successful response.
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/responseOk.yaml'
+    default:
+      description: An unexpected error response.
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'

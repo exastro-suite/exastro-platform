@@ -981,24 +981,33 @@ components:
             $ref: '#/components/schemas/plan'
     planItem:
       title: planItem is a definition of plan item resource.
+      allOf:
+        - type: object
+          properties:
+            id:
+              type: string
+              example: platform.workspaces
+        - $ref: '#/components/schemas/planItemFields'
+    planItemList:
+      title: plan item list is list of plan items resources.
+      type: array
+      items:
+        $ref: '#/components/schemas/planItem'
+    planItemFields:
+      title: planItem is a definition of plan item resource.
       type: object
       properties:
-        id:
-          type: string
-          example: platform.workspaces
         informations:
           type: object
           properties:
             description:
               type: string
-    planItemList:
-      title: plan item list is list of plan items resources.
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/planItem'
+            max:
+              type: integer
+              example: 10000
+            default:
+              type: integer
+              example: 1000
     limits:
       title: limitValue is a definition of Limit Value resource.
       type: object

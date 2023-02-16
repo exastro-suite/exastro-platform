@@ -137,6 +137,10 @@ paths:
       $ref: './paths/internal_plans.organizations.limits.yaml'
   "/internal-api/platform/limits":
       $ref: './paths/internal_plan.limits.yaml'
+  "/internal-api/platform/plan_items":
+      $ref: './paths/internal_plan.plan_items.yaml'
+  "/internal-api/platform/plan_items/{plan_item_id}":
+      $ref: './paths/internal_plan.plan_items.plan_item_id.yaml'
 
   "/internal-api/{organization_id}/platform/workspaces/{workspace_id}/roles":
       $ref: './paths/internal_workspaces.workspace_id.roles.yaml'
