@@ -19,4 +19,5 @@ allOf:
       id:
         type: string
         example: platform.workspaces
+        description: limit id
   - $ref: './planItemFields.yaml'

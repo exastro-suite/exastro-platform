@@ -5,12 +5,12 @@ get:
   x-openapi-router-controller: controllers.internal_plan_service_controller
   operationId: internal_plan_item_get
   parameters:
-  - name: plan_item_id
+  - name: limit_id
     in: path
     required: true
     schema:
       type: string
-    description: plan item key
+    description: limit id
   responses:
     200:
       description: A successful response.
@@ -37,12 +37,12 @@ put:
   x-openapi-router-controller: controllers.internal_plan_service_controller
   operationId: internal_plan_item_update
   parameters:
-  - name: plan_item_id
+  - name: limit_id
     in: path
     required: true
     schema:
       type: string
-    description: plan item key
+    description: limit id
   requestBody:
     content:
       application/json:
@@ -70,12 +70,12 @@ delete:
   x-openapi-router-controller: controllers.internal_plan_service_controller
   operationId: internal_plan_item_delete
   parameters:
-  - name: plan_item_id
+  - name: limit_id
     in: path
     required: true
     schema:
       type: string
-    description: plan item key
+    description: limit id
   responses:
     200:
       description: A successful response.
