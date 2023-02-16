@@ -12,7 +12,11 @@ get:
           schema:
             allOf:
               - $ref: '../schemas/responseOk.yaml'
-              - $ref: '../schemas/planItemList.yaml'
+              - type: object
+                properties:
+                  data:
+                    type: object
+                    $ref: '../schemas/planItemList.yaml'
     default:
       description: An unexpected error response.
       content:

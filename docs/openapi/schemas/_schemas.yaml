@@ -42,6 +42,8 @@ planItem:
   $ref: "./planItem.yaml"
 planItemList:
   $ref: "./planItemList.yaml"
+planItemFields:
+  $ref: "./planItemFields.yaml"
 limits:
   $ref: "./limits.yaml"
 limitsList:
