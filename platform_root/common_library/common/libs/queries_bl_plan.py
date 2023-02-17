@@ -45,4 +45,22 @@ VALUES (%(limit_id)s, %(informations)s, %(create_user)s, %(create_user)s)
 SQL_INSERT_PLAN_LIMIT = """
 INSERT INTO T_PLAN_LIMIT (PLAN_ID, LIMIT_ID, LIMIT_VALUE, CREATE_USER, LAST_UPDATE_USER)
 VALUES (%(plan_id)s, %(limit_id)s, %(limit_value)s, %(create_user)s, %(create_user)s)
+ON DUPLICATE KEY UPDATE
+    LIMIT_VALUE = %(limit_value)s,
+    LAST_UPDATE_USER = %(create_user)s
+"""
+
+SQL_UPDATE_PLAN_ITEM = """
+UPDATE T_PLAN_ITEM
+SET INFORMATIONS        =   %(informations)s
+,   LAST_UPDATE_USER    =   %(last_update_user)s
+WHERE LIMIT_ID          =   %(limit_id)s
+"""
+
+SQL_DELETE_PLAN_ITEM = """
+DELETE FROM T_PLAN_ITEM WHERE LIMIT_ID = %(limit_id)s
+"""
+
+SQL_DELETE_PLAN_LIMIT = """
+DELETE FROM T_PLAN_LIMIT WHERE PLAN_ID = %(plan_id)s AND LIMIT_ID = %(limit_id)s
 """
