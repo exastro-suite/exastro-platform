@@ -168,7 +168,20 @@ def internal_plan_item_get(limit_id):  # noqa: E501
     Returns:
         response: HTTP Response
     """
-    return common.response_200_ok(None)
+
+    globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
+
+    # limit_id informations get
+    with closing(DBconnector().connect_platformdb()) as conn:
+        data = bl_plan_service.plan_item_get(conn, limit_id)
+
+    if data is None:
+        raise common.NotFoundException(
+            message_id=f"404-{MSG_FUNCTION_ID}001",
+            message=multi_lang.get_text(f"404-{MSG_FUNCTION_ID}001", "プラン項目が存在しません(id:{0})", limit_id)
+        )
+
+    return common.response_200_ok(data)
 
 
 @common.platform_exception_handler

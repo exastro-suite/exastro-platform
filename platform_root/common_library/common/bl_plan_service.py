@@ -248,6 +248,44 @@ def plan_item_create(conn, user_id, plan_item):
         cursor.execute(queries_bl_plan.SQL_INSERT_PLAN_LIMIT, parameter)
 
 
+def plan_item_get(conn, limit_id):
+    with conn.cursor() as cursor:
+
+        # get infomation from T_PLAN_ITEM
+        parameter = {
+            "limit_id": limit_id
+        }
+
+        where = "WHERE limit_id = %(limit_id)s"
+
+        cursor.execute(queries_bl_plan.SQL_QUERY_PLAN_ITEMS + where, parameter)
+        plan_item = cursor.fetchone()
+
+        if plan_item is None:
+            return None
+
+        # get default limit_value from T_PLAN
+        parameter = {
+            "limit_id": limit_id,
+            "plan_id": common_const.DEFAULT_PLAN_ID
+        }
+
+        where = "WHERE limit_id = %(limit_id)s AND PLAN_ID = %(plan_id)s"
+
+        cursor.execute(queries_bl_plan.SQL_QUERY_PLAN_LIMITS + where, parameter)
+        plan_limit = cursor.fetchone()
+
+    informations = json.loads(plan_item.get("INFORMATIONS"))
+    informations["default"] = plan_limit.get("LIMIT_VALUE")
+
+    data = {
+        "id": plan_item.get("LIMIT_ID"),
+        "informations": informations
+    }
+
+    return data
+
+
 def plan_item_update(conn, user_id, limit_id, plan_item):
     """update plan item
 

@@ -27,6 +27,11 @@ SELECT *
 FROM T_PLAN
 """
 
+SQL_QUERY_PLAN_ITEMS = """
+SELECT *
+FROM T_PLAN_ITEM
+"""
+
 SQL_INSERT_ORGANIZATION_PLAN = """
 INSERT INTO T_ORGANIZATION_PLAN (ORGANIZATION_ID, START_TIMESTAMP, PLAN_ID, CREATE_USER, LAST_UPDATE_USER)
 values (%(organization_id)s, %(start_timestamp)s, %(plan_id)s, %(create_user)s, %(last_update_user)s)
