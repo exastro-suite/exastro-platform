@@ -182,6 +182,35 @@ def internal_plan_item_update(body, limit_id):  # noqa: E501
     Returns:
         response: HTTP Response
     """
+    globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
+
+    r = connexion.request
+    user_id = r.headers.get("User-id")
+
+    # validation parameters
+    validate = validation.validate_plan_item_description(body.get("informations", {}).get("description"))
+    if not validate.ok:
+        return common.response_validation_error(validate)
+
+    validate = validation.validate_plan_item_default(
+        body.get("informations", {}).get("default"),
+        body.get("informations", {}).get("max"))
+    if not validate.ok:
+        return common.response_validation_error(validate)
+
+    with closing(DBconnector().connect_platformdb()) as conn:
+
+        # check exists
+        if bl_plan_service.plan_item_get(conn, limit_id) is None:
+            message_id = f"404-{MSG_FUNCTION_ID}001"
+            raise common.NotFoundException(message_id=message_id, message=multi_lang.get_text(message_id, "プラン項目が存在しません(id:{0})", limit_id))
+
+        # update plan item
+        bl_plan_service.plan_item_update(conn, user_id, limit_id, body)
+
+        # commit
+        conn.commit()
+
     return common.response_200_ok(None)
 
 
@@ -195,4 +224,19 @@ def internal_plan_item_delete(limit_id):  # noqa: E501
     Returns:
         response: HTTP Response
     """
+    globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
+
+    with closing(DBconnector().connect_platformdb()) as conn:
+
+        # check exists
+        if bl_plan_service.plan_item_get(conn, limit_id) is None:
+            message_id = f"404-{MSG_FUNCTION_ID}001"
+            raise common.NotFoundException(message_id=message_id, message=multi_lang.get_text(message_id, "プラン項目が存在しません(id:{0})", limit_id))
+
+        # delete plan item
+        bl_plan_service.plan_item_delete(conn, limit_id)
+
+        # commit
+        conn.commit()
+
     return common.response_200_ok(None)
