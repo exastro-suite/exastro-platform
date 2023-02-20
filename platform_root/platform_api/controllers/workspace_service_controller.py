@@ -282,6 +282,20 @@ def workspace_create(body, organization_id):
 
 
 @common.platform_exception_handler
+def workspace_delete(organization_id, workspace_id):  # noqa: E501
+    """Delete an workspace
+
+    Args:
+        organization_id (str): organization id
+        workspace_id (_type_): workspace id
+
+    Returns:
+        Response: http response
+    """
+    return common.response_200_ok(data=None)
+
+
+@common.platform_exception_handler
 def workspace_info(organization_id, workspace_id):
     """workspace info returns infmation of workspaces
 
