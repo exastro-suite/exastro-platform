@@ -52,25 +52,28 @@ def organization_limits_get(organization_id, limit_id=None):
             cursor.execute(queries_bl_plan.SQL_QUERY_ORGANIZATION_PLAN + where, parameter)
             org_plans = cursor.fetchall()
 
+            limits_where = " WHERE plan_id = %(plan_id)s" + (" AND limit_id LIKE CONCAT(%(limit_id)s,'%%')" if limit_id is not None else "")
+
+            # get default plan
+            cursor.execute(queries_bl_plan.SQL_QUERY_PLAN_LIMITS + limits_where, {"plan_id": common_const.DEFAULT_PLAN_ID, "limit_id": limit_id})
+            default_limits = cursor.fetchall()
+
+            # get organization plan
             if len(org_plans) >= 1:
-                plan_id = org_plans[0]["PLAN_ID"]
+                cursor.execute(queries_bl_plan.SQL_QUERY_PLAN_LIMITS + limits_where, {"plan_id": org_plans[0]["PLAN_ID"], "limit_id": limit_id})
+                org_limits = cursor.fetchall()
             else:
-                plan_id = common_const.DEFAULT_PLAN_ID
+                org_limits = None
 
-            parameter = {
-                "plan_id": plan_id,
-            }
-            where = " WHERE plan_id = %(plan_id)s"
-            if limit_id is not None:
-                parameter["limit_id"] = limit_id
-                where = where + " AND limit_id LIKE CONCAT(%(limit_id)s,'%%')"
-
-            cursor.execute(queries_bl_plan.SQL_QUERY_PLAN_LIMITS + where, parameter)
-            result_plan_limits = cursor.fetchall()
-
+    # make response data
     data = {}
-    for plan_limit in result_plan_limits:
-        data[plan_limit["LIMIT_ID"]] = plan_limit["LIMIT_VALUE"]
+    if org_limits is not None:
+        for limit in org_limits:
+            data[limit["LIMIT_ID"]] = limit["LIMIT_VALUE"]
+
+    for limit in default_limits:
+        if not (limit["LIMIT_ID"] in data):
+            data[limit["LIMIT_ID"]] = limit["LIMIT_VALUE"]
 
     return data
 
@@ -276,7 +279,7 @@ def plan_item_get(conn, limit_id):
         plan_limit = cursor.fetchone()
 
     informations = json.loads(plan_item.get("INFORMATIONS"))
-    informations["default"] = plan_limit.get("LIMIT_VALUE")
+    informations["default"] = plan_limit.get("LIMIT_VALUE") if plan_limit is not None else None
 
     data = {
         "id": plan_item.get("LIMIT_ID"),

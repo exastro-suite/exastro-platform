@@ -65,45 +65,40 @@ def limits_get(limit_id=None):
     with closing(DBconnector().connect_platformdb()) as conn:
         with conn.cursor() as cursor:
 
+            # get all organization and current plan_id
             cursor.execute(queries_internal_plan.SQL_QUERY_ALL_ORGANIZATION_PLAN_ID)
             org_plans = cursor.fetchall()
 
-            # Get all plan_ids
-            plan_ids = list(set([r["PLAN_ID"] if r["PLAN_ID"] is not None else const.DEFAULT_PLAN_ID for r in org_plans]) | {const.DEFAULT_PLAN_ID})
+            # Get all plan_id (unique)
+            plan_ids = list(set([org_plan["PLAN_ID"] for org_plan in org_plans if org_plan["PLAN_ID"] is not None]))
 
-            # Get all limits
+            # limit where stmt
+            limit_where = " WHERE plan_id = %(plan_id)s" + (" AND limit_id LIKE CONCAT(%(limit_id)s,'%%')" if limit_id is not None else "")
+
+            # initialize all plans limits dictionary
+            #   dictionary structure description: limits[plan_id][limit_id] = limit_value
             limits = {}
 
-            pln_param = {}
-            pln_where = " WHERE plan_id = %(plan_id)s"
+            # get default plan
+            cursor.execute(queries_internal_plan.SQL_QUERY_PLAN_LIMITS + limit_where, {"plan_id": const.DEFAULT_PLAN_ID, "limit_id": limit_id})
+            rows_limits = cursor.fetchall()
+            # save dictionary
+            limits[const.DEFAULT_PLAN_ID] = {row_limit["LIMIT_ID"]: row_limit["LIMIT_VALUE"] for row_limit in rows_limits}
 
-            lmt_param = {}
-            lmt_where = " WHERE plan_id = %(plan_id)s"
-            if limit_id is not None:
-                lmt_param["limit_id"] = limit_id
-                lmt_where = lmt_where + " AND limit_id LIKE CONCAT(%(limit_id)s,'%%')"
-
+            # get plans exists organization
             for plan_id in plan_ids:
-                pln_param["plan_id"] = plan_id
-                lmt_param["plan_id"] = plan_id
+                cursor.execute(queries_internal_plan.SQL_QUERY_PLAN_LIMITS + limit_where, {"plan_id": plan_id, "limit_id": limit_id})
+                rows_limits = cursor.fetchall()
+                # merge organization plan limits and default plan limits
+                limits[plan_id] = (limits[const.DEFAULT_PLAN_ID] | {rows_limit["LIMIT_ID"]: rows_limit["LIMIT_VALUE"] for rows_limit in rows_limits})
 
-                # check exists plan
-                cursor.execute(queries_internal_plan.SQL_QUERY_PLANS + pln_where, pln_param)
-                plan = cursor.fetchall()
-                if len(plan) == 0:
-                    continue
-
-                # get limit value
-                cursor.execute(queries_internal_plan.SQL_QUERY_PLAN_LIMITS + lmt_where, lmt_param)
-                plan_limits = cursor.fetchall()
-
-                limits[plan_id] = {plan_limit["LIMIT_ID"]: plan_limit["LIMIT_VALUE"] for plan_limit in plan_limits}
-
-    # make response data
-    data = [{
+    data = [
+        {
             "organization_id": org_plan["ORGANIZATION_ID"],
-            "limits": limits[org_plan["PLAN_ID"] if org_plan["PLAN_ID"] is not None and org_plan["PLAN_ID"] in limits else const.DEFAULT_PLAN_ID]
-            } for org_plan in org_plans]
+            "limits": limits[org_plan["PLAN_ID"] if org_plan["PLAN_ID"] is not None else const.DEFAULT_PLAN_ID]
+        }
+        for org_plan in org_plans
+    ]
 
     return common.response_200_ok(data)
 
@@ -151,7 +146,7 @@ def plan_item_create(body):  # noqa: E501
                     409,
                     None,
                     f"409-{MSG_FUNCTION_ID}001",
-                    multi_lang.get_text(f"409-{MSG_FUNCTION_ID}001", "指定されたリミットIDはすでに存在しているため作成できません。(limit_id:{0})", plan_item.get("limit_id")))
+                    multi_lang.get_text(f"409-{MSG_FUNCTION_ID}001", "指定されたリミットIDはすでに存在しているため作成できません。(limit_id:{0})", plan_item.get("id")))
 
         conn.commit()
 
