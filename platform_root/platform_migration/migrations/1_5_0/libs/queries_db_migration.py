@@ -12,12 +12,21 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-title: planItem is a definition of plan item resource.
-allOf:
-  - type: object
-    properties:
-      id:
-        type: string
-        example: platform.workspaces
-        description: limit id
-  - $ref: './planItemFields.yaml'
+CREATE_TABLES = [
+    """
+    CREATE TABLE IF NOT EXISTS M_SYSTEM_CONFIG
+    (
+      CONFIG_KEY VARCHAR(100) NOT NULL,
+      CONFIG_VALUE VARCHAR(4000) NOT NULL,
+      DESCRIPTION VARCHAR(255) NULL,
+      CREATE_TIMESTAMP DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      CREATE_USER VARCHAR(40),
+      LAST_UPDATE_TIMESTAMP DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      LAST_UPDATE_USER VARCHAR(40),
+      PRIMARY KEY (CONFIG_KEY)
+    )
+    """
+]
+
+# SETTING_DATAS = [
+# ]

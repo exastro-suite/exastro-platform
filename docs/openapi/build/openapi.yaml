@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: Exastro Platform API
   description: Exastro Platform API
-  version: 1.3.0
+  version: 1.5.0
 servers:
   - url: 'https://{host}'
     description: API endpoint
@@ -43,6 +43,8 @@ tags:
     description: ロールに関する操作
   - name: RoleMappingsService
     description: ロール・マッピングに関する操作
+  - name: CommonService
+    description: システム管理者共通
   - name: InternalCommonService
     description: 共通(内部用)
   - name: InternalPlanService
@@ -457,7 +459,11 @@ paths:
               schema:
                 allOf:
                   - $ref: '#/components/schemas/responseOk'
-                  - $ref: '#/components/schemas/planItemList'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        $ref: '#/components/schemas/planItemList'
         default:
           description: An unexpected error response.
           content:
@@ -559,6 +565,61 @@ paths:
                 allOf:
                   - $ref: '#/components/schemas/responseOk'
                   - $ref: '#/components/schemas/usageList'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+  /api/platform/settings/common:
+    get:
+      tags:
+        - CommonService
+      summary: Returns the current system config value
+      x-openapi-router-controller: controllers.common_service_controller
+      operationId: settings_system_config_list
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - $ref: '#/components/schemas/systemConfigList'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+  '/api/platform/settings/common/{config_key}':
+    put:
+      tags:
+        - CommonService
+      summary: Update an system config value settings
+      x-openapi-router-controller: controllers.common_service_controller
+      operationId: settings_system_config_update
+      parameters:
+        - name: config_key
+          in: path
+          required: true
+          schema:
+            type: string
+          description: config key
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/systemConfigUpdate'
+        required: true
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responseOk'
         default:
           description: An unexpected error response.
           content:
@@ -1066,6 +1127,192 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/runtimeError'
+  /internal-api/alive:
+    get:
+      tags:
+        - InternalCommonService
+      summary: alive
+      x-openapi-router-controller: controllers.internal_common_service_controller
+      operationId: alive
+      parameters:
+        - name: User-Id
+          in: header
+          required: true
+          schema:
+            type: string
+        - name: Roles
+          in: header
+          required: true
+          schema:
+            type: string
+        - name: Language
+          in: header
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        example: null
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+  /internal-api/platform/settings/common:
+    get:
+      tags:
+        - InternalCommonService
+      summary: Returns the current system config value
+      x-openapi-router-controller: controllers.internal_common_service_controller
+      operationId: internal_settings_system_config_list
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - $ref: '#/components/schemas/systemConfigList'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+    post:
+      tags:
+        - InternalCommonService
+      summary: Create creates an system config value
+      x-openapi-router-controller: controllers.internal_common_service_controller
+      operationId: internal_settings_system_config_create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/systemConfigCreate'
+        required: true
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responseOk'
+        '409':
+          description: Duplicate key error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeErrorConflict'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+  '/internal-api/platform/settings/common/{config_key}':
+    get:
+      tags:
+        - InternalCommonService
+      summary: Returns the system config key value
+      x-openapi-router-controller: controllers.internal_common_service_controller
+      operationId: internal_settings_system_config_item
+      parameters:
+        - name: config_key
+          in: path
+          required: true
+          schema:
+            type: string
+          description: config key
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        $ref: '#/components/schemas/systemConfig'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+    put:
+      tags:
+        - InternalCommonService
+      summary: Update an system config value settings
+      x-openapi-router-controller: controllers.internal_common_service_controller
+      operationId: internal_settings_system_config_update
+      parameters:
+        - name: config_key
+          in: path
+          required: true
+          schema:
+            type: string
+          description: config key
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/systemConfigUpdate'
+        required: true
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responseOk'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+    delete:
+      tags:
+        - InternalCommonService
+      summary: delete an system config value settings
+      x-openapi-router-controller: controllers.internal_common_service_controller
+      operationId: internal_settings_system_config_delete
+      parameters:
+        - name: config_key
+          in: path
+          required: true
+          schema:
+            type: string
+          description: config key
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responseOk'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
   '/internal-api/{organization_id}/platform/limits':
     get:
       tags:
@@ -1153,6 +1400,123 @@ paths:
                 allOf:
                   - $ref: '#/components/schemas/responseOk'
                   - $ref: '#/components/schemas/limitsList'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+  /internal-api/platform/plan_items:
+    post:
+      tags:
+        - InternalPlanService
+      summary: Create a plan items
+      x-openapi-router-controller: controllers.internal_plan_service_controller
+      operationId: plan_item_create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/planItemList'
+        required: true
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responseOk'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+  '/internal-api/platform/plan_items/{limit_id}':
+    get:
+      tags:
+        - InternalPlanService
+      summary: Returns of plan item
+      x-openapi-router-controller: controllers.internal_plan_service_controller
+      operationId: internal_plan_item_get
+      parameters:
+        - name: limit_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: limit id
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        $ref: '#/components/schemas/planItem'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+    put:
+      tags:
+        - InternalPlanService
+      summary: Update a plan item
+      x-openapi-router-controller: controllers.internal_plan_service_controller
+      operationId: internal_plan_item_update
+      parameters:
+        - name: limit_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: limit id
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/planItemFields'
+        required: true
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responseOk'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+    delete:
+      tags:
+        - InternalPlanService
+      summary: Delete a plan item
+      x-openapi-router-controller: controllers.internal_plan_service_controller
+      operationId: internal_plan_item_delete
+      parameters:
+        - name: limit_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: limit id
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responseOk'
         default:
           description: An unexpected error response.
           content:
@@ -1307,48 +1671,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/runtimeError'
       x-openapi-router-controller: controllers.internal_users_service_controller
-  /internal-api/alive:
-    get:
-      tags:
-        - InternalCommonService
-      summary: alive
-      x-openapi-router-controller: controllers.internal_common_service_controller
-      operationId: alive
-      parameters:
-        - name: User-Id
-          in: header
-          required: true
-          schema:
-            type: string
-        - name: Roles
-          in: header
-          required: true
-          schema:
-            type: string
-        - name: Language
-          in: header
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: A successful response.
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: '#/components/schemas/responseOk'
-                  - type: object
-                    properties:
-                      data:
-                        type: object
-                        example: null
-        default:
-          description: An unexpected error response.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/runtimeError'
 components:
   schemas:
     responseOk:
@@ -1384,6 +1706,22 @@ components:
           type: integer
           format: int32
           example: 500
+        message:
+          type: string
+          example: Error Message
+        ts:
+          type: string
+          format: date-time
+        data:
+          type: object
+          example: null
+    runtimeErrorConflict:
+      type: object
+      properties:
+        result:
+          type: integer
+          format: int32
+          example: 409
         message:
           type: string
           example: Error Message
@@ -1549,24 +1887,40 @@ components:
             $ref: '#/components/schemas/plan'
     planItem:
       title: planItem is a definition of plan item resource.
+      allOf:
+        - type: object
+          properties:
+            id:
+              type: string
+              example: platform.workspaces
+              description: limit id
+        - $ref: '#/components/schemas/planItemFields'
+    planItemList:
+      title: plan item list is list of plan items resources.
+      type: array
+      items:
+        $ref: '#/components/schemas/planItem'
+      example:
+        - id: platform.workspaces
+          informations:
+            description: max workspaces
+            max: 1000
+            default: 100
+    planItemFields:
+      title: planItem is a definition of plan item resource.
       type: object
       properties:
-        id:
-          type: string
-          example: platform.workspaces
         informations:
           type: object
           properties:
             description:
               type: string
-    planItemList:
-      title: plan item list is list of plan items resources.
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/planItem'
+            max:
+              type: integer
+              example: 10000
+            default:
+              type: integer
+              example: 1000
     limits:
       title: limitValue is a definition of Limit Value resource.
       type: object
@@ -2031,6 +2385,70 @@ components:
               expire_timestamp:
                 type: string
                 format: date-time
+    systemConfig:
+      title: system config is a definition of system config resource.
+      type: object
+      properties:
+        key:
+          type: string
+          description: config key
+          example: platform.max_organization
+        value:
+          type: string
+          description: config value
+          example: '100'
+        description:
+          type: string
+          description: config description
+          example: platform max organization
+    systemConfigList:
+      title: system config list is list of system config resources.
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/systemConfig'
+    systemConfigCreate:
+      title: system config value is a definition of system config resource.
+      type: array
+      items:
+        $ref: '#/components/schemas/systemConfig'
+        required:
+          - key
+          - value
+      example:
+        - key: platform.max_organization
+          value: '100'
+          description: platform max organization
+    systemConfigUpdate:
+      example:
+        value: '100'
+        description: max organization
+      required:
+        - value
+      title: system config is a definition of system config resource.
+      type: object
+      properties:
+        value:
+          type: string
+          description: config value
+        description:
+          type: string
+          description: config description
+    systemConfigValue:
+      title: system config is a definition of system config resource.
+      type: object
+      properties:
+        value:
+          type: string
+          description: config value
+        description:
+          type: string
+          description: config description
+      example:
+        value: 100
+        description: ''
   securitySchemes:
     BearerAuth:
       description: Credentials or access token for API

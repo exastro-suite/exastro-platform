@@ -76,7 +76,7 @@
                     <div id="content">
                         <div class="contentHeader">
                             <h1 class="contentTitle"><span class="contentTitleInner">アカウント管理</span></h1>
-                            <p class="contentMenuInfo">アカウントの編集やパスワードの変更および二要素認証の設定が行えます</p>
+                            <p class="contentMenuInfo">アカウントの編集やパスワードの変更や二要素認証の設定およびAPI用のトークンの発行が行えます</p>
                         </div>
                         <div class="contentBody">
                             <div class="contentMenu">
@@ -96,6 +96,11 @@
                                             <span class="inner">二要素認証設定</span>
                                         </a>
                                     </li>
+                                    <li class="contentMenuItem">
+                                        <a class="contentMenuLink" href="#token_manage" tabindex="-1">
+                                            <span class="inner">トークン発行</span>
+                                        </a>
+                                    </li>
                                 </ul>
                             </div>
                             <section class="section tabOpen" id="account_edit">
@@ -113,11 +118,109 @@
                                     <iframe id="ifra_two_factor_auth" style="width:100%; height:100%"></iframe>
                                 </div>
                             </section>
+                            <section class="section" id="token_manage">
+                                <div class="sectionBody">
+                                    <div id="MT" class="tableContainer viewTable">
+                                        <div class="tableHeader">
+                                            <ul class="tableHeaderMainMenuList">
+                                                <li class="operationMenuItem">
+                                                    <button title="新規" id="button_create_modal_open" data-action="positive" class="itaButton tableHeaderMainMenuButton button" style="width:200px;">
+                                                        <span class="inner">
+                                                            <span class="iconButtonIcon icon icon-plus"></span>
+                                                            <span class="iconButtonBody">発行</span>
+                                                        </span>
+                                                    </button>
+                                                </li>
+                                                <li class="operationMenuItem">
+                                                    <button title="削除" id="button_delete_modal_open" data-action="danger" class="itaButton tableHeaderMainMenuButton button" style="width:200px;">
+                                                        <span class="inner">
+                                                            <span class="iconButtonIcon icon icon-trash"></span>
+                                                            <span class="iconButtonBody">削除</span>
+                                                        </span>
+                                                    </button>
+                                                </li>
+                                            </ul>
+                                        </div>
+
+                                        <div class="tableBody">
+                                            <table class="table" width="100%" id="token_list">
+                                                <thead class="thead">
+                                                    <tr class="tHeadTr tr">
+                                                        <th class="tHeadLeftSticky tHeadTh popup th" rowspan="1" colspan="1" }="" title="発行日時"><div class="ci">発行日時</div></th>
+                                                        <th class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="有効期限"><div class="ci">有効期限</div></th>
+                                                        <th class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="最終アクセス日時"><div class="ci">最終アクセス日時</div></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody class="tbody">
+                                                    <tr class="tBodyTr tr datarow-template" style="display:none">
+                                                        <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1" }="" ><div class="ci" style="text-align: center;">${start_timestamp}</div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }="" ><div class="ci" style="text-align: center;">${expire_timestamp}</div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }="" ><div class="ci" style="text-align: center;">${lastaccess_timestamp}</div></td>
+                                                    </tr>
+                                                    <tr class="tBodyTr tr notfound" style="display:none">
+                                                        <td class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="3" }="" height="50px"><div class="ci" style="text-align: center;">
+                                                            有効なrefresh tokenは存在しません
+                                                        </div></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
                         </div>
                     </div>
                 </main>
             </div>
             <div class="containerLoading"></div>
+        </div>
+        <!--
+            Dialog
+        -->
+        <div class="dialog-template" style="display: none">
+            <div id="create_token_dialog">
+                <div class="tableContainer" style="width: 60vw; height:200px;">
+                    <div class="tableBody">
+                        <table class="table mainTable tableReady" table-mode="input">
+                            <thead class="thead">
+                                <tr class="tHeadTr tr">
+                                    <th data-id="c1" data-rest="id" class="tHeadLeftSticky tHeadTh popup th" rowspan="1" colspan="1" }="" title="項目名" style="width:300px;"><div class="ci">項目名</div></th>
+                                    <th data-id="c2" data-rest="name" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="設定値" style="width:300px;"><div class="ci">入力</div></th>
+                                    <th data-id="c3" data-rest="name" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="備考" style="width:600px;"><div class="ci">備考</div></th>
+                                </tr>
+                            </thead>
+                            <tbody class="tbody">
+                                <tr class="tBodyTr tr">
+                                    <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: left;">パスワード<span class="tHeadRequired">必須</span></div></td>
+                                    <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci">
+                                        <input type="password" value="" class="tableEditInputText inputText input inputTextWidthAdjustment" id="form_password" style="width:300px;" >
+                                        <span class="validate_error" id="message_password"></span>
+                                    </div></td>
+                                    <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci">ログインパスワードを指定してください。</div></td>
+                                </tr>
+                                <tr class="tBodyTr tr">
+                                    <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: left;">ワンタイムパスワード</div></td>
+                                    <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci">
+                                        <input type="text" value="" class="tableEditInputText inputText input inputTextWidthAdjustment" id="form_onetime_password" style="width:300px;">
+                                        <span class="validate_error" id="message_onetime_password"></span>
+                                    </div></td>
+                                    <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci">二要素認証を設定している場合は、オーセンティケーターで発行した<br>ワンタイムパスワードを指定してください。</div></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="create_token_result_dialog">
+                <div class="alertMessage" style="margin-left: 30px; margin-right: 30px;">
+                    refresh tokenの発行に成功しました。<br>
+                    発行したrefresh tokenはこの画面を閉じると二度と表示されませんので大切に保管してください。<br>
+                    <br>
+                    <textarea style="width:50vw;" rows="6" readonly>{refresh_token}</textarea>
+                    <div class="copy_message"><br></div>
+                </div>
+            </div>
         </div>
     </body>
 </html>

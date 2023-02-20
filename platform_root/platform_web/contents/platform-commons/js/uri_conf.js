@@ -43,6 +43,11 @@ var api_conf = {
             "get": "/api/{organization_id}/platform/users",
             "put": "/api/{organization_id}/platform/users/{user_id}",
             "delete": "/api/{organization_id}/platform/users/{user_id}",
+        },
+        "token": {
+            "post": "/auth/realms/{organization_id}/protocol/openid-connect/token",
+            "get": "/api/{organization_id}/platform/users/_current/refresh_tokens",
+            "delete": "/api/{organization_id}/platform/users/_current/refresh_tokens"
         }
     }
 }

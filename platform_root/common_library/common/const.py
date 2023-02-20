@@ -33,7 +33,11 @@ length_user_name = 255
 length_user_email = 255
 length_user_firstName = 100
 length_user_lastName = 100
-
+length_system_config_key = 100
+length_system_config_value = 4000
+length_system_config_description = 255
+length_limit_id = 255
+length_plan_item_description = 4000
 
 # ロール種別
 # Role Kind

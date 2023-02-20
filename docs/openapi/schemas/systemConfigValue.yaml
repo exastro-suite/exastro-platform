@@ -1,4 +1,4 @@
-#   Copyright 2022 NEC Corporation
+#   Copyright 2023 NEC Corporation
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -12,12 +12,15 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-title: planItem is a definition of plan item resource.
-allOf:
-  - type: object
-    properties:
-      id:
-        type: string
-        example: platform.workspaces
-        description: limit id
-  - $ref: './planItemFields.yaml'
+title: system config is a definition of system config resource.
+type: object
+properties:
+  value:
+    type: string
+    description: config value
+  description:
+    type: string
+    description: config description
+example:
+  value: 100
+  description: ""

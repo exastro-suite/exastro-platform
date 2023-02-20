@@ -809,6 +809,22 @@ components:
         data:
           type: object
           example: null
+    runtimeErrorConflict:
+      type: object
+      properties:
+        result:
+          type: integer
+          format: int32
+          example: 409
+        message:
+          type: string
+          example: Error Message
+        ts:
+          type: string
+          format: date-time
+        data:
+          type: object
+          example: null
     organization:
       title: organization is a definition of Organization resource.
       type: object
@@ -965,24 +981,40 @@ components:
             $ref: '#/components/schemas/plan'
     planItem:
       title: planItem is a definition of plan item resource.
+      allOf:
+        - type: object
+          properties:
+            id:
+              type: string
+              example: platform.workspaces
+              description: limit id
+        - $ref: '#/components/schemas/planItemFields'
+    planItemList:
+      title: plan item list is list of plan items resources.
+      type: array
+      items:
+        $ref: '#/components/schemas/planItem'
+      example:
+        - id: platform.workspaces
+          informations:
+            description: max workspaces
+            max: 1000
+            default: 100
+    planItemFields:
+      title: planItem is a definition of plan item resource.
       type: object
       properties:
-        id:
-          type: string
-          example: platform.workspaces
         informations:
           type: object
           properties:
             description:
               type: string
-    planItemList:
-      title: plan item list is list of plan items resources.
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/planItem'
+            max:
+              type: integer
+              example: 10000
+            default:
+              type: integer
+              example: 1000
     limits:
       title: limitValue is a definition of Limit Value resource.
       type: object
@@ -1447,6 +1479,70 @@ components:
               expire_timestamp:
                 type: string
                 format: date-time
+    systemConfig:
+      title: system config is a definition of system config resource.
+      type: object
+      properties:
+        key:
+          type: string
+          description: config key
+          example: platform.max_organization
+        value:
+          type: string
+          description: config value
+          example: '100'
+        description:
+          type: string
+          description: config description
+          example: platform max organization
+    systemConfigList:
+      title: system config list is list of system config resources.
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/systemConfig'
+    systemConfigCreate:
+      title: system config value is a definition of system config resource.
+      type: array
+      items:
+        $ref: '#/components/schemas/systemConfig'
+        required:
+          - key
+          - value
+      example:
+        - key: platform.max_organization
+          value: '100'
+          description: platform max organization
+    systemConfigUpdate:
+      example:
+        value: '100'
+        description: max organization
+      required:
+        - value
+      title: system config is a definition of system config resource.
+      type: object
+      properties:
+        value:
+          type: string
+          description: config value
+        description:
+          type: string
+          description: config description
+    systemConfigValue:
+      title: system config is a definition of system config resource.
+      type: object
+      properties:
+        value:
+          type: string
+          description: config value
+        description:
+          type: string
+          description: config description
+      example:
+        value: 100
+        description: ''
   securitySchemes:
     BearerAuth:
       description: Credentials or access token for API

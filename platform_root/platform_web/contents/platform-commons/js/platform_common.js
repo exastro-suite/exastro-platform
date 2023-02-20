@@ -273,6 +273,41 @@ function call_api_promise(ajaxparam, api_description, succeed_httpcodes = [200])
     });
 }
 
+function call_api_promise_noMessage(ajaxparam) {
+    return new Promise((resolve, reject) => {
+        console.log(`[CALL] ${ajaxparam.type} ${ajaxparam.url}`);
+        console.log(ajaxparam);
+        $.ajax(ajaxparam).done(
+            function(data, status, jqXHR) {
+                console.log(`[DONE] ${ajaxparam.type} ${ajaxparam.url} status=${jqXHR.status}`);
+                console.log(data);
+                resolve({data: data, status: status, jqXHR: jqXHR});
+            }
+        ).fail(
+            function(jqXHR, textStatus, errorThrown) {
+                let msg;
+                try {
+                    msg = `status:[${jqXHR.status}]`
+                    msg += `\nmessage_id:[${jqXHR.responseJSON.result}]\n${jqXHR.responseJSON.message}`;
+                } catch(e) { }
+
+                console.log(`[ERROR] ${ajaxparam.type} ${ajaxparam.url}\n${msg}`);
+                console.log(ajaxparam);
+                reject({jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown});
+            }
+        );
+    });
+}
+
+function alertMessageApiError(jqXHR, textStatus, errorThrown) {
+    let msg;
+    try {
+        msg = `status:[${jqXHR.status}]`
+        msg += `\nmessage_id:[${jqXHR.responseJSON.result}]\n${jqXHR.responseJSON.message}`;
+    } catch(e) { }
+
+    alert(msg);
+}
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //   Common Dialog
@@ -320,6 +355,7 @@ function confirmMessage(title, message, onOk = null, onCancel = null) {
     },
     {
         ok: function() {
+            $(dialog.$.dbody).find()
             dialog.close();
             if(onOk !== null) {
                 onOk();
@@ -333,6 +369,46 @@ function confirmMessage(title, message, onOk = null, onCancel = null) {
         }
     });
     dialog.open('<div class="alertMessage" style="margin-left: 30px; margin-right: 30px;">'+ message +'</div>');
+}
+
+function doubleConfirmMessage(title, message, onOk = null, onCancel = null) {
+    const dialog = new Dialog({
+        mode: 'modeless',
+        position: 'center',
+        width: 'auto',
+        header: {
+            title: title,
+        },
+        footer: {
+            button: {
+                ok: { text: "ＯＫ", action: "positive" },
+                cancel: { text: "キャンセル", action: "normal" }
+            }
+        },
+    },
+    {
+        ok: function() {
+            if($(dialog.$.dbody).find(".confirm_yes").val() != "yes") {
+                $(dialog.$.dbody).find(".validate_error").css("display", "");
+                return;
+            }
+            dialog.close();
+            if(onOk !== null) {
+                onOk();
+            }
+        },
+        cancel: function() {
+            dialog.close();
+            if(onCancel !== null) {
+                onCancel();
+            }
+        }
+    });
+    dialog.open('<div class="alertMessage" style="margin-left: 30px; margin-right: 30px;">'+ message
+                +'<hr>続行する場合は"yes"と入力して、OKボタンをクリックしてください。<br>'
+                + '<input class="confirm_yes" type="text" size="5" maxlength="3"> '
+                + '<span class="validate_error" style="display:none;">"yes"と入力してください</span>'
+                + '</div>');
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -27,7 +27,7 @@ const DebugConsole = {
      * @param {string} logClass         log class
      * @param {string} logText          Text to log - ログ出力するテキスト
      * @param {*} variable              Variable to output log - ログ出力する変数
-     */    
+     */
     "log": function(logClass, logText, variable) {
         try {
             if(DebugConsole._outputClass.indexOf(logClass) !== -1) {
@@ -48,7 +48,7 @@ const DebugConsole = {
     },
     /**
      * Target log class to log output - log classをログ出力の対象にします
-     * @param {string} logClass 
+     * @param {string} logClass
      */
     "setOutputClass": function(logClass) {
         if(DebugConsole._outputClass.indexOf(logClass) === -1) {
@@ -175,6 +175,17 @@ const CommonAuth = {
         } else {
             return CommonAuth.keycloak.tokenParsed.preferred_username;
         }
+    },
+
+    /**Returns the Preferred Username (login username)
+     *
+     * @returns {string} Preferred Username (login username)
+     */
+    "getPreferredUsername" : function() {
+        if(!CommonAuth.keycloak.authenticated) {
+            throw "not authenticated";
+        }
+        return CommonAuth.keycloak.tokenParsed.preferred_username;
     },
 
     /**
@@ -304,7 +315,7 @@ const CommonAuth = {
     /**
      * Returns the workspace id for which the given workspace admin permission is for
      * 指定のワークスペース管理者権限が対象とするワークスペースIDを返します
-     * @param {string} authorityName 
+     * @param {string} authorityName
      * @returns {string} workspace_id
      */
     "authorityNameToWorkspaceId": function(authorityName) {
@@ -318,7 +329,7 @@ const CommonAuth = {
     /**
      * Returns the admin privilege name for the given workspace id
      * 指定のワークスペースIDの管理者権限名を返します
-     * @param {string} workspace_id 
+     * @param {string} workspace_id
      * @returns {string} workspace admin authority name
      */
     "workspaceIdToAdminRoleName": function(workspace_id) {
@@ -332,10 +343,10 @@ const CommonAuth = {
         try {
             let nowTime = (new Date()).getTime();
             if(CommonAuthConfig.TOKEN_AUTO_REFRESH === -1 || nowTime <= CommonAuth._lastTimeToGetToken + CommonAuthConfig.TOKEN_AUTO_REFRESH * 1000) {
-    
+
                 // Renew the token indefinitely or until a certain amount of time has passed since the last request for the token.
                 // - 無制限またはトークンの最後の要求から一定の時間が経過するまで、トークンを更新します
-    
+
                 DebugConsole.log("CommonAuth", "[CALL] keycloak.updateToken");
                 CommonAuth.keycloak.updateToken(CommonAuthConfig.TOKEN_REFRESH_TIMMING).then((refreshed)=>{
                     if(refreshed) {
@@ -371,7 +382,7 @@ const CommonAuth = {
 
     /**
      * Returns the client id of the keycloak to log in - ログインするkeycloakのclient idを返します
-     * @returns 
+     * @returns
      */
     "_getLoginClient": function() {
         return CommonAuthConfig.LOGIN_CLIENT.replace(/%{RELMNAME}/g, CommonAuth.getRealm());
