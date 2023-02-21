@@ -44,6 +44,8 @@ def workspace_create(body, organization_id):
 
     :rtype: Workspace
     """
+    globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
+
     r = connexion.request
 
     user_id = r.headers.get("User-id")
@@ -287,11 +289,88 @@ def workspace_delete(organization_id, workspace_id):  # noqa: E501
 
     Args:
         organization_id (str): organization id
-        workspace_id (_type_): workspace id
+        workspace_id (str): workspace id
 
     Returns:
         Response: http response
     """
+    globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
+
+    r = connexion.request
+
+    user_id = r.headers.get("User-id")
+    encode_roles = r.headers.get("Roles")
+    language = r.headers.get("Language")
+
+    db = DBconnector()
+    private = db.get_organization_private(organization_id)
+    with closing(db.connect_orgdb(organization_id)) as conn:
+        with conn.cursor() as cursor:
+            # Check workspace exists
+            cursor.execute(
+                queries_workspaces.SQL_QUERY_WORKSPACES + " WHERE workspace_id = %(workspace_id)s FOR UPDATE",
+                {"workspace_id": workspace_id}
+            )
+
+            workspaces = cursor.fetchall()
+            if len(workspaces) == 0:
+                message_id = f"404-{MSG_FUNCTION_ID}001"
+                raise common.NotFoundException(message_id=message_id, message=multi_lang.get_text(message_id, "ワークスペース情報が存在しません"))
+
+            # Delete ITA workspace
+            globals.logger.info(f"Delete ITA Workspace : organization_id={organization_id} / workspace_id={workspace_id}")
+            r_delete_ita_workspace = api_ita_admin_call.ita_workspace_delete(organization_id, workspace_id, user_id, encode_roles, language)
+            if r_delete_ita_workspace.status_code not in [200, 404]:
+                globals.logger.error(f"response.status_code:{r_delete_ita_workspace.status_code}")
+                globals.logger.error(f"response.text:{r_delete_ita_workspace.text}")
+                message_id = f"500-{MSG_FUNCTION_ID}008"
+                message = multi_lang.get_text(
+                    message_id,
+                    "IT Automationのワークスペース削除に失敗しました(対象ID:{0})",
+                    workspace_id,
+                )
+                raise common.InternalErrorException(message_id=message_id, message=message)
+
+            # サービスアカウントのTOKEN取得
+            # Get a service account token
+            token_response = api_keycloak_tokens.service_account_get_token(
+                organization_id, private.internal_api_client_clientid, private.internal_api_client_secret,
+            )
+            if token_response.status_code != 200:
+                raise common.AuthException(
+                    "client_user_get_token error status:{}, response:{}".format(token_response.status_code, token_response.text)
+                )
+
+            token = json.loads(token_response.text)["access_token"]
+
+            # Delete Workspace Roles
+            globals.logger.info(f"Delete Platform Workspace Role: organization_id={organization_id} / workspace_id={workspace_id}")
+            delete_roles = [
+                {"client_uid": private.internal_api_client_id, "role_name": workspace_id},
+                {"client_uid": private.internal_api_client_id, "role_name": common.get_ws_admin_rolename(workspace_id)},
+                {"client_uid": private.user_token_client_id, "role_name": common.get_ws_admin_rolename(workspace_id) }
+            ]
+
+            for delete_role in delete_roles:
+                resp_role_delete = api_keycloak_roles.clients_role_delete(organization_id, delete_role["client_uid"], delete_role["role_name"], token)
+
+                if resp_role_delete.status_code not in [200, 204, 404]:
+                    globals.logger.error(f"response.status_code:{resp_role_delete.status_code}")
+                    globals.logger.error(f"response.text:{resp_role_delete.text}")
+                    message_id = f"500-{MSG_FUNCTION_ID}001"
+                    message = multi_lang.get_text(
+                        message_id,
+                        "ワークスペースロール削除に失敗しました(対象ID:{0})",
+                        workspace_id,
+                    )
+                    raise common.InternalErrorException(message_id=message_id, message=message)
+
+            # Detele from Workspace table
+            globals.logger.info(f"Delete Platform Workspace table: organization_id={organization_id} / workspace_id={workspace_id}")
+            cursor.execute(queries_workspaces.SQL_DELETE_WORKSPACE, {"workspace_id": workspace_id})
+
+            conn.commit()
+
     return common.response_200_ok(data=None)
 
 
