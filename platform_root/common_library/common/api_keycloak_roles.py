@@ -159,8 +159,43 @@ def clients_role_create(realm_name, client_uid, role_name, token, role_options=N
     return request_response
 
 
+def clients_role_delete(realm_name, client_uid, role_name, token):
+    """クライアントロール削除 user client role delete
+
+    Args:
+        realm_name (str): realm name
+        client_uid (str): client id
+        role_name (str): role name
+        token (str): token
+
+    Returns:
+        Response: HTTP Respose (success : .status_code=204)
+    """
+    globals.logger.info(
+        'Delete keycloak client role. client_uid={}, role_name={}'.format(client_uid, role_name)
+    )
+
+    header_para = {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer {}".format(token),
+    }
+
+    globals.logger.debug("client role delete send")
+    # 呼び出し先設定 requests setting
+    api_url = "{}://{}:{}".format(os.environ['API_KEYCLOAK_PROTOCOL'], os.environ['API_KEYCLOAK_HOST'], os.environ['API_KEYCLOAK_PORT'])
+
+    request_response = requests.delete(
+        "{}/auth/admin/realms/{}/clients/{}/roles/{}".format(api_url, realm_name, client_uid, role_name),
+        headers=header_para,
+    )
+
+    # globals.logger.debug(request_response.text)
+
+    return request_response
+
+
 def clients_role_update(realm_name, client_uid, role_name, token, role_options=None):
-    """client ロール取得 client roles get
+    """client ロール取得 client roles update
     Args:
         realm_name (str): realm name
         client_uid (str): client id (not client-id)
