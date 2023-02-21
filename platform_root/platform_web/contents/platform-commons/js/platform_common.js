@@ -371,7 +371,7 @@ function confirmMessage(title, message, onOk = null, onCancel = null) {
     dialog.open('<div class="alertMessage" style="margin-left: 30px; margin-right: 30px;">'+ message +'</div>');
 }
 
-function doubleConfirmMessage(title, message, onOk = null, onCancel = null) {
+function doubleConfirmMessage(title, message, input, onOk = null, onCancel = null) {
     const dialog = new Dialog({
         mode: 'modeless',
         position: 'center',
@@ -388,7 +388,7 @@ function doubleConfirmMessage(title, message, onOk = null, onCancel = null) {
     },
     {
         ok: function() {
-            if($(dialog.$.dbody).find(".confirm_yes").val() != "yes") {
+            if($(dialog.$.dbody).find(".confirm_yes").val() != input) {
                 $(dialog.$.dbody).find(".validate_error").css("display", "");
                 return;
             }
@@ -405,9 +405,9 @@ function doubleConfirmMessage(title, message, onOk = null, onCancel = null) {
         }
     });
     dialog.open('<div class="alertMessage" style="margin-left: 30px; margin-right: 30px;">'+ message
-                +'<hr>続行する場合は"yes"と入力して、OKボタンをクリックしてください。<br>'
+                +'<hr>続行する場合は <span style="font-weight: bold;">' + fn.cv(input, "", true)  + '</span> と入力して、OKボタンをクリックしてください。<br>'
                 + '<input class="confirm_yes" type="text" size="5" maxlength="3"> '
-                + '<span class="validate_error" style="display:none;">"yes"と入力してください</span>'
+                + '<span class="validate_error" style="display:none;"> ' + fn.cv(input, "", true) + ' と入力してください</span>'
                 + '</div>');
 }
 
