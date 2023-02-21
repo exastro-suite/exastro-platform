@@ -108,6 +108,7 @@
                                                         <th data-id="c3" data-rest="name" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="説明"><div class="ci">説明</div></th>
                                                         <th data-id="c4" data-rest="last_update_date_time" title="最終更新日時" class="tHeadTh popup th" rowspan="1" colspan="1" }="" width="200px;"><div class="ci">最終更新日時</div></th>
                                                         <th data-id="c5" data-rest="name" class="tHeadTh popup th" rowspan="1" colspan="1" }="" width="130px;"><div class="ci"></div></th>
+                                                        <th data-id="c6" data-rest="name" class="tHeadTh popup th" rowspan="1" colspan="1" }="" width="130px;"><div class="ci"></div></th>
                                                     </tr>
                                                 </thead>
                                                 <tbody class="tbody">
@@ -118,6 +119,14 @@
                                                         <td class="tBodyTd td to_detail" rowspan="1" colspan="1" }="" data-id="${workspace_id}"><div class="ci" style="text-align: center;">${last_update_date_time}</div></td>
                                                         <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: center;">
                                                             <button class="pl_button btn_ita" data-id="${workspace_id}" disabled><img src="/_/platform-commons/img/Exastro-ITA-logo1-rgb.png" width="80" height="20"></button>
+                                                        </div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: center;">
+                                                            <button title="削除" id="button_delete_modal_open" data-action="danger" class="itaButton button" data-id="${workspace_id}" style="width:100px;">
+                                                                <span class="inner">
+                                                                    <span class="iconButtonIcon icon icon-trash"></span>
+                                                                    <span class="iconButtonBody">削除</span>
+                                                                </span>
+                                                            </button>
                                                         </div></td>
                                                     </tr>
                                                     <tr class="tBodyTr tr notfound" style="display:none">
