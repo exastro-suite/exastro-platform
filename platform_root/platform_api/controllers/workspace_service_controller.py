@@ -320,7 +320,7 @@ def workspace_delete(organization_id, workspace_id):  # noqa: E501
             # Delete ITA workspace
             globals.logger.info(f"Delete ITA Workspace : organization_id={organization_id} / workspace_id={workspace_id}")
             r_delete_ita_workspace = api_ita_admin_call.ita_workspace_delete(organization_id, workspace_id, user_id, encode_roles, language)
-            if r_delete_ita_workspace.status_code not in [200, 404]:
+            if r_delete_ita_workspace.status_code not in [200, 404, 499]:
                 globals.logger.error(f"response.status_code:{r_delete_ita_workspace.status_code}")
                 globals.logger.error(f"response.text:{r_delete_ita_workspace.text}")
                 message_id = f"500-{MSG_FUNCTION_ID}008"
@@ -330,6 +330,24 @@ def workspace_delete(organization_id, workspace_id):  # noqa: E501
                     workspace_id,
                 )
                 raise common.InternalErrorException(message_id=message_id, message=message)
+
+            # Alredy Deleted : status_code = 499 and response body result = '499-00002'
+            if r_delete_ita_workspace.status_code == 499:
+                try:
+                    r_delete_ita_workspace_body = json.loads(r_delete_ita_workspace.text)
+                except Exception:
+                    r_delete_ita_workspace_body = {}
+
+                if r_delete_ita_workspace_body.get("result", "") != '499-00002':  # Alredy Deleted
+                    globals.logger.error(f"response.status_code:{r_delete_ita_workspace.status_code}")
+                    globals.logger.error(f"response.text:{r_delete_ita_workspace.text}")
+                    message_id = f"500-{MSG_FUNCTION_ID}008"
+                    message = multi_lang.get_text(
+                        message_id,
+                        "IT Automationのワークスペース削除に失敗しました(対象ID:{0})",
+                        workspace_id,
+                    )
+                    raise common.InternalErrorException(message_id=message_id, message=message)
 
             # サービスアカウントのTOKEN取得
             # Get a service account token
