@@ -406,7 +406,7 @@ function doubleConfirmMessage(title, message, input, onOk = null, onCancel = nul
     });
     dialog.open('<div class="alertMessage" style="margin-left: 30px; margin-right: 30px;">'+ message
                 +'<hr>続行する場合は <span style="font-weight: bold;">' + fn.cv(input, "", true)  + '</span> と入力して、OKボタンをクリックしてください。<br>'
-                + '<input class="confirm_yes" type="text" size="5" maxlength="3"> '
+                + '<input class="confirm_yes" type="text" size="' + Math.trunc(input.length * 1.2)+ '" maxlength="' + input.length + '"> '
                 + '<span class="validate_error" style="display:none;"> ' + fn.cv(input, "", true) + ' と入力してください</span>'
                 + '</div>');
 }
