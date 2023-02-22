@@ -70,7 +70,7 @@ $(function(){
         //
         // display Exastro IT Automation button
         //
-        $('.to_ita').on('click',() => { 
+        $('.to_ita').on('click',() => {
             window.location = location_conf.href.workspaces.ita.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{workspace_id}/g, workspace_id);
         });
         if(CommonAuth.getAccessibleWorkspaces().indexOf(workspace_id) !== -1) {
@@ -78,6 +78,19 @@ $(function(){
         } else {
             $('.to_ita').prop('disabled', true);
             $('.to_ita').css('cursor', 'not-allowed');
+        }
+
+        //
+        // display Delete Workspace button
+        //
+        $('.button_delete_workspace').on('click',() => {
+            delete_workspace();
+        });
+        if(CommonAuth.getAdminWorkspaces().indexOf(workspace_id) !== -1 || CommonAuth.hasAuthority(RolesCommon.ORG_AUTH_WS_MAINTE)) {
+            $('.button_delete_workspace').prop('disabled', false);
+        } else {
+            $('.button_delete_workspace').prop('disabled', true);
+            $('.button_delete_workspace').css('cursor', 'not-allowed');
         }
 
         //
@@ -106,5 +119,41 @@ $(function(){
             }
         }
         $("#text_workspace_member").html(memberList);
+    }
+
+    function delete_workspace() {
+        console.log("[CALL] confirm_delete");
+        message = 'ワークスペース(' + fn.cv(workspace_id, '', true) +')を削除します。<br>'
+                + '<span class="caution_message">削除したワークスペースへのアクセスは以降一切できなくなります。</span>'
+                + '<br><br>よろしいですか？<br>'
+
+        doubleConfirmMessage("実行確認",
+        message, workspace_id,
+        () => {
+            disabled_button();
+            show_progress();
+
+            // APIを呼出す
+            call_api_promise({
+                type: "DELETE",
+                url: api_conf.api.workspaces.delete.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{workspace_id}/g, workspace_id),
+                headers: {
+                    Authorization: "Bearer " + CommonAuth.getToken(),
+                },
+            }).then(() => {
+                hide_progress();
+                alertMessage("処理結果","ワークスペースを削除しました。",
+                    () => {
+                        window.location.href = location_conf.href.workspaces.list.replace(/{organization_id}/g, CommonAuth.getRealm());
+                    });
+            }).catch(() => {
+                hide_progress();
+            });
+        });
+    }
+
+    function disabled_button() {
+        $('.to_ita').prop('disabled', true);
+        $('.button_delete_workspace').prop('disabled', true);
     }
 });

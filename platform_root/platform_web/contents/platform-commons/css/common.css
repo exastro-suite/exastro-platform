@@ -2258,9 +2258,98 @@ line-height: 1.75;
 font-size: 14px;
 }
 
-
-
-
+/*
+##################################################
+  Operation menu
+##################################################
+*/
+.operationMenu {
+  flex: 0 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 32px;
+  width: 100%;
+  padding: 0 4px;
+  }
+  .operationMenuList {
+  flex: 0 0 auto;
+  display: inline-flex;
+  gap: 16px;
+  max-width: 100%;
+  height: 48px;
+  min-width: 0;
+  padding-bottom: 4px;
+  }
+  .operationMenuSub {
+  margin-left: auto;
+  }
+  .operationMenuItem {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  }
+  .editor .operationMenuItem {
+  padding-top: 2px;
+  }
+  .editor .button:focus {
+  box-shadow: 0 0 0 1px var(--black90), 0 0 0 3px var(--focusColor);
+  }
+  .editor .button:focus:hover {
+  box-shadow: none;
+  }
+  .operationMenuSeparate {
+  position: relative;
+  z-index: 0;
+  padding-left: 16px;
+  }
+  .operationMenuSeparate::before {
+  content: '';
+  display: block;
+  position: absolute;
+  left: 0; top: 50%;
+  transform: translateY(-50%);
+  width: 1px; height: 32px;
+  border-left: 1px solid var(--black30);
+  }
+  .editor .operationMenuSeparate::before {
+  border-left: 1px solid rgba( 0,0,0,.3 );
+  border-right: 1px solid rgba( 255,255,255,.1 );
+  }
+  .operationMenuSub .operationMenuSeparate::before {
+  height: 28px;
+  }
+  .operationMenuButton  {
+  height: 32px;
+  line-height: 32px;
+  }
+  .operationMenuButton  > .inner {
+  overflow: hidden;
+  max-width: 100%;
+  padding: 0 12px;
+  }
+  .operationMenuSub .operationMenuButton  {
+  height: 28px;
+  line-height: 28px;
+  }
+  .operationMenuSub .operationMenuButton  > .inner {
+  padding: 0 8px;
+  font-size: 12px;
+  }
+  .operationMenuMessage {
+  display: flex;
+  align-items: center;
+  letter-spacing: .25px;
+  line-height: 1.5;
+  font-size: 16px;
+  color: var(--black80);
+  }
+  .operationMenuMessageIcon {
+  margin-right: 8px;
+  line-height: 1;
+  font-size: 24px;
+  color: var(--mainColor50);
+  }
 
 
 /*
