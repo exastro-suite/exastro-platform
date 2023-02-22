@@ -27,15 +27,8 @@ $(function(){
             loadCommonContents(),
 
             // get Workspace List
-            call_api_promise({
-                type: "GET",
-                url: api_conf.api.workspaces.get.replace(/{organization_id}/g, CommonAuth.getRealm()),
-                headers: {
-                    Authorization: "Bearer " + CommonAuth.getToken(),
-                },
-                contentType: "application/json",
-                dataType: "json",
-            })
+            call_api_promise_get_workspaces(),
+
         ]).then(function(results) {
             // Display Menu
             displayMenu('menu_workspace');
@@ -46,11 +39,24 @@ $(function(){
 
             display_main(results[1].data);
             finish_onload_progress();
+            enabled_button();
         }).catch((e) => {
             console.log('[ERROR] load_main catch');
             finish_onload_progress_at_error();
             if(typeof e != "undefined") console.log(e);
             return;
+        });
+    }
+
+    function call_api_promise_get_workspaces() {
+        return call_api_promise({
+            type: "GET",
+            url: api_conf.api.workspaces.get.replace(/{organization_id}/g, CommonAuth.getRealm()),
+            headers: {
+                Authorization: "Bearer " + CommonAuth.getToken(),
+            },
+            contentType: "application/json",
+            dataType: "json",
         });
     }
 
@@ -72,7 +78,11 @@ $(function(){
         //
         if ( workspaces.length == 0 ) {
             $("#workspace_list .notfound").css('display', '');
+            $("#workspace_list .datarow").remove();
         } else {
+            $("#workspace_list .notfound").css('display', 'none');
+            $("#workspace_list .datarow").remove();
+
             //
             // sort workspace list
             //
@@ -92,7 +102,7 @@ $(function(){
             //
             // display workspace list
             //
-            const row_template = $('#workspace_list .datarow').prop('outerHTML');
+            const row_template = $('#workspace_list .datarow-template').clone(true).removeClass('datarow-template').addClass('datarow').prop('outerHTML');
             let html='';
             for(var row of workspaces) {
                 html += row_template
@@ -101,8 +111,8 @@ $(function(){
                     .replace(/\${workspace_description}/g, fn.cv(row.informations.description,'',true))
                     .replace(/\${last_update_date_time}/g, fn.date(new Date(row.last_update_timestamp),'yyyy/MM/dd HH:mm:ss'));
             }
-            $("#workspace_list tbody").html(html);
-            $("#workspace_list tbody tr").css('display', '');
+            $("#workspace_list tbody").append(html);
+            $("#workspace_list .datarow").css('display', '');
 
             $('#workspace_list .to_detail').on('click', function() {
                 let workspace_id = $(this).attr('data-id');
@@ -113,16 +123,78 @@ $(function(){
                 window.location = location_conf.href.workspaces.ita.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{workspace_id}/g, workspace_id);
             });
 
-            let accessibleWorkspaces = CommonAuth.getAccessibleWorkspaces();
-            $('#workspace_list .btn_ita').each(function(index, element) {
-                let $element = $(element);
-                if(accessibleWorkspaces.indexOf($element.attr('data-id')) !== -1) {
-                    $element.prop('disabled', false);
-                } else {
-                    $element.prop('disabled', true);
-                    $element.css('cursor', 'not-allowed');
-                }
-            });
+            $('#workspace_list .button_delete_workspace').on('click', function() {
+                confirm_delete($(this).attr('data-id'));
+            })
         }
+    }
+
+    function confirm_delete(workspace_id) {
+        console.log("[CALL] confirm_delete");
+        message = 'ワークスペース(' + fn.cv(workspace_id, '', true) +')を削除します。<br>'
+                + '<span class="caution_message">削除したワークスペースへのアクセスは以降一切できなくなります。</span>'
+                + '<br><br>よろしいですか？<br>'
+
+        doubleConfirmMessage("実行確認",
+        message, workspace_id,
+        () => {
+            disabled_button();
+            show_progress();
+
+            // APIを呼出す
+            call_api_promise({
+                type: "DELETE",
+                url: api_conf.api.workspaces.delete.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{workspace_id}/g, workspace_id),
+                headers: {
+                    Authorization: "Bearer " + CommonAuth.getToken(),
+                },
+            }).then(() => {
+                // 一覧の再取得
+                return call_api_promise_get_workspaces();
+            }).then((result) => {
+                // 一覧の再描画
+                display_main(result.data);
+                enabled_button();
+                hide_progress();
+                alertMessage("処理結果","ワークスペースを削除しました。");
+            }).catch(() => {
+                enabled_button();
+            });
+        });
+    }
+
+    function disabled_button() {
+        $("#new_workspace").prop('disabled', true);
+        $("#workspace_list button").prop('disabled', true);
+    }
+
+    function enabled_button() {
+        $("#new_workspace").prop('disabled', false);
+
+        const accessibleWorkspaces = CommonAuth.getAccessibleWorkspaces();
+        $('#workspace_list .btn_ita').each(function(index, element) {
+            let $element = $(element);
+            if(accessibleWorkspaces.indexOf($element.attr('data-id')) !== -1) {
+                $element.prop('disabled', false);
+            } else {
+                $element.prop('disabled', true);
+                $element.css('cursor', 'not-allowed');
+            }
+        });
+
+        const adminWorkspaces = CommonAuth.getAdminWorkspaces();
+        $('#workspace_list .button_delete_workspace').each(function(index, element) {
+            let $element = $(element);
+            if(CommonAuth.hasAuthority(RolesCommon.ORG_AUTH_WS_MAINTE)) {
+                $element.prop('disabled', false);
+                return;
+            }
+            if(adminWorkspaces.indexOf($element.attr('data-id')) !== -1) {
+                $element.prop('disabled', false);
+            } else {
+                $element.prop('disabled', true);
+                $element.css('cursor', 'not-allowed');
+            }
+        });
     }
 });

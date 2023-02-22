@@ -112,7 +112,7 @@
                                                     </tr>
                                                 </thead>
                                                 <tbody class="tbody">
-                                                    <tr class="tBodyTr tr datarow" style="cursor:pointer; display:none">
+                                                    <tr class="tBodyTr tr datarow-template" style="cursor:pointer; display:none">
                                                         <th class="tBodyLeftSticky tBodyTh th to_detail" rowspan="1" colspan="1" }="" data-id="${workspace_id}"><div class="ci" style="text-align: left;">${workspace_id}</div></td>
                                                         <td class="tBodyTd td to_detail" rowspan="1" colspan="1" }="" data-id="${workspace_id}"><div class="ci">${workspace_name}</div></td>
                                                         <td class="tBodyTd td to_detail" rowspan="1" colspan="1" }="" data-id="${workspace_id}"><div class="ci">${workspace_description}</div></td>
@@ -121,7 +121,7 @@
                                                             <button class="pl_button btn_ita" data-id="${workspace_id}" disabled><img src="/_/platform-commons/img/Exastro-ITA-logo1-rgb.png" width="80" height="20"></button>
                                                         </div></td>
                                                         <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: center;">
-                                                            <button title="削除" id="button_delete_modal_open" data-action="danger" class="itaButton button" data-id="${workspace_id}" style="width:100px;">
+                                                            <button title="削除" data-action="danger" class="itaButton button button_delete_workspace" data-id="${workspace_id}" style="width:100px;">
                                                                 <span class="inner">
                                                                     <span class="iconButtonIcon icon icon-trash"></span>
                                                                     <span class="iconButtonBody">削除</span>
@@ -130,7 +130,7 @@
                                                         </div></td>
                                                     </tr>
                                                     <tr class="tBodyTr tr notfound" style="display:none">
-                                                        <td class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="5" }="" height="50px"><div class="ci" style="text-align: center;">
+                                                        <td class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="6" }="" height="50px"><div class="ci" style="text-align: center;">
                                                             使用可能なワークスペースが存在しません
                                                         </div></td>
                                                     </tr>
