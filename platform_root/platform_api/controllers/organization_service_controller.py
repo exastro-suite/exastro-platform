@@ -311,6 +311,19 @@ def organization_create(body, retry=None):
 
 
 @common.platform_exception_handler
+def organization_delete(organization_id):  # noqa: E501
+    """Delete an organization
+
+    Args:
+        organization_id (str): organization id
+
+    Returns:
+        response: HTTP Response
+    """
+    return common.response_200_ok(None)
+
+
+@common.platform_exception_handler
 def organization_list():
     """organization info. list
 
