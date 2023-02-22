@@ -103,23 +103,23 @@
                                             <table class="table" width="100%" id="workspace_list">
                                                 <thead class="thead">
                                                     <tr class="tHeadTr tr">
-                                                        <th data-id="c1" data-rest="id" class="tHeadLeftSticky tHeadTh popup th" rowspan="1" colspan="1" }="" title="ワークスペースID" width="300px;"><div class="ci">ワークスペースID</div></th>
+                                                        <th data-id="c5" data-rest="name" class="tHeadTh popup th" rowspan="1" colspan="1" }="" width="130px;"><div class="ci"></div></th>
+                                                        <th data-id="c1" data-rest="id" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="ワークスペースID" width="300px;"><div class="ci">ワークスペースID</div></th>
                                                         <th data-id="c2" data-rest="name" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="ワークスペース名"><div class="ci">ワークスペース名</div></th>
                                                         <th data-id="c3" data-rest="name" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="説明"><div class="ci">説明</div></th>
                                                         <th data-id="c4" data-rest="last_update_date_time" title="最終更新日時" class="tHeadTh popup th" rowspan="1" colspan="1" }="" width="200px;"><div class="ci">最終更新日時</div></th>
-                                                        <th data-id="c5" data-rest="name" class="tHeadTh popup th" rowspan="1" colspan="1" }="" width="130px;"><div class="ci"></div></th>
                                                         <th data-id="c6" data-rest="name" class="tHeadTh popup th" rowspan="1" colspan="1" }="" width="130px;"><div class="ci"></div></th>
                                                     </tr>
                                                 </thead>
                                                 <tbody class="tbody">
                                                     <tr class="tBodyTr tr datarow-template" style="cursor:pointer; display:none">
-                                                        <th class="tBodyLeftSticky tBodyTh th to_detail" rowspan="1" colspan="1" }="" data-id="${workspace_id}"><div class="ci" style="text-align: left;">${workspace_id}</div></td>
+                                                        <td class="tBodyTh tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: center;">
+                                                            <button class="pl_button btn_ita" data-id="${workspace_id}" disabled><img src="/_/platform-commons/img/Exastro-ITA-logo1-rgb.png" width="80" height="20"></button>
+                                                        </div></td>
+                                                        <td class="tBodyTd td to_detail" rowspan="1" colspan="1" }="" data-id="${workspace_id}"><div class="ci" style="text-align: left;">${workspace_id}</div></td>
                                                         <td class="tBodyTd td to_detail" rowspan="1" colspan="1" }="" data-id="${workspace_id}"><div class="ci">${workspace_name}</div></td>
                                                         <td class="tBodyTd td to_detail" rowspan="1" colspan="1" }="" data-id="${workspace_id}"><div class="ci">${workspace_description}</div></td>
                                                         <td class="tBodyTd td to_detail" rowspan="1" colspan="1" }="" data-id="${workspace_id}"><div class="ci" style="text-align: center;">${last_update_date_time}</div></td>
-                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: center;">
-                                                            <button class="pl_button btn_ita" data-id="${workspace_id}" disabled><img src="/_/platform-commons/img/Exastro-ITA-logo1-rgb.png" width="80" height="20"></button>
-                                                        </div></td>
                                                         <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: center;">
                                                             <button title="削除" data-action="danger" class="itaButton button button_delete_workspace" data-id="${workspace_id}" style="width:100px;">
                                                                 <span class="inner">

@@ -159,6 +159,7 @@ $(function(){
                 alertMessage("処理結果","ワークスペースを削除しました。");
             }).catch(() => {
                 enabled_button();
+                hide_progress();
             });
         });
     }
