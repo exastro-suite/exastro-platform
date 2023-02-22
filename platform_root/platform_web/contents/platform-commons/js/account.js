@@ -93,6 +93,7 @@ $(function(){
         for(i in list) {
             const row = list[i];
             const row_html = row_template
+            .replace(/\${id}/g, fn.cv(row.id, '', true))
             .replace(/\${start_timestamp}/g, fn.date(new Date(row.start_timestamp),'yyyy/MM/dd HH:mm:ss'))
             .replace(/\${expire_timestamp}/g, fn.date(new Date(row.expire_timestamp),'yyyy/MM/dd HH:mm:ss'))
             .replace(/\${lastaccess_timestamp}/g, fn.date(new Date(row.lastaccess_timestamp),'yyyy/MM/dd HH:mm:ss'));
@@ -247,7 +248,14 @@ $(function(){
     // Delete refresh token
     // refresh tokenの削除
     function delete_modal_open() {
-        doubleConfirmMessage("実行確認", "あなたが発行した全てのrefresh tokenを削除(無効化)します。<br><br>よろしいですか？<br>",
+        message = "あなたが発行した以下の全てのrefresh tokenを削除(無効化)します。<br>"
+        + '<textarea cols="40" rows="10" readonly>'
+        + $("#token_list .datarow").map((i,elm) => {return fn.cv($(elm).attr("data-id"),"", true)}).get().join('\n')
+        + '</textarea>'
+        + '<br><br>よろしいですか？<br>'
+
+        doubleConfirmMessage("実行確認",
+        message, "yes",
         () => {
             // APIを呼出す
             show_progress();

@@ -146,19 +146,21 @@
                                             <table class="table" width="100%" id="token_list">
                                                 <thead class="thead">
                                                     <tr class="tHeadTr tr">
-                                                        <th class="tHeadLeftSticky tHeadTh popup th" rowspan="1" colspan="1" }="" title="発行日時"><div class="ci">発行日時</div></th>
+                                                        <th class="tHeadLeftSticky tHeadTh popup th" rowspan="1" colspan="1" }="" title="ID"><div class="ci">ID</div></th>
+                                                        <th class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="発行日時"><div class="ci">発行日時</div></th>
                                                         <th class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="有効期限"><div class="ci">有効期限</div></th>
                                                         <th class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="最終アクセス日時"><div class="ci">最終アクセス日時</div></th>
                                                     </tr>
                                                 </thead>
                                                 <tbody class="tbody">
-                                                    <tr class="tBodyTr tr datarow-template" style="display:none">
-                                                        <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1" }="" ><div class="ci" style="text-align: center;">${start_timestamp}</div></td>
+                                                    <tr class="tBodyTr tr datarow-template" style="display:none" data-id="${id}">
+                                                        <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1" }="" ><div class="ci" style="text-align: center;">${id}</div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }="" ><div class="ci" style="text-align: center;">${start_timestamp}</div></td>
                                                         <td class="tBodyTd td" rowspan="1" colspan="1" }="" ><div class="ci" style="text-align: center;">${expire_timestamp}</div></td>
                                                         <td class="tBodyTd td" rowspan="1" colspan="1" }="" ><div class="ci" style="text-align: center;">${lastaccess_timestamp}</div></td>
                                                     </tr>
                                                     <tr class="tBodyTr tr notfound" style="display:none">
-                                                        <td class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="3" }="" height="50px"><div class="ci" style="text-align: center;">
+                                                        <td class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="4" }="" height="50px"><div class="ci" style="text-align: center;">
                                                             有効なrefresh tokenは存在しません
                                                         </div></td>
                                                     </tr>
