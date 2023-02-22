@@ -66,6 +66,8 @@ paths:
 
   "/api/platform/{organization_id}/plans":
       $ref: './paths/plans.organizations.yaml'
+  "/api/platform/organizations/{organization_id}":
+      $ref: './paths/organizations.organization_id.yaml'
   "/api/platform/{organization_id}/plans/{plan_start_datetime}":
       $ref: './paths/plans.organizations.plan_start_datetime.yaml'
   "/api/platform/plans":
