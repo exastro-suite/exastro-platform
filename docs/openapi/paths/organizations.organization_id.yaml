@@ -1,0 +1,26 @@
+delete:
+  tags:
+  - OrganizationService
+  summary: Delete an organization
+  x-openapi-router-controller: controllers.organization_service_controller
+  operationId: organization_delete
+  parameters:
+    - name: organization_id
+      in: path
+      required: true
+      schema:
+        type: string
+  responses:
+    200:
+      description: A successful response.
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '../schemas/responseOk.yaml'
+    default:
+      description: An unexpected error response.
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'
