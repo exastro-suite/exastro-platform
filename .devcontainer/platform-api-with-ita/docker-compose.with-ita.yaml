@@ -69,8 +69,13 @@ services:
       context: ${ITA_REPO_ROOT}
     environment:
       - EXECUTE_INTERVAL=${ITA_BY_INTERVAL}
-
   ita-by-ansible-towermaster-sync:
+    build:
+      context: ${ITA_REPO_ROOT}
+    environment:
+      - EXECUTE_INTERVAL=${ITA_BY_INTERVAL}
+
+  ita-by-cicd-for-iac:
     build:
       context: ${ITA_REPO_ROOT}
     environment:
@@ -80,11 +85,29 @@ services:
       context: ${ITA_REPO_ROOT}
     environment:
       - EXECUTE_INTERVAL=${ITA_BY_INTERVAL}
+
+  ita-by-conductor-regularly:
+    build:
+      context: ${ITA_REPO_ROOT}
+    environment:
+      - EXECUTE_INTERVAL=${ITA_BY_INTERVAL}
   ita-by-conductor-synchronize:
     build:
       context: ${ITA_REPO_ROOT}
     environment:
       - EXECUTE_INTERVAL=${ITA_BY_INTERVAL}
+
+  ita-by-excel-export-import:
+    build:
+      context: ${ITA_REPO_ROOT}
+    environment:
+      - EXECUTE_INTERVAL=${ITA_BY_INTERVAL}
+  ita-by-hostgroup-split:
+    build:
+      context: ${ITA_REPO_ROOT}
+    environment:
+      - EXECUTE_INTERVAL=${ITA_BY_INTERVAL}
+
   ita-by-menu-create:
     build:
       context: ${ITA_REPO_ROOT}
@@ -95,7 +118,23 @@ services:
       context: ${ITA_REPO_ROOT}
     environment:
       - EXECUTE_INTERVAL=${ITA_BY_INTERVAL}
-  ita-by-excel-export-import:
+
+  ita-by-terraform-cli-execute:
+    build:
+      context: ${ITA_REPO_ROOT}
+    environment:
+      - EXECUTE_INTERVAL=${ITA_BY_INTERVAL}
+  ita-by-terraform-cli-vars-listup:
+    build:
+      context: ${ITA_REPO_ROOT}
+    environment:
+      - EXECUTE_INTERVAL=${ITA_BY_INTERVAL}
+  ita-by-terraform-cloud-ep-execute:
+    build:
+      context: ${ITA_REPO_ROOT}
+    environment:
+      - EXECUTE_INTERVAL=${ITA_BY_INTERVAL}
+  ita-by-terraform-cloud-ep-vars-listup:
     build:
       context: ${ITA_REPO_ROOT}
     environment:
