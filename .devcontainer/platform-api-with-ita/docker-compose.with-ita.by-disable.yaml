@@ -10,13 +10,32 @@ services:
     image: busybox:latest
   ita-by-ansible-towermaster-sync:
     image: busybox:latest
+
+  ita-by-cicd-for-iac:
+    image: busybox:latest
   ita-by-collector:
+    image: busybox:latest
+
+  ita-by-conductor-regularly:
     image: busybox:latest
   ita-by-conductor-synchronize:
     image: busybox:latest
+
+  ita-by-excel-export-import:
+    image: busybox:latest
+  ita-by-hostgroup-split:
+    image: busybox:latest
+
   ita-by-menu-create:
     image: busybox:latest
   ita-by-menu-export-import:
     image: busybox:latest
-  ita-by-excel-export-import:
+
+  ita-by-terraform-cli-execute:
+    image: busybox:latest
+  ita-by-terraform-cli-vars-listup:
+    image: busybox:latest
+  ita-by-terraform-cloud-ep-execute:
+    image: busybox:latest
+  ita-by-terraform-cloud-ep-vars-listup:
     image: busybox:latest
