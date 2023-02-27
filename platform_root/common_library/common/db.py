@@ -121,6 +121,17 @@ class DBconnector:
 
         return orgdb
 
+    def get_dbinfo_organization(self, organization_id):
+        """get organization dbinfo
+
+        Args:
+            organization_id (str): organization id
+
+        Returns:
+            DBinfo: organization dbinfo
+        """
+        return self.__get_dbinfo_organization(organization_id)
+
     def connection(self, dbinfo: DBinfo):
         """connect database
 
