@@ -57,3 +57,7 @@ SQL_INSERT_ORGANIZATION_DBINFO = """
 INSERT INTO T_ORGANIZATION_DB (ORGANIZATION_ID, DB_HOST, DB_PORT, DB_DATABASE, DB_USER, DB_PASSWORD, CREATE_USER, LAST_UPDATE_USER)
 VALUES (%(organization_id)s, %(db_host)s, %(db_port)s, %(db_database)s, %(db_user)s, %(db_password)s, %(create_user)s, %(last_update_user)s)
 """
+
+SQL_DELETE_ORGANIZATION_DBINFO = """
+DELETE FROM T_ORGANIZATION_DB WHERE ORGANIZATION_ID = %(organization_id)s
+"""

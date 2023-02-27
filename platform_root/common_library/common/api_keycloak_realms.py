@@ -84,6 +84,37 @@ def realm_update(realm_id, realm_json, token):
     return request_response
 
 
+def realm_delete(realm_id, token):
+    """realm更新
+
+    Args:
+        realm_id (str): realm id
+        realm_json (dict): 更新対象の項目json値(json)
+                            Item json value to be updated (json)
+        toekn (str): token
+
+    Returns:
+        Response: HTTP Respose (success : .status_code=200)
+    """
+    globals.logger.info(f'Delete keycloak realms. realm_name={realm_id}')
+
+    header_para = {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer {}".format(token),
+    }
+
+    # 呼び出し先設定
+    # Call destination setting
+    api_url = "{}://{}:{}".format(os.environ['API_KEYCLOAK_PROTOCOL'], os.environ['API_KEYCLOAK_HOST'], os.environ['API_KEYCLOAK_PORT'])
+    request_response = requests.delete(f"{api_url}/auth/admin/realms/{realm_id}", headers=header_para)
+
+    globals.logger.debug(request_response.text)
+
+    # 応答をそのまま返却
+    # return response as is
+    return request_response
+
+
 def __get_keycloak_api_url():
     return "{}://{}:{}".format(os.environ['API_KEYCLOAK_PROTOCOL'], os.environ['API_KEYCLOAK_HOST'], os.environ['API_KEYCLOAK_PORT'])
 

@@ -155,3 +155,15 @@ class DBinit(DBconnector):
                 cursor.execute(queries_dbinit.SQL_INSERT_ORGANIZATION_DBINFO, parameter)
                 conn.commit()
         return
+
+    def delete_organization_dbinfo(self, organization_id):
+        """delete organization database info
+
+        Args:
+            organization_id (str): organization id
+        """
+        with closing(super().connect_platformdb()) as conn:
+            with conn.cursor() as cursor:
+                cursor.execute(queries_dbinit.SQL_DELETE_ORGANIZATION_DBINFO, {"organization_id": organization_id})
+                conn.commit()
+        return

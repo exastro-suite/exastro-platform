@@ -37,6 +37,10 @@ INSERT INTO T_ORGANIZATION_PLAN (ORGANIZATION_ID, START_TIMESTAMP, PLAN_ID, CREA
 values (%(organization_id)s, %(start_timestamp)s, %(plan_id)s, %(create_user)s, %(last_update_user)s)
 """
 
+SQL_DELETE_ORGANIZATION_PLAN = """
+DELETE FROM T_ORGANIZATION_PLAN WHERE ORGANIZATION_ID = %(organization_id)s
+"""
+
 SQL_INSERT_PLAN_ITEM = """
 INSERT INTO T_PLAN_ITEM (LIMIT_ID, INFORMATIONS, CREATE_USER, LAST_UPDATE_USER)
 VALUES (%(limit_id)s, %(informations)s, %(create_user)s, %(create_user)s)
