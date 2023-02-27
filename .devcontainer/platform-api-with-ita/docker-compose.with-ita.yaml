@@ -45,8 +45,6 @@ services:
   ita-mariadb:
     build:
       context: ${ITA_REPO_ROOT}
-    ports:
-      - "0.0.0.0:3307:3306"
 
   ita-by-ansible-execute:
     build:

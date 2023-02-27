@@ -132,7 +132,7 @@ services:
 
   platform-db:
     ports:
-      - "0.0.0.0:3306:3306"
+      - "0.0.0.0:3307:3306"
 
   # platform-migration-1:
   #   build:
