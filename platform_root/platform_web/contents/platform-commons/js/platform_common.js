@@ -371,7 +371,7 @@ function confirmMessage(title, message, onOk = null, onCancel = null) {
     dialog.open('<div class="alertMessage" style="margin-left: 30px; margin-right: 30px;">'+ message +'</div>');
 }
 
-function doubleConfirmMessage(title, message, input, onOk = null, onCancel = null) {
+function deleteConfirmMessage(title, message, deleteResources, cautionMessage, input, onOk = null, onCancel = null) {
     const dialog = new Dialog({
         mode: 'modeless',
         position: 'center',
@@ -381,7 +381,7 @@ function doubleConfirmMessage(title, message, input, onOk = null, onCancel = nul
         },
         footer: {
             button: {
-                ok: { text: "ＯＫ", action: "positive" },
+                ok: { text: '<span class="iconButtonIcon icon icon-trash"></span>はい、削除します', action: "danger" },
                 cancel: { text: "キャンセル", action: "normal" }
             }
         },
@@ -390,6 +390,7 @@ function doubleConfirmMessage(title, message, input, onOk = null, onCancel = nul
         ok: function() {
             if($(dialog.$.dbody).find(".confirm_yes").val() != input) {
                 $(dialog.$.dbody).find(".validate_error").css("display", "");
+                $(dialog.$.dbody).find(".confirm_yes").focus();
                 return;
             }
             dialog.close();
@@ -404,11 +405,26 @@ function doubleConfirmMessage(title, message, input, onOk = null, onCancel = nul
             }
         }
     });
-    dialog.open('<div class="alertMessage" style="margin-left: 30px; margin-right: 30px;">'+ message
-                +'<hr>続行する場合は <span style="font-weight: bold;">' + fn.cv(input, "", true)  + '</span> と入力して、OKボタンをクリックしてください。<br>'
-                + '<input class="confirm_yes" type="text" size="' + Math.trunc(input.length * 1.2)+ '" maxlength="' + input.length + '"> '
-                + '<span class="validate_error" style="display:none;"> ' + fn.cv(input, "", true) + ' と入力してください</span>'
-                + '</div>');
+
+    let content = "";
+    content += '<div class="alertMessage" style="margin-left: 30px; margin-right: 30px;">'
+    content += message + '<br>';
+    if((typeof deleteResources) == "string") {
+        content += '<ul style="list-style-type:disc; padding-left:30px; background-color: #FFFFEE;"><li>' + fn.cv(deleteResources, "", true) + '</li></ul>'
+    } else {
+        content += '<div style="max-height: 200px; overflow: auto;">'
+        content += '<ul style="list-style-type:disc; padding-left:30px; background-color: #FFFFEE;">' + deleteResources.map((value, i) => { return '<li>' + fn.cv(value, "", true) + '</li>'; }).join("") + '</ul>'
+        content += '</div>'
+    }
+    if(cautionMessage != null && cautionMessage != "" ) {
+        content += '<span class="caution_message">' + cautionMessage+ '</span><br>'
+    }
+    content += '<hr>続行する場合は <span style="font-weight: bold;">' + fn.cv(input, "", true)  + '</span> と入力ください。<br>'
+    content += '<input class="confirm_yes inputText input" type="text" maxlength="' + input.length + '">'
+    content += '<span class="validate_error" style="display:none;"><span style="font-weight: bold;">' + fn.cv(input, "", true) + '</span> と入力してください</span>'
+    content += '</div>';
+
+    dialog.open(content);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

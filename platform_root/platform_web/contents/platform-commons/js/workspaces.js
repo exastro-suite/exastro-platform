@@ -124,44 +124,46 @@ $(function(){
             });
 
             $('#workspace_list .button_delete_workspace').on('click', function() {
-                confirm_delete($(this).attr('data-id'));
+                confirm_delete($(this).attr('data-id'), $(this).attr('data-name'));
             })
         }
     }
 
-    function confirm_delete(workspace_id) {
+    function confirm_delete(workspace_id, workspace_name) {
         console.log("[CALL] confirm_delete");
-        message = 'ワークスペース(' + fn.cv(workspace_id, '', true) +')を削除します。<br>'
-                + '<span class="caution_message">削除したワークスペースへのアクセスは以降一切できなくなります。</span>'
-                + '<br><br>よろしいですか？<br>'
 
-        doubleConfirmMessage("実行確認",
-        message, CommonAuth.getRealm() + "/" + workspace_id,
-        () => {
-            disabled_button();
-            show_progress();
+        deleteConfirmMessage(
+            "実行確認",
+            "以下のワークスペースを削除してよろしいですか？",
+            workspace_id,
+            "削除したワークスペースへのアクセスは以降一切できなくなります。",
+            CommonAuth.getRealm() + "/" + workspace_id,
+            () => {
+                disabled_button();
+                show_progress();
 
-            // APIを呼出す
-            call_api_promise({
-                type: "DELETE",
-                url: api_conf.api.workspaces.delete.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{workspace_id}/g, workspace_id),
-                headers: {
-                    Authorization: "Bearer " + CommonAuth.getToken(),
-                },
-            }).then(() => {
-                // 一覧の再取得
-                return call_api_promise_get_workspaces();
-            }).then((result) => {
-                // 一覧の再描画
-                display_main(result.data);
-                enabled_button();
-                hide_progress();
-                alertMessage("処理結果","ワークスペースを削除しました。");
-            }).catch(() => {
-                enabled_button();
-                hide_progress();
-            });
-        });
+                // APIを呼出す
+                call_api_promise({
+                    type: "DELETE",
+                    url: api_conf.api.workspaces.delete.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{workspace_id}/g, workspace_id),
+                    headers: {
+                        Authorization: "Bearer " + CommonAuth.getToken(),
+                    },
+                }).then(() => {
+                    // 一覧の再取得
+                    return call_api_promise_get_workspaces();
+                }).then((result) => {
+                    // 一覧の再描画
+                    display_main(result.data);
+                    enabled_button();
+                    hide_progress();
+                    alertMessage("処理結果","ワークスペースを削除しました。");
+                }).catch(() => {
+                    enabled_button();
+                    hide_progress();
+                });
+            }
+        );
     }
 
     function disabled_button() {

@@ -83,10 +83,12 @@ $(function(){
         // データが無いときはnot foundを表示
         if( list == null || list.length == 0 ) {
             $("#token_list .notfound").css("display","");
+            $("#button_delete_modal_open").prop("disabled", true);
             return;
         }
 
         $("#token_list .notfound").css("display","none");
+        $("#button_delete_modal_open").prop("disabled", false);
 
         const row_template = $('#token_list .datarow-template').clone(true).removeClass('datarow-template').addClass('datarow').prop('outerHTML');
 
@@ -248,33 +250,31 @@ $(function(){
     // Delete refresh token
     // refresh tokenの削除
     function delete_modal_open() {
-        message = "あなたが発行した以下の全てのrefresh tokenを削除(無効化)します。<br>"
-        + '<textarea cols="40" rows="10" readonly>'
-        + $("#token_list .datarow").map((i,elm) => {return fn.cv($(elm).attr("data-id"),"", true)}).get().join('\n')
-        + '</textarea>'
-        + '<br><br>よろしいですか？<br>'
-
-        doubleConfirmMessage("実行確認",
-        message, "yes",
-        () => {
-            // APIを呼出す
-            show_progress();
-            call_api_promise({
-                type: "DELETE",
-                url: api_conf.api.token.delete.replace(/{organization_id}/g, CommonAuth.getRealm()),
-                headers: {
-                    Authorization: "Bearer " + CommonAuth.getToken(),
-                },
-            }).then(() => {
-                // 一覧の再取得
-                return call_api_promise_getTokenList();
-            }).then((result) => {
-                // 一覧の再描画
-                displayTokenList(result.data);
-                hide_progress();
-                alertMessage("処理結果","あなたが発行した全てのrefresh tokenを削除(無効化)しました。");
+        deleteConfirmMessage(
+            "実行確認",
+            "あなたが発行した以下の全てのrefresh tokenを削除(無効化)してよろしいですか？",
+            $("#token_list .datarow").map((i,elm) => {return fn.cv($(elm).attr("data-id"),"", true)}).get(),
+            "削除したrefresh tokenを使ってAPIの呼出しを行っている場合、APIの呼び出しができなくなります。",
+            "yes",
+            () => {
+                // APIを呼出す
+                show_progress();
+                call_api_promise({
+                    type: "DELETE",
+                    url: api_conf.api.token.delete.replace(/{organization_id}/g, CommonAuth.getRealm()),
+                    headers: {
+                        Authorization: "Bearer " + CommonAuth.getToken(),
+                    },
+                }).then(() => {
+                    // 一覧の再取得
+                    return call_api_promise_getTokenList();
+                }).then((result) => {
+                    // 一覧の再描画
+                    displayTokenList(result.data);
+                    hide_progress();
+                    alertMessage("処理結果","あなたが発行した全てのrefresh tokenを削除(無効化)しました。");
+                });
             });
-        });
     }
 });
 
