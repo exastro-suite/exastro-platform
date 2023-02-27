@@ -136,7 +136,7 @@ $(function(){
                 + '<br><br>よろしいですか？<br>'
 
         doubleConfirmMessage("実行確認",
-        message, workspace_id,
+        message, CommonAuth.getRealm() + "/" + workspace_id,
         () => {
             disabled_button();
             show_progress();
