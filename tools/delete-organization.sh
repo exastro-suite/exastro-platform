@@ -3,7 +3,7 @@
 source "`dirname $0`/api-auth.conf"
 
 echo
-echo "Please enter the organization ID to delete the orgnization"
+echo "Please enter the organization ID to delete the organization"
 echo
 read -p "organization id : " ORG_ID
 
