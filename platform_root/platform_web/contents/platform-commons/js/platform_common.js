@@ -155,7 +155,7 @@ function replaceLanguageText() {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 function displayTopicPath(topicPaths) {
     topicPaths.unshift(
-        {"text":"メインメニュー", "href": location_conf.href.menu.toppage.replace(/{organization_id}/g, CommonAuth.getRealm())}
+        {"text": getText("000-80001", "メインメニュー"), "href": location_conf.href.menu.toppage.replace(/{organization_id}/g, CommonAuth.getRealm())}
     );
     let $topichPathList = $('.topichPathList');
     for(let i = 0; i < topicPaths.length; ++i ) {
@@ -179,9 +179,9 @@ function displayTopicPath(topicPaths) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 function displayMenu(curent) {
     $('.menuList').append(`
-        <li class="menuItem"><a class="menuLink" id="menu_workspace" href="#" tabindex="-1">ワークスペース管理</a></li>
-        <li class="menuItem"><a class="menuLink" id="menu_account_management" href="#" target="keycloak_management_console" style="display: none;">ユーザー管理</a></li>
-        <li class="menuItem"><a class="menuLink" id="menu_role_management" href="#" style="display: none;">ロール管理</a></li>
+        <li class="menuItem"><a class="menuLink" id="menu_workspace" href="#" tabindex="-1">${getText("000-80005", "ワークスペース管理")}</a></li>
+        <li class="menuItem"><a class="menuLink" id="menu_account_management" href="#" target="keycloak_management_console" style="display: none;">${getText("000-80006", "ユーザー管理")}</a></li>
+        <li class="menuItem"><a class="menuLink" id="menu_role_management" href="#" style="display: none;">${getText("000-80007", "ロール管理")}</a></li>
     `);
     if(curent != null) {
         $(`#${curent}`).addClass("current");
@@ -323,7 +323,7 @@ function alertMessage(title, message, onclose = null) {
         },
         footer: {
             button: {
-                close: { text: "閉じる", action: "normal" }
+                close: { text: getText("000-80011", "閉じる"), action: "normal" }
             }
         },
     },
@@ -348,8 +348,8 @@ function confirmMessage(title, message, onOk = null, onCancel = null) {
         },
         footer: {
             button: {
-                ok: { text: "ＯＫ", action: "positive" },
-                cancel: { text: "キャンセル", action: "normal" }
+                ok: { text: getText("000-80012", "ＯＫ"), action: "positive" },
+                cancel: { text: getText("000-80013", "キャンセル"), action: "normal" }
             }
         },
     },
@@ -381,8 +381,8 @@ function deleteConfirmMessage(title, message, deleteResources, cautionMessage, i
         },
         footer: {
             button: {
-                ok: { text: '<span class="iconButtonIcon icon icon-trash"></span>はい、削除します', action: "danger" },
-                cancel: { text: "キャンセル", action: "normal" }
+                ok: { text: '<span class="iconButtonIcon icon icon-trash"></span>' + getText("000-80014", "はい、削除します"), action: "danger" },
+                cancel: { text: getText("000-80013", "キャンセル"), action: "normal" }
             }
         },
     },
@@ -419,9 +419,9 @@ function deleteConfirmMessage(title, message, deleteResources, cautionMessage, i
     if(cautionMessage != null && cautionMessage != "" ) {
         content += '<span class="caution_message">' + cautionMessage+ '</span><br>'
     }
-    content += '<hr>続行する場合は <span style="font-weight: bold;">' + fn.cv(input, "", true)  + '</span> と入力ください。<br>'
+    content += '<hr>' + getText("000-80015", '続行する場合は <span style="font-weight: bold;">{0}</span> と入力してください。', fn.cv(input, "", true)) + '<br>'
     content += '<input class="confirm_yes inputText input" type="text" maxlength="' + input.length + '">'
-    content += '<span class="validate_error" style="display:none;"><span style="font-weight: bold;">' + fn.cv(input, "", true) + '</span> と入力してください</span>'
+    content += '<span class="validate_error" style="display:none;">' + getText("000-80015",'<span style="font-weight: bold;">{0}</span> と入力してください',fn.cv(input, "", true)) + '</span>'
     content += '</div>';
 
     dialog.open(content);

@@ -300,7 +300,7 @@ userInfo() {
         <div class="userInfoBlock userInfoRole">
             <div class="userInfoTitle">
                 <span class=" icon icon-role"></span>
-                ロール一覧
+                <span text-id="000-80004">ロール一覧</span>
             </div>
             <div class="userInfoBody">
                 <ul class="userInfoRoleList">
@@ -312,13 +312,13 @@ userInfo() {
             <div class="userInfoBody">
                 <ul class="userInfoMenuList">
                     <li class="userInfoMenuItem">
-                        ${fn.html.button(fn.html.icon('gear') + 'アカウント管理', ['userInfoMenuButton', 'itaButton'], { type: 'account', action: 'default'})}
+                        ${fn.html.button(fn.html.icon('gear') + '<span text-id="000-80003">アカウント管理</span>', ['userInfoMenuButton', 'itaButton'], { type: 'account', action: 'default'})}
                     </li>
                 </ul>
 
                 <ul class="userInfoMenuList">
                     <li class="userInfoMenuItem">
-                        ${fn.html.button(fn.html.icon('logout') + 'ログアウト', ['userInfoMenuButton', 'itaButton'], { type: 'logout', action: 'positive'})}
+                        ${fn.html.button(fn.html.icon('logout') + '<span text-id="000-80002">ログアウト</span>', ['userInfoMenuButton', 'itaButton'], { type: 'logout', action: 'positive'})}
                     </li>
                 </ul>
             </div>

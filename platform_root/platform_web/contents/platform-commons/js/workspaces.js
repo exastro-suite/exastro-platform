@@ -34,7 +34,7 @@ $(function(){
             displayMenu('menu_workspace');
             // Display Topic Path
             displayTopicPath([
-                {"text": "ワークスペース一覧", "href": location_conf.href.workspaces.list.replace(/{organization_id}/g, CommonAuth.getRealm()) }
+                {"text": getText("000-82001", "ワークスペース一覧"), "href": location_conf.href.workspaces.list.replace(/{organization_id}/g, CommonAuth.getRealm()) }
             ]);
 
             display_main(results[1].data);
@@ -133,10 +133,10 @@ $(function(){
         console.log("[CALL] confirm_delete");
 
         deleteConfirmMessage(
-            "実行確認",
-            "以下のワークスペースを削除してよろしいですか？",
+            getText("000-80017", "実行確認"),
+            getText("000-82005", "以下のワークスペースを削除してよろしいですか？"),
             workspace_id,
-            "削除したワークスペースへのアクセスは以降一切できなくなります。",
+            getText("000-82006", "削除したワークスペースへのアクセスは以降一切できなくなります。"),
             CommonAuth.getRealm() + "/" + workspace_id,
             () => {
                 disabled_button();
@@ -157,7 +157,7 @@ $(function(){
                     display_main(result.data);
                     enabled_button();
                     hide_progress();
-                    alertMessage("処理結果","ワークスペースを削除しました。");
+                    alertMessage(getText("000-80018", "処理結果"), getText("000-82007", "ワークスペースを削除しました。"));
                 }).catch(() => {
                     enabled_button();
                     hide_progress();
