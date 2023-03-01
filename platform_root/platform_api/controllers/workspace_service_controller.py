@@ -392,6 +392,23 @@ def workspace_delete(organization_id, workspace_id):  # noqa: E501
     return common.response_200_ok(data=None)
 
 
+def workspace_update(body, organization_id, workspace_id):  # noqa: E501
+    """Update updates an workspace
+
+    # noqa: E501
+
+    :param body: 
+    :type body: dict | bytes
+    :param organization_id: 
+    :type organization_id: str
+    :param workspace_id: 
+    :type workspace_id: str
+
+    :rtype: ResponseOk
+    """
+    return 'do some magic!'
+
+
 @common.platform_exception_handler
 def workspace_info(organization_id, workspace_id):
     """workspace info returns infmation of workspaces

@@ -166,6 +166,21 @@ def role_create(body, organization_id):
     return common.response_200_ok(data=None)
 
 
+def role_delete(organization_id, role_name):  # noqa: E501
+    """Delete a role
+
+    # noqa: E501
+
+    :param organization_id: 
+    :type organization_id: str
+    :param role_name: 
+    :type role_name: str
+
+    :rtype: InlineResponse2004
+    """
+    return 'do some magic!'
+
+
 @common.platform_exception_handler
 def role_list(organization_id, kind=None):
     """List returns list of roles
