@@ -927,6 +927,22 @@ components:
             allOf:
               - $ref: '#/components/schemas/workspace'
               - $ref: '#/components/schemas/responseStat'
+    workspaceUpdate:
+      title: workspace is a definition for workspace updates.
+      type: object
+      properties:
+        name:
+          type: string
+          example: name of workspace
+        informations:
+          type: object
+          properties:
+            description:
+              type: string
+            environments:
+              type: array
+              items:
+                $ref: '#/components/schemas/environment'
     userWorkspace:
       title: workspace is a definition of Workspace resource.
       type: object
