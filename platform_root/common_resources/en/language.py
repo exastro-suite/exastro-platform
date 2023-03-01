@@ -79,7 +79,14 @@ class LanguageList:
     lang_array['000-80015'] = 'If you want to continue, please enter <span style="font-weight: bold;">{0}</span>.'
     lang_array['000-80016'] = 'Please enter <span style="font-weight: bold;">{0}</span>.'
     lang_array['000-80017'] = 'Confirmation of execution'
-
+    lang_array['000-80018'] = 'Processing result'
+    lang_array['000-80019'] = 'Details'
+    lang_array['000-80020'] = 'Field name'
+    lang_array['000-80021'] = 'Value'
+    lang_array['000-80022'] = 'Input'
+    lang_array['000-80023'] = 'Remarks'
+    lang_array['000-80024'] = 'Required'
+    lang_array['000-80025'] = 'Register'
     lang_array['000-81001'] = 'Edit accouont'
     lang_array['000-81002'] = 'Change password'
     lang_array['000-81003'] = 'Two-factor authentication'
@@ -91,6 +98,19 @@ class LanguageList:
     lang_array['000-82005'] = 'Is it okay to delete the following workspace?'
     lang_array['000-82006'] = 'You will not be able to access the deleted workspace at all.'
     lang_array['000-82007'] = 'The workspace has been deleted.'
+    lang_array['000-82008'] = 'Workspace details / Workspace management / Exastro Platform'
+    lang_array['000-82009'] = 'Workspace details'
+    lang_array['000-82010'] = 'You can check the details of the workspace.'
+    lang_array['000-82011'] = 'Environment list'
+    lang_array['000-82012'] = 'Member'
+    lang_array['000-82013'] = 'New workspace / Workspace management / Exastro Platform'
+    lang_array['000-82014'] = 'New workspace'
+    lang_array['000-82015'] = 'Create a new workspace.'
+    lang_array['000-82016'] = 'Up to 36 characters / Available characters: single-byte alphanumeric characters, hyphens, underscores'
+    lang_array['000-82017'] = 'Up to 255 characters / Usable characters: full-width/half-width characters'
+    lang_array['000-82018'] = '1 environment Maximum 40 characters / Available characters: full-width / half-width characters / 1 environment with line feed'
+    lang_array['000-82019'] = 'Characters that can be used: full-width/half-width characters'
+    lang_array['000-82020'] = 'Created a workspace.'
     lang_array['400-00001'] = 'Request-Header Paramater({}) is Invalid'
     lang_array['400-00002'] = 'Request-Body Paramater({}) is Invalid'
     #
@@ -101,25 +121,25 @@ class LanguageList:
     #
     #
     #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
+    lang_array['400-00011'] = 'Missing a required item.({0})'
+    lang_array['400-00012'] = 'The number of characters that can be specified has been exceeded. (item: {0}, maximum number of characters: {1})'
+    lang_array['400-00013'] = 'Contains characters that cannot be specified. (Item: {0}, Characters that cannot be specified: {1})'
+    lang_array['400-00014'] = 'A non-alphabetic character is specified for the first character. ({0})'
+    lang_array['400-00015'] = 'Only lowercase letters can be specified. ({0})'
+    lang_array['400-00016'] = 'Cannot be specified because it is a reserved word. (item: {0}, reserved word: {1})'
+    lang_array['400-00017'] = 'Contains characters that cannot be specified. (Item: {0}, Characters that can be specified: {1})'
+    lang_array['400-00018'] = 'The maximum number that can be specified has been exceeded. (item: {0}, maximum number: {1})'
+    lang_array['400-00019'] = 'Duplicate value specified. (item: {0})'
+    lang_array['400-00020'] = 'A format other than the date and time format is specified. ({0})'
+    lang_array['400-00021'] = 'It is not a resource that can be aggregated. ({0})'
+    lang_array['400-00022'] = 'A new {0} cannot be created because it exceeds the maximum number of {0} ({1}).'
+    lang_array['400-00023'] = 'There is an error in the format of the email address. ({0})'
+    lang_array['400-00024'] = 'Something other than True/False is specified. ({0})'
+    lang_array['400-00025'] = 'Cannot specify a default value that exceeds the specified maximum value.'
+    lang_array['400-23001'] = 'The specified organization ({0}) has already been created and cannot be created.'
+    lang_array['400-23002'] = 'The parameter (retry) must be specified if creation of the specified organization is to be resumed.'
+    lang_array['400-24001'] = 'You do not have permission to specify the specified workspace as an operation target.'
+    lang_array['400-24002'] = 'You do not have permission to update the specified role.'
     #
     #
     #
@@ -225,6 +245,7 @@ class LanguageList:
     #
     #
     #
+
     #
     #
     #
