@@ -759,6 +759,46 @@ paths:
               schema:
                 $ref: '#/components/schemas/runtimeError'
       x-openapi-router-controller: controllers.workspace_service_controller
+    put:
+      tags:
+      - WorkspaceService
+      summary: Update updates an workspace
+      operationId: workspace_update
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: workspace_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/workspaceUpdate'
+        required: true
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responseOk'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+      x-openapi-router-controller: controllers.workspace_service_controller
     delete:
       tags:
       - WorkspaceService
@@ -1003,7 +1043,7 @@ paths:
     put:
       tags:
       - RoleService
-      summary: Update updates an role
+      summary: Update a role
       operationId: role_update
       parameters:
       - name: organization_id
@@ -1033,6 +1073,40 @@ paths:
                   workspaces:
                   - id: workspace-1
         required: true
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_4'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+      x-openapi-router-controller: controllers.role_service_controller
+    delete:
+      tags:
+      - RoleService
+      summary: Delete a role
+      operationId: role_delete
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: role_name
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
       responses:
         "200":
           description: A successful response.
@@ -2175,6 +2249,15 @@ components:
             allOf:
             - $ref: '#/components/schemas/workspace'
             - $ref: '#/components/schemas/responseStat'
+    workspaceUpdate:
+      title: workspace is a definition for workspace updates.
+      type: object
+      properties:
+        name:
+          type: string
+          example: name of workspace
+        informations:
+          $ref: '#/components/schemas/workspaceUpdate_informations'
     userWorkspace:
       title: workspace is a definition of Workspace resource.
       type: object
@@ -2639,6 +2722,15 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/workspace_administrator'
+    workspaceUpdate_informations:
+      type: object
+      properties:
+        description:
+          type: string
+        environments:
+          type: array
+          items:
+            $ref: '#/components/schemas/environment'
     roleDetailOrganization_authorities:
       type: object
       properties:
