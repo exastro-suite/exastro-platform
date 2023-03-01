@@ -499,6 +499,12 @@ const RolesCommon =
         }
     },
 
+    "isAllowedDeleteRole": function(role) {
+        // Can be deleted with the same privileges as role editing
+        // ロール編集と同じ権限で削除可能
+        return RolesCommon.isAllowedEditRole(role);
+    },
+
     "isAllowedGrantRole": function(role) {
         switch(role.kind) {
             case RolesCommon.ROLE_KIND_ORGANIZATION:
@@ -571,13 +577,13 @@ const RolesCommon =
                     try {
                         let workspacesIndex = workspaces.findIndex((i) => {return i.id == authority.name});
                         if( workspacesIndex != -1) {
-                            roleText.push(getText("400-00118", workspaces[workspacesIndex].name + ":使用", workspaces[workspacesIndex].name));
+                            roleText.push(getText("000-00118", workspaces[workspacesIndex].name + ":使用", workspaces[workspacesIndex].name));
 
                         } else if(CommonAuth.isAdminWorkspaceAuthority(authority.name)) {
                             let workspace_id = CommonAuth.authorityNameToWorkspaceId(authority.name);
                             let workspacesIndex = workspaces.findIndex((i) => {return i.id == workspace_id});
                             if( workspacesIndex != -1) {
-                                roleText.push(getText("400-00119", workspaces[workspacesIndex].name + ":管理", workspaces[workspacesIndex].name));
+                                roleText.push(getText("000-00119", workspaces[workspacesIndex].name + ":管理", workspaces[workspacesIndex].name));
                             } else {
                                 roleText.push(getText("400-00120", "権限の無いワークスペース"));
                             }

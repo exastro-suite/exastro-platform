@@ -26,6 +26,20 @@ langArray['000-00102'] = 'Workspace name'
 //
 //
 langArray['000-00106'] = 'Description'
+langArray['000-00107'] = 'Role name'
+langArray['000-00108'] = 'Role kind'
+langArray['000-00109'] = 'Organization update'
+langArray['000-00110'] = 'Organization administrator change'
+langArray['000-00111'] = 'Organization Role Grant'
+langArray['000-00112'] = 'Plan change'
+langArray['000-00113'] = 'Usage status confirmation'
+langArray['000-00114'] = 'User management'
+langArray['000-00115'] = 'Workspace role management'
+langArray['000-00116'] = 'Workspace role grant'
+langArray['000-00117'] = 'Workspace management'
+langArray['000-00118'] = '{0}: User'
+langArray['000-00119'] = '{0}: Admin'
+langArray['000-00120'] = 'Unprivileged workspace'
 //
 //
 //
@@ -40,21 +54,7 @@ langArray['000-00106'] = 'Description'
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
+langArray['000-00135'] = 'Users'
 //
 //
 //
@@ -87,6 +87,7 @@ langArray['000-80022'] = 'Input'
 langArray['000-80023'] = 'Remarks'
 langArray['000-80024'] = 'Required'
 langArray['000-80025'] = 'Register'
+langArray['000-80026'] = 'Edit'
 langArray['000-81001'] = 'Edit accouont'
 langArray['000-81002'] = 'Change password'
 langArray['000-81003'] = 'Two-factor authentication'
@@ -111,6 +112,14 @@ langArray['000-82017'] = 'Up to 255 characters / Usable characters: full-width/h
 langArray['000-82018'] = '1 environment Maximum 40 characters / Available characters: full-width / half-width characters / 1 environment with line feed'
 langArray['000-82019'] = 'Characters that can be used: full-width/half-width characters'
 langArray['000-82020'] = 'Created a workspace.'
+langArray['000-84001'] = 'Role list'
+langArray['000-84002'] = 'Role list / Role management / Exastro Platform'
+langArray['000-84003'] = 'Roles can be maintained (view/register/update/delete).'
+langArray['000-84004'] = 'Permissions / Workspace'
+langArray['000-84005'] = 'No roles available'
+langArray['000-84006'] = 'Are you sure you want to delete the following role?'
+langArray['000-84007'] = 'User roles associated with the deleted role are also revoked.'
+langArray['000-84008'] = 'Removed the role.'
 langArray['400-00001'] = 'Request-Header Paramater({}) is Invalid'
 langArray['400-00002'] = 'Request-Body Paramater({}) is Invalid'
 //
@@ -203,6 +212,7 @@ langArray['500-00006'] = 'System Error'
 //
 //
 langArray['500-99999'] = 'System Error'
+//
 //
 //
 //
