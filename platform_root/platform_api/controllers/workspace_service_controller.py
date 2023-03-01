@@ -392,21 +392,68 @@ def workspace_delete(organization_id, workspace_id):  # noqa: E501
     return common.response_200_ok(data=None)
 
 
+@common.platform_exception_handler
 def workspace_update(body, organization_id, workspace_id):  # noqa: E501
     """Update updates an workspace
 
     # noqa: E501
 
-    :param body: 
+    :param body:
     :type body: dict | bytes
-    :param organization_id: 
+    :param organization_id:
     :type organization_id: str
-    :param workspace_id: 
+    :param workspace_id:
     :type workspace_id: str
 
     :rtype: ResponseOk
     """
-    return 'do some magic!'
+    globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
+
+    # 更新する情報の取得
+    # get information to be updated
+    body = connexion.request.get_json()
+
+    workspace_name = body.get("name")
+    info = body.get("informations")
+    user_id = connexion.request.headers.get("User-id")
+
+    # validation check
+    validate = validation.validate_workspace_name(workspace_name)
+    if not validate.ok:
+        return common.response_validation_error(validate)
+    validate = validation.validate_workspace_informations(info)
+    if not validate.ok:
+        return common.response_validation_error(validate)
+
+    # ワークスペース更新
+    # update workspace
+    db = DBconnector()
+    with closing(db.connect_orgdb(organization_id)) as conn:
+        with conn.cursor() as cursor:
+            # Check workspace exists
+            cursor.execute(
+                queries_workspaces.SQL_QUERY_WORKSPACES + " WHERE workspace_id = %(workspace_id)s FOR UPDATE",
+                {"workspace_id": workspace_id}
+            )
+
+            workspaces = cursor.fetchall()
+            if len(workspaces) == 0:
+                raise common.NotFoundException(
+                    message_id=f"404-{MSG_FUNCTION_ID}001",
+                    message=multi_lang.get_text(f"404-{MSG_FUNCTION_ID}001", "ワークスペース情報が存在しません")
+                )
+
+            parameter = {
+                "workspace_id": workspace_id,
+                "workspace_name": workspace_name,
+                "informations": json.dumps(info, ensure_ascii=False),
+                "last_update_user": user_id,
+            }
+            cursor.execute(queries_workspaces.SQL_UPDATE_WORKSPACE, parameter)
+
+            conn.commit()
+
+    return common.response_200_ok(None)
 
 
 @common.platform_exception_handler
