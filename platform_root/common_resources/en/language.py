@@ -26,6 +26,20 @@ class LanguageList:
     #
     #
     lang_array['000-00106'] = 'Description'
+    lang_array['000-00107'] = 'Role name'
+    lang_array['000-00108'] = 'Role kind'
+    lang_array['000-00109'] = 'Organization update'
+    lang_array['000-00110'] = 'Organization administrator change'
+    lang_array['000-00111'] = 'Organization Role Grant'
+    lang_array['000-00112'] = 'Plan change'
+    lang_array['000-00113'] = 'Usage status confirmation'
+    lang_array['000-00114'] = 'User management'
+    lang_array['000-00115'] = 'Workspace role management'
+    lang_array['000-00116'] = 'Workspace role grant'
+    lang_array['000-00117'] = 'Workspace management'
+    lang_array['000-00118'] = '{0}: User'
+    lang_array['000-00119'] = '{0}: Admin'
+    lang_array['000-00120'] = 'Unprivileged workspace'
     #
     #
     #
@@ -40,21 +54,7 @@ class LanguageList:
     #
     #
     #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
+    lang_array['000-00135'] = 'Users'
     #
     #
     #
@@ -87,6 +87,7 @@ class LanguageList:
     lang_array['000-80023'] = 'Remarks'
     lang_array['000-80024'] = 'Required'
     lang_array['000-80025'] = 'Register'
+    lang_array['000-80026'] = 'Edit'
     lang_array['000-81001'] = 'Edit accouont'
     lang_array['000-81002'] = 'Change password'
     lang_array['000-81003'] = 'Two-factor authentication'
@@ -111,6 +112,14 @@ class LanguageList:
     lang_array['000-82018'] = '1 environment Maximum 40 characters / Available characters: full-width / half-width characters / 1 environment with line feed'
     lang_array['000-82019'] = 'Characters that can be used: full-width/half-width characters'
     lang_array['000-82020'] = 'Created a workspace.'
+    lang_array['000-84001'] = 'Role list'
+    lang_array['000-84002'] = 'Role list / Role management / Exastro Platform'
+    lang_array['000-84003'] = 'Roles can be maintained (view/register/update/delete).'
+    lang_array['000-84004'] = 'Permissions / Workspace'
+    lang_array['000-84005'] = 'No roles available'
+    lang_array['000-84006'] = 'Are you sure you want to delete the following role?'
+    lang_array['000-84007'] = 'User roles associated with the deleted role are also revoked.'
+    lang_array['000-84008'] = 'Removed the role.'
     lang_array['400-00001'] = 'Request-Header Paramater({}) is Invalid'
     lang_array['400-00002'] = 'Request-Body Paramater({}) is Invalid'
     #
@@ -245,7 +254,7 @@ class LanguageList:
     #
     #
     #
-
+    #
     #
     #
     #
