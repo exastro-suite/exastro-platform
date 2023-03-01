@@ -29,8 +29,8 @@ $(function(){
             displayMenu('menu_workspace');
             // Display Topic Path
             displayTopicPath([
-                {"text": "ワークスペース一覧", "href": location_conf.href.workspaces.list.replace(/{organization_id}/g, CommonAuth.getRealm()) },
-                {"text": "新規ワークスペース", "href": location_conf.href.workspaces.new.replace(/{organization_id}/g, CommonAuth.getRealm()) },
+                {"text": getText("000-82001", "ワークスペース一覧"), "href": location_conf.href.workspaces.list.replace(/{organization_id}/g, CommonAuth.getRealm()) },
+                {"text": getText("000-82014", "新規ワークスペース"), "href": location_conf.href.workspaces.new.replace(/{organization_id}/g, CommonAuth.getRealm()) },
             ]);
             display_main();
             finish_onload_progress();
@@ -154,7 +154,8 @@ $(function(){
             }
         ).then(() => {
             hide_progress();
-            alertMessage("処理結果", "ワークスペースを作成しました",() => {
+            alertMessage(getText("000-80018", "処理結果"), getText("000-82020", "ワークスペースを作成しました"),
+            () => {
                 window.location = location_conf.href.workspaces.list.replace(/{organization_id}/g, CommonAuth.getRealm());
             });
         }).catch(() => {

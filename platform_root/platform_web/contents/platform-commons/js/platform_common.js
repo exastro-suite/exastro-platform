@@ -421,7 +421,7 @@ function deleteConfirmMessage(title, message, deleteResources, cautionMessage, i
     }
     content += '<hr>' + getText("000-80015", '続行する場合は <span style="font-weight: bold;">{0}</span> と入力してください。', fn.cv(input, "", true)) + '<br>'
     content += '<input class="confirm_yes inputText input" type="text" maxlength="' + input.length + '">'
-    content += '<span class="validate_error" style="display:none;">' + getText("000-80015",'<span style="font-weight: bold;">{0}</span> と入力してください',fn.cv(input, "", true)) + '</span>'
+    content += '<span class="validate_error" style="display:none;">' + getText("000-80016",'<span style="font-weight: bold;">{0}</span> と入力してください',fn.cv(input, "", true)) + '</span>'
     content += '</div>';
 
     dialog.open(content);
