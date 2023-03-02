@@ -429,6 +429,89 @@ function deleteConfirmMessage(title, message, deleteResources, cautionMessage, i
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
+//   Workspaces Common
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+const WorkspacesCommon = {
+    validate: {
+        //
+        // validate workspace id
+        //
+        workspace_id: function(workspace_id) {
+            if(workspace_id === "") {
+                return {
+                    "result": false,
+                    "message": getText("400-00011", "必須項目が不足しています。({0})", getText("000-00101", "ワークスペースID"))
+                }
+            } else if(workspace_id.replace(/[a-zA-Z0-9_-]/g,"") !== "") {
+                return {
+                    "result": false,
+                    "message": getText("400-00017", "指定できない文字が含まれています。(項目:{0},指定可能な文字:{1})",
+                                    getText("000-00101", "ワークスペースID"),
+                                    getText("000-00101", "半角英数・ハイフン・アンダースコア")
+                                )
+                }
+
+            } else if( ! workspace_id.match(/^[a-zA-Z]/)) {
+                return {
+                    "result": false,
+                    "message": getText("400-00014", "先頭の文字にアルファベット以外が指定されています。({0})", getText("000-00101", "ワークスペースID"))
+                }
+            } else {
+                return {
+                    "result": true,
+                    "message": ""
+                }
+            }
+        },
+
+        //
+        // validate workspace name
+        //
+        workspace_name: function(workspace_name) {
+            if(workspace_name === "") {
+                return {
+                    "result": false,
+                    "message": getText("400-00011", "必須項目が不足しています。({0})", getText("000-00102", "ワークスペース名"))
+                }
+            } else {
+                return {
+                    "result": true,
+                    "message": ""
+                }
+            }
+        },
+
+        //
+        // validate environments
+        //
+        environments: function(environments) {
+            const MAX_LENGTTH_ENVRONMENT = 40;
+
+            environments_arr = environments.split(/\r\n|\r|\n/).map(i => i.trim()).filter(i => i.length > 0);
+
+            if(environments_arr.filter(i => i.length > MAX_LENGTTH_ENVRONMENT).length > 0) {
+                return {
+                    "result": false,
+                    "message": getText("400-00012", "指定可能な文字数を超えています。(項目:{0},最大文字数:{1})", getText("000-00105", "環境名"), MAX_LENGTTH_ENVRONMENT)
+                }
+            } else if(Array.from(new Set(environments_arr)).length !== environments_arr.length) {
+                return {
+                    "result": false,
+                    "message": getText("400-00019", "指定された値が重複しています。（項目:{0}）", getText("000-00105", "環境名"))
+                }
+            } else {
+                return {
+                    "result": true,
+                    "message": ""
+                }
+            }
+        }
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
 //   Role Common
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////

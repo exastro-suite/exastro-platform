@@ -20,6 +20,7 @@ var api_conf = {
             "post": "/api/{organization_id}/platform/workspaces",
             "get": "/api/{organization_id}/platform/workspaces",
             "delete": "/api/{organization_id}/platform/workspaces/{workspace_id}",
+            "put": "/api/{organization_id}/platform/workspaces/{workspace_id}",
 
             "detail": {
                 "get": "/api/{organization_id}/platform/workspaces/{workspace_id}",
@@ -60,6 +61,7 @@ var location_conf = {
             "new" : "/{organization_id}/platform/workspaces/_new",
             "list": "/{organization_id}/platform/workspaces",
             "detail": "/{organization_id}/platform/workspaces/{workspace_id}",
+            "edit": "/{organization_id}/platform/workspaces/{workspace_id}/edit",
             "ita": "/{organization_id}/workspaces/{workspace_id}/ita/"
         },
         "roles": {

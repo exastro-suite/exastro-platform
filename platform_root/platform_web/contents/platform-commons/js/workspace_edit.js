@@ -15,6 +15,8 @@
 */
 
 $(function(){
+    const workspace_id = window.location.pathname.split("/")[4];
+
     CommonAuth.onAuthSuccess(() => {
         new CommonUi(`#container`);
         load_main();
@@ -23,16 +25,26 @@ $(function(){
     function load_main() {
         Promise.all([
             // Load Common Contents
-            loadCommonContents()
+            loadCommonContents(),
+            // get Workspace List
+            call_api_promise({
+                type: "GET",
+                url: api_conf.api.workspaces.detail.get.replace('{organization_id}', CommonAuth.getRealm()).replace('{workspace_id}', workspace_id),
+                headers: {
+                    Authorization: "Bearer " + CommonAuth.getToken(),
+                },
+                contentType: "application/json",
+                dataType: "json",
+            }),
         ]).then(function(results) {
             // Display Menu
             displayMenu('menu_workspace');
             // Display Topic Path
             displayTopicPath([
                 {"text": getText("000-82001", "ワークスペース一覧"), "href": location_conf.href.workspaces.list.replace(/{organization_id}/g, CommonAuth.getRealm()) },
-                {"text": getText("000-82014", "新規ワークスペース"), "href": location_conf.href.workspaces.new.replace(/{organization_id}/g, CommonAuth.getRealm()) },
+                {"text": getText("000-82021", "ワークスペース編集"), "href": location_conf.href.workspaces.edit.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{workspace_id}/g, workspace_id) },
             ]);
-            display_main();
+            display_main(results[1].data);
             finish_onload_progress();
 
         }).catch((e) => {
@@ -43,8 +55,17 @@ $(function(){
         });
     }
 
-    function display_main(workspaces) {
+    function display_main(workspace) {
         console.log("[CALL] display_main");
+
+        //
+        // display fields
+        //
+        $("#display_workspace_id").text(workspace_id);
+        $("#form_workspace_id").val(workspace_id);
+        $("#form_workspace_name").val(workspace.name);
+        $("#form_workspace_environments").val(workspace.informations.environments.map((item,index) => { return item.name}).join("\n"));
+        $("#form_workspace_description").val(workspace.informations.description);
 
         //
         // register button
@@ -65,11 +86,6 @@ $(function(){
     function validate_register() {
         console.log("--- validate check start ----");
         let result=true;
-
-        // validate workspace id
-        validate = WorkspacesCommon.validate.workspace_id($("#form_workspace_id").val());
-        result = result && validate.result;
-        $("#message_workspace_id").text(validate.message);
 
         // validate workspace name
         validate = WorkspacesCommon.validate.workspace_name($("#form_workspace_name").val());
@@ -94,21 +110,18 @@ $(function(){
         env_json = environments.split(/\r\n|\r|\n/).map(i => i.trim()).filter(i => i.length > 0).map(i => {return {"name": i}});
 
         let reqbody =   {
-            "id": $('#form_workspace_id').val(),
             "name": $('#form_workspace_name').val(),
             "informations": {
                 "description": $('#form_workspace_description').val(),
-                "environments": env_json,
-                "workspace_administrators": [
-                ]
+                "environments": env_json
             }
         }
 
         show_progress();
         call_api_promise(
             {
-                type: "POST",
-                url: api_conf.api.workspaces.post.replace(/{organization_id}/g, CommonAuth.getRealm()),
+                type: "PUT",
+                url: api_conf.api.workspaces.put.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{workspace_id}/g, workspace_id),
                 headers: {
                     Authorization: "Bearer " + CommonAuth.getToken(),
                 },
@@ -118,7 +131,7 @@ $(function(){
             }
         ).then(() => {
             hide_progress();
-            alertMessage(getText("000-80018", "処理結果"), getText("000-82020", "ワークスペースを作成しました"),
+            alertMessage(getText("000-80018", "処理結果"), getText("000-82024", "ワークスペースを変更しました。"),
             () => {
                 window.location = location_conf.href.workspaces.list.replace(/{organization_id}/g, CommonAuth.getRealm());
             });

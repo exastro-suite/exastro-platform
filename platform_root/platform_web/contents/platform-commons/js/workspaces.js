@@ -123,6 +123,11 @@ $(function(){
                 window.location = location_conf.href.workspaces.ita.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{workspace_id}/g, workspace_id);
             });
 
+            $('#workspace_list .button_edit_workspace').on('click', function() {
+                let workspace_id = $(this).attr('data-id');
+                window.location = location_conf.href.workspaces.edit.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{workspace_id}/g, workspace_id);
+            });
+
             $('#workspace_list .button_delete_workspace').on('click', function() {
                 confirm_delete($(this).attr('data-id'), $(this).attr('data-name'));
             })
@@ -187,6 +192,20 @@ $(function(){
 
         const adminWorkspaces = CommonAuth.getAdminWorkspaces();
         $('#workspace_list .button_delete_workspace').each(function(index, element) {
+            let $element = $(element);
+            if(CommonAuth.hasAuthority(RolesCommon.ORG_AUTH_WS_MAINTE)) {
+                $element.prop('disabled', false);
+                return;
+            }
+            if(adminWorkspaces.indexOf($element.attr('data-id')) !== -1) {
+                $element.prop('disabled', false);
+            } else {
+                $element.prop('disabled', true);
+                $element.css('cursor', 'not-allowed');
+            }
+        });
+
+        $('#workspace_list .button_edit_workspace').each(function(index, element) {
             let $element = $(element);
             if(CommonAuth.hasAuthority(RolesCommon.ORG_AUTH_WS_MAINTE)) {
                 $element.prop('disabled', false);
