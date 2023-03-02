@@ -191,6 +191,7 @@ services:
       - ../.vscode_extensions/platform-migration/.vscode-server-insiders/extensions:/home/app_user/.vscode-server-insiders/extensions
     environment:
       - FLASK_ENV=development
+      - LOG_LEVEL=DEBUG
       - HTTP_PROXY=${HTTP_PROXY}
       - http_proxy=${HTTP_PROXY}
       - HTTPS_PROXY=${HTTPS_PROXY}
