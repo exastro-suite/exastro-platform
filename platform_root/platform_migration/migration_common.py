@@ -18,7 +18,7 @@ import os
 import json
 from jinja2 import Template
 from contextlib import closing
-# import traceback
+import traceback
 
 import globals
 from libs import queries_common
@@ -187,6 +187,8 @@ def wait_until_keycloak_to_start():
                     os.environ.get('KEYCLOAK_PASSWORD'))
 
             if token_response.status_code != 200:
+                globals.logger.debug(f'token_response.status_code:{token_response.status_code}')
+                globals.logger.debug(f'token_response.text:{token_response.text}')
                 time.sleep(WAIT_INTERVAL)
                 continue
 
@@ -205,9 +207,8 @@ def wait_until_keycloak_to_start():
 
             time.sleep(WAIT_INTERVAL)
 
-        # except Exception as err:
-        #     globals.logger.debug(''.join(list(traceback.TracebackException.from_exception(err).format())))
-        except Exception:
+        except Exception as err:
+            globals.logger.debug(''.join(list(traceback.TracebackException.from_exception(err).format())))
             time.sleep(WAIT_INTERVAL)
             continue
 

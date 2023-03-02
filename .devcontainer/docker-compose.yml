@@ -87,8 +87,8 @@ services:
       retries: 200
     environment:
       - TZ=Asia/Tokyo
-      - KEYCLOAK_ADMIN=admin
-      - KEYCLOAK_ADMIN_PASSWORD=password
+      - KEYCLOAK_ADMIN=${KEYCLOAK_ADMIN:-admin}
+      - KEYCLOAK_ADMIN_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD:-password}
       - KC_DB=mariadb
       - KC_DB_URL_HOST=platform-db
       - KC_DB_URL_DATABASE=keycloak
@@ -196,8 +196,8 @@ services:
     environment:
       - TZ=Asia/Tokyo
       - PYTHONIOENCODING=utf-8
-      - KEYCLOAK_USER=admin
-      - KEYCLOAK_PASSWORD=password
+      - KEYCLOAK_USER=${KEYCLOAK_ADMIN:-admin}
+      - KEYCLOAK_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD:-password}
       - API_KEYCLOAK_HOST=keycloak
       - API_KEYCLOAK_PROTOCOL=http
       - API_KEYCLOAK_PORT=8080
