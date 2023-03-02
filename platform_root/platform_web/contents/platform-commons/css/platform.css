@@ -115,3 +115,11 @@ html {
     font-size: 26px;
     margin-right: 5px;
 }
+
+.ci.pre_ht100 {
+    word-break: break-all!important;
+    white-space: pre !important;
+    max-height: 100px;
+    overflow: auto !important;
+    text-overflow: clip !important;
+}

@@ -20,7 +20,7 @@ $(function(){
         new CommonUi(`#container`);
         load_main();
     });
-    
+
     function load_main() {
         Promise.all([
             // Load Common Contents
@@ -116,7 +116,7 @@ $(function(){
                 return 0;
             }
         });
-    
+
         for(var row of workspaceListData) {
             var date = new Date(row.last_update_timestamp);
             format_last_update_timestamp = fn.date(date,'yyyy/MM/dd HH:mm:ss');
@@ -195,6 +195,7 @@ $(function(){
             "workspaces": checked_workspace_id
         }
 
+        show_progress();
         call_api_promise(
             {
                 type: "POST",
@@ -205,11 +206,15 @@ $(function(){
                 data: JSON.stringify(reqbody),
                 contentType: "application/json",
                 dataType: "json",
-            }            
+            }
         ).then(() => {
-            alert("ロールを作成しました");
-            window.location = location_conf.href.roles.list.replace(/{organization_id}/g, CommonAuth.getRealm());
+            hide_progress();
+            alertMessage(getText("000-80018", "処理結果"), "ロールを作成しました",
+                () => {
+                    window.location = location_conf.href.roles.list.replace(/{organization_id}/g, CommonAuth.getRealm());
+                });
         }).catch(() => {
+            hide_progress();
             $('#button_register').prop('disabled',false);
         })
     }

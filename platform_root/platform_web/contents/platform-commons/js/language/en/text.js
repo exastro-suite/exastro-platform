@@ -24,7 +24,7 @@ langArray['000-00101'] = 'Workspace ID'
 langArray['000-00102'] = 'Workspace name'
 //
 //
-//
+langArray['000-00105'] = 'Environment'
 langArray['000-00106'] = 'Description'
 langArray['000-00107'] = 'Role name'
 langArray['000-00108'] = 'Role kind'
@@ -112,6 +112,10 @@ langArray['000-82017'] = 'Up to 255 characters / Usable characters: full-width/h
 langArray['000-82018'] = '1 environment Maximum 40 characters / Available characters: full-width / half-width characters / 1 environment with line feed'
 langArray['000-82019'] = 'Characters that can be used: full-width/half-width characters'
 langArray['000-82020'] = 'Created a workspace.'
+langArray['000-82021'] = 'Edit workspace'
+langArray['000-82022'] = 'Edit workspace / Workspace management / Exastro Platform'
+langArray['000-82023'] = 'Change workspace.'
+langArray['000-82024'] = 'The workspace has been changed.'
 langArray['000-84001'] = 'Role list'
 langArray['000-84002'] = 'Role list / Role management / Exastro Platform'
 langArray['000-84003'] = 'Roles can be maintained (view/register/update/delete).'
@@ -149,6 +153,7 @@ langArray['400-23001'] = 'The specified organization ({0}) has already been crea
 langArray['400-23002'] = 'The parameter (retry) must be specified if creation of the specified organization is to be resumed.'
 langArray['400-24001'] = 'You do not have permission to specify the specified workspace as an operation target.'
 langArray['400-24002'] = 'You do not have permission to update the specified role.'
+
 //
 //
 //

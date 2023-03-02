@@ -81,6 +81,19 @@ $(function(){
         }
 
         //
+        // display Edit Workspace button
+        //
+        $('.button_edit_workspace').on('click',() => {
+            window.location = location_conf.href.workspaces.edit.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{workspace_id}/g, workspace_id);
+        });
+        if(CommonAuth.getAdminWorkspaces().indexOf(workspace_id) !== -1 || CommonAuth.hasAuthority(RolesCommon.ORG_AUTH_WS_MAINTE)) {
+            $('.button_edit_workspace').prop('disabled', false);
+        } else {
+            $('.button_edit_workspace').prop('disabled', true);
+            $('.button_edit_workspace').css('cursor', 'not-allowed');
+        }
+
+        //
         // display Delete Workspace button
         //
         $('.button_delete_workspace').on('click',() => {
@@ -123,9 +136,6 @@ $(function(){
 
     function delete_workspace() {
         console.log("[CALL] confirm_delete");
-        message = 'ワークスペース(' + fn.cv(workspace_id, '', true) +')を削除します。<br>'
-                + '<span class="caution_message">削除したワークスペースへのアクセスは以降一切できなくなります。</span>'
-                + '<br><br>よろしいですか？<br>'
 
         deleteConfirmMessage(
             getText("000-80017", "実行確認"),
@@ -159,6 +169,7 @@ $(function(){
 
     function disabled_button() {
         $('.to_ita').prop('disabled', true);
+        $('.button_edit_workspace').prop('disabled', true);
         $('.button_delete_workspace').prop('disabled', true);
     }
 });
