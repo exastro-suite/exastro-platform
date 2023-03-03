@@ -63,8 +63,8 @@ $(function(){
             displayMenu('menu_role_management');
             // Display Topic Path
             displayTopicPath([
-                {"text": "ロール一覧", "href": location_conf.href.roles.list.replace(/{organization_id}/g, CommonAuth.getRealm()) },
-                {"text": "ロール付与・解除", "href": location_conf.href.roles.edit.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{role_name}/g, role_name) },
+                {"text": getText("000-80004", "ロール一覧"), "href": location_conf.href.roles.list.replace(/{organization_id}/g, CommonAuth.getRealm()) },
+                {"text": getText("000-84010", "ロール付与・解除"), "href": location_conf.href.roles.edit.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{role_name}/g, role_name) },
             ]);
             display_main(results[1].data, results[2].data, results[3].data);
             finish_onload_progress();
@@ -104,7 +104,7 @@ $(function(){
         //
         let rolesIndex = roles.findIndex((r) => {return r.name === role_name});
         if(rolesIndex === -1) {
-            alert("ロールが存在しません");
+            alert(getText("404-24001", "ロールが存在しません"));
             return;
         }
         role = roles[rolesIndex];
@@ -247,7 +247,7 @@ $(function(){
 
         // 選択したものが無いとき
         if(revoke_users.length === 0) {
-            alertMessage("エラー", "解除するユーザが選択されていません",() => { disable_event_elements(false); });
+            alertMessage(getText("000-80029", "エラー"), getText("000-84016", "解除するユーザが選択されていません"),() => { disable_event_elements(false); });
             return;
         }
 
@@ -256,11 +256,11 @@ $(function(){
                 // １ページ目を表示していて、次ページが無い（表示しているものが全て）を解除した時
 
                 if(role_name === RolesCommon.ORG_ROLE_ORG_MANAGER) {
-                    alertMessage("エラー", "オーガナイゼーション管理者は最低１人必要です",() => { disable_event_elements(false); });
+                    alertMessage(getText("000-80029", "エラー"), getText("000-84017", "オーガナイゼーション管理者は最低１人必要です"),() => { disable_event_elements(false); });
                     return;
                 }
                 if(CommonAuth.isAdminWorkspaceAuthority(role_name)) {
-                    confirmMessage("確認", "ワークスペース管理者がいない状態になりますが、よろしいですか？",
+                    confirmMessage(getText("000-80030", "確認"), getText("000-84018", "ワークスペース管理者がいない状態になりますが、よろしいですか？"),
                         () => {
                             // OK
                             // CALL API
@@ -296,14 +296,14 @@ $(function(){
             dataType: "json",
         }).then(() => {
             hide_progress();
-            alertMessage("処理結果", "ロールを解除しました",() => {
+            alertMessage(getText("000-80018", "処理結果"), getText("000-84019", "ロールを解除しました"),() => {
                 CommonAuth.refreshTokenForce().then(() =>{
                     if(RolesCommon.isAllowedGrantRole(role)) {
                         // 画面を開く権限がある場合は、roloadする
                         movePage();
                     } else {
                         // 画面を開く権限がなくなってしまった場合は、topへ
-                        alert("画面を開く権限が無くなったので、トップページに戻ります");
+                        alert(getText("000-84020", "画面を開く権限が無くなったので、トップページに戻ります"));
                         window.location = location_conf.href.menu.toppage.replace(/{organization_id}/g, CommonAuth.getRealm());
                     }
                 });
@@ -335,12 +335,12 @@ $(function(){
             position: 'center',
             width: 'auto',
             header: {
-                title: "ロール付与",
+                title: getText("000-84021", "ロール付与"),
             },
             footer: {
                 button: {
-                    append: { text: '<span class="iconButtonIcon icon icon-plus"></span>付与', action: 'positive', style: 'width:200px;'},
-                    close: { text: "閉じる", action: "normal", style: 'width:200px;' }
+                    append: { text: '<span class="iconButtonIcon icon icon-plus"></span>'+getText("000-84013", '付与'), action: 'positive', style: 'width:200px;'},
+                    close: { text: getText("000-80011", "閉じる"), action: "normal", style: 'width:200px;' }
                 }
             },
         },
@@ -483,7 +483,7 @@ $(function(){
 
         // 選択したものが無いとき
         if(post_users.length == 0) {
-            alertMessage("エラー", "付与するユーザが選択されていません", () => {
+            alertMessage(getText("000-80029", "エラー"), getText("000-84022", "付与するユーザが選択されていません"), () => {
                 modal_disable_event_elements(dialog, paging, false);
             });
             return;
@@ -502,7 +502,7 @@ $(function(){
             dataType: "json",
         }).then(() => {
             hide_progress();
-            alertMessage("処理結果","ロールを付与しました",() => {
+            alertMessage(getText("000-80018", "処理結果"),getText("000-84023", "ロールを付与しました"),() => {
                 dialog.close();
                 movePage();
             });
