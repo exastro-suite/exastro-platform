@@ -45,13 +45,13 @@ langArray['000-00120'] = 'Unprivileged workspace'
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
+langArray['000-00126'] = 'Role'
+langArray['000-00127'] = 'Workspace'
+langArray['000-00128'] = 'Username'
+langArray['000-00129'] = 'email'
+langArray['000-00130'] = 'First name'
+langArray['000-00131'] = 'Last name'
+langArray['000-00132'] = 'Password'
 //
 //
 langArray['000-00135'] = 'Users'
@@ -61,9 +61,10 @@ langArray['000-00135'] = 'Users'
 //
 //
 langArray['000-00141'] = 'Last Modified'
+langArray['000-00142'] = 'Created date'
 //
 langArray['000-80001'] = 'Main menu'
-langArray['000-80002'] = 'Logout'
+langArray['000-80002'] = 'Sign Out'
 langArray['000-80003'] = 'Account management'
 langArray['000-80004'] = 'Role List'
 langArray['000-80005'] = 'Workspace management'
@@ -88,6 +89,10 @@ langArray['000-80023'] = 'Remarks'
 langArray['000-80024'] = 'Required'
 langArray['000-80025'] = 'Register'
 langArray['000-80026'] = 'Edit'
+langArray['000-80027'] = 'Page'
+langArray['000-80028'] = 'Filter'
+langArray['000-80029'] = 'Error'
+langArray['000-80030'] = 'Confirmation'
 langArray['000-81001'] = 'Edit accouont'
 langArray['000-81002'] = 'Change password'
 langArray['000-81003'] = 'Two-factor authentication'
@@ -124,6 +129,21 @@ langArray['000-84005'] = 'No roles available'
 langArray['000-84006'] = 'Are you sure you want to delete the following role?'
 langArray['000-84007'] = 'User roles associated with the deleted role are also revoked.'
 langArray['000-84008'] = 'Removed the role.'
+langArray['000-84009'] = 'Role Grant, Revoke / Role management / Exastro Platform'
+langArray['000-84010'] = 'Role Grant, Revoke'
+langArray['000-84011'] = 'You can grant roles to users and revoke roles from users.'
+langArray['000-84012'] = 'Role information'
+langArray['000-84013'] = 'Grant'
+langArray['000-84014'] = 'Revoke'
+langArray['000-84015'] = 'User does not exist'
+langArray['000-84016'] = 'No user selected to revoke'
+langArray['000-84017'] = 'At least one organization administrator is required'
+langArray['000-84018'] = 'There will be no workspace administrators, are you sure?'
+langArray['000-84019'] = 'Revoked role'
+langArray['000-84020'] = 'You no longer have the permissions to open the screen, so return to the top page'
+langArray['000-84021'] = 'Role grant'
+langArray['000-84022'] = 'No user selected to grant'
+langArray['000-84023'] = 'Granted a role'
 langArray['400-00001'] = 'Request-Header Paramater({}) is Invalid'
 langArray['400-00002'] = 'Request-Body Paramater({}) is Invalid'
 //
@@ -153,7 +173,7 @@ langArray['400-23001'] = 'The specified organization ({0}) has already been crea
 langArray['400-23002'] = 'The parameter (retry) must be specified if creation of the specified organization is to be resumed.'
 langArray['400-24001'] = 'You do not have permission to specify the specified workspace as an operation target.'
 langArray['400-24002'] = 'You do not have permission to update the specified role.'
-
+langArray['400-24003'] = 'You do not have permission to delete the specified role.'
 //
 //
 //
