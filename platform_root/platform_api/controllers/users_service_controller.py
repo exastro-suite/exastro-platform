@@ -217,7 +217,7 @@ def user_create(body, organization_id):
         message = multi_lang.get_text(
             message_id,
             "ユーザー作成に失敗しました(対象ユーザー:{0})",
-            common.get_response_error_message(u_create.text))
+            user_name)
 
         raise common.InternalErrorException(message_id=message_id, message=message)
 
@@ -332,7 +332,7 @@ def user_update(body, organization_id, user_id):  # noqa: E501
 
 
 @common.platform_exception_handler
-def user_delete(organization_id, user_id):  # noqa: E501
+def user_delete(organization_id, user_id):
     """delete user
 
     Args:
@@ -342,4 +342,50 @@ def user_delete(organization_id, user_id):  # noqa: E501
     Returns:
         Response: http response
     """
+
+    db = DBconnector()
+    private = db.get_organization_private(organization_id)
+
+    # サービスアカウントのTOKEN取得
+    # Get a service account token
+    token_response = api_keycloak_tokens.service_account_get_token(
+        organization_id, private.internal_api_client_clientid, private.internal_api_client_secret,
+    )
+    if token_response.status_code != 200:
+        raise common.AuthException(
+            "client_user_get_token error status:{}, response:{}".format(token_response.status_code, token_response.text)
+        )
+
+    token = json.loads(token_response.text)["access_token"]
+
+    response = api_keycloak_users.user_delete(
+        realm_name=organization_id, user_id=user_id, token=token
+    )
+    if response.status_code == 404:
+        globals.logger.debug(f"response:{response.text}")
+        message_id = f"404-{MSG_FUNCTION_ID}001"
+        message = multi_lang.get_text(
+            message_id,
+            "指定されたユーザーが存在しません")
+
+        raise common.BadRequestException(message_id=message_id, message=message)
+    elif response.status_code == 400:
+        globals.logger.debug(f"response:{response.text}")
+        message_id = f"400-{MSG_FUNCTION_ID}003"
+        message = multi_lang.get_text(
+            message_id,
+            "ユーザー削除に失敗しました(対象ユーザーID:{0})",
+            user_id)
+        raise common.BadRequestException(message_id=message_id, message=message)
+
+    elif response.status_code != 204:
+        globals.logger.debug(f"response:{response.text}")
+        message_id = f"500-{MSG_FUNCTION_ID}003"
+        message = multi_lang.get_text(
+            message_id,
+            "ユーザー削除に失敗しました(対象ユーザーID:{0})",
+            user_id)
+
+        raise common.InternalErrorException(message_id=message_id, message=message)
+
     return common.response_200_ok(None)
