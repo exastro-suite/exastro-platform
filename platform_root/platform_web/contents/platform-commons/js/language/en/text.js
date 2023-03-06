@@ -154,6 +154,11 @@ langArray['000-84030'] = 'Workspace used'
 langArray['000-84031'] = 'No selectable workspace exists'
 langArray['000-84032'] = 'Select the workspace you want to make available for this role'
 langArray['000-84033'] = 'Created a role'
+langArray['000-84034'] = 'Role edit / Role management / Exastro Platform'
+langArray['000-84035'] = 'Role edit'
+langArray['000-84036'] = 'Edit a role.'
+langArray['000-84037'] = 'No role to edit'
+langArray['000-84038'] = 'The role have been changed.'
 langArray['400-00001'] = 'Request-Header Paramater({}) is Invalid'
 langArray['400-00002'] = 'Request-Body Paramater({}) is Invalid'
 //
@@ -204,6 +209,7 @@ langArray['400-24003'] = 'You do not have permission to delete the specified rol
 //
 //
 //
+//
 langArray['401-00003'] = 'The linking setting of the target menu is invalid. (menu: {})'
 //
 //
@@ -213,6 +219,7 @@ langArray['401-00003'] = 'The linking setting of the target menu is invalid. (me
 //
 //
 langArray['403-00001'] = 'permission error'
+//
 //
 //
 //
@@ -323,3 +330,6 @@ langArray['500-99999'] = 'System Error'
 //
 //
 //
+//
+//
+
