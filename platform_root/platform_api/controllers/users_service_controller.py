@@ -222,3 +222,32 @@ def user_create(body, organization_id):
         raise common.InternalErrorException(message_id=message_id, message=message)
 
     return common.response_200_ok(None)
+
+
+@common.platform_exception_handler
+def user_update(body, organization_id, user_id):  # noqa: E501
+    """update user
+
+    Args:
+        body (dict): body
+        organization_id (str): organization id
+        user_id (str): user id
+
+    Returns:
+        Response: http response
+    """
+    return common.response_200_ok(None)
+
+
+@common.platform_exception_handler
+def user_delete(organization_id, user_id):  # noqa: E501
+    """delete user
+
+    Args:
+        organization_id (str): organization id
+        user_id (str): user id
+
+    Returns:
+        Response: http response
+    """
+    return common.response_200_ok(None)

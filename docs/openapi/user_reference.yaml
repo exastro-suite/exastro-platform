@@ -85,6 +85,8 @@ paths:
 
   "/api/{organization_id}/platform/users":
       $ref: './paths/users.yaml'
+  "/api/{organization_id}/platform/users/{user_id}":
+      $ref: './paths/users.user_id.yaml'
 
   "/api/{organization_id}/platform/roles":
       $ref: './paths/roles.yaml'
