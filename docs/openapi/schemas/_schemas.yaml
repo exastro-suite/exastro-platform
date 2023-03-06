@@ -66,6 +66,8 @@ userList:
   $ref: "./userList.yaml"
 userCreate:
   $ref: "./userCreate.yaml"
+userUpdate:
+  $ref: "./userUpdate.yaml"
 userCredentials:
   $ref: "./userCredentials.yaml"
 userRequiredActions:

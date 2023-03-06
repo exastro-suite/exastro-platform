@@ -34,7 +34,7 @@ put:
     content:
       application/json:
         schema:
-          $ref: '../schemas/userCreate.yaml'
+          $ref: '../schemas/userUpdate.yaml'
     required: true
   responses:
     200:
