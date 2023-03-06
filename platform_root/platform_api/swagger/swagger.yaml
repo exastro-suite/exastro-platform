@@ -984,7 +984,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/userCreate'
+              $ref: '#/components/schemas/userUpdate'
         required: true
       responses:
         "200":
@@ -2248,6 +2248,26 @@ components:
         username:
           type: string
           example: user-id
+        password:
+          type: string
+          example: password
+        password_temporary:
+          type: boolean
+          default: true
+        email:
+          type: string
+          example: user e-mail address
+        firstName:
+          type: string
+        lastName:
+          type: string
+        enabled:
+          type: boolean
+          default: true
+    userUpdate:
+      title: userUpate is a definition of User resource.
+      type: object
+      properties:
         password:
           type: string
           example: password

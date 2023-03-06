@@ -236,6 +236,98 @@ def user_update(body, organization_id, user_id):  # noqa: E501
     Returns:
         Response: http response
     """
+    body = connexion.request.get_json()
+    if not body:
+        raise common.BadRequestException(
+            message_id='400-000002', message='リクエストボディのパラメータ({})が不正です。'.format('Json')
+        )
+
+    user_email = body.get("email")
+    user_firstName = body.get("firstName")
+    user_lastName = body.get("lastName")
+    password_temporary = body.get("password_temporary", "True")
+    user_enabled = body.get("enabled", "True")
+
+    # validation check
+    validate = validation.validate_user_email(user_email)
+    if not validate.ok:
+        return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
+    validate = validation.validate_user_firstName(user_firstName)
+    if not validate.ok:
+        return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
+    validate = validation.validate_user_lastName(user_lastName)
+    if not validate.ok:
+        return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
+    validate = validation.validate_password_temporary(password_temporary)
+    if not validate.ok:
+        return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
+    validate = validation.validate_user_enabled(user_enabled)
+    if not validate.ok:
+        return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
+
+    db = DBconnector()
+    private = db.get_organization_private(organization_id)
+
+    # サービスアカウントのTOKEN取得
+    # Get a service account token
+    token_response = api_keycloak_tokens.service_account_get_token(
+        organization_id, private.internal_api_client_clientid, private.internal_api_client_secret,
+    )
+    if token_response.status_code != 200:
+        raise common.AuthException(
+            "client_user_get_token error status:{}, response:{}".format(token_response.status_code, token_response.text)
+        )
+
+    token = json.loads(token_response.text)["access_token"]
+
+    # ユーザー更新
+    # update user
+    user_json = {
+        "email": user_email,
+        "firstName": user_firstName,
+        "lastName": user_lastName,
+        "enabled": body.get("enabled")
+    }
+    if body.get("password") is not None:
+        user_json["credentials"] = [
+            {
+                "type": "password",
+                "value": body.get("password"),
+                "temporary": body.get("password_temporary")
+            }
+        ]
+
+    u_update = api_keycloak_users.user_update(
+        realm_name=organization_id, user_id=user_id, user_json=user_json, token=token
+    )
+    if u_update.status_code == 404:
+        globals.logger.debug(f"response:{u_update.text}")
+        message_id = f"404-{MSG_FUNCTION_ID}001"
+        message = multi_lang.get_text(
+            message_id,
+            "指定されたユーザーは存在していません。")
+
+        raise common.NotFoundException(message_id=message_id, message=message)
+
+    elif u_update.status_code == 400:
+        globals.logger.debug(f"response:{u_update.text}")
+        message_id = f"400-{MSG_FUNCTION_ID}004"
+        message = multi_lang.get_text(
+            message_id,
+            "ユーザー更新に失敗しました({0})",
+            common.get_response_error_message(u_update.text))
+        raise common.BadRequestException(message_id=message_id, message=message)
+
+    elif u_update.status_code not in [200, 204]:
+        globals.logger.debug(f"response:{u_update.text}")
+        message_id = f"500-{MSG_FUNCTION_ID}002"
+        message = multi_lang.get_text(
+            message_id,
+            "ユーザー更新に失敗しました(対象ユーザーID:{0})",
+            user_id)
+
+        raise common.InternalErrorException(message_id=message_id, message=message)
+
     return common.response_200_ok(None)
 
 
