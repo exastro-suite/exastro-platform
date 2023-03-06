@@ -51,8 +51,8 @@ $(function(){
             displayMenu('menu_role_management');
             // Display Topic Path
             displayTopicPath([
-                {"text": "ロール一覧", "href": location_conf.href.roles.list.replace(/{organization_id}/g, CommonAuth.getRealm()) },
-                {"text": "ロール編集", "href": location_conf.href.roles.edit.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{role_name}/g, role_name) },
+                {"text": getText("000-84001", "ロール一覧"), "href": location_conf.href.roles.list.replace(/{organization_id}/g, CommonAuth.getRealm()) },
+                {"text": getText("000-84035", "ロール編集"), "href": location_conf.href.roles.edit.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{role_name}/g, role_name) },
             ]);
             display_main(results[1].data, results[2].data);
             finish_onload_progress();
@@ -73,7 +73,7 @@ $(function(){
         //
         let roleIndex = roles.findIndex((role) => {return role.name == role_name});
         if(roleIndex === -1) {
-            alert("編集対象のロールがありません");
+            alert(getText("000-84037", "編集対象のロールがありません"));
             window.location = location_conf.href.roles.list.replace(/{organization_id}/g, CommonAuth.getRealm());
             return;
         }
@@ -219,7 +219,7 @@ $(function(){
             }
         ).then(() => {
             hide_progress();
-            alertMessage(getText("000-80018", "処理結果"), "ロールを変更しました",
+            alertMessage(getText("000-80018", "処理結果"), getText("000-84038", "ロールを変更しました"),
                 () => {
                     window.location = location_conf.href.roles.list.replace(/{organization_id}/g, CommonAuth.getRealm());
                 });
