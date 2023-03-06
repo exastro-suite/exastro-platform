@@ -1,0 +1,14 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "Auto Debug Satrt - platform-api",
+        "type": "shell",
+        "command": "${command:workbench.action.debug.start}",
+        "runOptions": {
+          "runOn": "folderOpen"
+        },
+        "problemMatcher": []
+      }
+    ]
+}
