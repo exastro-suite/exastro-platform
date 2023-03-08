@@ -16,7 +16,7 @@ import connexion
 import json
 import inspect
 
-from common_library.common import common, api_keycloak_tokens, api_keycloak_users
+from common_library.common import common, api_keycloak_tokens, api_keycloak_users, api_keycloak_roles
 from common_library.common import validation
 from common_library.common import multi_lang
 from common_library.common.db import DBconnector
@@ -82,6 +82,8 @@ def user_list(organization_id, first=0, max=100, search=None):
             "email": user.get("email", ""),
             "preferred_username": user.get("username", ""),
             "name": common.get_username(user.get("firstName"), user.get("lastName"), user.get("username")),
+            "affiliation": user.get("attributes", {}).get("affiliation", [""])[0],
+            "description": user.get("attributes", {}).get("description", [""])[0],
             "enabled": user.get("enabled", False),
             "create_timestamp": common.keycloak_timestamp_to_str(user.get("createdTimestamp")),
         }
@@ -137,6 +139,8 @@ def user_create(body, organization_id):
     user_firstName = body.get("firstName")
     user_lastName = body.get("lastName")
     password_temporary = body.get("password_temporary", "True")
+    user_affiliation = body.get("affiliation")
+    user_description = body.get("description")
     user_enabled = body.get("enabled", "True")
 
     # validation check
@@ -153,6 +157,12 @@ def user_create(body, organization_id):
     if not validate.ok:
         return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
     validate = validation.validate_password_temporary(password_temporary)
+    if not validate.ok:
+        return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
+    validate = validation.validate_user_affiliation(user_affiliation)
+    if not validate.ok:
+        return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
+    validate = validation.validate_user_description(user_description)
     if not validate.ok:
         return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
     validate = validation.validate_user_enabled(user_enabled)
@@ -188,6 +198,11 @@ def user_create(body, organization_id):
                 "temporary": body.get("password_temporary")
             }
         ],
+        "attributes":
+        {
+            "affiliation": [user_affiliation],
+            "description": [user_description],
+        },
         "enabled": body.get("enabled")
     }
 
@@ -199,7 +214,8 @@ def user_create(body, organization_id):
         message_id = f"409-{MSG_FUNCTION_ID}001"
         message = multi_lang.get_text(
             message_id,
-            "指定されたユーザーはすでに存在しているため作成できません。")
+            "指定されたユーザーはすでに存在しているため作成できません。[{0}]",
+            json.loads(u_create.text)["errorMessage"])
 
         raise common.BadRequestException(message_id=message_id, message=message)
     elif u_create.status_code == 400:
@@ -246,6 +262,8 @@ def user_update(body, organization_id, user_id):  # noqa: E501
     user_firstName = body.get("firstName")
     user_lastName = body.get("lastName")
     password_temporary = body.get("password_temporary", "True")
+    user_affiliation = body.get("affiliation")
+    user_description = body.get("description")
     user_enabled = body.get("enabled", "True")
 
     # validation check
@@ -259,6 +277,12 @@ def user_update(body, organization_id, user_id):  # noqa: E501
     if not validate.ok:
         return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
     validate = validation.validate_password_temporary(password_temporary)
+    if not validate.ok:
+        return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
+    validate = validation.validate_user_affiliation(user_affiliation)
+    if not validate.ok:
+        return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
+    validate = validation.validate_user_description(user_description)
     if not validate.ok:
         return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
     validate = validation.validate_user_enabled(user_enabled)
@@ -286,6 +310,11 @@ def user_update(body, organization_id, user_id):  # noqa: E501
         "email": user_email,
         "firstName": user_firstName,
         "lastName": user_lastName,
+        "attributes":
+        {
+            "affiliation": [user_affiliation],
+            "description": [user_description],
+        },
         "enabled": body.get("enabled")
     }
     if body.get("password") is not None:
@@ -343,6 +372,17 @@ def user_delete(organization_id, user_id):
         Response: http response
     """
 
+    r = connexion.request
+
+    # 自分自身は削除できないチェック
+    # Check cannot delete itself
+    if user_id == r.headers.get("User-Id"):
+        message_id = f"400-{MSG_FUNCTION_ID}005"
+        message = multi_lang.get_text(
+            message_id,
+            "削除者自身のユーザーは削除できません")
+        raise common.BadRequestException(message_id=message_id, message=message)
+
     db = DBconnector()
     private = db.get_organization_private(organization_id)
 
@@ -357,6 +397,32 @@ def user_delete(organization_id, user_id):
         )
 
     token = json.loads(token_response.text)["access_token"]
+
+    # organization role user情報取得
+    # get organization role user information
+    response = api_keycloak_roles.role_uesrs_get(
+        realm_name=organization_id, client_id=private.user_token_client_id, role_name=common_const.ORG_ROLE_ORG_MANAGER, token=token,
+    )
+    if response.status_code != 200:
+        globals.logger.error(f"response:{response.text}")
+        message_id = f"500-{MSG_FUNCTION_ID}005"
+        message = multi_lang.get_text(
+            message_id,
+            "オーガナイゼーション管理者ロールのユーザー情報が取得できません")
+        raise common.InternalErrorException(message_id=message_id, message=message)
+
+    # User role チェック - オーガナイゼーション管理者は削除不可
+    # User role check - organization admin cannot delete
+    response_user = json.loads(response.text)
+    og_managers = [u.get("id") for u in response_user]
+    globals.logger.debug(f"og_managers:{og_managers}")
+
+    if user_id in og_managers:
+        message_id = f"400-{MSG_FUNCTION_ID}006"
+        message = multi_lang.get_text(
+            message_id,
+            "オーガナイゼーション管理者は削除できません")
+        raise common.BadRequestException(message_id=message_id, message=message)
 
     response = api_keycloak_users.user_delete(
         realm_name=organization_id, user_id=user_id, token=token

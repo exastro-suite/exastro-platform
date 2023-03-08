@@ -760,6 +760,44 @@ def validate_password_temporary(password_temporary):
     return result(True)
 
 
+def validate_user_affiliation(user_affiliation):
+    """Validate user affiliation
+
+    Args:
+        user_affiliation (str): user affiliation
+
+    Returns:
+        result: Validation result
+    """
+    if len(user_affiliation) > const.length_user_affiliation:
+        return result(
+            False, 400, '400-{}012'.format(MSG_FUNCTION_ID), '指定可能な文字数を超えています。(項目:{0},最大文字数:{1})',
+            multi_lang.get_text('000-00143', "所属"),
+            str(const.length_user_affiliation)
+        )
+
+    return result(True)
+
+
+def validate_user_description(user_description):
+    """Validate user description
+
+    Args:
+        user_description (str): user description
+
+    Returns:
+        result: Validation result
+    """
+    if len(user_description) > const.length_user_description:
+        return result(
+            False, 400, '400-{}012'.format(MSG_FUNCTION_ID), '指定可能な文字数を超えています。(項目:{0},最大文字数:{1})',
+            multi_lang.get_text('000-00106', "説明"),
+            str(const.length_user_description)
+        )
+
+    return result(True)
+
+
 def validate_user_enabled(user_enabled):
     """Validate user enabled
 
