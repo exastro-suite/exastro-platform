@@ -135,7 +135,7 @@ $(function(){
                 const isUpdateAbleRow = UsersCommon.isAllowedEditUser(user); // 更新可能か
                 const isSystemAccount = UsersCommon.isSystemUser(user);
 
-                row_html = row_template
+                const row_html = row_template
                     .replace(/\${user_id}/g, fn.cv(user.id,'',true))
                     .replace(/\${username}/g, fn.cv(user.preferred_username,'',true))
                     .replace(/\${email}/g, fn.cv(user.email,'',true))
@@ -144,11 +144,23 @@ $(function(){
                     .replace(/\${affiliation}/g, fn.cv(user.affiliation,'',true))
                     .replace(/\${enabled}/g, (user.enabled) ? '<span class="icon icon-check"></span>' : '')
                     .replace(/\${create_timestamp}/g, fn.date(new Date(user.create_timestamp),'yyyy/MM/dd HH:mm:ss'))
-                    .replace(/\${button_style_display}/g, isSystemAccount? "display: none;": "")
-                    .replace(/\${button_style_cursor}/g, isUpdateAbleRow? "": "cursor: not-allowed")
-                    .replace(/\${button_didabled}/g, isUpdateAbleRow? "": "disabled")
 
-                $("#users_list tbody").append(row_html);
+                const $row = $("#users_list tbody").append(row_html).find(".datarow:last-child");
+
+                console.log("$row", $row);
+                console.log("button_edit", $row.find(".button_edit"));
+                console.log("btn_delete", $row.find(".btn_delete"));
+
+                $row.find(".button_edit")
+                    .prop("disabled", isSystemAccount || !isUpdateAbleRow)
+                    .css("cursor", isSystemAccount || !isUpdateAbleRow ? "not-allowed": "")
+                    .css("display", isSystemAccount? "none": "");
+
+                $row.find(".btn_delete")
+                    .prop("disabled", isSystemAccount || !isUpdateAbleRow || CommonAuth.getUserId() === user.id)
+                    .css("cursor", isSystemAccount || !isUpdateAbleRow  || CommonAuth.getUserId() === user.id ? "not-allowed": "")
+                    .css("display", isSystemAccount? "none": "");
+
             }
 
             //
