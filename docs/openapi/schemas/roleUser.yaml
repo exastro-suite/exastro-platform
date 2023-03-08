@@ -29,6 +29,10 @@ properties:
     type: string
   enabled:
     type: boolean
+  affiliation:
+    type: string
+  description:
+    type: string
   create_timestamp:
     type: string
     format: date-time
