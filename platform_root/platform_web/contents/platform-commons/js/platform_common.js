@@ -180,7 +180,7 @@ function displayTopicPath(topicPaths) {
 function displayMenu(curent) {
     $('.menuList').append(`
         <li class="menuItem"><a class="menuLink" id="menu_workspace" href="#" tabindex="-1">${getText("000-80005", "ワークスペース管理")}</a></li>
-        <li class="menuItem"><a class="menuLink" id="menu_account_management" href="#" target="keycloak_management_console" style="display: none;">${getText("000-80006", "ユーザー管理")}</a></li>
+        <li class="menuItem"><a class="menuLink" id="menu_account_management" href="#" style="display: none;">${getText("000-80006", "ユーザー管理")}</a></li>
         <li class="menuItem"><a class="menuLink" id="menu_role_management" href="#" style="display: none;">${getText("000-80007", "ロール管理")}</a></li>
     `);
     if(curent != null) {
@@ -188,8 +188,8 @@ function displayMenu(curent) {
     }
 
     $('#menu_workspace').attr('href', location_conf.href.workspaces.list.replace(/{organization_id}/g, CommonAuth.getRealm()));
-    $('#menu_account_management').attr('href', location_conf.href.menu.account_manaagement.replace(/{organization_id}/g, CommonAuth.getRealm()));
-    // $('#menu_account_management').attr('href', location_conf.href.users.list.replace(/{organization_id}/g, CommonAuth.getRealm()));
+    // $('#menu_account_management').attr('href', location_conf.href.menu.account_manaagement.replace(/{organization_id}/g, CommonAuth.getRealm()));
+    $('#menu_account_management').attr('href', location_conf.href.users.list.replace(/{organization_id}/g, CommonAuth.getRealm()));
     $('#menu_role_management').attr('href', location_conf.href.roles.list.replace(/{organization_id}/g, CommonAuth.getRealm()));
 
     if (CommonAuth.hasAuthority("_og-usr-mt")) {

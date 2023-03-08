@@ -73,7 +73,8 @@ var location_conf = {
         "users": {
             "new": "/{organization_id}/platform/users/_new",
             "list": "/{organization_id}/platform/users",
-            "edit": "/{organization_id}/platform/users/{user_id}",
+            "detail": "/{organization_id}/platform/users/{user_id}",
+            "edit": "/{organization_id}/platform/users/{user_id}/edit",
         },
         "menu": {
             "toppage": "/{organization_id}/platform/workspaces",
