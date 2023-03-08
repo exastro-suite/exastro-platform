@@ -2257,6 +2257,10 @@ components:
           type: string
         preferred_username:
           type: string
+        affiliation:
+          type: string
+        description:
+          type: string
         enabled:
           type: boolean
         create_timestamp:
@@ -2290,6 +2294,10 @@ components:
           type: string
         lastName:
           type: string
+        affiliation:
+          type: string
+        description:
+          type: string
         enabled:
           type: boolean
           default: true
@@ -2312,6 +2320,10 @@ components:
         firstName:
           type: string
         lastName:
+          type: string
+        affiliation:
+          type: string
+        description:
           type: string
         enabled:
           type: boolean
@@ -2549,6 +2561,10 @@ components:
           type: string
         enabled:
           type: boolean
+        affiliation:
+          type: string
+        description:
+          type: string
         create_timestamp:
           type: string
           format: date-time

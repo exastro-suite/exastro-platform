@@ -28,6 +28,10 @@ properties:
     type: string
   lastName:
     type: string
+  affiliation:
+    type: string
+  description:
+    type: string
   enabled:
     type: boolean
     default: true
