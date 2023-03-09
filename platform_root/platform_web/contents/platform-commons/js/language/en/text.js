@@ -142,6 +142,12 @@ langArray['000-83013'] = 'Up to 255 characters / Available characters: E-mail ad
 langArray['000-83014'] = 'Maximum 100 characters / Usable characters: full-width/half-width characters'
 langArray['000-83015'] = 'Up to 255 characters / Usable characters: full-width/half-width characters'
 langArray['000-83016'] = 'Created a user'
+langArray['000-83017'] = 'User edit'
+langArray['000-83018'] = 'User edit / User management / Exastro Platform'
+langArray['000-83019'] = 'Change the user.'
+langArray['000-83020'] = 'Reset the password'
+langArray['000-83021'] = 'Changed the user'
+langArray['000-84001'] = 'Role list'
 langArray['000-84002'] = 'Role list / Role management / Exastro Platform'
 langArray['000-84003'] = 'Roles can be maintained (view/register/update/delete).'
 langArray['000-84004'] = 'Permissions / Workspace'
@@ -209,7 +215,6 @@ langArray['400-23002'] = 'The parameter (retry) must be specified if creation of
 langArray['400-24001'] = 'You do not have permission to specify the specified workspace as an operation target.'
 langArray['400-24002'] = 'You do not have permission to update the specified role.'
 langArray['400-24003'] = 'You do not have permission to delete the specified role.'
-//
 //
 //
 //
