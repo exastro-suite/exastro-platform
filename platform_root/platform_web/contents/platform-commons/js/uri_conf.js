@@ -44,6 +44,7 @@ var api_conf = {
             "get": "/api/{organization_id}/platform/users",
             "post": "/api/{organization_id}/platform/users",
             "get": "/api/{organization_id}/platform/users",
+            "getId": "/api/{organization_id}/platform/users/{user_id}",
             "put": "/api/{organization_id}/platform/users/{user_id}",
             "delete": "/api/{organization_id}/platform/users/{user_id}",
         },
