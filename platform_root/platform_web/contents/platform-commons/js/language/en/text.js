@@ -62,6 +62,8 @@ langArray['000-00135'] = 'Users'
 //
 langArray['000-00141'] = 'Last Modified'
 langArray['000-00142'] = 'Created date'
+langArray['000-00143'] = 'Affiliation'
+langArray['000-00144'] = 'User ID'
 //
 langArray['000-80001'] = 'Main menu'
 langArray['000-80002'] = 'Sign Out'
@@ -93,6 +95,9 @@ langArray['000-80027'] = 'Page'
 langArray['000-80028'] = 'Filter'
 langArray['000-80029'] = 'Error'
 langArray['000-80030'] = 'Confirmation'
+langArray['000-80031'] = 'Enabled'
+langArray['000-80032'] = 'Automatic generate'
+langArray['000-80033'] = 'Single-byte alphanumeric characters, hyphens, and underscores'
 langArray['000-81001'] = 'Edit accouont'
 langArray['000-81002'] = 'Change password'
 langArray['000-81003'] = 'Two-factor authentication'
@@ -121,7 +126,22 @@ langArray['000-82021'] = 'Edit workspace'
 langArray['000-82022'] = 'Edit workspace / Workspace management / Exastro Platform'
 langArray['000-82023'] = 'Change workspace.'
 langArray['000-82024'] = 'The workspace has been changed.'
-langArray['000-84001'] = 'Role list'
+langArray['000-83001'] = 'User list'
+langArray['000-83002'] = 'User list / User management / Exastro Platform'
+langArray['000-83003'] = 'Users can be maintained (view/register/update/delete).'
+langArray['000-83004'] = 'User does not exist'
+langArray['000-83005'] = 'Are you sure you want to delete the following user?'
+langArray['000-83006'] = 'Deleted users will no longer be able to sign in.'
+langArray['000-83007'] = 'User deleted.'
+langArray['000-83008'] = 'New user'
+langArray['000-83009'] = 'New user / User management / Exastro Platform'
+langArray['000-83010'] = 'Create a new user.'
+langArray['000-83011'] = 'Up to 64 characters / Available characters: single-byte alphanumeric characters, hyphens, underscores'
+langArray['000-83012'] = 'Password change request at first login'
+langArray['000-83013'] = 'Up to 255 characters / Available characters: E-mail address format'
+langArray['000-83014'] = 'Maximum 100 characters / Usable characters: full-width/half-width characters'
+langArray['000-83015'] = 'Up to 255 characters / Usable characters: full-width/half-width characters'
+langArray['000-83016'] = 'Created a user'
 langArray['000-84002'] = 'Role list / Role management / Exastro Platform'
 langArray['000-84003'] = 'Roles can be maintained (view/register/update/delete).'
 langArray['000-84004'] = 'Permissions / Workspace'
@@ -210,6 +230,9 @@ langArray['400-24003'] = 'You do not have permission to delete the specified rol
 //
 //
 //
+//
+//
+//
 langArray['401-00003'] = 'The linking setting of the target menu is invalid. (menu: {})'
 //
 //
@@ -219,6 +242,7 @@ langArray['401-00003'] = 'The linking setting of the target menu is invalid. (me
 //
 //
 langArray['403-00001'] = 'permission error'
+//
 //
 //
 //
@@ -332,4 +356,5 @@ langArray['500-99999'] = 'System Error'
 //
 //
 //
-
+//
+//
