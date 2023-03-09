@@ -15,7 +15,7 @@
 get:
   tags:
   - UsersService
-  summary: get user
+  summary: Get a user
   x-openapi-router-controller: controllers.users_service_controller
   operationId: user_get
   parameters:
@@ -51,7 +51,7 @@ get:
 put:
   tags:
   - UsersService
-  summary: update user
+  summary: Update a user
   x-openapi-router-controller: controllers.users_service_controller
   operationId: user_update
   parameters:
@@ -94,7 +94,7 @@ put:
 delete:
   tags:
   - UsersService
-  summary: delete a user
+  summary: Delete a user
   x-openapi-router-controller: controllers.users_service_controller
   operationId: user_delete
   parameters:

@@ -962,7 +962,7 @@ paths:
     get:
       tags:
       - UsersService
-      summary: get user
+      summary: Get a user
       operationId: user_get
       parameters:
       - name: organization_id
@@ -997,7 +997,7 @@ paths:
     put:
       tags:
       - UsersService
-      summary: update user
+      summary: Update a user
       operationId: user_update
       parameters:
       - name: organization_id
@@ -1038,7 +1038,7 @@ paths:
     delete:
       tags:
       - UsersService
-      summary: delete a user
+      summary: Delete a user
       operationId: user_delete
       parameters:
       - name: organization_id
@@ -2164,7 +2164,7 @@ components:
       type: object
       properties:
         data:
-          $ref: '#/components/schemas/plan_limits'
+          $ref: '#/components/schemas/limits_data'
     limitsList:
       title: limitValue is a definition of Limit Value resource.
       type: object
@@ -2835,7 +2835,8 @@ components:
       properties:
         limit.id:
           type: number
-      example: "{\"platform.workspaces\":100,\"platform.roles\":200}"
+      example: "{\"platform.workspaces\":500,\"platform.roles\":500,\"platform.users\"\
+        :1000}"
     planItemFields_informations:
       type: object
       properties:
@@ -2847,6 +2848,12 @@ components:
         default:
           type: integer
           example: 1000
+    limits_data:
+      type: object
+      properties:
+        limit.id:
+          type: number
+      example: "{\"platform.workspaces\":100,\"platform.roles\":200}"
     limitsList_data:
       type: object
       properties:
@@ -2854,7 +2861,7 @@ components:
           type: string
           example: organization_id
         limits:
-          $ref: '#/components/schemas/plan_limits'
+          $ref: '#/components/schemas/limits_data'
     usageOrganizationList_data:
       type: object
       properties:

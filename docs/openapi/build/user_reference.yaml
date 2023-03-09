@@ -561,7 +561,7 @@ paths:
     get:
       tags:
         - UsersService
-      summary: get user
+      summary: Get a user
       x-openapi-router-controller: controllers.users_service_controller
       operationId: user_get
       parameters:
@@ -597,7 +597,7 @@ paths:
     put:
       tags:
         - UsersService
-      summary: update user
+      summary: Update a user
       x-openapi-router-controller: controllers.users_service_controller
       operationId: user_update
       parameters:
@@ -640,7 +640,7 @@ paths:
     delete:
       tags:
         - UsersService
-      summary: delete a user
+      summary: Delete a user
       x-openapi-router-controller: controllers.users_service_controller
       operationId: user_delete
       parameters:
@@ -1188,8 +1188,9 @@ components:
             limit.id:
               type: number
           example:
-            platform.workspaces: 100
-            platform.roles: 200
+            platform.workspaces: 500
+            platform.roles: 500
+            platform.users: 1000
     planList:
       title: planList is list of Plan resources.
       type: object
