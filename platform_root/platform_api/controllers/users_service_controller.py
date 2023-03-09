@@ -349,7 +349,7 @@ def user_update(body, organization_id, user_id):  # noqa: E501
 
     elif u_update.status_code not in [200, 204]:
         globals.logger.debug(f"response:{u_update.text}")
-        message_id = f"500-{MSG_FUNCTION_ID}002"
+        message_id = f"500-{MSG_FUNCTION_ID}004"
         message = multi_lang.get_text(
             message_id,
             "ユーザー更新に失敗しました(対象ユーザーID:{0})",
@@ -371,17 +371,6 @@ def user_delete(organization_id, user_id):
     Returns:
         Response: http response
     """
-
-    r = connexion.request
-
-    # 自分自身は削除できないチェック
-    # Check cannot delete itself
-    if user_id == r.headers.get("User-Id"):
-        message_id = f"400-{MSG_FUNCTION_ID}005"
-        message = multi_lang.get_text(
-            message_id,
-            "削除者自身のユーザーは削除できません")
-        raise common.BadRequestException(message_id=message_id, message=message)
 
     db = DBconnector()
     private = db.get_organization_private(organization_id)
@@ -418,7 +407,7 @@ def user_delete(organization_id, user_id):
     globals.logger.debug(f"og_managers:{og_managers}")
 
     if user_id in og_managers:
-        message_id = f"400-{MSG_FUNCTION_ID}006"
+        message_id = f"400-{MSG_FUNCTION_ID}005"
         message = multi_lang.get_text(
             message_id,
             "オーガナイゼーション管理者は削除できません")
