@@ -31,13 +31,16 @@ MSG_FUNCTION_ID = "25"
 
 @common.platform_exception_handler
 def user_list(organization_id, first=0, max=100, search=None):
-    """List returns list of roles
+    """List returns list of users
 
     Args:
         organization_id (str): organization id
+        first (int): start data position index
+        max (int): max get count
+        search (str): search user keyword
 
     Returns:
-        InlineResponse2004: _description_
+        Response: http response
     """
 
     globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
@@ -105,7 +108,7 @@ def user_create(body, organization_id):
         organization_id (str): _description_. Defaults to None.
 
     Returns:
-        InlineResponse2001: _description_
+        Response: http response
     """
 
     # 上限チェック
@@ -241,6 +244,80 @@ def user_create(body, organization_id):
 
 
 @common.platform_exception_handler
+def user_get(organization_id, user_id):
+    """List returns list of roles
+
+    Args:
+        organization_id (str): organization id
+        user_id (str): user id
+
+    Returns:
+        Response: http response
+    """
+
+    globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
+
+    db = DBconnector()
+    private = db.get_organization_private(organization_id)
+
+    # サービスアカウントのTOKEN取得
+    # Get a service account token
+    token_response = api_keycloak_tokens.service_account_get_token(
+        organization_id, private.internal_api_client_clientid, private.internal_api_client_secret,
+    )
+    if token_response.status_code != 200:
+        raise common.AuthException(
+            "client_user_get_token error status:{}, response:{}".format(token_response.status_code, token_response.text)
+        )
+
+    token = json.loads(token_response.text)["access_token"]
+
+    # user 情報取得
+    # user get to keycloak
+    response = api_keycloak_users.user_get_by_id(realm_name=organization_id, user_id=user_id, token=token)
+    if response.status_code == 404:
+        globals.logger.debug(f"response:{response.text}")
+        message_id = f"404-{MSG_FUNCTION_ID}001"
+        message = multi_lang.get_text(
+            message_id,
+            "指定されたユーザーは存在していません。")
+
+        raise common.NotFoundException(message_id=message_id, message=message)
+    elif response.status_code != 200:
+        globals.logger.error(f"response.status_code:{response.status_code}")
+        globals.logger.error(f"response.text:{response.text}")
+        message_id = f"500-{MSG_FUNCTION_ID}001"
+        message = multi_lang.get_text(
+            message_id,
+            "ユーザーの取得に失敗しました(対象ID:{0})",
+            organization_id,
+        )
+        raise common.InternalErrorException(message_id=message_id, message=message)
+
+    user = json.loads(response.text)
+    globals.logger.debug(f"response user:{user}")
+
+    ret_user = {
+        "id": user["id"],
+        "firstName": user.get("firstName", ""),
+        "lastName": user.get("lastName", ""),
+        "email": user.get("email", ""),
+        "preferred_username": user.get("username", ""),
+        "name": common.get_username(user.get("firstName"), user.get("lastName"), user.get("username")),
+        "affiliation": user.get("attributes", {}).get("affiliation", [""])[0],
+        "description": user.get("attributes", {}).get("description", [""])[0],
+        "enabled": user.get("enabled", False),
+        "create_timestamp": common.keycloak_timestamp_to_str(user.get("createdTimestamp")),
+    }
+
+    globals.logger.debug(f"ret_user:{ret_user}")
+
+    globals.logger.info(f"### Succeed func:{inspect.currentframe().f_code.co_name}")
+
+    return common.response_200_ok(ret_user)
+
+
+@common.platform_exception_handler
 def user_update(body, organization_id, user_id):  # noqa: E501
     """update user
 
@@ -349,11 +426,12 @@ def user_update(body, organization_id, user_id):  # noqa: E501
 
     elif u_update.status_code not in [200, 204]:
         globals.logger.debug(f"response:{u_update.text}")
-        message_id = f"500-{MSG_FUNCTION_ID}002"
+        message_id = f"500-{MSG_FUNCTION_ID}004"
         message = multi_lang.get_text(
             message_id,
-            "ユーザー更新に失敗しました(対象ユーザーID:{0})",
-            user_id)
+            "ユーザー更新に失敗しました(対象ユーザーID:{0})[{1}]",
+            user_id,
+            json.loads(u_update.text)["errorMessage"])
 
         raise common.InternalErrorException(message_id=message_id, message=message)
 
@@ -371,17 +449,6 @@ def user_delete(organization_id, user_id):
     Returns:
         Response: http response
     """
-
-    r = connexion.request
-
-    # 自分自身は削除できないチェック
-    # Check cannot delete itself
-    if user_id == r.headers.get("User-Id"):
-        message_id = f"400-{MSG_FUNCTION_ID}005"
-        message = multi_lang.get_text(
-            message_id,
-            "削除者自身のユーザーは削除できません")
-        raise common.BadRequestException(message_id=message_id, message=message)
 
     db = DBconnector()
     private = db.get_organization_private(organization_id)
@@ -418,7 +485,7 @@ def user_delete(organization_id, user_id):
     globals.logger.debug(f"og_managers:{og_managers}")
 
     if user_id in og_managers:
-        message_id = f"400-{MSG_FUNCTION_ID}006"
+        message_id = f"400-{MSG_FUNCTION_ID}005"
         message = multi_lang.get_text(
             message_id,
             "オーガナイゼーション管理者は削除できません")

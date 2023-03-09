@@ -959,6 +959,41 @@ paths:
                 $ref: '#/components/schemas/runtimeError'
       x-openapi-router-controller: controllers.users_service_controller
   /api/{organization_id}/platform/users/{user_id}:
+    get:
+      tags:
+      - UsersService
+      summary: get user
+      operationId: user_get
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: user_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_16'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+      x-openapi-router-controller: controllers.users_service_controller
     put:
       tags:
       - UsersService
@@ -1067,7 +1102,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_16'
+                $ref: '#/components/schemas/inline_response_200_17'
         default:
           description: An unexpected error response.
           content:
@@ -1246,7 +1281,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_17'
+                $ref: '#/components/schemas/inline_response_200_18'
         default:
           description: An unexpected error response.
           content:
@@ -1448,7 +1483,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_18'
+                $ref: '#/components/schemas/inline_response_200_19'
         default:
           description: An unexpected error response.
           content:
@@ -1619,7 +1654,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_19'
+                $ref: '#/components/schemas/inline_response_200_20'
         default:
           description: An unexpected error response.
           content:
@@ -1674,7 +1709,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_20'
+                $ref: '#/components/schemas/inline_response_200_21'
         default:
           description: An unexpected error response.
           content:
@@ -1792,7 +1827,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_21'
+                $ref: '#/components/schemas/inline_response_200_22'
         default:
           description: An unexpected error response.
           content:
@@ -1904,7 +1939,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_22'
+                $ref: '#/components/schemas/inline_response_200_23'
         default:
           description: An unexpected error response.
           content:
@@ -2718,6 +2753,13 @@ components:
     inline_response_200_16:
       allOf:
       - $ref: '#/components/schemas/responseOk'
+      - type: object
+        properties:
+          data:
+            $ref: '#/components/schemas/user'
+    inline_response_200_17:
+      allOf:
+      - $ref: '#/components/schemas/responseOk'
       - $ref: '#/components/schemas/roleDetailList'
     platform_roles_body:
       oneOf:
@@ -2725,7 +2767,7 @@ components:
     roles_role_name_body:
       oneOf:
       - $ref: '#/components/schemas/roleDetailWorkspacePut'
-    inline_response_200_17:
+    inline_response_200_18:
       allOf:
       - $ref: '#/components/schemas/responseOk'
       - title: roleList is list of Role resources.
@@ -2735,29 +2777,29 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/roleUser'
-    inline_response_200_18:
+    inline_response_200_19:
       allOf:
       - $ref: '#/components/schemas/responseOk'
       - type: object
         properties:
           data:
             $ref: '#/components/schemas/systemConfig'
-    inline_response_200_19:
+    inline_response_200_20:
       allOf:
       - $ref: '#/components/schemas/responseOk'
       - $ref: '#/components/schemas/limitsList'
-    inline_response_200_20:
+    inline_response_200_21:
       allOf:
       - $ref: '#/components/schemas/responseOk'
       - type: object
         properties:
           data:
             $ref: '#/components/schemas/planItem'
-    inline_response_200_21:
+    inline_response_200_22:
       allOf:
       - $ref: '#/components/schemas/responseOk'
       - $ref: '#/components/schemas/roleList'
-    inline_response_200_22:
+    inline_response_200_23:
       allOf:
       - $ref: '#/components/schemas/responseOk'
       - $ref: '#/components/schemas/userWorkspaceList'

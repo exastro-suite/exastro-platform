@@ -12,6 +12,42 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
+get:
+  tags:
+  - UsersService
+  summary: get user
+  x-openapi-router-controller: controllers.users_service_controller
+  operationId: user_get
+  parameters:
+  - name: organization_id
+    in: path
+    required: true
+    schema:
+      type: string
+  - name: user_id
+    in: path
+    required: true
+    schema:
+      type: string
+      format: uuid
+  responses:
+    200:
+      description: A successful response.
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '../schemas/responseOk.yaml'
+              - type: object
+                properties:
+                  data:
+                    $ref: '../schemas/user.yaml'
+    default:
+      description: An unexpected error response.
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'
 put:
   tags:
   - UsersService
