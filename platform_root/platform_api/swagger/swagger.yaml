@@ -2861,7 +2861,7 @@ components:
           type: string
           example: organization_id
         limits:
-          $ref: '#/components/schemas/limits_data'
+          $ref: '#/components/schemas/plan_limits'
     usageOrganizationList_data:
       type: object
       properties:
