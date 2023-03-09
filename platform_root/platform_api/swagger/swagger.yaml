@@ -2164,7 +2164,7 @@ components:
       type: object
       properties:
         data:
-          $ref: '#/components/schemas/limits_data'
+          $ref: '#/components/schemas/plan_limits'
     limitsList:
       title: limitValue is a definition of Limit Value resource.
       type: object
@@ -2848,12 +2848,6 @@ components:
         default:
           type: integer
           example: 1000
-    limits_data:
-      type: object
-      properties:
-        limit.id:
-          type: number
-      example: "{\"platform.workspaces\":100,\"platform.roles\":200}"
     limitsList_data:
       type: object
       properties:
