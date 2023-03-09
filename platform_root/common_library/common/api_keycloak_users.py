@@ -61,6 +61,9 @@ def user_get(realm_name, user_name, token, first=0, max=100, search=None):
         realm_name (str): realm name
         user_name (str): user name (Noneの時はすべて取得 None is all user)
         toekn (str): token
+        first (int): start data position index
+        max (int): max get count
+        search (str): search user keyword (Noneの時はすべて取得 None is specifies no criteria)
     Returns:
         Response: HTTP Respose (success : .status_code=200)
     """

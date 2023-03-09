@@ -947,6 +947,42 @@ paths:
               schema:
                 $ref: '#/components/schemas/runtimeError'
   '/api/{organization_id}/platform/users/{user_id}':
+    get:
+      tags:
+        - UsersService
+      summary: get user
+      x-openapi-router-controller: controllers.users_service_controller
+      operationId: user_get
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/user'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
     put:
       tags:
         - UsersService
