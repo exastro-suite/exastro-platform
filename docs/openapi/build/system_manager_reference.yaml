@@ -644,8 +644,9 @@ components:
             limit.id:
               type: number
           example:
-            platform.workspaces: 100
-            platform.roles: 200
+            platform.workspaces: 500
+            platform.roles: 500
+            platform.users: 1000
     planList:
       title: planList is list of Plan resources.
       type: object
@@ -700,8 +701,9 @@ components:
             limit.id:
               type: number
           example:
-            platform.workspaces: 100
-            platform.roles: 200
+            platform.workspaces: 500
+            platform.roles: 500
+            platform.users: 1000
     limitsList:
       title: limitValue is a definition of Limit Value resource.
       type: object
@@ -720,8 +722,9 @@ components:
                   limit.id:
                     type: number
                 example:
-                  platform.workspaces: 100
-                  platform.roles: 200
+                  platform.workspaces: 500
+                  platform.roles: 500
+                  platform.users: 1000
     usage:
       title: usage is a definition of current value resource.
       type: object

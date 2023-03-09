@@ -30,6 +30,7 @@ properties:
               type: number
           example:
             {
-              platform.workspaces: 100,
-              platform.roles: 200
+              platform.workspaces: 500,
+              platform.roles: 500,
+              platform.users: 1000
             }
