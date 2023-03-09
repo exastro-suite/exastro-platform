@@ -157,8 +157,8 @@ $(function(){
                     .css("display", isSystemAccount? "none": "");
 
                 $row.find(".btn_delete")
-                    .prop("disabled", isSystemAccount || !isUpdateAbleRow || CommonAuth.getUserId() === user.id)
-                    .css("cursor", isSystemAccount || !isUpdateAbleRow  || CommonAuth.getUserId() === user.id ? "not-allowed": "")
+                    .prop("disabled", isSystemAccount || !isUpdateAbleRow)
+                    .css("cursor", isSystemAccount || !isUpdateAbleRow? "not-allowed": "")
                     .css("display", isSystemAccount? "none": "");
 
             }
@@ -244,7 +244,7 @@ $(function(){
             getText("000-80017", "実行確認"),
             getText("000-83005", "以下のユーザーを削除してよろしいですか？"),
             username,
-            getText("000-83006", "削除したユーザーは以降サインインできなくなります。"),
+            getText("000-83006", "削除したユーザーは以降ログインできなくなります。"),
             CommonAuth.getRealm() + "/" + username,
             () => {
                 disable_event_elements(true);
@@ -258,12 +258,25 @@ $(function(){
                         Authorization: "Bearer " + CommonAuth.getToken(),
                     },
                 }).then(() => {
-                    return call_api_promise_users();
+                    if(user_id == CommonAuth.getUserId()) {
+                        return new Promise((resolve, reject) => {resolve(null)})
+                    } else {
+                        return call_api_promise_users();
+                    }
                 }).then((results) => {
-                    // 一覧の再描画
-                    display_main(results.data);
+                    if( results != null) {
+                        // 一覧の再描画
+                        display_main(results.data);
+                    }
                     hide_progress();
-                    alertMessage(getText("000-80018", "処理結果"), getText("000-83007", "ユーザーを削除しました。"));
+                    alertMessage(getText("000-80018", "処理結果"), getText("000-83007", "ユーザーを削除しました。"),
+                    () => {
+                        if(user_id == CommonAuth.getUserId()) {
+                            // 自分自身を消したときは、top画面に遷移しログイン画面へ
+                            // When you erase yourself, transition to the top screen and go to the login screen
+                            window.location = location_conf.href.menu.toppage.replace(/{organization_id}/g, CommonAuth.getRealm());
+                        }
+                    });
                 }).catch(() => {
                     disable_event_elements(false);
                     hide_progress();
