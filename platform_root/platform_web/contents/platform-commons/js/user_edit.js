@@ -36,27 +36,13 @@ $(function(){
                 contentType: "application/json",
                 dataType: "json",
             }),
-                // new Promise((resolve, reject) => {
-                //     resolve({data: {
-                //         "id": user_id,
-                //         "name": "firstname lastname",
-                //         "firstName": "firstName_value",
-                //         "lastName": "lastName_value",
-                //         "email": "email@example.com",
-                //         "preferred_username": "preferred_username_value",
-                //         "affiliation": "affiliation_value",
-                //         "description": "description_value",
-                //         "enabled": true,
-                //         "create_timestamp": "2023-03-09T04:28:17.023Z"                        
-                //     }})
-                // }),
         ]).then(function(results) {
             // Display Menu
             displayMenu('menu_account_management');
             // Display Topic Path
             displayTopicPath([
                 {"text": getText("000-83001", "ユーザー一覧"), "href": location_conf.href.users.list.replace(/{organization_id}/g, CommonAuth.getRealm()) },
-                {"text": getText("000-83017", "ユーザー編集"), "href": location_conf.href.users.new.replace(/{organization_id}/g, CommonAuth.getRealm()) },
+                {"text": getText("000-83017", "ユーザー編集"), "href": location_conf.href.users.edit.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{user_id}/g, user_id) },
             ]);
             display_main(results[1].data);
             finish_onload_progress();
