@@ -100,22 +100,18 @@
                                             </ul>
                                         </div>
                                         <div class="tableHeader">
-                                            <div class="operationMenu">
-                                                <ul class="tableHeaderMainMenuList">
-                                                    <li class="operationMenuItem">
-                                                        <button title="フィルター" attr-text-id="title=000-80028" data-action="positive" data-type="tableEdit" class="itaButton tableHeaderMainMenuButton button button-filter" id="filter" style="width: 200px;">
-                                                            <span class="inner">
-                                                                <span class="iconButtonIcon icon icon-filter"></span>
-                                                                <span class="iconButtonBody" text-id="000-80028">フィルター</span>
-                                                                <span class="buttonMinWidth"></span>
-                                                            </span>
-                                                        </button>
-                                                    </li>
-                                                    <li class="operationMenuItem">
-                                                        <input type="text" value="" class="inputText input text-filter" maxlength="128" size="256" id="textFilter" placeholder="ユーザー名、email、名、姓の前方一致で絞り込みます" attr-text-id="placeholder=000-80036">
-                                                    </li>
-                                                </ul>
-                                            </div>
+                                            <ul class="tableHeaderMainMenuList">
+                                                <li class="operationMenuItem">
+                                                    <button title="フィルタ" attr-text-id="title=000-80028" data-action="restore" data-type="tableEdit" class="itaButton tableHeaderMainMenuButton button button-filter" id="filter" style="min-width:120px; max-width:120px; width:120px; margin-right:3px;">
+                                                        <span class="inner">
+                                                            <span class="iconButtonIcon icon icon-filter"></span>
+                                                            <span class="iconButtonBody" text-id="000-80028">フィルタ</span>
+                                                            <span class="buttonMinWidth"></span>
+                                                        </span>
+                                                    </button>
+                                                    <input type="text" value="" class="inputText input text-filter" maxlength="128" size="256" id="textFilter" placeholder="ユーザー名、email、名、姓の前方一致で絞り込みます" attr-text-id="placeholder=000-80036">
+                                                </li>
+                                            </ul>
                                         </div>
                                         <div class="tableBody">
                                             <table class="table" width="100%" id="users_list">
