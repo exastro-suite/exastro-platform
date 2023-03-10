@@ -381,19 +381,44 @@ def user_update(body, organization_id, user_id):  # noqa: E501
 
     token = json.loads(token_response.text)["access_token"]
 
+    # 更新前のユーザー情報の取得
+    # Get user information before update
+    res_before_user = api_keycloak_users.user_get_by_id(realm_name=organization_id, user_id=user_id, token=token)
+    if res_before_user.status_code == 404:
+        globals.logger.debug(f"response:{res_before_user.text}")
+        message_id = f"404-{MSG_FUNCTION_ID}001"
+        message = multi_lang.get_text(
+            message_id,
+            "指定されたユーザーは存在していません。")
+
+        raise common.NotFoundException(message_id=message_id, message=message)
+
+    elif res_before_user.status_code != 200:
+        globals.logger.error(f"response.status_code:{res_before_user.status_code}")
+        globals.logger.error(f"response.text:{res_before_user.text}")
+        message_id = f"500-{MSG_FUNCTION_ID}001"
+        message = multi_lang.get_text(
+            message_id,
+            "ユーザーの取得に失敗しました(対象ID:{0})",
+            organization_id,
+        )
+        raise common.InternalErrorException(message_id=message_id, message=message)
+
+    before_user = json.loads(res_before_user.text)
+
     # ユーザー更新
     # update user
     user_json = {
         "email": user_email,
         "firstName": user_firstName,
         "lastName": user_lastName,
-        "attributes":
-        {
-            "affiliation": [user_affiliation],
-            "description": [user_description],
-        },
+        "attributes": before_user.get("attributes", {}),  # 属性情報をbeforeから設定(localeを残すため)
         "enabled": body.get("enabled")
     }
+
+    user_json["attributes"]["affiliation"] = user_affiliation
+    user_json["attributes"]["description"] = user_description
+
     if body.get("password") is not None:
         user_json["credentials"] = [
             {
