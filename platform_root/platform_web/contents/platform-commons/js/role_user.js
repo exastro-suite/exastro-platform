@@ -170,6 +170,8 @@ $(function(){
                     .replace(/\${preferred_username}/g, fn.cv(role_user.preferred_username,'',true))
                     .replace(/\${firstName}/g, fn.cv(role_user.firstName,'',true))
                     .replace(/\${lastName}/g, fn.cv(role_user.lastName,'',true))
+                    .replace(/\${enabled}/g, role_user.enabled ? '<span class="icon icon-check"></span>' : '')
+                    .replace(/\${affiliation}/g, fn.cv(role_user.affiliation,'',true))
                     .replace(/\${create_timestamp}/g, fn.date(new Date(role_user.create_timestamp),'yyyy/MM/dd HH:mm:ss'))
                 $("#role_user_list tbody").append(row_html);
             }
@@ -446,6 +448,8 @@ $(function(){
                     .replace(/\${preferred_username}/g, fn.cv(user.preferred_username,'',true))
                     .replace(/\${firstName}/g, fn.cv(user.firstName,'',true))
                     .replace(/\${lastName}/g, fn.cv(user.lastName,'',true))
+                    .replace(/\${enabled}/g, user.enabled ? '<span class="icon icon-check"></span>' : '')
+                    .replace(/\${affiliation}/g, fn.cv(user.affiliation,'',true))
                     .replace(/\${create_timestamp}/g, fn.date(new Date(user.create_timestamp),'yyyy/MM/dd HH:mm:ss'));
                 dialogBody.find('.user_list tbody').append(row_html);
             }
