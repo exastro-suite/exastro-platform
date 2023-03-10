@@ -381,6 +381,33 @@ def user_update(body, organization_id, user_id):  # noqa: E501
 
     token = json.loads(token_response.text)["access_token"]
 
+    if body.get("enabled") == False:
+        # organization role user情報取得
+        # get organization role user information
+        response = api_keycloak_roles.role_uesrs_get(
+            realm_name=organization_id, client_id=private.user_token_client_id, role_name=common_const.ORG_ROLE_ORG_MANAGER, token=token,
+        )
+        if response.status_code != 200:
+            globals.logger.error(f"response:{response.text}")
+            message_id = f"500-{MSG_FUNCTION_ID}005"
+            message = multi_lang.get_text(
+                message_id,
+                "オーガナイゼーション管理者ロールのユーザー情報が取得できません")
+            raise common.InternalErrorException(message_id=message_id, message=message)
+
+        # User role チェック - オーガナイゼーション管理者は無効化不可
+        # User role check - organization admin cannot disable
+        response_user = json.loads(response.text)
+        og_managers = [u.get("id") for u in response_user]
+        globals.logger.debug(f"og_managers:{og_managers}")
+
+        if user_id in og_managers:
+            message_id = f"400-{MSG_FUNCTION_ID}006"
+            message = multi_lang.get_text(
+                message_id,
+                "オーガナイゼーション管理者は無効にできません")
+            raise common.BadRequestException(message_id=message_id, message=message)
+
     # 更新前のユーザー情報の取得
     # Get user information before update
     res_before_user = api_keycloak_users.user_get_by_id(realm_name=organization_id, user_id=user_id, token=token)
