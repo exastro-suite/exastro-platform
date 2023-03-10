@@ -98,10 +98,34 @@ langArray['000-80030'] = 'Confirmation'
 langArray['000-80031'] = 'Enabled'
 langArray['000-80032'] = 'Automatic generate'
 langArray['000-80033'] = 'Single-byte alphanumeric characters, hyphens, and underscores'
+langArray['000-80034'] = 'Issue'
+langArray['000-80035'] = 'Copy to clipboard'
 langArray['000-81001'] = 'Edit accouont'
 langArray['000-81002'] = 'Change password'
-langArray['000-81003'] = 'Two-factor authentication'
+langArray['000-81003'] = 'Two-factor authentication settings'
 langArray['000-81004'] = 'Token Issuance'
+langArray['000-81005'] = 'Account management / Exastro Platform'
+langArray['000-81006'] = 'Account management'
+langArray['000-81007'] = 'You can edit your account, change your password, set up two-factor authentication and issue a token for the API.'
+langArray['000-81008'] = 'ID'
+langArray['000-81009'] = 'Date of issue'
+langArray['000-81010'] = 'Expiration date'
+langArray['000-81011'] = 'Last access date'
+langArray['000-81012'] = 'No valid refresh token exists'
+langArray['000-81013'] = 'Please specify your login password.'
+langArray['000-81014'] = 'One-time password'
+langArray['000-81015'] = 'If you have set up two-factor authentication, specify the one-time password issued by the authenticator.'
+langArray['000-81016'] = 'Successfully issued a refresh token. '
+langArray['000-81017'] = 'The issued refresh token will not be displayed again after closing this screen, so please keep it in a safe place.'
+langArray['000-81018'] = 'Refresh token Issuance'
+langArray['000-81019'] = 'Failed to issue a refresh token due to an error in the input.'
+langArray['000-81020'] = 'An error has occurred.'
+langArray['000-81021'] = 'Copied to clipboard.'
+langArray['000-81022'] = 'Your browser cannot copy to the clipboard.'
+langArray['000-81023'] = 'Are you sure you want to delete (deactivate) all the following refresh tokens issued by you?'
+langArray['000-81024'] = 'If an API call is being made using a deleted refresh token, the API call will no longer be available.'
+langArray['000-81025'] = 'All refresh tokens issued by you have been removed (deactivated).'
+langArray['000-81026'] = 'Failed to get refresh token.'
 langArray['000-82001'] = 'Workspace list'
 langArray['000-82002'] = 'You can maintain (view/register/delete) workspaces.'
 langArray['000-82003'] = 'Workspace list / Workspace management / Exastro Platform'
@@ -223,6 +247,7 @@ langArray['400-24003'] = 'You do not have permission to delete the specified rol
 //
 //
 //
+
 //
 //
 //
