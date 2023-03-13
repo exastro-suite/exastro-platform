@@ -96,10 +96,6 @@ ALL_ORG_AUTHORITIES = [
     ORG_AUTH_WS_MAINTE,
 ]
 
-# keycloak realm-managementロール 登録
-# keycloak realm-management role
-ALL_REALM_MANAGEMENT_ROLE = ["manage-users", "view-users"]
-
 # plan未設定時のデフォルト
 # Default when plan is not set
 DEFAULT_PLAN_ID = "_default"
