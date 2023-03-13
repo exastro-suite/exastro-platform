@@ -22,8 +22,17 @@ import globals
 from common_library.common.db import DBconnector
 from common_library.common import common, api_keycloak_tokens, api_keycloak_clients, api_keycloak_roles
 from common_library.common import multi_lang
-import common_library.common.const as common_const
 from .libs import queries_db_user_mainte_role_delete
+
+# keycloak realm-managementロール 登録
+# keycloak realm-management role
+ALL_REALM_MANAGEMENT_ROLE = ["manage-users", "view-users"]
+
+# オーガナイゼーションロール
+# Organization role
+ORG_ROLE_ORG_MANAGER = "_organization-manager"
+ORG_ROLE_USER_ROLE_MANAGER = "_organization-user-role-manager"
+ORG_ROLE_USER_MANAGER = "_organization-user-manager"
 
 MSG_FUNCTION_ID = "90"
 
@@ -298,7 +307,7 @@ class user_mainte_role_delete:
 
         client_roles = []
 
-        for realm_management_role in common_const.ALL_REALM_MANAGEMENT_ROLE:
+        for realm_management_role in ALL_REALM_MANAGEMENT_ROLE:
             # 該当Clientのorganization管理者ロールを取得
             # Process for the number of organization administrators
             response = api_keycloak_roles.clients_role_get(organization_id, realm_management_client_id, realm_management_role, token)
@@ -334,7 +343,7 @@ class user_mainte_role_delete:
 
         # role削除
         # role delete for client-roles
-        target_roles = [common_const.ORG_ROLE_ORG_MANAGER, common_const.ORG_ROLE_USER_ROLE_MANAGER, common_const.ORG_ROLE_USER_MANAGER]
+        target_roles = [ORG_ROLE_ORG_MANAGER, ORG_ROLE_USER_ROLE_MANAGER, ORG_ROLE_USER_MANAGER]
         for target in target_roles:
             response = api_keycloak_roles.clients_role_composites_delete(organization_id, client_id, target, client_roles, token)
             if response.status_code not in [200, 204]:
