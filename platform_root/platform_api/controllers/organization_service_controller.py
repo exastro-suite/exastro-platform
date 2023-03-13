@@ -944,65 +944,6 @@ def __client_role_setting(organization_id, user_id):
             )
             raise common.InternalErrorException(message_id=message_id, message=message)
 
-    # TODO : ユーザー管理機能、ロール管理機能が完成した際は、付与解除
-    # Ungrant when user management function and role management function are completed
-    realm_management_clientid = "realm-management"
-
-    # client 情報取得
-    # get client information
-    response = api_keycloak_clients.clients_get(organization_id, realm_management_clientid, token)
-    if response.status_code != 200:
-        globals.logger.error(f"response.status_code:{response.status_code}")
-        globals.logger.error(f"response.text:{response.text}")
-        message_id = f"500-{MSG_FUNCTION_ID}004"
-        message = multi_lang.get_text(
-            message_id,
-            "clientの取得に失敗しました(対象ID:{0} client:{1})",
-            organization_id,
-            realm_management_clientid
-        )
-        raise common.InternalErrorException(message_id=message_id, message=message)
-
-    client_info = json.loads(response.text)
-    realm_management_client_id = client_info[0].get("id")
-
-    client_roles = []
-
-    for realm_management_role in common_const.ALL_REALM_MANAGEMENT_ROLE:
-        # 該当Clientのorganization管理者ロールを取得
-        # Process for the number of organization administrators
-        response = api_keycloak_roles.clients_role_get(organization_id, realm_management_client_id, realm_management_role, token)
-        if response.status_code != 200:
-            globals.logger.error(f"response.status_code:{response.status_code}")
-            globals.logger.error(f"response.text:{response.text}")
-            message_id = f"500-{MSG_FUNCTION_ID}011"
-            message = multi_lang.get_text(
-                message_id,
-                "client roleの取得に失敗しました(対象ID:{0} client:{1})",
-                organization_id,
-                realm_management_client_id
-            )
-            raise common.InternalErrorException(message_id=message_id, message=message)
-
-        client_roles.append(json.loads(response.text))
-
-    # role付与
-    # role grant for client-roles
-    target_roles = [common_const.ORG_ROLE_ORG_MANAGER, common_const.ORG_ROLE_USER_ROLE_MANAGER, common_const.ORG_ROLE_USER_MANAGER]
-    for target in target_roles:
-        response = api_keycloak_roles.clients_role_composites_create(organization_id, client_id, target, client_roles, token)
-        if response.status_code not in [200, 204]:
-            globals.logger.error(f"response.status_code:{response.status_code}")
-            globals.logger.error(f"response.text:{response.text}")
-            message_id = f"500-{MSG_FUNCTION_ID}007"
-            message = multi_lang.get_text(
-                message_id,
-                "client roleのrole設定に失敗しました(対象ID:{0} client:{1})",
-                organization_id,
-                client_clientid
-            )
-            raise common.InternalErrorException(message_id=message_id, message=message)
-
     # ステータス更新
     # update status
     __update_status(const.ORG_STATUS_ROLE_SETTING, organization_id, user_id)
