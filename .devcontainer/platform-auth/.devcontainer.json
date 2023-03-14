@@ -79,6 +79,7 @@
 		"formulahendry.vscode-mysql",
 		"mitchdenny.ecdc",
 		"ms-vsliveshare.vsliveshare",
+		"snyk-security.snyk-vulnerability-scanner",
 	],
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	"forwardPorts": [
