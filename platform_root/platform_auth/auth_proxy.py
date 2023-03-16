@@ -531,7 +531,9 @@ class auth_proxy:
                 continue
 
             # Get variables obtained by regular expression as a dictionary - 正規表現で取得した変数をディクショナリとして取得する
-            match_dict = match.groupdict()
+            match_dict = {}
+            for k, v in match.groupdict().items():
+                match_dict[k] = re.escape(v)
 
             for auth in pattern["auth"]:
                 if not ("*" in auth["method"] or request.method in auth["method"]):

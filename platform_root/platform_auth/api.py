@@ -64,6 +64,7 @@ def alive():
 
 
 @app.route('/auth/realms/<string:organization_id>/protocol/openid-connect/token', methods=["POST"])
+@common.platform_exception_handler
 def openid_connect_token(organization_id):
     """get token
     Args:
@@ -93,12 +94,19 @@ def openid_connect_token(organization_id):
     # remake response header
     excluded_headers = ['content-encoding', 'content-length', 'connection', 'keep-alive', 'proxy-authenticate',
                         'proxy-authorization', 'te', 'trailers', 'transfer-encoding', 'upgrade']
-    headers = [
-        (k, v) for k, v in redirect_response.raw.headers.items()
+    headers = {
+        k: v for k, v in redirect_response.raw.headers.items()
         if k.lower() not in excluded_headers
-    ]
+    }
 
-    return Response(redirect_response.content, redirect_response.status_code, headers)
+    # 戻り値をそのまま返却
+    # Return the return value as it is
+    response = make_response()
+    response.status_code = redirect_response.status_code
+    response.data = redirect_response.content
+    response.headers = headers
+
+    return response
 
 
 @app.route('/api/platform/<path:subpath>', methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTION"])
