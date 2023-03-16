@@ -175,6 +175,9 @@ langArray['000-83021'] = 'Changed the user'
 langArray['000-83022'] = 'User details'
 langArray['000-83023'] = 'User details / User management / Exastro Platform'
 langArray['000-83024'] = 'You can check the details of the user.'
+langArray['000-83025'] = 'Please enter password'
+langArray['000-83026'] = 'Please re-enter password to confirm'
+langArray['000-83027'] = 'Incorrect password confirmation'
 langArray['000-84001'] = 'Role list'
 langArray['000-84002'] = 'Role list / Role management / Exastro Platform'
 langArray['000-84003'] = 'Roles can be maintained (view/register/update/delete).'
@@ -312,6 +315,8 @@ langArray['500-00006'] = 'System Error'
 //
 //
 langArray['500-99999'] = 'System Error'
+//
+//
 //
 //
 //
