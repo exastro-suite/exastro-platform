@@ -94,13 +94,19 @@ $(function(){
         let result=true;
 
         // validate user password
-        if($("#form_user_password_initialize").prop("checked") && $("#form_user_password").val() === "") {
-            $("#message_user_password").text(getText("400-00011", "必須項目が不足しています。({0})", getText("000-00132", "パスワード")));
-            result = false;
+        if($("#form_user_password_initialize").prop("checked")) {
+            if($("#form_user_password").val() === "" || $("#form_user_password_confirm").val() === "") {
+                $("#message_user_password").text(getText("400-00011", "必須項目が不足しています。({0})", getText("000-00132", "パスワード")));
+                result = false;
+            } else if($("#form_user_password").val() != $("#form_user_password_confirm").val()) {
+                $("#message_user_password").text(getText("000-83027", "パスワードの確認入力が正しくありません"));
+                result = false;
+            } else {
+                $("#message_user_password").text("");
+            }
         } else {
             $("#message_user_password").text("");
         }
-
 
         console.log("--- validate check end [" + result + "] ----");
 
