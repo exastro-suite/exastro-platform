@@ -14,7 +14,6 @@
 #   limitations under the License.
 */
 $(function(){
-
     CommonAuth.onAuthSuccess(() => {
         new CommonUi(`#container`);
         load_main();
@@ -25,31 +24,15 @@ $(function(){
             // Load Common Contents
             loadCommonContents(),
             // Get Role List
-            call_api_promise({
-                type: "GET",
-                url: api_conf.api.roles.get.replace(/{organization_id}/g, CommonAuth.getRealm()),
-                headers: {
-                    Authorization: "Bearer " + CommonAuth.getToken(),
-                },
-                contentType: "application/json",
-                dataType: "json",
-            }),
+            call_api_promise_get_roles(),
             // get Workspace List
-            call_api_promise({
-                type: "GET",
-                url: api_conf.api.workspaces.get.replace(/{organization_id}/g, CommonAuth.getRealm()),
-                headers: {
-                    Authorization: "Bearer " + CommonAuth.getToken(),
-                },
-                contentType: "application/json",
-                dataType: "json",
-            })
+            call_api_promise_get_workspaces(),
         ]).then(function(results) {
             // Display Menu
             displayMenu('menu_role_management');
             // Display Topic Path
             displayTopicPath([
-                {"text": "ロール一覧", "href": location_conf.href.roles.list.replace(/{organization_id}/g, CommonAuth.getRealm()) }
+                {"text": getText("000-84001", "ロール一覧"), "href": location_conf.href.roles.list.replace(/{organization_id}/g, CommonAuth.getRealm()) }
             ]);
 
             display_main(results[1].data, results[2].data);
@@ -62,6 +45,30 @@ $(function(){
         });
     }
 
+    function call_api_promise_get_roles() {
+        return call_api_promise({
+            type: "GET",
+            url: api_conf.api.roles.get.replace(/{organization_id}/g, CommonAuth.getRealm()),
+            headers: {
+                Authorization: "Bearer " + CommonAuth.getToken(),
+            },
+            contentType: "application/json",
+            dataType: "json",
+        });
+    }
+
+    function call_api_promise_get_workspaces() {
+        return call_api_promise({
+            type: "GET",
+            url: api_conf.api.workspaces.get.replace(/{organization_id}/g, CommonAuth.getRealm()),
+            headers: {
+                Authorization: "Bearer " + CommonAuth.getToken(),
+            },
+            contentType: "application/json",
+            dataType: "json",
+        });
+    }
+
     function display_main(roles, workspaces) {
         console.log("[CALL] display_main");
         let adminWorkspaces = CommonAuth.getAdminWorkspaces();
@@ -71,17 +78,20 @@ $(function(){
         //
         if(RolesCommon.isAlllowedCreateRole()) {
             $('#new_role').css('display','');
-            $('#new_role').on('click',() => {
-                window.location = location_conf.href.roles.new.replace(/{organization_id}/g, CommonAuth.getRealm());
-            });
+            $('#new_role').prop('disabled',false);
         }
+        $('#new_role').on('click',() => {
+            window.location = location_conf.href.roles.new.replace(/{organization_id}/g, CommonAuth.getRealm());
+        });
+
         //
         // display role list
         //
+        $('#roles_list .datarow').remove();
         if (roles.length == 0) {
             $('#roles_list notfound').css('dispaly','');
         } else {
-            const row_template = $('#roles_list .datarow').prop('outerHTML');
+            const row_template = $('#roles_list .datarow-template').clone(true).removeClass('datarow-template').addClass('datarow').prop('outerHTML');
             let html = '';
             for(let role of roles.sort((a,b) => {
                 return (((a.kind + ":" + a.name) == (b.kind + ":" + b.name))? 0 : ((a.kind + ":" + a.name) > (b.kind + ":" + b.name))? 1: -1); })) {
@@ -93,16 +103,27 @@ $(function(){
                     .replace(/\${role_kind}/g, fn.cv(role.kind,'',true))
                     .replace(/\${role_authority}/g, authorityTexts.map((t) => {return '<span class="auth_item">' + fn.cv(t,'',true) +'</span>'}).join("\n"))
             }
-            $('#roles_list tbody').html(html);
+            $('#roles_list tbody').append(html);
             $('#roles_list .datarow').css('display','');
 
-            //
-            // display edit role button
-            //
+            // edit role button
             $('#roles_list .btn_edit').on('click',function() {
                 window.location = location_conf.href.roles.edit.replace('{organization_id}',CommonAuth.getRealm()).replace('{role_name}',$(this).attr('data-id'));
             });
 
+            // role member button
+            $('#roles_list .btn_member').on('click',function() {
+                window.location = location_conf.href.roles.user.replace('{organization_id}',CommonAuth.getRealm()).replace('{role_name}',$(this).attr('data-id'));
+            });
+
+            // role delete button
+            $('#roles_list .button_delete').on('click',function() {
+                click_deleteRole($(this).attr('data-id'));
+            });
+
+            //
+            // display role edit button
+            //
             $('#roles_list .btn_edit').each(function(index, element) {
                 const $element = $(element);
                 const rolename = $element.attr('data-id');
@@ -120,10 +141,6 @@ $(function(){
             //
             // display role member button
             //
-            $('#roles_list .btn_member').on('click',function() {
-                window.location = location_conf.href.roles.user.replace('{organization_id}',CommonAuth.getRealm()).replace('{role_name}',$(this).attr('data-id'));
-            });
-
             $('#roles_list .btn_member').each(function(index, element) {
                 const $element = $(element);
                 const rolename = $element.attr('data-id');
@@ -136,6 +153,92 @@ $(function(){
                 $element.prop('disabled', !allowedGrantRole);
                 $element.css('cursor', allowedGrantRole? '' :'not-allowed');
             });
+
+            //
+            // display role delete button
+            //
+            $('#roles_list .button_delete').each(function(index, element) {
+                const $element = $(element);
+                const rolename = $element.attr('data-id');
+                const rolesIndex = roles.findIndex((i) => {return i.name == rolename});
+                if(rolesIndex === -1) {
+                    allowedDeleteRole = false;
+                } else {
+                    allowedDeleteRole = RolesCommon.isAllowedDeleteRole(roles[rolesIndex]);
+                    $element.css('display', RolesCommon.isSystemRole(roles[rolesIndex])? 'none': '');
+                }
+                $element.prop('disabled', !allowedDeleteRole);
+                $element.css('cursor', allowedDeleteRole? '' :'not-allowed');
+            });
         }
+    }
+
+    function click_deleteRole(role_name) {
+        deleteConfirmMessage(
+            getText("000-80017", "実行確認"),
+            getText("000-84006", "以下のロールを削除してよろしいですか？"),
+            role_name,
+            getText("000-84007", "削除したロールに紐づくユーザからロールに紐づくワークスペースへのアクセス権限なくなります。"),
+            CommonAuth.getRealm() + "/" + role_name,
+            () => {
+                disabled_button();
+                show_progress();
+
+                // APIを呼出す
+                call_api_promise({
+                    type: "DELETE",
+                    url: api_conf.api.roles.delete.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{role_name}/g, role_name),
+                    headers: {
+                        Authorization: "Bearer " + CommonAuth.getToken(),
+                    },
+                }).then(() => {
+                    return Promise.all([
+                            // Get Role List
+                            call_api_promise_get_roles(),
+                            // get Workspace List
+                            call_api_promise_get_workspaces(),
+                        ]);
+                }).then((results) => {
+                    // 一覧の再描画
+                    display_main(results[0].data, results[1].data);
+                    hide_progress();
+                    alertMessage(getText("000-80018", "処理結果"), getText("000-84008", "ロールを削除しました。"));
+                }).catch(() => {
+                    enabled_button();
+                    hide_progress();
+                });
+            }
+        );
+    }
+
+    function disabled_button() {
+        $('#new_role').prop('disabled',true);
+
+        $('#roles_list .btn_edit').each(function(index, element) {
+            $(element).prop('disabled', true);
+        });
+        $('#roles_list .btn_member').each(function(index, element) {
+            $(element).prop('disabled', true);
+        });
+        $('#roles_list .button_delete').each(function(index, element) {
+            $(element).prop('disabled', true);
+        });
+    }
+
+    function enabled_button() {
+        $('#new_role').prop('disabled',false);
+
+        $('#roles_list .btn_edit').each(function(index, element) {
+            const $element = $(element);
+            $element.prop('disabled', ($element.css("cursor") == "not-allowed"));
+        });
+        $('#roles_list .btn_member').each(function(index, element) {
+            const $element = $(element);
+            $element.prop('disabled', ($element.css("cursor") == "not-allowed"));
+        });
+        $('#roles_list .button_delete').each(function(index, element) {
+            const $element = $(element);
+            $element.prop('disabled', ($element.css("cursor") == "not-allowed"));
+        });
     }
 });

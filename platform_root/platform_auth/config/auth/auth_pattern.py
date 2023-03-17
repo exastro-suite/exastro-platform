@@ -71,12 +71,12 @@ AUTH_PATTERN = [
                 ]
             },
             {
-                "method": ["POST"],
+                "method": ["POST", "PUT", "DELETE"],
                 "roles": [
                     {"client": "{org_id}-workspaces", "role": const.ORG_AUTH_USER_MAINTE},
                 ]
             }
-        ]
+        ],
     },
     {
         "url": r"^/api/(?P<org_id>[^/][^/]*)/platform/users/_current/refresh_tokens$",
@@ -108,7 +108,7 @@ AUTH_PATTERN = [
         "url": r"^/api/(?P<org_id>[^/][^/]*)/platform/roles/(?P<role_name>[^/][^/]*)($|/.*$)",
         "auth": [
             {
-                "method": ["PUT"],
+                "method": ["PUT", "DELETE"],
                 "roles": [
                     {"client": "{org_id}-workspaces", "role": const.WS_AUTH_ADMIN_ANY},
                     {"client": "{org_id}-workspaces", "role": const.ORG_AUTH_WS_ROLE_MAINTE},

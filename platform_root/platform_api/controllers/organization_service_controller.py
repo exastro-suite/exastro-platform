@@ -311,6 +311,67 @@ def organization_create(body, retry=None):
 
 
 @common.platform_exception_handler
+def organization_delete(organization_id):  # noqa: E501
+    """Delete an organization
+
+    Args:
+        organization_id (str): organization id
+
+    Returns:
+        response: HTTP Response
+    """
+    globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name} organization_id={organization_id}")
+
+    # exists organization
+    with closing(DBconnector().connect_platformdb()) as conn:
+        with conn.cursor() as cursor:
+            cursor.execute(
+                queries_organizations.SQL_QUERY_ORGANIZATIONS + " WHERE ORGANIZATION_ID = %(organization_id)s",
+                {"organization_id": organization_id})
+            result = cursor.fetchall()
+
+    if len(result) <= 0:
+        message_id = f"404-{MSG_FUNCTION_ID}002"
+        raise common.NotFoundException(
+            message_id=message_id,
+            message=multi_lang.get_text(message_id, "オーガナイゼーションが存在しません(id:{0})", organization_id)
+        )
+
+    # Disable the realm
+    globals.logger.info(f"Disable the realm : organization_id={organization_id}")
+    __realm_disabled(organization_id)
+
+    # Delete organization plan
+    globals.logger.info(f"Delete organization plan : organization_id={organization_id}")
+    bl_plan_service.organization_plan_delete(organization_id)
+
+    # Delete Exastro IT Automation Organization
+    globals.logger.info(f"Delete Exastro IT Automation Organization : organization_id={organization_id}")
+    __ita_delete(organization_id)
+
+    # get DBinit instance
+    dbinit = DBinit()
+
+    # Delete Platform Organization Database
+    globals.logger.info(f"Delete Platform Organization Database : organization_id={organization_id}")
+    dbinit.drop_database(DBconnector().get_dbinfo_organization(organization_id))
+
+    # Delete Platform Organization db info
+    globals.logger.info(f"Delete Platform Organization db info : organization_id={organization_id}")
+    dbinit.delete_organization_dbinfo(organization_id)
+
+    # Delete Organization realm
+    globals.logger.info(f"Delete Organization realm : organization_id={organization_id}")
+    __realm_delete(organization_id)
+
+    # Delete Platform Organization
+    globals.logger.info(f"Delete Platform Organization : organization_id={organization_id}")
+    __delete_finalize(organization_id)
+
+    return common.response_200_ok(None)
+
+
+@common.platform_exception_handler
 def organization_list():
     """organization info. list
 
@@ -482,6 +543,26 @@ def __create_start(organization_id, organization_name, options, user_id):
     return
 
 
+def __delete_finalize(organization_id):
+    """finalize delete organization
+
+    Args:
+        organization_id (str): organization id
+    """
+    globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name} organization_id={organization_id}")
+
+    # DB削除
+    # delete organization
+    db = DBconnector()
+    with closing(db.connect_platformdb()) as conn:
+        with conn.cursor() as cursor:
+            cursor.execute(queries_organizations.SQL_DELETE_ORGANIZATION, {"organization_id": organization_id})
+
+        conn.commit()
+
+    return
+
+
 def __realm_create(organization_id, organization_name, options, user_id):
     """realm create
 
@@ -532,6 +613,29 @@ def __realm_create(organization_id, organization_name, options, user_id):
     # ステータス更新
     # update status
     __update_status(const.ORG_STATUS_REALM_CREATE, organization_id, user_id)
+
+    return
+
+
+def __realm_delete(organization_id):
+
+    globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name} organization_id={organization_id}")
+
+    # サービスアカウントのTOKEN取得
+    # Get a service account token
+    token = __get_token()
+
+    # realm削除
+    # realm delete to keycloak
+    response = api_keycloak_realms.realm_delete(organization_id, token)
+    if response.status_code not in [200, 204, 404]:
+        globals.logger.error(f"response.status_code:{response.status_code}")
+        globals.logger.error(f"response.text:{response.text}")
+        message_id = f"500-{MSG_FUNCTION_ID}022"
+        message = multi_lang.get_text(message_id,
+                                      "realmの削除に失敗しました(対象ID:{0})",
+                                      organization_id)
+        raise common.InternalErrorException(message_id=message_id, message=message)
 
     return
 
@@ -611,7 +715,6 @@ def __client_create(organization_id, user_id):
         organization_id (str): organization id
         user_id (str): user id
     """
-
     globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
 
     # サービスアカウントのTOKEN取得
@@ -829,65 +932,6 @@ def __client_role_setting(organization_id, user_id):
         # role付与
         # role grant for client-roles
         response = api_keycloak_roles.clients_role_composites_create(organization_id, client_id, org_role, client_roles, token)
-        if response.status_code not in [200, 204]:
-            globals.logger.error(f"response.status_code:{response.status_code}")
-            globals.logger.error(f"response.text:{response.text}")
-            message_id = f"500-{MSG_FUNCTION_ID}007"
-            message = multi_lang.get_text(
-                message_id,
-                "client roleのrole設定に失敗しました(対象ID:{0} client:{1})",
-                organization_id,
-                client_clientid
-            )
-            raise common.InternalErrorException(message_id=message_id, message=message)
-
-    # TODO : ユーザー管理機能、ロール管理機能が完成した際は、付与解除
-    # Ungrant when user management function and role management function are completed
-    realm_management_clientid = "realm-management"
-
-    # client 情報取得
-    # get client information
-    response = api_keycloak_clients.clients_get(organization_id, realm_management_clientid, token)
-    if response.status_code != 200:
-        globals.logger.error(f"response.status_code:{response.status_code}")
-        globals.logger.error(f"response.text:{response.text}")
-        message_id = f"500-{MSG_FUNCTION_ID}004"
-        message = multi_lang.get_text(
-            message_id,
-            "clientの取得に失敗しました(対象ID:{0} client:{1})",
-            organization_id,
-            realm_management_clientid
-        )
-        raise common.InternalErrorException(message_id=message_id, message=message)
-
-    client_info = json.loads(response.text)
-    realm_management_client_id = client_info[0].get("id")
-
-    client_roles = []
-
-    for realm_management_role in common_const.ALL_REALM_MANAGEMENT_ROLE:
-        # 該当Clientのorganization管理者ロールを取得
-        # Process for the number of organization administrators
-        response = api_keycloak_roles.clients_role_get(organization_id, realm_management_client_id, realm_management_role, token)
-        if response.status_code != 200:
-            globals.logger.error(f"response.status_code:{response.status_code}")
-            globals.logger.error(f"response.text:{response.text}")
-            message_id = f"500-{MSG_FUNCTION_ID}011"
-            message = multi_lang.get_text(
-                message_id,
-                "client roleの取得に失敗しました(対象ID:{0} client:{1})",
-                organization_id,
-                realm_management_client_id
-            )
-            raise common.InternalErrorException(message_id=message_id, message=message)
-
-        client_roles.append(json.loads(response.text))
-
-    # role付与
-    # role grant for client-roles
-    target_roles = [common_const.ORG_ROLE_ORG_MANAGER, common_const.ORG_ROLE_USER_ROLE_MANAGER, common_const.ORG_ROLE_USER_MANAGER]
-    for target in target_roles:
-        response = api_keycloak_roles.clients_role_composites_create(organization_id, client_id, target, client_roles, token)
         if response.status_code not in [200, 204]:
             globals.logger.error(f"response.status_code:{response.status_code}")
             globals.logger.error(f"response.text:{response.text}")
@@ -1390,8 +1434,6 @@ def __ita_create(organization_id, user_id):
     json_para = {
     }
 
-    globals.logger.debug("realms post send")
-
     # 呼び出し先設定
     # Call destination setting
     api_url = "{}://{}:{}".format(os.environ['ITA_API_ADMIN_PROTOCOL'], os.environ['ITA_API_ADMIN_HOST'], os.environ['ITA_API_ADMIN_PORT'])
@@ -1413,6 +1455,60 @@ def __ita_create(organization_id, user_id):
     # ステータス更新
     # update status
     __update_status(const.ORG_STATUS_ITA_CREATE, organization_id, user_id)
+
+    return
+
+
+def __ita_delete(organization_id):
+    """Delete Exastro IT Automation organization
+
+    Args:
+        organization_id (str): organization id
+        user_id (str): user id
+    """
+    globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name} organization_id={organization_id}")
+
+    header_para = {
+        "User-Id": request.headers.get("User-Id"),
+        "Roles": request.headers.get("Roles"),
+        "Language": request.headers.get("Language"),
+    }
+
+    # 呼び出し先設定
+    # Call destination setting
+    api_url = "{}://{}:{}".format(os.environ['ITA_API_ADMIN_PROTOCOL'], os.environ['ITA_API_ADMIN_HOST'], os.environ['ITA_API_ADMIN_PORT'])
+    response = requests.delete(f"{api_url}/api/organizations/{organization_id}/ita/", headers=header_para)
+
+    if response.status_code not in [200, 404, 499]:
+        globals.logger.error(f"response.status_code:{response.status_code}")
+        globals.logger.error(f"response.text:{response.text}")
+        message_id = f"500-{MSG_FUNCTION_ID}013"
+        message = multi_lang.get_text(
+            message_id,
+            "Exastro IT Automationのorganization削除に失敗しました。(対象ID:{0})",
+            organization_id
+        )
+        raise common.InternalErrorException(message_id=message_id, message=message)
+
+    if response.status_code == 499:
+        try:
+            r_delete_ita_body = json.loads(response.text)
+        except Exception:
+            r_delete_ita_body = {}
+
+        if r_delete_ita_body.get("result", "") != '499-00002':  # Alredy Deleted
+            globals.logger.error(f"response.status_code:{response.status_code}")
+            globals.logger.error(f"response.text:{response.text}")
+
+            message_id = f"500-{MSG_FUNCTION_ID}013"
+            message = multi_lang.get_text(
+                message_id,
+                "Exastro IT Automationのorganization削除に失敗しました。(対象ID:{0})",
+                organization_id
+            )
+            raise common.InternalErrorException(message_id=message_id, message=message)
+
+    globals.logger.debug(f"response.status_code:{response.status_code}")
 
     return
 
@@ -1469,6 +1565,35 @@ def __realm_enabled(organization_id, user_id):
     # ステータス更新
     # update status
     __update_status(const.ORG_STATUS_REALM_ENABLED, organization_id, user_id)
+
+    return
+
+
+def __realm_disabled(organization_id):
+    """realm to disabled
+
+    Args:
+        organization_id (str): organization id
+    """
+    globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
+
+    # サービスアカウントのTOKEN取得
+    # Get a service account token
+    token = __get_token()
+
+    realm_json = {
+        "enabled": False,
+    }
+
+    response = api_keycloak_realms.realm_update(organization_id, realm_json, token)
+    if response.status_code not in [200, 204, 404]:
+        globals.logger.error(f"response.status_code:{response.status_code}")
+        globals.logger.error(f"response.text:{response.text}")
+        message_id = f"500-{MSG_FUNCTION_ID}021"
+        message = multi_lang.get_text(message_id,
+                                      "realmの無効化に失敗しました(対象ID:{0})",
+                                      organization_id)
+        raise common.InternalErrorException(message_id=message_id, message=message)
 
     return
 

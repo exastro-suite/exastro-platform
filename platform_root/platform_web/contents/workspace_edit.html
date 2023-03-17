@@ -1,0 +1,150 @@
+<!--
+#   Copyright 2022 NEC Corporation
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+-->
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="format-detection" content="telephone=no,email=no,address=no">
+        <meta name="theme-color" content="#002B62">
+        <title text-id="000-82022">
+            ワークスペース編集 / ワークスペース管理 / Exastro Platform
+        </title>
+        <link rel="stylesheet" href="/_/platform-commons/css/platform.css?ver=__BUILD_VERSION__">
+
+        <script type="text/javascript" src="/auth/js/keycloak.js?ver=__BUILD_VERSION__"></script>
+        <script type="text/javascript" src="/_/common-auth/js/exastro-common-auth-config.js?ver=__BUILD_VERSION__"></script>
+        <script type="text/javascript" src="/_/common-auth/js/exastro-common-auth.js?ver=__BUILD_VERSION__"></script>
+        <script src="/_/platform-commons/common/js/jquery.js?ver=__BUILD_VERSION__"></script>
+
+        <link rel="stylesheet" href="/_/platform-commons/css/custom_properties.css?ver=__BUILD_VERSION__">
+        <link rel="stylesheet" href="/_/platform-commons/css/common.css?ver=__BUILD_VERSION__">
+        <link rel="stylesheet" href="/_/platform-commons/css/dialog.css?ver=__BUILD_VERSION__">
+
+        <script src="/_/platform-commons/common/js/words.js?ver=__BUILD_VERSION__"></script>
+        <script src="/_/platform-commons/common/js/common.js?ver=__BUILD_VERSION__"></script>
+        <script src="/_/platform-commons/common/js/dialog.js?ver=__BUILD_VERSION__"></script>
+        <script src="/_/platform-commons/common/js/ui.js?ver=__BUILD_VERSION__"></script>
+
+        <script src="/_/platform-commons/js/platform_common.js?ver=__BUILD_VERSION__"></script>
+        <script src="/_/platform-commons/js/uri_conf.js?ver=__BUILD_VERSION__"></script>
+        <script src="/_/platform-commons/js/workspace_edit.js?ver=__BUILD_VERSION__"></script>
+
+    </head>
+    <body>
+        <div id="container">
+            <div class="containerHeader">
+                <header id="header">
+                    <div class="logo">
+                        <img class="logoImage" src="/_/platform-commons/img/Exastro-logo2-white-rgb.svg?ver=__BUILD_VERSION__" alt="Exastro" style="height:32px; margin:5px 18px;">
+                    </div>
+                    <div class="topicPath">
+                        <ol class="topichPathList" style="visibility:hidden;">
+                        </ol>
+                    </div>
+                    <div class="headerMenu">
+                        <ul class="headerMenuList">
+                            <li class="userInfomation headerMenuItem">
+                            </li>
+                        </ul>
+                    </div>
+                </header>
+            </div>
+            <div class="containerBody">
+                <aside id="menu" class="">
+                    <!--
+                    <div class="menuHeader"></div>
+                    -->
+                    <div class="menuBody">
+                        <nav class="menuNavi">
+                            <ul class="menuList" style="display:none;">
+                            </ul>
+                        </nav>
+                    </div>
+                </aside>
+                <main id="main" style="visibility:hidden;">
+                    <div id="content">
+                        <div class="contentHeader">
+                            <h1 class="contentTitle"><span class="contentTitleInner" text-id="000-82021">ワークスペース編集</span></h1>
+                            <p class="contentMenuInfo" text-id="000-82023">ワークスペースを変更します。</p>
+                        </div>
+                        <div class="contentBody">
+                            <div class="contentMenu">
+                                <ul class="contentMenuList">
+                                    <li class="contentMenuItem">
+                                        <a class="contentMenuLink tabOpen" href="#dataList" tabindex="-1">
+                                            <span class="inner" text-id="000-80022">入力</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <section class="section tabOpen" id="dataList">
+                                <div class="sectionBody">
+                                    <div id="MT" class="tableContainer viewTable">
+                                        <div class="tableBody">
+                                            <table class="table" width="100%">
+                                                <thead class="thead">
+                                                    <tr class="tHeadTr tr">
+                                                        <th data-id="c1" data-rest="id" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="項目名" attr-text-id="title=000-80020" width="250px;"><div class="ci" text-id="000-80020">項目名</div></th>
+                                                        <th data-id="c2" data-rest="name" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="設定値" attr-text-id="title=000-80021" style="min-width:400px;"><div class="ci" text-id="000-80021">設定値</div></th>
+                                                        <th data-id="c3" data-rest="name" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="備考" attr-text-id="title=000-80023"><div class="ci" text-id="000-80023">備考</div></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody class="tbody">
+                                                    <tr class="tBodyTr tr">
+                                                        <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: left;"><span text-id="000-00101">ワークスペースID</span></div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci" id="display_workspace_id"></div>
+                                                            <input type="hidden" id="form_workspace_id" value="">
+                                                        </td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci textOverWrap"></div></td>
+                                                    </tr>
+                                                    <tr class="tBodyTr tr">
+                                                        <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: left;"><span text-id="000-00102">ワークスペース名</span><span class="tHeadRequired" text-id="000-80024">必須</span></div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci">
+                                                            <input type="text" value="" class="tableEditInputText inputText input inputTextWidthAdjustment" id="form_workspace_name" maxlength="255">
+                                                            <span class="validate_error" id="message_workspace_name"></span>
+                                                        </div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci textOverWrap" text-id="000-82017">最大255文字 / 使用可能文字：全角・半角文字</div></td>
+                                                    </tr>
+                                                    <tr class="tBodyTr tr">
+                                                        <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: left;" text-id="000-82011">環境一覧</div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci">
+                                                            <textarea wrap="soft" rows="4" data-key="environments" data-id="3" data-required="0" data-int-min="0" data-int-max="5000" id="form_workspace_environments" class="tebleEditTextArea textarea input textareaAdjustment" maxlength="5000"></textarea>
+                                                            <span class="validate_error" id="message_workspace_environments"></span>
+                                                        </div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci textOverWrap" text-id="000-82018">1環境 最大40文字 / 使用可能文字：全角・半角文字 / 改行で1環境</div></td>
+                                                    </tr>
+                                                    <tr class="tBodyTr tr">
+                                                        <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: left;" text-id="000-00106">説明</div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci">
+                                                            <textarea wrap="soft" data-key="remarks" data-id="4" data-required="0" data-int-min="0" data-int-max="4000" id="form_workspace_description" class="tebleEditTextArea textarea input textareaAdjustment" maxlength="4000"></textarea>
+                                                        </div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci textOverWrap" text-id="000-82019">使用可能文字：全角・半角文字</div></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <button data-type="tableNew" data-action="positive" style="width:200px;" class="itaButton tableHeaderMainMenuButton button" id="button_register"><span class="inner"><span class="icon icon-edit"></span><span text-id="000-80025">登録</span></span></button>
+                                    </div>
+                                </div>
+                            </section>
+                        </div>
+                    </div>
+                </main>
+            </div>
+            <div class="containerLoading"></div>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,130 @@
+#   Copyright 2022 NEC Corporation
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+
+get:
+  tags:
+  - UsersService
+  summary: Get a user
+  x-openapi-router-controller: controllers.users_service_controller
+  operationId: user_get
+  parameters:
+  - name: organization_id
+    in: path
+    required: true
+    schema:
+      type: string
+  - name: user_id
+    in: path
+    required: true
+    schema:
+      type: string
+      format: uuid
+  responses:
+    200:
+      description: A successful response.
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '../schemas/responseOk.yaml'
+              - type: object
+                properties:
+                  data:
+                    $ref: '../schemas/user.yaml'
+    default:
+      description: An unexpected error response.
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'
+put:
+  tags:
+  - UsersService
+  summary: Update a user
+  x-openapi-router-controller: controllers.users_service_controller
+  operationId: user_update
+  parameters:
+  - name: organization_id
+    in: path
+    required: true
+    schema:
+      type: string
+  - name: user_id
+    in: path
+    required: true
+    schema:
+      type: string
+      format: uuid
+  requestBody:
+    content:
+      application/json:
+        schema:
+          $ref: '../schemas/userUpdate.yaml'
+    required: true
+  responses:
+    200:
+      description: A successful response.
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '../schemas/responseOk.yaml'
+              - type: object
+                properties:
+                  data:
+                    type: object
+                    example: null
+    default:
+      description: An unexpected error response.
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'
+delete:
+  tags:
+  - UsersService
+  summary: Delete a user
+  x-openapi-router-controller: controllers.users_service_controller
+  operationId: user_delete
+  parameters:
+  - name: organization_id
+    in: path
+    required: true
+    schema:
+      type: string
+  - name: user_id
+    in: path
+    required: true
+    schema:
+      type: string
+      format: uuid
+  responses:
+    200:
+      description: A successful response.
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '../schemas/responseOk.yaml'
+              - type: object
+                properties:
+                  data:
+                    type: object
+                    example: null
+    default:
+      description: An unexpected error response.
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'

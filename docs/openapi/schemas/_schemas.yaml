@@ -66,6 +66,8 @@ userList:
   $ref: "./userList.yaml"
 userCreate:
   $ref: "./userCreate.yaml"
+userUpdate:
+  $ref: "./userUpdate.yaml"
 userCredentials:
   $ref: "./userCredentials.yaml"
 userRequiredActions:
@@ -78,6 +80,8 @@ workspace:
   $ref: "./workspace.yaml"
 workspaceList:
   $ref: "./workspaceList.yaml"
+workspaceUpdate:
+  $ref: "./workspaceUpdate.yaml"
 userWorkspace:
   $ref: "./userWorkspace.yaml"
 userWorkspaceList:

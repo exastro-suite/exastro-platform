@@ -19,7 +19,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta name="format-detection" content="telephone=no,email=no,address=no">
         <meta name="theme-color" content="#002B62">
-        <title>
+        <title text-id="000-84002">
             ロール一覧 / ロール管理 / Exastro Platform
         </title>
         <link rel="stylesheet" href="/_/platform-commons/css/platform.css?ver=__BUILD_VERSION__">
@@ -35,7 +35,6 @@
 
         <script src="/_/platform-commons/common/js/words.js?ver=__BUILD_VERSION__"></script>
         <script src="/_/platform-commons/common/js/common.js?ver=__BUILD_VERSION__"></script>
-        <script src="/_/platform-commons/common/js/table.js?ver=__BUILD_VERSION__"></script>
         <script src="/_/platform-commons/common/js/dialog.js?ver=__BUILD_VERSION__"></script>
         <script src="/_/platform-commons/common/js/ui.js?ver=__BUILD_VERSION__"></script>
 
@@ -75,15 +74,15 @@
                 <main id="main" style="visibility:hidden;">
                     <div id="content">
                         <div class="contentHeader">
-                            <h1 class="contentTitle"><span class="contentTitleInner">ロール一覧</span></h1>
-                            <p class="contentMenuInfo">ロールをメンテナンス(閲覧/登録/更新/削除)できます。</p>
+                            <h1 class="contentTitle"><span class="contentTitleInner" text-id="000-84001">ロール一覧</span></h1>
+                            <p class="contentMenuInfo" text-id="000-84003">ロールをメンテナンス(閲覧/登録/更新/削除)できます。</p>
                         </div>
                         <div class="contentBody">
                             <div class="contentMenu">
                                 <ul class="contentMenuList">
                                     <li class="contentMenuItem">
                                         <a class="contentMenuLink tabOpen" href="#dataList" tabindex="-1">
-                                            <span class="inner">一覧</span>
+                                            <span class="inner" text-id="000-80008">一覧</span>
                                         </a>
                                     </li>
                                 </ul>
@@ -95,7 +94,7 @@
                                             <ul class="tableHeaderMainMenuList">
                                                 <li class="tableHeaderMainMenuItem">
                                                     <button data-type="tableNew" data-action="positive" style="width:200px; display: none;" class="itaButton tableHeaderMainMenuButton button" id="new_role">
-                                                        <span class="inner"><span class="icon icon-edit"></span>作成</span></button>
+                                                        <span class="inner"><span class="icon icon-edit"></span><span text-id="000-80009">作成</span></span></button>
                                                 </li>
                                             </ul>
                                         </div>
@@ -103,31 +102,40 @@
                                             <table class="table" width="100%" id="roles_list">
                                                 <thead class="thead">
                                                     <tr class="tHeadTr tr">
-                                                        <th data-id="c1" data-rest="name" class="tHeadLeftSticky tHeadTh popup th" rowspan="1" colspan="1" }="" title="ロール名" width="300px;"><div class="ci">ロール名</div></th>
-                                                        <th data-id="c2" data-rest="kind" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="種類" width="300px;"><div class="ci">種類</div></th>
-                                                        <th data-id="c3" data-rest="description" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="説明" width="40%"><div class="ci">説明</div></th>
-                                                        <th data-id="c4" data-rest="auth" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="権限 / ワークスペース" width="35%"><div class="ci">権限 / ワークスペース</div></th>
-                                                        <th data-id="c5" data-rest="member" class="tHeadTh popup th" rowspan="1" colspan="1" }="" width="80px"><div class="ci"></div></th>
+                                                        <th data-id="c1" data-rest="name" class="tHeadLeftSticky tHeadTh popup th" rowspan="1" colspan="1" }="" title="ロール名" attr-text-id="title=000-00107" width="300px;"><div class="ci" text-id="000-00107">ロール名</div></th>
+                                                        <th data-id="c2" data-rest="kind" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="種類" attr-text-id="title=000-00108" width="300px;"><div class="ci" text-id="000-00108">種類</div></th>
+                                                        <th data-id="c3" data-rest="description" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="説明" attr-text-id="title=000-00106" width="40%"><div class="ci" text-id="000-00106">説明</div></th>
+                                                        <th data-id="c4" data-rest="auth" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="権限 / ワークスペース" attr-text-id="title=000-84004" width="35%"><div class="ci" text-id="000-84004">権限 / ワークスペース</div></th>
+                                                        <th data-id="c5" data-rest="edit" class="tHeadTh popup th" rowspan="1" colspan="1" }="" width="80px"><div class="ci"></div></th>
                                                         <th data-id="c6" data-rest="member" class="tHeadTh popup th" rowspan="1" colspan="1" }="" width="100px"><div class="ci"></div></th>
+                                                        <th data-id="c7" data-rest="delete" class="tHeadTh popup th" rowspan="1" colspan="1" }="" width="100px"><div class="ci"></div></th>
                                                     </tr>
                                                 </thead>
                                                 <tbody class="tbody">
-                                                    <tr class="tBodyTr tr datarow" style="display:none">
+                                                    <tr class="tBodyTr tr datarow-template" style="display:none">
                                                         <th class="tBodyLeftSticky tBodyTh th to_detail" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: left;">${role_name}</div></td>
                                                         <td class="tBodyTd td to_detail" rowspan="1" colspan="1" }="" ><div class="ci">${role_kind}</div></td>
-                                                        <td class="tBodyTd td to_detail" rowspan="1" colspan="1" }="" ><div class="ci" style="white-space: pre; overflow: auto; text-overflow: unset;">${role_description}</div></td>
+                                                        <td class="tBodyTd td to_detail" rowspan="1" colspan="1" }="" ><div class="ci pre_ht100">${role_description}</div></td>
                                                         <td class="tBodyTd td to_detail" rowspan="1" colspan="1" }="">${role_authority}</td>
                                                         <td class="tBodyTd td to_detail" rowspan="1" colspan="1" }=""><div class="ci">
                                                             <button class="pl_button btn_edit" data-id="${role_name}" disabled>
-                                                                <span class="inner"><span class="icon icon-edit"></span>編集</span></button>
+                                                                <span class="inner"><span class="icon icon-edit"></span><span text-id="000-80026">編集</span></span></button>
                                                         </div></td>
                                                         <td class="tBodyTd td to_detail" rowspan="1" colspan="1" }=""><div class="ci">
                                                             <button class="pl_button btn_member" data-id="${role_name}" disabled>
-                                                                <span class="inner"></span><span class="icon icon-user"></span>ユーザー</span></button>
+                                                                <span class="inner"></span><span class="icon icon-user"></span><span text-id="000-00135">ユーザー</span></span></button>
+                                                        </div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: center;">
+                                                            <button title="削除" attr-text-id="title=000-80010" data-action="danger" class="itaButton button button_delete" data-id="${role_name}" style="width:100px;">
+                                                                <span class="inner">
+                                                                    <span class="iconButtonIcon icon icon-trash"></span>
+                                                                    <span class="iconButtonBody" text-id="000-80010">削除</span>
+                                                                </span>
+                                                            </button>
                                                         </div></td>
                                                     </tr>
                                                     <tr class="tBodyTr tr notfound" style="display:none">
-                                                        <td class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="6" }="" height="50px"><div class="ci" style="text-align: center;">
+                                                        <td class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="7" }="" height="50px"><div class="ci" style="text-align: center;" text-id="000-84005">
                                                             使用可能なロールが存在しません
                                                         </div></td>
                                                     </tr>

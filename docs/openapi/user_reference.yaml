@@ -17,7 +17,7 @@ openapi: 3.0.3
 info:
   title: Exastro Platform API
   description: Exastro Platform API
-  version: 1.3.0
+  version: 1.5.0
 
 servers:
   - url: "https://{host}"
@@ -85,6 +85,8 @@ paths:
 
   "/api/{organization_id}/platform/users":
       $ref: './paths/users.yaml'
+  "/api/{organization_id}/platform/users/{user_id}":
+      $ref: './paths/users.user_id.yaml'
 
   "/api/{organization_id}/platform/roles":
       $ref: './paths/roles.yaml'

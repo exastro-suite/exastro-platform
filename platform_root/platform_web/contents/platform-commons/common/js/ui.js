@@ -63,88 +63,6 @@ setUi() {
     ui.header();
 
     return;
-
-    // // REST API URLs
-    // const restApiUrls = [
-    //     '/user/',
-    //     '/user/menus/',
-    //     '/user/menus/panels/'
-    // ];
-    // // /api/{organization_id}/workspaces/{workspace_id}/ita/menu/{menu}/info/
-
-    // if ( ui.params.menuNameRest && ui.params.menuNameRest !== ui.debugModeName ) {
-    //     restApiUrls.push(`/menu/${ui.params.menuNameRest}/info/`);
-    // }
-
-    // fn.fetch( restApiUrls ).then(function( result ){
-    //     if ( result ) {
-    //         ui.rest = {};
-    //         ui.rest.user = result[0],
-    //         ui.rest.menuGroups = result[1].menu_groups,
-    //         ui.rest.panel = result[2];
-
-    //         ui.sideMenu();
-    //         ui.header();
-
-    //         if ( result[3] ) {
-    //             ui.rest.info = result[3];
-
-    //             // 権限フラグ
-    //             ui.flag = fn.editFlag( ui.rest.info.menu_info );
-
-    //             // sheet_typeによって分ける
-    //             switch ( ui.rest.info.menu_info.sheet_type ) {
-    //                 case undefined:
-    //                 break;
-    //                 // 0 - 4 : 標準メニュー
-    //                 case '0': case '1': case '2': case '3': case '4':
-    //                     ui.defaultMenu();
-    //                 break;
-    //                 // 11 : 作業実行
-    //                 case '11':
-    //                 break;
-    //                 // 12 : 作業状態確認
-    //                 case '12':
-    //                 break;
-    //                 // 13 : メニュー定義・作成
-    //                 case '13':
-    //                     ui.createMenu();
-    //                 break;
-    //                 // 14 : Conductorクラス編集
-    //                 case '14':
-    //                     ui.condcutor('edit');
-    //                 break;
-    //                 // 15 : Conductor作業実行
-    //                 case '15':
-    //                     ui.condcutor('');
-    //                 break;
-    //                 // 16 : Conductor作業確認
-    //                 case '16':
-    //                     ui.condcutor('');
-    //                 break;
-    //                 // 17 : 比較実行
-    //                 // 18 : バージョン確認
-    //                 // 19 : メニュー作成実行
-    //                 default:
-    //                 // メインメニュー
-    //                 ui.mainMenu();
-    //             }
-    //         } else {
-    //             if ( ui.params.menuNameRest === ui.debugModeName ) {
-    //                 // デバッグ用メニュー
-    //                 ui.debugMenu();
-    //             } else {
-    //                 // メインメニュー
-    //                 ui.mainMenu();
-    //             }
-    //         }
-    //     }
-    // }).catch(function( e ){
-    //     console.log('Error!')
-    //     alert(e.message);
-    //     window.console.error( e.message );
-    //     location.replace(ui.params.path + 'system_error/');
-    // });
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -230,12 +148,6 @@ headerMenu() {
         }
     });
 
-    // ワークスペース切替
-    // ui.$.header.find('.userInfoWorkspaceButton').on('click', function(){
-    //     const workspaceId =  $( this ).attr('data-workspace');
-    //     window.location.href = fn.getWorkspaceChangeUrl( workspaceId );
-    // });
-
     // アカウント管理
     ui.$.header.find('.userInfoMenuButton[data-type=account]').on('click', function(){
         window.location.href = location_conf.href.account.main_page.replace(/{organization_id}/g, CommonAuth.getRealm());
@@ -253,24 +165,11 @@ headerMenu() {
 ##################################################
 */
 userInfo() {
-    // const ui = this,
-    //       $user = $('#header').find('.userIndo'),
-    //       name = fn.cv( ui.rest.user.user_name, '', true ),
-    //       id = fn.cv( ui.rest.user.user_id, '', true ),
-    //       roles = fn.cv( ui.rest.user.roles, []),
-    //       workspaces = fn.cv( ui.rest.user.workspaces, []);
     const   ui = this,
             $user = $('#header').find('.userIndo'),
             name = fn.cv(CommonAuth.getUserName(), '', true),
             id = fn.cv(CommonAuth.getUserId(), '', true),
             roles = CommonAuth.getRoles();
-
-    // const workspaceList = [];
-    // for ( const work of workspaces ) {
-    //     workspaceList.push(`<li class="userinfoWorkspaceItem">`
-    //         + `<button class="userInfoWorkspaceButton" data-workspace="${work}">${work}</button>`
-    //     + `</li>`);
-    // }
 
     const roleList = [];
     if( roles.length === 0 ) {
@@ -300,7 +199,7 @@ userInfo() {
         <div class="userInfoBlock userInfoRole">
             <div class="userInfoTitle">
                 <span class=" icon icon-role"></span>
-                ロール一覧
+                <span text-id="000-80004">ロール一覧</span>
             </div>
             <div class="userInfoBody">
                 <ul class="userInfoRoleList">
@@ -312,13 +211,13 @@ userInfo() {
             <div class="userInfoBody">
                 <ul class="userInfoMenuList">
                     <li class="userInfoMenuItem">
-                        ${fn.html.button(fn.html.icon('gear') + 'アカウント管理', ['userInfoMenuButton', 'itaButton'], { type: 'account', action: 'default'})}
+                        ${fn.html.button(fn.html.icon('gear') + '<span text-id="000-80003">アカウント管理</span>', ['userInfoMenuButton', 'itaButton'], { type: 'account', action: 'default'})}
                     </li>
                 </ul>
 
                 <ul class="userInfoMenuList">
                     <li class="userInfoMenuItem">
-                        ${fn.html.button(fn.html.icon('logout') + 'ログアウト', ['userInfoMenuButton', 'itaButton'], { type: 'logout', action: 'positive'})}
+                        ${fn.html.button(fn.html.icon('logout') + '<span text-id="000-80002">ログアウト</span>', ['userInfoMenuButton', 'itaButton'], { type: 'logout', action: 'positive'})}
                     </li>
                 </ul>
             </div>
@@ -790,194 +689,6 @@ debugMenu() {
      });
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-//   標準メニュー
-//
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
-defaultMenu() {
-    const ui = this;
-
-    const contentTab = [
-        { name: 'dataList', title: WD.UI.List, type: 'blank' },
-        { name: 'changeHistory', title: WD.UI.ChangeHistory, type: 'blank' },
-        { name: 'dataDownload', title: WD.UI.AllDownload }
-    ];
-
-    const title = ui.currentPage.title,
-          menuInfo = fn.cv( ui.rest.info.menu_info.menu_info, '');
-
-    ui.$.content.html( ui.commonContainer( title, menuInfo, ui.contentTab( contentTab ) ) );
-    ui.contentTabEvent('#dataList');
-
-    // 一覧
-    const $dataList = ui.$.content.find('#dataList');
-    ui.mainTable = new DataTable('MT', 'view', ui.rest.info, ui.params );
-    $dataList.find('.sectionBody').html( ui.mainTable.setup() );
-
-    // 履歴
-    const $history = ui.$.content.find('#changeHistory');
-    ui.historyTable = new DataTable('HT', 'history', ui.rest.info, ui.params );
-    $history.find('.sectionBody').html( ui.historyTable.setup() );
-
-    // 全件ダウンロード・ファイル一括登録
-    const $download = ui.$.content.find('#dataDownload');
-    $download.find('.operationButton').on('click', function(){
-        const $button = $( this ),
-              type = $button.attr('data-type');
-
-        const downloadFile = function( type, url, fileName ){
-            $button.prop('disabled', true );
-
-            fn.fetch( url ).then(function( result ){
-                fn.download( type, result, fileName );
-                fn.disabledTimer( $button, false, 1000 );
-            }).catch(function( error ){
-                alert( error.message );
-                location.replace('system_error/');
-            });
-        };
-
-        switch ( type ) {
-            case 'allDwonloadExcel':
-                downloadFile('excel', `/menu/${ui.params.menuNameRest}/excel/`, ui.currentPage.title + '_all');
-            break;
-            case 'allDwonloadJson':
-                downloadFile('json', `/menu/${ui.params.menuNameRest}/filter/`, ui.currentPage.title + '_all');
-            break;
-            case 'newDwonloadExcel':
-                downloadFile('excel', `/menu/${ui.params.menuNameRest}/excel/format/`, ui.currentPage.title + '_format');
-            break;
-            case 'excelUpload':
-                ui.fileRegister( $button, 'excel');
-            break;
-            case 'jsonUpload':
-                ui.fileRegister( $button, 'json');
-            break;
-            case 'allHistoryDwonloadExcel':
-                downloadFile('excel', `/menu/${ui.params.menuNameRest}/excel/journal/`, ui.currentPage.title + '_journal');
-            break;
-        }
-    });
-
-    // 一覧 個別履歴ボタン
-    ui.mainTable.$.container.on('click', '.tBodyRowMenuUi', function(){
-        const $button = $( this ),
-              uuid = $button.attr('data-id');
-
-        ui.contentTabOpen('#changeHistory');
-        $history.find('.tableHeaderMainMenuInput').val( uuid ).trigger('input');
-
-        ui.historyTable.$.header.find('.itaButton').prop('disabled', false );
-        ui.historyTable.workStart('filter');
-        ui.historyTable.workerPost('history', uuid );
-
-    });
-}
-/*
-##################################################
-   全件ダウンロード・ファイル一括登録
-##################################################
-*/
-dataDownload() {
-    const list = [
-        { title: WD.UI.AllDownloadExcel, description: WD.UI.AllDownloadExcelText, type: 'allDwonloadExcel'},
-        { title: WD.UI.AllDownloadJson, description: WD.UI.AllDownloadJsonText, type: 'allDwonloadJson'}
-    ];
-
-    if ( this.flag.insert ) {
-        list.push({ title: WD.UI.NewDownloadExcel, description: WD.UI.NewDownloadExcelText, type: 'newDwonloadExcel'});
-    }
-
-    list.push({ title: WD.UI.AllDownloadHistoryExcel, description: WD.UI.AllDownloadHistoryExcelText, type: 'allHistoryDwonloadExcel'});
-
-    if ( this.flag.edit ) {
-        list.push({ title: WD.UI.ExcelUpload, description: WD.UI.ExcelUploadText, type: 'excelUpload', action: 'positive'});
-        list.push({ title: WD.UI.JsonUpload, description: WD.UI.JsonUploadText, type: 'jsonUpload', action: 'positive'});
-    }
-
-    const html = [];
-    for ( const item of list ) {
-        const attr = { type: item.type };
-        if ( item.action ) attr.action = item.action;
-        html.push(`<div class="operationBlock">`
-            + `<div class="operationTitle">${fn.html.button( item.title, ['operationButton', 'itaButton'], attr )}</div>`
-            + `<div class="operationDescription">${item.description}</div>`
-        + `</div>`);
-    }
-
-    return html.join('');
-}
-/*
-##################################################
-   ファイル一括登録
-##################################################
-*/
-fileRegister( $button, type ) {
-    const ui = this;
-
-    const fileType = ( type === 'excel')? 'base64': 'json',
-          fileMime = ( type === 'excel')? 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'application/json',
-          restUrl = ( type === 'excel')? `excel/maintenance/`: `maintenance/all/`;
-
-    // ボタンを無効
-    $button.prop('disabled', true );
-
-    // ファイル選択
-    fn.fileSelect( fileType, null, fileMime ).then(function( selectFile ){
-        const postData = ( type === 'excel')? { excel: selectFile.base64 }: selectFile.json;
-
-        // 登録するか確認する
-        const buttons = {
-            ok: { text: '一括登録開始', action: 'positive'},
-            cancel: { text: 'キャンセル', action: 'normal'}
-        };
-
-        const table = { tbody: []};
-        table.tbody.push(['ファイルネーム', selectFile.name ]);
-        table.tbody.push(['ファイルサイズ', selectFile.size.toLocaleString() + ' byte']);
-
-        if ( fileType === 'json') {
-            try {
-                table.tbody.push(['件数', selectFile.json.length.toLocaleString() ]);
-            } catch( e ) {
-                throw new Error('JSONの形式が正しくありません。');
-            }
-        }
-
-        fn.alert('一括登録確認', fn.html.table( table, 'fileSelectTable', 1 ), 'confirm', buttons ).then( function( flag ){
-            if ( flag ) {
-
-                const processing = fn.processingModal('一括登録処理中');
-
-                // POST（登録）
-                fn.fetch(`/menu/${ui.params.menuNameRest}/${restUrl}`, null, 'POST', postData ).then(function( result ){
-                    // 登録成功
-                    fn.resultModal( result ).then(function(){
-                        ui.contentTabOpen('#dataList');
-                        ui.mainTable.changeViewMode();
-                    });
-                }).catch(function( error ){
-                    // 登録失敗
-                    fn.errorModal( error, ui.currentPage.title );
-                }).then(function(){
-                    // ボタンを戻す
-                    fn.disabledTimer( $button, false, 1000 );
-                    processing.close();
-                });
-            } else {
-                // キャンセル
-                fn.disabledTimer( $button, false, 0 );
-            }
-        });
-    }).catch(function( error ){
-        if ( error !== 'cancel') {
-            alert( error );
-        }
-        fn.disabledTimer( $button, false, 0 );
-    });
-}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -999,25 +710,5 @@ createMenu( mode ) {
     });
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-//   Conductor
-//
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
-condcutor( mode ) {
-    const ui = this;
-
-    const assets = [
-        { type: 'js', url: '/_/ita/js/conductor.js'},
-        { type: 'css', url: '/_/ita/css/editor_common.css'},
-        { type: 'css', url: '/_/ita/css/conductor.css'}
-    ];
-
-    fn.loadAssets( assets ).then(function(){
-        const conductor = new Conductor('#content', mode );
-        conductor.setup();
-    });
-}
 
 }

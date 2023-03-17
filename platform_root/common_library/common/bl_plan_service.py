@@ -214,6 +214,20 @@ def organization_plan_create(user_id, organization_id, plan_id, plan_start_datet
                 raise common.InternalErrorException(message_id=message_id, message=message)
 
 
+def organization_plan_delete(organization_id):
+    """Delete organization plan
+
+    Args:
+        organization_id (str): organization id
+    """
+    with closing(DBconnector().connect_platformdb()) as conn:
+        with conn.cursor() as cursor:
+            cursor.execute(queries_bl_plan.SQL_DELETE_ORGANIZATION_PLAN, {"organization_id": organization_id})
+
+        conn.commit()
+    return
+
+
 def plan_item_create(conn, user_id, plan_item):
     """create plan item
 

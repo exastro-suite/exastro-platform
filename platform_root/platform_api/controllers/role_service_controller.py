@@ -167,6 +167,106 @@ def role_create(body, organization_id):
 
 
 @common.platform_exception_handler
+def role_delete(organization_id, role_name):  # noqa: E501
+    """Delete a role
+
+    Args:
+        organization_id (str): organization id
+        role_name (str): role name
+
+    Returns:
+        response: HTTP Response
+    """
+    globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
+
+    # validation check
+    validate = validation.validate_role_name(role_name)
+    if not validate.ok:
+        return common.response_validation_error(validate)
+
+    db = DBconnector()
+    private = db.get_organization_private(organization_id)
+
+    # サービスアカウントのTOKEN取得
+    # Get a service account token
+    token_response = api_keycloak_tokens.service_account_get_token(
+        organization_id, private.internal_api_client_clientid, private.internal_api_client_secret,
+    )
+    if token_response.status_code != 200:
+        raise common.AuthException(
+            "client_user_get_token error status:{}, response:{}".format(token_response.status_code, token_response.text)
+        )
+
+    token = json.loads(token_response.text)["access_token"]
+
+    r_cust_role = api_keycloak_roles.clients_role_get(
+        realm_name=organization_id, client_id=private.user_token_client_id, role_name=role_name, token=token,
+    )
+
+    if r_cust_role.status_code == 404:
+        globals.logger.debug(f"response:{r_cust_role.text}")
+        message_id = f"404-{MSG_FUNCTION_ID}001"
+        message = multi_lang.get_text(
+            message_id,
+            "ロールが存在しません(対象ID:{0})",
+            role_name,
+        )
+        raise common.NotFoundException(message_id=message_id, message=message)
+
+    elif r_cust_role.status_code != 200:
+        globals.logger.debug(f"response:{r_cust_role.text}")
+        message_id = f"500-{MSG_FUNCTION_ID}001"
+        raise common.InternalErrorException(
+            None, message_id, multi_lang.get_text(message_id, "ワークスペースロールの取得に失敗しました(対象ID:{0})", role_name)
+        )
+
+    # Get composite role before change
+    # 変更前のcomposite roleを取得する
+    r_comp_role = api_keycloak_roles.clients_role_composites_get(
+        realm_name=organization_id, client_uid=private.user_token_client_id, role_name=role_name, token=token
+    )
+    if r_comp_role.status_code == 200:
+        comp_roles = json.loads(r_comp_role.text)
+    elif r_comp_role.status_code == 404:
+        comp_roles = []
+    else:
+        globals.logger.error(f"response.status_code:{r_comp_role.status_code}")
+        globals.logger.error(f"response.text:{r_comp_role.text}")
+        message_id = f"500-{MSG_FUNCTION_ID}006"
+        message = multi_lang.get_text(
+            message_id,
+            "composite roleの取得に失敗しました(対象ID:{0} client:{1})",
+            organization_id,
+            private.token_check_client_clientid
+        )
+        raise common.InternalErrorException(message_id=message_id, message=message)
+
+    # Check if the information before change can be updated
+    # 変更前の情報が更新できるかチェックする
+    workspace_ids = [w.get("name") for w in comp_roles]
+    cauth = check_authority.CheckAuthority(organization_id, connexion.request.headers)
+    is_auth = cauth.is_workspaces_authority(workspace_ids, is_maintenance=True)
+    if not is_auth and len(comp_roles) > 0:
+        raise common.BadRequestException(
+            message_id=f"400-{MSG_FUNCTION_ID}003", message='指定されたロールを削除する権限がありません。'
+        )
+
+    # Delete a Role
+    # ロールを削除する
+    r_delete_role = api_keycloak_roles.clients_role_delete(
+        realm_name=organization_id, client_uid=private.user_token_client_id, role_name=role_name, token=token,
+    )
+    if r_delete_role.status_code not in [200, 204, 404]:
+        globals.logger.debug(f"response:{r_cust_role.text}")
+        message_id = f"500-{MSG_FUNCTION_ID}008"
+        raise common.InternalErrorException(
+            None, message_id, multi_lang.get_text(message_id, "ロールの削除に失敗しました(対象ロール:{0})", role_name)
+        )
+
+    return common.response_200_ok(data=None)
+
+
+@common.platform_exception_handler
 def role_list(organization_id, kind=None):
     """List returns list of roles
 

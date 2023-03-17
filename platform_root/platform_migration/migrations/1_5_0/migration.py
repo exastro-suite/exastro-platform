@@ -16,10 +16,20 @@ import migration_common
 from contextlib import closing
 
 import globals
+from . import user_mainte_role_delete
 from .libs import queries_db_migration
 
 
 def main():
+    
+    # オーガナイゼーションユーザーからユーザーメンテロールの解除
+    # Remove user maintenance role from organization user
+    api = user_mainte_role_delete.user_mainte_role_delete()
+    result = api.start()
+
+    # エラーがあっても処理を継続する
+    # continue processing even if there is an error
+
     with closing(migration_common.connect_platform_db()) as conn:
         with conn.cursor() as cursor:
             for query in queries_db_migration.CREATE_TABLES:
@@ -31,6 +41,9 @@ def main():
             #     cursor.execute(query)
 
             conn.commit()
+
+    if result != 0:
+        return result
 
     return 0
 

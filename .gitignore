@@ -11,3 +11,4 @@ __pycache__/
 /*.sql
 /.private/
 exastro-platform.yaml
+.dccache

@@ -107,6 +107,33 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/runtimeError'
+  '/api/platform/organizations/{organization_id}':
+    delete:
+      tags:
+        - OrganizationService
+      summary: Delete an organization
+      x-openapi-router-controller: controllers.organization_service_controller
+      operationId: organization_delete
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
   '/api/{organization_id}/platform/setting':
     get:
       tags:
@@ -735,6 +762,42 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/runtimeError'
+    put:
+      tags:
+        - WorkspaceService
+      summary: Update updates an workspace
+      x-openapi-router-controller: controllers.workspace_service_controller
+      operationId: workspace_update
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: workspace_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/workspaceUpdate'
+        required: true
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responseOk'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
     delete:
       tags:
         - WorkspaceService
@@ -883,6 +946,123 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/runtimeError'
+  '/api/{organization_id}/platform/users/{user_id}':
+    get:
+      tags:
+        - UsersService
+      summary: Get a user
+      x-openapi-router-controller: controllers.users_service_controller
+      operationId: user_get
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/user'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+    put:
+      tags:
+        - UsersService
+      summary: Update a user
+      x-openapi-router-controller: controllers.users_service_controller
+      operationId: user_update
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/userUpdate'
+        required: true
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        example: null
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+    delete:
+      tags:
+        - UsersService
+      summary: Delete a user
+      x-openapi-router-controller: controllers.users_service_controller
+      operationId: user_delete
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        example: null
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
   '/api/{organization_id}/platform/roles':
     get:
       tags:
@@ -970,7 +1150,7 @@ paths:
     put:
       tags:
         - RoleService
-      summary: Update updates an role
+      summary: Update a role
       x-openapi-router-controller: controllers.role_service_controller
       operationId: role_update
       parameters:
@@ -998,6 +1178,42 @@ paths:
                   workspaces:
                     - id: workspace-1
         required: true
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        example: null
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+    delete:
+      tags:
+        - RoleService
+      summary: Delete a role
+      x-openapi-router-controller: controllers.role_service_controller
+      operationId: role_delete
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: role_name
+          in: path
+          required: true
+          schema:
+            type: string
       responses:
         '200':
           description: A successful response.
@@ -1905,8 +2121,9 @@ components:
             limit.id:
               type: number
           example:
-            platform.workspaces: 100
-            platform.roles: 200
+            platform.workspaces: 500
+            platform.roles: 500
+            platform.users: 1000
     planList:
       title: planList is list of Plan resources.
       type: object
@@ -1961,8 +2178,9 @@ components:
             limit.id:
               type: number
           example:
-            platform.workspaces: 100
-            platform.roles: 200
+            platform.workspaces: 500
+            platform.roles: 500
+            platform.users: 1000
     limitsList:
       title: limitValue is a definition of Limit Value resource.
       type: object
@@ -1981,8 +2199,9 @@ components:
                   limit.id:
                     type: number
                 example:
-                  platform.workspaces: 100
-                  platform.roles: 200
+                  platform.workspaces: 500
+                  platform.roles: 500
+                  platform.users: 1000
     usage:
       title: usage is a definition of current value resource.
       type: object
@@ -2077,6 +2296,10 @@ components:
           type: string
         preferred_username:
           type: string
+        affiliation:
+          type: string
+        description:
+          type: string
         enabled:
           type: boolean
         create_timestamp:
@@ -2110,12 +2333,40 @@ components:
           type: string
         lastName:
           type: string
+        affiliation:
+          type: string
+        description:
+          type: string
         enabled:
           type: boolean
           default: true
       required:
         - username
         - password
+    userUpdate:
+      title: userUpate is a definition of User resource.
+      type: object
+      properties:
+        password:
+          type: string
+          example: password
+        password_temporary:
+          type: boolean
+          default: true
+        email:
+          type: string
+          example: user e-mail address
+        firstName:
+          type: string
+        lastName:
+          type: string
+        affiliation:
+          type: string
+        description:
+          type: string
+        enabled:
+          type: boolean
+          default: true
     userCredentials:
       title: userCredentials is Credentials of User resources.
       type: object
@@ -2188,6 +2439,22 @@ components:
             allOf:
               - $ref: '#/components/schemas/workspace'
               - $ref: '#/components/schemas/responseStat'
+    workspaceUpdate:
+      title: workspace is a definition for workspace updates.
+      type: object
+      properties:
+        name:
+          type: string
+          example: name of workspace
+        informations:
+          type: object
+          properties:
+            description:
+              type: string
+            environments:
+              type: array
+              items:
+                $ref: '#/components/schemas/environment'
     userWorkspace:
       title: workspace is a definition of Workspace resource.
       type: object
@@ -2333,6 +2600,10 @@ components:
           type: string
         enabled:
           type: boolean
+        affiliation:
+          type: string
+        description:
+          type: string
         create_timestamp:
           type: string
           format: date-time

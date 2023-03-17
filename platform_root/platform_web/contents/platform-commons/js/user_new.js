@@ -29,8 +29,8 @@ $(function(){
             displayMenu('menu_account_management');
             // Display Topic Path
             displayTopicPath([
-                {"text": "ユーザー一覧", "href": location_conf.href.users.list.replace(/{organization_id}/g, CommonAuth.getRealm()) },
-                {"text": "新規ユーザー", "href": location_conf.href.users.new.replace(/{organization_id}/g, CommonAuth.getRealm()) },
+                {"text": getText("000-83001", "ユーザー一覧"), "href": location_conf.href.users.list.replace(/{organization_id}/g, CommonAuth.getRealm()) },
+                {"text": getText("000-83008", "新規ユーザー"), "href": location_conf.href.users.new.replace(/{organization_id}/g, CommonAuth.getRealm()) },
             ]);
             display_main();
             finish_onload_progress();
@@ -72,19 +72,19 @@ $(function(){
         //
         if($("#form_user_username").val() === "") {
             $("#message_user_username").text(
-                getText("400-00011", "必須項目が不足しています。({0})", getText("000-00XXX", "ユーザー名")));
+                getText("400-00011", "必須項目が不足しています。({0})", getText("000-00128", "ユーザー名")));
             result = false;
 
         } else if($("#form_user_username").val().replace(/[a-zA-Z0-9_-]/g,"") !== "") {
             $("#message_user_username").text(
                 getText("400-00017", "指定できない文字が含まれています。(項目:{0},指定可能な文字:{1})",
-                    getText("000-00XXX", "ユーザー名"),
-                    getText("000-00XXX", "半角英数・ハイフン・アンダースコア")));
+                    getText("000-00128", "ユーザー名"),
+                    getText("000-80033", "半角英数・ハイフン・アンダースコア")));
             result = false;
 
         } else if( ! $("#form_user_username").val().match(/^[a-zA-Z]/)) {
             $("#message_user_username").text(
-                getText("400-00014", "先頭の文字にアルファベット以外が指定されています。({0})", getText("000-00XXX", "ユーザー名")));
+                getText("400-00014", "先頭の文字にアルファベット以外が指定されています。({0})", getText("000-00128", "ユーザー名")));
             result = false;
         } else {
             $("#message_user_username").text("");
@@ -93,13 +93,15 @@ $(function(){
         //
         // validate user password
         //
-        if($("#form_user_password").val() === "") {
-            $("#message_user_password").text(getText("400-00011", "必須項目が不足しています。({0})", getText("000-00XXX", "パスワード")));
+        if($("#form_user_password").val() === "" || $("#form_user_password_confirm").val() === "") {
+            $("#message_user_password").text(getText("400-00011", "必須項目が不足しています。({0})", getText("000-00132", "パスワード")));
+            result = false;
+        } else if($("#form_user_password").val() != $("#form_user_password_confirm").val()) {
+            $("#message_user_password").text(getText("000-83027", "パスワードの確認入力が正しくありません"));
             result = false;
         } else {
             $("#message_user_password").text("");
         }
-
 
         console.log("--- validate check end [" + result + "] ----");
 
@@ -114,13 +116,16 @@ $(function(){
         let reqbody =   {
             "username": $('#form_user_username').val(),
             "password": $('#form_user_password').val(),
-            "password_temporary": ($('#form_user_password_temporary').checked) ? true : false,
+            "password_temporary": ($('#form_user_password_temporary').prop('checked') ? true : false),
             "email": $('#form_user_email').val(),
             "firstName": $('#form_user_first_name').val(),
             "lastName": $('#form_user_last_name').val(),
-            "enabled": ($('#form_user_enabled').checked) ? true : false,
+            "affiliation": $('#form_affiliation').val(),
+            "description": $('#form_description').val(),
+            "enabled": ($('#form_user_enabled').prop('checked') ? true : false),
         }
 
+        show_progress();
         call_api_promise(
             {
                 type: "POST",
@@ -133,9 +138,13 @@ $(function(){
                 dataType: "json",
             }
         ).then(() => {
-            alert("ユーザーを作成しました");
-            window.location = location_conf.href.users.list.replace(/{organization_id}/g, CommonAuth.getRealm());
+            hide_progress();
+            alertMessage(getText("000-80018", "処理結果"), getText("000-83016", "ユーザーを作成しました"),
+            () => {
+                window.location = location_conf.href.users.list.replace(/{organization_id}/g, CommonAuth.getRealm());
+            });
         }).catch(() => {
+            hide_progress();
             $('#button_register').prop('disabled',false);
         })
     }

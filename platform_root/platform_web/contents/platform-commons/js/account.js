@@ -33,7 +33,7 @@ $(function(){
             displayMenu(null);
             // Display Topic Path
             displayTopicPath([
-                {"text": "アカウント管理", "href": location_conf.href.account.main_page.replace(/{organization_id}/g, CommonAuth.getRealm()) },
+                {"text": getText("000-81006", "アカウント管理"), "href": location_conf.href.account.main_page.replace(/{organization_id}/g, CommonAuth.getRealm()) },
             ]);
             $("#ifra_account_edit").prop("src",location_conf.href.account.account_edit.replace(/{organization_id}/g, CommonAuth.getRealm()));
             $("#ifra_password_change").prop("src",location_conf.href.account.update_password.replace(/{organization_id}/g, CommonAuth.getRealm()));
@@ -83,10 +83,12 @@ $(function(){
         // データが無いときはnot foundを表示
         if( list == null || list.length == 0 ) {
             $("#token_list .notfound").css("display","");
+            $("#button_delete_modal_open").prop("disabled", true);
             return;
         }
 
         $("#token_list .notfound").css("display","none");
+        $("#button_delete_modal_open").prop("disabled", false);
 
         const row_template = $('#token_list .datarow-template').clone(true).removeClass('datarow-template').addClass('datarow').prop('outerHTML');
 
@@ -110,12 +112,12 @@ $(function(){
             position: 'center',
             width: 'auto',
             header: {
-                title: "refresh token発行",
+                title: getText("000-81018", "refresh token発行"),
             },
             footer: {
                 button: {
-                    append: { text: '<span class="iconButtonIcon icon icon-plus"></span>発行', action: 'positive', style: 'width:200px;'},
-                    close: { text: "閉じる", action: "normal", style: 'width:200px;' }
+                    append: { text: '<span class="iconButtonIcon icon icon-plus"></span>'+getText("000-80034", "発行"), action: 'positive', style: 'width:200px;'},
+                    close: { text: getText("000-80011", "閉じる"), action: "normal", style: 'width:200px;' }
                 }
             },
         },
@@ -180,7 +182,7 @@ $(function(){
                 // APIのエラー応答
                 switch(error.jqXHR.status) {
                     case 401:
-                        alertMessage("処理結果","入力に誤りがあるため、refresh tokenの発行に失敗しました。", () => {
+                        alertMessage(getText("000-80018", "処理結果"),getText("000-81019", "入力に誤りがあるため、refresh tokenの発行に失敗しました。"), () => {
                             $(dialog.$.dbody).find("#form_password").val("");
                             $(dialog.$.dbody).find("#form_onetime_password").val("");
                         });
@@ -192,7 +194,7 @@ $(function(){
             } else {
                 const detail = "";
                 try { detail += "" + error.toString() } catch {}
-                alert("エラーが発生しました。\n" + detail);
+                alert(getText("000-81020", "エラーが発生しました。") + detail);
             }
         });
     }
@@ -213,12 +215,12 @@ $(function(){
                 position: 'center',
                 width: 'auto',
                 header: {
-                    title: "refresh token発行",
+                    title: getText("000-81018", "refresh token発行"),
                 },
                 footer: {
                     button: {
-                        copy: { text: '<span class="iconButtonIcon icon icon-copy"></span>クリップボードにコピー', action: 'positive', style: 'width:250px;'},
-                        close: { text: "閉じる", action: "normal", style: 'width:200px;' }
+                        copy: { text: '<span class="iconButtonIcon icon icon-copy"></span>'+getText("000-80035", "クリップボードにコピー"), action: 'positive', style: 'width:250px;'},
+                        close: { text: getText("000-80011", "閉じる"), action: "normal", style: 'width:200px;' }
                     }
                 },
             },
@@ -226,10 +228,10 @@ $(function(){
                 copy: function() {
                     if ( navigator.clipboard ) {
                         navigator.clipboard.writeText(data.refresh_token).then( function(){
-                            $(dialog.$.dbody).find(".copy_message").text("クリップボードにコピーしました。");
+                            $(dialog.$.dbody).find(".copy_message").text(getText("000-81021", "クリップボードにコピーしました。"));
                         });
                     } else {
-                        alert("お使いのブラウザでは、クリップボードにコピーできません。");
+                        alert(getText("000-81022", "お使いのブラウザでは、クリップボードにコピーできません。"));
                     }
                 },
                 close: function() {
@@ -241,40 +243,38 @@ $(function(){
         } else {
             // When a normal response is returned but there is no refresh_token in data
             // 正常応答が返ってきているが、dataにrefresh_tokenが無いとき
-            alert(`refresh tokenの取得に失敗しました。\n\nstatus=${jqXHR.status}`)
+            alert(getText("000-81026", "refresh tokenの取得に失敗しました。")+`\n\nstatus=${jqXHR.status}`)
         }
     }
 
     // Delete refresh token
     // refresh tokenの削除
     function delete_modal_open() {
-        message = "あなたが発行した以下の全てのrefresh tokenを削除(無効化)します。<br>"
-        + '<textarea cols="40" rows="10" readonly>'
-        + $("#token_list .datarow").map((i,elm) => {return fn.cv($(elm).attr("data-id"),"", true)}).get().join('\n')
-        + '</textarea>'
-        + '<br><br>よろしいですか？<br>'
-
-        doubleConfirmMessage("実行確認",
-        message, "yes",
-        () => {
-            // APIを呼出す
-            show_progress();
-            call_api_promise({
-                type: "DELETE",
-                url: api_conf.api.token.delete.replace(/{organization_id}/g, CommonAuth.getRealm()),
-                headers: {
-                    Authorization: "Bearer " + CommonAuth.getToken(),
-                },
-            }).then(() => {
-                // 一覧の再取得
-                return call_api_promise_getTokenList();
-            }).then((result) => {
-                // 一覧の再描画
-                displayTokenList(result.data);
-                hide_progress();
-                alertMessage("処理結果","あなたが発行した全てのrefresh tokenを削除(無効化)しました。");
+        deleteConfirmMessage(
+            getText("000-80017", "実行確認"),
+            getText("000-81023", "あなたが発行した以下の全てのrefresh tokenを削除(無効化)してよろしいですか？"),
+            $("#token_list .datarow").map((i,elm) => {return fn.cv($(elm).attr("data-id"),"", true)}).get(),
+            getText("000-81024", "削除したrefresh tokenを使ってAPIの呼出しを行っている場合、APIの呼び出しができなくなります。"),
+            "yes",
+            () => {
+                // APIを呼出す
+                show_progress();
+                call_api_promise({
+                    type: "DELETE",
+                    url: api_conf.api.token.delete.replace(/{organization_id}/g, CommonAuth.getRealm()),
+                    headers: {
+                        Authorization: "Bearer " + CommonAuth.getToken(),
+                    },
+                }).then(() => {
+                    // 一覧の再取得
+                    return call_api_promise_getTokenList();
+                }).then((result) => {
+                    // 一覧の再描画
+                    displayTokenList(result.data);
+                    hide_progress();
+                    alertMessage(getText("000-80018", "処理結果"),getText("000-81025", "あなたが発行した全てのrefresh tokenを削除(無効化)しました。"));
+                });
             });
-        });
     }
 });
 
