@@ -134,6 +134,22 @@ services:
     profiles:
       - exastro-it-automation-backyard
       - ita-by-excel-export-import
+  ita-by-execinstance-dataautoclean:
+    build:
+      context: ${ITA_REPO_ROOT}
+    environment:
+      - EXECUTE_INTERVAL=${ITA_BY_INTERVAL}
+    profiles:
+      - exastro-it-automation-backyard
+      - ita-by-excel-export-import
+  ita-by-file-autoclean:
+    build:
+      context: ${ITA_REPO_ROOT}
+    environment:
+      - EXECUTE_INTERVAL=${ITA_BY_INTERVAL}
+    profiles:
+      - exastro-it-automation-backyard
+      - ita-by-excel-export-import
   ita-by-hostgroup-split:
     build:
       context: ${ITA_REPO_ROOT}
