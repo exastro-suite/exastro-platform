@@ -524,6 +524,13 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/planMappingOrganization'
+        enabled:
+          type: boolean
+          description: organization enabled(true) or disabled(false)
+          example: true
+        status:
+          type: string
+          example: Organization Create Complete
     organizationCreate:
       title: organization is a definition of Organization resource.
       type: object
