@@ -2082,7 +2082,7 @@ components:
         enabled:
           type: boolean
     organizationList:
-      title: roleList is list of Role resources.
+      title: A list of organizational resources.
       type: object
       properties:
         data:
