@@ -13,10 +13,18 @@
 #   limitations under the License.
 */
 const CommonAuthConfig = {
-    /**
-     * Login client name pattern
-     */
-    "LOGIN_CLIENT": "%{RELMNAME}",
+    "PLATFORM_ADMIN_SITE": {
+        "ROOT_PATH_NAME": "platform",
+        "REAMNAME": "master",
+        "LOGIN_CLIENT": "_platform-console",
+        "TOKEN_CLIENT": "_platform-api",
+        "TOPURL": window.location.origin,
+    },
+    "ORGANIZATION_USER_SITE": {
+        "LOGIN_CLIENT": "%{RELMNAME}",
+        "TOKEN_CLIENT": "_{RELMNAME}-api",
+        "TOPURL": window.location.origin + window.location.pathname.split("/").slice(0,2).join("/") + "/platform/",
+    },
 
     /**
      * Interval to check token expiration (sec) / tokenの有効期限切れをチェックする間隔(sec)

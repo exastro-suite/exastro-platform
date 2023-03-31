@@ -306,7 +306,7 @@ $(function(){
                     } else {
                         // 画面を開く権限がなくなってしまった場合は、topへ
                         alert(getText("000-84020", "画面を開く権限が無くなったので、トップページに戻ります"));
-                        window.location = location_conf.href.menu.toppage.replace(/{organization_id}/g, CommonAuth.getRealm());
+                        window.location = location_conf.href.menu.organization_user_site.toppage.replace(/{organization_id}/g, CommonAuth.getRealm());
                     }
                 });
             });

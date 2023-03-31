@@ -223,7 +223,7 @@ const CommonAuth = {
      * @returns {string} realm
      */
     "getRealm": function() {
-        return window.location.pathname.split("/")[1];
+        return (CommonAuth.isPlatformAdminSite()? CommonAuthConfig.PLATFORM_ADMIN_SITE.REAMNAME: window.location.pathname.split("/")[1]);
     },
 
     /**
@@ -370,6 +370,14 @@ const CommonAuth = {
     },
 
     /**
+     * Determine if it is a platform admin site - platform admin siteかを判定します
+     * @returns {boolean} true: platform admin site / false: organization user site
+     */
+    "isPlatformAdminSite": function() {
+        return (window.location.pathname.split("/")[1] == CommonAuthConfig.PLATFORM_ADMIN_SITE.ROOT_PATH_NAME);
+    },
+
+    /**
      * Returns the keycloak.init call parameter - keycloak.init呼び出しパラメーターを返します
      * @returns {json} keycloak.init parameter
      */
@@ -385,7 +393,7 @@ const CommonAuth = {
      * @returns
      */
     "_getLoginClient": function() {
-        return CommonAuthConfig.LOGIN_CLIENT.replace(/%{RELMNAME}/g, CommonAuth.getRealm());
+        return CommonAuth.isPlatformAdminSite()? CommonAuthConfig.PLATFORM_ADMIN_SITE.LOGIN_CLIENT: CommonAuthConfig.ORGANIZATION_USER_SITE.LOGIN_CLIENT.replace(/%{RELMNAME}/g, CommonAuth.getRealm());
     },
 
     /**
@@ -393,7 +401,7 @@ const CommonAuth = {
      * @returns {string} top url
      */
     "_getTopURL": function() {
-        return window.location.origin + window.location.pathname.split("/").slice(0,2).join("/") + "/platform/";
+        return CommonAuth.isPlatformAdminSite()? CommonAuthConfig.PLATFORM_ADMIN_SITE.TOPURL: CommonAuthConfig.ORGANIZATION_USER_SITE.TOPURL;
     },
 }
 

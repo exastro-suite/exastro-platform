@@ -49,9 +49,15 @@ var api_conf = {
             "delete": "/api/{organization_id}/platform/users/{user_id}",
         },
         "token": {
-            "post": "/auth/realms/{organization_id}/protocol/openid-connect/token",
-            "get": "/api/{organization_id}/platform/users/_current/refresh_tokens",
-            "delete": "/api/{organization_id}/platform/users/_current/refresh_tokens"
+            "post": "/auth/realms/{realm_name}/protocol/openid-connect/token",
+            "platform_admin_site": {
+                "get": "/api/platform/users/_current/refresh_tokens",
+                "delete": "/api/platform/users/_current/refresh_tokens"
+            },
+            "organization_user_site": {
+                "get": "/api/{organization_id}/platform/users/_current/refresh_tokens",
+                "delete": "/api/{organization_id}/platform/users/_current/refresh_tokens"
+            },
         }
     }
 }
@@ -78,14 +84,40 @@ var location_conf = {
             "edit": "/{organization_id}/platform/users/{user_id}/edit",
         },
         "menu": {
-            "toppage": "/{organization_id}/platform/workspaces",
-            "account_manaagement": "/auth/admin/{organization_id}/console/#/realms/{organization_id}/users",
+            "platform_admin_site": {
+                "toppage": "/platform/organizations",
+            },
+            "organization_user_site": {
+                "toppage": "/{organization_id}/platform/workspaces",
+            }
         },
         "account": {
-            "main_page": "/{organization_id}/platform/account",
-            "account_edit": "/auth/realms/{organization_id}/account/",
-            "update_password": "/auth/realms/{organization_id}/account/password",
-            "two_factor_auth": "/auth/realms/{organization_id}/account/totp"
+            "platform_admin_site": {
+                "main_page": "/platform/account",
+            },
+            "organization_user_site": {
+                "main_page": "/{organization_id}/platform/account",
+            },
+            "account_edit": "/auth/realms/{realm_name}/account/",
+            "update_password": "/auth/realms/{realm_name}/account/password",
+            "two_factor_auth": "/auth/realms/{realm_name}/account/totp"
+        },
+
+        "organizations": {
+            "new": "/platform/organizations/_new",
+            "list": "/platform/organizations",
+            "detail": "/platform/organizations/{organization_id}",
+            "edit": "/platform/organizations/{organization_id}/edit",
+        },
+        "plans": {
+            "new": "/platform/plans/_new",
+            "list": "/platform/plans",
+        },
+        "system_settings": {
+            "top": "/platform/settings",
+        },
+        "keycloak": {
+            "console": "/auth/admin/master/console",
         }
     }
 }
