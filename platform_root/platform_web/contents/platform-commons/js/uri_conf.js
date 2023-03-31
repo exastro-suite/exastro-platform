@@ -58,6 +58,13 @@ var api_conf = {
                 "get": "/api/{organization_id}/platform/users/_current/refresh_tokens",
                 "delete": "/api/{organization_id}/platform/users/_current/refresh_tokens"
             },
+        },
+        "organizations": {
+            "get": "/api/platform/organizations",
+            "delete": "/api/platform/organizations/{organization_id}"
+        },
+        "plans": {
+            "get": "/api/platform/plans"
         }
     }
 }
