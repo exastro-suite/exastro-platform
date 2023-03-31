@@ -22,9 +22,9 @@ class LanguageList:
     #
     lang_array['000-00101'] = 'Workspace ID'
     lang_array['000-00102'] = 'Workspace name'
-    #
-    #
-    #
+    lang_array['000-00103'] = 'Organization ID'
+    lang_array['000-00104'] = 'Organization name'
+    lang_array['000-00105'] = 'Environment'
     lang_array['000-00106'] = 'Description'
     lang_array['000-00107'] = 'Role name'
     lang_array['000-00108'] = 'Role kind'
@@ -40,30 +40,33 @@ class LanguageList:
     lang_array['000-00118'] = '{0}: User'
     lang_array['000-00119'] = '{0}: Admin'
     lang_array['000-00120'] = 'Unprivileged workspace'
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
+    lang_array['000-00121'] = 'Plan ID'
+    lang_array['000-00122'] = 'Plan name'
+    lang_array['000-00123'] = 'Limit ID'
+    lang_array['000-00124'] = 'Limit value'
+    lang_array['000-00125'] = 'Plan start date'
+    lang_array['000-00126'] = 'Role'
+    lang_array['000-00127'] = 'Workspace'
+    lang_array['000-00128'] = 'Username'
+    lang_array['000-00129'] = 'email'
+    lang_array['000-00130'] = 'First name'
+    lang_array['000-00131'] = 'Last name'
+    lang_array['000-00132'] = 'Password'
+    lang_array['000-00133'] = 'password_temporary'
+    lang_array['000-00134'] = 'enabled'
     lang_array['000-00135'] = 'Users'
-    #
-    #
-    #
-    #
-    #
+    lang_array['000-00136'] = 'System setting name'
+    lang_array['000-00137'] = 'System setting value'
+    lang_array['000-00138'] = 'Description of system settings'
+    lang_array['000-00139'] = 'Plan item description'
+    lang_array['000-00140'] = 'Plan item default value'
     lang_array['000-00141'] = 'Last Modified'
-    #
+    lang_array['000-00142'] = 'Created date'
+    lang_array['000-00143'] = 'Affiliation'
+    lang_array['000-00144'] = 'User ID'
+    lang_array['000-31001'] = 'Single-byte alphanumeric characters, hyphens, and underscores'
     lang_array['000-80001'] = 'Main menu'
-    lang_array['000-80002'] = 'Logout'
+    lang_array['000-80002'] = 'Sign Out'
     lang_array['000-80003'] = 'Account management'
     lang_array['000-80004'] = 'Role List'
     lang_array['000-80005'] = 'Workspace management'
@@ -88,10 +91,47 @@ class LanguageList:
     lang_array['000-80024'] = 'Required'
     lang_array['000-80025'] = 'Register'
     lang_array['000-80026'] = 'Edit'
+    lang_array['000-80027'] = 'Page'
+    lang_array['000-80028'] = 'Filter'
+    lang_array['000-80029'] = 'Error'
+    lang_array['000-80030'] = 'Confirmation'
+    lang_array['000-80031'] = 'Enabled'
+    lang_array['000-80032'] = 'Automatic generate'
+    lang_array['000-80033'] = 'Single-byte alphanumeric characters, hyphens, and underscores'
+    lang_array['000-80034'] = 'Issue'
+    lang_array['000-80035'] = 'Copy to clipboard'
+    lang_array['000-80036'] = 'Filter by prefix match of username, email, first name, last name'
+    lang_array['000-80037'] = 'Organization management'
+    lang_array['000-80038'] = 'Resource plan management'
+    lang_array['000-80039'] = 'System settings'
+    lang_array['000-80040'] = 'keycloak console'
+    lang_array['000-80041'] = 'no rolls'
     lang_array['000-81001'] = 'Edit accouont'
     lang_array['000-81002'] = 'Change password'
-    lang_array['000-81003'] = 'Two-factor authentication'
+    lang_array['000-81003'] = 'Two-factor authentication settings'
     lang_array['000-81004'] = 'Token Issuance'
+    lang_array['000-81005'] = 'Account management / Exastro Platform'
+    lang_array['000-81006'] = 'Account management'
+    lang_array['000-81007'] = 'You can edit your account, change your password, set up two-factor authentication and issue a token for the API.'
+    lang_array['000-81008'] = 'ID'
+    lang_array['000-81009'] = 'Date of issue'
+    lang_array['000-81010'] = 'Expiration date'
+    lang_array['000-81011'] = 'Last access date'
+    lang_array['000-81012'] = 'No valid refresh token exists'
+    lang_array['000-81013'] = 'Please specify your login password.'
+    lang_array['000-81014'] = 'One-time password'
+    lang_array['000-81015'] = 'If you have set up two-factor authentication, specify the one-time password issued by the authenticator.'
+    lang_array['000-81016'] = 'Successfully issued a refresh token. '
+    lang_array['000-81017'] = 'The issued refresh token will not be displayed again after closing this screen, so please keep it in a safe place.'
+    lang_array['000-81018'] = 'Refresh token Issuance'
+    lang_array['000-81019'] = 'Failed to issue a refresh token due to an error in the input.'
+    lang_array['000-81020'] = 'An error has occurred.'
+    lang_array['000-81021'] = 'Copied to clipboard.'
+    lang_array['000-81022'] = 'Your browser cannot copy to the clipboard.'
+    lang_array['000-81023'] = 'Are you sure you want to delete (deactivate) all the following refresh tokens issued by you?'
+    lang_array['000-81024'] = 'If an API call is being made using a deleted refresh token, the API call will no longer be available.'
+    lang_array['000-81025'] = 'All refresh tokens issued by you have been removed (deactivated).'
+    lang_array['000-81026'] = 'Failed to get refresh token.'
     lang_array['000-82001'] = 'Workspace list'
     lang_array['000-82002'] = 'You can maintain (view/register/delete) workspaces.'
     lang_array['000-82003'] = 'Workspace list / Workspace management / Exastro Platform'
@@ -112,6 +152,37 @@ class LanguageList:
     lang_array['000-82018'] = '1 environment Maximum 40 characters / Available characters: full-width / half-width characters / 1 environment with line feed'
     lang_array['000-82019'] = 'Characters that can be used: full-width/half-width characters'
     lang_array['000-82020'] = 'Created a workspace.'
+    lang_array['000-82021'] = 'Edit workspace'
+    lang_array['000-82022'] = 'Edit workspace / Workspace management / Exastro Platform'
+    lang_array['000-82023'] = 'Change workspace.'
+    lang_array['000-82024'] = 'The workspace has been changed.'
+    lang_array['000-83001'] = 'User list'
+    lang_array['000-83002'] = 'User list / User management / Exastro Platform'
+    lang_array['000-83003'] = 'Users can be maintained (view/register/update/delete).'
+    lang_array['000-83004'] = 'User does not exist'
+    lang_array['000-83005'] = 'Are you sure you want to delete the following user?'
+    lang_array['000-83006'] = 'Deleted users will no longer be able to sign in.'
+    lang_array['000-83007'] = 'User deleted.'
+    lang_array['000-83008'] = 'New user'
+    lang_array['000-83009'] = 'New user / User management / Exastro Platform'
+    lang_array['000-83010'] = 'Create a new user.'
+    lang_array['000-83011'] = 'Up to 64 characters / Available characters: single-byte alphanumeric characters, hyphens, underscores'
+    lang_array['000-83012'] = 'Password change request at first login'
+    lang_array['000-83013'] = 'Up to 255 characters / Available characters: E-mail address format'
+    lang_array['000-83014'] = 'Maximum 100 characters / Usable characters: full-width/half-width characters'
+    lang_array['000-83015'] = 'Up to 255 characters / Usable characters: full-width/half-width characters'
+    lang_array['000-83016'] = 'Created a user'
+    lang_array['000-83017'] = 'User edit'
+    lang_array['000-83018'] = 'User edit / User management / Exastro Platform'
+    lang_array['000-83019'] = 'Change the user.'
+    lang_array['000-83020'] = 'Reset the password'
+    lang_array['000-83021'] = 'Changed the user'
+    lang_array['000-83022'] = 'User details'
+    lang_array['000-83023'] = 'User details / User management / Exastro Platform'
+    lang_array['000-83024'] = 'You can check the details of the user.'
+    lang_array['000-83025'] = 'Please enter password'
+    lang_array['000-83026'] = 'Please re-enter password to confirm'
+    lang_array['000-83027'] = 'Incorrect password confirmation'
     lang_array['000-84001'] = 'Role list'
     lang_array['000-84002'] = 'Role list / Role management / Exastro Platform'
     lang_array['000-84003'] = 'Roles can be maintained (view/register/update/delete).'
@@ -120,6 +191,45 @@ class LanguageList:
     lang_array['000-84006'] = 'Are you sure you want to delete the following role?'
     lang_array['000-84007'] = 'User roles associated with the deleted role are also revoked.'
     lang_array['000-84008'] = 'Removed the role.'
+    lang_array['000-84009'] = 'Role Grant, Revoke / Role management / Exastro Platform'
+    lang_array['000-84010'] = 'Role Grant, Revoke'
+    lang_array['000-84011'] = 'You can grant roles to users and revoke roles from users.'
+    lang_array['000-84012'] = 'Role information'
+    lang_array['000-84013'] = 'Grant'
+    lang_array['000-84014'] = 'Revoke'
+    lang_array['000-84015'] = 'User does not exist'
+    lang_array['000-84016'] = 'No user selected to revoke'
+    lang_array['000-84017'] = 'At least one organization administrator is required'
+    lang_array['000-84018'] = 'There will be no workspace administrators, are you sure?'
+    lang_array['000-84019'] = 'Revoked role'
+    lang_array['000-84020'] = 'You no longer have the permissions to open the screen, so return to the top page'
+    lang_array['000-84021'] = 'Role grant'
+    lang_array['000-84022'] = 'No user selected to grant'
+    lang_array['000-84023'] = 'Granted a role'
+    lang_array['000-84024'] = 'New role / Role management / Exastro Platform'
+    lang_array['000-84025'] = 'New role'
+    lang_array['000-84026'] = 'Create a new role.'
+    lang_array['000-84027'] = 'Up to 64 characters / Available characters: single-byte alphanumeric characters, hyphens, underscores'
+    lang_array['000-84028'] = 'workspace Fixed'
+    lang_array['000-84029'] = 'Up to 255 characters / Usable characters: full-width/half-width characters'
+    lang_array['000-84030'] = 'Workspace used'
+    lang_array['000-84031'] = 'No selectable workspace exists'
+    lang_array['000-84032'] = 'Select the workspace you want to make available for this role'
+    lang_array['000-84033'] = 'Created a role'
+    lang_array['000-84034'] = 'Role edit / Role management / Exastro Platform'
+    lang_array['000-84035'] = 'Role edit'
+    lang_array['000-84036'] = 'Edit a role.'
+    lang_array['000-84037'] = 'No role to edit'
+    lang_array['000-84038'] = 'The role have been changed.'
+    lang_array['000-85001'] = 'Organization list'
+    lang_array['000-85002'] = 'Organization list / Organization management / Exastro Platform'
+    lang_array['000-85003'] = 'You can maintain (view/register/change/delete) the organization.'
+    lang_array['000-85004'] = 'Current resource plan'
+    lang_array['000-85005'] = 'Organization does not exist'
+    lang_array['000-85006'] = 'Organization creation status'
+    lang_array['000-85007'] = 'Are you sure you want to delete the following organization?'
+    lang_array['000-85008'] = 'Users of the deleted organization will no longer be able to access it.'
+    lang_array['000-85009'] = 'Removed the organization.'
     lang_array['400-00001'] = 'Request-Header Paramater({}) is Invalid'
     lang_array['400-00002'] = 'Request-Body Paramater({}) is Invalid'
     #
@@ -149,26 +259,31 @@ class LanguageList:
     lang_array['400-23002'] = 'The parameter (retry) must be specified if creation of the specified organization is to be resumed.'
     lang_array['400-24001'] = 'You do not have permission to specify the specified workspace as an operation target.'
     lang_array['400-24002'] = 'You do not have permission to update the specified role.'
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
+    lang_array['400-24003'] = 'You do not have permission to delete the specified role.'
+    lang_array['400-25001'] = 'User creation failed ({0})'
+    lang_array['400-25002'] = 'The specified user already exists and cannot be created.'
+    lang_array['400-25003'] = 'Failed to delete user (target user ID: {0})'
+    lang_array['400-25004'] = 'User update failed ({0})'
+    lang_array['400-25005'] = 'Organization managers cannot be deleted'
+    lang_array['400-25006'] = 'Organization managers cannot disable'
+    lang_array['400-26001'] = 'Failed to get client role (Target ID: {0} client: {1} role: {2})'
+    lang_array['400-26002'] = 'You do not have permission to operate the specified role.'
+    lang_array['400-26003'] = 'You do not have permission to operate the specified role.'
+    lang_array['400-26004'] = 'Failed to get user information (Target: {0})'
+    lang_array['400-26005'] = 'The corresponding user does not exist (target: {0})'
+    lang_array['400-26006'] = 'Failed to get user information (Target: {0})'
+    lang_array['400-26007'] = 'The corresponding user does not exist (target: {0})'
+    lang_array['400-26008'] = '{0} requires at least one person'
+    lang_array['400-27001'] = 'Not a specifiable limit ID. (Target ID: {0})'
+    lang_array['400-27002'] = 'It is outside the range of specifiable limit values. (Target ID: {0})'
+    lang_array['400-27003'] = 'There is a limit ID with no value specified.'
+    lang_array['400-27004'] = 'The specified plan cannot be created because it already exists (Plan:{0})'
+    lang_array['400-27005'] = 'The specified plan limit value already exists and cannot be created (Plan:{0})'
+    lang_array['400-29001'] = 'The specified organization\'s plan start date and time cannot be registered because another plan has already been registered. (Target ID: {0}, Plan: {1}, Plan start time: {2})'
+    lang_array['400-30001'] = 'Failed to get offline session (Target ID: {0} user: {1} client: {2})'
+    lang_array['400-30002'] = 'Failed to get realm information (Target ID: {0}'
+    lang_array['401-00001'] = 'Failed to get token. realm:[{0}] client:[{1}]'
+    lang_array['401-00002'] = 'Certification failed.'
     lang_array['401-00003'] = 'The linking setting of the target menu is invalid. (menu: {})'
     #
     #
@@ -177,33 +292,35 @@ class LanguageList:
     #
     #
     #
-    lang_array['403-00001'] = 'permission error'
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
+    lang_array['403-00001'] = 'Permission error'
+    lang_array['404-00001'] = 'Organization not found id:{0}'
+    lang_array['404-20001'] = 'Setting does not exist (key:{0})'
+    lang_array['404-22001'] = 'Workspace information does not exist'
+    lang_array['404-21001'] = 'User does not exist'
+    lang_array['404-23001'] = 'Plan does not exist (id:{0})'
+    lang_array['404-23002'] = 'Organization does not exist (id:{0})'
+    lang_array['404-24001'] = 'Role does not exist'
+    lang_array['404-25001'] = 'Specified user does not exist'
+    lang_array['404-26001'] = 'Information does not exist (role:{0}, message{1})'
+    lang_array['404-26002'] = 'Role does not exist (role:{0})'
+    lang_array['404-27001'] = 'The organization plan corresponding to the specified plan start date and time does not exist (target ID: {0}, plan start date and time: {1})'
+    lang_array['404-28001'] = 'Plan item does not exist (id:{0})'
+    lang_array['404-29001'] = 'Plan does not exist (id:{0})'
+    lang_array['409-20001'] = 'The specified setting value already exists and cannot be created. (key: {0})'
+    lang_array['409-22001'] = 'The specified workspace cannot be created because it already exists.'
+    lang_array['409-24001'] = 'The specified role already exists and cannot be created.'
+    lang_array['409-25001'] = 'The specified user already exists and cannot be created. [{0}]'
+    lang_array['409-28001'] = 'The specified limit id already exists and cannot be created. (limit_id: {0})'
     lang_array['500-00001'] = 'System Error'
     lang_array['500-00002'] = 'System Error'
     lang_array['500-00003'] = 'System Error'
     lang_array['500-00004'] = 'System Error'
     lang_array['500-00005'] = 'System Error'
     lang_array['500-00006'] = 'System Error'
-    #
-    #
-    #
-    #
+    lang_array['500-00007'] = 'Failed to get token'
+    lang_array['500-00008'] = 'Failed to acquire organization role composite (Target ID: {0} client: {1})'
+    lang_array['500-00009'] = 'Failed to acquire workspace role composite (Target ID: {0} client: {1})'
+    lang_array['500-00010'] = 'Failed to get role (Target ID: {0} client: {1})'
     #
     #
     #
@@ -212,69 +329,77 @@ class LanguageList:
     #
     #
     lang_array['500-99999'] = 'System Error'
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
+    lang_array['500-01001'] = 'get access token failed.'
+    lang_array['500-01002'] = 'client create failed. (realm:{0} cliest:{1})'
+    lang_array['500-01003'] = 'get client failed. (realm:{0} cliest:{1})'
+    lang_array['500-01004'] = 'get service account user failed. (realm:{0} client:{1})'
+    lang_array['500-01005'] = 'get realm role failed. (realm:{0} role:{1})'
+    lang_array['500-01006'] = 'servise account setting failed. (realm:{0})'
+    lang_array['500-01007'] = 'get client secret failed. (realm:{0} client:{1} client_id:{2})'
+    lang_array['500-01008'] = 'update platform-db setting failed.'
+    lang_array['500-01009'] = 'get user failed. (realm:{0} user:{1})'
+    lang_array['500-01010'] = 'update user failed. (realm:{0} user:{1})'
+    lang_array['500-01011'] = 'realm update failed. (realm:{0})'
+    lang_array['500-11001'] = 'Failed to get organization private information'
+    lang_array['500-11002'] = 'Failed to get platform private information'
+    lang_array['500-23001'] = 'Failed to create realm (Target ID: {0})'
+    lang_array['500-23002'] = 'Failed to update status.'
+    lang_array['500-23003'] = 'Failed to create client (Target ID: {0} client: {1})'
+    lang_array['500-23004'] = 'Failed to get client (Target ID: {0} client: {1})'
+    lang_array['500-23005'] = 'Failed to create client secret (Target ID: {0} client: {1} client_id{2})'
+    lang_array['500-23006'] = 'Failed to get service account user (Target ID: {0} client: {1})'
+    lang_array['500-23007'] = 'Failed to set role of service account (Target ID: {0} client: {1})'
+    lang_array['500-23008'] = 'Failed to set client role (Target ID: {0} client: {1})'
+    lang_array['500-23009'] = 'Failed to create Organization manager (Target ID: {0} username: {1})'
+    lang_array['500-23010'] = 'Failed to get organization manager (Target ID: {0} username: {1})'
+    lang_array['500-23011'] = 'Failed to get client role (Target ID: {0} client: {1})'
+    lang_array['500-23012'] = 'Failed to set organization manager role (Target ID: {0} username: {1})'
+    lang_array['500-23013'] = 'Failed to create Exastro IT Automation organization. (Target ID: {0})'
+    lang_array['500-23014'] = 'Failed to enable realm (Target ID: {0})'
+    lang_array['500-23015'] = 'Failed to create Organization Database (Target ID: {0} database: {1})'
+    lang_array['500-23016'] = 'Failed to get client secret (Target ID: {0} client: {1} client_id{2})'
+    lang_array['500-23017'] = 'Failed to update organization private table. (Target ID: {0})'
+    lang_array['500-23018'] = 'Failed to get realm information.'
+    lang_array['500-23019'] = 'Failed to update realm. (Target ID: {0})'
+    lang_array['500-23020'] = 'Failed to update client. (Target ID: {0}.{1})'
+    lang_array['500-23021'] = 'Failed to disable realm (Target ID: {0})'
+    lang_array['500-23022'] = 'Failed to delete realm (Target ID: {0})'
+    lang_array['500-24001'] = 'Failed to get workspace role (Target ID: {0})'
+    lang_array['500-24002'] = 'Role creation failed (target role: {})'
+    lang_array['500-24003'] = 'Failed to associate role and workspace role (target role: {})'
+    lang_array['500-24004'] = 'Failed to delete composite role (target role: {0})'
+    lang_array['500-24005'] = 'Failed to get role (Target ID: {0} client: {1})'
+    lang_array['500-24006'] = 'Failed to get composite role (Target ID: {0} client: {1})'
+    lang_array['500-24007'] = 'Failed to update role (target role: {0})'
+    lang_array['500-24008'] = 'Failed to delete role (target role: {0})'
+    lang_array['500-25001'] = 'Failed to get user (Target ID: {0})'
+    lang_array['500-25002'] = 'User creation failed (target user: {0})'
+    lang_array['500-25003'] = 'Failed to delete user (target user ID: {0})'
+    lang_array['500-25004'] = 'Failed to update user (target user ID: {0})'
+    lang_array['500-25005'] = 'Unable to get user information for organization manager role'
+    lang_array['500-26001'] = 'Failed to get the user associated with the role (Role: {0})'
+    lang_array['500-26002'] = 'Failed to set role (Target ID: {0} client: {1} username: {2})'
+    lang_array['500-26003'] = 'Failed to delete the link between role and user (Target ID: {0} username: {1})'
+    lang_array['500-26004'] = 'Failed to get composite role (Target ID: {0} client: {1})'
+    lang_array['500-27001'] = 'Failed to create plan (Plan:{0})'
+    lang_array['500-27002'] = 'Failed to create plan limits (Plan:{0})'
+    lang_array['500-27003'] = 'Failed to get the plan set in organization (target ID: {0} plan start time: {1})'
+    lang_array['500-27004'] = 'Failed to delete the plan set in organization (target ID: {0} plan start time: {1})'
+    lang_array['500-29001'] = 'Failed to get the plan to set for organization (Target ID: {0} Plan: {1})'
+    lang_array['500-29002'] = 'Failed to set plan to organization (Target ID: {0} Plan: {1})'
+    lang_array['500-30001'] = 'Failed to delete offline session (Target ID: {0} user: {1} client: {2})'
+    lang_array['500-90001'] = 'Failed to get client (Target ID: {0} client: {1})'
+    lang_array['500-90002'] = 'Failed to get client role (Target ID: {0} client: {1})'
+    lang_array['500-90003'] = 'Failed to create client (Target ID: {0} client: {1})'
+    lang_array['500-90004'] = 'Failed to create client secret (Target ID: {0} client: {1} client_id{2})'
+    lang_array['500-22001'] = 'Failed to create workspace role (Target ID: {})'
+    lang_array['500-22002'] = 'Failed to create workspace administrator role (Target ID: {})'
+    lang_array['500-22003'] = 'Failed to get workspace administrator role (Target ID: {})'
+    lang_array['500-22004'] = 'Failed to associate workspace administrator role and workspace role (Target ID: {})'
+    lang_array['500-22005'] = 'Failed to get workspace administrator role (Target ID: {})'
+    lang_array['500-22006'] = 'Failed to associate administrator user with workspace administrator role (Target ID: {})'
+    lang_array['500-22007'] = 'Failed to create Exastro IT Automation workspace (Target ID: {})'
+    lang_array['500-22008'] = 'Failed to delete Exastro IT Automation workspace (Target ID: {0})'
     #
     #
     #
