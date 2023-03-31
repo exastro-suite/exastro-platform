@@ -274,7 +274,7 @@ $(function(){
                         if(user_id == CommonAuth.getUserId()) {
                             // 自分自身を消したときは、top画面に遷移しログイン画面へ
                             // When you erase yourself, transition to the top screen and go to the login screen
-                            window.location = location_conf.href.menu.toppage.replace(/{organization_id}/g, CommonAuth.getRealm());
+                            window.location = location_conf.href.menu.organization_user_site.toppage.replace(/{organization_id}/g, CommonAuth.getRealm());
                         }
                     });
                 }).catch(() => {
