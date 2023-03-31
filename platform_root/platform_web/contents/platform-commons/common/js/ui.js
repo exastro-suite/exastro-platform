@@ -150,7 +150,11 @@ headerMenu() {
 
     // アカウント管理
     ui.$.header.find('.userInfoMenuButton[data-type=account]').on('click', function(){
-        window.location.href = location_conf.href.account.main_page.replace(/{organization_id}/g, CommonAuth.getRealm());
+        if(CommonAuth.isPlatformAdminSite()) {
+            window.location.href = location_conf.href.account.platform_admin_site.main_page;
+        } else {
+            window.location.href = location_conf.href.account.organization_user_site.main_page.replace(/{organization_id}/g, CommonAuth.getRealm());
+        }
     });
 
     // ログアウト
@@ -174,7 +178,7 @@ userInfo() {
     const roleList = [];
     if( roles.length === 0 ) {
         roleList.push(`<li class="userinfoRoleItem">`
-        + "ロールがありません"
+        + getText("000-80041","ロールがありません")
     + `</li>`);
     } else {
         for ( const role of roles.sort() ) {
@@ -196,7 +200,7 @@ userInfo() {
                 <div class="userInfoId">${id}</div>
             </div>
         </div>
-        <div class="userInfoBlock userInfoRole">
+        <div class="userInfoBlock userInfoRole" ${CommonAuth.isPlatformAdminSite()? 'style="display:none;"': ''}>
             <div class="userInfoTitle">
                 <span class=" icon icon-role"></span>
                 <span text-id="000-80004">ロール一覧</span>

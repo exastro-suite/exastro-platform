@@ -101,6 +101,11 @@ langArray['000-80033'] = 'Single-byte alphanumeric characters, hyphens, and unde
 langArray['000-80034'] = 'Issue'
 langArray['000-80035'] = 'Copy to clipboard'
 langArray['000-80036'] = 'Filter by prefix match of username, email, first name, last name'
+langArray['000-80037'] = 'Organization management'
+langArray['000-80038'] = 'Resource plan management'
+langArray['000-80039'] = 'System settings'
+langArray['000-80040'] = 'keycloak console'
+langArray['000-80041'] = 'no rolls'
 langArray['000-81001'] = 'Edit accouont'
 langArray['000-81002'] = 'Change password'
 langArray['000-81003'] = 'Two-factor authentication settings'
@@ -251,7 +256,7 @@ langArray['400-24003'] = 'You do not have permission to delete the specified rol
 //
 //
 //
-
+//
 //
 //
 //
@@ -315,6 +320,8 @@ langArray['500-00006'] = 'System Error'
 //
 //
 langArray['500-99999'] = 'System Error'
+//
+//
 //
 //
 //
