@@ -1,4 +1,4 @@
-#   Copyright 2022 NEC Corporation
+#   Copyright 2023 NEC Corporation
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -11,12 +11,11 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
-# from flask import Flask, render_template
+from flask import Flask, render_template
 import inspect
 import os
 import json
 import traceback
-from flask import render_template
 
 import globals
 from common_library.common import common, api_keycloak_tokens, api_keycloak_clients
@@ -175,21 +174,29 @@ class realm_clients_add:
 
         templates = ["template_client_user_token.json"]
 
-        for template_path in templates:
-            # templatesの取得
-            # get a templates
-            client_json = render_template(template_path,
-                                          organization_id=client_name)
-            client_json = json.loads(client_json)
+        template_folder = os.path.join(os.path.dirname(__file__), "templates")
+        app = Flask(__name__, template_folder=template_folder)
+        globals.logger.debug(f"__file__:{__file__}")
+        globals.logger.debug(f"template_folder:{template_folder}")
 
-            # globals.logger.debug(f"client_json:{client_json}")
+        for template_path in templates:
+            client_json = None
+            with app.app_context():
+                # templatesの取得
+                # get a templates
+                client_json = render_template(template_path,
+                                              organization_id=client_name)
+                client_json = json.loads(client_json)
+
+            globals.logger.debug(f"client_json:{client_json}")
 
             # client登録
             # client registration to keycloak
             response = api_keycloak_clients.client_create(realm_name, client_json, token)
+            globals.logger.debug(f"client_create response:{response}")
             if response.status_code != 200 and \
-               response.status_code != 201 and \
-               response.status_code != 409:    # 409 exists client
+                response.status_code != 201 and \
+                response.status_code != 409:    # 409 exists client
                 globals.logger.error(f"response.status_code:{response.status_code}")
                 globals.logger.error(f"response.text:{response.text}")
                 message_id = f"500-{MSG_FUNCTION_ID}003"
@@ -207,6 +214,7 @@ class realm_clients_add:
                 # client取得
                 # client get to keycloak
                 response = api_keycloak_clients.clients_get(realm_name, client_json.get("clientId"), token)
+                globals.logger.debug(f"clients_get response:{response}")
                 if response.status_code != 200:
                     globals.logger.error(f"response.status_code:{response.status_code}")
                     globals.logger.error(f"response.text:{response.text}")
@@ -225,6 +233,7 @@ class realm_clients_add:
                 # client secret登録
                 # client secret registration to keycloak
                 response = api_keycloak_clients.client_secret_create(realm_name, client_id, token)
+                globals.logger.debug(f"client_secret_create response:{response}")
                 if response.status_code != 200:
                     globals.logger.error(f"response.status_code:{response.status_code}")
                     globals.logger.error(f"response.text:{response.text}")
