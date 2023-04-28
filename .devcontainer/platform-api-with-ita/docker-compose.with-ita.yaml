@@ -206,3 +206,9 @@ services:
     profiles:
       - exastro-it-automation-backyard
       - ita-by-terraform-cloud-ep-vars-listup
+  ita-migration:
+    build:
+      context: ${ITA_REPO_ROOT}
+      target: develop_build
+    volumes:
+      - ../.volumes/storage:/storage
