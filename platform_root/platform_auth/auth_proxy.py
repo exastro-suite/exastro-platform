@@ -556,7 +556,7 @@ class auth_proxy:
                     else:
                         # If client is specified, check if there is anything that matches the client role
                         # - clientの指定があるときはclientロールに合致するものが無いかチェックする
-                        role_client = role["client"].format(**match_dict)
+                        role_client = role["client"].format(**(match.groupdict()))
                         my_roles = self.token_decode.get("resource_access", {}).get(role_client, {}).get("roles", [])
                         for my_role in my_roles:
                             if re.match(role_name_re, my_role):
