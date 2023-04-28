@@ -37,7 +37,7 @@ RUN dnf install -y \
 &&  pip3.9 install \
     requests \
     pyyaml \
-    Flask \
+    Flask==2.2.3 \
     pytz \
     markdown \
     PyJWT \
