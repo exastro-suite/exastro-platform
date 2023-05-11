@@ -40,18 +40,17 @@ RUN dnf install -y \
     python39 \
     python39-devel \
     python39-mod_wsgi \
-&&  pip3.9 install \
-    requests \
-    pyyaml \
-    Flask \
-    pytz \
-    markdown \
-    requests \
-    PyJWT \
-    python-dotenv \
-    flask-log-request-id \
-    pymysql \
-    pycryptodome \
+&&  pip3.9 install --upgrade requests \
+&&  pip3.9 install --upgrade pyyaml \
+&&  pip3.9 install --upgrade Flask \
+&&  pip3.9 install --upgrade pytz \
+&&  pip3.9 install --upgrade markdown \
+&&  pip3.9 install --upgrade requests \
+&&  pip3.9 install --upgrade PyJWT \
+&&  pip3.9 install --upgrade python-dotenv \
+&&  pip3.9 install --upgrade flask-log-request-id \
+&&  pip3.9 install --upgrade pymysql \
+&&  pip3.9 install --upgrade pycryptodome \
 &&  groupadd $GROUPNAME \
 &&  useradd -m -s /bin/bash -g $GROUPNAME $USERNAME \
 &&  setcap 'cap_net_bind_service=+ep' /usr/sbin/httpd \
