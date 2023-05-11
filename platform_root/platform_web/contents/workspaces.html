@@ -19,7 +19,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta name="format-detection" content="telephone=no,email=no,address=no">
         <meta name="theme-color" content="#002B62">
-        <title>
+        <title text-id="000-82003">
             ワークスペース一覧 / ワークスペース管理 / Exastro Platform
         </title>
         <link rel="stylesheet" href="/_/platform-commons/css/platform.css?ver=__BUILD_VERSION__">
@@ -35,7 +35,6 @@
 
         <script src="/_/platform-commons/common/js/words.js?ver=__BUILD_VERSION__"></script>
         <script src="/_/platform-commons/common/js/common.js?ver=__BUILD_VERSION__"></script>
-        <script src="/_/platform-commons/common/js/table.js?ver=__BUILD_VERSION__"></script>
         <script src="/_/platform-commons/common/js/dialog.js?ver=__BUILD_VERSION__"></script>
         <script src="/_/platform-commons/common/js/ui.js?ver=__BUILD_VERSION__"></script>
 
@@ -75,15 +74,15 @@
                 <main id="main" style="visibility:hidden;">
                     <div id="content">
                         <div class="contentHeader">
-                            <h1 class="contentTitle"><span class="contentTitleInner">ワークスペース一覧</span></h1>
-                            <p class="contentMenuInfo">ワークスペースをメンテナンス(閲覧/登録)できます。</p>
+                            <h1 class="contentTitle"><span class="contentTitleInner" text-id="000-82001">ワークスペース一覧</span></h1>
+                            <p class="contentMenuInfo" text-id="000-82002">ワークスペースをメンテナンス(閲覧/登録)できます。</p>
                         </div>
                         <div class="contentBody">
                             <div class="contentMenu">
                                 <ul class="contentMenuList">
                                     <li class="contentMenuItem">
                                         <a class="contentMenuLink tabOpen" href="#dataList" tabindex="-1">
-                                            <span class="inner">一覧</span>
+                                            <span class="inner" text-id="000-80008">一覧</span>
                                         </a>
                                     </li>
                                 </ul>
@@ -95,7 +94,7 @@
                                             <ul class="tableHeaderMainMenuList">
                                                 <li class="tableHeaderMainMenuItem">
                                                     <button data-type="tableNew" data-action="positive" style="width:200px; display: none;" class="itaButton tableHeaderMainMenuButton button" id="new_workspace">
-                                                        <span class="inner"><span class="icon icon-edit"></span>作成</span></button>
+                                                        <span class="inner"><span class="icon icon-edit"></span><span text-id="000-80009">作成</span></span></button>
                                                 </li>
                                             </ul>
                                         </div>
@@ -103,25 +102,43 @@
                                             <table class="table" width="100%" id="workspace_list">
                                                 <thead class="thead">
                                                     <tr class="tHeadTr tr">
-                                                        <th data-id="c1" data-rest="id" class="tHeadLeftSticky tHeadTh popup th" rowspan="1" colspan="1" }="" title="ワークスペースID" width="300px;"><div class="ci">ワークスペースID</div></th>
-                                                        <th data-id="c2" data-rest="name" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="ワークスペース名"><div class="ci">ワークスペース名</div></th>
-                                                        <th data-id="c3" data-rest="name" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="説明"><div class="ci">説明</div></th>
-                                                        <th data-id="c4" data-rest="last_update_date_time" title="最終更新日時" class="tHeadTh popup th" rowspan="1" colspan="1" }="" width="200px;"><div class="ci">最終更新日時</div></th>
-                                                        <th data-id="c5" data-rest="name" class="tHeadTh popup th" rowspan="1" colspan="1" }="" width="130px;"><div class="ci"></div></th>
+                                                        <th data-id="c1" data-rest="name" class="tHeadTh popup th" rowspan="1" colspan="1" }="" width="130px;"><div class="ci"></div></th>
+                                                        <th data-id="c2" data-rest="id" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="ワークスペースID" attr-text-id="title=000-00101" width="300px;"><div class="ci" text-id="000-00101">ワークスペースID</div></th>
+                                                        <th data-id="c3" data-rest="name" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="ワークスペース名" attr-text-id="title=000-00102"><div class="ci" text-id="000-00102">ワークスペース名</div></th>
+                                                        <th data-id="c4" data-rest="name" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="説明" attr-text-id="title=000-00106"><div class="ci" text-id="000-00106">説明</div></th>
+                                                        <th data-id="c5" data-rest="last_update_date_time" title="最終更新日時" attr-text-id="title=000-00141" class="tHeadTh popup th" rowspan="1" colspan="1" }="" width="200px;"><div class="ci" text-id="000-00141">最終更新日時</div></th>
+                                                        <th data-id="c6" data-rest="name" class="tHeadTh popup th" rowspan="1" colspan="1" }="" width="130px;"><div class="ci"></div></th>
+                                                        <th data-id="c7" data-rest="name" class="tHeadTh popup th" rowspan="1" colspan="1" }="" width="130px;"><div class="ci"></div></th>
                                                     </tr>
                                                 </thead>
                                                 <tbody class="tbody">
-                                                    <tr class="tBodyTr tr datarow" style="cursor:pointer; display:none">
-                                                        <th class="tBodyLeftSticky tBodyTh th to_detail" rowspan="1" colspan="1" }="" data-id="${workspace_id}"><div class="ci" style="text-align: left;">${workspace_id}</div></td>
+                                                    <tr class="tBodyTr tr datarow-template" style="cursor:pointer; display:none">
+                                                        <td class="tBodyTh tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: center;">
+                                                            <button class="pl_button btn_ita" data-id="${workspace_id}" disabled><img src="/_/platform-commons/img/Exastro-ITA-logo1-rgb.png" width="80" height="20"></button>
+                                                        </div></td>
+                                                        <td class="tBodyTd td to_detail" rowspan="1" colspan="1" }="" data-id="${workspace_id}"><div class="ci" style="text-align: left;">${workspace_id}</div></td>
                                                         <td class="tBodyTd td to_detail" rowspan="1" colspan="1" }="" data-id="${workspace_id}"><div class="ci">${workspace_name}</div></td>
-                                                        <td class="tBodyTd td to_detail" rowspan="1" colspan="1" }="" data-id="${workspace_id}"><div class="ci">${workspace_description}</div></td>
+                                                        <td class="tBodyTd td to_detail" rowspan="1" colspan="1" }="" data-id="${workspace_id}"><div class="ci pre_ht100">${workspace_description}</div></td>
                                                         <td class="tBodyTd td to_detail" rowspan="1" colspan="1" }="" data-id="${workspace_id}"><div class="ci" style="text-align: center;">${last_update_date_time}</div></td>
                                                         <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: center;">
-                                                            <button class="pl_button btn_ita" data-id="${workspace_id}" disabled><img src="/_/platform-commons/img/Exastro-ITA-logo1-rgb.png" width="80" height="20"></button>
+                                                            <button title="編集" attr-text-id="title=000-80026" data-action="positive" class="itaButton button button_edit_workspace" data-id="${workspace_id}" data-name="${workspace_name}" style="width:100px;">
+                                                                <span class="inner">
+                                                                    <span class="iconButtonIcon icon icon-edit"></span>
+                                                                    <span class="iconButtonBody" text-id="000-80026">編集</span>
+                                                                </span>
+                                                            </button>
+                                                        </div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: center;">
+                                                            <button title="削除" attr-text-id="title=000-80010" data-action="danger" class="itaButton button button_delete_workspace" data-id="${workspace_id}" data-name="${workspace_name}" style="width:100px;">
+                                                                <span class="inner">
+                                                                    <span class="iconButtonIcon icon icon-trash"></span>
+                                                                    <span class="iconButtonBody" text-id="000-80010">削除</span>
+                                                                </span>
+                                                            </button>
                                                         </div></td>
                                                     </tr>
                                                     <tr class="tBodyTr tr notfound" style="display:none">
-                                                        <td class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="5" }="" height="50px"><div class="ci" style="text-align: center;">
+                                                        <td class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="7" }="" height="50px"><div class="ci" style="text-align: center;" text-id="000-82004">
                                                             使用可能なワークスペースが存在しません
                                                         </div></td>
                                                     </tr>

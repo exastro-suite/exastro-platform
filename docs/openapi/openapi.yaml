@@ -17,7 +17,7 @@ openapi: 3.0.3
 info:
   title: Exastro Platform API
   description: Exastro Platform API
-  version: 1.3.0
+  version: 1.5.0
 
 servers:
   - url: "https://{host}"
@@ -60,6 +60,8 @@ tags:
   description: ロールに関する操作
 - name: RoleMappingsService
   description: ロール・マッピングに関する操作
+- name: CommonService
+  description: システム管理者共通
 - name: InternalCommonService
   description: 共通(内部用)
 - name: InternalPlanService
@@ -72,6 +74,8 @@ tags:
 paths:
   "/api/platform/organizations":
       $ref: './paths/organizations.yaml'
+  "/api/platform/organizations/{organization_id}":
+      $ref: './paths/organizations.organization_id.yaml'
   "/api/{organization_id}/platform/setting":
       $ref: './paths/organization.setting.yaml'
 
@@ -99,6 +103,11 @@ paths:
   "/api/{organization_id}/platform/usages":
       $ref: './paths/usages.organizations.yaml'
 
+  "/api/platform/settings/common":
+      $ref: './paths/common.settings.common.yaml'
+  "/api/platform/settings/common/{config_key}":
+      $ref: './paths/common.settings.common.config.yaml'
+
   "/api/{organization_id}/platform/workspaces":
       $ref: './paths/workspaces.yaml'
   "/api/{organization_id}/platform/workspaces/{workspace_id}":
@@ -108,6 +117,8 @@ paths:
 
   "/api/{organization_id}/platform/users":
       $ref: './paths/users.yaml'
+  "/api/{organization_id}/platform/users/{user_id}":
+      $ref: './paths/users.user_id.yaml'
 
   "/api/{organization_id}/platform/roles":
       $ref: './paths/roles.yaml'
@@ -117,10 +128,23 @@ paths:
   "/api/{organization_id}/platform/roles/{role_name}/users":
       $ref: './paths/roles.role_name.users.yaml'
 
+  "/internal-api/alive":
+      $ref: './paths/internal_alive.yaml'
+
+  "/internal-api/platform/settings/common":
+      $ref: './paths/internal_common.settings.common.yaml'
+
+  "/internal-api/platform/settings/common/{config_key}":
+      $ref: './paths/internal_common.settings.common.config.yaml'
+
   "/internal-api/{organization_id}/platform/limits":
       $ref: './paths/internal_plans.organizations.limits.yaml'
   "/internal-api/platform/limits":
       $ref: './paths/internal_plan.limits.yaml'
+  "/internal-api/platform/plan_items":
+      $ref: './paths/internal_plan.plan_items.yaml'
+  "/internal-api/platform/plan_items/{limit_id}":
+      $ref: './paths/internal_plan.plan_items.limit_id.yaml'
 
   "/internal-api/{organization_id}/platform/workspaces/{workspace_id}/roles":
       $ref: './paths/internal_workspaces.workspace_id.roles.yaml'
@@ -128,9 +152,6 @@ paths:
       $ref: './paths/internal_workspaces.workspace_id.users.yaml'
   "/internal-api/{organization_id}/platform/users/{user_id}/workspaces":
       $ref: './paths/internal_users.user_id.workspaces.yaml'
-
-  "/internal-api/alive":
-      $ref: './paths/internal_alive.yaml'
 
 components:
   schemas:

@@ -89,6 +89,8 @@ def role_user_mapping_get(organization_id, role_name, first=0, max=100):
                 "lastName": user.get("lastName"),
                 "preferred_username": user.get("username"),
                 "enabled": user.get("enabled"),
+                "affiliation": user.get("attributes",{}).get("affiliation",[None])[0],
+                "description": user.get("attributes",{}).get("description",[None])[0],
                 "create_timestamp": common.keycloak_timestamp_to_str(user.get("createdTimestamp"))
             }
         )

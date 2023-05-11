@@ -19,7 +19,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta name="format-detection" content="telephone=no,email=no,address=no">
         <meta name="theme-color" content="#002B62">
-        <title>
+        <title data-id="000-83002">
             ユーザー一覧 / ユーザー管理 / Exastro Platform
         </title>
         <link rel="stylesheet" href="/_/platform-commons/css/platform.css?ver=__BUILD_VERSION__">
@@ -35,7 +35,6 @@
 
         <script src="/_/platform-commons/common/js/words.js?ver=__BUILD_VERSION__"></script>
         <script src="/_/platform-commons/common/js/common.js?ver=__BUILD_VERSION__"></script>
-        <script src="/_/platform-commons/common/js/table.js?ver=__BUILD_VERSION__"></script>
         <script src="/_/platform-commons/common/js/dialog.js?ver=__BUILD_VERSION__"></script>
         <script src="/_/platform-commons/common/js/ui.js?ver=__BUILD_VERSION__"></script>
 
@@ -75,15 +74,15 @@
                 <main id="main" style="visibility:hidden;">
                     <div id="content">
                         <div class="contentHeader">
-                            <h1 class="contentTitle"><span class="contentTitleInner">ユーザー一覧</span></h1>
-                            <p class="contentMenuInfo">ユーザーをメンテナンス(閲覧/登録/更新/削除)できます。</p>
+                            <h1 class="contentTitle"><span class="contentTitleInner" text-id="000-83001">ユーザー一覧</span></h1>
+                            <p class="contentMenuInfo" text-id="000-83003">ユーザーをメンテナンス(閲覧/登録/更新/削除)できます。</p>
                         </div>
                         <div class="contentBody">
                             <div class="contentMenu">
                                 <ul class="contentMenuList">
                                     <li class="contentMenuItem">
                                         <a class="contentMenuLink tabOpen" href="#dataList" tabindex="-1">
-                                            <span class="inner">一覧</span>
+                                            <span class="inner" text-id="000-80008">一覧</span>
                                         </a>
                                     </li>
                                 </ul>
@@ -95,40 +94,37 @@
                                             <ul class="tableHeaderMainMenuList">
                                                 <li class="tableHeaderMainMenuItem">
                                                     <button data-type="tableNew" data-action="positive" style="width:200px; display: none;" class="itaButton tableHeaderMainMenuButton button" id="new_user">
-                                                        <span class="inner"><span class="icon icon-edit"></span>作成</span></button>
+                                                        <span class="inner"><span class="icon icon-plus"></span><span text-id="000-80009">作成</span></span></button>
                                                 </li>
                                             </ul>
                                         </div>
                                         <div class="tableHeader">
-                                            <div class="operationMenu">
-                                                <ul class="tableHeaderMainMenuList">
-                                                    <li class="operationMenuItem">
-                                                        <button title="フィルター" data-action="positive" data-type="tableEdit" class="itaButton tableHeaderMainMenuButton button button-filter" id="filter">
-                                                            <span class="inner">
-                                                                <span class="iconButtonIcon icon icon-filter"></span>
-                                                                <span class="iconButtonBody">フィルター</span>
-                                                                <span class="buttonMinWidth"></span>
-                                                            </span>
-                                                        </button>
-                                                    </li>
-                                                    <li class="operationMenuItem">
-                                                        <input type="text" value="" class="inputText input text-filter" maxlength="128" size="256" id="textFilter">
-                                                    </li>
-                                                </ul>
-                                            </div>
+                                            <ul class="tableHeaderMainMenuList">
+                                                <li class="operationMenuItem">
+                                                    <button title="フィルタ" attr-text-id="title=000-80028" data-action="restore" data-type="tableEdit" class="itaButton tableHeaderMainMenuButton button button-filter" id="filter" style="min-width:120px; max-width:120px; width:120px; margin-right:3px;">
+                                                        <span class="inner">
+                                                            <span class="iconButtonIcon icon icon-filter"></span>
+                                                            <span class="iconButtonBody" text-id="000-80028">フィルタ</span>
+                                                            <span class="buttonMinWidth"></span>
+                                                        </span>
+                                                    </button>
+                                                    <input type="text" value="" class="inputText input text-filter" maxlength="128" size="256" id="textFilter" placeholder="ユーザー名、email、名、姓の前方一致で絞り込みます" attr-text-id="placeholder=000-80036">
+                                                </li>
+                                            </ul>
                                         </div>
                                         <div class="tableBody">
                                             <table class="table" width="100%" id="users_list">
                                                 <thead class="thead">
                                                     <tr class="tHeadTr tr">
-                                                        <th data-id="c1" data-rest="username" class="tHeadLeftSticky tHeadTh popup th" rowspan="1" colspan="1" }="" title="ユーザー名" width="210px;"><div class="ci">ユーザー名</div></th>
-                                                        <th data-id="c2" data-rest="email" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="Eメール"><div class="ci">Eメール</div></th>
-                                                        <th data-id="c3" data-rest="firstName" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="姓" width="200px"><div class="ci">姓</div></th>
-                                                        <th data-id="c4" data-rest="lastName" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="名" width="200px"><div class="ci">名</div></th>
-                                                        <th data-id="c5" data-rest="enabled" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="有効" width="80px;"><div class="ci">有効</div></th>
-                                                        <th data-id="c6" data-rest="user_id" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="ユーザーID" width="210px;"><div class="ci">ユーザーID</div></th>
-                                                        <th data-id="c7" data-rest="create_timestamp" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="作成日時" width="200px;"><div class="ci">作成日時</div></th>
+                                                        <th data-id="c1" data-rest="username" class="tHeadLeftSticky tHeadTh popup th" rowspan="1" colspan="1" }="" title="ユーザー名" attr-text-id="title=000-00128" width="210px;"><div class="ci" text-id="000-00128">ユーザー名</div></th>
+                                                        <th data-id="c2" data-rest="email" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="Eメール" attr-text-id="title=000-00129"><div class="ci" text-id="000-00129">email</div></th>
+                                                        <th data-id="c3" data-rest="lastName" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="名" attr-text-id="000-00130" width="200px"><div class="ci" text-id="000-00130">名</div></th>
+                                                        <th data-id="c4" data-rest="firstName" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="姓" attr-text-id="title=000-00131" width="200px"><div class="ci" text-id="000-00131">姓</div></th>
+                                                        <th data-id="c5" data-rest="enabled" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="有効" attr-text-id="title=000-80031" width="80px;"><div class="ci" text-id="000-80031">有効</div></th>
+                                                        <th data-id="c6" data-rest="user_id" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="所属" attr-text-id="title=000-00143" width="210px;"><div class="ci" text-id="000-00143">所属</div></th>
+                                                        <th data-id="c7" data-rest="create_timestamp" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="登録日時" attr-text-id="title=000-00142" width="200px;"><div class="ci" text-id="000-00142">登録日時</div></th>
                                                         <th data-id="c8" data-rest="action" class="tHeadTh popup th" rowspan="1" colspan="1" }="" width="100px"><div class="ci"></div></th>
+                                                        <th data-id="c9" data-rest="action" class="tHeadTh popup th" rowspan="1" colspan="1" }="" width="100px"><div class="ci"></div></th>
                                                     </tr>
                                                 </thead>
                                                 <tbody class="tbody">
@@ -138,15 +134,27 @@
                                                         <td class="tBodyTd td to_detail" data-id="${user_id}" rowspan="1" colspan="1" }=""><div class="ci">${firstName}</div></td>
                                                         <td class="tBodyTd td to_detail" data-id="${user_id}" rowspan="1" colspan="1" }=""><div class="ci">${lastName}</div></td>
                                                         <td class="tBodyTd td to_detail" data-id="${user_id}" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: center;">${enabled}</td>
-                                                        <td class="tBodyTd th to_detail" data-id="${user_id}" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: left;">${user_id}</div></td>
+                                                        <td class="tBodyTd th to_detail" data-id="${user_id}" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: left;">${affiliation}</div></td>
                                                         <td class="tBodyTd td to_detail" data-id="${user_id}" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: center;">${create_timestamp}</div></td>
-                                                        <td class="tBodyTd td to_detail" rowspan="1" colspan="1" }=""><div class="ci">
-                                                            <button class="pl_button btn_delete" data-id="${user_id}" disabled>
-                                                                <span class="inner"><span class="icon icon-trash"></span>削除</span></button>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci">
+                                                            <button title="編集" attr-text-id="title=000-80026" data-action="positive" class="itaButton button button_edit" data-id="${user_id}" style="width:100px;">
+                                                                <span class="inner">
+                                                                    <span class="iconButtonIcon icon icon-edit"></span>
+                                                                    <span class="iconButtonBody" text-id="000-80026">編集</span>
+                                                                </span>
+                                                            </button>
+                                                        </div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci">
+                                                            <button title="削除" attr-text-id="title=000-80010" data-action="danger" class="itaButton button btn_delete" data-id="${user_id}" username='${username}' style="width:100px;">
+                                                                <span class="inner">
+                                                                    <span class="iconButtonIcon icon icon-trash"></span>
+                                                                    <span class="iconButtonBody" text-id="000-80010">削除</span>
+                                                                </span>
+                                                            </button>
                                                         </div></td>
                                                     </tr>
                                                     <tr class="tBodyTr tr notfound" style="display:none">
-                                                        <td class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="6" }="" height="50px"><div class="ci" style="text-align: center;">
+                                                        <td class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="9" }="" height="50px"><div class="ci" style="text-align: center;" text-id="000-83004">
                                                             ユーザーが存在しません
                                                         </div></td>
                                                     </tr>
@@ -166,11 +174,11 @@
                                                         <li class="tableFooterItem">
                                                             <div class="pagingPage">
                                                                 <span class="pagingCurrentPage">1</span>
-                                                                <span class="pagingPageJumpNumber">ページ</span>
+                                                                <span class="pagingPageJumpNumber" text-id="000-80027">ページ</span>
                                                             </div>
                                                         </li>
                                                         <li class="tableFooterItem">
-                                                            <button class="pagingMoveButton" data-type="next"><span class=" icon icon-next"></span></button>
+                                                            <button class="pagingMoveButton" data-type="next"><span class="icon icon-next"></span></button>
                                                         </li>
                                                     </ul>
                                                 </div>

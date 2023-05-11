@@ -20,7 +20,7 @@ $(function(){
         new CommonUi(`#container`);
         load_main();
     });
-    
+
     function load_main() {
         Promise.all([
             // Load Common Contents
@@ -40,8 +40,8 @@ $(function(){
             displayMenu('menu_role_management');
             // Display Topic Path
             displayTopicPath([
-                {"text": "ロール一覧", "href": location_conf.href.roles.list.replace(/{organization_id}/g, CommonAuth.getRealm()) },
-                {"text": "新規ロール", "href": location_conf.href.roles.new.replace(/{organization_id}/g, CommonAuth.getRealm()) },
+                {"text": getText("000-84001", "ロール一覧"), "href": location_conf.href.roles.list.replace(/{organization_id}/g, CommonAuth.getRealm()) },
+                {"text": getText("000-84025", "新規ロール"), "href": location_conf.href.roles.new.replace(/{organization_id}/g, CommonAuth.getRealm()) },
             ]);
             display_main(results[1].data);
             finish_onload_progress();
@@ -116,7 +116,7 @@ $(function(){
                 return 0;
             }
         });
-    
+
         for(var row of workspaceListData) {
             var date = new Date(row.last_update_timestamp);
             format_last_update_timestamp = fn.date(date,'yyyy/MM/dd HH:mm:ss');
@@ -148,19 +148,19 @@ $(function(){
         //
         if($("#form_role_name").val() === "") {
             $("#message_role_name").text(
-                getText("400-00011", "必須項目が不足しています。({0})", getText("000-00101", "ロール名")));
+                getText("400-00011", "必須項目が不足しています。({0})", getText("000-00107", "ロール名")));
             result = false;
 
         } else if($("#form_role_name").val().replace(/[a-zA-Z0-9_-]/g,"") !== "") {
             $("#message_role_name").text(
                 getText("400-00017", "指定できない文字が含まれています。(項目:{0},指定可能な文字:{1})",
-                        getText("000-00101", "ロール名"),
-                        getText("000-00101", "半角英数・ハイフン・アンダースコア")));
+                        getText("000-00107", "ロール名"),
+                        getText("000-31001", "半角英数・ハイフン・アンダースコア")));
             result = false;
 
         } else if( ! $("#form_role_name").val().match(/^[a-zA-Z]/)) {
             $("#message_role_name").text(
-                getText("400-00014", "先頭の文字にアルファベット以外が指定されています。({0})", getText("000-00101", "ロール名")));
+                getText("400-00014", "先頭の文字にアルファベット以外が指定されています。({0})", getText("000-00107", "ロール名")));
             result = false;
         } else {
             $("#message_role_name").text("");
@@ -195,6 +195,7 @@ $(function(){
             "workspaces": checked_workspace_id
         }
 
+        show_progress();
         call_api_promise(
             {
                 type: "POST",
@@ -205,11 +206,15 @@ $(function(){
                 data: JSON.stringify(reqbody),
                 contentType: "application/json",
                 dataType: "json",
-            }            
+            }
         ).then(() => {
-            alert("ロールを作成しました");
-            window.location = location_conf.href.roles.list.replace(/{organization_id}/g, CommonAuth.getRealm());
+            hide_progress();
+            alertMessage(getText("000-80018", "処理結果"), getText("000-84033", "ロールを作成しました"),
+                () => {
+                    window.location = location_conf.href.roles.list.replace(/{organization_id}/g, CommonAuth.getRealm());
+                });
         }).catch(() => {
+            hide_progress();
             $('#button_register').prop('disabled',false);
         })
     }

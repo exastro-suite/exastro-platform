@@ -103,3 +103,23 @@ html {
 .validate_error {
     color: red;
 }
+
+.caution_message {
+    color: red;
+    font-weight: bold;
+}
+.caution_message:before {
+    font-family: 'exastro-ui-icons' !important;
+    color: orangered;
+    content: "\e94b";
+    font-size: 26px;
+    margin-right: 5px;
+}
+
+.ci.pre_ht100 {
+    word-break: break-all!important;
+    white-space: pre !important;
+    max-height: 100px;
+    overflow: auto !important;
+    text-overflow: clip !important;
+}

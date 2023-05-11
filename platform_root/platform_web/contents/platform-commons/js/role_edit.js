@@ -21,7 +21,7 @@ $(function(){
         new CommonUi(`#container`);
         load_main();
     });
-    
+
     function load_main() {
         Promise.all([
             // Load Common Contents
@@ -51,8 +51,8 @@ $(function(){
             displayMenu('menu_role_management');
             // Display Topic Path
             displayTopicPath([
-                {"text": "ロール一覧", "href": location_conf.href.roles.list.replace(/{organization_id}/g, CommonAuth.getRealm()) },
-                {"text": "ロール編集", "href": location_conf.href.roles.edit.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{role_name}/g, role_name) },
+                {"text": getText("000-84001", "ロール一覧"), "href": location_conf.href.roles.list.replace(/{organization_id}/g, CommonAuth.getRealm()) },
+                {"text": getText("000-84035", "ロール編集"), "href": location_conf.href.roles.edit.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{role_name}/g, role_name) },
             ]);
             display_main(results[1].data, results[2].data);
             finish_onload_progress();
@@ -73,7 +73,7 @@ $(function(){
         //
         let roleIndex = roles.findIndex((role) => {return role.name == role_name});
         if(roleIndex === -1) {
-            alert("編集対象のロールがありません");
+            alert(getText("000-84037", "編集対象のロールがありません"));
             window.location = location_conf.href.roles.list.replace(/{organization_id}/g, CommonAuth.getRealm());
             return;
         }
@@ -149,7 +149,7 @@ $(function(){
                 return 0;
             }
         });
-    
+
         for(var row of workspaceListData) {
             var date = new Date(row.last_update_timestamp);
             format_last_update_timestamp = fn.date(date,'yyyy/MM/dd HH:mm:ss');
@@ -205,6 +205,7 @@ $(function(){
             "workspaces": checked_workspace_id
         }
 
+        show_progress();
         call_api_promise(
             {
                 type: "PUT",
@@ -215,11 +216,15 @@ $(function(){
                 data: JSON.stringify(reqbody),
                 contentType: "application/json",
                 dataType: "json",
-            }            
+            }
         ).then(() => {
-            alert("ロールを変更しました");
-            window.location = location_conf.href.roles.list.replace(/{organization_id}/g, CommonAuth.getRealm());
+            hide_progress();
+            alertMessage(getText("000-80018", "処理結果"), getText("000-84038", "ロールを変更しました"),
+                () => {
+                    window.location = location_conf.href.roles.list.replace(/{organization_id}/g, CommonAuth.getRealm());
+                });
         }).catch(() => {
+            hide_progress();
             $('#button_register').prop('disabled',false);
             $('#button_delete').prop('disabled',false);
         })

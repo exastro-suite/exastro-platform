@@ -13,14 +13,11 @@
 #   limitations under the License.
 
 title: planItem is a definition of plan item resource.
-type: object
-properties:
-  id:
-    type: string
-    example: platform.workspaces
-  informations:
-    type: object
+allOf:
+  - type: object
     properties:
-      description:
+      id:
         type: string
-
+        example: platform.workspaces
+        description: limit id
+  - $ref: './planItemFields.yaml'

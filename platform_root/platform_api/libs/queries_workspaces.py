@@ -21,3 +21,13 @@ SQL_QUERY_WORKSPACES = """
 SELECT *
 FROM T_WORKSPACE
 """
+
+SQL_DELETE_WORKSPACE = """
+DELETE FROM T_WORKSPACE WHERE WORKSPACE_ID = %(workspace_id)s"""
+
+SQL_UPDATE_WORKSPACE = """
+UPDATE T_WORKSPACE
+SET WORKSPACE_NAME = %(workspace_name)s,
+INFORMATIONS = %(informations)s,
+LAST_UPDATE_USER = %(last_update_user)s
+WHERE WORKSPACE_ID = %(workspace_id)s"""

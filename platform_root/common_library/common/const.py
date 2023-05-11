@@ -33,7 +33,13 @@ length_user_name = 255
 length_user_email = 255
 length_user_firstName = 100
 length_user_lastName = 100
-
+length_user_affiliation = 255
+length_user_description = 255
+length_system_config_key = 100
+length_system_config_value = 4000
+length_system_config_description = 255
+length_limit_id = 255
+length_plan_item_description = 4000
 
 # ロール種別
 # Role Kind
@@ -89,10 +95,6 @@ ALL_ORG_AUTHORITIES = [
     ORG_AUTH_WS_ROLE_USER,
     ORG_AUTH_WS_MAINTE,
 ]
-
-# keycloak realm-managementロール 登録
-# keycloak realm-management role
-ALL_REALM_MANAGEMENT_ROLE = ["manage-users", "view-users"]
 
 # plan未設定時のデフォルト
 # Default when plan is not set

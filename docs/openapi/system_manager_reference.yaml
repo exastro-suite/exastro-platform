@@ -17,7 +17,7 @@ openapi: 3.0.3
 info:
   title: Exastro Platform API (System Management)
   description: Exastro Platform API for System Manager
-  version: 1.3.0
+  version: 1.5.0
 
 servers:
   - url: "https://{host}"
@@ -52,6 +52,8 @@ tags:
   description: プランに関する操作
 - name: UsageService
   description: リソース使用量に関する操作
+- name: CommonService
+  description: システム管理者共通
 
 paths:
   "/auth/realms/master/protocol/openid-connect/token":
@@ -64,6 +66,8 @@ paths:
 
   "/api/platform/{organization_id}/plans":
       $ref: './paths/plans.organizations.yaml'
+  "/api/platform/organizations/{organization_id}":
+      $ref: './paths/organizations.organization_id.yaml'
   "/api/platform/{organization_id}/plans/{plan_start_datetime}":
       $ref: './paths/plans.organizations.plan_start_datetime.yaml'
   "/api/platform/plans":
@@ -73,6 +77,11 @@ paths:
 
   "/api/platform/usages":
       $ref: './paths/usages.yaml'
+
+  "/api/platform/settings/common":
+      $ref: './paths/common.settings.common.yaml'
+  "/api/platform/settings/common/{config_key}":
+      $ref: './paths/common.settings.common.config.yaml'
 
 components:
   schemas:

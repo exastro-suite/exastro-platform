@@ -1,0 +1,91 @@
+get:
+  tags:
+  - InternalPlanService
+  summary: Returns of plan item
+  x-openapi-router-controller: controllers.internal_plan_service_controller
+  operationId: internal_plan_item_get
+  parameters:
+  - name: limit_id
+    in: path
+    required: true
+    schema:
+      type: string
+    description: limit id
+  responses:
+    200:
+      description: A successful response.
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '../schemas/responseOk.yaml'
+              - type: object
+                properties:
+                  data:
+                    type: object
+                    $ref: '../schemas/planItem.yaml'
+    default:
+      description: An unexpected error response.
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'
+put:
+  tags:
+  - InternalPlanService
+  summary: Update a plan item
+  x-openapi-router-controller: controllers.internal_plan_service_controller
+  operationId: internal_plan_item_update
+  parameters:
+  - name: limit_id
+    in: path
+    required: true
+    schema:
+      type: string
+    description: limit id
+  requestBody:
+    content:
+      application/json:
+        schema:
+          $ref: '../schemas/planItemFields.yaml'
+    required: true
+  responses:
+    200:
+      description: A successful response.
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/responseOk.yaml'
+    default:
+      description: An unexpected error response.
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'
+
+delete:
+  tags:
+  - InternalPlanService
+  summary: Delete a plan item
+  x-openapi-router-controller: controllers.internal_plan_service_controller
+  operationId: internal_plan_item_delete
+  parameters:
+  - name: limit_id
+    in: path
+    required: true
+    schema:
+      type: string
+    description: limit id
+  responses:
+    200:
+      description: A successful response.
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/responseOk.yaml'
+    default:
+      description: An unexpected error response.
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'

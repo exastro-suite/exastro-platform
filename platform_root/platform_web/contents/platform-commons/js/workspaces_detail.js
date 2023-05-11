@@ -50,8 +50,8 @@ $(function(){
             displayMenu('menu_workspace');
             // Display Topic Path
             displayTopicPath([
-                {"text": "ワークスペース一覧", "href": location_conf.href.workspaces.list.replace(/{organization_id}/g, CommonAuth.getRealm()) },
-                {"text": "ワークスペース詳細", "href": location_conf.href.workspaces.detail.replace(/{organization_id}/g, CommonAuth.getRealm()).replace('{workspace_id}', workspace_id) },
+                {"text": getText("000-82001", "ワークスペース一覧"), "href": location_conf.href.workspaces.list.replace(/{organization_id}/g, CommonAuth.getRealm()) },
+                {"text": getText("000-82009", "ワークスペース詳細"), "href": location_conf.href.workspaces.detail.replace(/{organization_id}/g, CommonAuth.getRealm()).replace('{workspace_id}', workspace_id) },
             ]);
             display_main(results[1].data, results[2].data);
             finish_onload_progress();
@@ -70,7 +70,7 @@ $(function(){
         //
         // display Exastro IT Automation button
         //
-        $('.to_ita').on('click',() => { 
+        $('.to_ita').on('click',() => {
             window.location = location_conf.href.workspaces.ita.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{workspace_id}/g, workspace_id);
         });
         if(CommonAuth.getAccessibleWorkspaces().indexOf(workspace_id) !== -1) {
@@ -78,6 +78,32 @@ $(function(){
         } else {
             $('.to_ita').prop('disabled', true);
             $('.to_ita').css('cursor', 'not-allowed');
+        }
+
+        //
+        // display Edit Workspace button
+        //
+        $('.button_edit_workspace').on('click',() => {
+            window.location = location_conf.href.workspaces.edit.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{workspace_id}/g, workspace_id);
+        });
+        if(CommonAuth.getAdminWorkspaces().indexOf(workspace_id) !== -1 || CommonAuth.hasAuthority(RolesCommon.ORG_AUTH_WS_MAINTE)) {
+            $('.button_edit_workspace').prop('disabled', false);
+        } else {
+            $('.button_edit_workspace').prop('disabled', true);
+            $('.button_edit_workspace').css('cursor', 'not-allowed');
+        }
+
+        //
+        // display Delete Workspace button
+        //
+        $('.button_delete_workspace').on('click',() => {
+            delete_workspace();
+        });
+        if(CommonAuth.getAdminWorkspaces().indexOf(workspace_id) !== -1 || CommonAuth.hasAuthority(RolesCommon.ORG_AUTH_WS_MAINTE)) {
+            $('.button_delete_workspace').prop('disabled', false);
+        } else {
+            $('.button_delete_workspace').prop('disabled', true);
+            $('.button_delete_workspace').css('cursor', 'not-allowed');
         }
 
         //
@@ -106,5 +132,44 @@ $(function(){
             }
         }
         $("#text_workspace_member").html(memberList);
+    }
+
+    function delete_workspace() {
+        console.log("[CALL] confirm_delete");
+
+        deleteConfirmMessage(
+            getText("000-80017", "実行確認"),
+            getText("000-82005", "以下のワークスペースを削除してよろしいですか？"),
+            workspace_id,
+            getText("000-82006", "削除したワークスペースへのアクセスは以降一切できなくなります。"),
+            CommonAuth.getRealm() + "/" + workspace_id,
+            () => {
+                disabled_button();
+                show_progress();
+
+                // APIを呼出す
+                call_api_promise({
+                    type: "DELETE",
+                    url: api_conf.api.workspaces.delete.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{workspace_id}/g, workspace_id),
+                    headers: {
+                        Authorization: "Bearer " + CommonAuth.getToken(),
+                    },
+                }).then(() => {
+                    hide_progress();
+                    alertMessage(getText("000-80018", "処理結果"), getText("000-82007", "ワークスペースを削除しました。"),
+                        () => {
+                            window.location.href = location_conf.href.workspaces.list.replace(/{organization_id}/g, CommonAuth.getRealm());
+                        });
+                }).catch(() => {
+                    hide_progress();
+                });
+            }
+        );
+    }
+
+    function disabled_button() {
+        $('.to_ita').prop('disabled', true);
+        $('.button_edit_workspace').prop('disabled', true);
+        $('.button_delete_workspace').prop('disabled', true);
     }
 });

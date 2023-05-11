@@ -19,6 +19,8 @@ var api_conf = {
         "workspaces": {
             "post": "/api/{organization_id}/platform/workspaces",
             "get": "/api/{organization_id}/platform/workspaces",
+            "delete": "/api/{organization_id}/platform/workspaces/{workspace_id}",
+            "put": "/api/{organization_id}/platform/workspaces/{workspace_id}",
 
             "detail": {
                 "get": "/api/{organization_id}/platform/workspaces/{workspace_id}",
@@ -31,6 +33,7 @@ var api_conf = {
             "post": "/api/{organization_id}/platform/roles",
             "get": "/api/{organization_id}/platform/roles",
             "put": "/api/{organization_id}/platform/roles/{role_name}",
+            "delete": "/api/{organization_id}/platform/roles/{role_name}",
             "users": {
                 "get": "/api/{organization_id}/platform/roles/{role_name}/users",
                 "post": "/api/{organization_id}/platform/roles/{role_name}/users",
@@ -41,8 +44,14 @@ var api_conf = {
             "get": "/api/{organization_id}/platform/users",
             "post": "/api/{organization_id}/platform/users",
             "get": "/api/{organization_id}/platform/users",
+            "getId": "/api/{organization_id}/platform/users/{user_id}",
             "put": "/api/{organization_id}/platform/users/{user_id}",
             "delete": "/api/{organization_id}/platform/users/{user_id}",
+        },
+        "token": {
+            "post": "/auth/realms/{organization_id}/protocol/openid-connect/token",
+            "get": "/api/{organization_id}/platform/users/_current/refresh_tokens",
+            "delete": "/api/{organization_id}/platform/users/_current/refresh_tokens"
         }
     }
 }
@@ -53,6 +62,7 @@ var location_conf = {
             "new" : "/{organization_id}/platform/workspaces/_new",
             "list": "/{organization_id}/platform/workspaces",
             "detail": "/{organization_id}/platform/workspaces/{workspace_id}",
+            "edit": "/{organization_id}/platform/workspaces/{workspace_id}/edit",
             "ita": "/{organization_id}/workspaces/{workspace_id}/ita/"
         },
         "roles": {
@@ -64,7 +74,8 @@ var location_conf = {
         "users": {
             "new": "/{organization_id}/platform/users/_new",
             "list": "/{organization_id}/platform/users",
-            "edit": "/{organization_id}/platform/users/{user_id}",
+            "detail": "/{organization_id}/platform/users/{user_id}",
+            "edit": "/{organization_id}/platform/users/{user_id}/edit",
         },
         "menu": {
             "toppage": "/{organization_id}/platform/workspaces",

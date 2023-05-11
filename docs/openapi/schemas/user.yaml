@@ -27,6 +27,10 @@ properties:
     type: string
   preferred_username:
     type: string
+  affiliation:
+    type: string
+  description:
+    type: string
   enabled:
     type: boolean
   create_timestamp:

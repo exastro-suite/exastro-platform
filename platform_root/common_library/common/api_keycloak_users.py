@@ -17,6 +17,7 @@ import os
 import json
 import requests
 import urllib
+import inspect
 
 # User Imports
 import globals  # 共通的なglobals Common globals
@@ -60,6 +61,9 @@ def user_get(realm_name, user_name, token, first=0, max=100, search=None):
         realm_name (str): realm name
         user_name (str): user name (Noneの時はすべて取得 None is all user)
         toekn (str): token
+        first (int): start data position index
+        max (int): max get count
+        search (str): search user keyword (Noneの時はすべて取得 None is specifies no criteria)
     Returns:
         Response: HTTP Respose (success : .status_code=200)
     """
@@ -245,5 +249,35 @@ def service_account_user_get(realm_name, client_id, token):
     # サービスアカウントユーザー情報取得
     # get service account user
     request_response = requests.get(f"{api_url}/auth/admin/realms/{realm_name}/clients/{client_id}/service-account-user", headers=header_para)
+
+    return request_response
+
+
+def user_delete(realm_name, user_id, token):
+    """ユーザー削除 user delete
+    Args:
+        realm_name (str): realm name
+        user_id (str): user id
+        toekn (str): token
+    Returns:
+        Response: HTTP Respose (success : .status_code=200)
+    """
+    globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name} realm_name={realm_name}, user_id={user_id}")
+
+    # 呼び出し先設定
+    # Call destination setting
+    api_url = __get_keycloak_api_url()
+
+    header_para = {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer {}".format(token),
+    }
+
+    globals.logger.debug("user delete")
+    # ユーザ情報削除
+    # User information deletetion
+    request_response = requests.delete(f"{api_url}/auth/admin/realms/{realm_name}/users/{user_id}", headers=header_para)
+
+    globals.logger.info(f"### Succeed func:{inspect.currentframe().f_code.co_name}")
 
     return request_response

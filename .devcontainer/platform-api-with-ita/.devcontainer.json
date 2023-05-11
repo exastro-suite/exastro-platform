@@ -21,8 +21,7 @@
 		"../docker-compose.yml",
 		"../docker-compose.devcontainer.yml",
 		"../../../exastro-it-automation/.devcontainer/docker-compose.yml",
-		"./docker-compose.with-ita.yaml",
-		"./docker-compose.with-ita.by-disable.yaml"
+		"./docker-compose.with-ita.yaml"
 	],
 	"service": "platform-api",
 	// Set *default* container specific settings.json values on container create.
@@ -85,6 +84,7 @@
 		//"formulahendry.vscode-mysql",
 		"mitchdenny.ecdc",
 		"ms-vsliveshare.vsliveshare",
+		"snyk-security.snyk-vulnerability-scanner",
 	],
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	"forwardPorts": [
@@ -93,5 +93,5 @@
 	// "onCreateCommand":"sudo dnf install -y git vim diffutils bind-utils iputils && sudo pip3.9 install flake8 && sudo pip3.9 install autopep8",
 	"postCreateCommand": "sudo chmod -R 777 /home/app_user/.vscode-server && sudo chmod 777 /home/app_user/.vscode-server-insiders",
 	"workspaceFolder": "/workspace",
-	"overrideCommand": true
+	"overrideCommand": true,
 }

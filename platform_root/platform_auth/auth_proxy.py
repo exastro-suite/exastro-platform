@@ -531,7 +531,9 @@ class auth_proxy:
                 continue
 
             # Get variables obtained by regular expression as a dictionary - 正規表現で取得した変数をディクショナリとして取得する
-            match_dict = match.groupdict()
+            match_dict = {}
+            for k, v in match.groupdict().items():
+                match_dict[k] = re.escape(v)
 
             for auth in pattern["auth"]:
                 if not ("*" in auth["method"] or request.method in auth["method"]):
@@ -554,7 +556,7 @@ class auth_proxy:
                     else:
                         # If client is specified, check if there is anything that matches the client role
                         # - clientの指定があるときはclientロールに合致するものが無いかチェックする
-                        role_client = role["client"].format(**match_dict)
+                        role_client = role["client"].format(**(match.groupdict()))
                         my_roles = self.token_decode.get("resource_access", {}).get(role_client, {}).get("roles", [])
                         for my_role in my_roles:
                             if re.match(role_name_re, my_role):

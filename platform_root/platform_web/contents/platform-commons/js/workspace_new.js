@@ -29,8 +29,8 @@ $(function(){
             displayMenu('menu_workspace');
             // Display Topic Path
             displayTopicPath([
-                {"text": "ワークスペース一覧", "href": location_conf.href.workspaces.list.replace(/{organization_id}/g, CommonAuth.getRealm()) },
-                {"text": "新規ワークスペース", "href": location_conf.href.workspaces.new.replace(/{organization_id}/g, CommonAuth.getRealm()) },
+                {"text": getText("000-82001", "ワークスペース一覧"), "href": location_conf.href.workspaces.list.replace(/{organization_id}/g, CommonAuth.getRealm()) },
+                {"text": getText("000-82014", "新規ワークスペース"), "href": location_conf.href.workspaces.new.replace(/{organization_id}/g, CommonAuth.getRealm()) },
             ]);
             display_main();
             finish_onload_progress();
@@ -66,56 +66,20 @@ $(function(){
         console.log("--- validate check start ----");
         let result=true;
 
-        //
         // validate workspace id
-        //
-        if($("#form_workspace_id").val() === "") {
-            $("#message_workspace_id").text(
-                getText("400-00011", "必須項目が不足しています。({0})", getText("000-00101", "ワークスペースID")));
-            result = false;
+        validate = WorkspacesCommon.validate.workspace_id($("#form_workspace_id").val());
+        result = result && validate.result;
+        $("#message_workspace_id").text(validate.message);
 
-        } else if($("#form_workspace_id").val().replace(/[a-zA-Z0-9_-]/g,"") !== "") {
-            $("#message_workspace_id").text(
-                getText("400-00017", "指定できない文字が含まれています。(項目:{0},指定可能な文字:{1})",
-                    getText("000-00101", "ワークスペースID"),
-                    getText("000-00101", "半角英数・ハイフン・アンダースコア")));
-            result = false;
-
-        } else if( ! $("#form_workspace_id").val().match(/^[a-zA-Z]/)) {
-            $("#message_workspace_id").text(
-                getText("400-00014", "先頭の文字にアルファベット以外が指定されています。({0})", getText("000-00101", "ワークスペースID")));
-            result = false;
-        } else {
-            $("#message_workspace_id").text("");
-        }
-
-        //
         // validate workspace name
-        //
-        if($("#form_workspace_name").val() === "") {
-            $("#message_workspace_name").text(getText("400-00011", "必須項目が不足しています。({0})", getText("000-00102", "ワークスペース名")));
-            result = false;
-        } else {
-            $("#message_workspace_name").text("");
-        }
+        validate = WorkspacesCommon.validate.workspace_name($("#form_workspace_name").val());
+        result = result && validate.result;
+        $("#message_workspace_name").text(validate.message);
 
-        //
         // validate environments
-        //
-        // 文字数チェック
-        // Character count check
-        environments = $('#form_workspace_environments').val();
-        environments_arr = environments.split(/\r\n|\r|\n/).map(i => i.trim()).filter(i => i.length > 0);
-
-        if(environments_arr.filter(i => i.length > 40).length > 0) {
-            $("#message_workspace_environments").text(getText("400-00012", "指定可能な文字数を超えています。(項目:{0},最大文字数:{1})", getText("000-00105", "環境名"), "40"));
-            result = false;
-        } else if(Array.from(new Set(environments_arr)).length !== environments_arr.length) {
-            $("#message_workspace_environments").text(getText("400-00019", "指定された値が重複しています。（項目:{0}）", getText("000-00105", "環境名")));
-            result = false;
-        } else {
-            $("#message_workspace_environments").text("");
-        }
+        validate = WorkspacesCommon.validate.environments($('#form_workspace_environments').val());
+        result = result && validate.result;
+        $("#message_workspace_environments").text(validate.message);
 
         console.log("--- validate check end [" + result + "] ----");
 
@@ -140,6 +104,7 @@ $(function(){
             }
         }
 
+        show_progress();
         call_api_promise(
             {
                 type: "POST",
@@ -152,9 +117,13 @@ $(function(){
                 dataType: "json",
             }
         ).then(() => {
-            alert("ワークスペースを作成しました");
-            window.location = location_conf.href.workspaces.list.replace(/{organization_id}/g, CommonAuth.getRealm());
+            hide_progress();
+            alertMessage(getText("000-80018", "処理結果"), getText("000-82020", "ワークスペースを作成しました"),
+            () => {
+                window.location = location_conf.href.workspaces.list.replace(/{organization_id}/g, CommonAuth.getRealm());
+            });
         }).catch(() => {
+            hide_progress();
             $('#button_register').prop('disabled',false);
         })
     }

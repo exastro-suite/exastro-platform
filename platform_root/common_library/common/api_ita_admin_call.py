@@ -151,7 +151,6 @@ def ita_workspace_delete(organization_id, workspace_id, user_id, encode_roles, l
     )
 
     header_para = {
-        "Content-Type": "application/json",
         "organization_id": organization_id,
         "User-Id": user_id,
         "Roles": encode_roles,

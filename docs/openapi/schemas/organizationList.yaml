@@ -12,7 +12,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-title: roleList is list of Role resources.
+title: A list of organizational resources.
 type: object
 properties:
   data:

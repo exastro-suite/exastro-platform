@@ -68,6 +68,7 @@ services:
       - ~/.netrc:/home/app_user/.netrc
       - ~/.gitconfig:/home/app_user/.gitconfig
       - ./platform-api/.vscode/launch.json:/workspace/.vscode/launch.json
+      - ./platform-api/.vscode/tasks.json:/workspace/.vscode/tasks.json
       - /usr/share/pki/ca-trust-source/anchors/UserRootCertificate.crt:/etc/ssl/certs/ca-certificates.crt
       - /mnt/mainte/talisman/.talismanrc:/mnt/mainte/talisman/.talismanrc
       - ~/.config/git/ignore:/home/app_user/.config/git/ignore
@@ -132,7 +133,7 @@ services:
 
   platform-db:
     ports:
-      - "0.0.0.0:3306:3306"
+      - "0.0.0.0:3307:3306"
 
   # platform-migration-1:
   #   build:
@@ -191,6 +192,7 @@ services:
       - ../.vscode_extensions/platform-migration/.vscode-server-insiders/extensions:/home/app_user/.vscode-server-insiders/extensions
     environment:
       - FLASK_ENV=development
+      - LOG_LEVEL=DEBUG
       - HTTP_PROXY=${HTTP_PROXY}
       - http_proxy=${HTTP_PROXY}
       - HTTPS_PROXY=${HTTPS_PROXY}

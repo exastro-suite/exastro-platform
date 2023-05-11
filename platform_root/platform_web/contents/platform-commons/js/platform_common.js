@@ -155,7 +155,7 @@ function replaceLanguageText() {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 function displayTopicPath(topicPaths) {
     topicPaths.unshift(
-        {"text":"メインメニュー", "href": location_conf.href.menu.toppage.replace(/{organization_id}/g, CommonAuth.getRealm())}
+        {"text": getText("000-80001", "メインメニュー"), "href": location_conf.href.menu.toppage.replace(/{organization_id}/g, CommonAuth.getRealm())}
     );
     let $topichPathList = $('.topichPathList');
     for(let i = 0; i < topicPaths.length; ++i ) {
@@ -179,17 +179,17 @@ function displayTopicPath(topicPaths) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 function displayMenu(curent) {
     $('.menuList').append(`
-        <li class="menuItem"><a class="menuLink" id="menu_workspace" href="#" tabindex="-1">ワークスペース管理</a></li>
-        <li class="menuItem"><a class="menuLink" id="menu_account_management" href="#" target="keycloak_management_console" style="display: none;">ユーザー管理</a></li>
-        <li class="menuItem"><a class="menuLink" id="menu_role_management" href="#" style="display: none;">ロール管理</a></li>
+        <li class="menuItem"><a class="menuLink" id="menu_workspace" href="#" tabindex="-1">${getText("000-80005", "ワークスペース管理")}</a></li>
+        <li class="menuItem"><a class="menuLink" id="menu_account_management" href="#" style="display: none;">${getText("000-80006", "ユーザー管理")}</a></li>
+        <li class="menuItem"><a class="menuLink" id="menu_role_management" href="#" style="display: none;">${getText("000-80007", "ロール管理")}</a></li>
     `);
     if(curent != null) {
         $(`#${curent}`).addClass("current");
     }
 
     $('#menu_workspace').attr('href', location_conf.href.workspaces.list.replace(/{organization_id}/g, CommonAuth.getRealm()));
-    $('#menu_account_management').attr('href', location_conf.href.menu.account_manaagement.replace(/{organization_id}/g, CommonAuth.getRealm()));
-    // $('#menu_account_management').attr('href', location_conf.href.users.list.replace(/{organization_id}/g, CommonAuth.getRealm()));
+    // $('#menu_account_management').attr('href', location_conf.href.menu.account_manaagement.replace(/{organization_id}/g, CommonAuth.getRealm()));
+    $('#menu_account_management').attr('href', location_conf.href.users.list.replace(/{organization_id}/g, CommonAuth.getRealm()));
     $('#menu_role_management').attr('href', location_conf.href.roles.list.replace(/{organization_id}/g, CommonAuth.getRealm()));
 
     if (CommonAuth.hasAuthority("_og-usr-mt")) {
@@ -273,6 +273,41 @@ function call_api_promise(ajaxparam, api_description, succeed_httpcodes = [200])
     });
 }
 
+function call_api_promise_noMessage(ajaxparam) {
+    return new Promise((resolve, reject) => {
+        console.log(`[CALL] ${ajaxparam.type} ${ajaxparam.url}`);
+        console.log(ajaxparam);
+        $.ajax(ajaxparam).done(
+            function(data, status, jqXHR) {
+                console.log(`[DONE] ${ajaxparam.type} ${ajaxparam.url} status=${jqXHR.status}`);
+                console.log(data);
+                resolve({data: data, status: status, jqXHR: jqXHR});
+            }
+        ).fail(
+            function(jqXHR, textStatus, errorThrown) {
+                let msg;
+                try {
+                    msg = `status:[${jqXHR.status}]`
+                    msg += `\nmessage_id:[${jqXHR.responseJSON.result}]\n${jqXHR.responseJSON.message}`;
+                } catch(e) { }
+
+                console.log(`[ERROR] ${ajaxparam.type} ${ajaxparam.url}\n${msg}`);
+                console.log(ajaxparam);
+                reject({jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown});
+            }
+        );
+    });
+}
+
+function alertMessageApiError(jqXHR, textStatus, errorThrown) {
+    let msg;
+    try {
+        msg = `status:[${jqXHR.status}]`
+        msg += `\nmessage_id:[${jqXHR.responseJSON.result}]\n${jqXHR.responseJSON.message}`;
+    } catch(e) { }
+
+    alert(msg);
+}
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //   Common Dialog
@@ -288,7 +323,7 @@ function alertMessage(title, message, onclose = null) {
         },
         footer: {
             button: {
-                close: { text: "閉じる", action: "normal" }
+                close: { text: getText("000-80011", "閉じる"), action: "normal" }
             }
         },
     },
@@ -313,13 +348,14 @@ function confirmMessage(title, message, onOk = null, onCancel = null) {
         },
         footer: {
             button: {
-                ok: { text: "ＯＫ", action: "positive" },
-                cancel: { text: "キャンセル", action: "normal" }
+                ok: { text: getText("000-80012", "ＯＫ"), action: "positive" },
+                cancel: { text: getText("000-80013", "キャンセル"), action: "normal" }
             }
         },
     },
     {
         ok: function() {
+            $(dialog.$.dbody).find()
             dialog.close();
             if(onOk !== null) {
                 onOk();
@@ -333,6 +369,145 @@ function confirmMessage(title, message, onOk = null, onCancel = null) {
         }
     });
     dialog.open('<div class="alertMessage" style="margin-left: 30px; margin-right: 30px;">'+ message +'</div>');
+}
+
+function deleteConfirmMessage(title, message, deleteResources, cautionMessage, input, onOk = null, onCancel = null) {
+    const dialog = new Dialog({
+        mode: 'modeless',
+        position: 'center',
+        width: 'auto',
+        header: {
+            title: title,
+        },
+        footer: {
+            button: {
+                ok: { text: '<span class="iconButtonIcon icon icon-trash"></span>' + getText("000-80014", "はい、削除します"), action: "danger" },
+                cancel: { text: getText("000-80013", "キャンセル"), action: "normal" }
+            }
+        },
+    },
+    {
+        ok: function() {
+            if($(dialog.$.dbody).find(".confirm_yes").val() != input) {
+                $(dialog.$.dbody).find(".validate_error").css("display", "");
+                $(dialog.$.dbody).find(".confirm_yes").focus();
+                return;
+            }
+            dialog.close();
+            if(onOk !== null) {
+                onOk();
+            }
+        },
+        cancel: function() {
+            dialog.close();
+            if(onCancel !== null) {
+                onCancel();
+            }
+        }
+    });
+
+    let content = "";
+    content += '<div class="alertMessage" style="margin-left: 30px; margin-right: 30px;">'
+    content += message + '<br>';
+    if((typeof deleteResources) == "string") {
+        content += '<ul style="list-style-type:disc; padding-left:30px; background-color: #FFFFEE;"><li>' + fn.cv(deleteResources, "", true) + '</li></ul>'
+    } else {
+        content += '<div style="max-height: 200px; overflow: auto;">'
+        content += '<ul style="list-style-type:disc; padding-left:30px; background-color: #FFFFEE;">' + deleteResources.map((value, i) => { return '<li>' + fn.cv(value, "", true) + '</li>'; }).join("") + '</ul>'
+        content += '</div>'
+    }
+    if(cautionMessage != null && cautionMessage != "" ) {
+        content += '<span class="caution_message">' + cautionMessage+ '</span><br>'
+    }
+    content += '<hr>' + getText("000-80015", '続行する場合は <span style="font-weight: bold;">{0}</span> と入力してください。', fn.cv(input, "", true)) + '<br>'
+    content += '<input class="confirm_yes inputText input" type="text" maxlength="' + input.length + '">'
+    content += '<span class="validate_error" style="display:none;">' + getText("000-80016",'<span style="font-weight: bold;">{0}</span> と入力してください',fn.cv(input, "", true)) + '</span>'
+    content += '</div>';
+
+    dialog.open(content);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//   Workspaces Common
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+const WorkspacesCommon = {
+    validate: {
+        //
+        // validate workspace id
+        //
+        workspace_id: function(workspace_id) {
+            if(workspace_id === "") {
+                return {
+                    "result": false,
+                    "message": getText("400-00011", "必須項目が不足しています。({0})", getText("000-00101", "ワークスペースID"))
+                }
+            } else if(workspace_id.replace(/[a-zA-Z0-9_-]/g,"") !== "") {
+                return {
+                    "result": false,
+                    "message": getText("400-00017", "指定できない文字が含まれています。(項目:{0},指定可能な文字:{1})",
+                                    getText("000-00101", "ワークスペースID"),
+                                    getText("000-00101", "半角英数・ハイフン・アンダースコア")
+                                )
+                }
+
+            } else if( ! workspace_id.match(/^[a-zA-Z]/)) {
+                return {
+                    "result": false,
+                    "message": getText("400-00014", "先頭の文字にアルファベット以外が指定されています。({0})", getText("000-00101", "ワークスペースID"))
+                }
+            } else {
+                return {
+                    "result": true,
+                    "message": ""
+                }
+            }
+        },
+
+        //
+        // validate workspace name
+        //
+        workspace_name: function(workspace_name) {
+            if(workspace_name === "") {
+                return {
+                    "result": false,
+                    "message": getText("400-00011", "必須項目が不足しています。({0})", getText("000-00102", "ワークスペース名"))
+                }
+            } else {
+                return {
+                    "result": true,
+                    "message": ""
+                }
+            }
+        },
+
+        //
+        // validate environments
+        //
+        environments: function(environments) {
+            const MAX_LENGTTH_ENVRONMENT = 40;
+
+            environments_arr = environments.split(/\r\n|\r|\n/).map(i => i.trim()).filter(i => i.length > 0);
+
+            if(environments_arr.filter(i => i.length > MAX_LENGTTH_ENVRONMENT).length > 0) {
+                return {
+                    "result": false,
+                    "message": getText("400-00012", "指定可能な文字数を超えています。(項目:{0},最大文字数:{1})", getText("000-00105", "環境名"), MAX_LENGTTH_ENVRONMENT)
+                }
+            } else if(Array.from(new Set(environments_arr)).length !== environments_arr.length) {
+                return {
+                    "result": false,
+                    "message": getText("400-00019", "指定された値が重複しています。（項目:{0}）", getText("000-00105", "環境名"))
+                }
+            } else {
+                return {
+                    "result": true,
+                    "message": ""
+                }
+            }
+        }
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -407,6 +582,12 @@ const RolesCommon =
         }
     },
 
+    "isAllowedDeleteRole": function(role) {
+        // Can be deleted with the same privileges as role editing
+        // ロール編集と同じ権限で削除可能
+        return RolesCommon.isAllowedEditRole(role);
+    },
+
     "isAllowedGrantRole": function(role) {
         switch(role.kind) {
             case RolesCommon.ROLE_KIND_ORGANIZATION:
@@ -479,13 +660,13 @@ const RolesCommon =
                     try {
                         let workspacesIndex = workspaces.findIndex((i) => {return i.id == authority.name});
                         if( workspacesIndex != -1) {
-                            roleText.push(getText("400-00118", workspaces[workspacesIndex].name + ":使用", workspaces[workspacesIndex].name));
+                            roleText.push(getText("000-00118", workspaces[workspacesIndex].name + ":使用", workspaces[workspacesIndex].name));
 
                         } else if(CommonAuth.isAdminWorkspaceAuthority(authority.name)) {
                             let workspace_id = CommonAuth.authorityNameToWorkspaceId(authority.name);
                             let workspacesIndex = workspaces.findIndex((i) => {return i.id == workspace_id});
                             if( workspacesIndex != -1) {
-                                roleText.push(getText("400-00119", workspaces[workspacesIndex].name + ":管理", workspaces[workspacesIndex].name));
+                                roleText.push(getText("000-00119", workspaces[workspacesIndex].name + ":管理", workspaces[workspacesIndex].name));
                             } else {
                                 roleText.push(getText("400-00120", "権限の無いワークスペース"));
                             }

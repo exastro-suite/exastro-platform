@@ -760,6 +760,44 @@ def validate_password_temporary(password_temporary):
     return result(True)
 
 
+def validate_user_affiliation(user_affiliation):
+    """Validate user affiliation
+
+    Args:
+        user_affiliation (str): user affiliation
+
+    Returns:
+        result: Validation result
+    """
+    if len(user_affiliation) > const.length_user_affiliation:
+        return result(
+            False, 400, '400-{}012'.format(MSG_FUNCTION_ID), '指定可能な文字数を超えています。(項目:{0},最大文字数:{1})',
+            multi_lang.get_text('000-00143', "所属"),
+            str(const.length_user_affiliation)
+        )
+
+    return result(True)
+
+
+def validate_user_description(user_description):
+    """Validate user description
+
+    Args:
+        user_description (str): user description
+
+    Returns:
+        result: Validation result
+    """
+    if len(user_description) > const.length_user_description:
+        return result(
+            False, 400, '400-{}012'.format(MSG_FUNCTION_ID), '指定可能な文字数を超えています。(項目:{0},最大文字数:{1})',
+            multi_lang.get_text('000-00106', "説明"),
+            str(const.length_user_description)
+        )
+
+    return result(True)
+
+
 def validate_user_enabled(user_enabled):
     """Validate user enabled
 
@@ -815,5 +853,142 @@ def validate_organization_setting(body):
 
         # The range check of body["token"]["access_token_lifespan_minutes"] is omitted because it is performed by openapi (connexion)
         # body["token"]["access_token_lifespan_minutes"]の範囲チェックはopenapi(connexion)で実施されているので割愛する
+
+    return result(True)
+
+
+def validate_system_config_key(config_key):
+    """validate system config key
+
+    Args:
+        config_key (str): system config key
+
+    Returns:
+        result: Validation result
+    """
+    if config_key is None or config_key == "":
+        return result(
+            False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
+            multi_lang.get_text('000-00136', "システム設定名")
+        )
+
+    if len(config_key) > const.length_system_config_key:
+        return result(
+            False, 400, '400-{}012'.format(MSG_FUNCTION_ID), '指定可能な文字数を超えています。(項目:{0},最大文字数:{1})',
+            multi_lang.get_text('000-00136', "システム設定名"),
+            str(const.length_system_config_key)
+        )
+
+    return result(True)
+
+
+def validate_system_config_value(config_value):
+    """validate system config value
+
+    Args:
+        config_value (str): system config value
+
+    Returns:
+        result: Validation result
+    """
+    if config_value is None or config_value == "":
+        return result(
+            False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
+            multi_lang.get_text('000-00137', "システム設定値")
+        )
+
+    if len(config_value) > const.length_system_config_value:
+        return result(
+            False, 400, '400-{}012'.format(MSG_FUNCTION_ID), '指定可能な文字数を超えています。(項目:{0},最大文字数:{1})',
+            multi_lang.get_text('000-00137', "システム設定値"),
+            str(const.length_system_config_value)
+        )
+
+    return result(True)
+
+
+def validate_system_config_description(description):
+    """validate system config description
+
+    Args:
+        description (str): system config description
+
+    Returns:
+        result: Validation result
+    """
+    if description is not None and len(description) > const.length_system_config_description:
+        return result(
+            False, 400, '400-{}012'.format(MSG_FUNCTION_ID), '指定可能な文字数を超えています。(項目:{0},最大文字数:{1})',
+            multi_lang.get_text('000-00138', "システム設定値説明"),
+            str(const.length_system_config_description)
+        )
+
+    return result(True)
+
+
+def validate_limit_id(limit_id):
+    """validate limit id
+
+    Args:
+        limit_id (str): limit id
+
+    Returns:
+        result: Validation result
+    """
+    if limit_id is None or limit_id == "":
+        return result(
+            False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
+            multi_lang.get_text('000-00123', "リミットID")
+        )
+
+    if len(limit_id) > const.length_limit_id:
+        return result(
+            False, 400, '400-{}012'.format(MSG_FUNCTION_ID), '指定可能な文字数を超えています。(項目:{0},最大文字数:{1})',
+            multi_lang.get_text('000-00123', "リミットID"),
+            str(const.length_limit_id)
+        )
+
+    return result(True)
+
+
+def validate_plan_item_description(description):
+    """validate plan item description
+
+    Args:
+        description (str): plan item description
+
+    Returns:
+        result: Validation result
+    """
+    if description is not None and len(description) > const.length_plan_item_description:
+        return result(
+            False, 400, '400-{}012'.format(MSG_FUNCTION_ID), '指定可能な文字数を超えています。(項目:{0},最大文字数:{1})',
+            multi_lang.get_text('000-00139', "プラン項目説明"),
+            str(const.length_plan_item_description)
+        )
+
+    return result(True)
+
+
+def validate_plan_item_default(default, max):
+    """validate plan item validate
+
+    Args:
+        default (int): default plan limit
+        max (int): plan item max limit
+
+    Returns:
+        result: Validation result
+    """
+    if default is None:
+        return result(
+            False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
+            multi_lang.get_text('000-00140', "プラン項目デフォルト値")
+        )
+
+    if max is not None and default > max:
+        return result(
+            False, 400, '400-{}025'.format(MSG_FUNCTION_ID), '指定した最大値を超えるデフォルト値を指定することはできません。'
+        )
 
     return result(True)

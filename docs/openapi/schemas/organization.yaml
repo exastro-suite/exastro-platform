@@ -35,3 +35,10 @@ properties:
     type: array
     items:
       $ref: './planMappingOrganization.yaml'
+  enabled:
+    type: boolean
+    description: organization enabled(true) or disabled(false)
+    example: true
+  status:
+    type: string
+    example: Organization Create Complete

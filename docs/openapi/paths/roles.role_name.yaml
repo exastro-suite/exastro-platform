@@ -15,7 +15,7 @@
 put:
   tags:
   - RoleService
-  summary: Update updates an role
+  summary: Update a role
   x-openapi-router-controller: controllers.role_service_controller
   operationId: role_update
   parameters:
@@ -42,6 +42,42 @@ put:
           # organization:
           #   $ref: '../schemas/roleDetailOrganizationPutExample.yaml'
     required: true
+  responses:
+    200:
+      description: A successful response.
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '../schemas/responseOk.yaml'
+              - type: object
+                properties:
+                  data:
+                    type: object
+                    example: null
+    default:
+      description: An unexpected error response.
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'
+delete:
+  tags:
+  - RoleService
+  summary: Delete a role
+  x-openapi-router-controller: controllers.role_service_controller
+  operationId: role_delete
+  parameters:
+  - name: organization_id
+    in: path
+    required: true
+    schema:
+      type: string
+  - name: role_name
+    in: path
+    required: true
+    schema:
+      type: string
   responses:
     200:
       description: A successful response.

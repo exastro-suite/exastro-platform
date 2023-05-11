@@ -39,7 +39,7 @@ $(function(){
             displayMenu('menu_account_management');
             // Display Topic Path
             displayTopicPath([
-                {"text": "ユーザー一覧", "href": location_conf.href.users.list.replace(/{organization_id}/g, CommonAuth.getRealm()) }
+                {"text": getText("000-83001", "ユーザー一覧"), "href": location_conf.href.users.list.replace(/{organization_id}/g, CommonAuth.getRealm()) }
             ]);
 
             display_main(results[1].data);
@@ -132,23 +132,48 @@ $(function(){
             // 明細にデータを埋め込み行を明細を作りこむ
             for(let i = 0; i < Math.min(users.length, paging.rows_per_page); ++i) {
                 const user = users[i];
+                const isUpdateAbleRow = UsersCommon.isAllowedEditUser(user); // 更新可能か
+                const isSystemAccount = UsersCommon.isSystemUser(user);
 
-                row_html = row_template
+                const row_html = row_template
                     .replace(/\${user_id}/g, fn.cv(user.id,'',true))
                     .replace(/\${username}/g, fn.cv(user.preferred_username,'',true))
                     .replace(/\${email}/g, fn.cv(user.email,'',true))
                     .replace(/\${firstName}/g, fn.cv(user.firstName,'',true))
                     .replace(/\${lastName}/g, fn.cv(user.lastName,'',true))
+                    .replace(/\${affiliation}/g, fn.cv(user.affiliation,'',true))
                     .replace(/\${enabled}/g, (user.enabled) ? '<span class="icon icon-check"></span>' : '')
                     .replace(/\${create_timestamp}/g, fn.date(new Date(user.create_timestamp),'yyyy/MM/dd HH:mm:ss'))
-                $("#users_list tbody").append(row_html);
-            }
 
+                const $row = $("#users_list tbody").append(row_html).find(".datarow:last-child");
+
+                console.log("$row", $row);
+                console.log("button_edit", $row.find(".button_edit"));
+                console.log("btn_delete", $row.find(".btn_delete"));
+
+                $row.find(".button_edit")
+                    .prop("disabled", isSystemAccount || !isUpdateAbleRow)
+                    .css("cursor", isSystemAccount || !isUpdateAbleRow ? "not-allowed": "")
+                    .css("display", isSystemAccount? "none": "");
+
+                $row.find(".btn_delete")
+                    .prop("disabled", isSystemAccount || !isUpdateAbleRow)
+                    .css("cursor", isSystemAccount || !isUpdateAbleRow? "not-allowed": "")
+                    .css("display", isSystemAccount? "none": "");
+
+            }
 
             //
             // edit user
             //
-            $('#users_list .to_detail').on('click', function() {
+            $('#users_list .datarow .to_detail').on('click', function() {
+                let user_id = $(this).attr('data-id');
+                if (user_id != undefined){
+                    window.location = location_conf.href.users.detail.replace('{organization_id}',CommonAuth.getRealm()).replace('{user_id}',user_id);
+                }
+            });
+
+            $('#users_list .datarow .button_edit').on('click', function() {
                 let user_id = $(this).attr('data-id');
                 if (user_id != undefined){
                     window.location = location_conf.href.users.edit.replace('{organization_id}',CommonAuth.getRealm()).replace('{user_id}',user_id);
@@ -158,25 +183,8 @@ $(function(){
             //
             // delete user
             //
-            $('#users_list .btn_delete').on('click', function() {
-                if (confirm("delete ok"))
-                {
-
-                }
-            });
-
-            $('#users_list .btn_delete').each(function(index, element) {
-                const $element = $(element);
-                const id = $element.attr('data-id');
-                const usersIndex = users.findIndex((i) => {return i.id == id});
-                if(usersIndex === -1) {
-                    allowedEditUser = false;
-                } else {
-                    allowedEditUser = UsersCommon.isAllowedEditUser(users[usersIndex]);
-                    $element.css('display', UsersCommon.isSystemUser(users[usersIndex])? 'none': '');
-                }
-                $element.prop('disabled', !allowedEditUser);
-                $element.css('cursor', allowedEditUser? '' :'not-allowed');
+            $('#users_list .datarow .btn_delete').on('click', function() {
+                click_delete_user_button($(this).attr('data-id'), $(this).attr('username'));
             });
         }
         $('#users_list .datarow').css('display','');
@@ -229,4 +237,51 @@ $(function(){
         movePage();
     });
 
+    // delete user button event
+    function click_delete_user_button(user_id, username) {
+        console.log("username", username);
+        deleteConfirmMessage(
+            getText("000-80017", "実行確認"),
+            getText("000-83005", "以下のユーザーを削除してよろしいですか？"),
+            username,
+            getText("000-83006", "削除したユーザーは以降ログインできなくなります。"),
+            CommonAuth.getRealm() + "/" + username,
+            () => {
+                disable_event_elements(true);
+                show_progress();
+
+                // APIを呼出す
+                call_api_promise({
+                    type: "DELETE",
+                    url: api_conf.api.users.delete.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{user_id}/g, user_id),
+                    headers: {
+                        Authorization: "Bearer " + CommonAuth.getToken(),
+                    },
+                }).then(() => {
+                    if(user_id == CommonAuth.getUserId()) {
+                        return new Promise((resolve, reject) => {resolve(null)})
+                    } else {
+                        return call_api_promise_users();
+                    }
+                }).then((results) => {
+                    if( results != null) {
+                        // 一覧の再描画
+                        display_main(results.data);
+                    }
+                    hide_progress();
+                    alertMessage(getText("000-80018", "処理結果"), getText("000-83007", "ユーザーを削除しました。"),
+                    () => {
+                        if(user_id == CommonAuth.getUserId()) {
+                            // 自分自身を消したときは、top画面に遷移しログイン画面へ
+                            // When you erase yourself, transition to the top screen and go to the login screen
+                            window.location = location_conf.href.menu.toppage.replace(/{organization_id}/g, CommonAuth.getRealm());
+                        }
+                    });
+                }).catch(() => {
+                    disable_event_elements(false);
+                    hide_progress();
+                });
+            }
+        );
+    }
 });

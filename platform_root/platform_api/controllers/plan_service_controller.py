@@ -45,7 +45,19 @@ def plan_item_list():
             cursor.execute(queries_plans.SQL_QUERY_PLAN_ITEMS)
             plan_items = cursor.fetchall()
 
-    data = [{"id": r["LIMIT_ID"], "informations": json.loads(r["INFORMATIONS"])} for r in plan_items]
+            cursor.execute(queries_plans.SQL_QUERY_PLAN_LIMITS + " WHERE PLAN_ID = %(plan_id)s", {"plan_id": common_const.DEFAULT_PLAN_ID})
+            default_limits = cursor.fetchall()
+
+    data = []
+    for plan_item in plan_items:
+        data_item = {
+            "id": plan_item["LIMIT_ID"],
+            "informations": json.loads(plan_item["INFORMATIONS"]),
+        }
+        data_item["informations"]["default"] = next((limit["LIMIT_VALUE"] for limit in default_limits if limit["LIMIT_ID"] == plan_item["LIMIT_ID"]), None)
+
+        data.append(data_item)
+
     return common.response_200_ok(data)
 
 

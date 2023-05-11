@@ -87,8 +87,8 @@ services:
       retries: 200
     environment:
       - TZ=Asia/Tokyo
-      - KEYCLOAK_ADMIN=admin
-      - KEYCLOAK_ADMIN_PASSWORD=password
+      - KEYCLOAK_ADMIN=${KEYCLOAK_ADMIN:-admin}
+      - KEYCLOAK_ADMIN_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD:-password}
       - KC_DB=mariadb
       - KC_DB_URL_HOST=platform-db
       - KC_DB_URL_DATABASE=keycloak
@@ -102,6 +102,7 @@ services:
     depends_on:
       platform-migration-1:
         condition: service_completed_successfully
+
   platform-db:
     image: mariadb:10.4.8
     healthcheck:
@@ -114,6 +115,7 @@ services:
     environment:
       - TZ=Asia/Tokyo
       - MYSQL_ROOT_PASSWORD=password
+
   platform-web:
     user: 1000:1000
     build:
@@ -141,7 +143,6 @@ services:
     environment:
       - TZ=Asia/Tokyo
       - LISTEN_PORT=8000
-      # - PYTHONPATH=/app/
       - CONFIG_API_PATH=/app/api.conf
       - PYTHONIOENCODING=utf-8
       - API_KEYCLOAK_HOST=keycloak
@@ -157,6 +158,7 @@ services:
       - DB_ADMIN_USER=root
       - DB_ADMIN_PASSWORD=password
       - ENCRYPT_KEY=${ENCRYPT_KEY}
+
   platform-migration-1:
     user: 1000:1000
     build:
@@ -182,6 +184,7 @@ services:
       - KEYCLOAK_DB_PASSWORD=password
       # - TIMEOUT_SECONDS_CONNECT_DB=600
       # - TIMEOUT_SECONDS_KEYCLOAK_START=600
+
   platform-migration-2:
     user: 1000:1000
     build:
@@ -196,8 +199,8 @@ services:
     environment:
       - TZ=Asia/Tokyo
       - PYTHONIOENCODING=utf-8
-      - KEYCLOAK_USER=admin
-      - KEYCLOAK_PASSWORD=password
+      - KEYCLOAK_USER=${KEYCLOAK_ADMIN:-admin}
+      - KEYCLOAK_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD:-password}
       - API_KEYCLOAK_HOST=keycloak
       - API_KEYCLOAK_PROTOCOL=http
       - API_KEYCLOAK_PORT=8080
@@ -217,34 +220,3 @@ services:
       platform-migration-1:
         condition: service_completed_successfully
 
-  # platform-job:
-  #   user: 1000:1000
-  #   build:
-  #     dockerfile: ./platform_root/platform_job/Dockerfile
-  #     context: ../.
-  #     args:
-  #       - HTTP_PROXY=${HTTP_PROXY}
-  #       - http_proxy=${HTTP_PROXY}
-  #       - HTTPS_PROXY=${HTTPS_PROXY}
-  #       - https_proxy=${HTTPS_PROXY}
-  #   command: python3 /app/platform_init.py
-  #   environment:
-  #     - TZ=Asia/Tokyo
-  #     - PYTHONIOENCODING=utf-8
-  #     - KEYCLOAK_USER=admin
-  #     - KEYCLOAK_PASSWORD=password
-  #     - API_KEYCLOAK_HOST=keycloak
-  #     - API_KEYCLOAK_PROTOCOL=http
-  #     - API_KEYCLOAK_PORT=8080
-  #     - DB_HOST=platform-db
-  #     - DB_DATABASE=platform
-  #     - DB_USER=app_user
-  #     - DB_PASSWORD=password
-  #     - DB_ADMIN_USER=root
-  #     - DB_ADMIN_PASSWORD=password
-  #     - ENCRYPT_KEY=${ENCRYPT_KEY}
-  #   depends_on:
-  #     platform-db:
-  #       condition: service_healthy
-  #     keycloak:
-  #       condition: service_healthy

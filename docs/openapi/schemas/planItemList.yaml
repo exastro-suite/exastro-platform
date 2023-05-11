@@ -13,9 +13,17 @@
 #   limitations under the License.
 
 title: plan item list is list of plan items resources.
-type: object
-properties:
-  data:
-    type: array
-    items:
-      $ref: './planItem.yaml'
+type: array
+items:
+  $ref: './planItem.yaml'
+example:
+  [
+    {
+      id: "platform.workspaces",
+      informations: {
+        description: "max workspaces",
+        max : 1000,
+        default: 100
+      }
+    }
+  ]

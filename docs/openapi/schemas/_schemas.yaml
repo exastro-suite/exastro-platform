@@ -18,6 +18,8 @@ responseStat:
   $ref: "./responseStat.yaml"
 runtimeError:
   $ref: "./runtimeError.yaml"
+runtimeErrorConflict:
+  $ref: "./runtimeErrorConflict.yaml"
 organization:
   $ref: "./organization.yaml"
 organizationCreate:
@@ -40,6 +42,8 @@ planItem:
   $ref: "./planItem.yaml"
 planItemList:
   $ref: "./planItemList.yaml"
+planItemFields:
+  $ref: "./planItemFields.yaml"
 limits:
   $ref: "./limits.yaml"
 limitsList:
@@ -62,6 +66,8 @@ userList:
   $ref: "./userList.yaml"
 userCreate:
   $ref: "./userCreate.yaml"
+userUpdate:
+  $ref: "./userUpdate.yaml"
 userCredentials:
   $ref: "./userCredentials.yaml"
 userRequiredActions:
@@ -74,6 +80,8 @@ workspace:
   $ref: "./workspace.yaml"
 workspaceList:
   $ref: "./workspaceList.yaml"
+workspaceUpdate:
+  $ref: "./workspaceUpdate.yaml"
 userWorkspace:
   $ref: "./userWorkspace.yaml"
 userWorkspaceList:
@@ -102,3 +110,13 @@ tokenResponseError:
   $ref: "./tokenResponseError.yaml"
 tokenRefreshList:
   $ref: "./tokenRefreshList.yaml"
+systemConfig:
+  $ref: "./systemConfig.yaml"
+systemConfigList:
+  $ref: "./systemConfigList.yaml"
+systemConfigCreate:
+  $ref: "./systemConfigCreate.yaml"
+systemConfigUpdate:
+  $ref: "./systemConfigUpdate.yaml"
+systemConfigValue:
+  $ref: "./systemConfigValue.yaml"

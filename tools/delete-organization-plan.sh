@@ -18,23 +18,19 @@ if [ "${CONFIRM}" != "Y" -a "${CONFIRM}" != "y" ]; then
     exit 1
 fi
 
-# echo "POST JSON:"
-# echo "${BODY_JSON}"
-# echo
-
 TEMPFILE_API_RESPONSE="/tmp/`basename $0`.$$.1"
 TEMPFILE_API_CODE="/tmp/`basename $0`.$$.2"
+
+ENCODE_DATETIME=$(echo ${START_DATETIME} | jq -Rr '@uri')
 
 touch "${TEMPFILE_API_RESPONSE}"
 touch "${TEMPFILE_API_CODE}"
 
 curl ${CURL_OPT} -X DELETE \
     -u ${USERNAME}:${PASSWORD} \
-    -H 'Content-type: application/json' \
-    -d "${BODY_JSON}" \
     -o "${TEMPFILE_API_RESPONSE}" \
     -w '%{http_code}\n' \
-    "${CONF_BASE_URL}/api/platform/${ORG_ID}/plans/${START_DATETIME}" > "${TEMPFILE_API_CODE}"
+    "${CONF_BASE_URL}/api/platform/${ORG_ID}/plans/${ENCODE_DATETIME}" > "${TEMPFILE_API_CODE}"
 
 RESULT_CURL=$?
 RESULT_CODE=$(cat "${TEMPFILE_API_CODE}")

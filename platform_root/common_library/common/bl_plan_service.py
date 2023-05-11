@@ -15,6 +15,7 @@
 from contextlib import closing
 from datetime import datetime
 import pymysql
+import json
 
 from common_library.common import common, const as common_const
 from common_library.common.db import DBconnector
@@ -51,25 +52,28 @@ def organization_limits_get(organization_id, limit_id=None):
             cursor.execute(queries_bl_plan.SQL_QUERY_ORGANIZATION_PLAN + where, parameter)
             org_plans = cursor.fetchall()
 
+            limits_where = " WHERE plan_id = %(plan_id)s" + (" AND limit_id LIKE CONCAT(%(limit_id)s,'%%')" if limit_id is not None else "")
+
+            # get default plan
+            cursor.execute(queries_bl_plan.SQL_QUERY_PLAN_LIMITS + limits_where, {"plan_id": common_const.DEFAULT_PLAN_ID, "limit_id": limit_id})
+            default_limits = cursor.fetchall()
+
+            # get organization plan
             if len(org_plans) >= 1:
-                plan_id = org_plans[0]["PLAN_ID"]
+                cursor.execute(queries_bl_plan.SQL_QUERY_PLAN_LIMITS + limits_where, {"plan_id": org_plans[0]["PLAN_ID"], "limit_id": limit_id})
+                org_limits = cursor.fetchall()
             else:
-                plan_id = common_const.DEFAULT_PLAN_ID
+                org_limits = None
 
-            parameter = {
-                "plan_id": plan_id,
-            }
-            where = " WHERE plan_id = %(plan_id)s"
-            if limit_id is not None:
-                parameter["limit_id"] = limit_id
-                where = where + " AND limit_id LIKE CONCAT(%(limit_id)s,'%%')"
-
-            cursor.execute(queries_bl_plan.SQL_QUERY_PLAN_LIMITS + where, parameter)
-            result_plan_limits = cursor.fetchall()
-
+    # make response data
     data = {}
-    for plan_limit in result_plan_limits:
-        data[plan_limit["LIMIT_ID"]] = plan_limit["LIMIT_VALUE"]
+    if org_limits is not None:
+        for limit in org_limits:
+            data[limit["LIMIT_ID"]] = limit["LIMIT_VALUE"]
+
+    for limit in default_limits:
+        if not (limit["LIMIT_ID"] in data):
+            data[limit["LIMIT_ID"]] = limit["LIMIT_VALUE"]
 
     return data
 
@@ -208,3 +212,153 @@ def organization_plan_create(user_id, organization_id, plan_id, plan_start_datet
                     plan_id,
                 )
                 raise common.InternalErrorException(message_id=message_id, message=message)
+
+
+def organization_plan_delete(organization_id):
+    """Delete organization plan
+
+    Args:
+        organization_id (str): organization id
+    """
+    with closing(DBconnector().connect_platformdb()) as conn:
+        with conn.cursor() as cursor:
+            cursor.execute(queries_bl_plan.SQL_DELETE_ORGANIZATION_PLAN, {"organization_id": organization_id})
+
+        conn.commit()
+    return
+
+
+def plan_item_create(conn, user_id, plan_item):
+    """create plan item
+
+    Args:
+        conn (connection): database connection
+        user_id (str): user id
+        plan_item (dict): plan item
+    """
+    with conn.cursor() as cursor:
+
+        default = plan_item.get("informations", {}).get("default")
+
+        informations = {
+            "description": plan_item.get("informations", {}).get("description"),
+            "max": plan_item.get("informations", {}).get("max")
+        }
+
+        # insert t_plan_item
+        parameter = {
+            "limit_id": plan_item.get("id"),
+            "informations": json.dumps(informations),
+            "create_user": user_id
+        }
+
+        cursor.execute(queries_bl_plan.SQL_INSERT_PLAN_ITEM, parameter)
+
+        # insert default plan
+        parameter = {
+            "plan_id": common_const.DEFAULT_PLAN_ID,
+            "limit_id": plan_item.get("id"),
+            "limit_value": default,
+            "create_user": user_id
+        }
+
+        cursor.execute(queries_bl_plan.SQL_INSERT_PLAN_LIMIT, parameter)
+
+
+def plan_item_get(conn, limit_id):
+    with conn.cursor() as cursor:
+
+        # get infomation from T_PLAN_ITEM
+        parameter = {
+            "limit_id": limit_id
+        }
+
+        where = "WHERE limit_id = %(limit_id)s"
+
+        cursor.execute(queries_bl_plan.SQL_QUERY_PLAN_ITEMS + where, parameter)
+        plan_item = cursor.fetchone()
+
+        if plan_item is None:
+            return None
+
+        # get default limit_value from T_PLAN
+        parameter = {
+            "limit_id": limit_id,
+            "plan_id": common_const.DEFAULT_PLAN_ID
+        }
+
+        where = "WHERE limit_id = %(limit_id)s AND PLAN_ID = %(plan_id)s"
+
+        cursor.execute(queries_bl_plan.SQL_QUERY_PLAN_LIMITS + where, parameter)
+        plan_limit = cursor.fetchone()
+
+    informations = json.loads(plan_item.get("INFORMATIONS"))
+    informations["default"] = plan_limit.get("LIMIT_VALUE") if plan_limit is not None else None
+
+    data = {
+        "id": plan_item.get("LIMIT_ID"),
+        "informations": informations
+    }
+
+    return data
+
+
+def plan_item_update(conn, user_id, limit_id, plan_item):
+    """update plan item
+
+    Args:
+        conn (connection): database connection
+        user_id (str): user id
+        limit_id (str): limit id
+        plan_item (dict): plan item
+    """
+    with conn.cursor() as cursor:
+        default = plan_item.get("informations", {}).get("default")
+
+        informations = {
+            "description": plan_item.get("informations", {}).get("description"),
+            "max": plan_item.get("informations", {}).get("max")
+        }
+
+        # update t_plan_item
+        parameter = {
+            "limit_id": limit_id,
+            "informations": json.dumps(informations),
+            "last_update_user": user_id
+        }
+
+        cursor.execute(queries_bl_plan.SQL_UPDATE_PLAN_ITEM, parameter)
+
+        # update default plan
+        parameter = {
+            "plan_id": common_const.DEFAULT_PLAN_ID,
+            "limit_id": limit_id,
+            "limit_value": default,
+            "create_user": user_id
+        }
+
+        cursor.execute(queries_bl_plan.SQL_INSERT_PLAN_LIMIT, parameter)
+
+
+def plan_item_delete(conn, limit_id):
+    """delete plan item
+
+    Args:
+        conn (connection): database connection
+        limit_id (str): limit id
+    """
+    with conn.cursor() as cursor:
+        # delete t_plan_item
+        parameter = {
+            "limit_id": limit_id
+        }
+
+        cursor.execute(queries_bl_plan.SQL_DELETE_PLAN_ITEM, parameter)
+
+        # delete default plan item
+        parameter = {
+            "plan_id": common_const.DEFAULT_PLAN_ID,
+            "limit_id": limit_id
+        }
+
+        cursor.execute(queries_bl_plan.SQL_DELETE_PLAN_LIMIT, parameter)

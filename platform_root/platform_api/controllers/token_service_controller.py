@@ -11,7 +11,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from flask import request, Response
+from flask import request, make_response
 import os
 from contextlib import closing
 import json
@@ -101,12 +101,19 @@ def token_create(organization_id):  # noqa: E501
         # remake response header
         excluded_headers = ['content-encoding', 'content-length', 'connection', 'keep-alive', 'proxy-authenticate',
                             'proxy-authorization', 'te', 'trailers', 'transfer-encoding', 'Upgrade']
-        headers = [
-            (k, v) for k, v in redirect_response.raw.headers.items()
+        headers = {
+            k: v for k, v in redirect_response.raw.headers.items()
             if k.lower() not in excluded_headers
-        ]
+        }
 
-        return Response(redirect_response.content, redirect_response.status_code, headers)
+        # 戻り値をそのまま返却
+        # Return the return value as it is
+        response = make_response()
+        response.status_code = redirect_response.status_code
+        response.data = redirect_response.content
+        response.headers = headers
+
+        return response
 
     except Exception as e:
         # When an error occurs, respond in the same format as keycloak (openid-connect format)

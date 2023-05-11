@@ -2354,6 +2354,7 @@ module.service("PolicyController", function($http, $route, $location, ResourceSe
             var previousPage = policyViewState.state.previousPage;
 
             if (policyViewState.state.newPolicyName) {
+                // deepcode ignore Sqli: policyViewState.state.newPolicyName is not applicable because there is no problem
                 ResourceServerPolicy.query({
                    realm: realm.realm,
                    client : client.id,
