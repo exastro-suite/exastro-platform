@@ -64,6 +64,7 @@ def organization_create(body, retry=None):
     organization_id = body.get("id")
     organization_name = body.get("name")
     options = body.get("options")
+    options_ita = body.get("optionsIta")
     org_mng_users = body.get("organization_managers")
 
     # validation check
@@ -290,7 +291,7 @@ def organization_create(body, retry=None):
     if is_ITA_CREATE:
         # Organization Database 作成
         # Organization Database creation
-        __ita_create(organization_id, user_id)
+        __ita_create(organization_id, user_id, options_ita)
 
     if is_PLAN_CREATE:
         # Organization Plan 作成
@@ -1414,12 +1415,13 @@ def __organization_database_update(organization_id, user_id):
     return
 
 
-def __ita_create(organization_id, user_id):
+def __ita_create(organization_id, user_id, options_ita):
     """Exastro IT Automation initialize call
 
     Args:
         organization_id (str): organization id
         user_id (str): user id
+        options_ita (dict): ita option
     """
 
     globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
@@ -1431,8 +1433,10 @@ def __ita_create(organization_id, user_id):
         "Language": request.headers.get("Language"),
     }
 
-    json_para = {
-    }
+    if options_ita is None or len(options_ita) == 0:
+        json_para = {}
+    else:
+        json_para = options_ita
 
     # 呼び出し先設定
     # Call destination setting
