@@ -365,7 +365,11 @@ class auth_proxy:
                 request_files = {}
 
         # レスポンスContent-Type
-        request_content_type = request.headers['Content-Type'].lower()
+        if request.content_type:
+            request_content_type = request.content_type.lower()
+        else:
+            request_content_type = ""
+        globals.logger.debug(f'request_content_type: {request_content_type}')
 
         # 引数
         # query_string
