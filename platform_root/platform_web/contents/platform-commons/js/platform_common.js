@@ -449,6 +449,64 @@ function deleteConfirmMessage(title, message, deleteResources, cautionMessage, i
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
+//   Organizations Common
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+const OrganizationsCommon = {
+    validate: {
+        //
+        // validate organization id
+        //
+        organization_id: function(organization_id) {
+            if(organization_id === "") {
+                return {
+                    "result": false,
+                    "message": getText("400-00011", "必須項目が不足しています。({0})", getText("000-00103", "オーガナイゼーションID"))
+                }
+            } else if(organization_id.replace(/[a-zA-Z0-9_-]/g,"") !== "") {
+                return {
+                    "result": false,
+                    "message": getText("400-00017", "指定できない文字が含まれています。(項目:{0},指定可能な文字:{1})",
+                                    getText("000-00103", "オーガナイゼーションID"),
+                                    getText("000-31001", "半角英数・ハイフン・アンダースコア")
+                                )
+                }
+
+            } else if( ! organization_id.match(/^[a-zA-Z]/)) {
+                return {
+                    "result": false,
+                    "message": getText("400-00014", "先頭の文字にアルファベット以外が指定されています。({0})", getText("000-00103", "オーガナイゼーションID"))
+                }
+            } else {
+                return {
+                    "result": true,
+                    "message": ""
+                }
+            }
+        },
+
+        //
+        // validate organization name
+        //
+        organization_name: function(organization_name) {
+            if(organization_name === "") {
+                return {
+                    "result": false,
+                    "message": getText("400-00011", "必須項目が不足しています。({0})", getText("000-00104", "オーガナイゼーション名"))
+                }
+            } else {
+                return {
+                    "result": true,
+                    "message": ""
+                }
+            }
+        }
+
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
 //   Workspaces Common
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -468,7 +526,7 @@ const WorkspacesCommon = {
                     "result": false,
                     "message": getText("400-00017", "指定できない文字が含まれています。(項目:{0},指定可能な文字:{1})",
                                     getText("000-00101", "ワークスペースID"),
-                                    getText("000-00101", "半角英数・ハイフン・アンダースコア")
+                                    getText("000-31001", "半角英数・ハイフン・アンダースコア")
                                 )
                 }
 
