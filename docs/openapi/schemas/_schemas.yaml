@@ -120,3 +120,5 @@ systemConfigUpdate:
   $ref: "./systemConfigUpdate.yaml"
 systemConfigValue:
   $ref: "./systemConfigValue.yaml"
+maintenanceModeSettings:
+  $ref: "./maintenanceModeSettings.yaml"

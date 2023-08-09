@@ -992,3 +992,40 @@ def validate_plan_item_default(default, max):
         )
 
     return result(True)
+
+
+def validate_maintenance_mode(config_key, config_value):
+    """validate maintenance mode name, setting value
+
+    Args:
+        config_key (str): maintenance mode name
+        config_value (str): maintenance setting value
+
+    Returns:
+        result: Validation result
+    """
+    accept_key_value = {
+        "key": [
+            "backyard_execute_stop",
+            "data_update_stop"
+        ],
+        "value": [
+            "0",
+            "1"
+        ]
+    }
+    if config_key is None or (str(config_key).lower() not in accept_key_value['key']):
+        return result(
+            False, 400, '400-{}026'.format(MSG_FUNCTION_ID),
+            'メンテナンスモード名に「{}」以外が指定されています。({}:{})',
+            '/'.join(accept_key_value['key']), config_key, config_value
+        )
+
+    if config_value is None or (str(config_value) not in accept_key_value['value']):
+        return result(
+            False, 400, '400-{}027'.format(MSG_FUNCTION_ID),
+            '設定値に「{}」以外が指定されています。({}:{}) ',
+            '/'.join(accept_key_value['value']), config_key, config_value
+        )
+
+    return result(True)
