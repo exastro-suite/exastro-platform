@@ -20,7 +20,7 @@ import inspect
 import pymysql
 import base64
 
-from common_library.common import common, validation, multi_lang
+from common_library.common import common, validation, multi_lang, maintenancemode
 from common_library.common import api_keycloak_tokens, api_keycloak_roles, api_ita_admin_call
 from common_library.common import resources
 from common_library.common import bl_plan_service
@@ -66,6 +66,20 @@ def workspace_create(body, organization_id):
         description = ""
         environments = []
         wsadmin_users = []
+
+    # メンテナンスモード(data_update_stop)中は、エラー
+    # error during maintenance mode (data_update_stop)
+    mode_name = "data_update_stop"
+    target_name = "Workspace"
+    maintenance_mode = maintenancemode.maintenace_mode_get(mode_name)
+    if maintenance_mode == "1":
+        message_id = f"498-{MSG_FUNCTION_ID}001"
+        message = multi_lang.get_text(
+            message_id,
+            "メンテナンス中の為、{}の作成は出来ません。({})",
+            target_name,
+            workspace_id)
+        raise common.MaintenanceException(message_id=message_id, message=message)
 
     # validation check
     validate = validation.validate_workspace_id(workspace_id)
@@ -296,6 +310,20 @@ def workspace_delete(organization_id, workspace_id):  # noqa: E501
     """
     globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
 
+    # メンテナンスモード(data_update_stop)中は、エラー
+    # error during maintenance mode (data_update_stop)
+    mode_name = "data_update_stop"
+    target_name = "Workspace"
+    maintenance_mode = maintenancemode.maintenace_mode_get(mode_name)
+    if maintenance_mode == "1":
+        message_id = f"498-{MSG_FUNCTION_ID}002"
+        message = multi_lang.get_text(
+            message_id,
+            "メンテナンス中の為、{}の削除は出来ません。({})",
+            target_name,
+            workspace_id)
+        raise common.MaintenanceException(message_id=message_id, message=message)
+
     r = connexion.request
 
     user_id = r.headers.get("User-id")
@@ -408,6 +436,20 @@ def workspace_update(body, organization_id, workspace_id):  # noqa: E501
     :rtype: ResponseOk
     """
     globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
+
+    # メンテナンスモード(data_update_stop)中は、エラー
+    # error during maintenance mode (data_update_stop)
+    mode_name = "data_update_stop"
+    target_name = "Workspace"
+    maintenance_mode = maintenancemode.maintenace_mode_get(mode_name)
+    if maintenance_mode == "1":
+        message_id = f"498-{MSG_FUNCTION_ID}003"
+        message = multi_lang.get_text(
+            message_id,
+            "メンテナンス中の為、{}の更新は出来ません。({})",
+            target_name,
+            workspace_id)
+        raise common.MaintenanceException(message_id=message_id, message=message)
 
     # 更新する情報の取得
     # get information to be updated
