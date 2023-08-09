@@ -28,6 +28,7 @@ from flask_log_request_id import RequestID
 # User Imports
 import globals
 import common_library.common.common as common
+import common_library.common.maintenancemode as maintenancemode
 from common_library.common.exastro_logging import ExastroLogRecordFactory, LOGGING
 from common_library.common.db import DBconnector
 from common_library.common import multi_lang
@@ -205,6 +206,21 @@ def ita_admin_api_call(subpath):
 
         # return jsonify({"result": "200", "time": str(datetime.now())}), 200
 
+        # メンテナンスモード(DATA_UPDATE_STOP)中、GET以外は、エラー
+        # During maintenance mode (data_update_stop), except for GET, error
+        mode_name = "data_update_stop"
+        target_name = "Exastro IT Automation API (System Management)"
+        maintenance_mode = maintenancemode.maintenace_mode_get(mode_name)
+        if maintenance_mode == "1" and request.method != "GET":
+            message_id = "498-00001"
+            message = multi_lang.get_text(
+                message_id,
+                "メンテナンス中の為、{}は利用出来ません。({}:/api/ita/{})",
+                target_name, request.method, subpath
+            )
+            info = 'MaintenanceMode({}:{})'.format(mode_name, maintenance_mode)
+            raise common.MaintenanceException(info, message_id=message_id, message=message)
+
         # Common authorization proxy processing call - 共通の認可proxy処理呼び出し
 
         # サービスアカウントを使うためにClientのSercretを取得
@@ -256,6 +272,10 @@ def ita_admin_api_call(subpath):
         message_id = "403-00001"
         info = common.multi_lang.get_text(message_id, "permission error")
         raise common.NotAllowedException(message_id=message_id, message=info)
+
+    except common.MaintenanceException as e:
+        globals.logger.info(f'under maintenance:{e.args}')
+        raise e
 
     except Exception as e:
         return common.response_server_error(e)
