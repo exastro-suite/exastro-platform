@@ -45,6 +45,8 @@ tags:
     description: ロール・マッピングに関する操作
   - name: CommonService
     description: システム管理者共通
+  - name: MaintenanceModeService
+    description: メンテナンスモードに関する操作
   - name: InternalCommonService
     description: 共通(内部用)
   - name: InternalPlanService
@@ -53,8 +55,8 @@ tags:
     description: ユーザーに関する操作(内部用)
   - name: InternalWorkspaceService
     description: ワークスペースに関する操作(内部用)
-  - name: MaintenanceModeService
-    description: メンテナンスモードに関する操作
+  - name: InternalMaintenanceModeService
+    description: メンテナンスモードに関する操作(内部用)
 paths:
   /api/platform/organizations:
     get:
@@ -1375,6 +1377,62 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/runtimeError'
+  /api/platform/maintenance-mode-setting:
+    get:
+      tags:
+        - MaintenanceModeService
+      description: メンテナンスモードの設定を取得する
+      operationId: get_maintenance_mode_setting
+      parameters: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - $ref: '#/components/schemas/maintenanceModeSettings'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+      x-openapi-router-controller: controllers.maintenance_mode_setting_controller
+    patch:
+      tags:
+        - MaintenanceModeService
+      description: メンテナンスモードの設定を更新する
+      operationId: patch_maintenance_mode_setting
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                backyard_execute_stop:
+                  type: string
+                  example: '1'
+                data_update_stop:
+                  type: string
+                  example: '1'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+      x-openapi-router-controller: controllers.maintenance_mode_setting_controller
   /internal-api/alive:
     get:
       tags:
@@ -1919,12 +1977,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/runtimeError'
       x-openapi-router-controller: controllers.internal_users_service_controller
-  /api/platform/maintenance-mode-setting:
+  /internal-api/platform/maintenance-mode-setting:
     get:
       tags:
-        - MaintenanceModeService
+        - InternalMaintenanceModeService
       description: メンテナンスモードの設定を取得する
-      operationId: get_maintenance_mode_setting
+      operationId: internal_get_maintenance_mode_setting
       parameters: []
       responses:
         '200':
@@ -1941,40 +1999,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/runtimeError'
-      x-openapi-router-controller: controllers.maintenance_mode_setting_controller
-    patch:
-      tags:
-        - MaintenanceModeService
-      description: メンテナンスモードの設定を更新する
-      operationId: patch_maintenance_mode_setting
-      parameters: []
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                backyard_execute_stop:
-                  type: string
-                  example: '1'
-                data_update_stop:
-                  type: string
-                  example: '1'
-      responses:
-        '200':
-          description: Success
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: '#/components/schemas/responseOk'
-        default:
-          description: An unexpected error response.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/runtimeError'
-      x-openapi-router-controller: controllers.maintenance_mode_setting_controller
+      x-openapi-router-controller: controllers.internal_maintenance_mode_setting_controller
 components:
   schemas:
     responseOk:

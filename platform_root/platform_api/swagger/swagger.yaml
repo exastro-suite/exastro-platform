@@ -48,6 +48,8 @@ tags:
   description: ロール・マッピングに関する操作
 - name: CommonService
   description: システム管理者共通
+- name: MaintenanceModeService
+  description: メンテナンスモードに関する操作
 - name: InternalCommonService
   description: 共通(内部用)
 - name: InternalPlanService
@@ -56,8 +58,8 @@ tags:
   description: ユーザーに関する操作(内部用)
 - name: InternalWorkspaceService
   description: ワークスペースに関する操作(内部用)
-- name: MaintenanceModeService
-  description: メンテナンスモードに関する操作
+- name: InternalMaintenanceModeService
+  description: メンテナンスモードに関する操作(内部用)
 paths:
   /api/platform/organizations:
     get:
@@ -1371,6 +1373,52 @@ paths:
               schema:
                 $ref: '#/components/schemas/runtimeError'
       x-openapi-router-controller: controllers.role_mappings_service_controller
+  /api/platform/maintenance-mode-setting:
+    get:
+      tags:
+      - MaintenanceModeService
+      description: メンテナンスモードの設定を取得する
+      operationId: get_maintenance_mode_setting
+      parameters: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_19'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+      x-openapi-router-controller: controllers.maintenance_mode_setting_controller
+    patch:
+      tags:
+      - MaintenanceModeService
+      description: メンテナンスモードの設定を更新する
+      operationId: patch_maintenance_mode_setting
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/platform_maintenancemodesetting_body'
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_1'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+      x-openapi-router-controller: controllers.maintenance_mode_setting_controller
   /internal-api/alive:
     get:
       tags:
@@ -1485,7 +1533,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_19'
+                $ref: '#/components/schemas/inline_response_200_20'
         default:
           description: An unexpected error response.
           content:
@@ -1656,7 +1704,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_20'
+                $ref: '#/components/schemas/inline_response_200_21'
         default:
           description: An unexpected error response.
           content:
@@ -1711,7 +1759,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_21'
+                $ref: '#/components/schemas/inline_response_200_22'
         default:
           description: An unexpected error response.
           content:
@@ -1829,7 +1877,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_22'
+                $ref: '#/components/schemas/inline_response_200_23'
         default:
           description: An unexpected error response.
           content:
@@ -1941,27 +1989,6 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_23'
-        default:
-          description: An unexpected error response.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/runtimeError'
-      x-openapi-router-controller: controllers.internal_users_service_controller
-  /api/platform/maintenance-mode-setting:
-    get:
-      tags:
-      - MaintenanceModeService
-      description: メンテナンスモードの設定を取得する
-      operationId: get_maintenance_mode_setting
-      parameters: []
-      responses:
-        "200":
-          description: Success
-          content:
-            application/json:
-              schema:
                 $ref: '#/components/schemas/inline_response_200_24'
         default:
           description: An unexpected error response.
@@ -1969,32 +1996,28 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/runtimeError'
-      x-openapi-router-controller: controllers.maintenance_mode_setting_controller
-    patch:
+      x-openapi-router-controller: controllers.internal_users_service_controller
+  /internal-api/platform/maintenance-mode-setting:
+    get:
       tags:
-      - MaintenanceModeService
-      description: メンテナンスモードの設定を更新する
-      operationId: patch_maintenance_mode_setting
+      - InternalMaintenanceModeService
+      description: メンテナンスモードの設定を取得する
+      operationId: internal_get_maintenance_mode_setting
       parameters: []
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/platform_maintenancemodesetting_body'
       responses:
         "200":
           description: Success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_1'
+                $ref: '#/components/schemas/inline_response_200_19'
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/runtimeError'
-      x-openapi-router-controller: controllers.maintenance_mode_setting_controller
+      x-openapi-router-controller: controllers.internal_maintenance_mode_setting_controller
 components:
   schemas:
     responseOk:
@@ -2846,32 +2869,6 @@ components:
     inline_response_200_19:
       allOf:
       - $ref: '#/components/schemas/responseOk'
-      - type: object
-        properties:
-          data:
-            $ref: '#/components/schemas/systemConfig'
-    inline_response_200_20:
-      allOf:
-      - $ref: '#/components/schemas/responseOk'
-      - $ref: '#/components/schemas/limitsList'
-    inline_response_200_21:
-      allOf:
-      - $ref: '#/components/schemas/responseOk'
-      - type: object
-        properties:
-          data:
-            $ref: '#/components/schemas/planItem'
-    inline_response_200_22:
-      allOf:
-      - $ref: '#/components/schemas/responseOk'
-      - $ref: '#/components/schemas/roleList'
-    inline_response_200_23:
-      allOf:
-      - $ref: '#/components/schemas/responseOk'
-      - $ref: '#/components/schemas/userWorkspaceList'
-    inline_response_200_24:
-      allOf:
-      - $ref: '#/components/schemas/responseOk'
       - $ref: '#/components/schemas/maintenanceModeSettings'
     platform_maintenancemodesetting_body:
       type: object
@@ -2882,6 +2879,32 @@ components:
         data_update_stop:
           type: string
           example: "1"
+    inline_response_200_20:
+      allOf:
+      - $ref: '#/components/schemas/responseOk'
+      - type: object
+        properties:
+          data:
+            $ref: '#/components/schemas/systemConfig'
+    inline_response_200_21:
+      allOf:
+      - $ref: '#/components/schemas/responseOk'
+      - $ref: '#/components/schemas/limitsList'
+    inline_response_200_22:
+      allOf:
+      - $ref: '#/components/schemas/responseOk'
+      - type: object
+        properties:
+          data:
+            $ref: '#/components/schemas/planItem'
+    inline_response_200_23:
+      allOf:
+      - $ref: '#/components/schemas/responseOk'
+      - $ref: '#/components/schemas/roleList'
+    inline_response_200_24:
+      allOf:
+      - $ref: '#/components/schemas/responseOk'
+      - $ref: '#/components/schemas/userWorkspaceList'
     organization_active_plan:
       type: object
       properties:

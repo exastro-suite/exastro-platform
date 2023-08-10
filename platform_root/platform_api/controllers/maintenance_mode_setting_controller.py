@@ -36,12 +36,12 @@ def get_maintenance_mode_setting():  # noqa: E501
     """
     globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
 
-    maintenace_values = {}
+    data = {}
     with closing(DBconnector().connect_platformdb()) as conn:
         with conn.cursor() as cursor:
             cursor.execute(queries_bl_maintenancemode.SQL_QUERY_MAINTENANCE_MODE)
             maintenace_rows = cursor.fetchall()
-
+            maintenace_values = {}
             # get maintenance_mode_setting: mode_name, setting_value
             if len(maintenace_rows) >= 1:
                 for maintenace_row in maintenace_rows:
