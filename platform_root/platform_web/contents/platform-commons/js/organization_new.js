@@ -40,7 +40,7 @@ $(function(){
             // Display Topic Path
             displayTopicPath([
                 { "text": getText("000-85001", "オーガナイゼーション一覧"), "href": location_conf.href.organizations.list },
-                { "text": getText("000-82014", "新規オーガナイゼーション"), "href": location_conf.href.organizations.new },
+                { "text": getText("000-85011", "新規オーガナイゼーション"), "href": location_conf.href.organizations.new },
             ]);
             display_main(results[1].data);
             finish_onload_progress();
@@ -65,12 +65,21 @@ $(function(){
         // register button
         //
         $('#button_register').on('click',() => {
-            $('#button_register').prop('disabled',true);
-            if( ! validate_register() ) {
-                $('#button_register').prop('disabled',false);
-                return;
-            }
-            organization_register();
+            confirmMessage(getText("000-80042", "作成確認"), getText("000-85025", "オーガナイゼーションを作成しますか？"),
+                () => {
+                    // OK
+                    $('#button_register').prop('disabled',true);
+                    if( ! validate_register() ) {
+                        $('#button_register').prop('disabled',false);
+                        return;
+                    }
+                    organization_register();
+                },
+                () => {
+                    // Cancel
+                    return;
+                }
+            );
         });
     }
 
@@ -79,7 +88,7 @@ $(function(){
     //
     function display_plans_list(plans) {
 
-            //
+        //
         // List configurable plans list
         // プラン一覧をリスト化する
         //
@@ -115,7 +124,10 @@ $(function(){
 
         $('#form_plan_id').append($('<option>').html('').val(''));
         for(var row of planListData) {
-            $('#form_plan_id').append($('<option>').html(fn.cv(row.plan_id,'',true)+':'+fn.cv(row.plan_name,'',true)).val(fn.cv(row.plan_id,'',true)));
+            if (fn.cv(row.plan_id,'',true).charAt(0) != '_')
+            {
+                $('#form_plan_id').append($('<option>').html(fn.cv(row.plan_id,'',true)+':'+fn.cv(row.plan_name,'',true)).val(fn.cv(row.plan_id,'',true)));
+            }
         }
     }
 
@@ -136,6 +148,38 @@ $(function(){
         result = result && validate.result;
         $("#message_organization_name").text(validate.message);
 
+        // validate user username
+        if($("#form_user_username").val() === "") {
+            $("#message_user_username").text(
+                getText("400-00011", "必須項目が不足しています。({0})", getText("000-00128", "ユーザー名")));
+            result = false;
+
+        } else if($("#form_user_username").val().replace(/[a-zA-Z0-9_-]/g,"") !== "") {
+            $("#message_user_username").text(
+                getText("400-00017", "指定できない文字が含まれています。(項目:{0},指定可能な文字:{1})",
+                    getText("000-00128", "ユーザー名"),
+                    getText("000-80033", "半角英数・ハイフン・アンダースコア")));
+            result = false;
+
+        } else if( ! $("#form_user_username").val().match(/^[a-zA-Z]/)) {
+            $("#message_user_username").text(
+                getText("400-00014", "先頭の文字にアルファベット以外が指定されています。({0})", getText("000-00128", "ユーザー名")));
+            result = false;
+        } else {
+            $("#message_user_username").text("");
+        }
+
+        // validate user password
+        if($("#form_user_password").val() === "" || $("#form_user_password_confirm").val() === "") {
+            $("#message_user_password").text(getText("400-00011", "必須項目が不足しています。({0})", getText("000-00132", "パスワード")));
+            result = false;
+        } else if($("#form_user_password").val() != $("#form_user_password_confirm").val()) {
+            $("#message_user_password").text(getText("000-83027", "パスワードの確認入力が正しくありません"));
+            result = false;
+        } else {
+            $("#message_user_password").text("");
+        }
+
         console.log("--- validate check end [" + result + "] ----");
 
         return result;
@@ -147,16 +191,17 @@ $(function(){
     function organization_register() {
         let plan_id = "";
         if($("#form_plan_id").val() != "") {
-                plan_id = { "plan": {
-                    "plan_id": $("#form_plan_id").val()
-                }
-            }
+            plan_id = $("#form_plan_id").val();
         }
+        let no_install_driver = [];
+        $('input[name=form_ita_no_install_driver]:not(:checked)').each(function() {
+            no_install_driver.push( $(this).val() );
+        });
+        console.log("--- no_install_driver: [" + no_install_driver + "] ----");
 
         let reqbody =   {
             "id": $('#form_organization_id').val(),
             "name": $('#form_organization_name').val(),
-            plan_id,
             "organization_managers": [{
                 "username": $('#form_user_username').val(),
                 "email": $('#form_user_email').val(),
@@ -175,6 +220,12 @@ $(function(){
                 "enabled": ($('#form_user_enabled').prop('checked') ? true : false),
             }]
         }
+        if (plan_id != ""){
+            reqbody.plan = { "id": plan_id };
+        }
+        if(no_install_driver.length > 0) {
+            reqbody.optionsIta = { "no_install_driver" : no_install_driver };
+        }
 
         show_progress();
         call_api_promise(
@@ -190,7 +241,7 @@ $(function(){
             }
         ).then(() => {
             hide_progress();
-            alertMessage(getText("000-80018", "処理結果"), getText("000-82020", "オーガナイゼーションを作成しました"),
+            alertMessage(getText("000-80018", "処理結果"), getText("000-85024", "オーガナイゼーションを作成しました"),
             () => {
                 window.location = location_conf.href.organizations.list;
             });
