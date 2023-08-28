@@ -1,4 +1,4 @@
-#   Copyright 2022 NEC Corporation
+#   Copyright 2023 NEC Corporation
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -12,33 +12,28 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-title: organization is a definition of Organization resource.
+title: organization-user is a definition of User resource.
 type: object
 properties:
   id:
     type: string
-    example: org1
-  name:
+    format: uuid
+  email:
     type: string
-    example: name of org1
-  organization_managers:
+    example: user e-mail address
+  firstName:
+    type: string
+  lastName:
+    type: string
+  credentials:
     type: array
     items:
-      $ref: "./organizationUserList.yaml"
-  active_plan:
-    type: object
-    properties:
-      id:
-        type: string
-        example: plan-1
-  plans:
-    type: array
-    items:
-      $ref: './planMappingOrganization.yaml'
+      $ref: "./userCredentials.yaml"
+  requiredActions:
+    $ref: "./userRequiredActions.yaml"
   enabled:
     type: boolean
-    description: organization enabled(true) or disabled(false)
     example: true
-  status:
-    type: string
-    example: Organization Create Complete
+required:
+  - id
+

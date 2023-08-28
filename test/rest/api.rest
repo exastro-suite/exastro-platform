@@ -3,7 +3,6 @@
 @sys-user-pw = password
 @org-user-id = admin
 @org-user-pw = password
-
 @base_sys_url = http://platform-auth:{{sys-mng-port}}
 @base_org_url = http://platform-auth:{{org-mng-port}}
 
@@ -52,6 +51,13 @@ content-type: application/json
     ]
   }
 }
+
+###
+
+@org_id = org1
+
+GET {{base_sys_url}}/api/platform/organizations/{{org_id}}
+Authorization: Basic {{sys-user-id}} {{sys-user-pw}}
 
 ###
 

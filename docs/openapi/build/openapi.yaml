@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: Exastro Platform API
   description: Exastro Platform API
-  version: 1.5.0
+  version: 1.6.0
 servers:
   - url: 'https://{host}'
     description: API endpoint
@@ -108,6 +108,125 @@ paths:
               schema:
                 $ref: '#/components/schemas/runtimeError'
   '/api/platform/organizations/{organization_id}':
+    get:
+      tags:
+        - OrganizationService
+      summary: get organization
+      x-openapi-router-controller: controllers.organization_service_controller
+      operationId: organization_get
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - $ref: '#/components/schemas/organization'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+    put:
+      tags:
+        - OrganizationService
+      summary: update an organization
+      x-openapi-router-controller: controllers.organization_service_controller
+      operationId: organization_update
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - title: organization is a definition of Organization resource.
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                      example: name of org1
+                    organization_managers:
+                      type: array
+                      items:
+                        title: organization-user is a definition of User resource.
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                            format: uuid
+                          email:
+                            type: string
+                            example: user e-mail address
+                          firstName:
+                            type: string
+                          lastName:
+                            type: string
+                          credentials:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/userCredentials'
+                          requiredActions:
+                            $ref: '#/components/schemas/userRequiredActions'
+                          enabled:
+                            type: boolean
+                            example: true
+                        required:
+                          - id
+                    enabled:
+                      type: boolean
+                      description: organization enabled(true) or disabled(false)
+                      example: true
+            examples:
+              organization:
+                value:
+                  name: name of org1
+                  organization_managers:
+                    - id: user id xxxxx-xxxxx-xxxxxx
+                      username: user-id
+                      email: user e-mail address
+                      firstName: firstname
+                      lastName: lastname
+                      credentials:
+                        type: password
+                        value: password
+                        temporary: true
+                      requiredActions:
+                        - UPDATE_PROFILE
+                      enabled: true
+                  enabled: true
+        required: true
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        example: null
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
     delete:
       tags:
         - OrganizationService
@@ -1990,7 +2109,34 @@ components:
         organization_managers:
           type: array
           items:
-            $ref: '#/components/schemas/usernameOnly'
+            title: userList is list of User resources.
+            type: object
+            properties:
+              data:
+                type: array
+                items:
+                  title: user is a definition of User resource.
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      format: uuid
+                    username:
+                      type: string
+                    name:
+                      type: string
+                      example: firstname lastname
+                    firstName:
+                      type: string
+                    lastName:
+                      type: string
+                    email:
+                      type: string
+                    enabled:
+                      type: boolean
+                    create_timestamp:
+                      type: string
+                      format: date-time
         active_plan:
           type: object
           properties:
