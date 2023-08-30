@@ -1433,6 +1433,34 @@ paths:
               schema:
                 $ref: '#/components/schemas/runtimeError'
       x-openapi-router-controller: controllers.maintenance_mode_setting_controller
+  '/api/{organization_id}/platform/maintenance-mode-setting':
+    get:
+      tags:
+        - MaintenanceModeService
+      description: メンテナンスモードの設定を取得する
+      operationId: get_maintenance_mode_setting_organization
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - $ref: '#/components/schemas/maintenanceModeSettings'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+      x-openapi-router-controller: controllers.maintenance_mode_setting_controller
   /internal-api/alive:
     get:
       tags:

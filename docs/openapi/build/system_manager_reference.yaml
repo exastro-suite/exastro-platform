@@ -37,6 +37,8 @@ tags:
     description: リソース使用量に関する操作
   - name: CommonService
     description: システム管理者共通
+  - name: MaintenanceModeService
+    description: メンテナンスモードに関する操作
 paths:
   /auth/realms/master/protocol/openid-connect/token:
     post:

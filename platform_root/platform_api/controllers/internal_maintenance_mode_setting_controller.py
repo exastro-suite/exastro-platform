@@ -16,7 +16,7 @@ import connexion
 from contextlib import closing
 import inspect
 
-from common_library.common import common, validation
+from common_library.common import common, validation, maintenancemode
 from common_library.common.db import DBconnector
 from common_library.common import multi_lang
 from common_library.common.libs import queries_bl_maintenancemode
@@ -37,18 +37,6 @@ def internal_get_maintenance_mode_setting():  # noqa: E501
     globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
 
     data = {}
-    with closing(DBconnector().connect_platformdb()) as conn:
-        with conn.cursor() as cursor:
-            cursor.execute(queries_bl_maintenancemode.SQL_QUERY_MAINTENANCE_MODE)
-            maintenace_rows = cursor.fetchall()
-            maintenace_values = {}
-            # get maintenance_mode_setting: mode_name, setting_value
-            if len(maintenace_rows) >= 1:
-                for maintenace_row in maintenace_rows:
-                    mode_name = maintenace_row.get('MODE_NAME').lower()
-                    setting_value = maintenace_row.get('SETTING_VALUE')
-                    maintenace_values.setdefault(mode_name, setting_value)
-            # make response data
-            data = maintenace_values
+    data = maintenancemode.maintenace_mode_get_all()
 
     return common.response_200_ok(data)
