@@ -134,6 +134,9 @@ paths:
   "/api/platform/maintenance-mode-setting":
       $ref: './paths/maintenance_mode_setting.yaml'
 
+  "/api/{organization_id}/platform/maintenance-mode-setting":
+      $ref: './paths/maintenance_mode_setting_organizations.yaml'
+
   "/internal-api/alive":
       $ref: './paths/internal_alive.yaml'
 
