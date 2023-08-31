@@ -128,7 +128,10 @@ paths:
               schema:
                 allOf:
                   - $ref: '#/components/schemas/responseOk'
-                  - $ref: '#/components/schemas/organization'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/organization'
         default:
           description: An unexpected error response.
           content:
@@ -161,7 +164,6 @@ paths:
                     organization_managers:
                       type: array
                       items:
-                        title: organization-user is a definition of User resource.
                         type: object
                         properties:
                           id:
@@ -195,7 +197,6 @@ paths:
                   name: name of org1
                   organization_managers:
                     - id: user id xxxxx-xxxxx-xxxxxx
-                      username: user-id
                       email: user e-mail address
                       firstName: firstname
                       lastName: lastname
@@ -2109,34 +2110,27 @@ components:
         organization_managers:
           type: array
           items:
-            title: userList is list of User resources.
             type: object
             properties:
-              data:
-                type: array
-                items:
-                  title: user is a definition of User resource.
-                  type: object
-                  properties:
-                    id:
-                      type: string
-                      format: uuid
-                    username:
-                      type: string
-                    name:
-                      type: string
-                      example: firstname lastname
-                    firstName:
-                      type: string
-                    lastName:
-                      type: string
-                    email:
-                      type: string
-                    enabled:
-                      type: boolean
-                    create_timestamp:
-                      type: string
-                      format: date-time
+              id:
+                type: string
+                format: uuid
+              username:
+                type: string
+              name:
+                type: string
+                example: firstname lastname
+              firstName:
+                type: string
+              lastName:
+                type: string
+              email:
+                type: string
+              enabled:
+                type: boolean
+              create_timestamp:
+                type: string
+                format: date-time
         active_plan:
           type: object
           properties:

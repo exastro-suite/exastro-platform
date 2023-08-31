@@ -12,7 +12,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-title: user is a definition of User resource.
+# title: user is a definition of User resource.
 type: object
 properties:
   id:

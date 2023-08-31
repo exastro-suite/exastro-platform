@@ -24,7 +24,7 @@ properties:
   organization_managers:
     type: array
     items:
-      $ref: "./organizationUserList.yaml"
+      $ref: "./organizationUser.yaml"
   active_plan:
     type: object
     properties:

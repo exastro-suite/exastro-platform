@@ -1057,34 +1057,27 @@ components:
         organization_managers:
           type: array
           items:
-            title: userList is list of User resources.
             type: object
             properties:
-              data:
-                type: array
-                items:
-                  title: user is a definition of User resource.
-                  type: object
-                  properties:
-                    id:
-                      type: string
-                      format: uuid
-                    username:
-                      type: string
-                    name:
-                      type: string
-                      example: firstname lastname
-                    firstName:
-                      type: string
-                    lastName:
-                      type: string
-                    email:
-                      type: string
-                    enabled:
-                      type: boolean
-                    create_timestamp:
-                      type: string
-                      format: date-time
+              id:
+                type: string
+                format: uuid
+              username:
+                type: string
+              name:
+                type: string
+                example: firstname lastname
+              firstName:
+                type: string
+              lastName:
+                type: string
+              email:
+                type: string
+              enabled:
+                type: boolean
+              create_timestamp:
+                type: string
+                format: date-time
         active_plan:
           type: object
           properties:
