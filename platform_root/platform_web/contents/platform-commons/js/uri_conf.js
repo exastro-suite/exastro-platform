@@ -52,6 +52,9 @@ var api_conf = {
             "post": "/auth/realms/{organization_id}/protocol/openid-connect/token",
             "get": "/api/{organization_id}/platform/users/_current/refresh_tokens",
             "delete": "/api/{organization_id}/platform/users/_current/refresh_tokens"
+        },
+        "maintenance-mode-setting": {
+            "get": "/api/{organization_id}/platform/maintenance-mode-setting"
         }
     }
 }
