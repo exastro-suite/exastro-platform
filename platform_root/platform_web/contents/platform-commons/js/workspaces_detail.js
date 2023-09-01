@@ -19,6 +19,7 @@ $(function(){
 
     CommonAuth.onAuthSuccess(() => {
         new CommonUi(`#container`);
+        maintenanceMode();
         load_main();
     });
 

@@ -708,3 +708,30 @@ const UsersCommon =
         return true;
     }
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//   Maintenance mode
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+function maintenanceMode() {
+    call_api_promise({
+        type: "GET",
+        url: api_conf.api["maintenance-mode-setting"].get.replace('{organization_id}', CommonAuth.getRealm()),
+        headers: {
+            Authorization: "Bearer " + CommonAuth.getToken(),
+        },
+        dataType: "json",
+    }).then(function( result ){
+        if ( result.data && result.message === 'SUCCESS' && result.data.data_update_stop === '1') {
+            const container = document.getElementById('container');
+            const message = document.querySelector('.modeMessageText');
+            if ( container !== null && message !== null ) {
+                container.classList.add('inMaintenanceMode');
+                message.textContent = 'メンテナンス中のため、ワークスペース作成を行うことができません。';
+            }
+        }
+    }).catch(function( error ){
+        console.error( error );
+    });
+}
