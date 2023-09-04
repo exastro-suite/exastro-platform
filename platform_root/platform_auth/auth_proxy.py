@@ -336,13 +336,40 @@ class auth_proxy:
         request_method = request.method
         globals.logger.debug(f'request_method: {request_method}')
 
+        request_body = {}
+        request_form = {}
+        request_files = {}
+
         # パラメータを形成
         # Form parameters
-        try:
-            request_body = request.json.copy()
-            globals.logger.debug(f'request_body: {request_body}')
-        except Exception:
-            request_body = {}
+        if request.is_json:
+            try:
+                request_body = request.json.copy()
+                globals.logger.debug(f'request_body: {request_body}')
+            except Exception:
+                request_body = {}
+
+        # パラメータを形成(multipart/form-data)
+        # form parameters, files parameters
+        if request.form:
+            try:
+                request_form = request.form.copy()
+                globals.logger.debug(f'request_form: {request_form}')
+            except Exception:
+                request_form = {}
+        if request.files:
+            try:
+                request_files = request.files.copy()
+                globals.logger.debug(f'request_files: {request_files}')
+            except Exception:
+                request_files = {}
+
+        # レスポンスContent-Type
+        if request.content_type:
+            request_content_type = request.content_type.lower()
+        else:
+            request_content_type = ""
+        globals.logger.debug(f'request_content_type: {request_content_type}')
 
         # 引数
         # query_string
@@ -353,7 +380,7 @@ class auth_proxy:
 
         # リクエストを実行
         # Execute request
-        ret = self.main_request(request_method, dest_url, post_headers, request_body, query_string)
+        ret = self.main_request(request_method, dest_url, post_headers, request_body, query_string, request_content_type, request_form, request_files)
         # ----ここまでAPサーバへのリクエスト処理---- #
         # Request processing to the AP server so far
 
@@ -389,7 +416,7 @@ class auth_proxy:
             globals.logger.error(''.join(list(traceback.TracebackException.from_exception(e).format())))
             raise
 
-    def main_request(self, method, url, post_headers, request_body, query_string):
+    def main_request(self, method, url, post_headers, request_body, query_string, request_content_type=None, request_form={}, request_files={}):
         """
         APサーバへリクエストを実行
         Execute a request to the AP server
@@ -400,26 +427,44 @@ class auth_proxy:
             post_headers (dic): post headers
             request_body (str): request body(json)
             query_string (str): query_string
-
+            request_content_type (str): Content-Type
+            request_form (dic): request form
+            request_files (dic): request files
         Returns:
             esponse: HTTP Respose
         """
 
-        globals.logger.info(f'Start main_request. method={method} url={url} request_body={request_body} query_string={query_string}')
+        globals.logger.info(f'Start main_request. method={method} url={url} request_body={request_body} query_string={query_string}'
+                            f'request_content_type={request_content_type} request_form={request_form}, request_files={request_form}')
 
-        # methodによって、呼び出しの内容を変える
-        # Change the content of the call depending on the method
+        # method、request_content_typeによって、呼び出しの内容を変える
+        # Change the content of the call depending on method and request_content_type
         if method == 'GET':
             ret = requests.get(url, headers=post_headers, params=query_string)
 
         elif method == 'POST':
-            ret = requests.post(url, headers=post_headers, json=request_body, params=query_string)
+            if 'application/json' in request_content_type:
+                ret = requests.post(url, headers=post_headers, json=request_body, params=query_string)
+            elif 'multipart/form-data' in request_content_type:
+                ret = requests.post(url, headers=post_headers, data=request_form, files=request_files, params=query_string)
+            else:
+                ret = requests.post(url, headers=post_headers, json=request_body, params=query_string)
 
         elif method == 'PATCH':
-            ret = requests.patch(url, headers=post_headers, json=request_body, params=query_string)
+            if 'application/json' in request_content_type:
+                ret = requests.patch(url, headers=post_headers, json=request_body, params=query_string)
+            elif 'multipart/form-data' in request_content_type:
+                ret = requests.patch(url, headers=post_headers, data=request_form, files=request_files, params=query_string)
+            else:
+                ret = requests.patch(url, headers=post_headers, json=request_body, params=query_string)
 
         elif method == 'PUT':
-            ret = requests.put(url, headers=post_headers, json=request_body, params=query_string)
+            if 'application/json' in request_content_type:
+                ret = requests.put(url, headers=post_headers, json=request_body, params=query_string)
+            elif 'multipart/form-data' in request_content_type:
+                ret = requests.put(url, headers=post_headers, data=request_form, files=request_files, params=query_string)
+            else:
+                ret = requests.put(url, headers=post_headers, json=request_body, params=query_string)
 
         elif method == 'DELETE':
             ret = requests.delete(url, headers=post_headers, params=query_string)

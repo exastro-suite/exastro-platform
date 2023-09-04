@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: Exastro Platform API
   description: Exastro Platform API
-  version: 1.5.0
+  version: 1.5.2
 servers:
 - url: "https://{host}"
   description: API endpoint
@@ -48,6 +48,8 @@ tags:
   description: ロール・マッピングに関する操作
 - name: CommonService
   description: システム管理者共通
+- name: MaintenanceModeService
+  description: メンテナンスモードに関する操作
 - name: InternalCommonService
   description: 共通(内部用)
 - name: InternalPlanService
@@ -56,6 +58,8 @@ tags:
   description: ユーザーに関する操作(内部用)
 - name: InternalWorkspaceService
   description: ワークスペースに関する操作(内部用)
+- name: InternalMaintenanceModeService
+  description: メンテナンスモードに関する操作(内部用)
 paths:
   /api/platform/organizations:
     get:
@@ -1369,6 +1373,80 @@ paths:
               schema:
                 $ref: '#/components/schemas/runtimeError'
       x-openapi-router-controller: controllers.role_mappings_service_controller
+  /api/platform/maintenance-mode-setting:
+    get:
+      tags:
+      - MaintenanceModeService
+      description: メンテナンスモードの設定を取得する
+      operationId: get_maintenance_mode_setting
+      parameters: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_19'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+      x-openapi-router-controller: controllers.maintenance_mode_setting_controller
+    patch:
+      tags:
+      - MaintenanceModeService
+      description: メンテナンスモードの設定を更新する
+      operationId: patch_maintenance_mode_setting
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/platform_maintenancemodesetting_body'
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_1'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+      x-openapi-router-controller: controllers.maintenance_mode_setting_controller
+  /api/{organization_id}/platform/maintenance-mode-setting:
+    get:
+      tags:
+      - MaintenanceModeService
+      description: メンテナンスモードの設定を取得する
+      operationId: get_maintenance_mode_setting_organization
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_19'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+      x-openapi-router-controller: controllers.maintenance_mode_setting_controller
   /internal-api/alive:
     get:
       tags:
@@ -1483,7 +1561,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_19'
+                $ref: '#/components/schemas/inline_response_200_20'
         default:
           description: An unexpected error response.
           content:
@@ -1654,7 +1732,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_20'
+                $ref: '#/components/schemas/inline_response_200_21'
         default:
           description: An unexpected error response.
           content:
@@ -1709,7 +1787,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_21'
+                $ref: '#/components/schemas/inline_response_200_22'
         default:
           description: An unexpected error response.
           content:
@@ -1827,7 +1905,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_22'
+                $ref: '#/components/schemas/inline_response_200_23'
         default:
           description: An unexpected error response.
           content:
@@ -1939,7 +2017,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_23'
+                $ref: '#/components/schemas/inline_response_200_24'
         default:
           description: An unexpected error response.
           content:
@@ -1947,6 +2025,27 @@ paths:
               schema:
                 $ref: '#/components/schemas/runtimeError'
       x-openapi-router-controller: controllers.internal_users_service_controller
+  /internal-api/platform/maintenance-mode-setting:
+    get:
+      tags:
+      - InternalMaintenanceModeService
+      description: メンテナンスモードの設定を取得する
+      operationId: internal_get_maintenance_mode_setting
+      parameters: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_19'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+      x-openapi-router-controller: controllers.internal_maintenance_mode_setting_controller
 components:
   schemas:
     responseOk:
@@ -2681,6 +2780,15 @@ components:
       example:
         value: 100
         description: ""
+    maintenanceModeSettings:
+      title: maintenance mode settings resource.
+      type: object
+      properties:
+        result:
+          type: string
+          example: 000-00000
+        data:
+          $ref: '#/components/schemas/maintenanceModeSettings_data'
     inline_response_200:
       allOf:
       - $ref: '#/components/schemas/responseOk'
@@ -2789,26 +2897,39 @@ components:
     inline_response_200_19:
       allOf:
       - $ref: '#/components/schemas/responseOk'
+      - $ref: '#/components/schemas/maintenanceModeSettings'
+    platform_maintenancemodesetting_body:
+      type: object
+      properties:
+        backyard_execute_stop:
+          type: string
+          example: "1"
+        data_update_stop:
+          type: string
+          example: "1"
+    inline_response_200_20:
+      allOf:
+      - $ref: '#/components/schemas/responseOk'
       - type: object
         properties:
           data:
             $ref: '#/components/schemas/systemConfig'
-    inline_response_200_20:
+    inline_response_200_21:
       allOf:
       - $ref: '#/components/schemas/responseOk'
       - $ref: '#/components/schemas/limitsList'
-    inline_response_200_21:
+    inline_response_200_22:
       allOf:
       - $ref: '#/components/schemas/responseOk'
       - type: object
         properties:
           data:
             $ref: '#/components/schemas/planItem'
-    inline_response_200_22:
+    inline_response_200_23:
       allOf:
       - $ref: '#/components/schemas/responseOk'
       - $ref: '#/components/schemas/roleList'
-    inline_response_200_23:
+    inline_response_200_24:
       allOf:
       - $ref: '#/components/schemas/responseOk'
       - $ref: '#/components/schemas/userWorkspaceList'
@@ -2943,6 +3064,15 @@ components:
         expire_timestamp:
           type: string
           format: date-time
+    maintenanceModeSettings_data:
+      type: object
+      properties:
+        backyard_execute_stop:
+          type: string
+          example: "0"
+        data_update_stop:
+          type: string
+          example: "0"
   responses:
     UnauthorizedError:
       description: Access token is missing or invalid
@@ -2958,4 +3088,3 @@ components:
       description: Value converted from ID/Password in base64
       scheme: basic
       x-basicInfoFunc: swagger_server.controllers.authorization_controller.check_BasicAuth
-

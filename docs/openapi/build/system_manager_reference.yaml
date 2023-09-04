@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: Exastro Platform API (System Management)
   description: Exastro Platform API for System Manager
-  version: 1.5.0
+  version: 1.5.2
 servers:
   - url: 'https://{host}'
     description: API endpoint
@@ -37,6 +37,8 @@ tags:
     description: リソース使用量に関する操作
   - name: CommonService
     description: システム管理者共通
+  - name: MaintenanceModeService
+    description: メンテナンスモードに関する操作
 paths:
   /auth/realms/master/protocol/openid-connect/token:
     post:
@@ -440,6 +442,62 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/runtimeError'
+  /api/platform/maintenance-mode-setting:
+    get:
+      tags:
+        - MaintenanceModeService
+      description: メンテナンスモードの設定を取得する
+      operationId: get_maintenance_mode_setting
+      parameters: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - $ref: '#/components/schemas/maintenanceModeSettings'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+      x-openapi-router-controller: controllers.maintenance_mode_setting_controller
+    patch:
+      tags:
+        - MaintenanceModeService
+      description: メンテナンスモードの設定を更新する
+      operationId: patch_maintenance_mode_setting
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                backyard_execute_stop:
+                  type: string
+                  example: '1'
+                data_update_stop:
+                  type: string
+                  example: '1'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+      x-openapi-router-controller: controllers.maintenance_mode_setting_controller
 components:
   schemas:
     responseOk:
@@ -1293,6 +1351,22 @@ components:
       example:
         value: 100
         description: ''
+    maintenanceModeSettings:
+      title: maintenance mode settings resource.
+      type: object
+      properties:
+        result:
+          type: string
+          example: 000-00000
+        data:
+          type: object
+          properties:
+            backyard_execute_stop:
+              type: string
+              example: '0'
+            data_update_stop:
+              type: string
+              example: '0'
   securitySchemes:
     BearerAuth:
       description: Credentials or access token for API
