@@ -15,20 +15,5 @@
 value:
   {
     "name": "name of org1",
-    "organization_managers": [
-      {
-        "id": "user id xxxxx-xxxxx-xxxxxx",
-        "email": "user e-mail address",
-        "firstName": "firstname",
-        "lastName": "lastname",
-        "credentials": {
-          "type": "password",
-          "value": "password",
-          "temporary": true,
-        },
-        "requiredActions": [ "UPDATE_PROFILE" ],
-        "enabled": true,
-      }
-    ],
     "enabled": true
   }

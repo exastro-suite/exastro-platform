@@ -18,10 +18,6 @@ properties:
   name:
     type: string
     example: name of org1
-  organization_managers:
-    type: array
-    items:
-      $ref: "./organizationUserUpdate.yaml"
   enabled:
     type: boolean
     description: organization enabled(true) or disabled(false)
