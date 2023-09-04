@@ -33,11 +33,16 @@ $(function(){
             displayMenu(null);
             // Display Topic Path
             displayTopicPath([
-                {"text": getText("000-81006", "アカウント管理"), "href": location_conf.href.account.main_page.replace(/{organization_id}/g, CommonAuth.getRealm()) },
+                {
+                    "text": getText("000-81006", "アカウント管理"),
+                    "href": CommonAuth.isPlatformAdminSite()?
+                                location_conf.href.account.platform_admin_site.main_page:
+                                location_conf.href.account.organization_user_site.main_page.replace(/{organization_id}/g, CommonAuth.getRealm())
+                },
             ]);
-            $("#ifra_account_edit").prop("src",location_conf.href.account.account_edit.replace(/{organization_id}/g, CommonAuth.getRealm()));
-            $("#ifra_password_change").prop("src",location_conf.href.account.update_password.replace(/{organization_id}/g, CommonAuth.getRealm()));
-            $("#ifra_two_factor_auth").prop("src",location_conf.href.account.two_factor_auth.replace(/{organization_id}/g, CommonAuth.getRealm()));
+            $("#ifra_account_edit").prop("src",location_conf.href.account.account_edit.replace(/{realm_name}/g, CommonAuth.getRealm()));
+            $("#ifra_password_change").prop("src",location_conf.href.account.update_password.replace(/{realm_name}/g, CommonAuth.getRealm()));
+            $("#ifra_two_factor_auth").prop("src",location_conf.href.account.two_factor_auth.replace(/{realm_name}/g, CommonAuth.getRealm()));
 
             // Display Token List
             displayTokenList(results[1].data);
@@ -65,7 +70,9 @@ $(function(){
     function call_api_promise_getTokenList() {
         return call_api_promise({
             type: "GET",
-            url: api_conf.api.token.get.replace(/{organization_id}/g, CommonAuth.getRealm()),
+            url: CommonAuth.isPlatformAdminSite()? 
+                api_conf.api.token.platform_admin_site.get:
+                api_conf.api.token.organization_user_site.get.replace(/{organization_id}/g, CommonAuth.getRealm()),
             headers: {
                 Authorization: "Bearer " + CommonAuth.getToken(),
             },
@@ -150,7 +157,9 @@ $(function(){
 
         // Post dataの生成
         const post_data = {
-            client_id: "_{organization_id}-api".replace(/{organization_id}/g, CommonAuth.getRealm()),
+            client_id: CommonAuth.isPlatformAdminSite()?
+                CommonAuthConfig.PLATFORM_ADMIN_SITE.TOKEN_CLIENT:
+                CommonAuthConfig.ORGANIZATION_USER_SITE.TOKEN_CLIENT.replace(/{RELMNAME}/g, CommonAuth.getRealm()),
             grant_type: "password",
             scope: "openid offline_access",
             username: CommonAuth.getPreferredUsername(),
@@ -164,7 +173,7 @@ $(function(){
         // APIの呼出(401応答を処理したいのでnoMessage版を使う)
         call_api_promise_noMessage({
             type: "POST",
-            url: api_conf.api.token.post.replace(/{organization_id}/g, CommonAuth.getRealm()),
+            url: api_conf.api.token.post.replace(/{realm_name}/g, CommonAuth.getRealm()),
             headers: {
                 contentType: "application/x-www-form-urlencoded",
             },
@@ -261,7 +270,9 @@ $(function(){
                 show_progress();
                 call_api_promise({
                     type: "DELETE",
-                    url: api_conf.api.token.delete.replace(/{organization_id}/g, CommonAuth.getRealm()),
+                    url: CommonAuth.isPlatformAdminSite()?
+                        api_conf.api.token.platform_admin_site.delete:
+                        api_conf.api.token.organization_user_site.delete.replace(/{organization_id}/g, CommonAuth.getRealm()),
                     headers: {
                         Authorization: "Bearer " + CommonAuth.getToken(),
                     },

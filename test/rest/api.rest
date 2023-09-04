@@ -1,0 +1,90 @@
+# not quate strings
+@sys-user-id = admin
+@sys-user-pw = password
+@org-user-id = admin
+@org-user-pw = password
+
+@base_sys_url = http://platform-auth:{{sys-mng-port}}
+@base_org_url = http://platform-auth:{{org-mng-port}}
+
+# 1 api to ### 
+
+###
+
+GET {{base_sys_url}}/api/platform/organizations
+Authorization: Basic {{sys-user-id}} {{sys-user-pw}}
+
+###
+
+POST {{base_sys_url}}/api/platform/organizations
+Authorization: Basic {{sys-user-id}} {{sys-user-pw}}
+content-type: application/json
+
+{
+  "id": "org1x",
+  "name": "organization of org1",
+  "organization_managers": [
+    {
+      "username": "user-id",
+      "email": "user e-mail address",
+      "firstName": "string",
+      "lastName": "string",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "password",
+          "temporary": true
+        }
+      ],
+      "requiredActions": [
+        "UPDATE_PROFILE"
+      ],
+      "enabled": true
+    }
+  ],
+  "plan": {
+    "id": "plan-1"
+  },
+  "options": {},
+  "optionsIta": {
+    "no_install_driver": [
+      "terraform_cloud_ep"
+    ]
+  }
+}
+
+###
+
+GET {{base_sys_url}}/api/platform/plans
+Authorization: Basic {{sys-user-id}} {{sys-user-pw}}
+
+###
+
+GET {{base_sys_url}}/api/platform/plan_items
+Authorization: Basic {{sys-user-id}} {{sys-user-pw}}
+
+###
+
+@org_id = org1
+
+GET {{base_sys_url}}/api/platform/{{org_id}}/plans
+Authorization: Basic {{sys-user-id}} {{sys-user-pw}}
+
+###
+
+POST {{base_sys_url}}/api/platform/plans
+Authorization: Basic {{sys-user-id}} {{sys-user-pw}}
+content-type: application/json
+
+{
+  "id": "plan-1",
+  "name": "name of plan",
+  "informations": {
+    "description": "string"
+  },
+  "limits": {
+    "platform.workspaces": 500,
+    "platform.roles": 500,
+    "platform.users": 1000
+  }
+}

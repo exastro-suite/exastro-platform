@@ -1504,6 +1504,10 @@ border-right: 1px solid var(--mainColor40);
 border-bottom: 1px solid var(--mainColor20);
 vertical-align: middle;
 }
+.th2 {
+border-bottom: 1px solid var(--mainColor20);
+vertical-align: middle;
+}
 .tBodyTr > .tBodyTh {
 background-color: var(--rowHeadColor);
 }
