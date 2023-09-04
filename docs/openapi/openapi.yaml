@@ -62,6 +62,8 @@ tags:
   description: ロール・マッピングに関する操作
 - name: CommonService
   description: システム管理者共通
+- name: MaintenanceModeService
+  description: メンテナンスモードに関する操作
 - name: InternalCommonService
   description: 共通(内部用)
 - name: InternalPlanService
@@ -70,7 +72,8 @@ tags:
   description: ユーザーに関する操作(内部用)
 - name: InternalWorkspaceService
   description: ワークスペースに関する操作(内部用)
-
+- name: InternalMaintenanceModeService
+  description: メンテナンスモードに関する操作(内部用)
 paths:
   "/api/platform/organizations":
       $ref: './paths/organizations.yaml'
@@ -128,6 +131,12 @@ paths:
   "/api/{organization_id}/platform/roles/{role_name}/users":
       $ref: './paths/roles.role_name.users.yaml'
 
+  "/api/platform/maintenance-mode-setting":
+      $ref: './paths/maintenance_mode_setting.yaml'
+
+  "/api/{organization_id}/platform/maintenance-mode-setting":
+      $ref: './paths/maintenance_mode_setting_organizations.yaml'
+
   "/internal-api/alive":
       $ref: './paths/internal_alive.yaml'
 
@@ -152,6 +161,9 @@ paths:
       $ref: './paths/internal_workspaces.workspace_id.users.yaml'
   "/internal-api/{organization_id}/platform/users/{user_id}/workspaces":
       $ref: './paths/internal_users.user_id.workspaces.yaml'
+
+  "/internal-api/platform/maintenance-mode-setting":
+      $ref: './paths/internal_maintenance_mode_setting.yaml'
 
 components:
   schemas:

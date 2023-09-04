@@ -25,7 +25,7 @@ import requests
 import datetime
 # import base64
 
-from common_library.common import common, validation
+from common_library.common import common, validation, maintenancemode
 from common_library.common import api_keycloak_tokens, api_keycloak_realms, api_keycloak_clients, api_keycloak_users, api_keycloak_roles
 from common_library.common.db import DBconnector
 from common_library.common.db_init import DBinit
@@ -64,7 +64,22 @@ def organization_create(body, retry=None):
     organization_id = body.get("id")
     organization_name = body.get("name")
     options = body.get("options")
+    options_ita = body.get("optionsIta")
     org_mng_users = body.get("organization_managers")
+
+    # メンテナンスモード(data_update_stop)中は、エラー
+    # error during maintenance mode (data_update_stop)
+    mode_name = "data_update_stop"
+    target_name = "Organization"
+    maintenance_mode = maintenancemode.maintenace_mode_get(mode_name)
+    if maintenance_mode == "1":
+        message_id = f"498-{MSG_FUNCTION_ID}001"
+        message = multi_lang.get_text(
+            message_id,
+            "メンテナンス中の為、{}の作成は出来ません。({})",
+            target_name,
+            organization_id)
+        raise common.MaintenanceException(message_id=message_id, message=message)
 
     # validation check
     validate = validation.validate_organization_id(organization_id)
@@ -290,7 +305,7 @@ def organization_create(body, retry=None):
     if is_ITA_CREATE:
         # Organization Database 作成
         # Organization Database creation
-        __ita_create(organization_id, user_id)
+        __ita_create(organization_id, user_id, options_ita)
 
     if is_PLAN_CREATE:
         # Organization Plan 作成
@@ -406,6 +421,20 @@ def organization_delete(organization_id):  # noqa: E501
         response: HTTP Response
     """
     globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name} organization_id={organization_id}")
+
+    # メンテナンスモード(data_update_stop)中は、エラー
+    # error during maintenance mode (data_update_stop)
+    mode_name = "data_update_stop"
+    target_name = "Organization"
+    maintenance_mode = maintenancemode.maintenace_mode_get(mode_name)
+    if maintenance_mode == "1":
+        message_id = f"498-{MSG_FUNCTION_ID}002"
+        message = multi_lang.get_text(
+            message_id,
+            "メンテナンス中の為、{}の削除は出来ません。({})",
+            target_name,
+            organization_id)
+        raise common.MaintenanceException(message_id=message_id, message=message)
 
     # exists organization
     with closing(DBconnector().connect_platformdb()) as conn:
@@ -1436,12 +1465,13 @@ def __organization_database_update(organization_id, user_id):
     return
 
 
-def __ita_create(organization_id, user_id):
+def __ita_create(organization_id, user_id, options_ita):
     """Exastro IT Automation initialize call
 
     Args:
         organization_id (str): organization id
         user_id (str): user id
+        options_ita (dict): ita option
     """
 
     globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
@@ -1453,8 +1483,10 @@ def __ita_create(organization_id, user_id):
         "Language": request.headers.get("Language"),
     }
 
-    json_para = {
-    }
+    if options_ita is None or len(options_ita) == 0:
+        json_para = {}
+    else:
+        json_para = options_ita
 
     # 呼び出し先設定
     # Call destination setting
@@ -1834,6 +1866,20 @@ def organization_setting_update(body, organization_id):  # noqa: E501
     Returns:
         response: HTTP Response
     """
+
+    # メンテナンスモード(data_update_stop)中は、エラー
+    # error during maintenance mode (data_update_stop)
+    mode_name = "data_update_stop"
+    target_name = "Organization"
+    maintenance_mode = maintenancemode.maintenace_mode_get(mode_name)
+    if maintenance_mode == "1":
+        message_id = f"498-{MSG_FUNCTION_ID}003"
+        message = multi_lang.get_text(
+            message_id,
+            "メンテナンス中の為、{}の更新は出来ません。({})",
+            target_name,
+            organization_id)
+        raise common.MaintenanceException(message_id=message_id, message=message)
 
     # validation check
     validate = validation.validate_organization_setting(body)

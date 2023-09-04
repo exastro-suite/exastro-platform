@@ -54,6 +54,8 @@ tags:
   description: リソース使用量に関する操作
 - name: CommonService
   description: システム管理者共通
+- name: MaintenanceModeService
+  description: メンテナンスモードに関する操作
 
 paths:
   "/auth/realms/master/protocol/openid-connect/token":
@@ -82,6 +84,9 @@ paths:
       $ref: './paths/common.settings.common.yaml'
   "/api/platform/settings/common/{config_key}":
       $ref: './paths/common.settings.common.config.yaml'
+
+  "/api/platform/maintenance-mode-setting":
+      $ref: './paths/maintenance_mode_setting.yaml'
 
 components:
   schemas:

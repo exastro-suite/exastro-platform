@@ -66,6 +66,9 @@ var api_conf = {
         },
         "plans": {
             "get": "/api/platform/plans"
+        },
+        "maintenance-mode-setting": {
+            "get": "/api/{organization_id}/platform/maintenance-mode-setting"
         }
     }
 }

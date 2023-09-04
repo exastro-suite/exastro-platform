@@ -14,6 +14,7 @@ services:
       - NO_PROXY=localhost,127.0.0.1,keycloak,platform-auth,platform-api,platform-web,ita-web,ita-api,ita-api-organization,ita-api-admin
       - no_proxy=localhost,127.0.0.1,keycloak,platform-auth,platform-api,platform-web,ita-web,ita-api,ita-api-organization,ita-api-admin
   platform-api:
+    command: /bin/bash -c "httpd -D FOREGROUND; while(true) do sleep 600; done"
     environment:
       - ITA_API_ADMIN_PROTOCOL=http
       - ITA_API_ADMIN_HOST=ita-api-admin
@@ -48,6 +49,11 @@ services:
   ita-web-server:
     build:
       context: ${ITA_REPO_ROOT}
+  # ita-mariadb:
+  #   build:
+  #     context: ${ITA_REPO_ROOT}
+  #   ports:
+  #     - "0.0.0.0:3306:3306"
   ita-by-ansible-execute:
     build:
       context: ${ITA_REPO_ROOT}
