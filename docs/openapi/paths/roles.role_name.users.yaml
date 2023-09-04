@@ -82,8 +82,6 @@ post:
       application/json:
         schema:
           $ref: '../schemas/roleMappingUser.yaml'
-          required:
-            - preferred_username
     required: true
   responses:
     200:

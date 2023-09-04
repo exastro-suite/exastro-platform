@@ -165,32 +165,6 @@ paths:
                     name:
                       type: string
                       example: name of org1
-                    organization_managers:
-                      type: array
-                      items:
-                        type: object
-                        properties:
-                          id:
-                            type: string
-                            format: uuid
-                          email:
-                            type: string
-                            example: user e-mail address
-                          firstName:
-                            type: string
-                          lastName:
-                            type: string
-                          credentials:
-                            type: array
-                            items:
-                              $ref: '#/components/schemas/userCredentials'
-                          requiredActions:
-                            $ref: '#/components/schemas/userRequiredActions'
-                          enabled:
-                            type: boolean
-                            example: true
-                        required:
-                          - id
                     enabled:
                       type: boolean
                       description: organization enabled(true) or disabled(false)
@@ -199,18 +173,6 @@ paths:
               organization:
                 value:
                   name: name of org1
-                  organization_managers:
-                    - id: user id xxxxx-xxxxx-xxxxxx
-                      email: user e-mail address
-                      firstName: firstname
-                      lastName: lastname
-                      credentials:
-                        type: password
-                        value: password
-                        temporary: true
-                      requiredActions:
-                        - UPDATE_PROFILE
-                      enabled: true
                   enabled: true
         required: true
       responses:
@@ -613,7 +575,6 @@ paths:
                   - type: object
                     properties:
                       data:
-                        type: object
                         $ref: '#/components/schemas/planItemList'
         default:
           description: An unexpected error response.
@@ -1433,8 +1394,6 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/roleMappingUser'
-              required:
-                - preferred_username
         required: true
       responses:
         '200':
@@ -1701,7 +1660,6 @@ paths:
                   - type: object
                     properties:
                       data:
-                        type: object
                         $ref: '#/components/schemas/systemConfig'
         default:
           description: An unexpected error response.
@@ -1911,7 +1869,6 @@ paths:
                   - type: object
                     properties:
                       data:
-                        type: object
                         $ref: '#/components/schemas/planItem'
         default:
           description: An unexpected error response.
@@ -2878,6 +2835,8 @@ components:
         create_timestamp:
           type: string
           format: date-time
+      required:
+        - preferred_username
     tokenRequestBody:
       title: create refresh token request parameter.
       type: object
@@ -2973,6 +2932,9 @@ components:
           type: string
           description: config description
           example: platform max organization
+      required:
+        - key
+        - value
     systemConfigList:
       title: system config list is list of system config resources.
       type: object
@@ -2986,9 +2948,6 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/systemConfig'
-        required:
-          - key
-          - value
       example:
         - key: platform.max_organization
           value: '100'

@@ -36,7 +36,6 @@ get:
               - type: object
                 properties:
                   data:
-                    type: object
                     $ref: '../schemas/systemConfig.yaml'
     default:
       description: An unexpected error response.
