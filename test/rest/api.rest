@@ -15,12 +15,12 @@ Authorization: Basic {{sys-user-id}} {{sys-user-pw}}
 
 ###
 
-POST {{base_sys_url}}/api/platform/organizations
+POST {{base_sys_url}}/api/platform/organizations?retry=1
 Authorization: Basic {{sys-user-id}} {{sys-user-pw}}
 content-type: application/json
 
 {
-  "id": "org1x",
+  "id": "org1",
   "name": "organization of org1",
   "organization_managers": [
     {
@@ -47,11 +47,10 @@ content-type: application/json
   "options": {},
   "optionsIta": {
     "no_install_driver": [
-      "terraform_cloud_ep"
+      "terraform_cli"
     ]
   }
 }
-
 ###
 
 @org_id = org1
@@ -89,6 +88,7 @@ content-type: application/json
     "description": "string"
   },
   "limits": {
+    "ita.organization.ansible.execution_limit": 25,
     "platform.workspaces": 500,
     "platform.roles": 500,
     "platform.users": 1000
