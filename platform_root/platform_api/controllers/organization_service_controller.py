@@ -260,7 +260,7 @@ def organization_create(body, retry=None):
     if is_CREATE_START:
         # DB登録
         # insert organization
-        __create_start(organization_id, organization_name, options, user_id)
+        __create_start(organization_id, organization_name, options, user_id, options_ita)
 
     if is_REALM_CREATE:
         # Realm作成
@@ -549,7 +549,7 @@ def organization_list():
     return common.response_200_ok(ret_realms)
 
 
-def __create_start(organization_id, organization_name, options, user_id):
+def __create_start(organization_id, organization_name, options, user_id, options_ita):
     """Create Start to data insert
 
     Args:
@@ -557,6 +557,7 @@ def __create_start(organization_id, organization_name, options, user_id):
         organization_name (str): organization name
         options (dict): create options
         user_id (str): user id
+        options_ita (dict): create options_ita
 
     Raises:
         common.BadRequestException: _description_
@@ -570,7 +571,7 @@ def __create_start(organization_id, organization_name, options, user_id):
     with closing(db.connect_platformdb()) as conn:
         with conn.cursor() as cursor:
 
-            informations = {"status": const.ORG_STATUS_CREATE_START, "options": options, }
+            informations = {"status": const.ORG_STATUS_CREATE_START, "options": options, "ext_options": {"options_ita": options_ita}, }
             parameter = {
                 "organization_id": organization_id,
                 "organization_name": organization_name,
@@ -1788,7 +1789,7 @@ def __realms_detail_get(organization_id, keycloak_org, org_row, org_informations
         "plans": plans,
         "status": org_informations.get("status"),
         "enabled": keycloak_org.get("enabled"),
-        "optionsIta": org_row.get("optionsIta"),
+        "optionsIta": org_informations.get("ext_options", {}).get("options_ita", {}),
     }
 
     return ret_realm
