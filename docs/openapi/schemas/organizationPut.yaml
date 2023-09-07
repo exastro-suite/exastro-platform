@@ -12,15 +12,16 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-title: system config value is a definition of system config resource.
-type: array
-items:
-  $ref: './systemConfig.yaml'
-example:
-  [
-    {
-      key: "platform.max_organization",
-      value: "100",
-      description: "platform max organization"
-    }
-  ]
+title: organization is a definition of Organization resource.
+type: object
+properties:
+  name:
+    type: string
+    example: name of org1
+  enabled:
+    type: boolean
+    description: organization enabled(true) or disabled(false)
+    example: true
+required:
+  - name
+  - enabled

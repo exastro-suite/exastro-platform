@@ -22,7 +22,6 @@ get:
               - type: object
                 properties:
                   data:
-                    type: object
                     $ref: '../schemas/planItem.yaml'
     default:
       description: An unexpected error response.
