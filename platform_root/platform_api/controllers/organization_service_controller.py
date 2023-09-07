@@ -76,7 +76,7 @@ def organization_create(body, retry=None):
         message_id = f"498-{MSG_FUNCTION_ID}001"
         message = multi_lang.get_text(
             message_id,
-            "メンテナンス中の為、{}の作成は出来ません。({})",
+            "メンテナンス中の為、{0}の作成は出来ません。({1})",
             target_name,
             organization_id)
         raise common.MaintenanceException(message_id=message_id, message=message)
@@ -407,6 +407,62 @@ def organization_update(organization_id):  # noqa: E501
     """
     globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name} organization_id={organization_id}")
 
+    r = connexion.request
+
+    user_id = r.headers.get("User-id")
+
+    body = r.get_json()
+    organization_name = body.get("name")
+    organization_enabled = body.get("enabled")
+
+    # メンテナンスモード(data_update_stop)中は、エラー
+    # error during maintenance mode (data_update_stop)
+    mode_name = "data_update_stop"
+    target_name = "Organization"
+    maintenance_mode = maintenancemode.maintenace_mode_get(mode_name)
+    if maintenance_mode == "1":
+        message_id = f"498-{MSG_FUNCTION_ID}003"
+        message = multi_lang.get_text(
+            message_id,
+            "メンテナンス中の為、{0}の更新は出来ません。({1})",
+            target_name,
+            organization_id)
+        raise common.MaintenanceException(message_id=message_id, message=message)
+
+    # validation check
+    validate = validation.validate_organization_name(organization_name)
+    if not validate.ok:
+        return common.response_validation_error(validate)
+
+    # オーガナイゼーション名の更新
+    # update organization name
+    db = DBconnector()
+    with closing(db.connect_platformdb()) as conn:
+        with conn.cursor() as cursor:
+
+            parameter = {
+                "organization_id": organization_id,
+                "organization_name": organization_name,
+                "last_update_user": user_id,
+            }
+            try:
+                cursor.execute(queries_organizations.SQL_UPDATE_ORGANIZATION, parameter)
+
+                conn.commit()
+
+            except Exception as e:
+                globals.logger.error(f"exception:{e.args}")
+                # Duplicate PRIMARY KEY
+                message_id = f"500-{MSG_FUNCTION_ID}024"
+                message = multi_lang.get_text(message_id,
+                                              "オーガナイゼーションの更新に失敗しました(対象ID:{0})",
+                                              organization_id)
+                raise common.InternalErrorException(message_id=message_id, message=message)
+
+    # オーガナイゼーションの有効／無効の切り替え
+    # Enable/disable organization
+    __realm_enabled_change(organization_id, user_id, organization_enabled)
+
     return common.response_200_ok(None)
 
 
@@ -431,7 +487,7 @@ def organization_delete(organization_id):  # noqa: E501
         message_id = f"498-{MSG_FUNCTION_ID}002"
         message = multi_lang.get_text(
             message_id,
-            "メンテナンス中の為、{}の削除は出来ません。({})",
+            "メンテナンス中の為、{0}の削除は出来ません。({1})",
             target_name,
             organization_id)
         raise common.MaintenanceException(message_id=message_id, message=message)
@@ -1795,6 +1851,40 @@ def __realms_detail_get(organization_id, keycloak_org, org_row, org_informations
     return ret_realm
 
 
+def __realm_enabled_change(organization_id, user_id, organization_enbaled):
+    """realm to enabled/disabled change
+
+    Args:
+        organization_id (str): organization id
+        user_id (str): user id
+        organization_enbaled (bool): organization enabled
+    """
+
+    globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
+
+    # サービスアカウントのTOKEN取得
+    # Get a service account token
+    token = __get_token()
+
+    realm_json = {
+        "enabled": organization_enbaled,
+    }
+
+    # realm登録
+    # realm registration to keycloak
+    response = api_keycloak_realms.realm_update(organization_id, realm_json, token)
+    if response.status_code not in [200, 204]:
+        globals.logger.error(f"response.status_code:{response.status_code}")
+        globals.logger.error(f"response.text:{response.text}")
+        message_id = f"500-{MSG_FUNCTION_ID}023"
+        message = multi_lang.get_text(message_id,
+                                      "オーガナイゼーションの有効・無効の切り替えに失敗しました(対象ID:{0})",
+                                      organization_id)
+        raise common.InternalErrorException(message_id=message_id, message=message)
+
+    return
+
+
 @common.platform_exception_handler
 def organization_setting_get(organization_id):  # noqa: E501
     """get an organization settings
@@ -1877,7 +1967,7 @@ def organization_setting_update(body, organization_id):  # noqa: E501
         message_id = f"498-{MSG_FUNCTION_ID}003"
         message = multi_lang.get_text(
             message_id,
-            "メンテナンス中の為、{}の更新は出来ません。({})",
+            "メンテナンス中の為、{0}の更新は出来ません。({1})",
             target_name,
             organization_id)
         raise common.MaintenanceException(message_id=message_id, message=message)

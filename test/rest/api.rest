@@ -6,6 +6,9 @@
 @base_sys_url = http://platform-auth:{{sys-mng-port}}
 @base_org_url = http://platform-auth:{{org-mng-port}}
 
+# share org_id (同じものを複数記載すると最後の設定値が渡される)
+@org_id = org1
+
 # 1 api to ### 
 
 ###
@@ -53,10 +56,19 @@ content-type: application/json
 }
 ###
 
-@org_id = org1
-
 GET {{base_sys_url}}/api/platform/organizations/{{org_id}}
 Authorization: Basic {{sys-user-id}} {{sys-user-pw}}
+
+###
+
+PUT {{base_sys_url}}/api/platform/organizations/{{org_id}}
+Authorization: Basic {{sys-user-id}} {{sys-user-pw}}
+content-type: application/json
+
+{
+  "name": "organization of org1",
+  "enabled": true
+}
 
 ###
 
@@ -69,8 +81,6 @@ GET {{base_sys_url}}/api/platform/plan_items
 Authorization: Basic {{sys-user-id}} {{sys-user-pw}}
 
 ###
-
-@org_id = org1
 
 GET {{base_sys_url}}/api/platform/{{org_id}}/plans
 Authorization: Basic {{sys-user-id}} {{sys-user-pw}}
@@ -94,3 +104,8 @@ content-type: application/json
     "platform.users": 1000
   }
 }
+
+###
+
+GET {{base_sys_url}}/api/platform/settings/common
+Authorization: Basic {{sys-user-id}} {{sys-user-pw}}

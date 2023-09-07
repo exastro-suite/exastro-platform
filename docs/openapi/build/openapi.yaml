@@ -169,6 +169,9 @@ paths:
                       type: boolean
                       description: organization enabled(true) or disabled(false)
                       example: true
+                  required:
+                    - name
+                    - enabled
             examples:
               organization:
                 value:
