@@ -1,0 +1,228 @@
+<!--
+#   Copyright 2022 NEC Corporation
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+-->
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="format-detection" content="telephone=no,email=no,address=no">
+        <meta name="theme-color" content="#002B62">
+        <title text-id="000-85026">
+            オーガナイゼーション詳細 / オーガナイゼーション管理 / Exastro Platform
+        </title>
+        <link rel="stylesheet" href="/_/platform-commons/css/platform.css?ver=__BUILD_VERSION__">
+
+        <script type="text/javascript" src="/auth/js/keycloak.js?ver=__BUILD_VERSION__"></script>
+        <script type="text/javascript" src="/_/common-auth/js/exastro-common-auth-config.js?ver=__BUILD_VERSION__"></script>
+        <script type="text/javascript" src="/_/common-auth/js/exastro-common-auth.js?ver=__BUILD_VERSION__"></script>
+        <script src="/_/platform-commons/common/js/jquery.js?ver=__BUILD_VERSION__"></script>
+
+        <link rel="stylesheet" href="/_/platform-commons/css/custom_properties.css?ver=__BUILD_VERSION__">
+        <link rel="stylesheet" href="/_/platform-commons/css/common.css?ver=__BUILD_VERSION__">
+        <link rel="stylesheet" href="/_/platform-commons/css/dialog.css?ver=__BUILD_VERSION__">
+
+        <script src="/_/platform-commons/common/js/words.js?ver=__BUILD_VERSION__"></script>
+        <script src="/_/platform-commons/common/js/common.js?ver=__BUILD_VERSION__"></script>
+        <script src="/_/platform-commons/common/js/dialog.js?ver=__BUILD_VERSION__"></script>
+        <script src="/_/platform-commons/common/js/ui.js?ver=__BUILD_VERSION__"></script>
+
+        <script src="/_/platform-commons/js/platform_common.js?ver=__BUILD_VERSION__"></script>
+        <script src="/_/platform-commons/js/uri_conf.js?ver=__BUILD_VERSION__"></script>
+        <script src="/_/platform-commons/js/organization_detail.js?ver=__BUILD_VERSION__"></script>
+
+    </head>
+    <body>
+        <div id="container">
+            <div class="containerHeader">
+                <header id="header">
+                    <div class="logo">
+                        <img class="logoImage" src="/_/platform-commons/img/Exastro-logo2-white-rgb.svg?ver=__BUILD_VERSION__" alt="Exastro" style="height:32px; margin:5px 18px;">
+                    </div>
+                    <div class="topicPath">
+                        <ol class="topichPathList" style="visibility:hidden;">
+                        </ol>
+                    </div>
+                    <div class="headerMenu">
+                        <ul class="headerMenuList">
+                            <li class="userInfomation headerMenuItem">
+                            </li>
+                        </ul>
+                    </div>
+                </header>
+            </div>
+            <div class="containerBody">
+                <aside id="menu" class="">
+                    <!--
+                    <div class="menuHeader"></div>
+                    -->
+                    <div class="menuBody">
+                        <nav class="menuNavi">
+                            <ul class="menuList" style="display:none;">
+                            </ul>
+                        </nav>
+                    </div>
+                </aside>
+                <main id="main" style="visibility:hidden;">
+                    <div id="content">
+                        <div class="contentHeader">
+                            <h1 class="contentTitle"><span class="contentTitleInner" text-id="000-85027">オーガナイゼーション詳細</span></h1>
+                            <p class="contentMenuInfo" text-id="000-85028">オーガナイゼーションの詳細を確認できます。</p>
+                        </div>
+                        <div class="contentBody">
+                            <div class="contentMenu">
+                                <ul class="contentMenuList">
+                                    <li class="contentMenuItem">
+                                        <a class="contentMenuLink tabOpen" href="#dataList" tabindex="-1">
+                                            <span class="inner" text-id="000-80019">詳細</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <section class="section tabOpen" id="dataList">
+                                <div class="sectionBody">
+                                    <div id="MT" class="tableContainer viewTable">
+                                        <div class="tableHeader">
+                                            <div class="operationMenu">
+                                                <ul class="operationMenuList operationMenuMain">
+                                                </ul>
+                                                <ul class="operationMenuList operationMenuSub">
+                                                    <li class="operationMenuItem">
+                                                        <button title="編集" attr-text-id="title=000-80026" data-action="positive" class="itaButton button button_edit_organization" data-id="${organization_id}" style="width:100px;">
+                                                        <span class="inner">
+                                                            <span class="iconButtonIcon icon icon-edit"></span>
+                                                            <span class="iconButtonBody" text-id="000-80026">編集</span>
+                                                        </span>
+                                                        </button>
+                                                    </li>
+
+                                                    <li class="operationMenuItem">
+                                                        <button title="削除" attr-text-id="title=000-80010" data-action="danger" class="itaButton button button_delete_organization" data-id="${organization_id}" style="width:100px;">
+                                                        <span class="inner">
+                                                            <span class="iconButtonIcon icon icon-trash"></span>
+                                                            <span class="iconButtonBody" text-id="000-80010">削除</span>
+                                                        </span>
+                                                        </button>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <div class="tableBody">
+                                            <table class="table" width="100%">
+                                                <thead class="tbody">
+                                                    <tr class="tBodyTr tr">
+                                                        <td data-id="c1" data-rest="id" class="popup th2" rowspan="1" colspan="2" }="" title="【オーガナイゼーション基本】" attr-text-id="title=000-85029" width="250px;"><div class="ci" text-id="000-85029">【オーガナイゼーション基本情報】</div></td>
+                                                    </tr>
+                                                </thead>
+                                                <thead class="thead">
+                                                    <tr class="tHeadTr tr">
+                                                        <th data-id="c1" data-rest="id" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="項目名" attr-text-id="title=000-80020" width="250px;"><div class="ci" text-id="000-80020">項目名</div></th>
+                                                        <th data-id="c2" data-rest="name" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="設定値" attr-text-id="title=000-80021"><div class="ci" text-id="000-80021">設定値</div></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody class="tbody">
+                                                    <tr class="tBodyTr tr">
+                                                        <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: left;"><span text-id="000-00103">オーガナイゼーションID</span></div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci" id="text_organization_id">
+                                                        </div></td>
+                                                    </tr>
+                                                    <tr class="tBodyTr tr">
+                                                        <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: left;"><span text-id="000-00102">オーガナイゼーション名</span></div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci" id="text_organization_name">
+                                                        </div></td>
+                                                    </tr>
+                                                    <tr class="tBodyTr tr">
+                                                        <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: left;" text-id="000-85033">現在のリソースプラン</div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci" id="text_active_plan">
+                                                        </div></td>
+                                                    </tr>
+                                                    <tr class="tBodyTr tr">
+                                                        <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: left;" text-id="000-85034">状態</div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci" id="text_status">
+                                                        </div></td>
+                                                    </tr>
+                                                </tbody>
+                                            <!-- </table>
+                                        </div>
+                                        <div class="tableBody">
+                                            <table class="table" width="100%"> -->
+                                                <tbody class="tbody">
+                                                    <tr class="tBodyTr tr">
+                                                        <td data-id="c1" data-rest="id" class="popup th2" rowspan="1" colspan="2" }="" title="【オーガナイゼーション管理者】" attr-text-id="title=000-85030" width="250px;"><div class="ci" text-id="000-85030">【オーガナイゼーション管理者】</div></td>
+                                                    </tr>
+                                                </tbody>
+                                                <tbody class="tbody">
+                                                    <tr class="tBodyTr tr">
+                                                        <td class="tBodyTd td" rowspan="1" colspan="2" }=""> 
+                                                            <div class="tableBody">
+                                                                <table class="table" width="100%" id="organization_managers_list">
+                                                                    <thead class="thead">
+                                                                        <tr class="tHeadTr tr">
+                                                                            <th class="tHeadLeftSticky tHeadTh popup th" rowspan="1" colspan="1" }="" title="ユーザー名" attr-text-id="title=000-00128"><div class="ci" text-id="000-00128">ユーザー名</div></th>
+                                                                            <th class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="名" attr-text-id="title=000-00130"><div class="ci" text-id="000-00130">名</div></th>
+                                                                            <th class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="姓" attr-text-id="title=000-00131"><div class="ci" text-id="000-00131">姓</div></th>
+                                                                            <th class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="有効" attr-text-id="title=000-80031" width="80px;"><div class="ci" text-id="000-80031">有効</div></th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody class="tbody">
+                                                                        <tr class="tBodyTr tr datarow-template" style="display:none" username='${username}' data-id="${user_id}">
+                                                                            <td class="tBodyLeftSticky tBodyTd td" rowspan="1" colspan="1" }="" ><div class="ci">${username}</div></td>
+                                                                            <td class="tBodyTd td" rowspan="1" colspan="1" }="" ><div class="ci">${firstName}</div></td>
+                                                                            <td class="tBodyTd td" rowspan="1" colspan="1" }="" ><div class="ci">${lastName}</div></td>
+                                                                            <td class="tBodyTd td" rowspan="1" colspan="1" }="" ><div class="ci" style="text-align: center;">${enabled}</div></td>
+                                                                        </tr>
+                                                                        <tr class="tBodyTr tr notfound" style="display:none">
+                                                                            <td class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="4" }="" height="50px"><div class="ci" style="text-align: center;" text-id="000-84015">
+                                                                                ユーザーが存在しません
+                                                                            </div></td>
+                                                                        </tr>
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                                <tbody class="tbody">
+                                                    <tr class="tBodyTr tr">
+                                                        <td data-id="c1" data-rest="id" class="popup th2" rowspan="1" colspan="2" }="" title="【IT Automation オプション】" attr-text-id="title=000-85031" width="250px;"><div class="ci" text-id="000-85031">【IT Automation オプション】</div></td>
+                                                    </tr>
+                                                </tbody>
+                                                <thead class="thead">
+                                                    <tr class="tHeadTr tr">
+                                                        <th data-id="c1" data-rest="id" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="項目名" attr-text-id="title=000-80020" width="250px;"><div class="ci" text-id="000-80020">項目名</div></th>
+                                                        <th data-id="c2" data-rest="name" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="設定値" attr-text-id="title=000-80021"><div class="ci" text-id="000-80021">設定値</div></th>
+                                                    </tr>
+                                                </thead>
+                                                <tr class="tBodyTr tr">
+                                                    <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: left;" text-id="000-85020">インストールドライバ</div></td>
+                                                    <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci">
+                                                        <input type="checkbox" name="form_ita_no_install_driver" value="terraform_cloud_ep" id="form_ita_no_install_driver_terraform_cloud_ep" checked><span text-id="000-85021">Terraform-Cloud/EPドライバ</span>
+                                                        <input type="checkbox" name="form_ita_no_install_driver" value="terraform_cli" id="form_ita_no_install_driver_terraform_cli" checked><span text-id="000-85022">Terraform-CLIドライバ</span>
+                                                        <input type="checkbox" name="form_ita_no_install_driver" value="ci_cd" id="form_ita_no_install_driver_ci_cd" checked><span text-id="000-85023">CI/CD for IaC</span>
+                                                    </div></td>
+                                                </tr>
+                                        </table>
+                                        </div>
+                                        <button data-type="tableNew" data-action="positive" style="width:200px;" class="itaButton tableHeaderMainMenuButton button" id="button_register"><span class="inner"><span class="icon icon-edit"></span><span text-id="000-80025">登録</span></span></button>
+                                    </div>
+                                </div>
+                            </section>
+                        </div>
+                    </div>
+                </main>
+            </div>
+            <div class="containerLoading"></div>
+        </div>
+    </body>
+</html>
