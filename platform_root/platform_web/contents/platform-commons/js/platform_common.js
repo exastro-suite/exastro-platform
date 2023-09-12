@@ -154,9 +154,16 @@ function replaceLanguageText() {
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 function displayTopicPath(topicPaths) {
-    topicPaths.unshift(
-        {"text": getText("000-80001", "メインメニュー"), "href": location_conf.href.menu.toppage.replace(/{organization_id}/g, CommonAuth.getRealm())}
-    );
+
+    if(CommonAuth.isPlatformAdminSite()) {
+        topicPaths.unshift(
+            {"text": getText("000-80001", "メインメニュー"), "href": location_conf.href.menu.platform_admin_site.toppage}
+        );
+    } else {
+        topicPaths.unshift(
+            {"text": getText("000-80001", "メインメニュー"), "href": location_conf.href.menu.organization_user_site.toppage.replace(/{organization_id}/g, CommonAuth.getRealm())}
+        );
+    }
     let $topichPathList = $('.topichPathList');
     for(let i = 0; i < topicPaths.length; ++i ) {
         let topicPath = topicPaths[i];
@@ -178,30 +185,43 @@ function displayTopicPath(topicPaths) {
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 function displayMenu(curent) {
-    $('.menuList').append(`
-        <li class="menuItem"><a class="menuLink" id="menu_workspace" href="#" tabindex="-1">${getText("000-80005", "ワークスペース管理")}</a></li>
-        <li class="menuItem"><a class="menuLink" id="menu_account_management" href="#" style="display: none;">${getText("000-80006", "ユーザー管理")}</a></li>
-        <li class="menuItem"><a class="menuLink" id="menu_role_management" href="#" style="display: none;">${getText("000-80007", "ロール管理")}</a></li>
-    `);
+    if(CommonAuth.isPlatformAdminSite()) {
+        $('.menuList').empty().append(`
+            <li class="menuItem"><a class="menuLink" id="menu_organizations" href="#" tabindex="-1">${getText("000-80037", "オーガナイゼーション管理")}</a></li>
+            <li class="menuItem"><a class="menuLink" id="menu_plans" href="#">${getText("000-80038", "リソースプラン管理")}</a></li>
+            <li class="menuItem"><a class="menuLink" id="menu_system_settings" href="#">${getText("000-80039", "システム設定")}</a></li>
+            <li class="menuItem"><a class="menuLink" id="menu_keycloak" href="#" target="exastro_platform_keycloak">${getText("000-80040", "keycloakコンソール")}</a></li>
+        `);
+        $('#menu_organizations').attr('href', location_conf.href.organizations.list);
+        // $('#menu_plans').attr('href', location_conf.href.plans.list);
+        // $('#menu_system_settings').attr('href', location_conf.href.system_settings.top);
+        $('#menu_keycloak').attr('href', location_conf.href.keycloak.console);
+    } else {
+        $('.menuList').empty().append(`
+            <li class="menuItem"><a class="menuLink" id="menu_workspace" href="#" tabindex="-1">${getText("000-80005", "ワークスペース管理")}</a></li>
+            <li class="menuItem"><a class="menuLink" id="menu_account_management" href="#" style="display: none;">${getText("000-80006", "ユーザー管理")}</a></li>
+            <li class="menuItem"><a class="menuLink" id="menu_role_management" href="#" style="display: none;">${getText("000-80007", "ロール管理")}</a></li>
+        `);
+
+        $('#menu_workspace').attr('href', location_conf.href.workspaces.list.replace(/{organization_id}/g, CommonAuth.getRealm()));
+        $('#menu_account_management').attr('href', location_conf.href.users.list.replace(/{organization_id}/g, CommonAuth.getRealm()));
+        $('#menu_role_management').attr('href', location_conf.href.roles.list.replace(/{organization_id}/g, CommonAuth.getRealm()));
+    
+        if (CommonAuth.hasAuthority("_og-usr-mt")) {
+            $("#menu_account_management").css("display", "");
+        }
+        let adminWorkspaces = CommonAuth.getAdminWorkspaces();
+        if (CommonAuth.hasAuthority(RolesCommon.ORG_AUTH_OWNER_MAINTE)
+        ||  CommonAuth.hasAuthority(RolesCommon.ORG_AUTH_ROLE_USER)
+        ||  CommonAuth.hasAuthority(RolesCommon.ORG_AUTH_WS_ROLE_MAINTE)
+        ||  CommonAuth.hasAuthority(RolesCommon.ORG_AUTH_WS_ROLE_USER)
+        ||  adminWorkspaces.length > 0) {
+            $("#menu_role_management").css("display", "");
+        }
+    }
+
     if(curent != null) {
         $(`#${curent}`).addClass("current");
-    }
-
-    $('#menu_workspace').attr('href', location_conf.href.workspaces.list.replace(/{organization_id}/g, CommonAuth.getRealm()));
-    // $('#menu_account_management').attr('href', location_conf.href.menu.account_manaagement.replace(/{organization_id}/g, CommonAuth.getRealm()));
-    $('#menu_account_management').attr('href', location_conf.href.users.list.replace(/{organization_id}/g, CommonAuth.getRealm()));
-    $('#menu_role_management').attr('href', location_conf.href.roles.list.replace(/{organization_id}/g, CommonAuth.getRealm()));
-
-    if (CommonAuth.hasAuthority("_og-usr-mt")) {
-        $("#menu_account_management").css("display", "");
-    }
-    let adminWorkspaces = CommonAuth.getAdminWorkspaces();
-    if (CommonAuth.hasAuthority(RolesCommon.ORG_AUTH_OWNER_MAINTE)
-    ||  CommonAuth.hasAuthority(RolesCommon.ORG_AUTH_ROLE_USER)
-    ||  CommonAuth.hasAuthority(RolesCommon.ORG_AUTH_WS_ROLE_MAINTE)
-    ||  CommonAuth.hasAuthority(RolesCommon.ORG_AUTH_WS_ROLE_USER)
-    ||  adminWorkspaces.length > 0) {
-        $("#menu_role_management").css("display", "");
     }
 }
 
@@ -429,6 +449,64 @@ function deleteConfirmMessage(title, message, deleteResources, cautionMessage, i
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
+//   Organizations Common
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+const OrganizationsCommon = {
+    validate: {
+        //
+        // validate organization id
+        //
+        organization_id: function(organization_id) {
+            if(organization_id === "") {
+                return {
+                    "result": false,
+                    "message": getText("400-00011", "必須項目が不足しています。({0})", getText("000-00103", "オーガナイゼーションID"))
+                }
+            } else if(organization_id.replace(/[a-zA-Z0-9_-]/g,"") !== "") {
+                return {
+                    "result": false,
+                    "message": getText("400-00017", "指定できない文字が含まれています。(項目:{0},指定可能な文字:{1})",
+                                    getText("000-00103", "オーガナイゼーションID"),
+                                    getText("000-31001", "半角英数・ハイフン・アンダースコア")
+                                )
+                }
+
+            } else if( ! organization_id.match(/^[a-zA-Z]/)) {
+                return {
+                    "result": false,
+                    "message": getText("400-00014", "先頭の文字にアルファベット以外が指定されています。({0})", getText("000-00103", "オーガナイゼーションID"))
+                }
+            } else {
+                return {
+                    "result": true,
+                    "message": ""
+                }
+            }
+        },
+
+        //
+        // validate organization name
+        //
+        organization_name: function(organization_name) {
+            if(organization_name === "") {
+                return {
+                    "result": false,
+                    "message": getText("400-00011", "必須項目が不足しています。({0})", getText("000-00104", "オーガナイゼーション名"))
+                }
+            } else {
+                return {
+                    "result": true,
+                    "message": ""
+                }
+            }
+        }
+
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
 //   Workspaces Common
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -448,7 +526,7 @@ const WorkspacesCommon = {
                     "result": false,
                     "message": getText("400-00017", "指定できない文字が含まれています。(項目:{0},指定可能な文字:{1})",
                                     getText("000-00101", "ワークスペースID"),
-                                    getText("000-00101", "半角英数・ハイフン・アンダースコア")
+                                    getText("000-31001", "半角英数・ハイフン・アンダースコア")
                                 )
                 }
 
@@ -707,4 +785,31 @@ const UsersCommon =
         }
         return true;
     }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//   Maintenance mode
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+function maintenanceMode() {
+    call_api_promise({
+        type: "GET",
+        url: api_conf.api["maintenance-mode-setting"].get.replace('{organization_id}', CommonAuth.getRealm()),
+        headers: {
+            Authorization: "Bearer " + CommonAuth.getToken(),
+        },
+        dataType: "json",
+    }).then(function( result ){
+        if ( result.data && result.message === 'SUCCESS' && result.data.data_update_stop === '1') {
+            const container = document.getElementById('container');
+            const message = document.querySelector('.modeMessageText');
+            if ( container !== null && message !== null ) {
+                container.classList.add('inMaintenanceMode');
+                message.textContent = 'メンテナンス中のため、ワークスペース作成を行うことができません。';
+            }
+        }
+    }).catch(function( error ){
+        console.error( error );
+    });
 }

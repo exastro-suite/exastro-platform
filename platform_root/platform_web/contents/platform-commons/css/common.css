@@ -56,7 +56,7 @@ text-align: right;
 .inputNumber::-webkit-inner-spin-button,
 .inputNumber::-webkit-outer-spin-button {
 -webkit-appearance: none;
--moz-appearance: textfield;
+appearance: textfield;
 }
 /* select */
 .select {
@@ -479,6 +479,80 @@ display: flex;
 width: 100%; height: calc( 100% - 48px );
 border-top: 1px solid var(--black100);
 }
+.modeMessage {
+display: none;
+}
+/*
+##################################################
+    メンテナンスモード
+##################################################
+*/
+.inMaintenanceMode .containerBody {
+height: calc( 100% - 96px );
+}
+.inMaintenanceMode .modeMessage {
+position: relative;
+z-index: 5;
+display: flex;
+justify-content: center;
+align-items: center;
+height: 48px;
+padding: 8px 32px;
+background-color: #FFDD00;
+background-image: linear-gradient( rgba(0,0,0,.05), rgba(0,0,0,0) 20%, rgba(0,0,0,0) 80%, rgba(0,0,0,.05));
+border-top: 1px solid var(--black100);
+line-height: 1.4;
+font-size: 14px;
+font-weight: bold;
+color: #333;
+}
+@media screen and (max-width: 980px) {
+  .inMaintenanceMode .modeMessage {
+    font-size: 12px;
+  }
+}
+@media screen and (max-width: 760px) {
+  .inMaintenanceMode .modeMessage {
+    font-size: 10px;
+  }
+}
+.inMaintenanceMode .modeMessage::before,
+.inMaintenanceMode .modeMessage::after {
+content: '';
+position: absolute;
+top: 0;
+display: block;
+width: 16px; height: 100%;
+background-image: linear-gradient( -45deg, transparent 25%, var(--black90) 25%, var(--black90) 50%, transparent 50%, transparent 75%, var(--black90) 75% );
+background-size: 16px 16px;
+}
+.inMaintenanceMode .modeMessage::before {
+left: 0;
+}
+.inMaintenanceMode .modeMessage::after {
+right: 0;
+}
+.inMaintenanceMode .modeMessageText {
+position: relative;
+display: inline-flex;
+justify-content: center;
+align-items: center;
+padding-left: 36px;
+height: 100%;
+}
+.inMaintenanceMode .modeMessageText::before {
+content: "\e94b";
+position: absolute;
+left: 0; top: 50%;
+transform: translateY(-50%);
+font-family: 'exastro-ui-icons' !important;
+color: #F00;
+font-size: 28px;
+}
+.inMaintenanceMode .menuGroupSub {
+top: 96px;
+height: calc( 100% - 96px );
+}
 /*
 ##################################################
    Header
@@ -872,7 +946,6 @@ transform: rotate(180deg);
 }
 .menuBody {
 height: calc( 100% - 48px );
-border-top: 1px solid rgba(255,255,255,.1);
 }
 .menuNavi {
 direction: rtl;
@@ -945,7 +1018,6 @@ color: var(--white100);
 }
 .menuList {
 direction: ltr;
-border-top: 1px solid rgba(0,0,0,.4);
 border-bottom: 1px solid rgba(255,255,255,.1);
 }
 .menuLink {
@@ -1056,8 +1128,6 @@ background-color: var(--black40);
 }
 .open > .menuSecondaryToggleIcon::after {
 display: none;
-}
-.menuSecondaryToggleIcon.open {
 }
 .menuSecondary {
 position: relative;
@@ -1431,6 +1501,10 @@ border-spacing: 0;
 .td {
 background-color: var(--rowColor);
 border-right: 1px solid var(--mainColor40);
+border-bottom: 1px solid var(--mainColor20);
+vertical-align: middle;
+}
+.th2 {
 border-bottom: 1px solid var(--mainColor20);
 vertical-align: middle;
 }
@@ -1809,8 +1883,6 @@ font-size: 12px;
 }
 .filterMenuButton > .inner {
 padding: 0 16px;
-}
-.filterInputFromToNumber {
 }
 .filterInputFromNumberWrap,
 .filterInputFromDateWrap {
@@ -2830,7 +2902,7 @@ height: 100%;
 .icon {
   /* use !important to prevent issues with browser extensions that change fonts */
   font-family: 'exastro-ui-icons' !important;
-  speak: never;
+  /*speak: never;*/
   font-style: normal;
   font-weight: normal;
   font-variant: normal;

@@ -41,6 +41,14 @@
 		"thunder-client.saveToWorkspace": true,
 		"thunder-client.workspaceRelativePath": ".vscode_extensions",
 
+		// rest-client setting
+		"rest-client.environmentVariables": {
+			"$shared": {
+				"sys-mng-port": "8001",
+				"org-mng-port": "8000"
+			}
+		},
+		
 		// python extension setting
 		"python.linting.pylintEnabled": false,
 		"python.linting.flake8Enabled": true,
@@ -85,6 +93,8 @@
 		"mitchdenny.ecdc",
 		"ms-vsliveshare.vsliveshare",
 		"snyk-security.snyk-vulnerability-scanner",
+		// "rapidapi.vscode-rapidapi-client",
+		"humao.rest-client",
 	],
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	"forwardPorts": [

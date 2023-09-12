@@ -12,15 +12,5 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-title: system config value is a definition of system config resource.
-type: array
-items:
-  $ref: './systemConfig.yaml'
-example:
-  [
-    {
-      key: "platform.max_organization",
-      value: "100",
-      description: "platform max organization"
-    }
-  ]
+# SETTING_DATAS = [
+# ]

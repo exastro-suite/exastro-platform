@@ -1,0 +1,111 @@
+# not quate strings
+@sys-user-id = admin
+@sys-user-pw = password
+@org-user-id = admin
+@org-user-pw = password
+@base_sys_url = http://platform-auth:{{sys-mng-port}}
+@base_org_url = http://platform-auth:{{org-mng-port}}
+
+# share org_id (同じものを複数記載すると最後の設定値が渡される)
+@org_id = org1
+
+# 1 api to ### 
+
+###
+
+GET {{base_sys_url}}/api/platform/organizations
+Authorization: Basic {{sys-user-id}} {{sys-user-pw}}
+
+###
+
+POST {{base_sys_url}}/api/platform/organizations?retry=1
+Authorization: Basic {{sys-user-id}} {{sys-user-pw}}
+content-type: application/json
+
+{
+  "id": "org1",
+  "name": "organization of org1",
+  "organization_managers": [
+    {
+      "username": "user-id",
+      "email": "user e-mail address",
+      "firstName": "string",
+      "lastName": "string",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "password",
+          "temporary": true
+        }
+      ],
+      "requiredActions": [
+        "UPDATE_PROFILE"
+      ],
+      "enabled": true
+    }
+  ],
+  "plan": {
+    "id": "plan-1"
+  },
+  "options": {},
+  "optionsIta": {
+    "no_install_driver": [
+      "terraform_cli"
+    ]
+  }
+}
+###
+
+GET {{base_sys_url}}/api/platform/organizations/{{org_id}}
+Authorization: Basic {{sys-user-id}} {{sys-user-pw}}
+
+###
+
+PUT {{base_sys_url}}/api/platform/organizations/{{org_id}}
+Authorization: Basic {{sys-user-id}} {{sys-user-pw}}
+content-type: application/json
+
+{
+  "name": "organization of org1",
+  "enabled": true
+}
+
+###
+
+GET {{base_sys_url}}/api/platform/plans
+Authorization: Basic {{sys-user-id}} {{sys-user-pw}}
+
+###
+
+GET {{base_sys_url}}/api/platform/plan_items
+Authorization: Basic {{sys-user-id}} {{sys-user-pw}}
+
+###
+
+GET {{base_sys_url}}/api/platform/{{org_id}}/plans
+Authorization: Basic {{sys-user-id}} {{sys-user-pw}}
+
+###
+
+POST {{base_sys_url}}/api/platform/plans
+Authorization: Basic {{sys-user-id}} {{sys-user-pw}}
+content-type: application/json
+
+{
+  "id": "plan-1",
+  "name": "name of plan",
+  "informations": {
+    "description": "string"
+  },
+  "limits": {
+    "ita.organization.ansible.execution_limit": 25,
+    "platform.workspaces": 500,
+    "platform.roles": 500,
+    "platform.users": 1000
+  }
+}
+
+###
+
+GET {{base_sys_url}}/api/platform/settings/common
+Authorization: Basic {{sys-user-id}} {{sys-user-pw}}

@@ -12,15 +12,27 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-title: system config value is a definition of system config resource.
-type: array
-items:
-  $ref: './systemConfig.yaml'
-example:
-  [
-    {
-      key: "platform.max_organization",
-      value: "100",
-      description: "platform max organization"
-    }
-  ]
+# title: user is a definition of User resource.
+type: object
+properties:
+  id:
+    type: string
+    format: uuid
+  username:
+    type: string
+  name:
+    type: string
+    example: firstname lastname
+  firstName:
+    type: string
+  lastName:
+    type: string
+  email:
+    type: string
+  enabled:
+    type: boolean
+  create_timestamp:
+    type: string
+    format: date-time
+
+

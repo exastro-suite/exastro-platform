@@ -67,6 +67,8 @@ services:
     ports:
       - "0.0.0.0:8000:8000"
       - "0.0.0.0:8001:8001"
+    networks:
+      - exastro
 
     depends_on:
       platform-migration-2:
@@ -96,6 +98,8 @@ services:
       - KC_DB_PASSWORD=password
       - KC_PROXY=passthrough
       - KC_HTTP_RELATIVE_PATH=/auth
+    networks:
+      - exastro
     command:
       # 開発モードで起動
       - start-dev --spi-theme-static-max-age=-1 --spi-theme-cache-themes=false --spi-theme-cache-templates=false
@@ -115,6 +119,8 @@ services:
     environment:
       - TZ=Asia/Tokyo
       - MYSQL_ROOT_PASSWORD=password
+    networks:
+      - exastro
 
   platform-web:
     user: 1000:1000
@@ -129,6 +135,8 @@ services:
     environment:
       - TZ=Asia/Tokyo
       - LISTEN_PORT=80
+    networks:
+      - exastro
 
   platform-api:
     user: 1000:1000
@@ -158,6 +166,8 @@ services:
       - DB_ADMIN_USER=root
       - DB_ADMIN_PASSWORD=password
       - ENCRYPT_KEY=${ENCRYPT_KEY}
+    networks:
+      - exastro
 
   platform-migration-1:
     user: 1000:1000
@@ -184,6 +194,8 @@ services:
       - KEYCLOAK_DB_PASSWORD=password
       # - TIMEOUT_SECONDS_CONNECT_DB=600
       # - TIMEOUT_SECONDS_KEYCLOAK_START=600
+    networks:
+      - exastro
 
   platform-migration-2:
     user: 1000:1000
@@ -216,7 +228,12 @@ services:
       # - TIMEOUT_SECONDS_CONNECT_DB=600
       # - TIMEOUT_SECONDS_KEYCLOAK_START=600
       - ENCRYPT_KEY=${ENCRYPT_KEY}
+    networks:
+      - exastro
     depends_on:
       platform-migration-1:
         condition: service_completed_successfully
 
+networks:
+  exastro:
+    name: "exastro_${NETWORK_ID}"

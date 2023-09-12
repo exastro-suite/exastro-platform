@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: Exastro Platform API
   description: Exastro Platform API
-  version: 1.5.2
+  version: 1.6.0
 servers:
 - url: "https://{host}"
   description: API endpoint
@@ -116,6 +116,71 @@ paths:
                 $ref: '#/components/schemas/runtimeError'
       x-openapi-router-controller: controllers.organization_service_controller
   /api/platform/organizations/{organization_id}:
+    get:
+      tags:
+      - OrganizationService
+      summary: get organization
+      operationId: organization_get
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_1'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+      x-openapi-router-controller: controllers.organization_service_controller
+    put:
+      tags:
+      - OrganizationService
+      summary: update an organization
+      operationId: organization_update
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/organizations_organization_id_body'
+            examples:
+              organization:
+                value:
+                  name: name of org1
+                  enabled: true
+        required: true
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_2'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+      x-openapi-router-controller: controllers.organization_service_controller
     delete:
       tags:
       - OrganizationService
@@ -135,7 +200,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_1'
+                $ref: '#/components/schemas/inline_response_200_3'
         default:
           description: An unexpected error response.
           content:
@@ -163,7 +228,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_2'
+                $ref: '#/components/schemas/inline_response_200_4'
         default:
           description: An unexpected error response.
           content:
@@ -257,7 +322,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_3'
+                $ref: '#/components/schemas/inline_response_200_5'
         default:
           description: An unexpected error response.
           content:
@@ -284,7 +349,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_4'
+                $ref: '#/components/schemas/inline_response_200_2'
         default:
           description: An unexpected error response.
           content:
@@ -304,7 +369,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_3'
+                $ref: '#/components/schemas/inline_response_200_5'
         default:
           description: An unexpected error response.
           content:
@@ -323,7 +388,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_4'
+                $ref: '#/components/schemas/inline_response_200_2'
         default:
           description: An unexpected error response.
           content:
@@ -351,7 +416,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_5'
+                $ref: '#/components/schemas/inline_response_200_6'
         default:
           description: An unexpected error response.
           content:
@@ -440,7 +505,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_6'
+                $ref: '#/components/schemas/inline_response_200_7'
         default:
           description: An unexpected error response.
           content:
@@ -485,7 +550,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_7'
+                $ref: '#/components/schemas/inline_response_200_8'
         default:
           description: An unexpected error response.
           content:
@@ -522,7 +587,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_8'
+                $ref: '#/components/schemas/inline_response_200_9'
         default:
           description: An unexpected error response.
           content:
@@ -559,7 +624,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_9'
+                $ref: '#/components/schemas/inline_response_200_10'
         default:
           description: An unexpected error response.
           content:
@@ -596,7 +661,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_10'
+                $ref: '#/components/schemas/inline_response_200_11'
         default:
           description: An unexpected error response.
           content:
@@ -616,7 +681,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_11'
+                $ref: '#/components/schemas/inline_response_200_12'
         default:
           description: An unexpected error response.
           content:
@@ -687,7 +752,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_12'
+                $ref: '#/components/schemas/inline_response_200_13'
         default:
           description: An unexpected error response.
           content:
@@ -720,7 +785,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_4'
+                $ref: '#/components/schemas/inline_response_200_2'
         default:
           description: An unexpected error response.
           content:
@@ -755,7 +820,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_13'
+                $ref: '#/components/schemas/inline_response_200_14'
         default:
           description: An unexpected error response.
           content:
@@ -864,7 +929,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_14'
+                $ref: '#/components/schemas/inline_response_200_15'
         default:
           description: An unexpected error response.
           content:
@@ -921,7 +986,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_15'
+                $ref: '#/components/schemas/inline_response_200_16'
         default:
           description: An unexpected error response.
           content:
@@ -954,7 +1019,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_4'
+                $ref: '#/components/schemas/inline_response_200_2'
         default:
           description: An unexpected error response.
           content:
@@ -990,7 +1055,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_16'
+                $ref: '#/components/schemas/inline_response_200_17'
         default:
           description: An unexpected error response.
           content:
@@ -1031,7 +1096,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_4'
+                $ref: '#/components/schemas/inline_response_200_2'
         default:
           description: An unexpected error response.
           content:
@@ -1066,7 +1131,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_4'
+                $ref: '#/components/schemas/inline_response_200_2'
         default:
           description: An unexpected error response.
           content:
@@ -1106,7 +1171,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_17'
+                $ref: '#/components/schemas/inline_response_200_18'
         default:
           description: An unexpected error response.
           content:
@@ -1147,7 +1212,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_4'
+                $ref: '#/components/schemas/inline_response_200_2'
         default:
           description: An unexpected error response.
           content:
@@ -1195,7 +1260,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_4'
+                $ref: '#/components/schemas/inline_response_200_2'
         default:
           description: An unexpected error response.
           content:
@@ -1229,7 +1294,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_4'
+                $ref: '#/components/schemas/inline_response_200_2'
         default:
           description: An unexpected error response.
           content:
@@ -1285,7 +1350,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_18'
+                $ref: '#/components/schemas/inline_response_200_19'
         default:
           description: An unexpected error response.
           content:
@@ -1325,7 +1390,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_4'
+                $ref: '#/components/schemas/inline_response_200_2'
         default:
           description: An unexpected error response.
           content:
@@ -1365,7 +1430,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_4'
+                $ref: '#/components/schemas/inline_response_200_2'
         default:
           description: An unexpected error response.
           content:
@@ -1386,7 +1451,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_19'
+                $ref: '#/components/schemas/inline_response_200_20'
         default:
           description: An unexpected error response.
           content:
@@ -1411,7 +1476,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_1'
+                $ref: '#/components/schemas/inline_response_200_3'
         default:
           description: An unexpected error response.
           content:
@@ -1439,7 +1504,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_19'
+                $ref: '#/components/schemas/inline_response_200_20'
         default:
           description: An unexpected error response.
           content:
@@ -1481,7 +1546,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_4'
+                $ref: '#/components/schemas/inline_response_200_2'
         default:
           description: An unexpected error response.
           content:
@@ -1501,7 +1566,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_11'
+                $ref: '#/components/schemas/inline_response_200_12'
         default:
           description: An unexpected error response.
           content:
@@ -1561,7 +1626,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_20'
+                $ref: '#/components/schemas/inline_response_200_21'
         default:
           description: An unexpected error response.
           content:
@@ -1681,7 +1746,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_8'
+                $ref: '#/components/schemas/inline_response_200_9'
         default:
           description: An unexpected error response.
           content:
@@ -1732,7 +1797,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_21'
+                $ref: '#/components/schemas/inline_response_200_22'
         default:
           description: An unexpected error response.
           content:
@@ -1787,7 +1852,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_22'
+                $ref: '#/components/schemas/inline_response_200_23'
         default:
           description: An unexpected error response.
           content:
@@ -1905,7 +1970,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_23'
+                $ref: '#/components/schemas/inline_response_200_24'
         default:
           description: An unexpected error response.
           content:
@@ -1961,7 +2026,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_15'
+                $ref: '#/components/schemas/inline_response_200_16'
         default:
           description: An unexpected error response.
           content:
@@ -2017,7 +2082,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_24'
+                $ref: '#/components/schemas/inline_response_200_25'
         default:
           description: An unexpected error response.
           content:
@@ -2038,7 +2103,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_19'
+                $ref: '#/components/schemas/inline_response_200_20'
         default:
           description: An unexpected error response.
           content:
@@ -2121,7 +2186,7 @@ components:
         organization_managers:
           type: array
           items:
-            $ref: '#/components/schemas/usernameOnly'
+            $ref: '#/components/schemas/organization_organization_managers'
         active_plan:
           $ref: '#/components/schemas/organization_active_plan'
         plans:
@@ -2621,6 +2686,8 @@ components:
         $ref: '#/components/schemas/roleUser'
     roleUser:
       title: role mapping user is a definition of User resource.
+      required:
+      - preferred_username
       type: object
       properties:
         id:
@@ -2721,6 +2788,9 @@ components:
             $ref: '#/components/schemas/tokenRefreshList_data'
     systemConfig:
       title: system config is a definition of system config resource.
+      required:
+      - key
+      - value
       type: object
       properties:
         key:
@@ -2796,60 +2866,79 @@ components:
     inline_response_200_1:
       allOf:
       - $ref: '#/components/schemas/responseOk'
+      - type: object
+        properties:
+          data:
+            $ref: '#/components/schemas/organization'
+    organizations_organization_id_body:
+      oneOf:
+      - title: organization is a definition of Organization resource.
+        type: object
+        properties:
+          name:
+            type: string
+            example: name of org1
+          enabled:
+            type: boolean
+            description: organization enabled(true) or disabled(false)
+            example: true
     inline_response_200_2:
       allOf:
       - $ref: '#/components/schemas/responseOk'
       - type: object
         properties:
           data:
-            $ref: '#/components/schemas/organizationSetting'
+            type: object
     inline_response_200_3:
       allOf:
       - $ref: '#/components/schemas/responseOk'
-      - $ref: '#/components/schemas/tokenRefreshList'
     inline_response_200_4:
       allOf:
       - $ref: '#/components/schemas/responseOk'
       - type: object
         properties:
           data:
-            type: object
+            $ref: '#/components/schemas/organizationSetting'
     inline_response_200_5:
       allOf:
       - $ref: '#/components/schemas/responseOk'
-      - $ref: '#/components/schemas/planMappingOrganizationList'
+      - $ref: '#/components/schemas/tokenRefreshList'
     inline_response_200_6:
       allOf:
       - $ref: '#/components/schemas/responseOk'
-      - $ref: '#/components/schemas/planList'
+      - $ref: '#/components/schemas/planMappingOrganizationList'
     inline_response_200_7:
+      allOf:
+      - $ref: '#/components/schemas/responseOk'
+      - $ref: '#/components/schemas/planList'
+    inline_response_200_8:
       allOf:
       - $ref: '#/components/schemas/responseOk'
       - type: object
         properties:
           data:
             $ref: '#/components/schemas/planItemList'
-    inline_response_200_8:
-      allOf:
-      - $ref: '#/components/schemas/responseOk'
-      - $ref: '#/components/schemas/limits'
     inline_response_200_9:
       allOf:
       - $ref: '#/components/schemas/responseOk'
-      - $ref: '#/components/schemas/usageOrganizationList'
+      - $ref: '#/components/schemas/limits'
     inline_response_200_10:
       allOf:
       - $ref: '#/components/schemas/responseOk'
-      - $ref: '#/components/schemas/usageList'
+      - $ref: '#/components/schemas/usageOrganizationList'
     inline_response_200_11:
       allOf:
       - $ref: '#/components/schemas/responseOk'
-      - $ref: '#/components/schemas/systemConfigList'
+      - $ref: '#/components/schemas/usageList'
     inline_response_200_12:
       allOf:
       - $ref: '#/components/schemas/responseOk'
-      - $ref: '#/components/schemas/workspaceList'
+      - $ref: '#/components/schemas/systemConfigList'
     inline_response_200_13:
+      allOf:
+      - $ref: '#/components/schemas/responseOk'
+      - $ref: '#/components/schemas/workspaceList'
+    inline_response_200_14:
       allOf:
       - $ref: '#/components/schemas/responseOk'
       - title: workspaceDetail is Workspace resources.
@@ -2859,22 +2948,22 @@ components:
             allOf:
             - $ref: '#/components/schemas/workspace'
             - $ref: '#/components/schemas/responseStat'
-    inline_response_200_14:
-      allOf:
-      - $ref: '#/components/schemas/responseOk'
-      - $ref: '#/components/schemas/memberList'
     inline_response_200_15:
       allOf:
       - $ref: '#/components/schemas/responseOk'
-      - $ref: '#/components/schemas/userList'
+      - $ref: '#/components/schemas/memberList'
     inline_response_200_16:
+      allOf:
+      - $ref: '#/components/schemas/responseOk'
+      - $ref: '#/components/schemas/userList'
+    inline_response_200_17:
       allOf:
       - $ref: '#/components/schemas/responseOk'
       - type: object
         properties:
           data:
             $ref: '#/components/schemas/user'
-    inline_response_200_17:
+    inline_response_200_18:
       allOf:
       - $ref: '#/components/schemas/responseOk'
       - $ref: '#/components/schemas/roleDetailList'
@@ -2884,7 +2973,7 @@ components:
     roles_role_name_body:
       oneOf:
       - $ref: '#/components/schemas/roleDetailWorkspacePut'
-    inline_response_200_18:
+    inline_response_200_19:
       allOf:
       - $ref: '#/components/schemas/responseOk'
       - title: roleList is list of Role resources.
@@ -2894,7 +2983,7 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/roleUser'
-    inline_response_200_19:
+    inline_response_200_20:
       allOf:
       - $ref: '#/components/schemas/responseOk'
       - $ref: '#/components/schemas/maintenanceModeSettings'
@@ -2907,32 +2996,54 @@ components:
         data_update_stop:
           type: string
           example: "1"
-    inline_response_200_20:
+    inline_response_200_21:
       allOf:
       - $ref: '#/components/schemas/responseOk'
       - type: object
         properties:
           data:
             $ref: '#/components/schemas/systemConfig'
-    inline_response_200_21:
+    inline_response_200_22:
       allOf:
       - $ref: '#/components/schemas/responseOk'
       - $ref: '#/components/schemas/limitsList'
-    inline_response_200_22:
+    inline_response_200_23:
       allOf:
       - $ref: '#/components/schemas/responseOk'
       - type: object
         properties:
           data:
             $ref: '#/components/schemas/planItem'
-    inline_response_200_23:
-      allOf:
-      - $ref: '#/components/schemas/responseOk'
-      - $ref: '#/components/schemas/roleList'
     inline_response_200_24:
       allOf:
       - $ref: '#/components/schemas/responseOk'
+      - $ref: '#/components/schemas/roleList'
+    inline_response_200_25:
+      allOf:
+      - $ref: '#/components/schemas/responseOk'
       - $ref: '#/components/schemas/userWorkspaceList'
+    organization_organization_managers:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        username:
+          type: string
+        name:
+          type: string
+          example: firstname lastname
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+        enabled:
+          type: boolean
+        create_timestamp:
+          type: string
+          format: date-time
     organization_active_plan:
       type: object
       properties:
@@ -3088,3 +3199,4 @@ components:
       description: Value converted from ID/Password in base64
       scheme: basic
       x-basicInfoFunc: swagger_server.controllers.authorization_controller.check_BasicAuth
+
