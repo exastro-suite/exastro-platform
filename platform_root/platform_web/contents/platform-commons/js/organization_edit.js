@@ -43,7 +43,7 @@ $(function(){
             // Display Topic Path
             displayTopicPath([
                 {"text": getText("000-85001", "オーガナイゼーション一覧"), "href": location_conf.href.organizations.list },
-                {"text": getText("000-85027", "オーガナイゼーション詳細"), "href": location_conf.href.organizations.detail.replace(/{organization_id}/g, organization_id) },
+                {"text": getText("000-85035", "オーガナイゼーション編集"), "href": location_conf.href.organizations.edit.replace(/{organization_id}/g, organization_id) },
             ]);
             display_main(results[1].data);
             finish_onload_progress();
@@ -60,39 +60,37 @@ $(function(){
         console.log("[CALL] display_main");
 
         //
-        // display Edit Organizations button
-        //
-        $('.button_edit_organization').on('click',() => {
-            window.location = location_conf.href.organizations.edit.replace(/{organization_id}/g, organization_id);
-        });
-        if(OrganizationsCommon.enabled_check.edit_button(row.status)) {
-            $('.button_edit_organization').prop('disabled', false);
-        } else {
-            $('.button_edit_organization').prop('disabled', true);
-            $('.button_edit_organization').css('cursor', 'not-allowed');
-        }
-
-        //
-        // display Delete Organizations button
-        //
-        $('.button_delete_organization').on('click',() => {
-            delete_organization();
-        });
-        $('.button_delete_organization').prop('disabled', false);
-
-        //
         // display Organizations detail
         //
         $("#text_organization_id").text(row.id);
-        $("#text_organization_name").text(row.name);
+        $("#form_organization_name").val(row.name);
         try { $("#text_active_plan").text(row.active_plan.id)} catch(e) { }
         try { $("#text_status").text(row.status)} catch(e) { }
+        $("#form_organization_enabled").prop("checked", row.enabled);
 
         //
         // オーガナイゼーション管理者一覧の表示 - organization managers list display
         //
         display_organization_managers_list(row.organization_managers);
 
+        //
+        // register button
+        //
+        $('#button_register').on('click',() => {
+            $('#button_register').prop('disabled',true);
+            if( ! validate_register() ) {
+                $('#button_register').prop('disabled',false);
+                return;
+            }
+            organization_register();
+        });
+
+        if(OrganizationsCommon.enabled_check.edit_button(row.status)) {
+            $('#button_register').prop('disabled', false);
+        } else {
+            $('#button_register').prop('disabled', true);
+            $('#button_register').css('cursor', 'not-allowed');
+        }
 
     }
 
@@ -127,46 +125,59 @@ $(function(){
                     .replace(/\${create_timestamp}/g, fn.date(new Date(user.create_timestamp),'yyyy/MM/dd HH:mm:ss'))
                 $("#organization_managers_list tbody").append(row_html);
             }
-
         }
         $('#organization_managers_list .datarow').css('display','');
     }
 
-    function delete_organization() {
-        console.log("[CALL] confirm_delete");
+    //
+    // validate register
+    //
+    function validate_register() {
+        console.log("--- validate check start ----");
+        let result=true;
 
-        deleteConfirmMessage(
-            getText("000-80017", "実行確認"),
-            getText("000-85007", "以下のオーガナイゼーションを削除してよろしいですか？"),
-            organization_id,
-            getText("000-85008", "削除したオーガナイゼーションのアクセスは以降一切できなくなります。"),
-            organization_id,
-            () => {
-                disabled_button();
-                show_progress();
+        // validate organization name
+        validate = OrganizationsCommon.validate.organization_name($("#form_organization_name").val());
+        result = result && validate.result;
+        $("#message_organization_name").text(validate.message);
 
-                // APIを呼出す
-                call_api_promise({
-                    type: "DELETE",
-                    url: api_conf.api.organizations.delete.replace(/{organization_id}/g, organization_id),
-                    headers: {
-                        Authorization: "Bearer " + CommonAuth.getToken(),
-                    },
-                }).then(() => {
-                    hide_progress();
-                    alertMessage(getText("000-80018", "処理結果"), getText("000-85009", "オーガナイゼーションを削除しました。"),
-                        () => {
-                            window.location.href = location_conf.href.organizations.list.replace(/{organization_id}/g, CommonAuth.getRealm());
-                        });
-                }).catch(() => {
-                    hide_progress();
-                });
+        console.log("--- validate check end [" + result + "] ----");
+
+        return result;
+    }
+
+    //
+    // register organization
+    //
+    function organization_register() {
+
+        let reqbody =   {
+            "name": $('#form_organization_name').val(),
+            "enabled": ($('#form_organization_enabled').prop('checked') ? true : false),
+        }
+
+        show_progress();
+        call_api_promise(
+            {
+                type: "PUT",
+                url: api_conf.api.organizations.detail.put.replace(/{organization_id}/g, organization_id),
+                headers: {
+                    Authorization: "Bearer " + CommonAuth.getToken(),
+                },
+                data: JSON.stringify(reqbody),
+                contentType: "application/json",
+                dataType: "json",
             }
-        );
+        ).then(() => {
+            hide_progress();
+            alertMessage(getText("000-80018", "処理結果"), getText("000-85038", "オーガナイゼーションを変更しました"),
+            () => {
+                window.location = location_conf.href.organizations.list;
+            });
+        }).catch(() => {
+            hide_progress();
+            $('#button_register').prop('disabled',false);
+        })
     }
 
-    function disabled_button() {
-        $('.button_edit_organization').prop('disabled', true);
-        $('.button_delete_organization').prop('disabled', true);
-    }
 });
