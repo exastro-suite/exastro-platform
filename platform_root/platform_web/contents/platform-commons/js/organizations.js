@@ -144,6 +144,8 @@ $(function(){
             $('#organization_list .button_delete_organization').on('click', function() {
                 confirm_delete($(this).attr('data-id'), $(this).attr('data-name'));
             })
+
+            enabled_button();
         }
     }
 
@@ -197,7 +199,16 @@ $(function(){
 
     function enabled_button() {
         $("#new_organization").prop('disabled', false);
-        $(".button_edit_organization").prop('disabled', false);
         $(".button_delete_organization").prop('disabled', false);
+
+        $('#organization_list .button_edit_organization').each(function(index, element) {
+            let $element = $(element);
+            if(OrganizationsCommon.enabled_check.edit_button($element.attr('data-status'))) {
+                $element.prop('disabled', false);
+            } else {
+                $element.prop('disabled', true);
+                $element.css('cursor', 'not-allowed');
+            }
+        });
     }
 });

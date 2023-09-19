@@ -502,6 +502,18 @@ const OrganizationsCommon = {
             }
         }
 
+    },
+
+    // ステータスによる有効無効チェック
+    // enabled/disabled check by status
+    enabled_check: {
+        edit_button: function(status) {
+            if(status === "Organization Create Complete") {
+                return true;
+            } else {
+                return false;
+            }
+        }
     }
 }
 
