@@ -1845,7 +1845,6 @@ def __realms_detail_get(organization_id, keycloak_org, org_row, org_informations
         "plans": plans,
         "status": org_informations.get("status"),
         "enabled": keycloak_org.get("enabled"),
-        "optionsIta": org_informations.get("ext_options", {}).get("options_ita", {}),
     }
 
     return ret_realm

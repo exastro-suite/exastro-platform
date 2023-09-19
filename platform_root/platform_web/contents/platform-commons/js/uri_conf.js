@@ -62,7 +62,11 @@ var api_conf = {
         "organizations": {
             "get": "/api/platform/organizations",
             "post": "/api/platform/organizations",
-            "delete": "/api/platform/organizations/{organization_id}"
+            "delete": "/api/platform/organizations/{organization_id}",
+            "detail": {
+                "get": "/api/platform/organizations/{organization_id}",
+                "put": "/api/platform/organizations/{organization_id}",
+            }
         },
         "plans": {
             "get": "/api/platform/plans"
