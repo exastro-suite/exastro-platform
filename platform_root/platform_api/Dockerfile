@@ -54,6 +54,7 @@ RUN dnf install -y \
 &&  pip3.9 install --upgrade pymysql \
 &&  pip3.9 install --upgrade pycryptodome \
 &&  pip3.9 install --upgrade email-validator \
+&&  pip3.9 install --upgrade cryptography \
 &&  groupadd $GROUPNAME \
 &&  useradd -m -s /bin/bash -g $GROUPNAME $USERNAME \
 &&  setcap 'cap_net_bind_service=+ep' /usr/sbin/httpd \
