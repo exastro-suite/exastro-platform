@@ -39,7 +39,7 @@ $(function(){
             }),
         ]).then(function(results) {
             // Display Menu
-            displayMenu('menu_organization');
+            displayMenu('menu_organizations');
             // Display Topic Path
             displayTopicPath([
                 {"text": getText("000-85001", "オーガナイゼーション一覧"), "href": location_conf.href.organizations.list },
