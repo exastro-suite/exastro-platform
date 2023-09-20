@@ -147,6 +147,8 @@ class DBconnector:
             user=dbinfo.db_user,
             password=encrypt.decrypt_str(dbinfo.db_password),
             port=dbinfo.db_port,
+            charset='utf8mb4',
+            collation='utf8mb4_general_ci',
             cursorclass=pymysql.cursors.DictCursor,
         )
         return conn
