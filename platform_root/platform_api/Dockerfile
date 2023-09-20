@@ -26,6 +26,7 @@ ENV LISTEN_PORT             8000
 ENV PYTHONIOENCODING        utf-8
 ENV APACHE_PID_DIR          /var/run_$USERNAME/httpd/pid
 ENV APACHE_SOCKET_DIR       /var/run_$USERNAME/httpd/socket
+ENV APACHE_TIMEOUT          360
 ENV APACHE_USERNAME         $USERNAME
 ENV APACHE_GROUPNAME        $GROUPNAME
 
@@ -53,6 +54,7 @@ RUN dnf install -y \
 &&  pip3.9 install --upgrade pymysql \
 &&  pip3.9 install --upgrade pycryptodome \
 &&  pip3.9 install --upgrade email-validator \
+&&  pip3.9 install --upgrade cryptography \
 &&  groupadd $GROUPNAME \
 &&  useradd -m -s /bin/bash -g $GROUPNAME $USERNAME \
 &&  setcap 'cap_net_bind_service=+ep' /usr/sbin/httpd \
