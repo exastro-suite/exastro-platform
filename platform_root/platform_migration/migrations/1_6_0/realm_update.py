@@ -18,7 +18,7 @@ import json
 import traceback
 
 import globals
-from common_library.common import common, api_keycloak_tokens, api_keycloak_clients
+from common_library.common import common, api_keycloak_tokens, api_keycloak_clients, api_keycloak_realms
 from common_library.common import multi_lang
 
 # keycloak realm-managementロール 登録
@@ -37,7 +37,7 @@ MASTER_REALM_NAME = "master"
 ADD_CLIENT_NAME = "_platform-console"
 
 
-class realm_clients_add:
+class realm_update:
 
     # realm name
     realm = None
@@ -74,11 +74,11 @@ class realm_clients_add:
         """マイグレーション処理 migration start processing
 
         """
-        globals.logger.info('realm client add start')
+        globals.logger.info('realm update start')
 
         try:
             self.step_count = 1
-            self.step_max = 2
+            self.step_max = 3
 
             # アクセストークンを取得
             # Get an access token
@@ -90,7 +90,12 @@ class realm_clients_add:
             self.__client_create(MASTER_REALM_NAME, ADD_CLIENT_NAME, access_token)
             self.step_count += 1
 
-            last_message = "realm client add successful !!"
+            # master realm 更新 (sslRequired)
+            # master realm update (sslRequired)
+            self.__realm_update(MASTER_REALM_NAME, access_token)
+            self.step_count += 1
+
+            last_message = "realm update successful !!"
 
         except (common.BadRequestException,
                 common.AuthException,
@@ -102,7 +107,7 @@ class realm_clients_add:
             globals.logger.error(f'exception handler:\n status_code:[{err.status_code}]\n message_id:[{err.message_id}]\n message:[{err.message}]')
             globals.logger.info("-" * 50)
             globals.logger.error(''.join(list(traceback.TracebackException.from_exception(err).format())))
-            last_message = "realm client add failed..."
+            last_message = "realm update failed..."
 
         except Exception as err:
             self.failed_count += 1
@@ -110,10 +115,10 @@ class realm_clients_add:
             globals.logger.error(f'exception:\n args:[{err.args}]')
             globals.logger.info("-" * 50)
             globals.logger.error(''.join(list(traceback.TracebackException.from_exception(err).format())))
-            last_message = "realm client add failed..."
+            last_message = "realm update failed..."
 
         globals.logger.info("-" * 50)
-        globals.logger.info(f"realm client add status: [OK:{self.ok_count}] [SKIP:{self.skip_count}] [IGNORE:{self.ignore_count}] [NG:{self.failed_count}]")     # noqa: E501
+        globals.logger.info(f"realm update status: [OK:{self.ok_count}] [SKIP:{self.skip_count}] [IGNORE:{self.ignore_count}] [NG:{self.failed_count}]")     # noqa: E501
         globals.logger.info("-" * 50)
         globals.logger.info(last_message)
 
@@ -191,12 +196,12 @@ class realm_clients_add:
             globals.logger.debug(f"client_json:{client_json}")
 
             # client登録
-            # client registration to keycloak
+            # Client registration to keycloak
             response = api_keycloak_clients.client_create(realm_name, client_json, token)
             globals.logger.debug(f"client_create response:{response}")
             if response.status_code != 200 and \
                 response.status_code != 201 and \
-                response.status_code != 409:    # 409 exists client
+                response.status_code != 409:    # 409 exists client # noqa: E125
                 globals.logger.error(f"response.status_code:{response.status_code}")
                 globals.logger.error(f"response.text:{response.text}")
                 message_id = f"500-{MSG_FUNCTION_ID}003"
@@ -246,6 +251,38 @@ class realm_clients_add:
                         client_id
                     )
                     raise common.InternalErrorException(message_id=message_id, message=message)
+
+        globals.logger.info(f"[{self.step_count}/{self.step_max}] ### Succeed func:{inspect.currentframe().f_code.co_name}")
+
+        return
+
+    def __realm_update(self, realm_name, token):
+        """realm update
+
+        Args:
+            realm_name (str): realm name
+            token (str): keycloak access token
+        """
+        globals.logger.info(f"[{self.step_count}/{self.step_max}] ### Start func:{inspect.currentframe().f_code.co_name}")
+
+        update_json = {
+            "sslRequired": "none"
+        }
+
+        # realm更新
+        # realm update to keycloak
+        response = api_keycloak_realms.realm_update(realm_name, update_json, token)
+        globals.logger.debug(f"realm_update response:{response}")
+        if response.status_code != 204:
+            globals.logger.error(f"response.status_code:{response.status_code}")
+            globals.logger.error(f"response.text:{response.text}")
+            message_id = f"500-{MSG_FUNCTION_ID}005"
+            message = multi_lang.get_text(
+                message_id,
+                "realmの更新に失敗しました。(対象ID:{0})",
+                realm_name
+            )
+            raise common.InternalErrorException(message_id=message_id, message=message)
 
         globals.logger.info(f"[{self.step_count}/{self.step_max}] ### Succeed func:{inspect.currentframe().f_code.co_name}")
 

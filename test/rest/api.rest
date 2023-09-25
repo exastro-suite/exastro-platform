@@ -109,3 +109,37 @@ content-type: application/json
 
 GET {{base_sys_url}}/api/platform/settings/common
 Authorization: Basic {{sys-user-id}} {{sys-user-pw}}
+
+
+###
+
+# @name sys_login
+
+POST {{base_sys_url}}/auth/realms/master/protocol/openid-connect/token
+content-type: application/x-www-form-urlencoded
+
+client_id=admin-cli
+&username={{sys-user-id}}
+&password={{sys-user-pw}}
+&grant_type=password
+
+###
+
+# please sendRquest sys_login execution
+@authToken = {{sys_login.response.body.access_token}}
+
+GET http://keycloak:8080/auth/admin/realms/master
+Authorization: Bearer {{authToken}}
+
+###
+
+# please sendRquest sys_login execution
+@authToken = {{sys_login.response.body.access_token}}
+
+PUT http://keycloak:8080/auth/admin/realms/master
+Authorization: Bearer {{authToken}}
+content-type: application/json
+
+{
+  "sslRequired": "none"
+}
