@@ -74,7 +74,7 @@ class realm_update:
         """マイグレーション処理 migration start processing
 
         """
-        globals.logger.info('realm client add start')
+        globals.logger.info('realm update start')
 
         try:
             self.step_count = 1
@@ -95,7 +95,7 @@ class realm_update:
             self.__realm_update(MASTER_REALM_NAME, access_token)
             self.step_count += 1
 
-            last_message = "realm client add successful !!"
+            last_message = "realm update successful !!"
 
         except (common.BadRequestException,
                 common.AuthException,
@@ -107,7 +107,7 @@ class realm_update:
             globals.logger.error(f'exception handler:\n status_code:[{err.status_code}]\n message_id:[{err.message_id}]\n message:[{err.message}]')
             globals.logger.info("-" * 50)
             globals.logger.error(''.join(list(traceback.TracebackException.from_exception(err).format())))
-            last_message = "realm client add failed..."
+            last_message = "realm update failed..."
 
         except Exception as err:
             self.failed_count += 1
@@ -115,10 +115,10 @@ class realm_update:
             globals.logger.error(f'exception:\n args:[{err.args}]')
             globals.logger.info("-" * 50)
             globals.logger.error(''.join(list(traceback.TracebackException.from_exception(err).format())))
-            last_message = "realm client add failed..."
+            last_message = "realm update failed..."
 
         globals.logger.info("-" * 50)
-        globals.logger.info(f"realm client add status: [OK:{self.ok_count}] [SKIP:{self.skip_count}] [IGNORE:{self.ignore_count}] [NG:{self.failed_count}]")     # noqa: E501
+        globals.logger.info(f"realm update status: [OK:{self.ok_count}] [SKIP:{self.skip_count}] [IGNORE:{self.ignore_count}] [NG:{self.failed_count}]")     # noqa: E501
         globals.logger.info("-" * 50)
         globals.logger.info(last_message)
 
