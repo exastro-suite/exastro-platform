@@ -16,7 +16,7 @@
 # from contextlib import closing
 
 # import globals
-from . import realm_clients_add
+from . import realm_update
 # from .libs import queries_db_migration
 
 
@@ -24,7 +24,7 @@ def main():
     
     # オーガナイゼーションユーザーからユーザーメンテロールの解除
     # Remove user maintenance role from organization user
-    api = realm_clients_add.realm_clients_add()
+    api = realm_update.realm_update()
     result = api.start()
 
     # エラーがあっても処理を継続する
