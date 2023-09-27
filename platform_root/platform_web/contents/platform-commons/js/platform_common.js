@@ -1,5 +1,5 @@
 /*
-#   Copyright 2019 NEC Corporation
+#   Copyright 2023 NEC Corporation
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -193,7 +193,7 @@ function displayMenu(curent) {
             <li class="menuItem"><a class="menuLink" id="menu_keycloak" href="#" target="exastro_platform_keycloak">${getText("000-80040", "keycloakコンソール")}</a></li>
         `);
         $('#menu_organizations').attr('href', location_conf.href.organizations.list);
-        // $('#menu_plans').attr('href', location_conf.href.plans.list);
+        $('#menu_plans').attr('href', location_conf.href.plans.list);
         // $('#menu_system_settings').attr('href', location_conf.href.system_settings.top);
         $('#menu_keycloak').attr('href', location_conf.href.keycloak.console);
     } else {
@@ -509,6 +509,100 @@ const OrganizationsCommon = {
     enabled_check: {
         edit_button: function(status) {
             if(status === "Organization Create Complete") {
+                return true;
+            } else {
+                return false;
+            }
+        }
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//   Plans Common
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+const PlansCommon = {
+    validate: {
+        //
+        // validate plan id
+        //
+        Plan_id: function(plan_id) {
+            if(plan_id === "") {
+                return {
+                    "result": false,
+                    "message": getText("400-00011", "必須項目が不足しています。({0})", getText("000-00103", "プランID"))
+                }
+            } else if(plan_id.replace(/[a-zA-Z0-9_-]/g,"") !== "") {
+                return {
+                    "result": false,
+                    "message": getText("400-00017", "指定できない文字が含まれています。(項目:{0},指定可能な文字:{1})",
+                                    getText("000-00103", "プランID"),
+                                    getText("000-31001", "半角英数・ハイフン・アンダースコア")
+                                )
+                }
+
+            } else if( ! plan_id.match(/^[a-zA-Z]/)) {
+                return {
+                    "result": false,
+                    "message": getText("400-00014", "先頭の文字にアルファベット以外が指定されています。({0})", getText("000-00103", "プランID"))
+                }
+            } else {
+                return {
+                    "result": true,
+                    "message": ""
+                }
+            }
+        },
+
+        //
+        // validate plan name
+        //
+        plan_name: function(plan_name) {
+            if(plan_name === "") {
+                return {
+                    "result": false,
+                    "message": getText("400-00011", "必須項目が不足しています。({0})", getText("000-00104", "プラン名"))
+                }
+            } else {
+                return {
+                    "result": true,
+                    "message": ""
+                }
+            }
+        },
+
+        // // 
+        // //  validate plan limit
+        // // 
+        // Plan_limit: function(Plan_limit) {
+        //     if(plan_limit === "") {
+        //         return {
+        //             "result": false,
+        //             "message": getText("400-00011", "必須項目が不足しています。({0})", getText("000-00103", "リミット値"))
+        //         }
+        //     } else if(plan_limit.replace(/[0-9]/g,"") !== "") {
+        //         return {
+        //             "result": false,
+        //             "message": getText("400-00017", "指定できない文字が含まれています。(項目:{0},指定可能な文字:{1})",
+        //                             getText("000-00103", "リミット値"),
+        //                             getText("000-31001", "半角数字")
+        //                         )
+        //         }
+        //     } else {
+        //         return {
+        //             "result": true,
+        //             "message": ""
+        //         }
+        //     }
+        // } 
+    },
+
+    // ステータスによる有効無効チェック
+    // enabled/disabled check by status
+    enabled_check: {
+        edit_button: function(status) {
+            if(status === "plan Create Complete") {
                 return true;
             } else {
                 return false;

@@ -69,7 +69,9 @@ var api_conf = {
             }
         },
         "plans": {
-            "get": "/api/platform/plans"
+            "get": "/api/platform/plans",
+            "getPlanItem": "/api/platform/plan_items",
+            "post": "/api/platform/plans"
         },
         "maintenance-mode-setting": {
             "get": "/api/{organization_id}/platform/maintenance-mode-setting"
