@@ -233,7 +233,7 @@ class auth_proxy:
             info = 'Access is not allowed'
             raise common.NotAllowedException(info)
 
-        token_roles = self.token_decode.get("resource_access").get(self.user_token_client_id)
+        token_roles = self.token_decode.get("resource_access", {}).get(self.user_token_client_id)
         globals.logger.debug(f'token_roles={token_roles}')
 
         roles_str = ""
