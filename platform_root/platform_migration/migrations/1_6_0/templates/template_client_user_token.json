@@ -44,7 +44,7 @@
         "saml.onetimeuse.condition": "false"
     },
     "authenticationFlowBindingOverrides": {},
-    "fullScopeAllowed": true,
+    "fullScopeAllowed": false,
     "nodeReRegistrationTimeout": -1,
     "defaultClientScopes": [
         "web-origins",
