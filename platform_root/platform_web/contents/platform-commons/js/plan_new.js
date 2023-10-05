@@ -108,7 +108,7 @@ $(function(){
         let result=true;
 
         // validate plan id
-        validate = PlansCommon.validate.Plan_id($("#form_plan_id").val());
+        validate = PlansCommon.validate.plan_id($("#form_plan_id").val());
         result = result && validate.result;
         $("#message_plan_id").text(validate.message);
 
@@ -124,7 +124,9 @@ $(function(){
         var idx = 0;
         for(var elem of elems){
             msg_elem = msg_elems[idx];
-            if(($(elem).val()) === "") {
+            if(($(elem).attr('plan-id'))=="${form_plan_limit}"){
+                    // なにもしない
+            } else if(($(elem).val()) === "") {
                 $($(msg_elem)).text(
                     getText("400-00011", "必須項目が不足しています。({0})", getText("000-00124", "リミット値")));
                 result = false;
