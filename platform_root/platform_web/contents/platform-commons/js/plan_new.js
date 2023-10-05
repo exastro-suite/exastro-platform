@@ -118,7 +118,7 @@ $(function(){
         result = result && validate.result;
         $("#message_plan_name").text(validate.message);
 
-        // // validate plan_limit
+        // validate plan_limit
         var elems = $("[id=form_plan_value]");
         var msg_elems =  $("[id=message_plan_limit]");
         var idx = 0;
@@ -139,7 +139,7 @@ $(function(){
                 result = false;
     
             } else {
-                $($(msg_elems)).text("");
+                $($(msg_elem)).text("");
             }
             idx ++;
         }
