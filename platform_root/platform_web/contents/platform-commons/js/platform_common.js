@@ -527,7 +527,7 @@ const PlansCommon = {
         //
         // validate plan id
         //
-        Plan_id: function(plan_id) {
+        plan_id: function(plan_id) {
             if(plan_id === "") {
                 return {
                     "result": false,
