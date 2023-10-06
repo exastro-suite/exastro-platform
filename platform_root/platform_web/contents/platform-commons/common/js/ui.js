@@ -177,9 +177,7 @@ userInfo() {
 
     const roleList = [];
     if( roles.length === 0 ) {
-        roleList.push(`<li class="userinfoRoleItem">`
-        + getText("000-80041","ロールがありません")
-    + `</li>`);
+        roleList.push(`<li class="userinfoRoleItem" text-id="000-80041">ロールがありません</li>`);
     } else {
         for ( const role of roles.sort() ) {
             roleList.push(`<li class="userinfoRoleItem">`
