@@ -43,7 +43,8 @@ RUN dnf install -y \
     python39-mod_wsgi \
 &&  pip3.9 install --upgrade requests \
 &&  pip3.9 install --upgrade pyyaml \
-&&  pip3.9 install --upgrade Flask \
+&&  pip3.9 install --upgrade Werkzeug==2.3.7 \
+&&  pip3.9 install --upgrade Flask==2.2.3 \
 &&  pip3.9 install --upgrade pytz \
 &&  pip3.9 install --upgrade markdown \
 &&  pip3.9 install --upgrade requests \
