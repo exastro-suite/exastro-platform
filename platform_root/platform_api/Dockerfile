@@ -42,7 +42,8 @@ RUN dnf install -y \
     python39-mod_wsgi \
 &&  pip3.9 install --upgrade requests \
 &&  pip3.9 install --upgrade pyyaml \
-&&  pip3.9 install --upgrade Flask \
+&&  pip3.9 install --upgrade Werkzeug==2.3.7 \
+&&  pip3.9 install --upgrade Flask==2.2.3 \
 &&  pip3.9 install --upgrade pytz \
 &&  pip3.9 install --upgrade markdown \
 &&  pip3.9 install --upgrade PyJWT \
@@ -89,12 +90,19 @@ RUN dnf config-manager --add-repo=https://download.docker.com/linux/centos/docke
     debugpy \
     flake8 \
     autopep8 \
+    pytest \
+    pytest-env \
+    pytest-cov \
+    pytest-docker \
+    pytest-mock \
+    requests-mock \
 &&  npm config set registry http://registry.npmjs.org/ \
 &&  npm -g config set strict-ssl false \
 &&  npm install -g @apidevtools/swagger-cli \
 &&  usermod -G wheel $USERNAME \
 &&  echo '%wheel ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers \
 &&  echo "%${GROUPNAME} ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+
 
 USER $USERNAME
 

@@ -66,6 +66,20 @@
 		"python.formatting.autopep8Args": [
 			"--aggressive", "--aggressive",
 		],
+
+		"python.testing.cwd": "/workspace/platform_root/platform_api",
+		"python.testing.unittestEnabled": false,
+		"python.testing.pytestEnabled": true,
+		"python.testing.pytestArgs": [
+			"--cov=/workspace/platform_root/platform_api/",
+			"--cov-report=xml",
+		],
+		"python.testing.autoTestDiscoverOnSaveEnabled": true,
+		"coverage-gutters.showGutterCoverage": false,
+		"coverage-gutters.showLineCoverage": true,
+		"coverage-gutters.showRulerCoverage": false,
+		"coverage-gutters.coverageBaseDir": "platform_root/platform_api",
+		"coverage-gutters.coverageReportFileName": "platform_root/platform_api/coverage.xml",
 	},
 	// Add the IDs of extensions you want installed when the container is created.
 	"extensions": [
@@ -95,6 +109,7 @@
 		"snyk-security.snyk-vulnerability-scanner",
 		// "rapidapi.vscode-rapidapi-client",
 		"humao.rest-client",
+		"ryanluker/vscode-coverage-gutters",
 	],
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	"forwardPorts": [

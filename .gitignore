@@ -12,3 +12,5 @@ __pycache__/
 /.private/
 exastro-platform.yaml
 .dccache
+.coverage
+coverage.xml
