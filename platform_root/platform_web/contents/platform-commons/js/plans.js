@@ -34,7 +34,7 @@ $(function(){
             displayMenu('menu_plans');
             // Display Topic Path
             displayTopicPath([
-                {"text": getText("000-86001", "プラン一覧"), "href": location_conf.href.plans.list }
+                {"text": getText("000-86001", "リソースプラン一覧"), "href": location_conf.href.plans.list }
             ]);
 
             display_main(results[1].data);

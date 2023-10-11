@@ -531,13 +531,13 @@ const PlansCommon = {
             if(plan_id === "") {
                 return {
                     "result": false,
-                    "message": getText("400-00011", "必須項目が不足しています。({0})", getText("000-00103", "プランID"))
+                    "message": getText("400-00011", "必須項目が不足しています。({0})", getText("000-00103", "リソースプランID"))
                 }
             } else if(plan_id.replace(/[a-zA-Z0-9_-]/g,"") !== "") {
                 return {
                     "result": false,
                     "message": getText("400-00017", "指定できない文字が含まれています。(項目:{0},指定可能な文字:{1})",
-                                    getText("000-00103", "プランID"),
+                                    getText("000-00103", "リソースプランID"),
                                     getText("000-31001", "半角英数・ハイフン・アンダースコア")
                                 )
                 }
@@ -545,7 +545,7 @@ const PlansCommon = {
             } else if( ! plan_id.match(/^[a-zA-Z]/)) {
                 return {
                     "result": false,
-                    "message": getText("400-00014", "先頭の文字にアルファベット以外が指定されています。({0})", getText("000-00103", "プランID"))
+                    "message": getText("400-00014", "先頭の文字にアルファベット以外が指定されています。({0})", getText("000-00103", "リソースプランID"))
                 }
             } else {
                 return {
@@ -562,7 +562,7 @@ const PlansCommon = {
             if(plan_name === "") {
                 return {
                     "result": false,
-                    "message": getText("400-00011", "必須項目が不足しています。({0})", getText("000-00104", "プラン名"))
+                    "message": getText("400-00011", "必須項目が不足しています。({0})", getText("000-00104", "リソースプラン名"))
                 }
             } else {
                 return {
@@ -571,31 +571,6 @@ const PlansCommon = {
                 }
             }
         },
-
-        // // 
-        // //  validate plan limit
-        // // 
-        // Plan_limit: function(Plan_limit) {
-        //     if(plan_limit === "") {
-        //         return {
-        //             "result": false,
-        //             "message": getText("400-00011", "必須項目が不足しています。({0})", getText("000-00103", "リミット値"))
-        //         }
-        //     } else if(plan_limit.replace(/[0-9]/g,"") !== "") {
-        //         return {
-        //             "result": false,
-        //             "message": getText("400-00017", "指定できない文字が含まれています。(項目:{0},指定可能な文字:{1})",
-        //                             getText("000-00103", "リミット値"),
-        //                             getText("000-31001", "半角数字")
-        //                         )
-        //         }
-        //     } else {
-        //         return {
-        //             "result": true,
-        //             "message": ""
-        //         }
-        //     }
-        // } 
     },
 
     // ステータスによる有効無効チェック
