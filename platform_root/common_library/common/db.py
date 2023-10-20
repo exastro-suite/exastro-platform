@@ -28,6 +28,13 @@ class DBconnector:
     """database connection class
     """
 
+    SQL_WORKSPACE_DB_INFO = """
+    SELECT DB_HOST, DB_PORT, DB_DATABASE, DB_USER, DB_PASSWORD
+    FROM T_WORKSPACE_DB
+    WHERE ORGANIZATION_ID = %s
+    AND WORKSPACE_ID = %s
+    """
+
     SQL_ORGANIZATION_DB_INFO = """
     SELECT DB_HOST, DB_PORT, DB_DATABASE, DB_USER, DB_PASSWORD
     FROM T_ORGANIZATION_DB
@@ -93,6 +100,9 @@ class DBconnector:
     def __get_dbinfo_organization(self, organization_id):
         """get organization dbinfo
 
+        Args:
+            organization_id (str): organization id
+
         Returns:
             DBinfo: organization dbinfo
         """
@@ -121,6 +131,42 @@ class DBconnector:
 
         return orgdb
 
+    def __get_dbinfo_workspace(self, organization_id, workspace_id):
+        """get workspace dbinfo
+
+        Args:
+            organization_id (str): organization id
+            workspace_id (str): workspace id
+
+        Returns:
+            DBinfo: workspace dbinfo
+        """
+        with closing(self.connect_orgdb(organization_id)) as conn:
+            with conn.cursor() as cursor:
+                sql = self.SQL_WORKSPACE_DB_INFO
+                cursor.execute(sql, (organization_id, workspace_id, ))
+                result = cursor.fetchone()
+
+        info = self.DBinfo()
+        if result:
+            info.db_host = result.get('DB_HOST')
+            info.db_port = result.get('DB_PORT')
+            info.db_database = result.get('DB_DATABASE')
+            info.db_user = result.get('DB_USER')
+            info.db_password = result.get('DB_PASSWORD')
+        else:
+            globals.logger.error(f"workspace not found organization_id:{organization_id} workspace_id:{workspace_id}")
+            message_id = "404-00002"
+            message = multi_lang.get_text(
+                message_id,
+                "workspace not found organization_id:{0} workspace_id:{1}",
+                organization_id,
+                workspace_id
+            )
+            raise common.NotFoundException(message_id=message_id, message=message)
+
+        return info
+
     def get_dbinfo_organization(self, organization_id):
         """get organization dbinfo
 
@@ -131,6 +177,18 @@ class DBconnector:
             DBinfo: organization dbinfo
         """
         return self.__get_dbinfo_organization(organization_id)
+
+    def get_dbinfo_workspace(self, organization_id, workspace_id):
+        """get workspace dbinfo
+
+        Args:
+            organization_id (str): organization id
+            workspace_id (str): workspace id
+
+        Returns:
+            DBinfo: organization dbinfo
+        """
+        return self.__get_dbinfo_workspace(organization_id, workspace_id)
 
     def connection(self, dbinfo: DBinfo):
         """connect database
@@ -184,6 +242,20 @@ class DBconnector:
         """
         orgdb = self.__get_dbinfo_organization(organization_id)
         conn = self.connection(orgdb)
+        return conn
+
+    def connect_workspacedb(self, organization_id: str, workspace_id: str) -> pymysql.connections.Connection:
+        """connect database at workspace
+
+        Args:
+            organization_id (str): organization id
+            workspace_id (str): workspace id
+
+        Returns:
+            pymysql.connections.Connection: organization connection
+        """
+        db = self.__get_dbinfo_workspace(organization_id, workspace_id)
+        conn = self.connection(db)
         return conn
 
     class organization_private:

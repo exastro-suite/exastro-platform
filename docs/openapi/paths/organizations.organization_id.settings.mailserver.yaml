@@ -1,0 +1,61 @@
+get:
+  tags:
+  - OrganizationService
+  summary: get an organization settings
+  x-openapi-router-controller: controllers.organization_service_controller
+  operationId: organization_setting_get
+  parameters:
+  - name: organization_id
+    in: path
+    required: true
+    schema:
+      type: string
+  responses:
+    200:
+      description: A successful response.
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '../schemas/responseOk.yaml'
+              - type: object
+                properties:
+                  data:
+                    $ref: '../schemas/organizationSetting.yaml'
+    default:
+      description: An unexpected error response.
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'
+patch:
+  tags:
+  - OrganizationService
+  summary: Update an organization settings
+  x-openapi-router-controller: controllers.organization_service_controller
+  operationId: organization_setting_update
+  parameters:
+  - name: organization_id
+    in: path
+    required: true
+    schema:
+      type: string
+  requestBody:
+    content:
+      application/json:
+        schema:
+          $ref: '../schemas/organizationSetting.yaml'
+    required: true
+  responses:
+    200:
+      description: A successful response.
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/responseOk.yaml'
+    default:
+      description: An unexpected error response.
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'
