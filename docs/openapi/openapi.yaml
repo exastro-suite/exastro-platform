@@ -64,6 +64,8 @@ tags:
   description: システム管理者共通
 - name: MaintenanceModeService
   description: メンテナンスモードに関する操作
+- name: NotificationService
+  description: 通知機能に関する操作
 - name: InternalCommonService
   description: 共通(内部用)
 - name: InternalPlanService
@@ -118,6 +120,18 @@ paths:
   "/api/{organization_id}/platform/workspaces/{workspace_id}/members":
       $ref: './paths/workspaces.workspace_id.members.yaml'
 
+  "/api/{organization_id}/platform/workspaces/{workspace_id}/settings/notifications":
+      $ref: './paths/workspaces.workspace_id.settings.notifications.yaml'
+
+  "/api/{organization_id}/platform/workspaces/{workspace_id}/settings/notifications/{destination_id}":
+      $ref: './paths/workspaces.workspace_id.settings.notifications.destination_id.yaml'
+
+  # "/api/{organization_id}/platform/workspaces/{workspace_id}/notifications":
+  #     $ref: './paths/workspaces.workspace_id.notifications.yaml'
+
+  # "/api/{organization_id}/platform/workspaces/{workspace_id}/notifications/{notifications_id}":
+  #     $ref: './paths/workspaces.workspace_id.notifications.notification_id.yaml'
+
   "/api/{organization_id}/platform/users":
       $ref: './paths/users.yaml'
   "/api/{organization_id}/platform/users/{user_id}":
@@ -136,6 +150,9 @@ paths:
 
   "/api/{organization_id}/platform/maintenance-mode-setting":
       $ref: './paths/maintenance_mode_setting_organizations.yaml'
+
+  # "/api/{organization_id}/platform/settings/mailserver":
+  #     $ref: './paths/organizations.organization_id.settings.mailserver.yaml'
 
   "/internal-api/alive":
       $ref: './paths/internal_alive.yaml'
