@@ -73,6 +73,7 @@
 		"python.testing.pytestArgs": [
 			"--cov=/workspace/platform_root/platform_api/",
 			"--cov-report=xml",
+			"--pdb"
 		],
 		"python.testing.autoTestDiscoverOnSaveEnabled": true,
 		"coverage-gutters.showGutterCoverage": false,

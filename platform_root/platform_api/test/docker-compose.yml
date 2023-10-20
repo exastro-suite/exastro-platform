@@ -8,7 +8,8 @@ services:
       retries: 200
     volumes:
       - ${PLATFORM_REPO_ROOT}/platform_root/platform_db/conf/my.cnf:/etc/mysql/conf.d/my.cnf
-      - ${PLATFORM_REPO_ROOT}/platform_root/platform_api/test/db:/docker-entrypoint-initdb.d
+      - ${PLATFORM_REPO_ROOT}/platform_root/platform_api/test/db/exports/pytest1_init_db.sql:/docker-entrypoint-initdb.d/pytest1_init_db.sql
+      - ${PLATFORM_REPO_ROOT}/platform_root/platform_api/test/db/pytest2_database_users.sql:/docker-entrypoint-initdb.d/pytest2_database_users.sql
     environment:
       - TZ=Asia/Tokyo
       - MYSQL_ROOT_PASSWORD=password

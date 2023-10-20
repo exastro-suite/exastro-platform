@@ -1,0 +1,25 @@
+; 当ファイルをpytest.iniにコピーして利用してください
+
+[pytest]
+; pythonのimportディレクトリを/appからカレントディレクトリ(/workspace/platform_root/***)に変更
+pythonpath=.
+
+;
+; 以下は設定はpytestコードのコーディング・テスト時のみ有効にしてください
+;
+; ;
+; ; 環境変数
+; ;
+; env =
+;     ; pytest時に起動中の外部コンテナに接続する(OFF)か別途コンテナを起動するか(ON:default)の指定
+;     ; ※コメントアウトすると別途コンテナを起動(ON)になります
+;     ;
+;     ; ※外部コンテナに接続する(OFF)に設定する以下の動作になります
+;     ;   1. unitテストの実行時間は早くなる
+;     ;   2. pytestを実行すると起動中のDB等のデータが初期化される（副作用）
+;     ;
+;     DOCKER_COMPOSE_UP_UNITTEST_NODE=OFF
+
+; ; pytestのデバック（debugger使用）時のみコメントアウトを解除してください
+; ; ※コメントアウト解除中はカバレッジレポートの情報は更新されません
+; addopts=--no-cov
