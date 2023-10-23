@@ -193,6 +193,59 @@
                                                         </td>
                                                     </tr>
                                                 </tbody>
+                                                <tbody class="tbody">
+                                                    <tr class="tBodyTr tr">
+                                                        <td data-id="c1" data-rest="id" class="popup th2" rowspan="1" colspan="1" }="" title="【リソースプラン】" attr-text-id="title=" width="100%;"><div class="ci" text-id="000-85030">【リソースプラン】</div></td>
+                                                        <td class="popup th2" rowspan="1" colspan="1" }="" width="100%;"><div class="ci" style="text-align: right;">
+                                                            <button title="リソースプラン設定" attr-text-id="title=" data-action="positive" class="itaButton button button_edit_organization_plan" style="width:200px;">
+                                                                <span class="inner">
+                                                                    <span class="iconButtonIcon icon icon-editplan"></span>
+                                                                    <span class="iconButtonBody" text-id="">リソースプラン設定</span>
+                                                                </span>
+                                                                </button>
+                                                        </div></td>
+                                                    </tr>
+                                                </tbody>
+                                                <tbody class="tbody">
+                                                    <tr class="tBodyTr tr">
+                                                        <td class="tBodyTd td" rowspan="1" colspan="2" }=""> 
+                                                            <div class="tableBody">
+                                                                <table class="table" width="100%" id="organization_plan_list">
+                                                                    <thead class="thead">
+                                                                        <tr class="tHeadTr tr">
+                                                                            <th class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="リソースプランID" attr-text-id="title="><div class="ci" text-id="">リソースプランID</div></th>
+                                                                            <th class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="適用開始日時" attr-text-id="title="><div class="ci" text-id="">適用開始日時</div></th>
+                                                                            <th class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="登録日時" attr-text-id="title="><div class="ci" text-id="">登録日時</div></th>
+                                                                            <th class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="登録者" attr-text-id="title=" width="80px;"><div class="ci" text-id="">登録者</div></th>
+                                                                            <th class="tHeadTh popup th" rowspan="1" colspan="1" }="" width="130px;"><div class="ci"></div></th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody class="tbody">
+                                                                        <tr class="tBodyTr tr datarow-template" style="display:none" username='${username}' data-id="${user_id}">
+                                                                            <td class="tBodyLeftSticky tBodyTd td" rowspan="1" colspan="1" }="" ><div class="ci">${plan_id}</div></td>
+                                                                            <td class="tBodyTd td" rowspan="1" colspan="1" }="" ><div class="ci">${plan_start_datetime}</div></td>
+                                                                            <td class="tBodyTd td" rowspan="1" colspan="1" }="" ><div class="ci">${plan_create_timestamp}</div></td>
+                                                                            <td class="tBodyTd td" rowspan="1" colspan="1" }="" ><div class="ci" style="text-align: center;">${plan_create_user}</div></td>
+                                                                            <td class="tBodyTd td" rowspan="1" colspan="1" }="" ><div class="ci" style="text-align: center;">
+                                                                                <button title="削除" attr-text-id="title=000-80010" data-action="danger" class="itaButton button button_delete_organization_plan" data-id="${plan_id}" data-start-datetime="${plan_start_datetime}" style="width:100px;">
+                                                                                    <span class="inner">
+                                                                                        <span class="iconButtonIcon icon icon-trash"></span>
+                                                                                        <span class="iconButtonBody" text-id="000-80010">削除</span>
+                                                                                    </span>
+                                                                                </button>
+                                                                            </div></td>
+                                                                        </tr>
+                                                                        <tr class="tBodyTr tr notfound" style="display:none">
+                                                                            <td class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="5" }="" height="50px"><div class="ci" style="text-align: center;" text-id="">
+                                                                                プランが存在しません
+                                                                            </div></td>
+                                                                        </tr>
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
                                             </table>
                                         </div>
                                     </div>
