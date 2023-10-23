@@ -48,7 +48,7 @@ def docker_compose_command() -> str:
     Returns:
         str: docker composeコマンド
     """
-    if os.environ.get('DOCKER_COMPOSE_UP_UNITTEST_NODE', 'ON') == 'ON': 
+    if os.environ.get('DOCKER_COMPOSE_UP_UNITTEST_NODE', 'ON') == 'ON':
         return "sudo docker compose "
     else:
         return ":"

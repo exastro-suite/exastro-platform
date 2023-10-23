@@ -2,6 +2,15 @@
     "version": "2.0.0",
     "tasks": [
       {
+        "label": "Unit Test Execute",
+        "type": "shell",
+        "options": {
+          "cwd": "${workspaceFolder}/platform_root/platform_api"
+        },
+        "command": "pytest --rootdir ${workspaceFolder}/platform_root/platform_api --cov=${workspaceFolder}/platform_root/platform_api/ --cov-report=xml --pdb && coverage report --data-file=${workspaceFolder}/platform_root/platform_api/.coverage",
+        "problemMatcher": []
+      },
+      {
         "label": "Coverage Report",
         "type": "shell",
         "command": "coverage report --data-file=${workspaceFolder}/platform_root/platform_api/.coverage",

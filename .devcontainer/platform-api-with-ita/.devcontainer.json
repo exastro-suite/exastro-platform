@@ -67,13 +67,12 @@
 			"--aggressive", "--aggressive",
 		],
 
-		"python.testing.cwd": "/workspace/platform_root/platform_api",
+		"python.testing.cwd": "${workspaceFolder}/platform_root/platform_api",
 		"python.testing.unittestEnabled": false,
 		"python.testing.pytestEnabled": true,
 		"python.testing.pytestArgs": [
-			"--cov=/workspace/platform_root/platform_api/",
+			"--cov=${workspaceFolder}/platform_root/platform_api/",
 			"--cov-report=xml",
-			"--pdb"
 		],
 		"python.testing.autoTestDiscoverOnSaveEnabled": true,
 		"coverage-gutters.showGutterCoverage": false,
