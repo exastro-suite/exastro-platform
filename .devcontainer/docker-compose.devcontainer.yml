@@ -77,6 +77,7 @@ services:
       - ../.vscode_extensions/platform-api/.vscode-server/extensions:/home/app_user/.vscode-server/extensions
       - ../.vscode_extensions/platform-api/.vscode-server-insiders/extensions:/home/app_user/.vscode-server-insiders/extensions
     environment:
+      - PLATFORM_REPO_ROOT=${PLATFORM_REPO_ROOT:-}
       - FLASK_ENV=development
       - LOG_LEVEL=DEBUG
       - HTTP_PROXY=${HTTP_PROXY}
@@ -89,7 +90,6 @@ services:
       - SSL_CERT_DIR=/etc/ssl/certs
       - NODE_EXTRA_CA_CERTS=/etc/ssl/certs/ca-certificates.crt
       - NODE_TLS_REJECT_UNAUTHORIZED=${NODE_TLS_REJECT_UNAUTHORIZED:-1}
-      - PLATFORM_REPO_ROOT=${PLATFORM_REPO_ROOT}
   platform-web:
     build:
       target: develop_build
