@@ -90,12 +90,19 @@ RUN dnf config-manager --add-repo=https://download.docker.com/linux/centos/docke
     debugpy \
     flake8 \
     autopep8 \
+    pytest \
+    pytest-env \
+    pytest-cov \
+    pytest-docker \
+    pytest-mock \
+    requests-mock \
 &&  npm config set registry http://registry.npmjs.org/ \
 &&  npm -g config set strict-ssl false \
 &&  npm install -g @apidevtools/swagger-cli \
 &&  usermod -G wheel $USERNAME \
 &&  echo '%wheel ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers \
 &&  echo "%${GROUPNAME} ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+
 
 USER $USERNAME
 
