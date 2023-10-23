@@ -14,12 +14,12 @@
 
 value:
   {
-    "id": "00000000000000000000000000",
+    "id": "00000001Z7ZXFAED6872F6C9W8",
     "name": "destinations of mail settings",
     "kind": "Mail",
     "infoamations": [
-      { "mail": "<to-name>to-mail1@example.com" },
-      { "mail": "<to-name>to-mail2@example.com" },
-      { "mail": "<to-name>to-mail3@example.com" }
+      { "mail": "<mike>mike@example.com" },
+      { "mail": "<tommy>tommy@example.com" },
+      { "mail": "<nancy>nancy@example.com" }
     ]
   }

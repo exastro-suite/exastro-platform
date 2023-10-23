@@ -29,6 +29,11 @@ get:
     required: true
     schema:
       type: string
+  - name: destination_id
+    in: path
+    required: true
+    schema:
+      type: string
   responses:
     200:
       description: A successful response.
@@ -57,6 +62,11 @@ put:
     schema:
       type: string
   - name: workspace_id
+    in: path
+    required: true
+    schema:
+      type: string
+  - name: destination_id
     in: path
     required: true
     schema:

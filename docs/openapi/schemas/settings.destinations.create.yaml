@@ -31,3 +31,4 @@ required:
   - id
   - name
   - kind
+  - informations

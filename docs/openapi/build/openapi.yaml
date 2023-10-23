@@ -1048,25 +1048,26 @@ paths:
                   - id
                   - name
                   - kind
+                  - informations
             examples:
               mail settings:
                 value:
-                  id: '00000000000000000000000000'
+                  id: 00000001Z7ZXFAED6872F6C9W8
                   name: destinations of mail settings
                   kind: Mail
                   infoamations:
-                    - mail: <to-name>to-mail1@example.com
-                    - mail: <to-name>to-mail2@example.com
-                    - mail: <to-name>to-mail3@example.com
+                    - mail: <mike>mike@example.com
+                    - mail: <tommy>tommy@example.com
+                    - mail: <nancy>nancy@example.com
               teams settings:
                 value:
-                  id: '00000000000000000000000000'
+                  id: 00000001Z7ZXFAED6872F6C9W9
                   name: destinations of teams settings
                   kind: Teams
                   infoamations:
-                    - webhook: 'https://xxxxxxxx.xxxx.xxxxxx1'
-                    - webhook: 'https://xxxxxxxx.xxxx.xxxxxx2'
-                    - webhook: 'https://xxxxxxxx.xxxx.xxxxxx3'
+                    - webhook: 'https://xxxxxxxx.webhook.office.com/webhookb/xxxxxxxx-xxxxxx-xxxx-xxxx-xxxxxxxxxxxx'
+                    - webhook: 'https://xxxxxxxx.webhook.office.com/webhookb/xxxxxxxx-xxxxxx-xxxx-xxxx-xxxxxxxxxxxx'
+                    - webhook: 'https://xxxxxxxx.webhook.office.com/webhookb/xxxxxxxx-xxxxxx-xxxx-xxxx-xxxxxxxxxxxx'
         required: true
       responses:
         '200':
@@ -1105,6 +1106,11 @@ paths:
           required: true
           schema:
             type: string
+        - name: destination_id
+          in: path
+          required: true
+          schema:
+            type: string
       responses:
         '200':
           description: A successful response.
@@ -1137,6 +1143,11 @@ paths:
           required: true
           schema:
             type: string
+        - name: destination_id
+          in: path
+          required: true
+          schema:
+            type: string
       requestBody:
         content:
           application/json:
@@ -1156,6 +1167,7 @@ paths:
               required:
                 - name
                 - kind
+                - informations
         required: true
       responses:
         '200':
