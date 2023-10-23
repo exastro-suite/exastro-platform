@@ -102,14 +102,14 @@
                                                 </thead>
                                                 <thead class="thead">
                                                     <tr class="tHeadTr tr">
-                                                        <th data-id="c1" data-rest="id" class="tHeadLeftSticky tHeadTh popup th" rowspan="1" colspan="1" }="" title="項目名" attr-text-id="title=000-80020" width="500px;"><div class="ci" text-id="000-80020">項目名</div></th>
+                                                        <th data-id="c1" data-rest="id" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="項目名" attr-text-id="title=000-80020" width="500px;"><div class="ci" text-id="000-80020">項目名</div></th>
                                                         <th data-id="c2" data-rest="name" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="設定値" attr-text-id="title=000-80021" style="min-width:400px;"><div class="ci" text-id="000-80021">設定値</div></th>
                                                         <th data-id="c3" data-rest="name" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="備考" attr-text-id="title=000-80023"><div class="ci" text-id="000-80023">備考</div></th>
                                                     </tr>
                                                 </thead>
                                                 <tbody class="tbody">
                                                     <tr class="tBodyTr tr">
-                                                        <td class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: left;"><span text-id="000-00121">プランID</span><span class="tHeadRequired" text-id="000-80024">必須</span></div></td>
+                                                        <td class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: left;"><span text-id="000-00121">リソースプランID</span><span class="tHeadRequired" text-id="000-80024">必須</span></div></td>
                                                         <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci">
                                                             <input type="text" value="" class="tableEditInputText inputText input inputTextWidthAdjustment" id="form_plan_id" maxlength="36">
                                                             <span class="validate_error" id="message_plan_id"></span>
@@ -117,7 +117,7 @@
                                                         <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci textOverWrap" text-id="000-85014">最大36文字 / 使用可能文字：半角英数・ハイフン・アンダースコア</div></td>
                                                     </tr>
                                                     <tr class="tBodyTr tr">
-                                                        <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: left;"><span text-id="000-00122">プラン名</span><span class="tHeadRequired" text-id="000-80024">必須</span></div></td>
+                                                        <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: left;"><span text-id="000-00122">リソースプラン名</span><span class="tHeadRequired" text-id="000-80024">必須</span></div></td>
                                                         <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci">
                                                             <input type="text" value="" class="tableEditInputText inputText input inputTextWidthAdjustment" id="form_plan_name" maxlength="255">
                                                             <span class="validate_error" id="message_plan_name"></span>
@@ -144,14 +144,14 @@
                                                 </tbody>
                                                 <thead class="thead">
                                                     <tr class="tHeadTr tr">
-                                                        <th data-id="c1" data-rest="id" class="tHeadLeftSticky tHeadTh popup th" rowspan="1" colspan="1" }="" title="項目名" attr-text-id="title=000-80020" width="500px;"><div class="ci" text-id="000-80020">項目名</div></th>
+                                                        <th data-id="c1" data-rest="id" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="項目名" attr-text-id="title=000-80020" width="500px;"><div class="ci" text-id="000-80020">項目名</div></th>
                                                         <th data-id="c2" data-rest="name" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="設定値" attr-text-id="title=000-80021" style="min-width:400px;"><div class="ci" text-id="000-80021">設定値</div></th>
                                                         <th data-id="c3" data-rest="name" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="説明" attr-text-id="title=000-80023"><div class="ci" text-id="000-80023">説明</div></th>
                                                     </tr>
                                                 </thead>
                                                 <tbody class="tbodylimit">
                                                     <tr class="tBodyTr tr datarow-template" style="display:none" >
-                                                        <td class="tBodyLeftSticky td to_detail" rowspan="1" colspan="1" }="" data-id="${plan_id}"><div class="ci" style="text-align: left;">${plan_item}<span class="tHeadRequired" text-id="000-80024">必須</span></div></td>
+                                                        <td class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1" }="" data-id="${plan_id}"><div class="ci" style="text-align: left;">${plan_item}<span class="tHeadRequired" text-id="000-80024">必須</span></div></td>
                                                         <td class="tBodyTd td to_detail" rowspan="1" colspan="1" }=""><div class="ci textOverWrap">
                                                             <input type="text" value="" class="tableEditInputText inputText input inputTextWidthAdjustment" plan-id="${form_plan_limit}" id="form_plan_value" maxlength="64">
                                                             <span class="validate_error" id="message_plan_limit"></span>
