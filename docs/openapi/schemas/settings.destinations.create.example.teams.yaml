@@ -14,12 +14,12 @@
 
 value:
   {
-    "id": "00000000000000000000000000",
+    "id": "00000001Z7ZXFAED6872F6C9W9",
     "name": "destinations of teams settings",
     "kind": "Teams",
     "infoamations": [
-      { "webhook": "https://xxxxxxxx.xxxx.xxxxxx1" },
-      { "webhook": "https://xxxxxxxx.xxxx.xxxxxx2" },
-      { "webhook": "https://xxxxxxxx.xxxx.xxxxxx3" }
+      { "webhook": "https://xxxxxxxx.webhook.office.com/webhookb/xxxxxxxx-xxxxxx-xxxx-xxxx-xxxxxxxxxxxx" },
+      { "webhook": "https://xxxxxxxx.webhook.office.com/webhookb/xxxxxxxx-xxxxxx-xxxx-xxxx-xxxxxxxxxxxx" },
+      { "webhook": "https://xxxxxxxx.webhook.office.com/webhookb/xxxxxxxx-xxxxxx-xxxx-xxxx-xxxxxxxxxxxx" }
     ]
   }

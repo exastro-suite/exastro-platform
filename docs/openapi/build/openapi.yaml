@@ -977,29 +977,7 @@ paths:
               schema:
                 allOf:
                   - $ref: '#/components/schemas/responseOk'
-                  - title: destinationList is list of Destination resources.
-                    type: object
-                    properties:
-                      data:
-                        type: array
-                        items:
-                          allOf:
-                            - title: destination is a definition of Destination resource.
-                              type: object
-                              properties:
-                                id:
-                                  type: string
-                                  description: Destination ID is a 26-digit string
-                                name:
-                                  type: string
-                                  description: Destination name can be any string
-                                kind:
-                                  type: string
-                                  description: Select destination kind from Mail/Teams/Webhook
-                                informations:
-                                  type: object
-                                  description: Set the destination information for the destination
-                            - $ref: '#/components/schemas/responseStat'
+                  - $ref: '#/components/schemas/settingsDestinationList'
         default:
           description: An unexpected error response.
           content:
@@ -1029,44 +1007,26 @@ paths:
             schema:
               type: array
               items:
-                title: destination is a definition of Destination resource.
-                type: object
-                properties:
-                  id:
-                    type: string
-                    description: Destination ID is a 26-digit string
-                  name:
-                    type: string
-                    description: Destination name can be any string
-                  kind:
-                    type: string
-                    description: Select destination kind from Mail/Teams/Webhook
-                  informations:
-                    type: object
-                    description: Set the destination information for the destination
-                required:
-                  - id
-                  - name
-                  - kind
+                $ref: '#/components/schemas/settingsDestinationCreate'
             examples:
               mail settings:
                 value:
-                  id: '00000000000000000000000000'
+                  id: 00000001Z7ZXFAED6872F6C9W8
                   name: destinations of mail settings
                   kind: Mail
                   infoamations:
-                    - mail: <to-name>to-mail1@example.com
-                    - mail: <to-name>to-mail2@example.com
-                    - mail: <to-name>to-mail3@example.com
+                    - mail: <mike>mike@example.com
+                    - mail: <tommy>tommy@example.com
+                    - mail: <nancy>nancy@example.com
               teams settings:
                 value:
-                  id: '00000000000000000000000000'
+                  id: 00000001Z7ZXFAED6872F6C9W9
                   name: destinations of teams settings
                   kind: Teams
                   infoamations:
-                    - webhook: 'https://xxxxxxxx.xxxx.xxxxxx1'
-                    - webhook: 'https://xxxxxxxx.xxxx.xxxxxx2'
-                    - webhook: 'https://xxxxxxxx.xxxx.xxxxxx3'
+                    - webhook: 'https://xxxxxxxx.webhook.office.com/webhookb/xxxxxxxx-xxxxxx-xxxx-xxxx-xxxxxxxxxxxx'
+                    - webhook: 'https://xxxxxxxx.webhook.office.com/webhookb/xxxxxxxx-xxxxxx-xxxx-xxxx-xxxxxxxxxxxx'
+                    - webhook: 'https://xxxxxxxx.webhook.office.com/webhookb/xxxxxxxx-xxxxxx-xxxx-xxxx-xxxxxxxxxxxx'
         required: true
       responses:
         '200':
@@ -1105,6 +1065,11 @@ paths:
           required: true
           schema:
             type: string
+        - name: destination_id
+          in: path
+          required: true
+          schema:
+            type: string
       responses:
         '200':
           description: A successful response.
@@ -1113,7 +1078,7 @@ paths:
               schema:
                 allOf:
                   - $ref: '#/components/schemas/responseOk'
-                  - $ref: '#/components/schemas/workspaceList'
+                  - $ref: '#/components/schemas/settingsDestination'
         default:
           description: An unexpected error response.
           content:
@@ -1137,25 +1102,16 @@ paths:
           required: true
           schema:
             type: string
+        - name: destination_id
+          in: path
+          required: true
+          schema:
+            type: string
       requestBody:
         content:
           application/json:
             schema:
-              title: destination is a definition of Destination resource.
-              type: object
-              properties:
-                name:
-                  type: string
-                  description: Destination name can be any string
-                kind:
-                  type: string
-                  description: Select destination kind from Mail/Teams/Webhook
-                informations:
-                  type: object
-                  description: Set the destination information for the destination
-              required:
-                - name
-                - kind
+              $ref: '#/components/schemas/settingsDestinationPut'
         required: true
       responses:
         '200':
@@ -3226,6 +3182,70 @@ components:
             data_update_stop:
               type: string
               example: '0'
+    settingsDestination:
+      title: destination is a definition of Destination resource.
+      type: object
+      properties:
+        id:
+          type: string
+          description: Destination ID is a 26-digit string
+        name:
+          type: string
+          description: Destination name can be any string
+        kind:
+          type: string
+          description: Select destination kind from Mail/Teams/Webhook
+        informations:
+          type: object
+          description: Set the destination information for the destination
+    settingsDestinationList:
+      title: destinationList is list of Destination resources.
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            allOf:
+              - $ref: '#/components/schemas/settingsDestination'
+              - $ref: '#/components/schemas/responseStat'
+    settingsDestinationCreate:
+      title: destination is a definition of Destination resource.
+      type: object
+      properties:
+        id:
+          type: string
+          description: Destination ID is a 26-digit string
+        name:
+          type: string
+          description: Destination name can be any string
+        kind:
+          type: string
+          description: Select destination kind from Mail/Teams/Webhook
+        informations:
+          type: object
+          description: Set the destination information for the destination
+      required:
+        - id
+        - name
+        - kind
+        - informations
+    settingsDestinationPut:
+      title: destination is a definition of Destination resource.
+      type: object
+      properties:
+        name:
+          type: string
+          description: Destination name can be any string
+        kind:
+          type: string
+          description: Select destination kind from Mail/Teams/Webhook
+        informations:
+          type: object
+          description: Set the destination information for the destination
+      required:
+        - name
+        - kind
+        - informations
   securitySchemes:
     BearerAuth:
       description: Credentials or access token for API

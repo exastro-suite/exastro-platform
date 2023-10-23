@@ -27,3 +27,4 @@ properties:
 required:
   - name
   - kind
+  - informations

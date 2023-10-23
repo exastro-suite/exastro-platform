@@ -122,3 +122,12 @@ systemConfigValue:
   $ref: "./systemConfigValue.yaml"
 maintenanceModeSettings:
   $ref: "./maintenanceModeSettings.yaml"
+settingsDestination:
+  $ref: "./settings.destination.yaml"
+settingsDestinationList:
+  $ref: "./settings.destinationList.yaml"
+settingsDestinationCreate:
+  $ref: "./settings.destinations.create.yaml"
+settingsDestinationPut:
+  $ref: "./settings.destinations.put.yaml"
+
