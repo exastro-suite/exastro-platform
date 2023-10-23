@@ -469,6 +469,17 @@ def workspace_delete(organization_id, workspace_id):  # noqa: E501
 
             conn.commit()
 
+    # get DBinit instance
+    dbinit = DBinit()
+
+    # Delete Platform Workspace Database
+    globals.logger.info(f"Delete Platform Workspace Database : organization_id={organization_id} workspace_id={workspace_id}")
+    dbinit.drop_database(DBconnector().get_dbinfo_workspace(organization_id, workspace_id))
+
+    # Delete Platform Workspace db info
+    globals.logger.info(f"Delete Platform Workspace db info : organization_id={organization_id} workspace_id={workspace_id}")
+    dbinit.delete_workspace_dbinfo(organization_id, workspace_id)
+
     return common.response_200_ok(data=None)
 
 

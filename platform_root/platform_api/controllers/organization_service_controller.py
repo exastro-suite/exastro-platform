@@ -522,6 +522,24 @@ def organization_delete(organization_id):  # noqa: E501
     # get DBinit instance
     dbinit = DBinit()
 
+    # ワークスペースの情報分ワークスペースDBの削除を実施する
+    # Delete workspace DB for workspace information
+    with closing(DBconnector().connect_orgdb(organization_id)) as conn:
+        with conn.cursor() as cursor:
+            cursor.execute(
+                queries_organizations.SQL_QUERY_WORKSPACE_DB_BY_ID,
+                {"organization_id": organization_id})
+            workspaces = cursor.fetchall()
+    
+            # ワークスペース数分処理する
+            # Process several workspaces
+            for workspace in workspaces:
+                workspace_id = workspace.get("WORKSPACE_ID")
+                
+                # Delete Platform Workspace Database
+                globals.logger.info(f"Delete Platform Workspace Database : organization_id={organization_id} workspace_id={workspace_id}")
+                dbinit.drop_database(DBconnector().get_dbinfo_workspace(organization_id, workspace_id))
+
     # Delete Platform Organization Database
     globals.logger.info(f"Delete Platform Organization Database : organization_id={organization_id}")
     dbinit.drop_database(DBconnector().get_dbinfo_organization(organization_id))
