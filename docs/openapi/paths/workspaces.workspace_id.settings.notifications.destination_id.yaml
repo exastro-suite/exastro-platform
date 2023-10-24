@@ -76,6 +76,11 @@ put:
       application/json:
         schema:
           $ref: '../schemas/settings.destinations.put.yaml'
+        examples:
+          mail settings:
+            $ref: "../schemas/settings.destinations.put.example.mail.yaml"
+          teams settings:
+            $ref: "../schemas/settings.destinations.put.example.teams.yaml"
     required: true
   responses:
     200:

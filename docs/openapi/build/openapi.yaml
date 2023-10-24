@@ -1011,22 +1011,22 @@ paths:
             examples:
               mail settings:
                 value:
-                  id: 00000001Z7ZXFAED6872F6C9W8
-                  name: destinations of mail settings
-                  kind: Mail
-                  infoamations:
-                    - mail: <mike>mike@example.com
-                    - mail: <tommy>tommy@example.com
-                    - mail: <nancy>nancy@example.com
+                  - id: 00000001Z7ZXFAED6872F6C9W8
+                    name: destinations of mail settings
+                    kind: Mail
+                    informations:
+                      - mail: <mike>mike@example.com
+                      - mail: <tommy>tommy@example.com
+                      - mail: <nancy>nancy@example.com
               teams settings:
                 value:
-                  id: 00000001Z7ZXFAED6872F6C9W9
-                  name: destinations of teams settings
-                  kind: Teams
-                  infoamations:
-                    - webhook: 'https://xxxxxxxx.webhook.office.com/webhookb/xxxxxxxx-xxxxxx-xxxx-xxxx-xxxxxxxxxxxx'
-                    - webhook: 'https://xxxxxxxx.webhook.office.com/webhookb/xxxxxxxx-xxxxxx-xxxx-xxxx-xxxxxxxxxxxx'
-                    - webhook: 'https://xxxxxxxx.webhook.office.com/webhookb/xxxxxxxx-xxxxxx-xxxx-xxxx-xxxxxxxxxxxx'
+                  - id: 00000001Z7ZXFAED6872F6C9W9
+                    name: destinations of teams settings
+                    kind: Teams
+                    informations:
+                      - webhook: 'https://xxxxxxxx.webhook.office.com/webhookb/xxxxxxxx-xxxxxx-xxxx-xxxx-xxxxxxxxxxxx'
+                      - webhook: 'https://xxxxxxxx.webhook.office.com/webhookb/xxxxxxxx-xxxxxx-xxxx-xxxx-xxxxxxxxxxxx'
+                      - webhook: 'https://xxxxxxxx.webhook.office.com/webhookb/xxxxxxxx-xxxxxx-xxxx-xxxx-xxxxxxxxxxxx'
         required: true
       responses:
         '200':
@@ -1112,6 +1112,23 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/settingsDestinationPut'
+            examples:
+              mail settings:
+                value:
+                  name: destinations of mail settings
+                  kind: Mail
+                  informations:
+                    - mail: <mike>mike@example.com
+                    - mail: <tommy>tommy@example.com
+                    - mail: <nancy>nancy@example.com
+              teams settings:
+                value:
+                  name: destinations of teams settings
+                  kind: Teams
+                  informations:
+                    - webhook: 'https://xxxxxxxx.webhook.office.com/webhookb/xxxxxxxx-xxxxxx-xxxx-xxxx-xxxxxxxxxxxx'
+                    - webhook: 'https://xxxxxxxx.webhook.office.com/webhookb/xxxxxxxx-xxxxxx-xxxx-xxxx-xxxxxxxxxxxx'
+                    - webhook: 'https://xxxxxxxx.webhook.office.com/webhookb/xxxxxxxx-xxxxxx-xxxx-xxxx-xxxxxxxxxxxx'
         required: true
       responses:
         '200':
@@ -3222,8 +3239,10 @@ components:
           type: string
           description: Select destination kind from Mail/Teams/Webhook
         informations:
-          type: object
-          description: Set the destination information for the destination
+          type: array
+          items:
+            type: object
+            description: Set the destination information for the destination
       required:
         - id
         - name
@@ -3240,8 +3259,10 @@ components:
           type: string
           description: Select destination kind from Mail/Teams/Webhook
         informations:
-          type: object
-          description: Set the destination information for the destination
+          type: array
+          items:
+            type: object
+            description: Set the destination information for the destination
       required:
         - name
         - kind

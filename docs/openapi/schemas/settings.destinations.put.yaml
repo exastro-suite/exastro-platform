@@ -22,8 +22,10 @@ properties:
     type: string
     description: Select destination kind from Mail/Teams/Webhook
   informations:
-    type: object
-    description: Set the destination information for the destination
+    type: array
+    items:
+      type: object
+      description: Set the destination information for the destination
 required:
   - name
   - kind

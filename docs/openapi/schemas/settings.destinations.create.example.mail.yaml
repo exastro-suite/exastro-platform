@@ -13,13 +13,15 @@
 #   limitations under the License.
 
 value:
-  {
-    "id": "00000001Z7ZXFAED6872F6C9W8",
-    "name": "destinations of mail settings",
-    "kind": "Mail",
-    "infoamations": [
-      { "mail": "<mike>mike@example.com" },
-      { "mail": "<tommy>tommy@example.com" },
-      { "mail": "<nancy>nancy@example.com" }
-    ]
-  }
+  [
+    {
+      "id": "00000001Z7ZXFAED6872F6C9W8",
+      "name": "destinations of mail settings",
+      "kind": "Mail",
+      "informations": [
+        { "mail": "<mike>mike@example.com" },
+        { "mail": "<tommy>tommy@example.com" },
+        { "mail": "<nancy>nancy@example.com" }
+      ]
+    }
+  ]
