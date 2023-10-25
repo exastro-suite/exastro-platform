@@ -11,16 +11,8 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
-import requests_mock
-from tests.common import request_parameters, test_common
 
-
-def test_plan_list(connexion_client):
-    with requests_mock.Mocker() as requests_mocker:
-        test_common.requsts_mocker_setting(requests_mocker)
-
-        response = connexion_client.get(
-            '/api/platform/plans',
-            headers=request_parameters.request_headers())
-
-        assert response.status_code == 200
+SQL_INSERT_NOTIFICATION_DESTINATION = """
+INSERT INTO M_NOTIFICATION_DESTINATION (DESTINATION_ID, DESTINATION_NAME, DESTINATION_KIND, DESTINATION_INFO, CREATE_USER, LAST_UPDATE_USER)
+values (%(destination_id)s, %(destination_name)s, %(destination_kind)s, %(destination_info)s, %(create_user)s, %(last_update_user)s)
+"""

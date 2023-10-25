@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: Exastro Platform API
   description: Exastro Platform API
-  version: 1.6.0
+  version: 1.7.0
 servers:
 - url: "https://{host}"
   description: API endpoint
@@ -50,6 +50,8 @@ tags:
   description: システム管理者共通
 - name: MaintenanceModeService
   description: メンテナンスモードに関する操作
+- name: NotificationService
+  description: 通知機能に関する操作
 - name: InternalCommonService
   description: 共通(内部用)
 - name: InternalPlanService
@@ -937,6 +939,208 @@ paths:
               schema:
                 $ref: '#/components/schemas/runtimeError'
       x-openapi-router-controller: controllers.workspace_service_controller
+  /api/{organization_id}/platform/workspaces/{workspace_id}/settings/notifications:
+    get:
+      tags:
+      - NotificationService
+      summary: List returns list of settings notifications
+      operationId: settings_notification_list
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: workspace_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_16'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+      x-openapi-router-controller: controllers.notification_service_controller
+    post:
+      tags:
+      - NotificationService
+      summary: Create creates an settings notifications
+      operationId: settings_notification_create
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: workspace_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/settingsDestinationCreate'
+            examples:
+              mail settings:
+                value:
+                - id: 00000001Z7ZXFAED6872F6C9W8
+                  name: destinations of mail settings
+                  kind: Mail
+                  informations:
+                  - mail: <mike>mike@example.com
+                  - mail: <tommy>tommy@example.com
+                  - mail: <nancy>nancy@example.com
+              teams settings:
+                value:
+                - id: 00000001Z7ZXFAED6872F6C9W9
+                  name: destinations of teams settings
+                  kind: Teams
+                  informations:
+                  - webhook: https://xxxxxxxx.webhook.office.com/webhookb/xxxxxxxx-xxxxxx-xxxx-xxxx-xxxxxxxxxxxx
+                  - webhook: https://xxxxxxxx.webhook.office.com/webhookb/xxxxxxxx-xxxxxx-xxxx-xxxx-xxxxxxxxxxxx
+                  - webhook: https://xxxxxxxx.webhook.office.com/webhookb/xxxxxxxx-xxxxxx-xxxx-xxxx-xxxxxxxxxxxx
+        required: true
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_2'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+      x-openapi-router-controller: controllers.notification_service_controller
+  /api/{organization_id}/platform/workspaces/{workspace_id}/settings/notifications/{destination_id}:
+    get:
+      tags:
+      - NotificationService
+      summary: Returns of settings destination
+      operationId: settings_destination_get
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: workspace_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: destination_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_17'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+      x-openapi-router-controller: controllers.notification_service_controller
+    put:
+      tags:
+      - NotificationService
+      summary: Put an settings destination
+      operationId: settings_destination_put
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: workspace_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: destination_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/settingsDestinationPut'
+            examples:
+              mail settings:
+                value:
+                  name: destinations of mail settings
+                  kind: Mail
+                  informations:
+                  - mail: <mike>mike@example.com
+                  - mail: <tommy>tommy@example.com
+                  - mail: <nancy>nancy@example.com
+              teams settings:
+                value:
+                  name: destinations of teams settings
+                  kind: Teams
+                  informations:
+                  - webhook: https://xxxxxxxx.webhook.office.com/webhookb/xxxxxxxx-xxxxxx-xxxx-xxxx-xxxxxxxxxxxx
+                  - webhook: https://xxxxxxxx.webhook.office.com/webhookb/xxxxxxxx-xxxxxx-xxxx-xxxx-xxxxxxxxxxxx
+                  - webhook: https://xxxxxxxx.webhook.office.com/webhookb/xxxxxxxx-xxxxxx-xxxx-xxxx-xxxxxxxxxxxx
+        required: true
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_2'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+      x-openapi-router-controller: controllers.notification_service_controller
   /api/{organization_id}/platform/users:
     get:
       tags:
@@ -986,7 +1190,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_16'
+                $ref: '#/components/schemas/inline_response_200_18'
         default:
           description: An unexpected error response.
           content:
@@ -1055,7 +1259,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_17'
+                $ref: '#/components/schemas/inline_response_200_19'
         default:
           description: An unexpected error response.
           content:
@@ -1171,7 +1375,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_18'
+                $ref: '#/components/schemas/inline_response_200_20'
         default:
           description: An unexpected error response.
           content:
@@ -1350,7 +1554,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_19'
+                $ref: '#/components/schemas/inline_response_200_21'
         default:
           description: An unexpected error response.
           content:
@@ -1451,7 +1655,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_20'
+                $ref: '#/components/schemas/inline_response_200_22'
         default:
           description: An unexpected error response.
           content:
@@ -1504,7 +1708,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_20'
+                $ref: '#/components/schemas/inline_response_200_22'
         default:
           description: An unexpected error response.
           content:
@@ -1626,7 +1830,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_21'
+                $ref: '#/components/schemas/inline_response_200_23'
         default:
           description: An unexpected error response.
           content:
@@ -1797,7 +2001,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_22'
+                $ref: '#/components/schemas/inline_response_200_24'
         default:
           description: An unexpected error response.
           content:
@@ -1852,7 +2056,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_23'
+                $ref: '#/components/schemas/inline_response_200_25'
         default:
           description: An unexpected error response.
           content:
@@ -1970,7 +2174,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_24'
+                $ref: '#/components/schemas/inline_response_200_26'
         default:
           description: An unexpected error response.
           content:
@@ -2026,7 +2230,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_16'
+                $ref: '#/components/schemas/inline_response_200_18'
         default:
           description: An unexpected error response.
           content:
@@ -2082,7 +2286,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_25'
+                $ref: '#/components/schemas/inline_response_200_27'
         default:
           description: An unexpected error response.
           content:
@@ -2103,7 +2307,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_20'
+                $ref: '#/components/schemas/inline_response_200_22'
         default:
           description: An unexpected error response.
           content:
@@ -2859,6 +3063,74 @@ components:
           example: 000-00000
         data:
           $ref: '#/components/schemas/maintenanceModeSettings_data'
+    settingsDestination:
+      title: destination is a definition of Destination resource.
+      type: object
+      properties:
+        id:
+          type: string
+          description: Destination ID is a 26-digit string
+        name:
+          type: string
+          description: Destination name can be any string
+        kind:
+          type: string
+          description: Select destination kind from Mail/Teams/Webhook
+        informations:
+          type: object
+          description: Set the destination information for the destination
+    settingsDestinationList:
+      title: destinationList is list of Destination resources.
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            allOf:
+            - $ref: '#/components/schemas/settingsDestination'
+            - $ref: '#/components/schemas/responseStat'
+    settingsDestinationCreate:
+      title: destination is a definition of Destination resource.
+      required:
+      - id
+      - informations
+      - kind
+      - name
+      type: object
+      properties:
+        id:
+          type: string
+          description: Destination ID is a 26-digit string
+        name:
+          type: string
+          description: Destination name can be any string
+        kind:
+          type: string
+          description: Select destination kind from Mail/Teams/Webhook
+        informations:
+          type: array
+          items:
+            type: object
+            description: Set the destination information for the destination
+    settingsDestinationPut:
+      title: destination is a definition of Destination resource.
+      required:
+      - informations
+      - kind
+      - name
+      type: object
+      properties:
+        name:
+          type: string
+          description: Destination name can be any string
+        kind:
+          type: string
+          description: Select destination kind from Mail/Teams/Webhook
+        informations:
+          type: array
+          items:
+            type: object
+            description: Set the destination information for the destination
     inline_response_200:
       allOf:
       - $ref: '#/components/schemas/responseOk'
@@ -2873,6 +3145,9 @@ components:
     organizations_organization_id_body:
       oneOf:
       - title: organization is a definition of Organization resource.
+        required:
+        - enabled
+        - name
         type: object
         properties:
           name:
@@ -2955,15 +3230,23 @@ components:
     inline_response_200_16:
       allOf:
       - $ref: '#/components/schemas/responseOk'
-      - $ref: '#/components/schemas/userList'
+      - $ref: '#/components/schemas/settingsDestinationList'
     inline_response_200_17:
+      allOf:
+      - $ref: '#/components/schemas/responseOk'
+      - $ref: '#/components/schemas/settingsDestination'
+    inline_response_200_18:
+      allOf:
+      - $ref: '#/components/schemas/responseOk'
+      - $ref: '#/components/schemas/userList'
+    inline_response_200_19:
       allOf:
       - $ref: '#/components/schemas/responseOk'
       - type: object
         properties:
           data:
             $ref: '#/components/schemas/user'
-    inline_response_200_18:
+    inline_response_200_20:
       allOf:
       - $ref: '#/components/schemas/responseOk'
       - $ref: '#/components/schemas/roleDetailList'
@@ -2973,7 +3256,7 @@ components:
     roles_role_name_body:
       oneOf:
       - $ref: '#/components/schemas/roleDetailWorkspacePut'
-    inline_response_200_19:
+    inline_response_200_21:
       allOf:
       - $ref: '#/components/schemas/responseOk'
       - title: roleList is list of Role resources.
@@ -2983,7 +3266,7 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/roleUser'
-    inline_response_200_20:
+    inline_response_200_22:
       allOf:
       - $ref: '#/components/schemas/responseOk'
       - $ref: '#/components/schemas/maintenanceModeSettings'
@@ -2996,29 +3279,29 @@ components:
         data_update_stop:
           type: string
           example: "1"
-    inline_response_200_21:
-      allOf:
-      - $ref: '#/components/schemas/responseOk'
-      - type: object
-        properties:
-          data:
-            $ref: '#/components/schemas/systemConfig'
-    inline_response_200_22:
-      allOf:
-      - $ref: '#/components/schemas/responseOk'
-      - $ref: '#/components/schemas/limitsList'
     inline_response_200_23:
       allOf:
       - $ref: '#/components/schemas/responseOk'
       - type: object
         properties:
           data:
-            $ref: '#/components/schemas/planItem'
+            $ref: '#/components/schemas/systemConfig'
     inline_response_200_24:
       allOf:
       - $ref: '#/components/schemas/responseOk'
-      - $ref: '#/components/schemas/roleList'
+      - $ref: '#/components/schemas/limitsList'
     inline_response_200_25:
+      allOf:
+      - $ref: '#/components/schemas/responseOk'
+      - type: object
+        properties:
+          data:
+            $ref: '#/components/schemas/planItem'
+    inline_response_200_26:
+      allOf:
+      - $ref: '#/components/schemas/responseOk'
+      - $ref: '#/components/schemas/roleList'
+    inline_response_200_27:
       allOf:
       - $ref: '#/components/schemas/responseOk'
       - $ref: '#/components/schemas/userWorkspaceList'

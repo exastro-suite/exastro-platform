@@ -12,13 +12,14 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
+import os
 import re
 from datetime import datetime
+import urllib.parse
 
 from common_library.common import common, multi_lang
 import common_library.common.const as const
 from email_validator import validate_email, EmailNotValidError
-
 
 MSG_FUNCTION_ID = "00"
 
@@ -1027,5 +1028,193 @@ def validate_maintenance_mode(config_key, config_value):
             '設定値に「{}」以外が指定されています。({}:{}) ',
             '/'.join(accept_key_value['value']), config_key, config_value
         )
+
+    return result(True)
+
+
+def validate_destinations(body):
+    if len(body) == 0:
+        return result(
+            False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
+            multi_lang.get_text('000-00150', "通知先")
+        )
+
+    return result(True)
+
+
+def validate_destination_id(destination_id):
+    """validate destination_id
+
+    Args:
+        destination_id (str): destination_id
+
+    Returns:
+        result: Validation result
+    """
+    if destination_id is None or destination_id == "":
+        return result(
+            False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
+            multi_lang.get_text('000-00145', "通知先ID")
+        )
+
+    if len(destination_id) > const.length_destination_id:
+        return result(
+            False, 400, '400-{}012'.format(MSG_FUNCTION_ID), '指定可能な文字数を超えています。(項目:{0},最大文字数:{1})',
+            multi_lang.get_text('000-00145', "通知先ID"),
+            str(const.length_destination_id)
+        )
+
+    rlt, chr = validate_id_characters(destination_id)
+    if not rlt:
+        return result(
+            False, 400, '400-{}013'.format(MSG_FUNCTION_ID), '指定できない文字が含まれています。(項目:{0},指定できない文字:{1})',
+            multi_lang.get_text('000-00145', "通知先ID"),
+            chr
+        )
+
+    if not re.match(RE_ID_USABLE_FIRST_CHARACTER, destination_id):
+        return result(
+            False, 400, '400-{}014'.format(MSG_FUNCTION_ID), '先頭の文字にアルファベット以外が指定されています。({0})',
+            multi_lang.get_text('000-00145', "通知先ID")
+        )
+
+    return result(True)
+
+
+def validate_destination_name(destination_name):
+    """validate destination_name
+
+    Args:
+        destination_name (str): destination_name
+
+    Returns:
+        result: Validation result
+    """
+    if destination_name is None or destination_name == "":
+        return result(
+            False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
+            multi_lang.get_text('000-00146', "通知先名")
+        )
+
+    if len(destination_name) > const.length_destination_name:
+        return result(
+            False, 400, '400-{}012'.format(MSG_FUNCTION_ID), '指定可能な文字数を超えています。(項目:{0},最大文字数:{1})',
+            multi_lang.get_text('000-00146', "通知先名"),
+            str(const.length_destination_name)
+        )
+
+    return result(True)
+
+
+def validate_destination_kind(destination_kind):
+    """validate destination_kind
+
+    Args:
+        destination_kind (str): destination_kind
+
+    Returns:
+        result: Validation result
+    """
+    if destination_kind is None or destination_kind == "":
+        return result(
+            False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
+            multi_lang.get_text('000-00146', "通知方法")
+        )
+
+    if destination_kind not in const.ALL_DESTINATION_KIND:
+        return result(
+            False, 400, '400-{}026'.format(MSG_FUNCTION_ID), '{0}以外の{1}は指定できません',
+            "/".join(const.ALL_DESTINATION_KIND),
+            multi_lang.get_text('000-00146', "通知方法")
+        )
+        
+    return result(True)
+
+
+def validate_destination_info(destination_kind, destination_info):
+    """validate destination_info
+
+    Args:
+        destination_info (dict): destination_info
+
+    Returns:
+        result: Validation result
+    """
+    if destination_kind == const.DESTINATION_KIND_MAIL:
+        if len(destination_info) == 0:
+            return result(
+                False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
+                multi_lang.get_text('000-00148', "通知先email")
+            )
+            
+        if len(destination_info) > const.max_destination_email:
+            return result(
+                False, 400, '400-{}018'.format(MSG_FUNCTION_ID), '指定可能な最大数を超えています。(項目:{0},最大数:{1})',
+                multi_lang.get_text('000-00148', "通知先email"),
+                str(const.max_destination_email)
+            )
+
+        for row in destination_info:
+            if row.get('mail') is None or row.get('mail') == "":
+                return result(
+                    False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
+                    multi_lang.get_text('000-00148', "通知先email")
+                )
+
+            if len(row['mail']) > const.length_destination_email:
+                return result(
+                    False, 400, '400-{}012'.format(MSG_FUNCTION_ID), '指定可能な文字数を超えています。(項目:{0},最大文字数:{1})',
+                    multi_lang.get_text('000-00148', "通知先email"),
+                    str(const.length_destination_email)
+                )
+
+            try:
+                # Check that the email address is valid.
+                validate_email(row['mail'], check_deliverability=False, allow_smtputf8=False)
+
+            except EmailNotValidError:
+                return result(
+                    False, 400, '400-{}023'.format(MSG_FUNCTION_ID), 'メールアドレスの形式に誤りがあります。({0})',
+                    multi_lang.get_text('000-00148', "通知先email"),
+                )
+
+    if destination_kind == const.DESTINATION_KIND_TEAMS:
+        if len(destination_info) == 0:
+            return result(
+                False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
+                multi_lang.get_text('000-00149', "通知先Teams webhook")
+            )
+
+        if len(destination_info) > const.max_destination_teams_webhook:
+            return result(
+                False, 400, '400-{}018'.format(MSG_FUNCTION_ID), '指定可能な最大数を超えています。(項目:{0},最大数:{1})',
+                multi_lang.get_text('000-00149', "通知先Teams webhook"),
+                str(const.max_destination_teams_webhook)
+            )
+
+        for row in destination_info:
+            if row.get('webhook') is None or row.get('webhook') == "":
+                return result(
+                    False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
+                    multi_lang.get_text('000-00149', "通知先Teams webhook")
+                )
+
+            if len(row['webhook']) > const.length_destination_teams_webhook:
+                return result(
+                    False, 400, '400-{}012'.format(MSG_FUNCTION_ID), '指定可能な文字数を超えています。(項目:{0},最大文字数:{1})',
+                    multi_lang.get_text('000-00149', "通知先Teams webhook"),
+                    str(const.length_destination_teams_webhook)
+                )
+
+            try:
+                urlparse = urllib.parse.urlparse(row['webhook'])
+                if urlparse.scheme not in ['http', 'https']:
+                    raise ValueError
+
+            except ValueError:
+                return result(
+                    False, 400, '400-{}027'.format(MSG_FUNCTION_ID), 'URLの形式に誤りがあります。({0}）',
+                    multi_lang.get_text('000-00149', "通知先Teams webhook")
+                )
 
     return result(True)

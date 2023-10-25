@@ -1,20 +1,37 @@
+#   Copyright 2022 NEC Corporation
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+
 version: '3.1'
 services:
   unittest-platform-db:
     image: mariadb:10.4.8
     healthcheck:
-      test: mysqladmin ping --silent && mysql -u keycloak -ppassword -e 'select 1;'
+      test: mysql -u keycloak -ppassword -e 'select 1;'
       interval: 3s
       retries: 200
     volumes:
       - ${PLATFORM_REPO_ROOT}/platform_root/platform_db/conf/my.cnf:/etc/mysql/conf.d/my.cnf
       - ${PLATFORM_REPO_ROOT}/platform_root/platform_api/tests/db/exports/pytest1_init_db.sql:/docker-entrypoint-initdb.d/pytest1_init_db.sql
-      - ${PLATFORM_REPO_ROOT}/platform_root/platform_api/tests/db/pytest2_database_users.sql:/docker-entrypoint-initdb.d/pytest2_database_users.sql
+      - ${PLATFORM_REPO_ROOT}/platform_root/platform_api/tests/db/exports/pytest2_restore_data.sql:/docker-entrypoint-initdb.d/pytest2_restore_data.sql
+      - ${PLATFORM_REPO_ROOT}/platform_root/platform_api/tests/db/pytest9_database_users.sql:/docker-entrypoint-initdb.d/pytest9_database_users.sql
     environment:
       - TZ=Asia/Tokyo
       - MYSQL_ROOT_PASSWORD=password
     networks:
       - exastro
+    ports:
+      - "0.0.0.0:3308:3306"
   unittest-keycloak:
     image: quay.io/keycloak/keycloak:20.0
     healthcheck:

@@ -1,51 +1,29 @@
+#   Copyright 2022 NEC Corporation
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+
 import requests_mock
-import os
-import re
+from tests.common import request_parameters, test_common
 
 
-def test_organization_create(connexion_client):
-    req_headers = {
-        "User-id": "unittest-user01",
-        "Roles": "",
-        "Language": "en"
-    }
-    
-    req_json = {
-        "id": "unittest-org001",
-        "name": "unittest-org01-name",
-        "organization_managers": [
-            {
-                "username": "admin",
-                "email": "admin@example.com",
-                "firstName": "admin",
-                "lastName": "admin",
-                "credentials": [
-                    {
-                        "type": "password",
-                        "value": "password",
-                        "temporary": True
-                    }
-                ],
-                "requiredActions": [
-                    "UPDATE_PROFILE"
-                ],
-                "enabled": True
-            }
-        ],
-        "options": {},
-        "optionsIta": {}
-    }
-    with requests_mock.Mocker() as request_mocker:
-        request_mocker.register_uri(
-            requests_mock.ANY,
-            re.compile(rf'^{os.environ["ITA_API_ADMIN_PROTOCOL"]}://{os.environ["ITA_API_ADMIN_HOST"]}:{os.environ["ITA_API_ADMIN_PORT"]}/'),
-            status_code=200,
-            json={"result": "000-00000", "message": ""})
-        request_mocker.register_uri(
-            requests_mock.ANY,
-            re.compile(rf'^{os.environ["API_KEYCLOAK_PROTOCOL"]}://{os.environ["API_KEYCLOAK_HOST"]}:{os.environ["API_KEYCLOAK_PORT"]}/'),
-            real_http=True)
+def test_organization_series_of_step(connexion_client):
+    with requests_mock.Mocker() as requests_mocker:
+        test_common.requsts_mocker_setting(requests_mocker)
+        response = connexion_client.post(
+            '/api/platform/organizations',
+            content_type='application/json',
+            headers=request_parameters.request_headers(),
+            json=request_parameters.create_organization())
 
-        response = connexion_client.post('/api/platform/organizations', content_type='application/json', headers=req_headers, json=req_json)
-        assert response.status_code == 200
+        assert response.status_code == 200, "create organization response code"
 
