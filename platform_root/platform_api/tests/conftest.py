@@ -158,11 +158,24 @@ def data_initalize():
             raise Exception('FAILED : clear keycloak realms cache (tests/conftest.py data_initalize)')
 
     #
-    # データ初期化
+    # データ初期化(platform_db/keycloak)
     #
     sql_file = os.path.join(os.path.dirname(__file__), "db", "exports", "pytest2_restore_data.sql")
     result_command = subprocess.run(
         f"mysql -u {os.environ['DB_ADMIN_USER']} -p{os.environ['DB_ADMIN_PASSWORD']} -h {os.environ['DB_HOST']} < {sql_file}",
         shell=True)
+
+    if result_command.returncode != 0:
+        raise Exception('FAILED : mysql command (tests/conftest.py data_initalize)')
+
+    #
+    # organization, workspace database drop
+    #
+    result_command = subprocess.run(
+        f"mysql -u {os.environ['DB_ADMIN_USER']} -p{os.environ['DB_ADMIN_PASSWORD']} -h {os.environ['DB_HOST']} -N -e 'show databases;'" +
+        " | sed -n -e '/^PF_\\(ORG\\|WS\\)_/{s/^/DROP DATABASE /;s/$/;/p}'" +
+        f" | mysql -u {os.environ['DB_ADMIN_USER']} -p{os.environ['DB_ADMIN_PASSWORD']} -h {os.environ['DB_HOST']}",
+        shell=True)
+
     if result_command.returncode != 0:
         raise Exception('FAILED : mysql command (tests/conftest.py data_initalize)')
