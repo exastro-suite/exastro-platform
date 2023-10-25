@@ -41,18 +41,8 @@ RUN dnf install -y \
     python39 \
     python39-devel \
     python39-mod_wsgi \
-&&  pip3.9 install --upgrade requests \
-&&  pip3.9 install --upgrade pyyaml \
-&&  pip3.9 install --upgrade Werkzeug==2.3.7 \
-&&  pip3.9 install --upgrade Flask==2.2.3 \
-&&  pip3.9 install --upgrade pytz \
-&&  pip3.9 install --upgrade markdown \
-&&  pip3.9 install --upgrade requests \
-&&  pip3.9 install --upgrade PyJWT \
-&&  pip3.9 install --upgrade python-dotenv \
-&&  pip3.9 install --upgrade flask-log-request-id \
-&&  pip3.9 install --upgrade pymysql \
-&&  pip3.9 install --upgrade pycryptodome \
+&&  pip3.9 install poetry==1.6.0 \
+&&  poetry config virtualenvs.create false \
 &&  groupadd $GROUPNAME \
 &&  useradd -m -s /bin/bash -g $GROUPNAME $USERNAME \
 &&  setcap 'cap_net_bind_service=+ep' /usr/sbin/httpd \
@@ -61,6 +51,12 @@ RUN dnf install -y \
 &&  chown $USERNAME:$GROUPNAME $APACHE_PID_DIR \
 &&  mkdir -p $APACHE_SOCKET_DIR \
 &&  chown $USERNAME:$GROUPNAME $APACHE_SOCKET_DIR
+
+WORKDIR $APP_PATH
+
+COPY ./platform_root/platform_auth/pyproject.toml ./platform_root/platform_auth/poetry.lock $APP_PATH/
+RUN poetry install --only first_install
+RUN poetry install --without develop_build
 
 #
 # Build for development
@@ -82,10 +78,6 @@ RUN dnf config-manager --add-repo=https://download.docker.com/linux/centos/docke
     iputils \
     docker-ce-cli \
     jq \
-&&  pip3.9 install \
-    debugpy \
-    flake8 \
-    autopep8 \
 &&  usermod -G wheel $USERNAME \
 &&  echo '%wheel ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers \
 &&  echo "%${GROUPNAME} ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
@@ -97,6 +89,8 @@ RUN mkdir ~/.config \
 && mkdir ~/.vscode-server-insiders
 
 WORKDIR $APP_PATH
+
+RUN poetry install --with develop_build
 
 COPY ./platform_root/platform_auth/config/httpd.conf/httpd.conf /etc/httpd/conf/httpd.conf
 COPY ./platform_root/platform_auth/config/httpd.conf/reverse-proxy.conf /etc/httpd/conf.d/reverse-proxy.conf
