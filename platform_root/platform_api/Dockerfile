@@ -56,6 +56,7 @@ RUN dnf install -y \
 &&  pip3.9 install --upgrade pycryptodome \
 &&  pip3.9 install --upgrade email-validator \
 &&  pip3.9 install --upgrade cryptography \
+&&  pip3.9 install --upgrade python-ulid \
 &&  groupadd $GROUPNAME \
 &&  useradd -m -s /bin/bash -g $GROUPNAME $USERNAME \
 &&  setcap 'cap_net_bind_service=+ep' /usr/sbin/httpd \
@@ -102,6 +103,10 @@ RUN dnf config-manager --add-repo=https://download.docker.com/linux/centos/docke
 &&  usermod -G wheel $USERNAME \
 &&  echo '%wheel ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers \
 &&  echo "%${GROUPNAME} ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+
+RUN curl -kL -O https://dev.mysql.com/get/mysql80-community-release-el8-8.noarch.rpm \
+&&  rpm -ivh mysql80-community-release-el8-8.noarch.rpm \
+&&  dnf install -y mysql-community-client
 
 
 USER $USERNAME
