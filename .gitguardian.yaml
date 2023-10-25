@@ -1,0 +1,4 @@
+version: 2
+secret:
+  ignored-paths:
+    - 'platform_root/platform_api/tests/db/exports/**'
