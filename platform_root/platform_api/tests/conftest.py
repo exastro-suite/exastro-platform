@@ -1,8 +1,24 @@
+#   Copyright 2022 NEC Corporation
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+
 import pytest
 import os
 import os.path
 import connexion
 import requests
+import json
+import subprocess
 
 from flask import request
 import logging
@@ -10,6 +26,8 @@ from logging.config import dictConfig as dictLogConf
 
 import globals
 from common_library.common.exastro_logging import ExastroLogRecordFactory, LOGGING
+from common_library.common.db import DBconnector
+from common_library.common import api_keycloak_tokens, api_keycloak_realms
 
 
 @pytest.fixture(scope='session')
@@ -48,7 +66,7 @@ def docker_compose_command() -> str:
     Returns:
         str: docker composeコマンド
     """
-    if os.environ.get('DOCKER_COMPOSE_UP_UNITTEST_NODE', 'ON') == 'ON':
+    if os.environ.get('DOCKER_COMPOSE_UP_UNITTEST_NODE', 'MANUAL') == 'AUTO':
         return "sudo docker compose "
     else:
         return ":"
@@ -76,22 +94,7 @@ def docker_compose_up(docker_ip, docker_services):
         docker_ip (_type_): docker_ip fixtureパラメータ
         docker_services (_type_): docker_services fixtureパラメータ
     """
-    if os.environ.get('DOCKER_COMPOSE_UP_UNITTEST_NODE', 'ON') == 'ON':
-        #
-        # platform_root/platform_api/test/docker-compose.ymlで起動するコンテナに切り替え
-        #
-        os.environ['API_KEYCLOAK_HOST'] = 'unittest-keycloak'
-        os.environ['API_KEYCLOAK_PROTOCOL'] = 'http'
-        os.environ['API_KEYCLOAK_PORT'] = '8080'
-        os.environ['DB_HOST'] = 'unittest-platform-db'
-        os.environ['DB_DATABASE'] = 'platform'
-        os.environ['DB_PASSWORD'] = 'password'
-        os.environ['DB_ADMIN_USER'] = 'root'
-        os.environ['DB_ADMIN_PASSWORD'] = 'password'
-        os.environ['ITA_API_ADMIN_PROTOCOL'] = 'http'
-        os.environ['ITA_API_ADMIN_HOST'] = 'unittest-ita-api-admin'
-        os.environ['ITA_API_ADMIN_PORT'] = '8079'
-
+    if os.environ.get('DOCKER_COMPOSE_UP_UNITTEST_NODE', 'MANUAL') == 'AUTO':
         #
         # Keycloakの起動待ち
         #
@@ -116,3 +119,63 @@ def is_responsive(url):
             return True
     except Exception:
         return False
+
+
+@pytest.fixture(scope='function', autouse=True)
+def data_initalize():
+    """データー初期化
+
+    """
+    #
+    # keycloak token取得
+    #
+    private = DBconnector().get_platform_private()
+    resp_token = api_keycloak_tokens.service_account_get_token(
+        private.token_check_realm_id, private.token_check_client_clientid, private.token_check_client_secret)
+    if resp_token.status_code != 200:
+        raise Exception('FAILED : get keycloak token (tests/conftest.py data_initalize)')
+
+    token = json.loads(resp_token.text).get("access_token")
+
+    #
+    # realm一覧取得
+    #
+    resp_realms = api_keycloak_realms.realms_get(token)
+    if resp_realms.status_code != 200:
+        raise Exception('FAILED : get keycloak realms (tests/conftest.py data_initalize)')
+
+    #
+    # 全レルムキャッシュクリア
+    #
+    keycloak_api_origin = f"{os.environ['API_KEYCLOAK_PROTOCOL']}://{os.environ['API_KEYCLOAK_HOST']}:{os.environ['API_KEYCLOAK_PORT']}"
+    for realm in json.loads(resp_realms.text):
+        resp_cache_clear = requests.post(
+            f"{keycloak_api_origin}/auth/admin/realms/{realm['realm']}/clear-realm-cache",
+            headers={"Content-Type": "application/json", "Authorization": f"Bearer {token}"},
+            json={"realm": realm['realm']})
+
+        if resp_cache_clear.status_code < 200 and resp_cache_clear.status_code > 299:
+            raise Exception('FAILED : clear keycloak realms cache (tests/conftest.py data_initalize)')
+
+    #
+    # データ初期化(platform_db/keycloak)
+    #
+    sql_file = os.path.join(os.path.dirname(__file__), "db", "exports", "pytest2_restore_data.sql")
+    result_command = subprocess.run(
+        f"mysql -u {os.environ['DB_ADMIN_USER']} -p{os.environ['DB_ADMIN_PASSWORD']} -h {os.environ['DB_HOST']} < {sql_file}",
+        shell=True)
+
+    if result_command.returncode != 0:
+        raise Exception('FAILED : mysql command (tests/conftest.py data_initalize)')
+
+    #
+    # organization, workspace database drop
+    #
+    result_command = subprocess.run(
+        f"mysql -u {os.environ['DB_ADMIN_USER']} -p{os.environ['DB_ADMIN_PASSWORD']} -h {os.environ['DB_HOST']} -N -e 'show databases;'" +
+        " | sed -n -e '/^PF_\\(ORG\\|WS\\)_/{s/^/DROP DATABASE /;s/$/;/p}'" +
+        f" | mysql -u {os.environ['DB_ADMIN_USER']} -p{os.environ['DB_ADMIN_PASSWORD']} -h {os.environ['DB_HOST']}",
+        shell=True)
+
+    if result_command.returncode != 0:
+        raise Exception('FAILED : mysql command (tests/conftest.py data_initalize)')
