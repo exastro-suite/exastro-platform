@@ -66,10 +66,17 @@ var api_conf = {
             "detail": {
                 "get": "/api/platform/organizations/{organization_id}",
                 "put": "/api/platform/organizations/{organization_id}",
-            }
+            },
+            "plans": {
+                "get": "/api/platform/{organization_id}/plans",
+                "post": "/api/platform/{organization_id}/plans",
+                "delete": "/api/platform/{organization_id}/plans/{plan_start_datetime}"
+            },
         },
         "plans": {
-            "get": "/api/platform/plans"
+            "get": "/api/platform/plans",
+            "getPlanItem": "/api/platform/plan_items",
+            "post": "/api/platform/plans"
         },
         "maintenance-mode-setting": {
             "get": "/api/{organization_id}/platform/maintenance-mode-setting"

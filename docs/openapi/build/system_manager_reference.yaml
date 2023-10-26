@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: Exastro Platform API (System Management)
   description: Exastro Platform API for System Manager
-  version: 1.6.0
+  version: 1.7.0
 servers:
   - url: 'https://{host}'
     description: API endpoint
@@ -1473,6 +1473,74 @@ components:
             data_update_stop:
               type: string
               example: '0'
+    settingsDestination:
+      title: destination is a definition of Destination resource.
+      type: object
+      properties:
+        id:
+          type: string
+          description: Destination ID is a 26-digit string
+        name:
+          type: string
+          description: Destination name can be any string
+        kind:
+          type: string
+          description: Select destination kind from Mail/Teams/Webhook
+        informations:
+          type: object
+          description: Set the destination information for the destination
+    settingsDestinationList:
+      title: destinationList is list of Destination resources.
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            allOf:
+              - $ref: '#/components/schemas/settingsDestination'
+              - $ref: '#/components/schemas/responseStat'
+    settingsDestinationCreate:
+      title: destination is a definition of Destination resource.
+      type: object
+      properties:
+        id:
+          type: string
+          description: Destination ID is a 26-digit string
+        name:
+          type: string
+          description: Destination name can be any string
+        kind:
+          type: string
+          description: Select destination kind from Mail/Teams/Webhook
+        informations:
+          type: array
+          items:
+            type: object
+            description: Set the destination information for the destination
+      required:
+        - id
+        - name
+        - kind
+        - informations
+    settingsDestinationPut:
+      title: destination is a definition of Destination resource.
+      type: object
+      properties:
+        name:
+          type: string
+          description: Destination name can be any string
+        kind:
+          type: string
+          description: Select destination kind from Mail/Teams/Webhook
+        informations:
+          type: array
+          items:
+            type: object
+            description: Set the destination information for the destination
+      required:
+        - name
+        - kind
+        - informations
   securitySchemes:
     BearerAuth:
       description: Credentials or access token for API

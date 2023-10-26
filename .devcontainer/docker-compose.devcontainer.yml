@@ -77,6 +77,7 @@ services:
       - ../.vscode_extensions/platform-api/.vscode-server/extensions:/home/app_user/.vscode-server/extensions
       - ../.vscode_extensions/platform-api/.vscode-server-insiders/extensions:/home/app_user/.vscode-server-insiders/extensions
     environment:
+      - PLATFORM_REPO_ROOT=${PLATFORM_REPO_ROOT:-}
       - FLASK_ENV=development
       - LOG_LEVEL=DEBUG
       - HTTP_PROXY=${HTTP_PROXY}
@@ -89,7 +90,6 @@ services:
       - SSL_CERT_DIR=/etc/ssl/certs
       - NODE_EXTRA_CA_CERTS=/etc/ssl/certs/ca-certificates.crt
       - NODE_TLS_REJECT_UNAUTHORIZED=${NODE_TLS_REJECT_UNAUTHORIZED:-1}
-
   platform-web:
     build:
       target: develop_build
@@ -203,40 +203,6 @@ services:
       - SSL_CERT_DIR=/etc/ssl/certs
       - NODE_EXTRA_CA_CERTS=/etc/ssl/certs/ca-certificates.crt
       - NODE_TLS_REJECT_UNAUTHORIZED=${NODE_TLS_REJECT_UNAUTHORIZED:-1}
-
-  # platform-job:
-  #   build:
-  #     target: develop_build
-  #   volumes:
-  #     - ..:/workspace:cached
-  #     - ../platform_root/common_library:/workspace/platform_root/platform_job/common_library:cached
-  #     - ../platform_root/common_resources:/workspace/platform_root/platform_job/common_resources:cached
-  #     - ../platform_root/platform_job:/app:cached
-  #     - ../platform_root/common_library:/app/common_library:cached
-  #     - ../platform_root/common_resources:/app/common_resources:cached
-  #     - ../platform_root/version:/app/version:cached
-  #     - ~/.netrc:/home/app_user/.netrc
-  #     - ~/.gitconfig:/home/app_user/.gitconfig
-  #     - ./platform-job/.vscode/launch.json:/workspace/.vscode/launch.json
-  #     - /usr/share/pki/ca-trust-source/anchors/UserRootCertificate.crt:/etc/ssl/certs/ca-certificates.crt
-  #     - /mnt/mainte/talisman/.talismanrc:/mnt/mainte/talisman/.talismanrc
-  #     - ~/.config/git/ignore:/home/app_user/.config/git/ignore
-  #     - ${TALISMAN_HOME}:${TALISMAN_HOME}
-  #     - /var/run/docker.sock:/var/run/docker.sock
-  #     - ../.vscode_extensions/platform-job/.vscode-server/extensions:/home/app_user/.vscode-server/extensions
-  #     - ../.vscode_extensions/platform-job/.vscode-server-insiders/extensions:/home/app_user/.vscode-server-insiders/extensions
-  #   environment:
-  #     - FLASK_ENV=development
-  #     - HTTP_PROXY=${HTTP_PROXY}
-  #     - http_proxy=${HTTP_PROXY}
-  #     - HTTPS_PROXY=${HTTPS_PROXY}
-  #     - https_proxy=${HTTPS_PROXY}
-  #     - NO_PROXY=localhost,127.0.0.1,keycloak,platform-auth,platform-api,platform-web,ita-web,ita-api
-  #     - no_proxy=localhost,127.0.0.1,keycloak,platform-auth,platform-api,platform-web,ita-web,ita-api
-  #     - SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
-  #     - SSL_CERT_DIR=/etc/ssl/certs
-  #     - NODE_EXTRA_CA_CERTS=/etc/ssl/certs/ca-certificates.crt
-  #     - NODE_TLS_REJECT_UNAUTHORIZED=${NODE_TLS_REJECT_UNAUTHORIZED:-1}
 
   ita-api:
     build:

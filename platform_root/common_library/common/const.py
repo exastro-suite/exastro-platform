@@ -40,6 +40,12 @@ length_system_config_value = 4000
 length_system_config_description = 255
 length_limit_id = 255
 length_plan_item_description = 4000
+length_destination_id = 36
+length_destination_name = 255
+length_destination_email = 255
+length_destination_teams_webhook = 1024
+max_destination_email = 500
+max_destination_teams_webhook = 500
 
 # ロール種別
 # Role Kind
@@ -114,4 +120,14 @@ ALL_RESOURCE_COUNT = [
     RESOURCE_COUNT_WORKSPACES,
     RESOURCE_COUNT_USERS,
     RESOURCE_COUNT_ROLES,
+]
+
+# 通知先区分
+# Notification destination kind
+DESTINATION_KIND_MAIL = "Mail"
+DESTINATION_KIND_TEAMS = "Teams"
+
+ALL_DESTINATION_KIND = [
+    DESTINATION_KIND_MAIL,
+    DESTINATION_KIND_TEAMS,
 ]
