@@ -31,7 +31,7 @@ CREATE_TABLES = [
         DESTINATION_NAME	            VARCHAR(255),	                                -- 通知先名
         DESTINATION_KIND	            VARCHAR(20),	                                -- 通知方法(Mail, Teams, Webhook)
         DESTINATION_INFORMATIONS        LONGTEXT,	                                    -- 通知先(Webhook URL, email) (Json形式)
-        EVENT_INFORMATIONS              LONGTEXT,	                                    -- イベント情報 (Json形式)
+        EVENT_TYPE                      LONGTEXT,	                                    -- イベント情報 (Json形式)
         CREATE_TIMESTAMP	            DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,    -- 作成日時
         CREATE_USER	                    VARCHAR(40),	                                -- 作成者
         LAST_UPDATE_TIMESTAMP	        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,    -- 最終更新日時
@@ -48,7 +48,7 @@ CREATE_TABLES = [
         DESTINATION_NAME	            VARCHAR(255),	                                -- 通知先名
         DESTINATION_KIND	            VARCHAR(20),	                                -- 通知方法(Mail, Teams, Webhook)
         DESTINATION_INFORMATIONS        LONGTEXT,	                                    -- 通知先(Webhook URL, email) (Json形式) ※暗号化
-        EVENT_INFORMATIONS              LONGTEXT,	                                    -- イベント情報 (Json形式)
+        EVENT_TYPE                      LONGTEXT,	                                    -- イベント情報 (Json形式)
         FUNC_ID	                        VARCHAR(100),	                                -- 機能ID (メニューID等）
         FUNC_INFORMATIONS	            LONGTEXT,	                                    -- 機能詳細情報(Json形式)
         MESSAGE_INFORMATIONS	        LONGTEXT,	                                    -- 通知メッセージ(Json形式)
