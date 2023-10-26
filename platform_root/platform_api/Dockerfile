@@ -40,23 +40,8 @@ RUN dnf install -y \
     python39 \
     python39-devel \
     python39-mod_wsgi \
-&&  pip3.9 install --upgrade requests \
-&&  pip3.9 install --upgrade pyyaml \
-&&  pip3.9 install --upgrade Werkzeug==2.3.7 \
-&&  pip3.9 install --upgrade Flask==2.2.3 \
-&&  pip3.9 install --upgrade pytz \
-&&  pip3.9 install --upgrade markdown \
-&&  pip3.9 install --upgrade PyJWT \
-&&  pip3.9 install --upgrade python-dotenv \
-&&  pip3.9 install --upgrade flask-log-request-id \
-&&  pip3.9 install --upgrade connexion \
-&&  pip3.9 install --upgrade connexion[swagger-ui] \
-&&  pip3.9 install --upgrade six \
-&&  pip3.9 install --upgrade pymysql \
-&&  pip3.9 install --upgrade pycryptodome \
-&&  pip3.9 install --upgrade email-validator \
-&&  pip3.9 install --upgrade cryptography \
-&&  pip3.9 install --upgrade python-ulid \
+&&  pip3.9 install poetry==1.6.0 \
+&&  poetry config virtualenvs.create false \
 &&  groupadd $GROUPNAME \
 &&  useradd -m -s /bin/bash -g $GROUPNAME $USERNAME \
 &&  setcap 'cap_net_bind_service=+ep' /usr/sbin/httpd \
@@ -65,6 +50,12 @@ RUN dnf install -y \
 &&  chown $USERNAME:$GROUPNAME $APACHE_PID_DIR \
 &&  mkdir -p $APACHE_SOCKET_DIR \
 &&  chown $USERNAME:$GROUPNAME $APACHE_SOCKET_DIR
+
+WORKDIR $APP_PATH
+
+COPY ./platform_root/platform_api/pyproject.toml ./platform_root/platform_api/poetry.lock $APP_PATH/
+RUN poetry install --only first_install
+RUN poetry install --without develop_build
 
 #
 # Build for development
@@ -87,16 +78,6 @@ RUN dnf config-manager --add-repo=https://download.docker.com/linux/centos/docke
     docker-ce-cli \
     jq \
     nodejs \
-&&  pip3.9 install \
-    debugpy \
-    flake8 \
-    autopep8 \
-    pytest \
-    pytest-env \
-    pytest-cov \
-    pytest-docker \
-    pytest-mock \
-    requests-mock \
 &&  npm config set registry http://registry.npmjs.org/ \
 &&  npm -g config set strict-ssl false \
 &&  npm install -g @apidevtools/swagger-cli \
@@ -108,7 +89,6 @@ RUN curl -kL -O https://dev.mysql.com/get/mysql80-community-release-el8-8.noarch
 &&  rpm -ivh mysql80-community-release-el8-8.noarch.rpm \
 &&  dnf install -y mysql-community-client
 
-
 USER $USERNAME
 
 RUN mkdir ~/.config \
@@ -116,6 +96,8 @@ RUN mkdir ~/.config \
 && mkdir ~/.vscode-server-insiders
 
 WORKDIR $APP_PATH
+
+RUN poetry install --with develop_build
 
 COPY ./platform_root/platform_api/config/httpd.conf/httpd.conf /etc/httpd/conf/httpd.conf
 COPY ./platform_root/platform_api/config/httpd.conf/wsgi.conf /etc/httpd/conf.d/wsgi.conf
