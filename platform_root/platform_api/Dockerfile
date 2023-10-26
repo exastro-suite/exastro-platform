@@ -89,6 +89,8 @@ RUN curl -kL -O https://dev.mysql.com/get/mysql80-community-release-el8-8.noarch
 &&  rpm -ivh mysql80-community-release-el8-8.noarch.rpm \
 &&  dnf install -y mysql-community-client
 
+RUN poetry install --with develop_build
+
 USER $USERNAME
 
 RUN mkdir ~/.config \
@@ -96,8 +98,6 @@ RUN mkdir ~/.config \
 && mkdir ~/.vscode-server-insiders
 
 WORKDIR $APP_PATH
-
-RUN poetry install --with develop_build
 
 COPY ./platform_root/platform_api/config/httpd.conf/httpd.conf /etc/httpd/conf/httpd.conf
 COPY ./platform_root/platform_api/config/httpd.conf/wsgi.conf /etc/httpd/conf.d/wsgi.conf
