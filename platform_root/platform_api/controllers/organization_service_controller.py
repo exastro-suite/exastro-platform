@@ -95,6 +95,37 @@ def organization_create(body, retry=None):
         if not validate.ok:
             return common.response_validation_error(validate)
 
+    # オーガナイゼーション管理者数分バリデーションチェックを行う
+    # Perform validation checks for multiple organization administrators
+    for user in org_mng_users:
+        user_name = user.get("username")
+        user_email = user.get("email")
+        user_firstName = user.get("firstName")
+        user_lastName = user.get("lastName")
+        user_enabled = user.get("enabled", "True")
+
+        # validation check
+        validate = validation.validate_user_name(user_name)
+        if not validate.ok:
+            return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
+        validate = validation.validate_user_email(user_email)
+        if not validate.ok:
+            return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
+        validate = validation.validate_user_firstName(user_firstName)
+        if not validate.ok:
+            return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
+        validate = validation.validate_user_lastName(user_lastName)
+        if not validate.ok:
+            return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
+        for pw in user.get("credentials", []):
+            password_temporary = pw.get("temporary", "True")
+            validate = validation.validate_password_temporary(password_temporary)
+            if not validate.ok:
+                return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
+        validate = validation.validate_user_enabled(user_enabled)
+        if not validate.ok:
+            return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
+
     db = DBconnector()
     with closing(db.connect_platformdb()) as conn:
         with conn.cursor(pymysql.cursors.DictCursor) as cursor:
