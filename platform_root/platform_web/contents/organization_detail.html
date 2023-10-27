@@ -197,7 +197,7 @@
                                                     <tr class="tBodyTr tr">
                                                         <td data-id="c1" data-rest="id" class="popup th2" rowspan="1" colspan="1" }="" title="【リソースプラン】" attr-text-id="title=" width="100%;"><div class="ci" text-id="000-85030">【リソースプラン】</div></td>
                                                         <td class="popup th2" rowspan="1" colspan="1" }="" width="100%;"><div class="ci" style="text-align: right;">
-                                                            <button title="リソースプラン設定" attr-text-id="title=" data-action="positive" class="itaButton button button_edit_organization_plan" style="width:200px;">
+                                                            <button title="リソースプラン設定" attr-text-id="title=" id=" button_detail_modal_open" data-action="positive" class="itaButton button button_edit_organization_plan" style="width:200px;">
                                                                 <span class="inner">
                                                                     <span class="iconButtonIcon icon icon-editplan"></span>
                                                                     <span class="iconButtonBody" text-id="">リソースプラン設定</span>
@@ -256,6 +256,34 @@
                 </main>
             </div>
             <div class="containerLoading"></div>
+        </div>
+        <!--
+            Dialog
+        -->
+        <div class="dialog-template" style="display: none">
+            <div id="organization_plan_detail_dialog">
+                <div class="tableContainer" style="width:50vw; height:40vh;">
+                    <div class="tableBody">
+                        <table class="table" width="100%">
+                            <tbody class="tBody">
+                                <tr class="tBodyTr tr">
+                                    <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: left;" text-id="000-85016">リソースプランID</div></td>
+                                    <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci">
+                                        <select class="ci form_plan_id" id="edit_plan_id">
+                                    </div></td>
+                                </tr>
+                                <tr class="tBodyTr tr">
+                                    <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: left;" text-id="000-85016">適用開始日時</div></td>
+                                    <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci">
+                                        <input type="text" data-timeflag="true" placeholder="yyyy-MM-dd HH:mm:ss" id="edit_start_time" class="executeSchedule inputDate inputText input" autocomplete="off"></div>
+                                        <span class="validate_error" id="message_plans"></span>
+                                    </div></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
     </body>
 </html>
