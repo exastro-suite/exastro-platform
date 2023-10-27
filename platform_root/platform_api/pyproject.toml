@@ -20,7 +20,7 @@ six = ">=0.0.0"
 pymysql = ">=0.0.0"
 pycryptodome = ">=0.0.0"
 email-validator = ">=0.0.0"
-cryptography = ">=0.0.0"
+cryptography = "^40.0.0"
 python-ulid = ">=0.0.0"
 
 
