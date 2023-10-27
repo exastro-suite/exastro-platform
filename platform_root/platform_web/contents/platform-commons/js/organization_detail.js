@@ -31,6 +31,8 @@ $(function(){
             call_api_promise_get_organization_detail(),
             // get plan of the organization
             call_api_promise_get_organization_plans(),
+            // get plans
+            call_api_promise_get_plans(),
 
         ]).then(function(results) {
             // Display Menu
@@ -41,7 +43,7 @@ $(function(){
                 {"text": getText("000-85027", "オーガナイゼーション詳細"), "href": location_conf.href.organizations.detail.replace(/{organization_id}/g, organization_id) },
             ]);
             // display_main(results[1].data);
-            display_main(results[1].data, results[2].data);
+            display_main(results[1].data, results[2].data, results[3].data);
             finish_onload_progress();
 
         }).catch((e) => {
@@ -76,7 +78,20 @@ $(function(){
         });
     }
 
-    function display_main(row, plans) {
+    function call_api_promise_get_plans() {
+        return call_api_promise({
+            type: "GET",
+                url: api_conf.api.plans.get,
+                headers: {
+                    Authorization: "Bearer " + CommonAuth.getToken(),
+                },
+                contentType: "application/json",
+                dataType: "json",
+                
+        })
+    }
+
+    function display_main(row, org_plans,plans) {
         console.log("[CALL] display_main");
 
         //
@@ -116,8 +131,13 @@ $(function(){
         //
         // オーガナイゼーションに紐づいているリソースプラン一覧の表示 - plan of the organization list display
         //
-        display_organization_plan_list(plans);
+        display_organization_plan_list(org_plans);
 
+        //
+        //リソースプランIDの一覧をモーダルに表示
+        //
+        display_org_plans_list(plans);
+    
         //
         // オーガナイゼーションにリソースプランを設定 - set plan to the organization
         //
@@ -134,6 +154,55 @@ $(function(){
         });
         $('.button_delete_organization_plan').prop('disabled', false);
 
+    }
+
+    //
+    //以下今後共通化する部分(~206)
+    //
+
+    function display_org_plans_list(plans){
+
+        //
+        // List configurable plans list
+        // プラン一覧をリスト化する
+        //
+
+        planListData = [];
+        for(let row of plans) {
+            planListData.push({
+                plan_id: row.id,
+                plan_name: row.name,
+                last_update_timestamp: row.last_update_timestamp,
+            });
+        }
+
+        //
+        // Display a list of plans
+        // プラン一覧を表示する
+        //
+
+        const sortKey = 'last_update_timestamp';
+        const sortreverse = 1;
+        planListData.sort(function(a, b){
+            const as = a[sortKey].toLowerCase(), bs = b[sortKey].toLowerCase();
+            if ( as < bs ) {
+                return sortreverse * 1;
+            } else if ( as > bs ) {
+                return sortreverse * -1;
+            } else {
+                return 0;
+            }
+        });
+
+        let html = '';
+        $(".form_plan_id").children().remove();
+        $('.form_plan_id').append($('<option>').html('').val(''));
+        for(var row of planListData) {
+            if (fn.cv(row.plan_id,'',true).charAt(0) != '_')
+            {
+                $('.form_plan_id').append($('<option>').html(fn.cv(row.plan_id,'',true)+':'+fn.cv(row.plan_name,'',true)).val(fn.cv(row.plan_id,'',true)));
+            }
+        }
     }
 
     //
@@ -267,6 +336,10 @@ $(function(){
     // オーガナイゼーションにリソースプランを設定 - set plan to the organization
     //
     // モーダル画面表示
+    $('#button_detail_modal_open').on('click',() => {
+        edit_organization_plan_open();
+    });
+
     function edit_organization_plan_open() {
         console.log("[CALL] edit_organization_plan_open");
 
@@ -286,20 +359,71 @@ $(function(){
         },
         {
             set: function() {
-                $(edit_dialog.$.dbody).find()
-                edit_dialog.close();
-                if(onSet !== null) {
-                    onSet();
-                }
+                
+                modal_edit_button(edit_dialog);
+                // edit_dialog.close();
+        //         if(onSet !== null) {
+        //             onSet();
+        //         }
             },
             cancel: function() {
                 edit_dialog.close();
-                if(onCancel !== null) {
-                    onCancel();
-                }
+        //         if(onCancel !== null) {
+        //             onCancel();
+        //         }
             }
         });
-        edit_dialog.open('<div class="alertMessage" style="margin-left: 30px; margin-right: 30px;"></div>');
+        edit_dialog.open($("#organization_plan_detail_dialog").html());
+        console.log("edit_dialog:");
+        console.log(edit_dialog);
+
+        const dialogBody = $(edit_dialog.$.dbody);
+    }    
+
+    //
+    // モーダル画面の設定ボタン
+    //
+    function modal_edit_button(dialog) {
+        const dialogBody = $(dialog.$.dbody)
+
+        let reqbody =   {
+            "id":dialogBody.find("#edit_plan_id").val(),
+            "start_datetime":dialogBody.find("#edit_start_time").val(),
+        }
+
+        // APIを呼出す
+        show_progress();
+        call_api_promise({
+            type: "POST",
+            url: api_conf.api.organizations.plans.post.replace(/{organization_id}/g, organization_id),
+            headers: {
+                Authorization: "Bearer " + CommonAuth.getToken(),
+            },
+            data: JSON.stringify(reqbody),
+            contentType: "application/json",
+            dataType: "json",
+        }).then(() => {
+            // 一覧の再取得
+            return Promise.all([
+                // get organization List
+                call_api_promise_get_organization_detail(),
+                // get plan of the organization
+                call_api_promise_get_organization_plans(),
+                // get plans
+                call_api_promise_get_plans(),
+            ]);
+        }).then((results) => {
+            // 一覧の再描画
+            display_main(results[0].data, results[1].data, results[2].data);
+            // enabled_button();
+            hide_progress();
+            alertMessage(getText("000-80018", "処理結果"),getText("000-", "リソースプランを設定しました"),() => {
+                dialog.close();
+            })
+        }).catch(() => {
+            // enabled_button();
+            hide_progress();
+        });
     }
 
     //
@@ -328,14 +452,16 @@ $(function(){
                 }).then(() => {
                     // 一覧の再取得
                     return Promise.all([
-                        // get organizations
+                        // gget organization List
                         call_api_promise_get_organization_detail(),
-                        // get plans
+                        // get plan of the organization
                         call_api_promise_get_organization_plans(),
+                        // get plans
+                        call_api_promise_get_plans(),
                     ]);
                 }).then((results) => {
                     // 一覧の再描画
-                    display_main(results[0].data, results[1].data);
+                    display_main(results[0].data, results[1].data, results[2].data);
                     // enabled_button();
                     hide_progress();
                     alertMessage(getText("000-80018", "処理結果"), getText("", "リソースプランを削除しました。"));
