@@ -16,7 +16,7 @@ import requests_mock
 from tests.common import request_parameters, test_common
 
 
-def test_organization_series_of_step(connexion_client):
+def test_organization_scenario(connexion_client):
     with requests_mock.Mocker() as requests_mocker:
         test_common.requsts_mocker_setting(requests_mocker)
         response = connexion_client.post(

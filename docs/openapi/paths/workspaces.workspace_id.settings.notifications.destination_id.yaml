@@ -42,7 +42,7 @@ get:
           schema:
             allOf:
               - $ref: '../schemas/responseOk.yaml'
-              - $ref: '../schemas/settings.destination.yaml'
+              - $ref: '../schemas/settings.destinationOne.yaml'
     default:
       description: An unexpected error response.
       content:

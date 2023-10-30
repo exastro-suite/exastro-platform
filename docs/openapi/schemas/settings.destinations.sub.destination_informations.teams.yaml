@@ -12,28 +12,9 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-value:
-  {
-    "name": "destinations of mail settings",
-    "kind": "Mail",
-    "conditions": {
-      "ita.event_type.new": false,
-      "ita.event_type.evaluated": false,
-      "ita.event_type.time_out": true,
-      "ita.event_type.undetected": true
-    },
-    "destination_informations": [
-      {
-        "address_header": "to",
-        "mail": "mike@example.com"
-      },
-      {
-        "address_header": "cc",
-        "mail": "tommy@example.com"
-      },
-      {
-        "address_header": "bcc",
-        "mail": "nancy@example.com"
-      }
-    ]
-  }
+title: destinations destination_informations(teams) resource.
+type: object
+properties:
+  webhook:
+    type: string
+    description: teams webhook url
