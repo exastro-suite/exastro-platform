@@ -18,7 +18,13 @@ value:
       "id": "00000001Z7ZXFAED6872F6C9W9",
       "name": "destinations of teams settings",
       "kind": "Teams",
-      "informations": [
+      "conditions": {
+        "ita.event_type.new": false,
+        "ita.event_type.evaluated": false,
+        "ita.event_type.time_out": true,
+        "ita.event_type.undetected": true
+      },
+      "destination_informations": [
         { "webhook": "https://xxxxxxxx.webhook.office.com/webhookb/xxxxxxxx-xxxxxx-xxxx-xxxx-xxxxxxxxxxxx" },
         { "webhook": "https://xxxxxxxx.webhook.office.com/webhookb/xxxxxxxx-xxxxxx-xxxx-xxxx-xxxxxxxxxxxx" },
         { "webhook": "https://xxxxxxxx.webhook.office.com/webhookb/xxxxxxxx-xxxxxx-xxxx-xxxx-xxxxxxxxxxxx" }

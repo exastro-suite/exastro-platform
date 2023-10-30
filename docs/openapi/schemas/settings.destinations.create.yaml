@@ -24,13 +24,19 @@ properties:
   kind:
     type: string
     description: Select destination kind from Mail/Teams/Webhook
-  informations:
+  conditions:
+    $ref: './settings.destinations.sub.conditions.yaml' 
+  destination_informations:
     type: array
     items:
       type: object
       description: Set the destination information for the destination
+      anyOf:
+        - $ref: './settings.destinations.sub.destination_informations.mail.yaml'
+        - $ref: './settings.destinations.sub.destination_informations.teams.yaml'
 required:
   - id
   - name
   - kind
-  - informations
+  - conditions
+  - destination_informations

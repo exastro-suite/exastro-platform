@@ -1,0 +1,62 @@
+# not quate strings
+@sys-user-id = admin
+@sys-user-pw = password
+@org-user-id = admin
+@org-user-pw = password
+@base_sys_url = http://platform-auth:{{sys-mng-port}}
+@base_org_url = http://platform-auth:{{org-mng-port}}
+
+# share org_id (同じものを複数記載すると最後の設定値が渡される)
+@org_id = org1
+
+# share ws_id (同じものを複数記載すると最後の設定値が渡される)
+@ws_id = ws1
+
+# 1 api to ### 
+
+
+### Create Notifications(kind=mail)
+POST {{base_org_url}}/api/{{org_id}}/platform/workspaces/{{ws_id}}/settings/notifications
+Authorization: Basic {{org-user-id}} {{org-user-pw}}
+content-type: application/json
+
+[
+  {
+    "id": "destination-mail-01",
+    "name": "name of mail destination",
+    "kind": "Mail",
+    "destination_informations": [{
+        "address_header": "to",
+        "email": "example@example.com"
+    }],
+    "conditions": {
+        "ita.event_type.new": true,
+        "ita.event_type.evaluated": false,
+        "ita.event_type.time_out": true,
+        "ita.event_type.undetected": false
+    }
+  }
+]
+
+
+### Create Notifications(kind=teams)
+POST {{base_org_url}}/api/{{org_id}}/platform/workspaces/{{ws_id}}/settings/notifications
+Authorization: Basic {{org-user-id}} {{org-user-pw}}
+content-type: application/json
+
+[
+  {
+    "id": "destination-teams-01",
+    "name": "name of teams destination",
+    "kind": "Teams",
+    "destination_informations": [{
+      "webhook": "https://example.com/teams"
+    }],
+    "conditions": {
+        "ita.event_type.new": true,
+        "ita.event_type.evaluated": false,
+        "ita.event_type.time_out": true,
+        "ita.event_type.undetected": false
+    }
+  }
+]

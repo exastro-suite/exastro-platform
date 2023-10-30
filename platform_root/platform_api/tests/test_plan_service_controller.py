@@ -15,7 +15,7 @@ import requests_mock
 from tests.common import request_parameters, test_common
 
 
-def test_plan_list(connexion_client):
+def test_plan_scenario(connexion_client):
     with requests_mock.Mocker() as requests_mocker:
         test_common.requsts_mocker_setting(requests_mocker)
 

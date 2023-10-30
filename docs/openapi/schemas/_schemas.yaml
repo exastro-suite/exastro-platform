@@ -126,8 +126,16 @@ settingsDestination:
   $ref: "./settings.destination.yaml"
 settingsDestinationList:
   $ref: "./settings.destinationList.yaml"
+settingsDestinationOne:
+  $ref: "./settings.destinationOne.yaml"
 settingsDestinationCreate:
   $ref: "./settings.destinations.create.yaml"
 settingsDestinationPut:
   $ref: "./settings.destinations.put.yaml"
+settingsDestinationSubDestinationInformationsMail:
+  $ref: "./settings.destinations.sub.destination_informations.mail.yaml"
+settingsDestinationSubDestinationInformationsTeams:
+  $ref: "./settings.destinations.sub.destination_informations.teams.yaml"
+settingsDestinationConditions:
+  $ref: "./settings.destinations.sub.conditions.yaml"
 

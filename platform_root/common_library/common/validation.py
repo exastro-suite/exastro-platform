@@ -12,7 +12,6 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-import os
 import re
 from datetime import datetime
 import urllib.parse
@@ -1033,6 +1032,12 @@ def validate_maintenance_mode(config_key, config_value):
 
 
 def validate_destinations(body):
+    if type(body) is not list:
+        return result(
+            False, 400, '400-{}002'.format(MSG_FUNCTION_ID), 'リクエストボディのパラメータ({0})が不正です。',
+            'Json'
+        )
+        
     if len(body) == 0:
         return result(
             False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
@@ -1131,8 +1136,8 @@ def validate_destination_kind(destination_kind):
     return result(True)
 
 
-def validate_destination_info(destination_kind, destination_info):
-    """validate destination_info
+def validate_destination_informations(destination_kind, destination_info):
+    """validate destination_informations
 
     Args:
         destination_info (dict): destination_info
@@ -1140,12 +1145,19 @@ def validate_destination_info(destination_kind, destination_info):
     Returns:
         result: Validation result
     """
+    if type(destination_info) is not list:
+        return result(
+            False, 400, '400-{}002'.format(MSG_FUNCTION_ID), 'リクエストボディのパラメータ({0})が不正です。',
+            'destination_informations'
+        )
+
+    if len(destination_info) == 0:
+        return result(
+            False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
+            multi_lang.get_text('000-00150', "通知先")
+        )
+
     if destination_kind == const.DESTINATION_KIND_MAIL:
-        if len(destination_info) == 0:
-            return result(
-                False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
-                multi_lang.get_text('000-00148', "通知先email")
-            )
             
         if len(destination_info) > const.max_destination_email:
             return result(
@@ -1155,13 +1167,26 @@ def validate_destination_info(destination_kind, destination_info):
             )
 
         for row in destination_info:
-            if row.get('mail') is None or row.get('mail') == "":
+            if row.get('address_header') is None or row.get('address_header') == "":
+                return result(
+                    False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
+                    multi_lang.get_text('000-00151', "通知先emailヘッダー")
+                )
+
+            if row.get('address_header') not in const.ALL_MAIL_HEADER:
+                return result(
+                    False, 400, '400-{}026'.format(MSG_FUNCTION_ID), '{0}以外の{1}は指定できません',
+                    "/".join(const.ALL_MAIL_HEADER),
+                    multi_lang.get_text('000-00151', "通知先emailヘッダー")
+                )
+
+            if row.get('email') is None or row.get('email') == "":
                 return result(
                     False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
                     multi_lang.get_text('000-00148', "通知先email")
                 )
 
-            if len(row['mail']) > const.length_destination_email:
+            if len(row['email']) > const.length_destination_email:
                 return result(
                     False, 400, '400-{}012'.format(MSG_FUNCTION_ID), '指定可能な文字数を超えています。(項目:{0},最大文字数:{1})',
                     multi_lang.get_text('000-00148', "通知先email"),
@@ -1170,7 +1195,7 @@ def validate_destination_info(destination_kind, destination_info):
 
             try:
                 # Check that the email address is valid.
-                validate_email(row['mail'], check_deliverability=False, allow_smtputf8=False)
+                validate_email(row['email'], check_deliverability=False, allow_smtputf8=False)
 
             except EmailNotValidError:
                 return result(
@@ -1179,12 +1204,6 @@ def validate_destination_info(destination_kind, destination_info):
                 )
 
     if destination_kind == const.DESTINATION_KIND_TEAMS:
-        if len(destination_info) == 0:
-            return result(
-                False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
-                multi_lang.get_text('000-00149', "通知先Teams webhook")
-            )
-
         if len(destination_info) > const.max_destination_teams_webhook:
             return result(
                 False, 400, '400-{}018'.format(MSG_FUNCTION_ID), '指定可能な最大数を超えています。(項目:{0},最大数:{1})',
@@ -1216,5 +1235,48 @@ def validate_destination_info(destination_kind, destination_info):
                     False, 400, '400-{}027'.format(MSG_FUNCTION_ID), 'URLの形式に誤りがあります。({0}）',
                     multi_lang.get_text('000-00149', "通知先Teams webhook")
                 )
+
+    return result(True)
+
+
+def validate_destination_conditions(conditions):
+    """validate destination conditions
+
+    Args:
+        event_type (dict): conditions
+
+    Returns:
+        result: Validation result
+    """
+    for key, value in conditions.items():
+        if key not in const.ALL_CONDITIONS:
+            return result(
+                False, 400, '400-{}002'.format(MSG_FUNCTION_ID), 'リクエストボディのパラメータ({0})が不正です。',
+                f'conditions.{key}'
+            )
+
+    if type(conditions.get(const.CONDITIONS_ITA_EVENT_TYPE_NEW)) is not bool:
+        return result(
+            False, 400, '400-{}024'.format(MSG_FUNCTION_ID), 'True/False 以外が指定されています。({0})',
+            multi_lang.get_text('000-00153', "新規イベント")
+        )
+
+    if type(conditions.get(const.CONDITIONS_ITA_EVENT_TYPE_EVALUATED)) is not bool:
+        return result(
+            False, 400, '400-{}024'.format(MSG_FUNCTION_ID), 'True/False 以外が指定されています。({0})',
+            multi_lang.get_text('000-00154', "既知（判定済み）")
+        )
+
+    if type(conditions.get(const.CONDITIONS_ITA_EVENT_TYPE_TIME_OUT)) is not bool:
+        return result(
+            False, 400, '400-{}024'.format(MSG_FUNCTION_ID), 'True/False 以外が指定されています。({0})',
+            multi_lang.get_text('000-00155', "既知（時間切れ）")
+        )
+
+    if type(conditions.get(const.CONDITIONS_ITA_EVENT_TYPE_ITA_UNDETECTED)) is not bool:
+        return result(
+            False, 400, '400-{}024'.format(MSG_FUNCTION_ID), 'True/False 以外が指定されています。({0})',
+            multi_lang.get_text('000-00156', "未知")
+        )
 
     return result(True)
