@@ -281,6 +281,7 @@ $(function(){
         $('.button_edit_organization').prop('disabled', true);
         $('.button_delete_organization').prop('disabled', true);
         $('.button_delete_organization_plan').prop('disabled', true);
+        $('.button_edit_organization_plan').prop('disabled', true);
     }
 
     //
@@ -383,7 +384,7 @@ $(function(){
         console.log(edit_dialog);
 
         const dialogBody = $(edit_dialog.$.dbody);
-        
+
         // set event
         dialogBody.find('#btn_start_time').on('click', function() {
 
@@ -408,27 +409,27 @@ $(function(){
 
         // validate plan id
         if(dialogBody.find("#edit_plan_id").val() === "") {
-            dialogBody.find("#message_edit_plans").text(getText("400-00011", "必須項目が不足しています。({0})", getText("000-00", "リソースプランID")));
+            dialogBody.find("#message_edit_plan_id").text(getText("400-00011", "必須項目が不足しています。({0})", getText("000-00", "リソースプランID")));
             result = false;
         } else {
-            dialogBody.find("#message_edit_plans").text("");
+            dialogBody.find("#message_edit_plan_id").text("");
         }
 
         // validate start time
         if(dialogBody.find("#edit_start_time").val() === "") {
-            dialogBody.find("#message_plans").text(
+            dialogBody.find("#message_edit_start_time").text(
                 getText("400-00011", "必須項目が不足しています。({0})", getText("000-00128", "適用開始日時")));
             result = false;
 
-        } else if(dialogBody.find("#edit_start_time").val().replace(/[0-9-:]/g,"") !== "") {
-            dialogBody.find("#message_plans").text(
+        } else if(dialogBody.find("#edit_start_time").val().replace(/[0-9-: ]/g,"") !== "") {
+            dialogBody.find("#message_edit_start_time").text(
                 getText("400-00017", "指定できない文字が含まれています。(項目:{0},指定可能な文字:{1})",
-                    getText("000-00128", "適用開始日時"),
+                    getText("000-00", "適用開始日時"),
                     getText("000-", "半角数字・ハイフン")));
             result = false;
 
         } else {
-            dialogBody.find("#message_plans").text("");
+            dialogBody.find("#message_edit_start_time").text("");
         }
 
 
