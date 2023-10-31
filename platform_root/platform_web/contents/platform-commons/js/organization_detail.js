@@ -383,6 +383,18 @@ $(function(){
         console.log(edit_dialog);
 
         const dialogBody = $(edit_dialog.$.dbody);
+        
+        // set event
+        dialogBody.find('#btn_start_time').on('click', function() {
+
+            $input = dialogBody.find("#edit_start_time");
+
+            fn.datePickerDialog('date', true, getText("000-85016", "適用開始日時"), $input.val() ).then(function( result ){
+                if ( result !== 'cancel') {
+                    $input.val( result.date ).change().focus().trigger('input');
+                }
+            });
+        });
     }
     
     //
@@ -424,6 +436,7 @@ $(function(){
 
         return result;
     }
+        
 
     //
     // モーダル画面の設定ボタン

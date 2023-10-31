@@ -790,6 +790,7 @@ calendar: function( setDate, currentDate, startDate, endDate ){
 ##################################################
 */
 datePicker: function( timeFlag, className, date, start, end ) {
+    const monthText = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月']
     
     date = ( date && !isNaN( new Date( date ) ) )? new Date( date ): new Date();
     
@@ -933,20 +934,73 @@ datePicker: function( timeFlag, className, date, start, end ) {
         </ul>
     </div>`);
     
+    const nowCalender = function( clearFlag ) {
+        const now = new Date();
+
+        const $h = $datePicker.find('.datePickerHourInput'),
+              $m = $datePicker.find('.datePickerMinInput'),
+              $s = $datePicker.find('.datePickerSecInput');
+
+        year = now.getFullYear();
+        month = now.getMonth();
+        day =  now.getDate();
+
+        $year.text( year );
+        $month.text( monthText[month] );
+
+        if ( clearFlag ) {
+            inputDate = null;
+            $date.val('').change();
+            $cal.html( cmn.calendar( now ) );
+
+            if ( timeFlag ) {
+                if ( className === 'datePickerToDateText') {
+                    hour = 23;
+                    min = 59;
+                    sec = 59;
+                } else {
+                    hour = min = sec = 0;
+                }
+            }
+        } else {
+            if ( timeFlag ) {
+                hour = now.getHours();
+                min = now.getMinutes();
+                sec = now.getSeconds();
+            }
+            setInputDate();
+            $cal.html( cmn.calendar( inputDate, inputDate, start, end ) );
+        }
+
+        if ( timeFlag ) {
+            $h.val( hour ).trigger('input');
+            $m.val( min ).trigger('input');
+            $s.val( sec ).trigger('input');
+        }
+    };
+
     $datePicker.find('.datePickerMenuButton').on('click', function(){
         const $button = $( this ),
               type = $button.attr('data-type');
         switch ( type ) {
             case 'current':
-                
+                nowCalender( false );
             break;
             case 'clear':
-            
+                nowCalender( true );
             break;
         }
     });
     
     return $datePicker;
+},
+/*
+##################################################
+   Check date
+##################################################
+*/
+checkDate: function( date ) {
+    return !Number.isNaN( new Date( date ).getTime() );
 },
 /*
 ##################################################
@@ -958,7 +1012,7 @@ datePickerDialog: function( type, timeFlag, title, date ){
         const funcs = {
             ok: function() {
                 const result = {};
-                
+
                 if ( type === 'fromTo') {
                     result.from = $dataPicker.find('.datePickerFromDateText').val();
                     result.to = $dataPicker.find('.datePickerToDateText').val();
@@ -968,22 +1022,26 @@ datePickerDialog: function( type, timeFlag, title, date ){
 
                 dialog.close().then(function(){
                     resolve( result );
+                    dialog = null;
                 });
             },
             cancel: function() {
-                dialog.close().then(function(){ resolve('cancel') });
+                dialog.close().then(function(){
+                    resolve('cancel');
+                    dialog = null;
+                });
             }
         };
-        
+
         const buttons = {
-            ok: { text: '反映', action: 'default'},
-            cancel: { text: 'キャンセル', action: 'normal'}
+            ok: { text: "適用", action: 'default', style: 'width:160px;'},
+            cancel: { text: "キャンセル", action: 'normal'}
         };
-        
+
         const config = {
             mode: 'modeless',
             position: 'center',
-            width: '720px',
+            width: 'auto',
             header: {
                 title: title,
                 close: false,
@@ -993,22 +1051,25 @@ datePickerDialog: function( type, timeFlag, title, date ){
                 button: buttons
             }
         };
-        
-        const dialog = new Dialog( config, funcs );
-        
+
+        let dialog = new Dialog( config, funcs );
+
         // Data picker
         const $dataPicker = $('<div/>', {
             'class': 'datePickerContainer'
         });
-            
+
         if ( type === 'fromTo') {
             $dataPicker.addClass('datePickerFromToContainer').html(`<div class="datePickerFrom"></div>`
             + `<div class="datePickerTo"></div>`);
 
+            if ( !cmn.checkDate( date.from ) ) date.from = '';
+            if ( !cmn.checkDate( date.to ) ) date.to = '';
+
             $dataPicker.find('.datePickerFrom').html( cmn.datePicker( timeFlag, 'datePickerFromDateText', date.from, null, date.to ) );
             $dataPicker.find('.datePickerTo').html( cmn.datePicker( timeFlag, 'datePickerToDateText', date.to, date.from, null ) );
-            
-            // 日付の入力をチェックする
+
+            // FromTo相互で日付の入力をチェックする
             $dataPicker.find('.datePickerFromDateText').on('change', function(){
                 const val = $( this ).val();
                 $dataPicker.find('.datePickerTo').find('.datePickerDateStart').val( val ).change();
@@ -1017,14 +1078,13 @@ datePickerDialog: function( type, timeFlag, title, date ){
                 const val = $( this ).val();
                 $dataPicker.find('.datePickerFrom').find('.datePickerDateEnd').val( val ).change();
             });
-            
+
         } else {
-            $dataPicker.html( cmn.datePicker( timeFlag, null, date ) );
+            if ( !cmn.checkDate( date ) ) date = '';
+            $dataPicker.html( cmn.datePicker( timeFlag, 'datePickerDateText', date ) );
         }
-        
+
         dialog.open( $dataPicker );
-        
-     
     });
 },
 /*

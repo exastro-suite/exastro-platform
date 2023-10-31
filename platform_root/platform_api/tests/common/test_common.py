@@ -100,3 +100,4 @@ def create_workspace(connexion_client, organization_id, workspace_id, workspace_
     return {
         "workspace_id": workspace_id
     }
+

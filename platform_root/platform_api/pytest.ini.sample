@@ -31,7 +31,7 @@ env =
     ;       起動を待つ時間が省かれるのでunit testの実行時間が短くて済みます
     ;
     ;       unit test用のコンテナを起動コマンド(devcontainer内から実行)
-    ;           sudo docker compose -f /workspace/platform_root/platform_api/tests/docker-compose.yml up
+    ;           ./platform_root/platform_api/tests/docker-compose-up.sh
     ;
     ;   DOCKER_COMPOSE_UP_UNITTEST_NODE=AUTO
     ;       自動でunit test用のコンテナを起動・停止します

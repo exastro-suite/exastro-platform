@@ -63,6 +63,7 @@ def settings_destination_put(body, organization_id, workspace_id, destination_id
     """
     return 'do some magic!'
 
+
 @common.platform_exception_handler
 def settings_notification_create(body, organization_id, workspace_id):  # noqa: E501
     """Create creates an settings notifications
@@ -85,16 +86,19 @@ def settings_notification_create(body, organization_id, workspace_id):  # noqa: 
         return common.response_validation_error(validate)
             
     for row in body:
-        validate = validation.validate_destination_id(row['id'])
+        validate = validation.validate_destination_id(row.get('id'))
         if not validate.ok:
             return common.response_validation_error(validate)
-        validate = validation.validate_destination_name(row['name'])
+        validate = validation.validate_destination_name(row.get('name'))
         if not validate.ok:
             return common.response_validation_error(validate)
-        validate = validation.validate_destination_kind(row['kind'])
+        validate = validation.validate_destination_kind(row.get('kind'))
         if not validate.ok:
             return common.response_validation_error(validate)
-        validate = validation.validate_destination_info(row['kind'], row['informations'])
+        validate = validation.validate_destination_informations(row.get('kind'), row.get('destination_informations'))
+        if not validate.ok:
+            return common.response_validation_error(validate)
+        validate = validation.validate_destination_conditions(row.get('conditions'))
         if not validate.ok:
             return common.response_validation_error(validate)
 
@@ -105,10 +109,11 @@ def settings_notification_create(body, organization_id, workspace_id):  # noqa: 
             for row in body:
                 try:
                     parameter = {
-                        "destination_id": row['id'],
-                        "destination_name": row['name'],
-                        "destination_kind": row['kind'],
-                        "destination_info": encrypt.encrypt_str(json.dumps(row['informations'])),
+                        "destination_id": row.get('id'),
+                        "destination_name": row.get('name'),
+                        "destination_kind": row.get('kind'),
+                        "destination_informations": encrypt.encrypt_str(json.dumps(row.get('destination_informations'))),
+                        "conditions": json.dumps(row.get('conditions')),
                         "create_user": user_id,
                         "last_update_user": user_id
                     }
@@ -116,7 +121,7 @@ def settings_notification_create(body, organization_id, workspace_id):  # noqa: 
                         cursor.execute(queries_notification.SQL_INSERT_NOTIFICATION_DESTINATION, parameter)
                     except pymysql.err.IntegrityError:
                         # Duplicate PRIMARY KEY
-                        message_id = f"400-{MSG_FUNCTION_ID}004"
+                        message_id = f"400-{MSG_FUNCTION_ID}001"
                         message = multi_lang.get_text(
                             message_id,
                             "指定された通知先はすでに存在しているため作成できません(id:{0})",
