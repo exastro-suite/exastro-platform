@@ -15,6 +15,8 @@
 import requests_mock
 from tests.common import request_parameters, test_common
 
+from common_library.common import const, validation
+
 
 def test_organization_scenario(connexion_client):
     """organization service scenario test
@@ -149,6 +151,39 @@ def test_organization_scenario(connexion_client):
             headers=request_parameters.request_headers())
 
         assert response.status_code == 500, "get organization response code"
+
+
+def test_organization_validate(connexion_client):
+    #
+    # validate : id
+    #
+    # validate : id = None
+    validate = validation.validate_organization_id(None)
+    assert not validate.ok, "organization_id : None"
+
+    # validate : id maxlength
+    validate = validation.validate_organization_id("a".ljust(const.length_destination_id, "_"))
+    assert validate.ok, "organization_id = max length"
+
+    # validate : id maxlength + 1
+    validate = validation.validate_organization_id("a".ljust(const.length_destination_id + 1, "_"))
+    assert not validate.ok, "organization_id = max length + 1"
+
+    # validate : id invalid char
+    validate = validation.validate_organization_id("a*")
+    assert not validate.ok, "organization_id = invalid char"
+
+    # validate : id upper char
+    validate = validation.validate_organization_id("ABC")
+    assert not validate.ok, "organization_id = upper char"
+
+    # validate : id invalid first char
+    validate = validation.validate_organization_id("_a")
+    assert not validate.ok, "organization_id = invalid first char"
+
+    # validate : id invalid first char
+    validate = validation.validate_organization_id("master")
+    assert not validate.ok, "organization_id = reseved word"
 
 
 def sample_data_organization(id, update={}):
