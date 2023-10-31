@@ -205,6 +205,9 @@ $(function(){
         }
     }
 
+
+// 
+
     //
     // オーガナイゼーション管理者一覧の表示 - display organization managers list
     //
@@ -278,6 +281,7 @@ $(function(){
         $('.button_edit_organization').prop('disabled', true);
         $('.button_delete_organization').prop('disabled', true);
         $('.button_delete_organization_plan').prop('disabled', true);
+        $('.button_edit_organization_plan').prop('disabled', true);
     }
 
     //
@@ -359,12 +363,14 @@ $(function(){
         },
         {
             set: function() {
-                
+                if( ! validate_register(edit_dialog) ) {
+                    return;
+                }
                 modal_edit_button(edit_dialog);
-                // edit_dialog.close();
-        //         if(onSet !== null) {
-        //             onSet();
-        //         }
+                edit_dialog.close();
+                if(onSet !== null) {
+                    onSet();
+                }
             },
             cancel: function() {
                 edit_dialog.close();
@@ -378,7 +384,7 @@ $(function(){
         console.log(edit_dialog);
 
         const dialogBody = $(edit_dialog.$.dbody);
-        
+
         // set event
         dialogBody.find('#btn_start_time').on('click', function() {
 
@@ -390,8 +396,48 @@ $(function(){
                 }
             });
         });
+    }
+    
+    //
+    // validate register
+    //
+    function validate_register(dialog) {
+        const dialogBody = $(dialog.$.dbody);
+        
+        console.log("--- validate check start ----");
+        let result=true;
 
-    }    
+        // validate plan id
+        if(dialogBody.find("#edit_plan_id").val() === "") {
+            dialogBody.find("#message_edit_plan_id").text(getText("400-00011", "必須項目が不足しています。({0})", getText("000-00", "リソースプランID")));
+            result = false;
+        } else {
+            dialogBody.find("#message_edit_plan_id").text("");
+        }
+
+        // validate start time
+        if(dialogBody.find("#edit_start_time").val() === "") {
+            dialogBody.find("#message_edit_start_time").text(
+                getText("400-00011", "必須項目が不足しています。({0})", getText("000-00128", "適用開始日時")));
+            result = false;
+
+        } else if(dialogBody.find("#edit_start_time").val().replace(/[0-9-: ]/g,"") !== "") {
+            dialogBody.find("#message_edit_start_time").text(
+                getText("400-00017", "指定できない文字が含まれています。(項目:{0},指定可能な文字:{1})",
+                    getText("000-00", "適用開始日時"),
+                    getText("000-", "半角数字・ハイフン")));
+            result = false;
+
+        } else {
+            dialogBody.find("#message_edit_start_time").text("");
+        }
+
+
+        console.log("--- validate check end [" + result + "] ----");
+
+        return result;
+    }
+        
 
     //
     // モーダル画面の設定ボタン
