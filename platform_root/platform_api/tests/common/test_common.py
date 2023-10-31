@@ -15,8 +15,13 @@ import requests_mock
 import re
 import os
 import json
+from ulid import ULID
 
-from tests.common import request_parameters, test_common
+from common_library.common import const
+
+from tests.common import request_parameters
+from tests import test_organization_service_controller
+from tests import test_workspace_service_controller
 
 
 def requsts_mocker_setting(requests_mocker):
@@ -45,21 +50,22 @@ def create_organization(connexion_client):
     Returns:
         dict: created organization info
     """
-    organization_parameter = request_parameters.create_organization()
+    organization_id = (f"unittest-{str(ULID()).lower()}")[0:const.length_organization_id]
+    json_parameter = test_organization_service_controller.sample_data_organization(organization_id)
 
     with requests_mock.Mocker() as requests_mocker:
-        test_common.requsts_mocker_setting(requests_mocker)
+        requsts_mocker_setting(requests_mocker)
         resp_post_org = connexion_client.post(
             '/api/platform/organizations',
             content_type='application/json',
             headers=request_parameters.request_headers(),
-            json=organization_parameter)
+            json=json_parameter)
 
         if resp_post_org.status_code != 200:
             raise Exception('FAILED : create organization')
 
         resp_get_users = connexion_client.get(
-            f"/api/{organization_parameter['id']}/platform/users",
+            f"/api/{organization_id}/platform/users",
             content_type='application/json',
             headers=request_parameters.request_headers())
 
@@ -67,12 +73,12 @@ def create_organization(connexion_client):
             raise Exception('FAILED : get users')
 
     return {
-        "organization_id": organization_parameter['id'],
+        "organization_id": organization_id,
         "user_id": json.loads(resp_get_users.text)['data'][0]['id']
     }
 
 
-def create_workspace(connexion_client, organization_id, workspace_id, workspace_admin_user_id, workspace_name=None):
+def create_workspace(connexion_client, organization_id, workspace_id, workspace_admin_user_id):
     """テスト用ワークスペース作成
 
     Args:
@@ -80,19 +86,20 @@ def create_workspace(connexion_client, organization_id, workspace_id, workspace_
         organization_id (str): organization_id
         workspace_id (str): workspace_id
         workspace_admin_user_id (str): workspace administrator user id
-        workspace_name (str, optional): workspace_name. Defaults to None.
 
     Raises:
         Exception: _description_
     """
     with requests_mock.Mocker() as requests_mocker:
-        test_common.requsts_mocker_setting(requests_mocker)
+        requsts_mocker_setting(requests_mocker)
+
+        json_create_workspace = test_workspace_service_controller.sample_data_workspace(workspace_id, workspace_admin_user_id)
 
         resp_post_ws = connexion_client.post(
             f"/api/{organization_id}/platform/workspaces",
             content_type='application/json',
             headers=request_parameters.request_headers(user_id=workspace_admin_user_id),
-            json=request_parameters.create_workspace(workspace_id, workspace_admin_user_id, workspace_name))
+            json=json_create_workspace)
 
         if resp_post_ws.status_code != 200:
             raise Exception('FAILED : create workspace')
@@ -101,3 +108,36 @@ def create_workspace(connexion_client, organization_id, workspace_id, workspace_
         "workspace_id": workspace_id
     }
 
+
+def delete_dict_item_written_info(target_vars):
+    """delete written infomation item
+        target_vars配下の作成日時・作成者・最終更新日時・最終更新者の情報を削除します
+        ※target_varsの内容を書き換えますので注意
+
+    Args:
+        target_vars (_type_): _description_
+    """
+    delete_dict_item(
+        target_vars,
+        [
+            'create_timestamp',
+            'create_user',
+            'last_update_timestamp',
+            'last_update_user'
+        ]
+    )
+
+
+def delete_dict_item(target_vars, delete_item_keys):
+    """delete item
+        target_vars配下の指定キーの情報を削除します
+        ※target_varsの内容を書き換えますので注意
+
+    Args:
+        target_vars (_type_): _description_
+        delete_item_keys (_type_): _description_
+    """
+    for target_var in (target_vars if type(target_vars) is list else [target_vars]):
+        for delete_item_key in (delete_item_keys if type(delete_item_keys) is list else [delete_item_keys]):
+            if delete_item_key in target_var:
+                del target_var[delete_item_key]

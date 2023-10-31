@@ -196,7 +196,7 @@ def multi_lang_get_text(mocker):
     multi_lang_get_text = multi_lang.get_text
 
     def mocked_function(text_id, origin_text, *args):
-        if text_id != '000-00000':
+        if text_id is not None and text_id != '000-00000':
             assert text_id in language.LanguageList.lang_array, f'Check lang_array Text id : {text_id}'
         return multi_lang_get_text(text_id, origin_text, *args)
 
