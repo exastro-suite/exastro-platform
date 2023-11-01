@@ -326,7 +326,7 @@ $(function(){
 
                 row_html = row_template
                     .replace(/\${plan_id}/g, fn.cv(plan.id,'',true))
-                    .replace(/\${plan_start_datetime}/g, fn.cv(plan.start_datetime,'',true))
+                    .replace(/\${plan_start_datetime}/g, fn.date(new Date(plan.start_datetime),'yyyy/MM/dd HH:mm:ss'))
                     .replace(/\${plan_create_timestamp}/g, fn.date(new Date(plan.create_timestamp),'yyyy/MM/dd HH:mm:ss'))
                     .replace(/\${plan_create_user}/g, fn.cv(plan.create_user,'',true))
                 $("#organization_plan_list tbody").append(row_html);
@@ -352,11 +352,11 @@ $(function(){
             position: 'center',
             width: 'auto',
             header: {
-                title: getText("", "リソースプラン設定"),
+                title: getText("000-85044", "リソースプラン設定"),
             },
             footer: {
                 button: {
-                    set: { text: getText("", "設定"), action: "positive" },
+                    set: { text: getText("000-80046", "適用"), action: "positive" },
                     cancel: { text: getText("000-80013", "キャンセル"), action: "normal" }
                 }
             },
@@ -390,7 +390,7 @@ $(function(){
 
             $input = dialogBody.find("#edit_start_time");
 
-            fn.datePickerDialog('date', true, getText("000-85016", "適用開始日時"), $input.val() ).then(function( result ){
+            fn.datePickerDialog('date', true, getText("000-00125", "プラン開始日時"), $input.val() ).then(function( result ){
                 if ( result !== 'cancel') {
                     $input.val( result.date ).change().focus().trigger('input');
                 }
@@ -491,11 +491,12 @@ $(function(){
     function delete_organization_plan(plan_id, plan_start_datetime) {
         console.log("[CALL] confirm_delete");
 
-        deleteConfirmMessage(
-            getText("000-80017", "実行確認"),
-            getText("", "以下のリソースプランを削除してよろしいですか？"),
-            plan_id + " - " + plan_start_datetime,
-            getText("", "削除したオーガナイゼーションリソースプランは、元に戻せません。"),
+        CancellationConfirmMessage(
+            getText("000-85041", "解除確認"),
+            getText("000-85042", "以下のリソースプランを解除してよろしいですか？"),
+            [ getText("000-00121", "リソースプランID") + " : " + plan_id,
+              getText("000-00125", "プラン開始日時") + " : " + plan_start_datetime ],
+            getText("000-85043", "解除した場合は、現在適用中のリソースプランが変更される可能性があります"),
             plan_id,
             () => {
                 disabled_button();
@@ -523,7 +524,7 @@ $(function(){
                     display_main(results[0].data, results[1].data, results[2].data);
                     // enabled_button();
                     hide_progress();
-                    alertMessage(getText("000-80018", "処理結果"), getText("", "リソースプランを削除しました。"));
+                    alertMessage(getText("000-80018", "処理結果"), getText("000-85046", "リソースプランを解除しました。"));
                 }).catch(() => {
                     // enabled_button();
                     hide_progress();

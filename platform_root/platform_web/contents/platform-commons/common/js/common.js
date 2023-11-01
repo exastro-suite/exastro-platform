@@ -692,14 +692,14 @@ alert: function( title, elements, type = 'alert', buttons = { ok: { text: '閉�
 ##################################################
 */
 calendar: function( setDate, currentDate, startDate, endDate ){
-    const weekText = ['日','月','火','水','木','金','土'],
+    const weekText = [getText("000-00157", '日'),getText("000-00158", '月'),getText("000-00159", '火'),getText("000-00160", '水'),getText("000-00161", '木'),getText("000-00162", '金'),getText("000-00163", '土')],
           weekClass = ['sun','mon','tue','wed','thu','fri','sat'];
-    
+
     if ( startDate ) startDate = fn.date( startDate, 'yyyy/MM/dd');
     if ( endDate ) endDate = fn.date( endDate, 'yyyy/MM/dd');
-    
+
     // 今月
-    const date = ( setDate !== undefined )? new Date( setDate ): new Date(),
+    const date = ( setDate )? new Date( setDate ): new Date(),
           year = date.getFullYear(),
           month = date.getMonth() + 1,
           end = new Date( year, month, 0 ).getDate();
@@ -716,10 +716,9 @@ calendar: function( setDate, currentDate, startDate, endDate ){
     const nextMonthDate = new Date( year, month + 1, 0 ),
           nextMonthYear = nextMonthDate.getFullYear(),
           nextMonth = nextMonthDate.getMonth() + 1;
-    
-    if ( !currentDate ) currentDate = date;
-    if ( currentDate ) currentDate = fn.date( currentDate, 'yyyy/MM/dd');    
-    
+
+    if ( currentDate ) currentDate = fn.date( currentDate, 'yyyy/MM/dd');
+
     // HTML
     const thead = function() {
         const th = [],
@@ -730,10 +729,10 @@ calendar: function( setDate, currentDate, startDate, endDate ){
         return `<tr class="calRow">${th.join('')}</tr>`;
     };
     const cell = function( num, className, dataDate ) {
-        return `<td class="${className}"><span class="calTdInner"><button type="button" class="calButton" data-date="${dataDate}">${num}</butto></span></td>`;
+        return `<td class="${className}"><span class="calTdInner"><button class="calButton" data-date="${dataDate}">${num}</butto></span></td>`;
     };
     const disabledCell = function( num, className ) {
-        return `<td class="${className} disabled"><span class="calDisabled">${num}</span></td>`;
+        return `<td class="${className} disabled"><span class="calTdInner"><button class="calButton calButtonDisabled" disabled>${num}</button></span></td>`;
     };
 
     const rowHtml = [];
@@ -758,14 +757,15 @@ calendar: function( setDate, currentDate, startDate, endDate ){
                 dataDate = `${year}/${cmn.zeroPadding( month, 2 )}/`;
             }
             const cellDate = dataDate + cmn.zeroPadding( num, 2 );
-            
-            if ( currentDate === cellDate ) className += ' currentCell';
-            
-            if ( ( startDate === cellDate ) || ( endDate && currentDate === cellDate ) ) className += ' startCell';
-            if ( ( endDate === cellDate ) || ( startDate && currentDate === cellDate ) ) className += ' endCell';
-            if ( ( startDate && startDate < cellDate && currentDate > cellDate )
-                || ( endDate && endDate > cellDate && currentDate < cellDate )  ) className += ' periodCell';
-            
+
+            if ( currentDate ) {
+                if ( currentDate === cellDate ) className += ' currentCell';
+                if ( ( startDate === cellDate ) || ( endDate && currentDate === cellDate ) ) className += ' startCell';
+                if ( ( endDate === cellDate ) || ( startDate && currentDate === cellDate ) ) className += ' endCell';
+                if ( ( startDate && startDate < cellDate && currentDate > cellDate )
+                    || ( endDate && endDate > cellDate && currentDate < cellDate )  ) className += ' periodCell';
+            }
+
             if ( ( startDate && startDate > cellDate ) || ( endDate && endDate < cellDate ) ) {
                 cellHtml.push( disabledCell( num, className ) );
             } else {
@@ -786,34 +786,76 @@ calendar: function( setDate, currentDate, startDate, endDate ){
 },
 /*
 ##################################################
-   Data picker
+   Date picker
 ##################################################
 */
 datePicker: function( timeFlag, className, date, start, end ) {
-    const monthText = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月']
-    
-    date = ( date && !isNaN( new Date( date ) ) )? new Date( date ): new Date();
-    
-    if ( className === 'datePickerFromDateText' && !end ) end = date;
-    if ( className === 'datePickerToDateText' && !start ) start = date;
-    
+    const monthText = [getText("000-00164", '1月'),
+                       getText("000-00165", '2月'),
+                       getText("000-00166", '3月'),
+                       getText("000-00167", '4月'),
+                       getText("000-00168", '5月'),
+                       getText("000-00169", '6月'),
+                       getText("000-00170", '7月'),
+                       getText("000-00171", '8月'),
+                       getText("000-00172", '9月'),
+                       getText("000-00173", '10月'),
+                       getText("000-00174", '11月'),
+                       getText("000-00175", '12月')];
+
+    let initDate;
+    if ( date && !isNaN( new Date( date ) ) ) {
+        initDate = new Date( date )
+    } else {
+        initDate = new Date();
+    }
+
     let monthCount = 0;
-    
+
     let inputDate;
-    
-    let year = date.getFullYear(),
-        month = date.getMonth() + 1,
-        day = date.getDate();
-    
-    let hour = date.getHours(),
-        min = date.getMinutes(),
-        sec = date.getSeconds();
-    
+
+    let year = initDate.getFullYear(),
+        month = initDate.getMonth(),
+        day = initDate.getDate();
+
+    let hour, min , sec;
+
+    if ( date ) {
+        hour = initDate.getHours(),
+        min = initDate.getMinutes(),
+        sec = initDate.getSeconds();
+    } else if ( className === 'datePickerToDateText') {
+        hour = 23;
+        min = sec = 59;
+    } else {
+        hour = min = sec = 0;
+    }
+
+    let placeholder = 'yyyy/MM/dd';
+    if ( timeFlag ) {
+        if ( timeFlag === 'hm') {
+            placeholder += ' HH:mm';
+        } else if  ( timeFlag === 'h') {
+            placeholder += ' HH';
+        } else {
+            placeholder += ' HH:mm:ss';
+        }
+    }
+
+    if ( className === 'datePickerFromDateText' && !end ) {
+        end = date;
+        placeholder = 'From : ' + placeholder;
+    }
+    if ( className === 'datePickerToDateText' && !start ) {
+        start = date;
+        placeholder = 'To : ' + placeholder;
+    }
+
     const $datePicker = $('<div/>', {
-        'class': 'datePickerContainer'
+        'class': 'datePickerBlock'
     }).html(`
     <div class="datePickerDate">
-        <input type="text" class="datePickerDateInput ${className}" tabindex="-1" readonly>
+        <input type="text" class="datePickerDateInput ${className}" tabindex="-1" placeholder="${placeholder}" readonly>
         <input type="hidden" class="datePickerDateHidden datePickerDateStart">
         <input type="hidden" class="datePickerDateHidden datePickerDateEnd">
     </div>
@@ -825,92 +867,118 @@ datePicker: function( timeFlag, className, date, start, end ) {
         </div>
         <div class="datePickerMonth">
             <div class="datePickerMonthPrev"><button class="datePickerButton" data-type="prevMonth"><span class="icon icon-prev"></span></button></div>
-            <div class="datePickerMonthText">${month}</div>
+            <div class="datePickerMonthText">${monthText[month]}</div>
             <div class="datePickerMonthNext"><button class="datePickerButton" data-type="nextMonth"><span class="icon icon-next"></span></button></div>
         </div>
     </div>
     <div class="datePickerCalendar">
-        ${cmn.calendar( date, date, start, end )}
+        ${cmn.calendar( initDate, date, start, end )}
     </div>`);
-    
+
     const setInputDate = function( changeFlag = true ) {
-        inputDate = `${year}/${fn.zeroPadding( month, 2 )}/${fn.zeroPadding( day, 2 )}`;
+        inputDate = `${year}/${fn.zeroPadding( month + 1, 2 )}/${fn.zeroPadding( day, 2 )}`;
         if ( timeFlag ) {
-            $date.val(`${inputDate} ${fn.zeroPadding( hour, 2 )}:${fn.zeroPadding( min, 2 )}:${fn.zeroPadding( sec, 2 )}`);
+            let timeValue;
+            if ( timeFlag === 'hm') {
+                timeValue = `${inputDate} ${fn.zeroPadding( hour, 2 )}:${fn.zeroPadding( min, 2 )}`;
+            } else if  ( timeFlag === 'h') {
+                timeValue = `${inputDate} ${fn.zeroPadding( hour, 2 )}`;
+            } else {
+                timeValue = `${inputDate} ${fn.zeroPadding( hour, 2 )}:${fn.zeroPadding( min, 2 )}:${fn.zeroPadding( sec, 2 )}`;
+            }
+            $date.val( timeValue );
         } else {
             $date.val( inputDate );
         }
         if ( changeFlag ) $date.change();
     };
-    
+
     const $date = $datePicker.find('.datePickerDateInput'),
           $year = $datePicker.find('.datePickerYearText'),
           $month = $datePicker.find('.datePickerMonthText'),
           $cal = $datePicker.find('.datePickerCalendar');
-    
-    setInputDate( false );
-    
+
+    if ( date ) setInputDate( false );
+
     $datePicker.find('.datePickerButton').on('click', function(){
         const $button = $( this ),
               type = $button.attr('data-type');
-        
+
         switch ( type ) {
             case 'prevYear': monthCount -= 12; break;
             case 'nextYear': monthCount += 12; break;
             case 'prevMonth': monthCount -= 1; break;
             case 'nextMonth': monthCount += 1; break;
         }
-        const newData = new Date( date.getFullYear(), date.getMonth() + monthCount, day );
-        
+        const newData = new Date( initDate.getFullYear(), initDate.getMonth() + monthCount, 1 );
+
         year = newData.getFullYear();
-        month = newData.getMonth() + 1;
-        
+        month = newData.getMonth();
+
         $year.text( year );
-        $month.text( month );
-                
+        $month.text( monthText[month] );
+
         $cal.html( cmn.calendar( newData, inputDate, start, end ) );
     });
-    
+
     $datePicker.on('click', '.calButton', function(){
         const $button = $( this ),
               ckickDate = $button.attr('data-date').split('/');
-              
+
         year = ckickDate[0];
-        month = ckickDate[1];
+        month = Number( ckickDate[1] ) - 1;
         day = ckickDate[2];
-        
+
+        if ( $button.closest('.nextMonth').length ) {
+            monthCount += 1;
+        }
+
+        if ( $button.closest('.lastMonth').length ) {
+            monthCount -= 1;
+        }
+
+        $year.text( year );
+        $month.text( monthText[month] );
+
         setInputDate();
         $cal.html( cmn.calendar( inputDate, inputDate, start, end ) );
     });
-    
+
+    // FromTo用:片方のカレンダーの設定が変わった場合
     $datePicker.find('.datePickerDateHidden').on('change', function(){
         const $hidden = $( this ),
-              value = $hidden.val(),
-              inputValue = $date.val();
+              value = $hidden.val();
+
         if ( $hidden.is('.datePickerDateStart') ) {
             start = value;
         } else {
             end = value;
         }
-        $cal.html( cmn.calendar( inputValue, inputValue, start, end ) );
+
+        const setDate = `${year}/${month+1}/1`;
+
+        $cal.html( cmn.calendar( setDate, inputDate, start, end ) );
     });
-    
+
     // 時間
     if ( timeFlag ) {
-            
-        const $time = $datePicker.find('.datePickerTime');
+        const datePickerTime = [`<div class="datePickerHour">${cmn.html.inputFader('datePickerHourInput', hour, null, { min: 0, max: 23 }, { after: getText("000-00178", "時") } )}</div>`];
+        if ( timeFlag === 'true' || timeFlag === true || timeFlag === 'hms' || timeFlag === 'hm') {
+            datePickerTime.push(`<div class="datePickerMin">${cmn.html.inputFader('datePickerMinInput', min, null, { min: 0, max: 59 }, { after: getText("000-00179", "分") } )}</div>`);
+        }
+        if ( timeFlag === 'true' || timeFlag === true || timeFlag === 'hms') {
+            datePickerTime.push(`<div class="datePickerSec">${cmn.html.inputFader('datePickerSecInput', sec, null, { min: 0, max: 59 }, { after: getText("000-00180", "秒") } )}</div>`);
+        }
 
         $datePicker.append(`
         <div class="datePickerTime">
-            <div class="datePickerHour">${cmn.html.inputFader('datePickerHourInput', hour, null, { min: 0, max: 23 }, { after: '時'} )}</div>
-            <div class="datePickerMin">${cmn.html.inputFader('datePickerMinInput', min, null, { min: 0, max: 59 }, { after: '分'} )}</div>
-            <div class="datePickerSec">${cmn.html.inputFader('datePickerSecInput', sec, null, { min: 0, max: 59 }, { after: '秒'} )}</div>
+            ${datePickerTime.join('')}
         </div>`);
-        
+
         $datePicker.find('.inputFaderWrap').each(function(){
             cmn.faderEvent( $( this ) );
         });
-        
+
         $datePicker.find('.inputFader').on('change', function(){
             const $input = $( this ),
                   value = $input.val();
@@ -921,19 +989,17 @@ datePicker: function( timeFlag, className, date, start, end ) {
             } else {
                 sec = value;
             }
-            
             setInputDate( false );
         });
-    
     }
-    
+
     $datePicker.append(`<div class="datePickerMenu">
         <ul class="datePickerMenuList">
-            <li class="datePickerMenuItem">${fn.html.button('現在', ['datePickerMenuButton', 'itaButton'], { type: 'current', action: 'normal', style: 'width:100%'})}</li>
-            <li class="datePickerMenuItem">${fn.html.button('クリア', ['datePickerMenuButton', 'itaButton'], { type: 'clear', action: 'normal', style: 'width:100%'})}</li>
+            <li class="datePickerMenuItem">${fn.html.button( getText("000-00176","現在"), ['datePickerMenuButton', 'itaButton'], { type: 'current', action: 'normal', style: 'width:100%'})}</li>
+            <li class="datePickerMenuItem">${fn.html.button( getText("000-00177","クリア"), ['datePickerMenuButton', 'itaButton'], { type: 'clear', action: 'normal', style: 'width:100%'})}</li>
         </ul>
     </div>`);
-    
+
     const nowCalender = function( clearFlag ) {
         const now = new Date();
 
@@ -991,7 +1057,7 @@ datePicker: function( timeFlag, className, date, start, end ) {
             break;
         }
     });
-    
+
     return $datePicker;
 },
 /*
@@ -1004,7 +1070,7 @@ checkDate: function( date ) {
 },
 /*
 ##################################################
-   Data picker dialog
+   Date picker dialog
 ##################################################
 */
 datePickerDialog: function( type, timeFlag, title, date ){
@@ -1034,8 +1100,8 @@ datePickerDialog: function( type, timeFlag, title, date ){
         };
 
         const buttons = {
-            ok: { text: "適用", action: 'default', style: 'width:160px;'},
-            cancel: { text: "キャンセル", action: 'normal'}
+            ok: { text: getText("000-80046", "適用"), action: 'default', style: 'width:160px;'},
+            cancel: { text: getText("000-80013", "キャンセル"), action: 'normal'}
         };
 
         const config = {
@@ -1086,6 +1152,26 @@ datePickerDialog: function( type, timeFlag, title, date ){
 
         dialog.open( $dataPicker );
     });
+},
+/*
+##################################################
+   Date picker Event
+##################################################
+*/
+setDatePickerEvent: function( $target, title ) {
+    const $container = $target.closest('.inputDateContainer'),
+          $button = $container.find('.inputDateCalendarButton'),
+          timeFlag = $button.attr('data-timeflag');
+
+    $button.on('click', function(){
+        const value = $target.val();
+        fn.datePickerDialog('date', timeFlag, title, value ).then(function( result ){
+            if ( result !== 'cancel') {
+                $target.val( result.date ).change().focus().trigger('input');
+            }
+        });
+    });
+
 },
 /*
 ##################################################

@@ -447,6 +447,62 @@ function deleteConfirmMessage(title, message, deleteResources, cautionMessage, i
     dialog.open(content);
 }
 
+function CancellationConfirmMessage(title, message, deleteResources, cautionMessage, input, onOk = null, onCancel = null) {
+    const dialog = new Dialog({
+        mode: 'modeless',
+        position: 'center',
+        width: 'auto',
+        header: {
+            title: title,
+        },
+        footer: {
+            button: {
+                ok: { text: '<span class="iconButtonIcon icon"></span>' + getText("000-80045", "はい、解除します"), action: "danger" },
+                cancel: { text: getText("000-80013", "キャンセル"), action: "normal" }
+            }
+        },
+    },
+    {
+        ok: function() {
+            if($(dialog.$.dbody).find(".confirm_yes").val() != input) {
+                $(dialog.$.dbody).find(".validate_error").css("display", "");
+                $(dialog.$.dbody).find(".confirm_yes").focus();
+                return;
+            }
+            dialog.close();
+            if(onOk !== null) {
+                onOk();
+            }
+        },
+        cancel: function() {
+            dialog.close();
+            if(onCancel !== null) {
+                onCancel();
+            }
+        }
+    });
+
+    let content = "";
+    content += '<div class="alertMessage" style="margin-left: 30px; margin-right: 30px;">'
+    content += message + '<br>';
+    if((typeof deleteResources) == "string") {
+        content += '<ul style="list-style-type:disc; padding-left:30px; background-color: #FFFFEE;"><li>' + fn.cv(deleteResources, "", true) + '</li></ul>'
+    } else {
+        content += '<div style="max-height: 200px; overflow: auto;">'
+        content += '<ul style="list-style-type:disc; padding-left:30px; background-color: #FFFFEE;">' + deleteResources.map((value, i) => { return '<li>' + fn.cv(value, "", true) + '</li>'; }).join("") + '</ul>'
+        content += '</div>'
+    }
+    if(cautionMessage != null && cautionMessage != "" ) {
+        content += '<span class="caution_message">' + cautionMessage+ '</span><br>'
+    }
+    content += '<hr>' + getText("000-80015", '続行する場合は <span style="font-weight: bold;">{0}</span> と入力してください。', fn.cv(input, "", true)) + '<br>'
+    content += '<input class="confirm_yes inputText input" type="text" maxlength="' + input.length + '">'
+    content += '<span class="validate_error" style="display:none;">' + getText("000-80016",'<span style="font-weight: bold;">{0}</span> と入力してください',fn.cv(input, "", true)) + '</span>'
+    content += '</div>';
+
+    dialog.open(content);
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //   Organizations Common
