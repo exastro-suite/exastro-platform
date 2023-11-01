@@ -505,7 +505,7 @@ $(function(){
                 // APIを呼出す
                 call_api_promise({
                     type: "DELETE",
-                    url: api_conf.api.organizations.plans.delete.replace(/{organization_id}/g, organization_id).replace(/{plan_start_datetime}/g, plan_start_datetime),
+                    url: api_conf.api.organizations.plans.delete.replace(/{organization_id}/g, organization_id).replace(/{plan_start_datetime}/g, plan_start_datetime.replaceAll("/", "-")),
                     headers: {
                         Authorization: "Bearer " + CommonAuth.getToken(),
                     },
