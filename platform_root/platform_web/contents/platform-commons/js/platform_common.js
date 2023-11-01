@@ -196,6 +196,8 @@ function displayMenu(curent) {
         $('#menu_plans').attr('href', location_conf.href.plans.list);
         // $('#menu_system_settings').attr('href', location_conf.href.system_settings.top);
         $('#menu_keycloak').attr('href', location_conf.href.keycloak.console);
+        // not support menu to hidden
+        $("#menu_system_settings").css("display", "None");
     } else {
         $('.menuList').empty().append(`
             <li class="menuItem"><a class="menuLink" id="menu_workspace" href="#" tabindex="-1">${getText("000-80005", "ワークスペース管理")}</a></li>
