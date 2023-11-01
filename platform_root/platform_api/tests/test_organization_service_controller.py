@@ -18,8 +18,8 @@ from tests.common import request_parameters, test_common
 from common_library.common import const, validation
 
 
-def test_organization_scenario(connexion_client):
-    """organization service scenario test
+def test_organization_api(connexion_client):
+    """organization service api test
 
     Args:
         connexion_client (_type_): _description_
@@ -154,6 +154,11 @@ def test_organization_scenario(connexion_client):
 
 
 def test_organization_validate(connexion_client):
+    """test validate organization
+
+    Args:
+        connexion_client (_type_): _description_
+    """
     #
     # validate : id
     #
@@ -184,6 +189,21 @@ def test_organization_validate(connexion_client):
     # validate : id invalid first char
     validate = validation.validate_organization_id("master")
     assert not validate.ok, "organization_id = reseved word"
+
+    #
+    # validate : name
+    #
+    # validate : name = None
+    validate = validation.validate_organization_name(None)
+    assert not validate.ok, "organization_name : None"
+
+    # validate : name maxlength
+    validate = validation.validate_organization_name("a".ljust(const.length_destination_name, "_"))
+    assert validate.ok, "organization_name = max length"
+
+    # validate : name maxlength + 1
+    validate = validation.validate_organization_name("a".ljust(const.length_destination_name + 1, "_"))
+    assert not validate.ok, "organization_name = max length + 1"
 
 
 def sample_data_organization(id, update={}):

@@ -17,8 +17,8 @@ from tests.common import request_parameters, test_common
 from common_library.common import const, validation
 
 
-def test_notification_scenario(connexion_client):
-    """シナリオ試験
+def test_notification_api(connexion_client):
+    """notification service api test
 
     Args:
         connexion_client (_type_): _description_
@@ -38,15 +38,6 @@ def test_notification_scenario(connexion_client):
 
         assert response.status_code == 200, "create notifications (kind = mail) response code"
 
-        # Mail通知の追加(alredy exists)
-        response = connexion_client.post(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/settings/notifications",
-            content_type='application/json',
-            headers=request_parameters.request_headers(organization["user_id"]),
-            json=[sample_data_mail('mail-01')])
-
-        assert response.status_code == 400, "create notifications already exists"
-
         # Teams通知の追加
         response = connexion_client.post(
             f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/settings/notifications",
@@ -56,7 +47,7 @@ def test_notification_scenario(connexion_client):
 
         assert response.status_code == 200, "create notifications (kind = teams) response code"
 
-        # 複合パターンの追加
+        # Mail+Teams通知の追加
         request_json = [
             sample_data_mail('mix-mail-01'),
             sample_data_teams('mix-teams-01'),
@@ -74,6 +65,11 @@ def test_notification_scenario(connexion_client):
 
 
 def test_notifications_validate(connexion_client):
+    """test validate notifications
+
+    Args:
+        connexion_client (_type_): _description_
+    """
     #
     # validate body
     #
@@ -266,6 +262,9 @@ def test_settings_notification_create(connexion_client):
     with requests_mock.Mocker() as requests_mocker:
         test_common.requsts_mocker_setting(requests_mocker)
 
+        #
+        # validate error route
+        #
         # validate error body
         response = connexion_client.post(
             f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/settings/notifications",
@@ -321,6 +320,27 @@ def test_settings_notification_create(connexion_client):
             headers=request_parameters.request_headers(organization['user_id']),
             json=request_json)
         assert response.status_code == 400, "create notifications valide conditions response error route"
+
+        #
+        # already exists
+        #
+        # Mail通知の追加
+        response = connexion_client.post(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/settings/notifications",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization["user_id"]),
+            json=[sample_data_mail('mail-01')])
+
+        assert response.status_code == 200, "create notifications (kind = mail) response code"
+
+        # Mail通知の追加(alredy exists)
+        response = connexion_client.post(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/settings/notifications",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization["user_id"]),
+            json=[sample_data_mail('mail-01')])
+
+        assert response.status_code == 400, "create notifications already exists"
 
 
 def sample_data_mail(id, update={}):
