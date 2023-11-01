@@ -17,8 +17,8 @@ import requests_mock
 from tests.common import request_parameters, test_common
 
 
-def test_workspace_scenario(connexion_client):
-    """workspace service scenario test
+def test_workspace_api(connexion_client):
+    """workspace service api test
 
     Args:
         connexion_client (_type_): _description_
