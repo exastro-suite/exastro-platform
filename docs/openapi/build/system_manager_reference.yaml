@@ -1111,6 +1111,26 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/member'
+    notifications.create:
+      title: Notification is a definition of Notification resource.
+      type: object
+      properties:
+        destination_id:
+          type: string
+          description: Destination ID is a 26-digit string
+        func_id:
+          type: string
+          description: Function ID unique to the caller (for filtering)
+        func_information:
+          type: object
+          description: Caller-specific details (for filtering)
+        message:
+          type: object
+          description: 'Webhook systems simply pass the value as the body. For e-mail, construct Json after reserving title and text'
+      required:
+        - destination_id
+        - func_id
+        - message
     workspace:
       title: workspace is a definition of Workspace resource.
       type: object
