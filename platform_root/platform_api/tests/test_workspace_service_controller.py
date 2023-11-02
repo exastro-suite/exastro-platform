@@ -13,7 +13,6 @@
 #   limitations under the License.
 import copy
 
-import requests_mock
 from tests.common import request_parameters, test_common
 
 
@@ -25,9 +24,7 @@ def test_workspace_api(connexion_client):
     """
     organization = test_common.create_organization(connexion_client)
 
-    with requests_mock.Mocker() as requests_mocker:
-        test_common.requsts_mocker_setting(requests_mocker)
-
+    with test_common.requsts_mocker_default():
         # get workspaces
         # ワークスペース一覧が0件であることを確認
         response = connexion_client.get(

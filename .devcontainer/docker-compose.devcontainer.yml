@@ -51,7 +51,6 @@ services:
       - SSL_CERT_DIR=/etc/ssl/certs
       - NODE_EXTRA_CA_CERTS=/etc/ssl/certs/ca-certificates.crt
       - NODE_TLS_REJECT_UNAUTHORIZED=${NODE_TLS_REJECT_UNAUTHORIZED:-1}
-      - NETWORK_ID=${NETWORK_ID:-}
 
   platform-api:
     build:
@@ -91,6 +90,7 @@ services:
       - SSL_CERT_DIR=/etc/ssl/certs
       - NODE_EXTRA_CA_CERTS=/etc/ssl/certs/ca-certificates.crt
       - NODE_TLS_REJECT_UNAUTHORIZED=${NODE_TLS_REJECT_UNAUTHORIZED:-1}
+      - NETWORK_ID=${NETWORK_ID:-}
   platform-web:
     build:
       target: develop_build

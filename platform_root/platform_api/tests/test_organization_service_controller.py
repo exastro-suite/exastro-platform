@@ -12,10 +12,11 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-import requests_mock
-from tests.common import request_parameters, test_common
+from unittest import mock
 
+from tests.common import request_parameters, test_common
 from common_library.common import const, validation
+from common_library.common import maintenancemode
 
 
 def test_organization_api(connexion_client):
@@ -24,9 +25,7 @@ def test_organization_api(connexion_client):
     Args:
         connexion_client (_type_): _description_
     """
-    with requests_mock.Mocker() as requests_mocker:
-        test_common.requsts_mocker_setting(requests_mocker)
-
+    with test_common.requsts_mocker_default():
         # get organizations
         # オーガナイゼーション一覧が0件であることを確認
         response = connexion_client.get(
@@ -204,6 +203,50 @@ def test_organization_validate(connexion_client):
     # validate : name maxlength + 1
     validate = validation.validate_organization_name("a".ljust(const.length_destination_name + 1, "_"))
     assert not validate.ok, "organization_name = max length + 1"
+
+
+def test_organization_create(connexion_client):
+    """_summary_
+
+    Args:
+        connexion_client (_type_): _description_
+        mocker (_type_): _description_
+    """
+    #
+    # maintenance mode
+    #
+    with test_common.requsts_mocker_default(), \
+            mock.patch.object(maintenancemode, 'maintenace_mode_get', return_value='1'):
+
+        response = connexion_client.post(
+            '/api/platform/organizations',
+            content_type='application/json',
+            headers=request_parameters.request_headers(),
+            json=sample_data_organization('organization-01'))
+
+        assert response.status_code == 498, "create organization response code = maintenancemode"
+
+    #
+    # validation error route
+    #
+    with test_common.requsts_mocker_default():
+        # validate error id
+        response = connexion_client.post(
+            '/api/platform/organizations',
+            content_type='application/json',
+            headers=request_parameters.request_headers(),
+            json=sample_data_organization('_'))
+        
+        assert response.status_code == 400, "create organization response code validate error"
+
+        # validate error name
+        response = connexion_client.post(
+            '/api/platform/organizations',
+            content_type='application/json',
+            headers=request_parameters.request_headers(),
+            json=sample_data_organization('organization-01', {"name": "".ljust(const.length_organization_name + 1, "_")}))
+
+        assert response.status_code == 400, "create organization response code validate error"
 
 
 def sample_data_organization(id, update={}):

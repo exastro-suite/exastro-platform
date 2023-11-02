@@ -25,11 +25,13 @@ from flask import request
 import logging
 from logging.config import dictConfig as dictLogConf
 
+from tests.common import test_common
 import globals
 from common_library.common.exastro_logging import ExastroLogRecordFactory, LOGGING
 from common_library.common.db import DBconnector
 from common_library.common import api_keycloak_tokens, api_keycloak_realms, multi_lang
 from common_resources.en import language
+
 
 @pytest.fixture(scope='session')
 def connexion_client():
@@ -102,7 +104,7 @@ def docker_compose_up(docker_ip, docker_services):
         docker_services.wait_until_responsive(
             timeout=300.0,
             pause=1.0,
-            check=lambda: is_responsive(f"{os.environ['API_KEYCLOAK_PROTOCOL']}://{os.environ['API_KEYCLOAK_HOST']}:{os.environ['API_KEYCLOAK_PORT']}/auth/health"))
+            check=lambda: is_responsive(f"{test_common.keycloak_origin()}/auth/health"))
 
 
 def is_responsive(url):
