@@ -221,6 +221,8 @@ services:
       - API_PORT=8000
       - PYTHONIOENCODING=utf-8
       - FLASK_ENV=development
+    networks:
+      - exastro
 
   ita-web:
     build:
@@ -237,3 +239,5 @@ services:
       - ../test/web/config/httpd.conf/httpd.conf:/etc/httpd/conf/httpd.conf:cached
       - ../test/web/config/httpd.conf/rewrite.conf:/etc/httpd/conf.d/rewrite.conf:cached
       - ../test/web/contents:/var/www/html:cached
+    networks:
+      - exastro
