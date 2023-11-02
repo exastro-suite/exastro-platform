@@ -34,6 +34,10 @@ get:
     required: true
     schema:
       type: string
+  - name: query_string
+    in: query
+    schema:
+      type: string
   responses:
     200:
       description: A successful response.
