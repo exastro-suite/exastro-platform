@@ -76,6 +76,8 @@ member:
   $ref: "./member.yaml"
 memberList:
   $ref: "./memberList.yaml"
+notifications.create:
+  $ref: "./notifications.create.yaml"
 workspace:
   $ref: "./workspace.yaml"
 workspaceList:

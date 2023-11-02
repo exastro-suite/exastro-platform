@@ -504,6 +504,146 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/runtimeError'
+  '/api/{organization_id}/platform/workspaces/{workspace_id}/notifications':
+    get:
+      tags:
+        - NotificationService
+      summary: Returns a list of message notifications
+      x-openapi-router-controller: controllers.notification_service_controller
+      operationId: notification_list
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: workspace_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: PageSize
+          in: query
+          description: 'Maximum number of return values ​​at one time (default: 100)'
+          schema:
+            type: number
+            minimum: 1
+        - name: CurrentPage
+          in: query
+          description: 'Current display page (default: 1)'
+          schema:
+            type: number
+            minimum: 1
+        - name: DetailsInfo
+          in: query
+          description: With message output
+          schema:
+            type: boolean
+        - name: FuncID
+          in: query
+          description: Filter by function ID
+          schema:
+            type: string
+        - name: Match.key
+          in: query
+          description: Specify exact match condition
+          schema:
+            type: string
+        - name: LikeBefore.key
+          in: query
+          description: Specifying conditions for beginning match
+          schema:
+            type: string
+        - name: LikeAfter.key
+          in: query
+          description: Specifying conditions for suffix match
+          schema:
+            type: string
+        - name: LikeAll.key
+          in: query
+          description: Specifying conditions for fuzzy search
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - $ref: '#/components/schemas/workspaceList'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+    post:
+      tags:
+        - NotificationService
+      summary: Register for message notifications
+      x-openapi-router-controller: controllers.notification_service_controller
+      operationId: notification_register
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: workspace_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/notifications.create'
+            examples:
+              mail message post:
+                value:
+                  - destination_id: 00000001Z7ZXFAED6872F6C9W8
+                    func_id: '00000000'
+                    func_information:
+                      key-1: value-1
+                      key-2: value-2
+                    message:
+                      title: subjects
+                      message: event message
+              teams message post:
+                value:
+                  - destination_id: 00000001Z7ZXFAED6872F6C9W9
+                    func_id: '00000000'
+                    func_information:
+                      key-1: value-1
+                      key-2: value-2
+                    message:
+                      title: send title
+                      text: send message
+        required: true
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        example: null
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
   '/api/{organization_id}/platform/users':
     get:
       tags:
@@ -1543,6 +1683,26 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/member'
+    notifications.create:
+      title: Notification is a definition of Notification resource.
+      type: object
+      properties:
+        destination_id:
+          type: string
+          description: Destination ID is a 26-digit string
+        func_id:
+          type: string
+          description: Function ID unique to the caller (for filtering)
+        func_information:
+          type: object
+          description: Caller-specific details (for filtering)
+        message:
+          type: object
+          description: 'Webhook systems simply pass the value as the body. For e-mail, construct Json after reserving title and text'
+      required:
+        - destination_id
+        - func_id
+        - message
     workspace:
       title: workspace is a definition of Workspace resource.
       type: object
