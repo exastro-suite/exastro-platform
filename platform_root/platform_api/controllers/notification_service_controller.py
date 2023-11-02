@@ -28,7 +28,7 @@ import globals
 MSG_FUNCTION_ID = "34"
 
 
-def settings_destination_get(organization_id, workspace_id, destination_id):  # noqa: E501
+def settings_destination_get(organization_id, workspace_id, destination_id, query_string=None):  # noqa: E501
     """Returns of settings destination
 
      # noqa: E501
@@ -39,8 +39,10 @@ def settings_destination_get(organization_id, workspace_id, destination_id):  # 
     :type workspace_id: str
     :param destination_id: 
     :type destination_id: str
+    :param query_string: 
+    :type query_string: str
 
-    :rtype: InlineResponse20013
+    :rtype: InlineResponse20017
     """
     return 'do some magic!'
 
