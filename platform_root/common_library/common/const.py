@@ -46,6 +46,7 @@ length_destination_email = 255
 length_destination_teams_webhook = 1024
 max_destination_email = 500
 max_destination_teams_webhook = 500
+length_func_id = 100
 
 # ロール種別
 # Role Kind
@@ -155,3 +156,9 @@ ALL_CONDITIONS = [
     CONDITIONS_ITA_EVENT_TYPE_TIME_OUT,
     CONDITIONS_ITA_EVENT_TYPE_ITA_UNDETECTED,
 ]
+
+# 通知結果
+# Notification status
+NOTIFICATION_STATUS_UNSENT = "Unsent"           # 未送信
+NOTIFICATION_STATUS_SUCCESSFUL = "Successful"   # 送信成功
+NOTIFICATION_STATUS_FAILED = "Failed"           # 送信失敗
