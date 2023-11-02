@@ -73,13 +73,14 @@
 		"mechatroner.rainbow-csv",
 		"ryu1kn.partial-diff",
 		"pkief.material-icon-theme",
-		"rangav.vscode-thunder-client",
+		//"rangav.vscode-thunder-client",
 		//"mtxr.sqltools",
 		//"mtxr.sqltools-driver-mysql",
 		"formulahendry.vscode-mysql",
 		"mitchdenny.ecdc",
 		"ms-vsliveshare.vsliveshare",
 		"snyk-security.snyk-vulnerability-scanner",
+		"humao.rest-client",
 	],
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	"forwardPorts": [

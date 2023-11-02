@@ -167,6 +167,75 @@ def call_ita_test(organization_id, workspace_id, subpath):
         return jsonify(ret), ret_status
 
 
+@app.route('/api/<string:organization_id>/workspaces/<string:workspace_id>/oase_agent/<path:subpath>',
+           methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTION"])
+def call_ita_oase_agent_test(organization_id, workspace_id, subpath):
+    """Exastro IT Automation OASE AGENT 試験モジュール
+
+    Returns:
+        Response: HTTP Respose
+    """
+    globals.logger.info('call ita_oase_agent api. method={} organization_id={} workspace_id={} subpath={}'.format(request.method,
+                                                                                                            organization_id,
+                                                                                                            workspace_id,
+                                                                                                            subpath))
+
+    # パラメータ情報(JSON形式)
+    organization_id = organization_id
+    globals.logger.debug('request_headers: {}'.format(str(request.headers)))
+    user_id = request.headers.get("User-Id")
+    roles = request.headers.get("Roles")
+    language = request.headers.get("Language")
+    globals.logger.error(f'roles: {roles}')
+    roles_decode = base64.b64decode(roles.encode()).decode("utf-8")
+    globals.logger.error(f'roles_decode: {roles_decode}')
+    json_roles = []
+    for role in roles_decode.split("\n"):
+        json_roles.append({"name": role})
+
+    # パラメータを形成
+    # Form parameters
+    try:
+        request_body = request.json.copy()
+        globals.logger.debug(f'request_body: {request_body}')
+    except Exception:
+        request_body = {}
+
+    # 引数
+    # query_string
+    query_string = request.query_string
+    globals.logger.debug(f'query_string: {query_string}')
+
+    ret_status = 200
+
+    ret = {
+        "result": "000-0000",
+        "data": {
+            "method": request.method,
+            "headers": str(request.headers),
+            "organization_id": organization_id,
+            "workspace_id": workspace_id,
+            "user_id": user_id,
+            "roles": json_roles,
+            "language": language,
+            "request_body": request_body,
+            "query_string": "{}".format(query_string),
+        },
+        "message": "",
+        "ts": __datetime_to_str(datetime.now()),
+    }
+
+    if subpath == "download":
+        response = make_response()
+        response.data = b'abc'
+        # response.data = json.dumps(ret).encode()
+        response.headers['Content-Type'] = 'application/octet-stream'
+        response.headers['Content-Disposition'] = 'attachment; filename=test.dat'
+        return response
+    else:
+        return jsonify(ret), ret_status
+
+
 @app.route('/api/<string:organization_id>/workspaces/<string:workspace_id>/ita/', methods=["POST"])
 def create_workspace(organization_id, workspace_id):
     """死活監視
