@@ -110,9 +110,6 @@ $(function(){
         //
         // display Delete Organizations button
         //
-        $('.button_delete_organization').on('click',() => {
-            delete_organization();
-        });
         $('.button_delete_organization').prop('disabled', false);
 
         //
@@ -141,9 +138,6 @@ $(function(){
         //
         // オーガナイゼーションにリソースプランを設定 - set plan to the organization
         //
-        $('.button_edit_organization_plan').on('click',() => {
-            edit_organization_plan_open();
-        });
         $('.button_edit_organization_plan').prop('disabled', false);
 
         //
@@ -198,15 +192,13 @@ $(function(){
         $(".form_plan_id").children().remove();
         $('.form_plan_id').append($('<option>').html('').val(''));
         for(var row of planListData) {
-            if (fn.cv(row.plan_id,'',true).charAt(0) != '_')
+            if (row["plan_id"].charAt(0) != '_')
             {
-                $('.form_plan_id').append($('<option>').html(fn.cv(row.plan_id,'',true)+':'+fn.cv(row.plan_name,'',true)).val(fn.cv(row.plan_id,'',true)));
+                $('.form_plan_id').append($('<option>').html(fn.cv(row.plan_id,'',true)+':'+fn.cv(row.plan_name,'',true)).val(row.plan_id));
             }
         }
     }
 
-
-// 
 
     //
     // オーガナイゼーション管理者一覧の表示 - display organization managers list
@@ -243,6 +235,10 @@ $(function(){
         }
         $('#organization_managers_list .datarow').css('display','');
     }
+
+    $('.button_delete_organization').on('click',() => {
+        delete_organization();
+    });
 
     function delete_organization() {
         console.log("[CALL] confirm_delete");
@@ -409,7 +405,7 @@ $(function(){
 
         // validate plan id
         if(dialogBody.find("#edit_plan_id").val() === "") {
-            dialogBody.find("#message_edit_plan_id").text(getText("400-00011", "必須項目が不足しています。({0})", getText("000-00", "リソースプランID")));
+            dialogBody.find("#message_edit_plan_id").text(getText("400-00011", "必須項目が不足しています。({0})", getText("000-00121", "リソースプランID")));
             result = false;
         } else {
             dialogBody.find("#message_edit_plan_id").text("");
@@ -418,14 +414,12 @@ $(function(){
         // validate start time
         if(dialogBody.find("#edit_start_time").val() === "") {
             dialogBody.find("#message_edit_start_time").text(
-                getText("400-00011", "必須項目が不足しています。({0})", getText("000-00128", "適用開始日時")));
+                getText("400-00011", "必須項目が不足しています。({0})", getText("000-00125", "プラン開始日時")));
             result = false;
 
-        } else if(dialogBody.find("#edit_start_time").val().replace(/[0-9-: ]/g,"") !== "") {
+        } else if(!fn.checkDate(dialogBody.find("#edit_start_time").val())) {
             dialogBody.find("#message_edit_start_time").text(
-                getText("400-00017", "指定できない文字が含まれています。(項目:{0},指定可能な文字:{1})",
-                    getText("000-00", "適用開始日時"),
-                    getText("000-", "半角数字・ハイフン")));
+                getText("400-00020", "日時形式以外が指定されています。({0})",getText("000-00125", "プラン開始日時")));
             result = false;
 
         } else {
@@ -447,7 +441,7 @@ $(function(){
 
         let reqbody =   {
             "id":dialogBody.find("#edit_plan_id").val(),
-            "start_datetime":dialogBody.find("#edit_start_time").val(),
+            "start_datetime":dialogBody.find("#edit_start_time").val().replaceAll( '/', '-' ),
         }
 
         // APIを呼出す
@@ -476,7 +470,7 @@ $(function(){
             display_main(results[0].data, results[1].data, results[2].data);
             // enabled_button();
             hide_progress();
-            alertMessage(getText("000-80018", "処理結果"),getText("000-", "リソースプランを設定しました"),() => {
+            alertMessage(getText("000-80018", "処理結果"),getText("000-85047", "リソースプランを設定しました"),() => {
                 dialog.close();
             })
         }).catch(() => {
@@ -488,6 +482,7 @@ $(function(){
     //
     // オーガナイゼーションに紐づいているリソースプランの削除 - delete plan to the organization
     //
+    
     function delete_organization_plan(plan_id, plan_start_datetime) {
         console.log("[CALL] confirm_delete");
 

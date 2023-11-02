@@ -15,6 +15,10 @@
 # 1 api to ### 
 
 
+### Get Notification
+GET {{base_org_url}}/api/{{org_id}}/platform/workspaces/{{ws_id}}/settings/notifications
+Authorization: Basic {{org-user-id}} {{org-user-pw}}
+
 ### Create Notifications(kind=mail)
 POST {{base_org_url}}/api/{{org_id}}/platform/workspaces/{{ws_id}}/settings/notifications
 Authorization: Basic {{org-user-id}} {{org-user-pw}}
