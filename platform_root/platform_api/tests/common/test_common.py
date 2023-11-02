@@ -12,10 +12,14 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 import requests_mock
+from unittest import mock
+
 import re
 import os
 import json
 from ulid import ULID
+import pymysql
+
 
 from common_library.common import const
 
@@ -24,21 +28,44 @@ from tests import test_organization_service_controller
 from tests import test_workspace_service_controller
 
 
-def requsts_mocker_setting(requests_mocker):
-    """setting default requests mocker
+def keycloak_origin():
+    """keycloak url origin
 
-    Args:
-        requests_mocker (obj): Return value of requests_mock.Mocker()
+    Returns:
+        str: keycloak url origin
     """
+    return f'{os.environ["API_KEYCLOAK_PROTOCOL"]}://{os.environ["API_KEYCLOAK_HOST"]}:{os.environ["API_KEYCLOAK_PORT"]}'
+
+
+def ita_api_admin_origin():
+    """it automation admin url origin
+
+    Returns:
+        str: it automation admin url origin
+    """
+    return f'{os.environ["ITA_API_ADMIN_PROTOCOL"]}://{os.environ["ITA_API_ADMIN_HOST"]}:{os.environ["ITA_API_ADMIN_PORT"]}'
+
+
+def requsts_mocker_default():
+    """requstsのデフォルトmocker
+
+    Returns:
+        _type_: _description_
+    """
+    requests_mocker = requests_mock.Mocker()
+
     requests_mocker.register_uri(
         requests_mock.ANY,
-        re.compile(rf'^{os.environ["ITA_API_ADMIN_PROTOCOL"]}://{os.environ["ITA_API_ADMIN_HOST"]}:{os.environ["ITA_API_ADMIN_PORT"]}/'),
+        re.compile(rf'^{ita_api_admin_origin()}/'),
         status_code=200,
         json={"result": "000-00000", "message": ""})
+
     requests_mocker.register_uri(
         requests_mock.ANY,
-        re.compile(rf'^{os.environ["API_KEYCLOAK_PROTOCOL"]}://{os.environ["API_KEYCLOAK_HOST"]}:{os.environ["API_KEYCLOAK_PORT"]}/'),
+        re.compile(rf'^{keycloak_origin()}/'),
         real_http=True)
+
+    return requests_mocker
 
 
 def create_organization(connexion_client):
@@ -53,8 +80,7 @@ def create_organization(connexion_client):
     organization_id = (f"unittest-{str(ULID()).lower()}")[0:const.length_organization_id]
     json_parameter = test_organization_service_controller.sample_data_organization(organization_id)
 
-    with requests_mock.Mocker() as requests_mocker:
-        requsts_mocker_setting(requests_mocker)
+    with requsts_mocker_default():
         resp_post_org = connexion_client.post(
             '/api/platform/organizations',
             content_type='application/json',
@@ -90,9 +116,7 @@ def create_workspace(connexion_client, organization_id, workspace_id, workspace_
     Raises:
         Exception: _description_
     """
-    with requests_mock.Mocker() as requests_mocker:
-        requsts_mocker_setting(requests_mocker)
-
+    with requsts_mocker_default():
         json_create_workspace = test_workspace_service_controller.sample_data_workspace(workspace_id, workspace_admin_user_id)
 
         resp_post_ws = connexion_client.post(

@@ -11,7 +11,6 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
-import requests_mock
 from tests.common import request_parameters, test_common
 
 from common_library.common import const, validation
@@ -26,9 +25,7 @@ def test_notification_api(connexion_client):
     organization = test_common.create_organization(connexion_client)
     workspace = test_common.create_workspace(connexion_client, organization['organization_id'], 'workspace-01', organization['user_id'])
 
-    with requests_mock.Mocker() as requests_mocker:
-        test_common.requsts_mocker_setting(requests_mocker)
-
+    with test_common.requsts_mocker_default():
         # Mail通知の追加
         response = connexion_client.post(
             f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/settings/notifications",
@@ -251,7 +248,7 @@ def test_notifications_validate(connexion_client):
 
 
 def test_settings_notification_create(connexion_client):
-    """test settings_notification_create validate
+    """test settings_notification_create
 
     Args:
         connexion_client (_type_): _description_
@@ -259,9 +256,7 @@ def test_settings_notification_create(connexion_client):
     organization = test_common.create_organization(connexion_client)
     workspace = test_common.create_workspace(connexion_client, organization['organization_id'], 'workspace-01', organization['user_id'])
 
-    with requests_mock.Mocker() as requests_mocker:
-        test_common.requsts_mocker_setting(requests_mocker)
-
+    with test_common.requsts_mocker_default():
         #
         # validate error route
         #
