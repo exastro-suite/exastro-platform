@@ -14,6 +14,7 @@
 from tests.common import request_parameters, test_common
 
 from common_library.common import const, validation
+from libs import queries_notification
 
 
 def test_notification_api(connexion_client):
@@ -336,6 +337,19 @@ def test_settings_notification_create(connexion_client):
             json=[sample_data_mail('mail-01')])
 
         assert response.status_code == 400, "create notifications already exists"
+
+    with test_common.requsts_mocker_default(), \
+            test_common.pymysql_execute_raise_exception_mocker(queries_notification.SQL_INSERT_NOTIFICATION_DESTINATION, Exception("DB Error Test")):
+        #
+        # DB error route
+        #
+        response = connexion_client.post(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/settings/notifications",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization["user_id"]),
+            json=[sample_data_mail('mail-db-error')])
+
+        assert response.status_code == 500, "create notifications response code: db error"
 
 
 def sample_data_mail(id, update={}):
