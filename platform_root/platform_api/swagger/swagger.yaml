@@ -1167,6 +1167,170 @@ paths:
               schema:
                 $ref: '#/components/schemas/runtimeError'
       x-openapi-router-controller: controllers.notification_service_controller
+  /api/{organization_id}/platform/workspaces/{workspace_id}/notifications:
+    get:
+      tags:
+      - NotificationService
+      summary: Returns a list of message notifications
+      operationId: notification_list
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: workspace_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: PageSize
+        in: query
+        description: "Maximum number of return values ​​at one time (default: 100)"
+        required: false
+        style: form
+        explode: true
+        schema:
+          minimum: 1
+          type: number
+      - name: CurrentPage
+        in: query
+        description: "Current display page (default: 1)"
+        required: false
+        style: form
+        explode: true
+        schema:
+          minimum: 1
+          type: number
+      - name: DetailsInfo
+        in: query
+        description: With message output
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: boolean
+      - name: FuncID
+        in: query
+        description: Filter by function ID
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: Match_key
+        in: query
+        description: Specify exact match condition
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: LikeBefore_key
+        in: query
+        description: Specifying conditions for beginning match
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: LikeAfter_key
+        in: query
+        description: Specifying conditions for suffix match
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: LikeAll_key
+        in: query
+        description: Specifying conditions for fuzzy search
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_13'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+      x-openapi-router-controller: controllers.notification_service_controller
+    post:
+      tags:
+      - NotificationService
+      summary: Register for message notifications
+      operationId: notification_register
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: workspace_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/notifications.create'
+            examples:
+              mail message post:
+                value:
+                - destination_id: 00000001Z7ZXFAED6872F6C9W8
+                  func_id: "00000000"
+                  func_information:
+                    key-1: value-1
+                    key-2: value-2
+                  message:
+                    title: subjects
+                    message: event message
+              teams message post:
+                value:
+                - destination_id: 00000001Z7ZXFAED6872F6C9W9
+                  func_id: "00000000"
+                  func_information:
+                    key-1: value-1
+                    key-2: value-2
+                  message:
+                    title: send title
+                    text: send message
+        required: true
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_2'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+      x-openapi-router-controller: controllers.notification_service_controller
   /api/{organization_id}/platform/users:
     get:
       tags:
@@ -2774,6 +2938,27 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/member'
+    notifications.create:
+      title: Notification is a definition of Notification resource.
+      required:
+      - destination_id
+      - func_id
+      - message
+      type: object
+      properties:
+        destination_id:
+          type: string
+          description: Destination ID is a 26-digit string
+        func_id:
+          type: string
+          description: Function ID unique to the caller (for filtering)
+        func_information:
+          type: object
+          description: Caller-specific details (for filtering)
+        message:
+          type: object
+          description: "Webhook systems simply pass the value as the body. For e-mail,\
+            \ construct Json after reserving title and text"
     workspace:
       title: workspace is a definition of Workspace resource.
       type: object

@@ -90,6 +90,9 @@ paths:
   "/api/{organization_id}/platform/workspaces/{workspace_id}/members":
       $ref: './paths/workspaces.workspace_id.members.yaml'
 
+  "/api/{organization_id}/platform/workspaces/{workspace_id}/notifications":
+      $ref: './paths/workspaces.workspace_id.notifications.yaml'
+
   "/api/{organization_id}/platform/users":
       $ref: './paths/users.yaml'
   "/api/{organization_id}/platform/users/{user_id}":
