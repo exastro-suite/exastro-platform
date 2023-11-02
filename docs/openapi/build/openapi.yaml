@@ -969,6 +969,10 @@ paths:
           required: true
           schema:
             type: string
+        - name: query_string
+          in: query
+          schema:
+            type: string
       responses:
         '200':
           description: A successful response.
@@ -978,6 +982,45 @@ paths:
                 allOf:
                   - $ref: '#/components/schemas/responseOk'
                   - $ref: '#/components/schemas/settingsDestinationList'
+              examples:
+                mail settings:
+                  value:
+                    result: 200
+                    message: SUCCESS
+                    ts: '2023-11-02T05:36:41.258Z'
+                    data:
+                      - id: 00000001Z7ZXFAED6872F6C9W8
+                        name: destinations of mail settings
+                        kind: Mail
+                        conditions:
+                          ita.event_type.new: false
+                          ita.event_type.evaluated: false
+                          ita.event_type.time_out: true
+                          ita.event_type.undetected: true
+                        destination_informations:
+                          - address_header: to
+                            mail: mike@example.com
+                          - address_header: cc
+                            mail: tommy@example.com
+                          - address_header: bcc
+                            mail: nancy@example.com
+                        create_timestamp: '2023-11-02T05:36:41.258Z'
+                        create_user: string
+                        last_update_timestamp: '2023-11-02T05:36:41.258Z'
+                        last_update_user: string
+                teams settings:
+                  value:
+                    name: destinations of teams settings
+                    kind: Teams
+                    conditions:
+                      ita.event_type.new: false
+                      ita.event_type.evaluated: false
+                      ita.event_type.time_out: true
+                      ita.event_type.undetected: true
+                    destination_informations:
+                      - webhook: 'https://xxxxxxxx.webhook.office.com/webhookb/xxxxxxxx-xxxxxx-xxxx-xxxx-xxxxxxxxxxxx'
+                      - webhook: 'https://xxxxxxxx.webhook.office.com/webhookb/xxxxxxxx-xxxxxx-xxxx-xxxx-xxxxxxxxxxxx'
+                      - webhook: 'https://xxxxxxxx.webhook.office.com/webhookb/xxxxxxxx-xxxxxx-xxxx-xxxx-xxxxxxxxxxxx'
         default:
           description: An unexpected error response.
           content:
@@ -1081,6 +1124,10 @@ paths:
         - name: destination_id
           in: path
           required: true
+          schema:
+            type: string
+        - name: query_string
+          in: query
           schema:
             type: string
       responses:
