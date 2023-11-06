@@ -608,7 +608,7 @@ paths:
                 value:
                   - destination_id: 00000001Z7ZXFAED6872F6C9W8
                     func_id: '00000000'
-                    func_information:
+                    func_informations:
                       key-1: value-1
                       key-2: value-2
                     message:
@@ -618,7 +618,7 @@ paths:
                 value:
                   - destination_id: 00000001Z7ZXFAED6872F6C9W9
                     func_id: '00000000'
-                    func_information:
+                    func_informations:
                       key-1: value-1
                       key-2: value-2
                     message:
@@ -1693,7 +1693,7 @@ components:
         func_id:
           type: string
           description: Function ID unique to the caller (for filtering)
-        func_information:
+        func_informations:
           type: object
           description: Caller-specific details (for filtering)
         message:

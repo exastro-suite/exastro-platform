@@ -1121,7 +1121,7 @@ components:
         func_id:
           type: string
           description: Function ID unique to the caller (for filtering)
-        func_information:
+        func_informations:
           type: object
           description: Caller-specific details (for filtering)
         message:

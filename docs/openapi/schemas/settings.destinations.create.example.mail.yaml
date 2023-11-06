@@ -27,15 +27,15 @@ value:
       "destination_informations": [
         {
           "address_header": "to",
-          "mail": "mike@example.com"
+          "email": "mike@example.com"
         },
         {
           "address_header": "cc",
-          "mail": "tommy@example.com"
+          "email": "tommy@example.com"
         },
         {
           "address_header": "bcc",
-          "mail": "nancy@example.com"
+          "email": "nancy@example.com"
         }
       ]
     }
