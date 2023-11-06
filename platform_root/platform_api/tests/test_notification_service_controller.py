@@ -12,6 +12,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 from tests.common import request_parameters, test_common
+import ulid
 
 from common_library.common import const, validation
 from libs import queries_notification
@@ -352,6 +353,66 @@ def test_settings_notification_create(connexion_client):
         assert response.status_code == 500, "create notifications response code: db error"
 
 
+def test_notification_register(connexion_client):
+    """test settings_notification_create
+
+    Args:
+        connexion_client (_type_): _description_
+    """
+    organization = test_common.create_organization(connexion_client)
+    workspace = test_common.create_workspace(connexion_client, organization['organization_id'], 'workspace-01', organization['user_id'])
+    setting_notifications = test_common.create_setting_notifications(connexion_client, organization['organization_id'], 'workspace-01', organization['user_id'])
+
+    with test_common.requsts_mocker_default():
+        #
+        # validate error route
+        #
+        # validate error body
+        response = connexion_client.post(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/notifications",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization['user_id']),
+            json=[])
+
+        assert response.status_code == 400, "create notifications valide body response error route"
+        
+        # validate error destination id
+        response = connexion_client.post(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/notifications",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization['user_id']),
+            json=[sample_data_notifications_no_destination_id()])
+
+        assert response.status_code == 400, "create notifications valide destination_id response error route"
+        
+        # validate error func id
+        response = connexion_client.post(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/notifications",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization['user_id']),
+            json=[sample_data_notifications_no_func_id({"destination_id": setting_notifications[0].get("destination_id")})])
+
+        assert response.status_code == 400, "create notifications valide func_id response error route"
+        
+        # validate error func_informations
+        response = connexion_client.post(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/notifications",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization['user_id']),
+            json=[sample_data_notifications_default({"destination_id": setting_notifications[0].get("destination_id"), "func_informations": "-"})])
+
+        assert response.status_code == 400, "create notifications valide func_informations response error route"
+        
+        # validate error conditions
+        response = connexion_client.post(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/notifications",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization['user_id']),
+            json=[sample_data_notifications_default({"destination_id": setting_notifications[0].get("destination_id"), "conditions": "-"})])
+
+        assert response.status_code == 400, "create notifications valide conditions response error route"
+
+
 def sample_data_mail(id, update={}):
     """sample data mail setting
 
@@ -467,3 +528,118 @@ def sample_data_conditions(update={}):
         dict: sample data
     """
     return dict(sample_data_mail_no_id()["conditions"], **update)
+
+
+def sample_data_settings_notifications(id, kind, dest_info, conditions, update={}):
+    """create workspace parameter
+
+    Args:
+        id (str): workspace id
+        kind (str): kind (Mail/Teams)
+        dest_info (dict): destination infomations
+        conditions (dict): conditions
+        update (dict, optional): update dict. Defaults to {}.
+
+    Returns:
+        dict: create workspace parameter
+    """
+    return dict({
+        "id": id,
+        "name": id + " Name",
+        "kind": kind,
+        "destination_informations": dest_info,
+        "conditions": conditions,
+    }, **update)
+
+
+def sample_data_notifications_no_id(update={}):
+    """sample data notifications (no id)
+
+    Args:
+        update (dict, optional): update dict. Defaults to {}.
+
+    Returns:
+        dict: sample data
+    """
+    return dict({
+        "destination_id": "X",
+        "func_id": "X",
+        "func_informations": {
+            "key-1": "value-1",
+            "key-2": "value-2"
+        },
+        "message": {
+            "title": "subjects",
+            "message": "message",
+        },
+    }, **update)
+
+
+def sample_data_notifications_no_destination_id(update={}):
+    """sample data notifications (no id)
+
+    Args:
+        update (dict, optional): update dict. Defaults to {}.
+
+    Returns:
+        dict: sample data
+    """
+    return dict({
+        "id": ulid.new().str,
+        "func_id": "X",
+        "func_informations": {
+            "key-1": "value-1",
+            "key-2": "value-2"
+        },
+        "message": {
+            "title": "subjects",
+            "message": "message",
+        },
+    }, **update)
+
+
+def sample_data_notifications_no_func_id(update={}):
+    """sample data notifications (no id)
+
+    Args:
+        update (dict, optional): update dict. Defaults to {}.
+
+    Returns:
+        dict: sample data
+    """
+    return dict({
+        "id": ulid.new().str,
+        "destination_id": "X",
+        "func_informations": {
+            "key-1": "value-1",
+            "key-2": "value-2"
+        },
+        "message": {
+            "title": "subjects",
+            "message": "message",
+        },
+    }, **update)
+
+
+def sample_data_notifications_default(update={}):
+    """sample data notifications (no id)
+
+    Args:
+        update (dict, optional): update dict. Defaults to {}.
+
+    Returns:
+        dict: sample data
+    """
+    return dict({
+        "id": ulid.new().str,
+        "destination_id": "X",
+        "func_id": "X",
+        "func_informations": {
+            "key-1": "value-1",
+            "key-2": "value-2"
+        },
+        "message": {
+            "title": "subjects",
+            "message": "message",
+        },
+    }, **update)

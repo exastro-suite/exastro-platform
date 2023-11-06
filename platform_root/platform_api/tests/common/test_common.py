@@ -13,19 +13,20 @@
 #   limitations under the License.
 import requests_mock
 from unittest import mock
+import logging
 
 import re
 import os
 import json
-from ulid import ULID
+import ulid
 import pymysql
-
 
 from common_library.common import const
 
 from tests.common import request_parameters
 from tests import test_organization_service_controller
 from tests import test_workspace_service_controller
+from tests import test_notification_service_controller
 
 
 def keycloak_origin():
@@ -162,7 +163,7 @@ def create_organization(connexion_client):
     Returns:
         dict: created organization info
     """
-    organization_id = (f"unittest-{str(ULID()).lower()}")[0:const.length_organization_id]
+    organization_id = (f"unittest-{ulid.new().str.lower()}")[0:const.length_organization_id]
     json_parameter = test_organization_service_controller.sample_data_organization(organization_id)
 
     with requsts_mocker_default():
@@ -250,3 +251,73 @@ def delete_dict_item(target_vars, delete_item_keys):
         for delete_item_key in (delete_item_keys if type(delete_item_keys) is list else [delete_item_keys]):
             if delete_item_key in target_var:
                 del target_var[delete_item_key]
+
+
+def create_setting_notifications(connexion_client, organization_id, workspace_id, user_id):
+    """テスト用通知先情報作成 / Creating test notification information
+
+    Args:
+        connexion_client (obj): connexion_client
+        organization_id (str): organization_id
+        workspace_id (str): workspace_id
+        workspace_admin_user_id (str): workspace administrator user id
+
+    Raises:
+        Exception: _description_
+    """
+    rows = []
+    with requsts_mocker_default():
+        
+        id = "TEST_TEAMS"
+        kind = const.DESTINATION_KIND_TEAMS
+        dest_info = [
+            {"webhook": "https://xxxxxxxx.webhook.office.com/webhookb/xxxxxxxx-xxxxxx-xxxx-xxxx-xxxxxxxxxxxx"},
+            {"webhook": "https://xxxxxxxx.webhook.office.com/webhookb/xxxxxxxx-xxxxxx-xxxx-xxxx-xxxxxxxxxxxx"},
+        ]
+        conditions = {
+            "ita.event_type.new": True,
+            "ita.event_type.evaluated": True,
+            "ita.event_type.time_out": True,
+            "ita.event_type.undetected": True,
+        }
+
+        json_create_settings_notifications = test_notification_service_controller.sample_data_settings_notifications(id, kind, dest_info, conditions)
+
+        rows.append(json_create_settings_notifications)
+        
+        id = "TEST_MAIL"
+        kind = const.DESTINATION_KIND_MAIL
+        dest_info = [
+            {"address_header": "to", "email": "test1@example.com"},
+            {"address_header": "cc", "email": "test2@example.com"},
+            {"address_header": "bcc", "email": "test3@example.com"},
+        ]
+        conditions = {
+            "ita.event_type.new": True,
+            "ita.event_type.evaluated": True,
+            "ita.event_type.time_out": True,
+            "ita.event_type.undetected": True,
+        }
+
+        json_create_settings_notifications = test_notification_service_controller.sample_data_settings_notifications(id, kind, dest_info, conditions)
+
+        rows.append(json_create_settings_notifications)
+
+    logger = logging.getLogger("TEST")
+
+    logger.info(f"json:{rows}")
+
+    with requsts_mocker_default():
+        resp_post = connexion_client.post(
+            f"/api/{organization_id}/platform/workspaces/{workspace_id}/settings/notifications",
+            content_type='application/json',
+            headers=request_parameters.request_headers(user_id=user_id),
+            json=rows)
+
+        logger.info("test log")
+        logger.info(resp_post.text)
+
+        if resp_post.status_code != 200:
+            raise Exception(f'FAILED : create_setting_notifications status:{resp_post.status_code}')
+
+    return rows

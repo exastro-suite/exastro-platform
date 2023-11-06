@@ -257,7 +257,7 @@ def notification_register(body, organization_id, workspace_id):  # noqa: E501
                 destination = destinations[0]
 
                 insert_notifications.append({
-                    "notification_id": ulid.new(),
+                    "notification_id": ulid.new().str,
                     "destination_id": destination.get('destination_id'),
                     "destination_name": destination.get('destination_name'),
                     "destination_kind": destination.get('destination_kind'),
