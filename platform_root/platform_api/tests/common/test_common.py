@@ -68,6 +68,91 @@ def requsts_mocker_default():
     return requests_mocker
 
 
+def pymysql_execute_raise_exception_mocker(sqlstmt, exception):
+    """DB Exception発行mocker
+
+    Args:
+        sqlstmt (stmt): SQL that causes an exception
+        exception (Exception): exception to raise
+
+    Returns:
+        _type_: _description_
+    """
+    # オリジナルのpymysql.connectメソッドを退避
+    pymysql_connect = pymysql.connect
+
+    def mocked_function(host, database, user, password, port, charset, collation, cursorclass):
+        conn = pymysql_connect(
+            host=host,
+            database=database,
+            user=user,
+            password=password,
+            port=port,
+            charset=charset,
+            collation=collation,
+            cursorclass=cursorclass
+        )
+        # pymysql.connectで返す内容をpymysql_connection_mocked instanceにする
+        return pymysql_connection_mocked(conn, sqlstmt, exception)
+
+    return mock.patch.object(pymysql, 'connect', side_effect=mocked_function)
+
+
+class pymysql_connection_mocked():
+    """pymysqlのconnectインスタンス（モック時）
+    """
+    def __init__(self, conn, sqlstmt, exception):
+        self.sqlstmt = sqlstmt
+        self.exception = exception
+        self.conn = conn
+
+    def begin(self):
+        return self.conn.begin()
+
+    def close(self):
+        return self.conn.close()
+
+    def commit(self):
+        return self.conn.commit()
+
+    def cursor(self):
+        cursor = self.conn.cursor()
+        return pymysql_cursor_mocked(cursor, self.sqlstmt, self.exception)
+
+    def rollback(self):
+        return self.conn.rollback()
+
+
+class pymysql_cursor_mocked():
+    """pymysqlのcursorインスタンス（モック時）
+    """
+    def __init__(self, cursor, sqlstmt, exception):
+        self.cursor = cursor
+        self.sqlstmt = sqlstmt
+        self.exception = exception
+
+    def __enter__(self):
+        return self
+    
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.cursor.close()
+
+    def close(self):
+        self.cursor.close()
+
+    def execute(self, query, args=None):
+        if query == self.sqlstmt:
+            raise self.exception
+
+        return self.cursor.execute(query, args)
+
+    def fetchall(self):
+        return self.cursor.fetchall()
+
+    def fetchone(self):
+        return self.cursor.fetchone()
+
+
 def create_organization(connexion_client):
     """テスト用オーガナイゼーション作成
 

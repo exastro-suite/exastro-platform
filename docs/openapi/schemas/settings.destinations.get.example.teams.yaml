@@ -20,8 +20,8 @@ value:
     "data":[
       {
         "id": "00000001Z7ZXFAED6872F6C9W8",
-        "name": "destinations of mail settings",
-        "kind": "Mail",
+        "name": "destinations of teams settings",
+        "kind": "Teams",
         "conditions": {
           "ita.event_type.new": false,
           "ita.event_type.evaluated": false,
@@ -29,18 +29,9 @@ value:
           "ita.event_type.undetected": true
         },
         "destination_informations": [
-          {
-            "address_header": "to",
-            "mail": "mike@example.com"
-          },
-          {
-            "address_header": "cc",
-            "mail": "tommy@example.com"
-          },
-          {
-            "address_header": "bcc",
-            "mail": "nancy@example.com"
-          }
+          { "webhook": "https://xxxxxxxx.webhook.office.com/webhookb/xxxxxxxx-xxxxxx-xxxx-xxxx-xxxxxxxxxxxx" },
+          { "webhook": "https://xxxxxxxx.webhook.office.com/webhookb/xxxxxxxx-xxxxxx-xxxx-xxxx-xxxxxxxxxxxx" },
+          { "webhook": "https://xxxxxxxx.webhook.office.com/webhookb/xxxxxxxx-xxxxxx-xxxx-xxxx-xxxxxxxxxxxx" }
         ],
         "create_timestamp": "2023-11-02T05:36:41.258Z",
         "create_user": "string",

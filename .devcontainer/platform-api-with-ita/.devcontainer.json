@@ -109,7 +109,7 @@
 		"snyk-security.snyk-vulnerability-scanner",
 		// "rapidapi.vscode-rapidapi-client",
 		"humao.rest-client",
-		"ryanluker/vscode-coverage-gutters",
+		"ryanluker.vscode-coverage-gutters",
 	],
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	"forwardPorts": [
