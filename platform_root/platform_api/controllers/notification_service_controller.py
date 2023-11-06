@@ -28,7 +28,7 @@ import globals
 MSG_FUNCTION_ID = "34"
 
 
-def settings_destination_get(organization_id, workspace_id, destination_id):  # noqa: E501
+def settings_destination_get(organization_id, workspace_id, destination_id, query_string=None):  # noqa: E501
     """Returns of settings destination
 
      # noqa: E501
@@ -39,8 +39,10 @@ def settings_destination_get(organization_id, workspace_id, destination_id):  # 
     :type workspace_id: str
     :param destination_id: 
     :type destination_id: str
+    :param query_string: 
+    :type query_string: str
 
-    :rtype: InlineResponse20013
+    :rtype: InlineResponse20017
     """
     return 'do some magic!'
 
@@ -62,6 +64,7 @@ def settings_destination_put(body, organization_id, workspace_id, destination_id
     :rtype: InlineResponse2002
     """
     return 'do some magic!'
+
 
 @common.platform_exception_handler
 def settings_notification_create(body, organization_id, workspace_id):  # noqa: E501
@@ -85,16 +88,19 @@ def settings_notification_create(body, organization_id, workspace_id):  # noqa: 
         return common.response_validation_error(validate)
             
     for row in body:
-        validate = validation.validate_destination_id(row['id'])
+        validate = validation.validate_destination_id(row.get('id'))
         if not validate.ok:
             return common.response_validation_error(validate)
-        validate = validation.validate_destination_name(row['name'])
+        validate = validation.validate_destination_name(row.get('name'))
         if not validate.ok:
             return common.response_validation_error(validate)
-        validate = validation.validate_destination_kind(row['kind'])
+        validate = validation.validate_destination_kind(row.get('kind'))
         if not validate.ok:
             return common.response_validation_error(validate)
-        validate = validation.validate_destination_info(row['kind'], row['informations'])
+        validate = validation.validate_destination_informations(row.get('kind'), row.get('destination_informations'))
+        if not validate.ok:
+            return common.response_validation_error(validate)
+        validate = validation.validate_destination_conditions(row.get('conditions'))
         if not validate.ok:
             return common.response_validation_error(validate)
 
@@ -105,10 +111,11 @@ def settings_notification_create(body, organization_id, workspace_id):  # noqa: 
             for row in body:
                 try:
                     parameter = {
-                        "destination_id": row['id'],
-                        "destination_name": row['name'],
-                        "destination_kind": row['kind'],
-                        "destination_info": encrypt.encrypt_str(json.dumps(row['informations'])),
+                        "destination_id": row.get('id'),
+                        "destination_name": row.get('name'),
+                        "destination_kind": row.get('kind'),
+                        "destination_informations": encrypt.encrypt_str(json.dumps(row.get('destination_informations'))),
+                        "conditions": json.dumps(row.get('conditions')),
                         "create_user": user_id,
                         "last_update_user": user_id
                     }
@@ -116,7 +123,7 @@ def settings_notification_create(body, organization_id, workspace_id):  # noqa: 
                         cursor.execute(queries_notification.SQL_INSERT_NOTIFICATION_DESTINATION, parameter)
                     except pymysql.err.IntegrityError:
                         # Duplicate PRIMARY KEY
-                        message_id = f"400-{MSG_FUNCTION_ID}004"
+                        message_id = f"400-{MSG_FUNCTION_ID}001"
                         message = multi_lang.get_text(
                             message_id,
                             "指定された通知先はすでに存在しているため作成できません(id:{0})",
@@ -156,3 +163,119 @@ def settings_notification_list(organization_id, workspace_id):  # noqa: E501
     :rtype: InlineResponse20016
     """
     return 'do some magic!'
+
+
+@common.platform_exception_handler
+def notification_list(organization_id, workspace_id, page_size=None, current_page=None, details_info=None, func_id=None, match_key=None, like_before_key=None, like_after_key=None, like_all_key=None):  # noqa: E501
+    """Returns a list of message notifications
+
+     # noqa: E501
+
+    :param organization_id: 
+    :type organization_id: str
+    :param workspace_id: 
+    :type workspace_id: str
+    :param page_size: Maximum number of return values ​​at one time (default: 100)
+    :type page_size: float
+    :param current_page: Current display page (default: 1)
+    :type current_page: float
+    :param details_info: With message output
+    :type details_info: bool
+    :param func_id: Filter by function ID
+    :type func_id: str
+    :param match_key: Specify exact match condition
+    :type match_key: str
+    :param like_before_key: Specifying conditions for beginning match
+    :type like_before_key: str
+    :param like_after_key: Specifying conditions for suffix match
+    :type like_after_key: str
+    :param like_all_key: Specifying conditions for fuzzy search
+    :type like_all_key: str
+
+    :rtype: InlineResponse20013
+    """
+    return common.response_200_ok(data=None)
+
+
+@common.platform_exception_handler
+def notification_register(body, organization_id, workspace_id):  # noqa: E501
+    """Register for message notifications
+
+    Args:
+        body (dict): json
+        organization_id (str): organization_id
+        workspace_id (str): workspace_id
+
+    Returns:
+        Response: http response
+    """
+    globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
+
+    body = connexion.request.get_json()
+
+    # # validation check
+    # validate = validation.validate_destinations(body)
+    # if not validate.ok:
+    #     return common.response_validation_error(validate)
+            
+    # for row in body:
+    #     validate = validation.validate_destination_id(row.get('id'))
+    #     if not validate.ok:
+    #         return common.response_validation_error(validate)
+    #     validate = validation.validate_destination_name(row.get('name'))
+    #     if not validate.ok:
+    #         return common.response_validation_error(validate)
+    #     validate = validation.validate_destination_kind(row.get('kind'))
+    #     if not validate.ok:
+    #         return common.response_validation_error(validate)
+    #     validate = validation.validate_destination_informations(row.get('kind'), row.get('destination_informations'))
+    #     if not validate.ok:
+    #         return common.response_validation_error(validate)
+    #     validate = validation.validate_destination_conditions(row.get('conditions'))
+    #     if not validate.ok:
+    #         return common.response_validation_error(validate)
+
+    # user_id = connexion.request.headers.get("User-id")
+
+    # with closing(DBconnector().connect_workspacedb(organization_id, workspace_id)) as conn:
+    #     with conn.cursor() as cursor:
+    #         for row in body:
+    #             try:
+    #                 parameter = {
+    #                     "destination_id": row.get('id'),
+    #                     "destination_name": row.get('name'),
+    #                     "destination_kind": row.get('kind'),
+    #                     "destination_informations": encrypt.encrypt_str(json.dumps(row.get('destination_informations'))),
+    #                     "conditions": json.dumps(row.get('conditions')),
+    #                     "create_user": user_id,
+    #                     "last_update_user": user_id
+    #                 }
+    #                 try:
+    #                     cursor.execute(queries_notification.SQL_INSERT_NOTIFICATION_DESTINATION, parameter)
+    #                 except pymysql.err.IntegrityError:
+    #                     # Duplicate PRIMARY KEY
+    #                     message_id = f"400-{MSG_FUNCTION_ID}001"
+    #                     message = multi_lang.get_text(
+    #                         message_id,
+    #                         "指定された通知先はすでに存在しているため作成できません(id:{0})",
+    #                         parameter['destination_id'],
+    #                     )
+    #                     raise common.BadRequestException(message_id=message_id, message=message)
+
+    #                 except Exception as e:
+    #                     globals.logger.error(f"exception:{e.args}")
+    #                     message_id = f"500-{MSG_FUNCTION_ID}001"
+    #                     message = multi_lang.get_text(
+    #                         message_id,
+    #                         "通知先の作成に失敗しました(id:{0})",
+    #                         parameter['destination_id'],
+    #                     )
+    #                     raise common.InternalErrorException(message_id=message_id, message=message)
+
+    #             except Exception as e:
+    #                 conn.rollback()
+    #                 raise e
+
+    #         conn.commit()
+
+    return common.response_200_ok(data=None)

@@ -18,10 +18,25 @@ value:
       "id": "00000001Z7ZXFAED6872F6C9W8",
       "name": "destinations of mail settings",
       "kind": "Mail",
-      "informations": [
-        { "mail": "<mike>mike@example.com" },
-        { "mail": "<tommy>tommy@example.com" },
-        { "mail": "<nancy>nancy@example.com" }
+      "conditions": {
+        "ita.event_type.new": false,
+        "ita.event_type.evaluated": false,
+        "ita.event_type.time_out": true,
+        "ita.event_type.undetected": true
+      },
+      "destination_informations": [
+        {
+          "address_header": "to",
+          "mail": "mike@example.com"
+        },
+        {
+          "address_header": "cc",
+          "mail": "tommy@example.com"
+        },
+        {
+          "address_header": "bcc",
+          "mail": "nancy@example.com"
+        }
       ]
     }
   ]

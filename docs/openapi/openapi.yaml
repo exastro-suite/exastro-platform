@@ -126,8 +126,8 @@ paths:
   "/api/{organization_id}/platform/workspaces/{workspace_id}/settings/notifications/{destination_id}":
       $ref: './paths/workspaces.workspace_id.settings.notifications.destination_id.yaml'
 
-  # "/api/{organization_id}/platform/workspaces/{workspace_id}/notifications":
-  #     $ref: './paths/workspaces.workspace_id.notifications.yaml'
+  "/api/{organization_id}/platform/workspaces/{workspace_id}/notifications":
+      $ref: './paths/workspaces.workspace_id.notifications.yaml'
 
   # "/api/{organization_id}/platform/workspaces/{workspace_id}/notifications/{notifications_id}":
   #     $ref: './paths/workspaces.workspace_id.notifications.notification_id.yaml'

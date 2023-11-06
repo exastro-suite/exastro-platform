@@ -47,6 +47,10 @@ def main():
                 globals.logger.info(f'EXECUTE SQL:{query}')
                 cursor.execute(query)
 
+            for query in queries_db_migration.UPDATE_TABLES:
+                globals.logger.info(f'EXECUTE SQL:{query}')
+                cursor.execute(query)
+
             conn.commit()
 
     if result != 0:

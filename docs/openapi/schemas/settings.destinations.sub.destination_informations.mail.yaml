@@ -12,27 +12,12 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-title: destination is a definition of Destination resource.
+title: destinations destination_informations(mail) resource.
 type: object
 properties:
-  name:
+  address_header:
     type: string
-    description: Destination name can be any string
-  kind:
+    description: Header to set email address
+  email:
     type: string
-    description: Select destination kind from Mail/Teams/Webhook
-  conditions:
-    $ref: './settings.destinations.sub.conditions.yaml' 
-  destination_informations:
-    type: array
-    items:
-      type: object
-      description: Set the destination information for the destination
-      anyOf:
-        - $ref: './settings.destinations.sub.destination_informations.mail.yaml'
-        - $ref: './settings.destinations.sub.destination_informations.teams.yaml'
-required:
-  - name
-  - kind
-  - conditions
-  - destination_informations
+    description: email address

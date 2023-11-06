@@ -102,6 +102,10 @@ html {
 }
 .validate_error {
     color: red;
+    text-overflow: unset;
+    overflow: scroll;
+    white-space: normal;
+
 }
 
 .caution_message {

@@ -13,6 +13,6 @@
 #   limitations under the License.
 
 SQL_INSERT_NOTIFICATION_DESTINATION = """
-INSERT INTO M_NOTIFICATION_DESTINATION (DESTINATION_ID, DESTINATION_NAME, DESTINATION_KIND, DESTINATION_INFO, CREATE_USER, LAST_UPDATE_USER)
-values (%(destination_id)s, %(destination_name)s, %(destination_kind)s, %(destination_info)s, %(create_user)s, %(last_update_user)s)
+INSERT INTO M_NOTIFICATION_DESTINATION (DESTINATION_ID, DESTINATION_NAME, DESTINATION_KIND, DESTINATION_INFORMATIONS, CONDITIONS, CREATE_USER, LAST_UPDATE_USER)
+values (%(destination_id)s, %(destination_name)s, %(destination_kind)s, %(destination_informations)s, %(conditions)s, %(create_user)s, %(last_update_user)s) # NOQA:E501
 """

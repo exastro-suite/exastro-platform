@@ -438,6 +438,85 @@ def ita_workspace_api_call(organization_id, workspace_id, subpath):
         return common.response_server_error(e)
 
 
+@app.route('/api/<string:organization_id>/workspaces/<string:workspace_id>/oase_agent/<path:subpath>', methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTION"])  # noqa: E501
+@common.platform_exception_handler
+def ita_oase_recever_api_call(organization_id, workspace_id, subpath):
+    """Call the IT-automation OASE RECIVER API after authorization - 認可後にIT-automation OASE RECIVER APIを呼び出します
+
+    Args:
+        organization_id (str): organization id
+        workspace_id (str): workspace id
+        subpath (str): subpath
+
+    Returns:
+        Response: HTTP Response
+    """
+    try:
+        globals.logger.info('call ita oase reciver api. method={} organization_id={} workspace_id={} subpath={}'.format(request.method, organization_id, workspace_id, subpath))  # noqa: E501
+
+        # Destination URL settings - 宛先URLの設定
+        dest_url = "{}://{}:{}/api/{}/workspaces/{}/oase_agent/{}".format(
+            os.environ['ITA_API_OASE_RECEIVER_PROTOCOL'], os.environ['ITA_API_OASE_RECEIVER_HOST'], os.environ['ITA_API_OASE_RECEIVER_PORT'], organization_id, workspace_id, subpath)
+
+        # サービスアカウントを使うためにClientのSercretを取得
+        # Get Client Sercret to use service account
+        db = DBconnector()
+        private = db.get_organization_private(organization_id)
+
+        # 取得できない場合は、エラー
+        # If you cannot get it, an error
+        if not private:
+            message_id = "500-11001"
+            message = multi_lang.get_text(message_id,
+                                          "organization private情報の取得に失敗しました")
+            raise common.InternalErrorException(essage_id=message_id, message=message)
+
+        # organization idをrealm名として設定
+        # Set organization id as realm name
+        proxy = auth_proxy.auth_proxy(organization_id,
+                                      private.token_check_client_clientid,
+                                      private.token_check_client_secret,
+                                      private.user_token_client_clientid,
+                                      None)
+
+        # 各種チェック check
+        response_json = proxy.check_authorization()
+
+        globals.logger.info(f'called check_authorization responce={response_json}')
+
+        # api呼び出し call api
+        return_api = proxy.call_api(dest_url, response_json.get("data"))
+        globals.logger.info('responce headers={}'.format(list(return_api.headers)))
+
+        # 戻り値をそのまま返却
+        # Return the return value as it is
+        response = make_response()
+        response.status_code = return_api.status_code
+        response.data = return_api.content
+        for key, value in return_api.headers.items():
+            if key.lower().startswith('content-'):
+                response.headers[key] = value
+        return response
+
+    except common.NotFoundException:
+        raise
+
+    except common.AuthException as e:
+        globals.logger.error(f'authentication error:{e.args}')
+        message_id = "401-00002"
+        message = multi_lang.get_text(message_id, "認証に失敗しました。")
+        raise common.AuthException(message_id=message_id, message=message)
+
+    except common.NotAllowedException as e:
+        globals.logger.info(f'permission error:{e.args}')
+        message_id = "403-00001"
+        info = common.multi_lang.get_text(message_id, "permission error")
+        raise common.NotAllowedException(message_id=message_id, message=info)
+
+    except Exception as e:
+        return common.response_server_error(e)
+
+
 if __name__ == '__main__':
     app.run(
         debug=(True if os.environ.get('FLASK_ENV', 'produciton') == 'development' else False),

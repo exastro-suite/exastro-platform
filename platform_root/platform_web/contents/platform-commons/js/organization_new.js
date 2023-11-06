@@ -124,9 +124,9 @@ $(function(){
 
         $('#form_plan_id').append($('<option>').html('').val(''));
         for(var row of planListData) {
-            if (fn.cv(row.plan_id,'',true).charAt(0) != '_')
+            if (row.plan_id.charAt(0) != '_')
             {
-                $('#form_plan_id').append($('<option>').html(fn.cv(row.plan_id,'',true)+':'+fn.cv(row.plan_name,'',true)).val(fn.cv(row.plan_id,'',true)));
+                $('#form_plan_id').append($('<option>').html(fn.cv(row.plan_id,'',true)+':'+fn.cv(row.plan_name,'',true)).val(row.plan_id));
             }
         }
     }

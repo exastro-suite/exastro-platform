@@ -28,3 +28,18 @@ CREATE_TABLES = [
     )ENGINE = InnoDB, CHARSET = utf8mb4, COLLATE = utf8mb4_bin, ROW_FORMAT=COMPRESSED ,KEY_BLOCK_SIZE=8;
     """
 ]
+
+UPDATE_TABLES = [
+    """
+    UPDATE T_PLAN_ITEM SET INFORMATIONS = JSON_SET(INFORMATIONS, '$.description', 'Maximum number of roles for organization default')
+        WHERE LIMIT_ID = 'platform.roles';
+    """,
+    """
+    UPDATE T_PLAN_ITEM SET INFORMATIONS = JSON_SET(INFORMATIONS, '$.description', 'Maximum number of users for organization default')
+        WHERE LIMIT_ID = 'platform.users';
+    """,
+    """
+    UPDATE T_PLAN_ITEM SET INFORMATIONS = JSON_SET(INFORMATIONS, '$.description', 'Maximum number of workspaces for organization default')
+        WHERE LIMIT_ID = 'platform.workspaces';
+    """
+]

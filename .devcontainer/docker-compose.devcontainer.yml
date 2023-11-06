@@ -90,6 +90,7 @@ services:
       - SSL_CERT_DIR=/etc/ssl/certs
       - NODE_EXTRA_CA_CERTS=/etc/ssl/certs/ca-certificates.crt
       - NODE_TLS_REJECT_UNAUTHORIZED=${NODE_TLS_REJECT_UNAUTHORIZED:-1}
+      - NETWORK_ID=${NETWORK_ID:-}
   platform-web:
     build:
       target: develop_build
@@ -220,6 +221,8 @@ services:
       - API_PORT=8000
       - PYTHONIOENCODING=utf-8
       - FLASK_ENV=development
+    networks:
+      - exastro
 
   ita-web:
     build:
@@ -236,3 +239,5 @@ services:
       - ../test/web/config/httpd.conf/httpd.conf:/etc/httpd/conf/httpd.conf:cached
       - ../test/web/config/httpd.conf/rewrite.conf:/etc/httpd/conf.d/rewrite.conf:cached
       - ../test/web/contents:/var/www/html:cached
+    networks:
+      - exastro

@@ -19,7 +19,7 @@ six = ">=0.0.0"
 pymysql = ">=0.0.0"
 pycryptodome = ">=0.0.0"
 packaging = ">=0.0.0"
-cryptography = ">=0.0.0"
+cryptography = "^40.0.0"
 
 
 [tool.poetry.group.first_install.dependencies]

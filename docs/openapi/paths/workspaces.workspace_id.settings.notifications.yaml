@@ -29,6 +29,10 @@ get:
     required: true
     schema:
       type: string
+  - name: query_string
+    in: query
+    schema:
+      type: string
   responses:
     200:
       description: A successful response.
@@ -38,6 +42,11 @@ get:
             allOf:
               - $ref: '../schemas/responseOk.yaml'
               - $ref: '../schemas/settings.destinationList.yaml'
+          examples:
+            mail settings:
+              $ref: "../schemas/settings.destinations.get.example.mail.yaml"
+            teams settings:
+              $ref: "../schemas/settings.destinations.get.example.teams.yaml"
     default:
       description: An unexpected error response.
       content:

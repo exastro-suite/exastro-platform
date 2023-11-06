@@ -11,14 +11,11 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
-import requests_mock
 from tests.common import request_parameters, test_common
 
 
-def test_plan_list(connexion_client):
-    with requests_mock.Mocker() as requests_mocker:
-        test_common.requsts_mocker_setting(requests_mocker)
-
+def test_plan_api(connexion_client):
+    with test_common.requsts_mocker_default():
         response = connexion_client.get(
             '/api/platform/plans',
             headers=request_parameters.request_headers())

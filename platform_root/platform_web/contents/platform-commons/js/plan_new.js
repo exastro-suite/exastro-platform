@@ -191,7 +191,7 @@ $(function(){
             }
         ).then(() => {
             hide_progress();
-            alertMessage(getText("000-80018", "処理結果"), getText("000-86012", "リソースプランを作成しました"),
+            alertMessage(getText("000-80018", "処理結果"), getText("000-86012", "リソースプランを作成しました。"),
             () => {
                 window.location = location_conf.href.plans.list;
             });

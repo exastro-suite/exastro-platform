@@ -73,6 +73,8 @@ RUN dnf config-manager --add-repo=https://download.docker.com/linux/centos/docke
 &&  echo '%wheel ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers \
 &&  echo "%${GROUPNAME} ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 
+RUN poetry install --with develop_build
+
 USER $USERNAME
 
 RUN mkdir ~/.config \
@@ -80,8 +82,6 @@ RUN mkdir ~/.config \
 && mkdir ~/.vscode-server-insiders
 
 WORKDIR $APP_PATH
-
-RUN poetry install --with develop_build
 
 COPY ./platform_root/version $APP_PATH/
 COPY ./platform_root/platform_migration/ $APP_PATH/

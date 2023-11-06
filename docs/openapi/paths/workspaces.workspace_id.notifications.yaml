@@ -14,19 +14,61 @@
 
 get:
   tags:
-  - WorkspaceService
-  summary: List returns list of workspaces
-  x-openapi-router-controller: controllers.workspace_service_controller
-  operationId: workspace_list
+  - NotificationService
+  summary: Returns a list of message notifications
+  x-openapi-router-controller: controllers.notification_service_controller
+  operationId: notification_list
   parameters:
   - name: organization_id
     in: path
     required: true
     schema:
       type: string
-  - name: workspace_name
+  - name: workspace_id
+    in: path
+    required: true
+    schema:
+      type: string
+  - name: PageSize
     in: query
-    description: the workspace's name.
+    description: "Maximum number of return values ​​at one time (default: 100)"
+    schema:
+      type: number
+      minimum: 1
+  - name: CurrentPage
+    in: query
+    description: "Current display page (default: 1)"
+    schema:
+      type: number
+      minimum: 1
+  - name: DetailsInfo
+    in: query
+    description: "With message output"
+    schema:
+      type: boolean
+  - name: FuncID
+    in: query
+    description: "Filter by function ID"
+    schema:
+      type: string
+  - name: Match.key
+    in: query
+    description: "Specify exact match condition"
+    schema:
+      type: string
+  - name: LikeBefore.key
+    in: query
+    description: "Specifying conditions for beginning match"
+    schema:
+      type: string
+  - name: LikeAfter.key
+    in: query
+    description: "Specifying conditions for suffix match"
+    schema:
+      type: string
+  - name: LikeAll.key
+    in: query
+    description: "Specifying conditions for fuzzy search"
     schema:
       type: string
   responses:
@@ -46,12 +88,17 @@ get:
             $ref: '../schemas/runtimeError.yaml'
 post:
   tags:
-  - WorkspaceService
-  summary: Create creates an workspace
-  x-openapi-router-controller: controllers.workspace_service_controller
-  operationId: workspace_create
+  - NotificationService
+  summary: Register for message notifications
+  x-openapi-router-controller: controllers.notification_service_controller
+  operationId: notification_register
   parameters:
   - name: organization_id
+    in: path
+    required: true
+    schema:
+      type: string
+  - name: workspace_id
     in: path
     required: true
     schema:
@@ -60,7 +107,14 @@ post:
     content:
       application/json:
         schema:
-          $ref: '../schemas/workspace.yaml'
+          type: array
+          items:
+            $ref: '../schemas/notifications.create.yaml'
+        examples:
+          mail message post:
+            $ref: "../schemas/notifications.create.example.mail.yaml"
+          teams message post:
+            $ref: "../schemas/notifications.create.example.teams.yaml"
     required: true
   responses:
     200:

@@ -30,7 +30,8 @@ CREATE_TABLES = [
         DESTINATION_ID	                VARCHAR(36) NOT NULL,	                        -- 通知先ID
         DESTINATION_NAME	            VARCHAR(255),	                                -- 通知先名
         DESTINATION_KIND	            VARCHAR(20),	                                -- 通知方法(Mail, Teams, Webhook)
-        DESTINATION_INFO	            LONGTEXT,	                                    -- 通知先(Webhook URL, email) (Json形式)
+        DESTINATION_INFORMATIONS        LONGTEXT,	                                    -- 通知先(Webhook URL, email) (Json形式)
+        CONDITIONS                      LONGTEXT,	                                    -- 通知条件 (Json形式)
         CREATE_TIMESTAMP	            DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,    -- 作成日時
         CREATE_USER	                    VARCHAR(40),	                                -- 作成者
         LAST_UPDATE_TIMESTAMP	        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,    -- 最終更新日時
@@ -46,10 +47,11 @@ CREATE_TABLES = [
         DESTINATION_ID	                VARCHAR(36),	                                -- 通知先ID
         DESTINATION_NAME	            VARCHAR(255),	                                -- 通知先名
         DESTINATION_KIND	            VARCHAR(20),	                                -- 通知方法(Mail, Teams, Webhook)
-        DESTINATION_INFO	            LONGTEXT,	                                    -- 通知先(Webhook URL, email) (Json形式) ※暗号化
+        DESTINATION_INFORMATIONS        LONGTEXT,	                                    -- 通知先(Webhook URL, email) (Json形式) ※暗号化
+        CONDITIONS                      LONGTEXT,	                                    -- 通知条件 (Json形式)
         FUNC_ID	                        VARCHAR(100),	                                -- 機能ID (メニューID等）
-        FUNC_INFOMATIONS	            LONGTEXT,	                                    -- 機能詳細情報(Json形式)
-        MESSAGE_INFOMATIONS	            LONGTEXT,	                                    -- 通知メッセージ(Json形式)
+        FUNC_INFORMATIONS	            LONGTEXT,	                                    -- 機能詳細情報(Json形式)
+        MESSAGE_INFORMATIONS	        LONGTEXT,	                                    -- 通知メッセージ(Json形式)
         NOTIFICATION_STATUS	            VARCHAR(40),	                                -- 通知結果：Unsent(未送信)、Successful(送信成功)、Failed(送信失敗)
         NOTIFICATION_TIMESTAMP	        DATETIME,	                                    -- 送信日時
         CREATE_TIMESTAMP	            DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,	-- 作成日時
