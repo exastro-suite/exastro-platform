@@ -85,3 +85,10 @@ content-type: application/json
     }
   }
 ]
+
+
+### Get Notification Desiti
+
+@dest_id = destination-mail-01
+GET {{base_org_url}}/api/{{org_id}}/platform/workspaces/{{ws_id}}/settings/notifications/{{dest_id}}
+Authorization: Basic {{org-user-id}} {{org-user-pw}}
