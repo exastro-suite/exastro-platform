@@ -1267,7 +1267,7 @@ def validate_destination_conditions(conditions):
             multi_lang.get_text('000-00154', "既知（判定済み）")
         )
 
-    if type(conditions.get(const.CONDITIONS_ITA_EVENT_TYPE_TIME_OUT)) is not bool:
+    if type(conditions.get(const.CONDITIONS_ITA_EVENT_TYPE_TIMEOUT)) is not bool:
         return result(
             False, 400, '400-{}024'.format(MSG_FUNCTION_ID), 'True/False 以外が指定されています。({0})',
             multi_lang.get_text('000-00155', "既知（時間切れ）")

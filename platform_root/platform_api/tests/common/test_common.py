@@ -275,10 +275,11 @@ def create_setting_notifications(connexion_client, organization_id, workspace_id
             {"webhook": "https://xxxxxxxx.webhook.office.com/webhookb/xxxxxxxx-xxxxxx-xxxx-xxxx-xxxxxxxxxxxx"},
         ]
         conditions = {
-            "ita_event_type_new": True,
-            "ita_event_type_evaluated": True,
-            "ita_event_type_time_out": True,
-            "ita_event_type_undetected": True,
+            "ita": {
+                "event_type": {
+                    "new": True, "evaluated": True, "timeout": True, "undetected": True,
+                }
+            }
         }
 
         json_create_settings_notifications = test_notification_service_controller.sample_data_settings_notifications(id, kind, dest_info, conditions)
@@ -293,10 +294,11 @@ def create_setting_notifications(connexion_client, organization_id, workspace_id
             {"address_header": "bcc", "email": "test3@example.com"},
         ]
         conditions = {
-            "ita_event_type_new": True,
-            "ita_event_type_evaluated": True,
-            "ita_event_type_time_out": True,
-            "ita_event_type_undetected": True,
+            "ita": {
+                "event_type": {
+                    "new": True, "evaluated": True, "timeout": True, "undetected": True,
+                }
+            }
         }
 
         json_create_settings_notifications = test_notification_service_controller.sample_data_settings_notifications(id, kind, dest_info, conditions)
