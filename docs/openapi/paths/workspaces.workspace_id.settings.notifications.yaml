@@ -29,10 +29,24 @@ get:
     required: true
     schema:
       type: string
-  - name: query_string
+  - name: event_type_true
     in: query
     schema:
-      type: string
+      type: array
+      items:
+        type: string
+    style: pipeDelimited
+    explode: false
+    description: When acquiring information where event_type is True, specify the corresponding item name
+  - name: event_type_false
+    in: query
+    schema:
+      type: array
+      items:
+        type: string
+    style: pipeDelimited
+    explode: false
+    description: When acquiring information where event_type is False, specify the corresponding item name
   responses:
     200:
       description: A successful response.

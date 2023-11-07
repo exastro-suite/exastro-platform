@@ -1280,3 +1280,81 @@ def validate_destination_conditions(conditions):
         )
 
     return result(True)
+
+
+def validate_notifications(body):
+    if type(body) is not list:
+        return result(
+            False, 400, '400-{}002'.format(MSG_FUNCTION_ID), 'リクエストボディのパラメータ({0})が不正です。',
+            'Json'
+        )
+        
+    if len(body) == 0:
+        return result(
+            False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
+            multi_lang.get_text('000-00181', "メッセージ通知情報")
+        )
+
+    return result(True)
+
+
+def validate_func_id(func_id):
+    """validate func_id
+
+    Args:
+        func_id (str): func_id
+
+    Returns:
+        result: Validation result
+    """
+    if func_id is None or func_id == "":
+        return result(
+            False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
+            multi_lang.get_text('000-00182', "機能ID")
+        )
+
+    if len(func_id) > const.length_func_id:
+        return result(
+            False, 400, '400-{}012'.format(MSG_FUNCTION_ID), '指定可能な文字数を超えています。(項目:{0},最大文字数:{1})',
+            multi_lang.get_text('000-00182', "機能ID"),
+            str(const.length_func_id)
+        )
+
+    return result(True)
+
+
+def validate_func_informations(func_info):
+    """validate func_informations
+
+    Args:
+        func_info (dict): func_info
+
+    Returns:
+        result: Validation result
+    """
+    # if not common.is_json_format(func_info):
+    #     return result(
+    #         False, 400, '400-{}002'.format(MSG_FUNCTION_ID), 'リクエストボディのパラメータ({0})が不正です。',
+    #         'func_informations'
+    #     )
+
+    return result(True)
+
+
+def validate_notification_message(message):
+    """validate notification_message
+
+    Args:
+        message (dict): message
+
+    Returns:
+        result: Validation result
+    """
+    # if not common.is_json_format(message):
+    #     return result(
+    #         False, 400, '400-{}002'.format(MSG_FUNCTION_ID), 'リクエストボディのパラメータ({0})が不正です。',
+    #         'message'
+    #     )
+
+    return result(True)
+

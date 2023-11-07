@@ -17,8 +17,9 @@ from contextlib import closing
 import json
 import inspect
 import pymysql
+import ulid
 
-from common_library.common import common, validation
+from common_library.common import common, validation, const
 from common_library.common.db import DBconnector
 from common_library.common import multi_lang, encrypt
 from libs import queries_notification
@@ -183,20 +184,50 @@ def settings_notification_create(body, organization_id, workspace_id):  # noqa: 
 
 
 @common.platform_exception_handler
-def settings_notification_list(organization_id, workspace_id):  # noqa: E501
+def settings_notification_list(organization_id, workspace_id, event_type_true=None, event_type_false=None):  # noqa: E501
     """List returns list of settings notifications
 
-    :param organization_id: 
-    :type organization_id: str
-    :param workspace_id: 
-    :type workspace_id: str
+    Args:
+        organization_id (str): organization_id
+        workspace_id (str): workspace_id
+        event_type_true (str): event_type true item_name (delimit ,)
+        event_type_false (str): event_type false item_name (delimit ,)
 
-    :rtype: settings notifications
+    Returns:
+        Response: http response
     """
-# destination_id list get
+
+    globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
+
+    globals.logger.debug(f"event_type_true:{event_type_true} --- event_type_false:{event_type_false}")
+
+    WhereArray = []
+    # event_type Trueの抽出SQL作成
+    # Create extraction SQL for event_type True
+    if event_type_true:
+        for cond in event_type_true:
+            cond = common.rep_sql_json_para(cond)
+            WhereArray.append(f" AND JSON_EXTRACT(CONDITIONS, '$.{cond}') = True")
+    # event_type Falseの抽出SQL作成
+    # Create extraction SQL for event_type False
+    if event_type_false:
+        for cond in event_type_false:
+            cond = common.rep_sql_json_para(cond)
+            WhereArray.append(f" AND JSON_EXTRACT(CONDITIONS, '$.{cond}') = False")
+        
+    # 条件結合
+    # conditional join
+    if len(WhereArray) > 0:
+        Where = ' WHERE' + ''.join(WhereArray)[4:]
+    else:
+        Where = ''
+
+    globals.logger.debug(f"Where:{Where}")
+    
+    # destination_id list get
     with closing(DBconnector().connect_workspacedb(organization_id, workspace_id)) as conn:
         with conn.cursor() as cursor:
-            cursor.execute(queries_notification.SQL_QUERY_NOTIFICATION_DESTINATION)
+            cursor.execute(queries_notification.SQL_QUERY_NOTIFICATION_DESTINATION + Where)
             result = cursor.fetchall()
     data = []
     for row in result:
@@ -216,6 +247,7 @@ def settings_notification_list(organization_id, workspace_id):  # noqa: E501
         }
         data.append(row)
     return common.response_200_ok(data)
+
 
 @common.platform_exception_handler
 def notification_list(organization_id, workspace_id, page_size=None, current_page=None, details_info=None, func_id=None, match_key=None, like_before_key=None, like_after_key=None, like_all_key=None):  # noqa: E501
@@ -265,69 +297,85 @@ def notification_register(body, organization_id, workspace_id):  # noqa: E501
 
     body = connexion.request.get_json()
 
-    # # validation check
-    # validate = validation.validate_destinations(body)
-    # if not validate.ok:
-    #     return common.response_validation_error(validate)
+    # validation check
+    validate = validation.validate_destinations(body)
+    if not validate.ok:
+        return common.response_validation_error(validate)
             
-    # for row in body:
-    #     validate = validation.validate_destination_id(row.get('id'))
-    #     if not validate.ok:
-    #         return common.response_validation_error(validate)
-    #     validate = validation.validate_destination_name(row.get('name'))
-    #     if not validate.ok:
-    #         return common.response_validation_error(validate)
-    #     validate = validation.validate_destination_kind(row.get('kind'))
-    #     if not validate.ok:
-    #         return common.response_validation_error(validate)
-    #     validate = validation.validate_destination_informations(row.get('kind'), row.get('destination_informations'))
-    #     if not validate.ok:
-    #         return common.response_validation_error(validate)
-    #     validate = validation.validate_destination_conditions(row.get('conditions'))
-    #     if not validate.ok:
-    #         return common.response_validation_error(validate)
+    for row in body:
+        validate = validation.validate_destination_id(row.get('destination_id'))
+        if not validate.ok:
+            return common.response_validation_error(validate)
+        validate = validation.validate_func_id(row.get('func_id'))
+        if not validate.ok:
+            return common.response_validation_error(validate)
+        globals.logger.debug("func_informations:{0}".format(row.get('func_informations')))
+        validate = validation.validate_func_informations(row.get('func_informations'))
+        if not validate.ok:
+            return common.response_validation_error(validate)
+        validate = validation.validate_notification_message(row.get('message'))
+        if not validate.ok:
+            return common.response_validation_error(validate)
 
-    # user_id = connexion.request.headers.get("User-id")
+    user_id = connexion.request.headers.get("User-id")
 
-    # with closing(DBconnector().connect_workspacedb(organization_id, workspace_id)) as conn:
-    #     with conn.cursor() as cursor:
-    #         for row in body:
-    #             try:
-    #                 parameter = {
-    #                     "destination_id": row.get('id'),
-    #                     "destination_name": row.get('name'),
-    #                     "destination_kind": row.get('kind'),
-    #                     "destination_informations": encrypt.encrypt_str(json.dumps(row.get('destination_informations'))),
-    #                     "conditions": json.dumps(row.get('conditions')),
-    #                     "create_user": user_id,
-    #                     "last_update_user": user_id
-    #                 }
-    #                 try:
-    #                     cursor.execute(queries_notification.SQL_INSERT_NOTIFICATION_DESTINATION, parameter)
-    #                 except pymysql.err.IntegrityError:
-    #                     # Duplicate PRIMARY KEY
-    #                     message_id = f"400-{MSG_FUNCTION_ID}001"
-    #                     message = multi_lang.get_text(
-    #                         message_id,
-    #                         "指定された通知先はすでに存在しているため作成できません(id:{0})",
-    #                         parameter['destination_id'],
-    #                     )
-    #                     raise common.BadRequestException(message_id=message_id, message=message)
+    insert_notifications = []
+    with closing(DBconnector().connect_workspacedb(organization_id, workspace_id)) as conn:
+        with conn.cursor() as cursor:
+            for row in body:
+                destination_id = row.get('destination_id')
+                # destination_idの存在チェック
+                # exists check to destination_id 
+                cursor.execute(
+                    queries_notification.SQL_QUERY_NOTIFICATION_DESTINATION + " WHERE destination_id = %(destination_id)s",
+                    {"destination_id": destination_id}
+                )
 
-    #                 except Exception as e:
-    #                     globals.logger.error(f"exception:{e.args}")
-    #                     message_id = f"500-{MSG_FUNCTION_ID}001"
-    #                     message = multi_lang.get_text(
-    #                         message_id,
-    #                         "通知先の作成に失敗しました(id:{0})",
-    #                         parameter['destination_id'],
-    #                     )
-    #                     raise common.InternalErrorException(message_id=message_id, message=message)
+                destinations = cursor.fetchall()
+                if len(destinations) == 0:
+                    raise common.NotFoundException(
+                        message_id=f"404-{MSG_FUNCTION_ID}001",
+                        message=multi_lang.get_text(f"404-{MSG_FUNCTION_ID}001", "通知先情報が存在しません(id:{0})", destination_id)
+                    )
+                destination = destinations[0]
 
-    #             except Exception as e:
-    #                 conn.rollback()
-    #                 raise e
+                insert_notifications.append({
+                    "notification_id": ulid.new().str,
+                    "destination_id": destination.get('destination_id'),
+                    "destination_name": destination.get('destination_name'),
+                    "destination_kind": destination.get('destination_kind'),
+                    "destination_informations": destination.get('destination_informations'),
+                    "conditions": destination.get('conditions'),
+                    "func_id": row.get('func_id'),
+                    "func_informations": json.dumps(row.get('func_informations')),
+                    "message_informations": json.dumps(row.get('message_informations')),
+                    "notification_status": const.NOTIFICATION_STATUS_UNSENT,
+                    "notification_timestamp": None,
+                    "create_user": user_id,
+                    "last_update_user": user_id
+                })
 
-    #         conn.commit()
+    with closing(DBconnector().connect_workspacedb(organization_id, workspace_id)) as conn:
+        with conn.cursor() as cursor:
+            for parameter in insert_notifications:
+                try:
+                    try:
+                        cursor.execute(queries_notification.SQL_INSERT_NOTIFICATION_MESSAGE, parameter)
+
+                    except Exception as e:
+                        globals.logger.error(f"exception:{e.args}")
+                        message_id = f"500-{MSG_FUNCTION_ID}002"
+                        message = multi_lang.get_text(
+                            message_id,
+                            "メッセージ通知の登録に失敗しました(destination id:{0})",
+                            parameter['destination_id'],
+                        )
+                        raise common.InternalErrorException(message_id=message_id, message=message)
+
+                except Exception as e:
+                    conn.rollback()
+                    raise e
+
+            conn.commit()
 
     return common.response_200_ok(data=None)

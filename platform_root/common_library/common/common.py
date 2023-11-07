@@ -588,3 +588,18 @@ def get_response_error_message(res):
         return json_text.get("errorMessage")
     except Exception:
         return None
+
+
+def rep_sql_json_para(str):
+    """SQL parameter json strings SQL Injection supports
+
+    Args:
+        str (str): update strings
+    """
+    
+    str = str.replace(",", "")
+    str = str.replace("'", "")
+    str = str.replace('"', '')
+    str = str.replace(" ", "")
+
+    return str

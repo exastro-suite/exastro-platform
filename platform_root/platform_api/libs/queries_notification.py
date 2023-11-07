@@ -21,3 +21,38 @@ SQL_QUERY_NOTIFICATION_DESTINATION = """
 SELECT *
 FROM M_NOTIFICATION_DESTINATION
 """
+
+SQL_INSERT_NOTIFICATION_MESSAGE = """
+INSERT INTO T_NOTIFICATION_MESSAGE (
+NOTIFICATION_ID,
+DESTINATION_ID,
+DESTINATION_NAME,
+DESTINATION_KIND,
+DESTINATION_INFORMATIONS,
+CONDITIONS,
+FUNC_ID,
+FUNC_INFORMATIONS,
+MESSAGE_INFORMATIONS,
+NOTIFICATION_STATUS,
+NOTIFICATION_TIMESTAMP,
+CREATE_TIMESTAMP,
+CREATE_USER,
+LAST_UPDATE_TIMESTAMP,
+LAST_UPDATE_USER
+) VALUES (
+%(notification_id)s,
+%(destination_id)s,
+%(destination_name)s,
+%(destination_kind)s,
+%(destination_informations)s,
+%(conditions)s,
+%(func_id)s,
+%(func_informations)s,
+%(message_informations)s,
+%(notification_status)s,
+%(notification_timestamp)s,
+%(create_user)s,
+%(last_update_user)s
+);
+"""
+
