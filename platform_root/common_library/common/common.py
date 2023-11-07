@@ -560,9 +560,9 @@ def val_to_boolean(val):
     """
     # 値がbool値の場合は、そのまま返却する
     # If the value is a bool value, return it as is
-    if type(val) == bool:
+    if type(val) is bool:
         return val
-    elif type(val) == str:
+    elif type(val) is str:
         if val.upper() == "TRUE":
             return True
         elif val.upper() == "FALSE":
