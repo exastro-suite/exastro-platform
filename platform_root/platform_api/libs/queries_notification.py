@@ -1,4 +1,4 @@
-#   Copyright 2022 NEC Corporation
+#   Copyright 2023 NEC Corporation
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -15,4 +15,9 @@
 SQL_INSERT_NOTIFICATION_DESTINATION = """
 INSERT INTO M_NOTIFICATION_DESTINATION (DESTINATION_ID, DESTINATION_NAME, DESTINATION_KIND, DESTINATION_INFORMATIONS, CONDITIONS, CREATE_USER, LAST_UPDATE_USER)
 values (%(destination_id)s, %(destination_name)s, %(destination_kind)s, %(destination_informations)s, %(conditions)s, %(create_user)s, %(last_update_user)s) # NOQA:E501
+"""
+
+SQL_QUERY_NOTIFICATION_DESTINATION = """
+SELECT *
+FROM M_NOTIFICATION_DESTINATION
 """
