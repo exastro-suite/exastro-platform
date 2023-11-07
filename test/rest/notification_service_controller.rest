@@ -50,17 +50,22 @@ content-type: application/json
 
 [
   {
-    "id": "destination-teams-01",
+    "id": "destination-teams-06",
     "name": "name of teams destination",
     "kind": "Teams",
     "destination_informations": [{
       "webhook": "https://example.com/teams"
     }],
     "conditions": {
-        "ita_event_type_new": true,
-        "ita_event_type_evaluated": false,
-        "ita_event_type_time_out": true,
-        "ita_event_type_undetected": false
+        "ita": {
+          "event_type": {
+            "new": true,
+            "evaluated": true,
+            "time_out": true,
+            "undetected": true,
+          }
+        }
+      }
     }
   }
 ]
@@ -96,7 +101,13 @@ Authorization: Basic {{org-user-id}} {{org-user-pw}}
 
 ### Get Notification Desitination list
 
-GET {{base_org_url}}/api/{{org_id}}/platform/workspaces/{{ws_id}}/settings/notifications?event_type_true=ita_event_type_new|ita_event_type_time_out&event_type_false=ita_event_type_evaluated|ita_event_type_undetected
+GET {{base_org_url}}/api/{{org_id}}/platform/workspaces/{{ws_id}}/settings/notifications?event_type_true=ita_event_type_new|ita_event_type_time_out&event_type_false=ita.event_type_evaluated|ita_event_type_undetected
+Authorization: Basic {{org-user-id}} {{org-user-pw}}
+
+
+### Get Notification Desitination list
+
+GET {{base_org_url}}/api/{{org_id}}/platform/workspaces/{{ws_id}}/settings/notifications?event_type_false=ita.event_type.new
 Authorization: Basic {{org-user-id}} {{org-user-pw}}
 
 ### Get Notification Desitination list
