@@ -34,10 +34,11 @@ content-type: application/json
         "email": "example@example.com"
     }],
     "conditions": {
-        "ita_event_type_new": true,
-        "ita_event_type_evaluated": false,
-        "ita_event_type_time_out": true,
-        "ita_event_type_undetected": false
+      "ita": {
+        "event_type": {
+            "new": true, "evaluated": false, "timeout": true, "undetected": false,
+        }
+      }
     }
   }
 ]
@@ -59,10 +60,7 @@ content-type: application/json
     "conditions": {
         "ita": {
           "event_type": {
-            "new": true,
-            "evaluated": true,
-            "time_out": true,
-            "undetected": true,
+            "new": true, "evaluated": true, "timeout": true, "undetected": true,
           }
         }
       }
@@ -101,7 +99,7 @@ Authorization: Basic {{org-user-id}} {{org-user-pw}}
 
 ### Get Notification Desitination list
 
-GET {{base_org_url}}/api/{{org_id}}/platform/workspaces/{{ws_id}}/settings/notifications?event_type_true=ita_event_type_new|ita_event_type_time_out&event_type_false=ita.event_type_evaluated|ita_event_type_undetected
+GET {{base_org_url}}/api/{{org_id}}/platform/workspaces/{{ws_id}}/settings/notifications?event_type_true=ita.event_type.new|ita.event_type.evaluated&event_type_false=ita.event_type.timeout|ita.event_type.undetected
 Authorization: Basic {{org-user-id}} {{org-user-pw}}
 
 

@@ -240,9 +240,9 @@ def test_notifications_validate(connexion_client):
     validate = validation.validate_destination_conditions(sample_data_conditions({"ita_event_type_evaluated": "dummy"}))
     assert not validate.ok, "create notifications validate conditions ita.evaluated different type"
 
-    # validate conditions ita_event_type_time_out different type
-    validate = validation.validate_destination_conditions(sample_data_conditions({"ita_event_type_time_out": "dummy"}))
-    assert not validate.ok, "create notifications validate conditions ita.time_out different type"
+    # validate conditions ita_event_type_timeout different type
+    validate = validation.validate_destination_conditions(sample_data_conditions({"ita_event_type_timeout": "dummy"}))
+    assert not validate.ok, "create notifications validate conditions ita.timeout different type"
 
     # validate conditions ita_event_type_undetected different type
     validate = validation.validate_destination_conditions(sample_data_conditions({"ita_event_type_undetected": "dummy"}))
@@ -446,10 +446,11 @@ def sample_data_mail_no_id(update={}):
             "email": "example@example.com",
         }],
         "conditions": {
-            "ita_event_type_new": True,
-            "ita_event_type_evaluated": False,
-            "ita_event_type_time_out": True,
-            "ita_event_type_undetected": False,
+            "ita": {
+                "event_type": {
+                    "new": True, "evaluated": False, "timeout": True, "undetected": False,
+                }
+            }
         }
     }, **update)
 
@@ -486,10 +487,11 @@ def sample_data_teams_no_id(update={}):
             "webhook": "https://example.com/teams",
         }],
         "conditions": {
-            "ita_event_type_new": True,
-            "ita_event_type_evaluated": False,
-            "ita_event_type_time_out": True,
-            "ita_event_type_undetected": False,
+            "ita": {
+                "event_type": {
+                    "new": True, "evaluated": False, "timeout": True, "undetected": False,
+                }
+            }
         }
     }, **update)
 

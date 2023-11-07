@@ -1178,10 +1178,12 @@ paths:
                       name: destinations of mail settings
                       kind: Mail
                       conditions:
-                        ita_event_type_new: false
-                        ita_event_type_evaluated: false
-                        ita_event_type_time_out: true
-                        ita_event_type_undetected: true
+                        ita:
+                          event_type:
+                            new: false
+                            evaluated: false
+                            timeout: true
+                            undetected: true
                       destination_informations:
                         - address_header: to
                           email: mike@example.com
@@ -1203,10 +1205,12 @@ paths:
                       name: destinations of teams settings
                       kind: Teams
                       conditions:
-                        ita_event_type_new: false
-                        ita_event_type_evaluated: false
-                        ita_event_type_time_out: true
-                        ita_event_type_undetected: true
+                        ita:
+                          event_type:
+                            new: true
+                            evaluated: true
+                            timeout: false
+                            undetected: false
                       destination_informations:
                         - webhook: 'https://xxxxxxxx.webhook.office.com/webhookb/xxxxxxxx-xxxxxx-xxxx-xxxx-xxxxxxxxxxxx'
                         - webhook: 'https://xxxxxxxx.webhook.office.com/webhookb/xxxxxxxx-xxxxxx-xxxx-xxxx-xxxxxxxxxxxx'
