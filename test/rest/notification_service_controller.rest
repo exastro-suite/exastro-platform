@@ -50,17 +50,22 @@ content-type: application/json
 
 [
   {
-    "id": "destination-teams-01",
+    "id": "destination-teams-06",
     "name": "name of teams destination",
     "kind": "Teams",
     "destination_informations": [{
       "webhook": "https://example.com/teams"
     }],
     "conditions": {
-        "ita_event_type_new": true,
-        "ita_event_type_evaluated": false,
-        "ita_event_type_time_out": true,
-        "ita_event_type_undetected": false
+        "ita": {
+          "event_type": {
+            "new": true,
+            "evaluated": true,
+            "time_out": true,
+            "undetected": true,
+          }
+        }
+      }
     }
   }
 ]
