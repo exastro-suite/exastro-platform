@@ -184,20 +184,50 @@ def settings_notification_create(body, organization_id, workspace_id):  # noqa: 
 
 
 @common.platform_exception_handler
-def settings_notification_list(organization_id, workspace_id):  # noqa: E501
+def settings_notification_list(organization_id, workspace_id, event_type_true=None, event_type_false=None):  # noqa: E501
     """List returns list of settings notifications
 
-    :param organization_id: 
-    :type organization_id: str
-    :param workspace_id: 
-    :type workspace_id: str
+    Args:
+        organization_id (str): organization_id
+        workspace_id (str): workspace_id
+        event_type_true (str): event_type true item_name (delimit ,)
+        event_type_false (str): event_type false item_name (delimit ,)
 
-    :rtype: settings notifications
+    Returns:
+        Response: http response
     """
-# destination_id list get
+
+    globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
+
+    globals.logger.debug(f"event_type_true:{event_type_true} --- event_type_false:{event_type_false}")
+
+    WhereArray = []
+    # event_type Trueの抽出SQL作成
+    # Create extraction SQL for event_type True
+    if event_type_true:
+        for cond in event_type_true:
+            cond = common.rep_sql_json_para(cond)
+            WhereArray.append(f" AND JSON_EXTRACT(CONDITIONS, '$.{cond}') = True")
+    # event_type Falseの抽出SQL作成
+    # Create extraction SQL for event_type False
+    if event_type_false:
+        for cond in event_type_false:
+            cond = common.rep_sql_json_para(cond)
+            WhereArray.append(f" AND JSON_EXTRACT(CONDITIONS, '$.{cond}') = False")
+        
+    # 条件結合
+    # conditional join
+    if len(WhereArray) > 0:
+        Where = ' WHERE' + ''.join(WhereArray)[4:]
+    else:
+        Where = ''
+
+    globals.logger.debug(f"Where:{Where}")
+    
+    # destination_id list get
     with closing(DBconnector().connect_workspacedb(organization_id, workspace_id)) as conn:
         with conn.cursor() as cursor:
-            cursor.execute(queries_notification.SQL_QUERY_NOTIFICATION_DESTINATION)
+            cursor.execute(queries_notification.SQL_QUERY_NOTIFICATION_DESTINATION + Where)
             result = cursor.fetchall()
     data = []
     for row in result:
@@ -217,6 +247,7 @@ def settings_notification_list(organization_id, workspace_id):  # noqa: E501
         }
         data.append(row)
     return common.response_200_ok(data)
+
 
 @common.platform_exception_handler
 def notification_list(organization_id, workspace_id, page_size=None, current_page=None, details_info=None, func_id=None, match_key=None, like_before_key=None, like_after_key=None, like_all_key=None):  # noqa: E501

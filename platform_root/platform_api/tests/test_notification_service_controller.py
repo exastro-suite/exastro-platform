@@ -232,20 +232,20 @@ def test_notifications_validate(connexion_client):
     validate = validation.validate_destination_conditions(sample_data_conditions({"dummy": "dummy"}))
     assert not validate.ok, "create notifications validate conditions undefined item"
 
-    # validate conditions ita.event_type.new different type
-    validate = validation.validate_destination_conditions(sample_data_conditions({"ita.event_type.new": "dummy"}))
+    # validate conditions ita_event_type_new different type
+    validate = validation.validate_destination_conditions(sample_data_conditions({"ita_event_type_new": "dummy"}))
     assert not validate.ok, "create notifications validate conditions ita.new different type"
 
-    # validate conditions ita.event_type.evaluated different type
-    validate = validation.validate_destination_conditions(sample_data_conditions({"ita.event_type.evaluated": "dummy"}))
+    # validate conditions ita_event_type_evaluated different type
+    validate = validation.validate_destination_conditions(sample_data_conditions({"ita_event_type_evaluated": "dummy"}))
     assert not validate.ok, "create notifications validate conditions ita.evaluated different type"
 
-    # validate conditions ita.event_type.time_out different type
-    validate = validation.validate_destination_conditions(sample_data_conditions({"ita.event_type.time_out": "dummy"}))
+    # validate conditions ita_event_type_time_out different type
+    validate = validation.validate_destination_conditions(sample_data_conditions({"ita_event_type_time_out": "dummy"}))
     assert not validate.ok, "create notifications validate conditions ita.time_out different type"
 
-    # validate conditions ita.event_type.undetected different type
-    validate = validation.validate_destination_conditions(sample_data_conditions({"ita.event_type.undetected": "dummy"}))
+    # validate conditions ita_event_type_undetected different type
+    validate = validation.validate_destination_conditions(sample_data_conditions({"ita_event_type_undetected": "dummy"}))
     assert not validate.ok, "create notifications validate conditions ita.undetected different type"
 
 
@@ -446,10 +446,10 @@ def sample_data_mail_no_id(update={}):
             "email": "example@example.com",
         }],
         "conditions": {
-            "ita.event_type.new": True,
-            "ita.event_type.evaluated": False,
-            "ita.event_type.time_out": True,
-            "ita.event_type.undetected": False,
+            "ita_event_type_new": True,
+            "ita_event_type_evaluated": False,
+            "ita_event_type_time_out": True,
+            "ita_event_type_undetected": False,
         }
     }, **update)
 
@@ -486,10 +486,10 @@ def sample_data_teams_no_id(update={}):
             "webhook": "https://example.com/teams",
         }],
         "conditions": {
-            "ita.event_type.new": True,
-            "ita.event_type.evaluated": False,
-            "ita.event_type.time_out": True,
-            "ita.event_type.undetected": False,
+            "ita_event_type_new": True,
+            "ita_event_type_evaluated": False,
+            "ita_event_type_time_out": True,
+            "ita_event_type_undetected": False,
         }
     }, **update)
 

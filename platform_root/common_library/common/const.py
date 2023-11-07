@@ -146,10 +146,10 @@ ALL_MAIL_HEADER = [
 
 # 通知イベントタイプ
 # Notification event type
-CONDITIONS_ITA_EVENT_TYPE_NEW = "ita.event_type.new"
-CONDITIONS_ITA_EVENT_TYPE_EVALUATED = "ita.event_type.evaluated"
-CONDITIONS_ITA_EVENT_TYPE_TIME_OUT = "ita.event_type.time_out"
-CONDITIONS_ITA_EVENT_TYPE_ITA_UNDETECTED = "ita.event_type.undetected"
+CONDITIONS_ITA_EVENT_TYPE_NEW = "ita_event_type_new"
+CONDITIONS_ITA_EVENT_TYPE_EVALUATED = "ita_event_type_evaluated"
+CONDITIONS_ITA_EVENT_TYPE_TIME_OUT = "ita_event_type_time_out"
+CONDITIONS_ITA_EVENT_TYPE_ITA_UNDETECTED = "ita_event_type_undetected"
 ALL_CONDITIONS = [
     CONDITIONS_ITA_EVENT_TYPE_NEW,
     CONDITIONS_ITA_EVENT_TYPE_EVALUATED,
