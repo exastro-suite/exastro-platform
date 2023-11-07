@@ -28,10 +28,9 @@ import globals
 MSG_FUNCTION_ID = "34"
 
 
+@common.platform_exception_handler
 def settings_destination_get(organization_id, workspace_id, destination_id, query_string=None):  # noqa: E501
     """Returns of settings destination
-
-     # noqa: E501
 
     :param organization_id: 
     :type organization_id: str
@@ -42,9 +41,42 @@ def settings_destination_get(organization_id, workspace_id, destination_id, quer
     :param query_string: 
     :type query_string: str
 
-    :rtype: InlineResponse20017
+    :rtype: settings destination
     """
-    return 'do some magic!'
+    # destination_id list get
+    with closing(DBconnector().connect_workspacedb(organization_id, workspace_id)) as conn:
+        with conn.cursor() as cursor:
+            if destination_id:
+                str_where = " WHERE destination_id = %(destination_id)s"
+                parameter = {
+                    "destination_id": destination_id,
+                }
+            else:
+                str_where = ""
+                parameter = {}
+
+            cursor.execute(queries_notification.SQL_QUERY_NOTIFICATION_DESTINATION + str_where, parameter)
+            result = cursor.fetchall()
+
+    data = []
+    for row in result:
+        # 該当のロールがある場合のみ、設定
+        # Set only if there is a corresponding role
+        # if row["DESTINATION_ID"] in posible_destination_id or posible_all_workspace:
+        row = {
+            "id": row["DESTINATION_ID"],
+            "name": row["DESTINATION_NAME"],
+            "kind": row["DESTINATION_KIND"],
+            "conditions": json.loads(row["CONDITIONS"]),
+            "destination_informations": json.loads(encrypt.decrypt_str(row["DESTINATION_INFORMATIONS"])),
+            "create_timestamp": common.datetime_to_str(row["CREATE_TIMESTAMP"]),
+            "create_user": row["CREATE_USER"],
+            "last_update_timestamp": common.datetime_to_str(row["LAST_UPDATE_TIMESTAMP"]),
+            "last_update_user": row["LAST_UPDATE_USER"],
+        }
+        data.append(row)
+
+    return common.response_200_ok(data)
 
 
 def settings_destination_put(body, organization_id, workspace_id, destination_id):  # noqa: E501
@@ -150,20 +182,40 @@ def settings_notification_create(body, organization_id, workspace_id):  # noqa: 
     return common.response_200_ok(data=None)
 
 
+@common.platform_exception_handler
 def settings_notification_list(organization_id, workspace_id):  # noqa: E501
     """List returns list of settings notifications
-
-     # noqa: E501
 
     :param organization_id: 
     :type organization_id: str
     :param workspace_id: 
     :type workspace_id: str
 
-    :rtype: InlineResponse20016
+    :rtype: settings notifications
     """
-    return 'do some magic!'
-
+# destination_id list get
+    with closing(DBconnector().connect_workspacedb(organization_id, workspace_id)) as conn:
+        with conn.cursor() as cursor:
+            cursor.execute(queries_notification.SQL_QUERY_NOTIFICATION_DESTINATION)
+            result = cursor.fetchall()
+    data = []
+    for row in result:
+        # 該当のロールがある場合のみ、設定
+        # Set only if there is a corresponding role
+        # if row["DESTINATION_ID"] in posible_destination_id or posible_all_workspace:
+        row = {
+            "id": row["DESTINATION_ID"],
+            "name": row["DESTINATION_NAME"],
+            "kind": row["DESTINATION_KIND"],
+            "conditions": json.loads(row["CONDITIONS"]),
+            "destination_informations": json.loads(encrypt.decrypt_str(row["DESTINATION_INFORMATIONS"])),
+            "create_timestamp": common.datetime_to_str(row["CREATE_TIMESTAMP"]),
+            "create_user": row["CREATE_USER"],
+            "last_update_timestamp": common.datetime_to_str(row["LAST_UPDATE_TIMESTAMP"]),
+            "last_update_user": row["LAST_UPDATE_USER"],
+        }
+        data.append(row)
+    return common.response_200_ok(data)
 
 @common.platform_exception_handler
 def notification_list(organization_id, workspace_id, page_size=None, current_page=None, details_info=None, func_id=None, match_key=None, like_before_key=None, like_after_key=None, like_all_key=None):  # noqa: E501
