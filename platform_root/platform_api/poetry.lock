@@ -267,6 +267,7 @@ jsonschema = ">=2.5.1,<5"
 packaging = ">=20"
 PyYAML = ">=5.1,<7"
 requests = ">=2.9.1,<3"
+swagger-ui-bundle = {version = ">=0.0.2,<0.1", optional = true, markers = "extra == \"swagger-ui\""}
 werkzeug = ">=1.0,<2.3"
 
 [package.extras]
@@ -1212,6 +1213,20 @@ files = [
 ]
 
 [[package]]
+name = "swagger-ui-bundle"
+version = "0.0.9"
+description = "swagger_ui_bundle - swagger-ui files in a pip package"
+optional = false
+python-versions = "*"
+files = [
+    {file = "swagger_ui_bundle-0.0.9-py3-none-any.whl", hash = "sha256:cea116ed81147c345001027325c1ddc9ca78c1ee7319935c3c75d3669279d575"},
+    {file = "swagger_ui_bundle-0.0.9.tar.gz", hash = "sha256:b462aa1460261796ab78fd4663961a7f6f347ce01760f1303bbbdf630f11f516"},
+]
+
+[package.dependencies]
+Jinja2 = ">=2.0"
+
+[[package]]
 name = "tomli"
 version = "2.0.1"
 description = "A lil' TOML parser"
@@ -1285,4 +1300,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "28459ec378093a9dc9ab8d02650fdb5adb5adccc676eaf8e054e0061031d73d5"
+content-hash = "e3cdf6d05835471456337a253056f61bf0cece87dde76ee65dfc2da0708836f0"
