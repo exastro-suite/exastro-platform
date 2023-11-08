@@ -246,38 +246,91 @@ def settings_notification_list(organization_id, workspace_id, event_type_true=No
             "last_update_user": row["LAST_UPDATE_USER"],
         }
         data.append(row)
+
     return common.response_200_ok(data)
 
 
 @common.platform_exception_handler
-def notification_list(organization_id, workspace_id, page_size=None, current_page=None, details_info=None, func_id=None, match_key=None, like_before_key=None, like_after_key=None, like_all_key=None):  # noqa: E501
+def notification_list(organization_id, workspace_id, page_size=None, current_page=None, details_info=None, func_id=None, match=None, like_before=None, like_after=None, like_all=None):  # noqa: E501
     """Returns a list of message notifications
 
-     # noqa: E501
+    Args:
+        :param organization_id: 
+        :type organization_id: str
+        :param workspace_id: 
+        :type workspace_id: str
+        :param page_size: Maximum number of return values ​​at one time (default: 100)
+        :type page_size: float
+        :param current_page: Current display page (default: 1)
+        :type current_page: float
+        :param details_info: With message output
+        :type details_info: bool
+        :param func_id: Filter by function ID
+        :type func_id: str
+        :param match: Specify exact match condition
+        :type match: str
+        :param like_before: Specifying conditions for beginning match
+        :type like_before: str
+        :param like_after: Specifying conditions for suffix match
+        :type like_after: str
+        :param like_all: Specifying conditions for fuzzy search
+        :type like_all: str
 
-    :param organization_id: 
-    :type organization_id: str
-    :param workspace_id: 
-    :type workspace_id: str
-    :param page_size: Maximum number of return values ​​at one time (default: 100)
-    :type page_size: float
-    :param current_page: Current display page (default: 1)
-    :type current_page: float
-    :param details_info: With message output
-    :type details_info: bool
-    :param func_id: Filter by function ID
-    :type func_id: str
-    :param match_key: Specify exact match condition
-    :type match_key: str
-    :param like_before_key: Specifying conditions for beginning match
-    :type like_before_key: str
-    :param like_after_key: Specifying conditions for suffix match
-    :type like_after_key: str
-    :param like_all_key: Specifying conditions for fuzzy search
-    :type like_all_key: str
-
-    :rtype: InlineResponse20013
+    Returns:
+        Response: http response
     """
+    
+    globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
+
+    globals.logger.debug(f"match:{match} --- like_all:{like_all}")
+
+    WhereArray = []
+    # event_type Trueの抽出SQL作成
+    # Create extraction SQL for event_type True
+    if match:
+        json
+        for cond in match:
+            cond = common.rep_sql_json_para(cond)
+            WhereArray.append(f" AND JSON_EXTRACT(CONDITIONS, '$.{cond}') = True")
+    # event_type Falseの抽出SQL作成
+    # Create extraction SQL for event_type False
+    if event_type_false:
+        for cond in event_type_false:
+            cond = common.rep_sql_json_para(cond)
+            WhereArray.append(f" AND JSON_EXTRACT(CONDITIONS, '$.{cond}') = False")
+        
+    # 条件結合
+    # conditional join
+    if len(WhereArray) > 0:
+        Where = ' WHERE' + ''.join(WhereArray)[4:]
+    else:
+        Where = ''
+
+    globals.logger.debug(f"Where:{Where}")
+    
+    # destination_id list get
+    with closing(DBconnector().connect_workspacedb(organization_id, workspace_id)) as conn:
+        with conn.cursor() as cursor:
+            cursor.execute(queries_notification.SQL_QUERY_NOTIFICATION_DESTINATION + Where)
+            result = cursor.fetchall()
+    data = []
+    for row in result:
+        # 該当のロールがある場合のみ、設定
+        # Set only if there is a corresponding role
+        # if row["DESTINATION_ID"] in posible_destination_id or posible_all_workspace:
+        row = {
+            "id": row["DESTINATION_ID"],
+            "name": row["DESTINATION_NAME"],
+            "kind": row["DESTINATION_KIND"],
+            "conditions": json.loads(row["CONDITIONS"]),
+            "destination_informations": json.loads(encrypt.decrypt_str(row["DESTINATION_INFORMATIONS"])),
+            "create_timestamp": common.datetime_to_str(row["CREATE_TIMESTAMP"]),
+            "create_user": row["CREATE_USER"],
+            "last_update_timestamp": common.datetime_to_str(row["LAST_UPDATE_TIMESTAMP"]),
+            "last_update_user": row["LAST_UPDATE_USER"],
+        }
+        data.append(row)
+
     return common.response_200_ok(data=None)
 
 

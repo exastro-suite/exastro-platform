@@ -1322,7 +1322,7 @@ paths:
         explode: false
         schema:
           type: string
-      - name: PageSize
+      - name: page_size
         in: query
         description: "Maximum number of return values ​​at one time (default: 100)"
         required: false
@@ -1331,7 +1331,8 @@ paths:
         schema:
           minimum: 1
           type: number
-      - name: CurrentPage
+          default: 100
+      - name: current_page
         in: query
         description: "Current display page (default: 1)"
         required: false
@@ -1340,7 +1341,8 @@ paths:
         schema:
           minimum: 1
           type: number
-      - name: DetailsInfo
+          default: 1
+      - name: details_info
         in: query
         description: With message output
         required: false
@@ -1348,7 +1350,8 @@ paths:
         explode: true
         schema:
           type: boolean
-      - name: FuncID
+          default: false
+      - name: func_id
         in: query
         description: Filter by function ID
         required: false
@@ -1356,15 +1359,15 @@ paths:
         explode: true
         schema:
           type: string
-      - name: Match_key
+      - name: match
         in: query
         description: Specify exact match condition
         required: false
-        style: form
+        style: deepObject
         explode: true
         schema:
           type: string
-      - name: LikeBefore_key
+      - name: like_before
         in: query
         description: Specifying conditions for beginning match
         required: false
@@ -1372,7 +1375,7 @@ paths:
         explode: true
         schema:
           type: string
-      - name: LikeAfter_key
+      - name: like_after
         in: query
         description: Specifying conditions for suffix match
         required: false
@@ -1380,7 +1383,7 @@ paths:
         explode: true
         schema:
           type: string
-      - name: LikeAll_key
+      - name: like_all
         in: query
         description: Specifying conditions for fuzzy search
         required: false
