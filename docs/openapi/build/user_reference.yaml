@@ -522,44 +522,49 @@ paths:
           required: true
           schema:
             type: string
-        - name: PageSize
+        - name: page_size
           in: query
           description: 'Maximum number of return values ​​at one time (default: 100)'
           schema:
             type: number
             minimum: 1
-        - name: CurrentPage
+            default: 100
+        - name: current_page
           in: query
           description: 'Current display page (default: 1)'
           schema:
             type: number
             minimum: 1
-        - name: DetailsInfo
+            default: 1
+        - name: details_info
           in: query
           description: With message output
           schema:
             type: boolean
-        - name: FuncID
+            default: false
+        - name: func_id
           in: query
           description: Filter by function ID
           schema:
             type: string
-        - name: Match.key
+        - name: match
           in: query
           description: Specify exact match condition
           schema:
             type: string
-        - name: LikeBefore.key
+          style: deepObject
+          explode: true
+        - name: like_before
           in: query
           description: Specifying conditions for beginning match
           schema:
             type: string
-        - name: LikeAfter.key
+        - name: like_after
           in: query
           description: Specifying conditions for suffix match
           schema:
             type: string
-        - name: LikeAll.key
+        - name: like_all
           in: query
           description: Specifying conditions for fuzzy search
           schema:
