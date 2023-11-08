@@ -1248,32 +1248,48 @@ def validate_destination_conditions(conditions):
     Returns:
         result: Validation result
     """
-    for key, value in conditions.items():
-        if key not in const.ALL_CONDITIONS:
-            return result(
-                False, 400, '400-{}002'.format(MSG_FUNCTION_ID), 'リクエストボディのパラメータ({0})が不正です。',
-                f'conditions.{key}'
-            )
+    if conditions.get('ita', {}).get('event_type', {}).get('new', None) is None:
+        return result(
+            False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
+            multi_lang.get_text('000-00153', "新規イベント")
+        )
 
-    if type(conditions.get(const.CONDITIONS_ITA_EVENT_TYPE_NEW)) is not bool:
+    if type(conditions.get('ita', {}).get('event_type', {}).get('new', None)) is not bool:
         return result(
             False, 400, '400-{}024'.format(MSG_FUNCTION_ID), 'True/False 以外が指定されています。({0})',
             multi_lang.get_text('000-00153', "新規イベント")
         )
 
-    if type(conditions.get(const.CONDITIONS_ITA_EVENT_TYPE_EVALUATED)) is not bool:
+    if conditions.get('ita', {}).get('event_type', {}).get('evaluated', None) is None:
+        return result(
+            False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
+            multi_lang.get_text('000-00154', "既知（判定済み）")
+        )
+
+    if type(conditions.get('ita', {}).get('event_type', {}).get('evaluated', None)) is not bool:
         return result(
             False, 400, '400-{}024'.format(MSG_FUNCTION_ID), 'True/False 以外が指定されています。({0})',
             multi_lang.get_text('000-00154', "既知（判定済み）")
         )
 
-    if type(conditions.get(const.CONDITIONS_ITA_EVENT_TYPE_TIMEOUT)) is not bool:
+    if conditions.get('ita', {}).get('event_type', {}).get('timeout', None) is None:
+        return result(
+            False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
+            multi_lang.get_text('000-00155', "既知（時間切れ）")
+        )
+
+    if type(conditions.get('ita', {}).get('event_type', {}).get('timeout', None)) is not bool:
         return result(
             False, 400, '400-{}024'.format(MSG_FUNCTION_ID), 'True/False 以外が指定されています。({0})',
             multi_lang.get_text('000-00155', "既知（時間切れ）")
         )
 
-    if type(conditions.get(const.CONDITIONS_ITA_EVENT_TYPE_ITA_UNDETECTED)) is not bool:
+    if conditions.get('ita', {}).get('event_type', {}).get('undetected', None) is None:
+        return result(
+            False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
+            multi_lang.get_text('000-00156', "未知")
+        )
+    if type(conditions.get('ita', {}).get('event_type', {}).get('undetected', None)) is not bool:
         return result(
             False, 400, '400-{}024'.format(MSG_FUNCTION_ID), 'True/False 以外が指定されています。({0})',
             multi_lang.get_text('000-00156', "未知")
