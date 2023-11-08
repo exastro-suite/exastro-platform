@@ -228,25 +228,50 @@ def test_notifications_validate(connexion_client):
     #
     # validate conditions
     #
-    # validate conditions undefined item
-    validate = validation.validate_destination_conditions(sample_data_conditions({"dummy": "dummy"}))
-    assert not validate.ok, "create notifications validate conditions undefined item"
 
-    # validate conditions ita_event_type_new different type
-    validate = validation.validate_destination_conditions(sample_data_conditions({"ita_event_type_new": "dummy"}))
-    assert not validate.ok, "create notifications validate conditions ita.new different type"
+    # validate conditions ita.event_type.new
+    conditions = sample_data_conditions()
+    conditions["ita"]["event_type"]["new"] = None
+    validate = validation.validate_destination_conditions(conditions)
+    assert not validate.ok, "create notifications validate conditions ita.event_type.new None"
 
-    # validate conditions ita_event_type_evaluated different type
-    validate = validation.validate_destination_conditions(sample_data_conditions({"ita_event_type_evaluated": "dummy"}))
-    assert not validate.ok, "create notifications validate conditions ita.evaluated different type"
+    conditions = sample_data_conditions()
+    conditions["ita"]["event_type"]["new"] = "dummy"
+    validate = validation.validate_destination_conditions(conditions)
+    assert not validate.ok, "create notifications validate conditions ita.event_type.new different type"
 
-    # validate conditions ita_event_type_timeout different type
-    validate = validation.validate_destination_conditions(sample_data_conditions({"ita_event_type_timeout": "dummy"}))
-    assert not validate.ok, "create notifications validate conditions ita.timeout different type"
+    # validate conditions ita.event_type.evaluated
+    conditions = sample_data_conditions()
+    conditions["ita"]["event_type"]["evaluated"] = None
+    validate = validation.validate_destination_conditions(conditions)
+    assert not validate.ok, "create notifications validate conditions ita.event_type.evaluated None"
 
-    # validate conditions ita_event_type_undetected different type
-    validate = validation.validate_destination_conditions(sample_data_conditions({"ita_event_type_undetected": "dummy"}))
-    assert not validate.ok, "create notifications validate conditions ita.undetected different type"
+    conditions = sample_data_conditions()
+    conditions["ita"]["event_type"]["evaluated"] = "dummy"
+    validate = validation.validate_destination_conditions(conditions)
+    assert not validate.ok, "create notifications validate conditions ita.event_type.evaluated different type"
+
+    # validate conditions ita.event_type.timeout
+    conditions = sample_data_conditions()
+    conditions["ita"]["event_type"]["timeout"] = None
+    validate = validation.validate_destination_conditions(conditions)
+    assert not validate.ok, "create notifications validate conditions ita.event_type.timeout None"
+
+    conditions = sample_data_conditions()
+    conditions["ita"]["event_type"]["timeout"] = "dummy"
+    validate = validation.validate_destination_conditions(conditions)
+    assert not validate.ok, "create notifications validate conditions ita.event_type.timeout different type"
+
+    # validate conditions ita.event_type.undetected
+    conditions = sample_data_conditions()
+    conditions["ita"]["event_type"]["undetected"] = None
+    validate = validation.validate_destination_conditions(conditions)
+    assert not validate.ok, "create notifications validate conditions ita.event_type.undetected None"
+
+    conditions = sample_data_conditions()
+    conditions["ita"]["event_type"]["undetected"] = "dummy"
+    validate = validation.validate_destination_conditions(conditions)
+    assert not validate.ok, "create notifications validate conditions ita.event_type.undetected different type"
 
 
 def test_settings_notification_create(connexion_client):
@@ -308,16 +333,16 @@ def test_settings_notification_create(connexion_client):
         assert response.status_code == 400, "create notifications valide informations response error route"
 
         # validate error conditions
-        request_json = [sample_data_mail('conditions-test-01')]
-        request_json[0]["conditions"]["dummy"] = "X"
-
+        # ※conditionsのvalidateエラーは通らない（open-apiのvalidationエラーで先に弾かれる）が一応テスト
         response = connexion_client.post(
             f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/settings/notifications",
             content_type='application/json',
             headers=request_parameters.request_headers(organization['user_id']),
-            json=request_json)
+            json=[sample_data_mail('conditions-test-01', {"conditions": None})])
+
         assert response.status_code == 400, "create notifications valide conditions response error route"
 
+    with test_common.requsts_mocker_default():
         #
         # already exists
         #
