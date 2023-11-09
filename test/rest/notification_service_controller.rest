@@ -112,3 +112,9 @@ Authorization: Basic {{org-user-id}} {{org-user-pw}}
 
 GET {{base_org_url}}/api/{{org_id}}/platform/workspaces/{{ws_id}}/settings/notifications
 Authorization: Basic {{org-user-id}} {{org-user-pw}}
+
+### Get Notification list
+
+GET {{base_org_url}}/api/{{org_id}}/platform/workspaces/{{ws_id}}/notifications?match=string|ass&like_before=111
+Authorization: Basic {{org-user-id}} {{org-user-pw}}
+accept: application/json
