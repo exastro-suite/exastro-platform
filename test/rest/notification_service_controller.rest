@@ -114,6 +114,17 @@ Authorization: Basic {{org-user-id}} {{org-user-pw}}
 
 ### Get Notification list
 
-GET {{base_org_url}}/api/{{org_id}}/platform/workspaces/{{ws_id}}/notifications?match=string|ass&like_before=111
+GET {{base_org_url}}/api/{{org_id}}/platform/workspaces/{{ws_id}}/notifications?match=string'""22/|ass&like_before="111//##""
 Authorization: Basic {{org-user-id}} {{org-user-pw}}
 accept: application/json
+
+### Get Notification list
+
+GET {{base_org_url}}/api/{{org_id}}/platform/workspaces/{{ws_id}}/notifications?mutch={"key":"aaa", "value":"cccc"}
+Authorization: Basic {{org-user-id}} {{org-user-pw}}
+accept: application/json
+
+
+### Get Notification list
+GET {{base_org_url}}/api/{{org_id}}/platform/workspaces/{{ws_id}}/notifications?page_size=100&current_page=1&details_info=false&match=ita.event_type.new|true|ita.event_type.timeout|true&like_before=ita.event_type.new|ue|ita.event_type.timeout|true&like_all=ita.event_type.timeout|t
+Authorization: Basic {{org-user-id}} {{org-user-pw}}

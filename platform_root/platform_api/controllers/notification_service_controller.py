@@ -284,16 +284,55 @@ def notification_list(organization_id, workspace_id, page_size=None, current_pag
 
     globals.logger.debug(f"connexion.request.query_string:{connexion.request.query_string}")
     globals.logger.debug(f"match:{match}")
-    globals.logger.debug(f"like_before:{like_before}")
 
     WhereArray = []
+    values = {}
     # event_type Trueの抽出SQL作成
     # Create extraction SQL for event_type True
-    # if match:
-    #     json
-    #     for cond in match:
-    #         cond = common.rep_sql_json_para(cond)
-    #         WhereArray.append(f" AND JSON_EXTRACT(CONDITIONS, '$.{cond}') = True")
+    if match:
+        col = True
+        colName = ""
+        for cond in match:
+            if col:
+                colName = common.rep_sql_json_para(cond)
+                col ^= True
+            else:
+                values.update({f"values{len(values)+1}": common.rep_sql_json_para(cond)})
+                WhereArray.append(f" AND JSON_EXTRACT(CONDITIONS, '$.{colName}') = %(values{len(values)})s")
+                col ^= True
+    if like_before:
+        col = True
+        colName = ""
+        for cond in like_before:
+            if col:
+                colName = common.rep_sql_json_para(cond)
+                col ^= True
+            else:
+                values.update({f"values{len(values)+1}": "%" + common.rep_sql_json_para(cond)})
+                WhereArray.append(f" AND JSON_EXTRACT(CONDITIONS, '$.{colName}') LIKE %(values{len(values)})s")
+                col ^= True
+    if like_after:
+        col = True
+        colName = ""
+        for cond in like_after:
+            if col:
+                colName = common.rep_sql_json_para(cond)
+                col ^= True
+            else:
+                values.update({f"values{len(values)+1}": common.rep_sql_json_para(cond) + "%"})
+                WhereArray.append(f" AND JSON_EXTRACT(CONDITIONS, '$.{colName}') LIKE %(values{len(values)})s")
+                col ^= True
+    if like_all:
+        col = True
+        colName = ""
+        for cond in like_all:
+            if col:
+                colName = common.rep_sql_json_para(cond)
+                col ^= True
+            else:
+                values.update({f"values{len(values)+1}": "%" + common.rep_sql_json_para(cond) + "%"})
+                WhereArray.append(f" AND JSON_EXTRACT(CONDITIONS, '$.{colName}') LIKE %(values{len(values)})s")
+                col ^= True
     # 条件結合
     # conditional join
     if len(WhereArray) > 0:
@@ -302,11 +341,13 @@ def notification_list(organization_id, workspace_id, page_size=None, current_pag
         Where = ''
 
     globals.logger.debug(f"Where:{Where}")
+    globals.logger.debug(f"values:{values}")
 
+    """ ↓試験用のロジック"""
     # destination_id list get
     with closing(DBconnector().connect_workspacedb(organization_id, workspace_id)) as conn:
         with conn.cursor() as cursor:
-            cursor.execute(queries_notification.SQL_QUERY_NOTIFICATION_DESTINATION + Where)
+            cursor.execute(queries_notification.SQL_QUERY_NOTIFICATION_DESTINATION + Where, values)
             result = cursor.fetchall()
     data = []
     for row in result:
@@ -325,8 +366,9 @@ def notification_list(organization_id, workspace_id, page_size=None, current_pag
             "last_update_user": row["LAST_UPDATE_USER"],
         }
         data.append(row)
+    """ ↑試験用のロジック """
 
-    return common.response_200_ok(data=None)
+    return common.response_200_ok(data)
 
 
 @common.platform_exception_handler

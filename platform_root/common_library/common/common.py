@@ -596,10 +596,11 @@ def rep_sql_json_para(str):
     Args:
         str (str): update strings
     """
-    
+
     str = str.replace(",", "")
     str = str.replace("'", "")
     str = str.replace('"', '')
     str = str.replace(" ", "")
+    str = str.replace("%", "")
 
     return str

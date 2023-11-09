@@ -1377,7 +1377,6 @@ paths:
         required: false
         style: pipeDelimited
         explode: false
-        allowReserved: true
         schema:
           type: array
           items:
