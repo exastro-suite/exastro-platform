@@ -294,6 +294,9 @@ def test_notifications_validate(connexion_client):
     # validate : func_id None
     validate = validation.validate_func_id(None)
     assert not validate.ok, "register notifications validate func_id : None"
+    # validate : func_id None
+    validate = validation.validate_func_id("".ljust(const.length_func_id + 1, "_"))
+    assert not validate.ok, "register notifications validate func_id : max length + 1"
     # validate : func_id other
     validate = validation.validate_func_id('other')
     assert validate.ok, "register notifications validate func_id : other"
@@ -499,6 +502,19 @@ def test_notification_register(connexion_client):
             json=[sample_data_notifications_default({"destination_id": setting_notifications[0].get("id")})])
 
         assert response.status_code == 200, "register notifications OK response error route"
+
+    with test_common.requsts_mocker_default(), \
+            test_common.pymysql_execute_raise_exception_mocker(queries_notification.SQL_INSERT_NOTIFICATION_MESSAGE, Exception("DB Error Test")):
+        #
+        # DB error route
+        #
+        response = connexion_client.post(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/notifications",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization["user_id"]),
+            json=[sample_data_notifications_default({"destination_id": setting_notifications[0].get("id")})])
+
+        assert response.status_code == 500, "register notifications response code: db error"
 
 
 def sample_data_mail(id, update={}):
