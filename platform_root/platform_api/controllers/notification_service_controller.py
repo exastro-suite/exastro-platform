@@ -33,13 +33,13 @@ MSG_FUNCTION_ID = "34"
 def settings_destination_get(organization_id, workspace_id, destination_id, query_string=None):  # noqa: E501
     """Returns of settings destination
 
-    :param organization_id: 
+    :param organization_id:
     :type organization_id: str
-    :param workspace_id: 
+    :param workspace_id:
     :type workspace_id: str
-    :param destination_id: 
+    :param destination_id:
     :type destination_id: str
-    :param query_string: 
+    :param query_string:
     :type query_string: str
 
     :rtype: settings destination
@@ -85,13 +85,13 @@ def settings_destination_put(body, organization_id, workspace_id, destination_id
 
      # noqa: E501
 
-    :param body: 
+    :param body:
     :type body: dict | bytes
-    :param organization_id: 
+    :param organization_id:
     :type organization_id: str
-    :param workspace_id: 
+    :param workspace_id:
     :type workspace_id: str
-    :param destination_id: 
+    :param destination_id:
     :type destination_id: str
 
     :rtype: InlineResponse2002
@@ -119,7 +119,7 @@ def settings_notification_create(body, organization_id, workspace_id):  # noqa: 
     validate = validation.validate_destinations(body)
     if not validate.ok:
         return common.response_validation_error(validate)
-            
+
     for row in body:
         validate = validation.validate_destination_id(row.get('id'))
         if not validate.ok:
@@ -214,7 +214,7 @@ def settings_notification_list(organization_id, workspace_id, event_type_true=No
         for cond in event_type_false:
             cond = common.rep_sql_json_para(cond)
             WhereArray.append(f" AND JSON_EXTRACT(CONDITIONS, '$.{cond}') = False")
-        
+
     # 条件結合
     # conditional join
     if len(WhereArray) > 0:
@@ -223,7 +223,7 @@ def settings_notification_list(organization_id, workspace_id, event_type_true=No
         Where = ''
 
     globals.logger.debug(f"Where:{Where}")
-    
+
     # destination_id list get
     with closing(DBconnector().connect_workspacedb(organization_id, workspace_id)) as conn:
         with conn.cursor() as cursor:
@@ -255,9 +255,9 @@ def notification_list(organization_id, workspace_id, page_size=None, current_pag
     """Returns a list of message notifications
 
     Args:
-        :param organization_id: 
+        :param organization_id:
         :type organization_id: str
-        :param workspace_id: 
+        :param workspace_id:
         :type workspace_id: str
         :param page_size: Maximum number of return values ​​at one time (default: 100)
         :type page_size: float
@@ -279,26 +279,21 @@ def notification_list(organization_id, workspace_id, page_size=None, current_pag
     Returns:
         Response: http response
     """
-    
+
     globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
 
-    globals.logger.debug(f"match:{match} --- like_all:{like_all}")
+    globals.logger.debug(f"connexion.request.query_string:{connexion.request.query_string}")
+    globals.logger.debug(f"match:{match}")
+    globals.logger.debug(f"like_before:{like_before}")
 
     WhereArray = []
     # event_type Trueの抽出SQL作成
     # Create extraction SQL for event_type True
-    if match:
-        json
-        for cond in match:
-            cond = common.rep_sql_json_para(cond)
-            WhereArray.append(f" AND JSON_EXTRACT(CONDITIONS, '$.{cond}') = True")
-    # event_type Falseの抽出SQL作成
-    # Create extraction SQL for event_type False
-    if event_type_false:
-        for cond in event_type_false:
-            cond = common.rep_sql_json_para(cond)
-            WhereArray.append(f" AND JSON_EXTRACT(CONDITIONS, '$.{cond}') = False")
-        
+    # if match:
+    #     json
+    #     for cond in match:
+    #         cond = common.rep_sql_json_para(cond)
+    #         WhereArray.append(f" AND JSON_EXTRACT(CONDITIONS, '$.{cond}') = True")
     # 条件結合
     # conditional join
     if len(WhereArray) > 0:
@@ -307,7 +302,7 @@ def notification_list(organization_id, workspace_id, page_size=None, current_pag
         Where = ''
 
     globals.logger.debug(f"Where:{Where}")
-    
+
     # destination_id list get
     with closing(DBconnector().connect_workspacedb(organization_id, workspace_id)) as conn:
         with conn.cursor() as cursor:
@@ -354,7 +349,7 @@ def notification_register(body, organization_id, workspace_id):  # noqa: E501
     validate = validation.validate_destinations(body)
     if not validate.ok:
         return common.response_validation_error(validate)
-            
+
     for row in body:
         validate = validation.validate_destination_id(row.get('destination_id'))
         if not validate.ok:
@@ -378,7 +373,7 @@ def notification_register(body, organization_id, workspace_id):  # noqa: E501
             for row in body:
                 destination_id = row.get('destination_id')
                 # destination_idの存在チェック
-                # exists check to destination_id 
+                # exists check to destination_id
                 cursor.execute(
                     queries_notification.SQL_QUERY_NOTIFICATION_DESTINATION + " WHERE destination_id = %(destination_id)s",
                     {"destination_id": destination_id}

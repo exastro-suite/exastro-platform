@@ -167,7 +167,7 @@ def test_notifications_validate(connexion_client):
         const.DESTINATION_KIND_MAIL,
         [sample_data_information_email({"address_header": "other"})])
     assert not validate.ok, "create notifications validate informations address_header other"
-    
+
     # validate informations mail None
     validate = validation.validate_destination_informations(
         const.DESTINATION_KIND_MAIL,
@@ -248,6 +248,30 @@ def test_notifications_validate(connexion_client):
     validate = validation.validate_destination_conditions(sample_data_conditions({"ita_event_type_undetected": "dummy"}))
     assert not validate.ok, "create notifications validate conditions ita.undetected different type"
 
+    #
+    # validate func_id
+    #
+    # validate : func_id None
+    validate = validation.validate_func_id(None)
+    assert not validate.ok, "post notifications validate func_id : None"
+    # validate : func_id other
+    validate = validation.validate_func_id('other')
+    assert validate.ok, "post notifications validate func_id : other"
+
+    #
+    # validate func_informations
+    #
+    # validate : func_informations json
+    validate = validation.validate_func_informations({})
+    assert validate.ok, "post notifications validate func_informations : {}"
+
+    #
+    # validate notification_message
+    #
+    # validate : notification_message json
+    validate = validation.validate_notification_message({})
+    assert validate.ok, "post notifications validate notification_message : {}"
+
 
 def test_settings_notification_create(connexion_client):
     """test settings_notification_create
@@ -270,7 +294,7 @@ def test_settings_notification_create(connexion_client):
             json=[])
 
         assert response.status_code == 400, "create notifications valide body response error route"
-        
+
         # validate error id
         response = connexion_client.post(
             f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/settings/notifications",
@@ -375,7 +399,7 @@ def test_notification_register(connexion_client):
             json=[])
 
         assert response.status_code == 400, "create notifications valide body response error route"
-        
+
         # validate error destination id
         response = connexion_client.post(
             f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/notifications",
@@ -384,7 +408,7 @@ def test_notification_register(connexion_client):
             json=[sample_data_notifications_no_destination_id()])
 
         assert response.status_code == 400, "create notifications valide destination_id response error route"
-        
+
         # validate error func id
         response = connexion_client.post(
             f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/notifications",
@@ -393,7 +417,7 @@ def test_notification_register(connexion_client):
             json=[sample_data_notifications_no_func_id({"destination_id": setting_notifications[0].get("destination_id")})])
 
         assert response.status_code == 400, "create notifications valide func_id response error route"
-        
+
         # validate error func_informations
         response = connexion_client.post(
             f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/notifications",
@@ -402,7 +426,7 @@ def test_notification_register(connexion_client):
             json=[sample_data_notifications_default({"destination_id": setting_notifications[0].get("destination_id"), "func_informations": "-"})])
 
         assert response.status_code == 400, "create notifications valide func_informations response error route"
-        
+
         # validate error conditions
         response = connexion_client.post(
             f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/notifications",
