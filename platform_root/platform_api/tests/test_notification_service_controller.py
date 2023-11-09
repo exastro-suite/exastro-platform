@@ -288,6 +288,10 @@ def test_notifications_validate(connexion_client):
     validate = validation.validate_notifications([])
     assert not validate.ok, "register notifications validate notifications body : len = 0"
 
+    # validate : on data
+    validate = validation.validate_notifications([{"test": "test"}])
+    assert validate.ok, "register notifications validate notifications body error"
+
     #
     # validate func_id
     #
