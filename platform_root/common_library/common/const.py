@@ -144,18 +144,6 @@ ALL_MAIL_HEADER = [
     MAIL_HEADER_BCC,
 ]
 
-# 通知イベントタイプ
-# Notification event type
-CONDITIONS_ITA_EVENT_TYPE_NEW = "ita_event_type_new"
-CONDITIONS_ITA_EVENT_TYPE_EVALUATED = "ita_event_type_evaluated"
-CONDITIONS_ITA_EVENT_TYPE_TIMEOUT = "ita_event_type_timeout"
-CONDITIONS_ITA_EVENT_TYPE_ITA_UNDETECTED = "ita_event_type_undetected"
-ALL_CONDITIONS = [
-    CONDITIONS_ITA_EVENT_TYPE_NEW,
-    CONDITIONS_ITA_EVENT_TYPE_EVALUATED,
-    CONDITIONS_ITA_EVENT_TYPE_TIMEOUT,
-    CONDITIONS_ITA_EVENT_TYPE_ITA_UNDETECTED,
-]
 
 # 通知結果
 # Notification status
