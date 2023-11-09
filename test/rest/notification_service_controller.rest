@@ -12,7 +12,7 @@
 # share ws_id (同じものを複数記載すると最後の設定値が渡される)
 @ws_id = ws1
 
-# 1 api to ### 
+# 1 api to ###
 
 
 ### Get Notification
@@ -36,7 +36,7 @@ content-type: application/json
     "conditions": {
       "ita": {
         "event_type": {
-            "new": true, "evaluated": false, "timeout": true, "undetected": false,
+            "new": true, "evaluated": false, "timeout": true, "undetected": false
         }
       }
     }
@@ -51,17 +51,16 @@ content-type: application/json
 
 [
   {
-    "id": "destination-teams-06",
+    "id": "destination-teams-01",
     "name": "name of teams destination",
     "kind": "Teams",
     "destination_informations": [{
       "webhook": "https://example.com/teams"
     }],
     "conditions": {
-        "ita": {
-          "event_type": {
-            "new": true, "evaluated": true, "timeout": true, "undetected": true,
-          }
+      "ita": {
+        "event_type": {
+          "new": true, "evaluated": true, "timeout": true, "undetected": true
         }
       }
     }
@@ -76,7 +75,7 @@ content-type: application/json
 
 [
   {
-    "destination_id": "A0000001Z7ZXFAED6872F6C9W8",
+    "destination_id": "destination-teams-01",
     "func_id": "00000000",
     "func_informations": {
       "key-1": "value-1",

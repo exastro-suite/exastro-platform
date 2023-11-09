@@ -1375,11 +1375,13 @@ paths:
         description: |
           Specifying conditions for beginning match. Separate with |(pipe), specify the item name in the odd numbered columns and the search character in the even numbered columns.
         required: false
-        content:
-          application/json:
-            schema:
-              type: object
-              x-content-type: application/json
+        style: pipeDelimited
+        explode: false
+        allowReserved: true
+        schema:
+          type: array
+          items:
+            type: string
       - name: like_after
         in: query
         description: |

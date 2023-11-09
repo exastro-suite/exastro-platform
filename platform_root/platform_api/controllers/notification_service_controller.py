@@ -346,7 +346,7 @@ def notification_register(body, organization_id, workspace_id):  # noqa: E501
     body = connexion.request.get_json()
 
     # validation check
-    validate = validation.validate_destinations(body)
+    validate = validation.validate_notifications(body)
     if not validate.ok:
         return common.response_validation_error(validate)
 
@@ -389,11 +389,11 @@ def notification_register(body, organization_id, workspace_id):  # noqa: E501
 
                 insert_notifications.append({
                     "notification_id": ulid.new().str,
-                    "destination_id": destination.get('destination_id'),
-                    "destination_name": destination.get('destination_name'),
-                    "destination_kind": destination.get('destination_kind'),
-                    "destination_informations": destination.get('destination_informations'),
-                    "conditions": destination.get('conditions'),
+                    "destination_id": destination.get('DESTINATION_ID'),
+                    "destination_name": destination.get('DESTINATION_NAME'),
+                    "destination_kind": destination.get('DESTINATION_KIND'),
+                    "destination_informations": destination.get('DESTINATION_INFORMATIONS'),
+                    "conditions": destination.get('CONDITIONS'),
                     "func_id": row.get('func_id'),
                     "func_informations": json.dumps(row.get('func_informations')),
                     "message_informations": json.dumps(row.get('message_informations')),

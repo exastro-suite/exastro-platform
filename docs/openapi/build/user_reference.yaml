@@ -561,12 +561,13 @@ paths:
           in: query
           description: |
             Specifying conditions for beginning match. Separate with |(pipe), specify the item name in the odd numbered columns and the search character in the even numbered columns.
-          content:
-            application/json:
-              schema:
-                type: object
-          style: deepObject
-          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+          style: pipeDelimited
+          explode: false
+          allowReserved: true
         - name: like_after
           in: query
           description: |
