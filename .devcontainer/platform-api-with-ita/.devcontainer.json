@@ -32,6 +32,8 @@
 			}
 		},
 		"terminal.integrated.defaultProfile.linux": "bash",
+		// Remove trailing spaces when saving
+		"files.trimTrailingWhitespace": true,
 
 		// git menu setting
 		"git.allowNoVerifyCommit": true,
