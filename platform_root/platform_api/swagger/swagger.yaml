@@ -1361,36 +1361,47 @@ paths:
           type: string
       - name: match
         in: query
-        description: Specify exact match condition
+        description: |
+          Specify exact match condition. Separate with |(pipe), specify the item name in the odd numbered columns and the search character in the even numbered columns.
         required: false
-        style: deepObject
-        explode: true
+        style: pipeDelimited
+        explode: false
         schema:
-          type: string
+          type: array
+          items:
+            type: string
       - name: like_before
         in: query
-        description: Specifying conditions for beginning match
+        description: |
+          Specifying conditions for beginning match. Separate with |(pipe), specify the item name in the odd numbered columns and the search character in the even numbered columns.
         required: false
-        style: form
-        explode: true
-        schema:
-          type: string
+        content:
+          application/json:
+            schema:
+              type: object
+              x-content-type: application/json
       - name: like_after
         in: query
-        description: Specifying conditions for suffix match
+        description: |
+          Specifying conditions for suffix match. Separate with |(pipe), specify the item name in the odd numbered columns and the search character in the even numbered columns.
         required: false
-        style: form
-        explode: true
+        style: pipeDelimited
+        explode: false
         schema:
-          type: string
+          type: array
+          items:
+            type: string
       - name: like_all
         in: query
-        description: Specifying conditions for fuzzy search
+        description: |
+          Specifying conditions for fuzzy search. Separate with |(pipe), specify the item name in the odd numbered columns and the search character in the even numbered columns.
         required: false
-        style: form
-        explode: true
+        style: pipeDelimited
+        explode: false
         schema:
-          type: string
+          type: array
+          items:
+            type: string
       responses:
         "200":
           description: A successful response.
@@ -3469,6 +3480,10 @@ components:
         kind:
           type: string
           description: Select destination kind from Mail/Teams/Webhook
+          enum:
+          - Mail
+          - Teams
+          - Webhook
         conditions:
           $ref: '#/components/schemas/settingsDestinationConditions'
         destination_informations:
@@ -3494,6 +3509,10 @@ components:
         kind:
           type: string
           description: Select destination kind from Mail/Teams/Webhook
+          enum:
+          - Mail
+          - Teams
+          - Webhook
         conditions:
           $ref: '#/components/schemas/settingsDestinationConditions'
         destination_informations:
