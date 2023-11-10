@@ -59,6 +59,8 @@ tags:
     description: ワークスペースに関する操作(内部用)
   - name: InternalMaintenanceModeService
     description: メンテナンスモードに関する操作(内部用)
+  - name: InternalNotificationService
+    description: 通知機能に関する操作(内部用)
 paths:
   /api/platform/organizations:
     get:
@@ -2628,6 +2630,106 @@ paths:
               schema:
                 $ref: '#/components/schemas/runtimeError'
       x-openapi-router-controller: controllers.internal_maintenance_mode_setting_controller
+  '/internal-api/{organization_id}/platform/workspaces/{workspace_id}/settings/notifications':
+    get:
+      tags:
+        - InternalNotificationService
+      summary: List returns list of settings notifications
+      x-openapi-router-controller: controllers.internal_notification_service_controller
+      operationId: internal_settings_notification_list
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: workspace_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: event_type_true
+          in: query
+          schema:
+            type: array
+            items:
+              type: string
+          style: pipeDelimited
+          explode: false
+          description: 'When acquiring information where event_type is True, specify the corresponding item name'
+        - name: event_type_false
+          in: query
+          schema:
+            type: array
+            items:
+              type: string
+          style: pipeDelimited
+          explode: false
+          description: 'When acquiring information where event_type is False, specify the corresponding item name'
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - $ref: '#/components/schemas/settingsDestinationList'
+              examples:
+                mail settings:
+                  $ref: '#/paths/~1api~1%7Borganization_id%7D~1platform~1workspaces~1%7Bworkspace_id%7D~1settings~1notifications/get/responses/200/content/application~1json/examples/mail%20settings'
+                teams settings:
+                  $ref: '#/paths/~1api~1%7Borganization_id%7D~1platform~1workspaces~1%7Bworkspace_id%7D~1settings~1notifications/get/responses/200/content/application~1json/examples/teams%20settings'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+  '/internal-api/{organization_id}/platform/workspaces/{workspace_id}/settings/notifications/{destination_id}':
+    get:
+      tags:
+        - InternalNotificationService
+      summary: Returns of settings destination
+      x-openapi-router-controller: controllers.internal_notification_service_controller
+      operationId: internal_settings_destination_get
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: workspace_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: destination_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - $ref: '#/components/schemas/settingsDestinationOne'
+                  - $ref: '#/components/schemas/responseStat'
+              examples:
+                mail settings:
+                  $ref: '#/paths/~1api~1%7Borganization_id%7D~1platform~1workspaces~1%7Bworkspace_id%7D~1settings~1notifications~1%7Bdestination_id%7D/get/responses/200/content/application~1json/examples/mail%20settings'
+                teams settings:
+                  $ref: '#/paths/~1api~1%7Borganization_id%7D~1platform~1workspaces~1%7Bworkspace_id%7D~1settings~1notifications~1%7Bdestination_id%7D/get/responses/200/content/application~1json/examples/teams%20settings'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
 components:
   schemas:
     responseOk:

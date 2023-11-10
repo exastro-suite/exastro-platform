@@ -1,0 +1,69 @@
+#   Copyright 2023 NEC Corporation
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+
+get:
+  tags:
+  - InternalNotificationService
+  summary: List returns list of settings notifications
+  x-openapi-router-controller: controllers.internal_notification_service_controller
+  operationId: internal_settings_notification_list
+  parameters:
+  - name: organization_id
+    in: path
+    required: true
+    schema:
+      type: string
+  - name: workspace_id
+    in: path
+    required: true
+    schema:
+      type: string
+  - name: event_type_true
+    in: query
+    schema:
+      type: array
+      items:
+        type: string
+    style: pipeDelimited
+    explode: false
+    description: When acquiring information where event_type is True, specify the corresponding item name
+  - name: event_type_false
+    in: query
+    schema:
+      type: array
+      items:
+        type: string
+    style: pipeDelimited
+    explode: false
+    description: When acquiring information where event_type is False, specify the corresponding item name
+  responses:
+    200:
+      description: A successful response.
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '../schemas/responseOk.yaml'
+              - $ref: '../schemas/settings.destinationList.yaml'
+          examples:
+            mail settings:
+              $ref: "../schemas/settings.destinations.get.example.mail.yaml"
+            teams settings:
+              $ref: "../schemas/settings.destinations.get.example.teams.yaml"
+    default:
+      description: An unexpected error response.
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'
