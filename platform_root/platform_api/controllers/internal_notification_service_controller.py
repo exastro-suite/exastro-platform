@@ -35,11 +35,11 @@ def internal_settings_destination_get(organization_id, workspace_id, destination
     Returns:
         Response: http response
     """
-    
+
     globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
-    
+
     data = bl_notification_service.settings_destination_get(organization_id, workspace_id, destination_id)
-    
+
     return common.response_200_ok(data)
 
 
@@ -50,8 +50,8 @@ def internal_settings_notification_list(organization_id, workspace_id, event_typ
     Args:
         organization_id (str): organization_id
         workspace_id (str): workspace_id
-        event_type_true (str): event_type true item_name (delimit ,)
-        event_type_false (str): event_type false item_name (delimit ,)
+        event_type_true (str): event_type true item_name (delimit |(pipe))
+        event_type_false (str): event_type false item_name (delimit |(pipe))
 
     Returns:
         Response: http response
@@ -62,6 +62,6 @@ def internal_settings_notification_list(organization_id, workspace_id, event_typ
     globals.logger.debug(f"event_type_true:{event_type_true} --- event_type_false:{event_type_false}")
 
     data = bl_notification_service.settings_notification_list(organization_id, workspace_id, event_type_true, event_type_false)
-    
+
     return common.response_200_ok(data)
 
