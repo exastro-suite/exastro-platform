@@ -18,10 +18,13 @@ import json
 from common_library.common import common
 from common_library.common.db import DBconnector
 from common_library.common import encrypt
+from common_library.common import multi_lang
 from common_library.common.libs import queries_bl_notification
 
 
 import globals
+
+MSG_FUNCTION_ID = "35"
 
 
 def settings_destination_get(organization_id, workspace_id, destination_id):  # noqa: E501
@@ -35,7 +38,7 @@ def settings_destination_get(organization_id, workspace_id, destination_id):  # 
     Returns:
         Response: http response
     """
-    
+
     # destination_id list get
     with closing(DBconnector().connect_workspacedb(organization_id, workspace_id)) as conn:
         with conn.cursor() as cursor:
@@ -52,9 +55,17 @@ def settings_destination_get(organization_id, workspace_id, destination_id):  # 
             result = cursor.fetchone()
 
     data = []
-    for row in result:
-        data.append(settings_notification_rowset(row))
-    
+    # 取得した結果が存在しない場合は、何もしない
+    # If the obtained result does not exist, do nothing
+    if result is not None:
+        globals.logger.debug(f"result:{result}")
+        data.append(settings_notification_rowset(result))
+    else:
+        raise common.NotFoundException(
+            message_id=f"404-{MSG_FUNCTION_ID}001",
+            message=multi_lang.get_text(f"404-{MSG_FUNCTION_ID}001", "通知先情報が存在しません(id:{0})", destination_id)
+        )
+
     return data
 
 
@@ -70,7 +81,7 @@ def settings_notification_rowset(row):
         "last_update_timestamp": common.datetime_to_str(row["LAST_UPDATE_TIMESTAMP"]),
         "last_update_user": row["LAST_UPDATE_USER"],
     }
-    
+
     return row_set
 
 
@@ -100,7 +111,7 @@ def settings_notification_list(organization_id, workspace_id, event_type_true=No
         for cond in event_type_false:
             cond = common.rep_sql_json_para(cond)
             WhereArray.append(f" AND JSON_EXTRACT(CONDITIONS, '$.{cond}') = False")
-        
+
     # 条件結合
     # conditional join
     if len(WhereArray) > 0:
@@ -109,7 +120,7 @@ def settings_notification_list(organization_id, workspace_id, event_type_true=No
         Where = ''
 
     globals.logger.debug(f"Where:{Where}")
-    
+
     # destination_id list get
     with closing(DBconnector().connect_workspacedb(organization_id, workspace_id)) as conn:
         with conn.cursor() as cursor:
@@ -119,5 +130,5 @@ def settings_notification_list(organization_id, workspace_id, event_type_true=No
     data = []
     for row in result:
         data.append(settings_notification_rowset(row))
-    
+
     return data

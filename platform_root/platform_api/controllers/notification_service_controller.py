@@ -34,21 +34,10 @@ MSG_FUNCTION_ID = "34"
 def settings_destination_get(organization_id, workspace_id, destination_id):  # noqa: E501
     """List returns list of settings notifications
 
-<<<<<<< HEAD
-    :param organization_id:
-    :type organization_id: str
-    :param workspace_id:
-    :type workspace_id: str
-    :param destination_id:
-    :type destination_id: str
-    :param query_string:
-    :type query_string: str
-=======
     Args:
         organization_id (str): organization_id
         workspace_id (str): workspace_id
         destination_id (str): destination_id
->>>>>>> upstream/1.7
 
     Returns:
         Response: http response

@@ -298,7 +298,10 @@ def test_notifications_validate(connexion_client):
     # validate : func_id None
     validate = validation.validate_func_id(None)
     assert not validate.ok, "register notifications validate func_id : None"
-    # validate : func_id None
+    # validate : func_id max length
+    validate = validation.validate_func_id("".ljust(const.length_func_id, "_"))
+    assert validate.ok, "register notifications validate func_id : max length"
+    # validate : func_id max length + 1
     validate = validation.validate_func_id("".ljust(const.length_func_id + 1, "_"))
     assert not validate.ok, "register notifications validate func_id : max length + 1"
     # validate : func_id other
@@ -519,6 +522,102 @@ def test_notification_register(connexion_client):
             json=[sample_data_notifications_default({"destination_id": setting_notifications[0].get("id")})])
 
         assert response.status_code == 500, "register notifications response code: db error"
+
+
+def test_settings_destination_get(connexion_client):
+    """test settings_destination_get
+
+    Args:
+        connexion_client (_type_): _description_
+    """
+    organization = test_common.create_organization(connexion_client)
+    workspace = test_common.create_workspace(connexion_client, organization['organization_id'], 'workspace-01', organization['user_id'])
+    setting_notifications = test_common.create_setting_notifications(connexion_client, organization['organization_id'], 'workspace-01', organization['user_id'])
+
+    logger.debug(f"setting_notifications:{setting_notifications}")
+
+    with test_common.requsts_mocker_default():
+        #
+        # validate get id not found
+        #
+        response = connexion_client.get(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/settings/notifications/not_id",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization['user_id']))
+
+        assert response.status_code == 404, "get notifications destination response error route"
+
+        #
+        # validate get normal
+        #
+        response = connexion_client.get(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/settings/notifications/{setting_notifications[0]['id']}",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization['user_id']))
+
+        assert response.status_code == 200, "get notifications destination response OK route"
+
+
+def test_settings_notification_list(connexion_client):
+    """test settings_notification_list
+
+    Args:
+        connexion_client (_type_): _description_
+    """
+    organization = test_common.create_organization(connexion_client)
+    workspace = test_common.create_workspace(connexion_client, organization['organization_id'], 'workspace-01', organization['user_id'])
+    setting_notifications = test_common.create_setting_notifications(connexion_client, organization['organization_id'], 'workspace-01', organization['user_id'])
+
+    logger.debug(f"setting_notifications:{setting_notifications}")
+
+    with test_common.requsts_mocker_default():
+        #
+        # validate get id not found
+        #
+        response = connexion_client.get(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/settings/notifications",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization['user_id']))
+
+        assert response.status_code == 200, "get notifications destination list response OK route"
+        assert len(response.json["data"]) == 2, "get notifications destination list"
+        assert response.json["data"][0].get("id") == setting_notifications[0]['id'], "get notifications destination id check"
+
+        #
+        # validate get normal
+        #
+        response = connexion_client.get(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/settings/notifications?event_type_true=ita.event_type.new",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization['user_id']))
+
+        assert response.status_code == 200, "get notifications destination list response OK route"
+        assert len(response.json["data"]) == 2, "get notifications destination list"
+        assert response.json["data"][0].get("conditions", {}).get("ita", {}).get("event_type", {}).get("new"), "get notifications destination id check"
+
+        #
+        # validate get normal
+        #
+        response = connexion_client.get(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/settings/notifications?event_type_true=ita.event_type.new|ita.event_type.evaluated",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization['user_id']))
+
+        assert response.status_code == 200, "get notifications destination list response OK route"
+        assert len(response.json["data"]) == 0, "get notifications destination list"
+
+        #
+        # validate get normal
+        #
+        response = connexion_client.get(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/settings/notifications?event_type_true=ita.event_type.new&event_type_false=ita.event_type.evaluated",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization['user_id']))
+
+        assert response.status_code == 200, "get notifications destination list response OK route"
+        assert len(response.json["data"]) == 2, "get notifications destination list"
+        assert response.json["data"][0].get("conditions", {}).get("ita", {}).get("event_type", {}).get("new"), "get notifications destination id check"
+        assert not response.json["data"][0].get("conditions", {}).get("ita", {}).get("event_type", {}).get("evaluated"), "get notifications destination id check"
 
 
 def sample_data_mail(id, update={}):
