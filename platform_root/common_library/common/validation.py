@@ -1037,7 +1037,7 @@ def validate_destinations(body):
             False, 400, '400-{}002'.format(MSG_FUNCTION_ID), 'リクエストボディのパラメータ({0})が不正です。',
             'Json'
         )
-        
+
     if len(body) == 0:
         return result(
             False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
@@ -1132,7 +1132,7 @@ def validate_destination_kind(destination_kind):
             "/".join(const.ALL_DESTINATION_KIND),
             multi_lang.get_text('000-00146', "通知方法")
         )
-        
+
     return result(True)
 
 
@@ -1158,7 +1158,7 @@ def validate_destination_informations(destination_kind, destination_info):
         )
 
     if destination_kind == const.DESTINATION_KIND_MAIL:
-            
+
         if len(destination_info) > const.max_destination_email:
             return result(
                 False, 400, '400-{}018'.format(MSG_FUNCTION_ID), '指定可能な最大数を超えています。(項目:{0},最大数:{1})',
@@ -1304,7 +1304,7 @@ def validate_notifications(body):
             False, 400, '400-{}002'.format(MSG_FUNCTION_ID), 'リクエストボディのパラメータ({0})が不正です。',
             'Json'
         )
-        
+
     if len(body) == 0:
         return result(
             False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',

@@ -17,6 +17,10 @@ import ulid
 from common_library.common import const, validation
 from libs import queries_notification
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 def test_notification_api(connexion_client):
     """notification service api test
@@ -167,7 +171,7 @@ def test_notifications_validate(connexion_client):
         const.DESTINATION_KIND_MAIL,
         [sample_data_information_email({"address_header": "other"})])
     assert not validate.ok, "create notifications validate informations address_header other"
-    
+
     # validate informations mail None
     validate = validation.validate_destination_informations(
         const.DESTINATION_KIND_MAIL,
@@ -273,6 +277,48 @@ def test_notifications_validate(connexion_client):
     validate = validation.validate_destination_conditions(conditions)
     assert not validate.ok, "create notifications validate conditions ita.event_type.undetected different type"
 
+    #
+    # validate body
+    #
+    # validate : different type
+    validate = validation.validate_notifications(None)
+    assert not validate.ok, "register notifications validate notifications body : different type"
+
+    # validate : no data
+    validate = validation.validate_notifications([])
+    assert not validate.ok, "register notifications validate notifications body : len = 0"
+
+    # validate : on data
+    validate = validation.validate_notifications([{"test": "test"}])
+    assert validate.ok, "register notifications validate notifications body error"
+
+    #
+    # validate func_id
+    #
+    # validate : func_id None
+    validate = validation.validate_func_id(None)
+    assert not validate.ok, "register notifications validate func_id : None"
+    # validate : func_id None
+    validate = validation.validate_func_id("".ljust(const.length_func_id + 1, "_"))
+    assert not validate.ok, "register notifications validate func_id : max length + 1"
+    # validate : func_id other
+    validate = validation.validate_func_id('other')
+    assert validate.ok, "register notifications validate func_id : other"
+
+    #
+    # validate func_informations
+    #
+    # validate : func_informations json
+    validate = validation.validate_func_informations({})
+    assert validate.ok, "register notifications validate func_informations : {}"
+
+    #
+    # validate notification_message
+    #
+    # validate : notification_message json
+    validate = validation.validate_notification_message({})
+    assert validate.ok, "register notifications validate notification_message : {}"
+
 
 def test_settings_notification_create(connexion_client):
     """test settings_notification_create
@@ -295,7 +341,7 @@ def test_settings_notification_create(connexion_client):
             json=[])
 
         assert response.status_code == 400, "create notifications valide body response error route"
-        
+
         # validate error id
         response = connexion_client.post(
             f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/settings/notifications",
@@ -388,6 +434,8 @@ def test_notification_register(connexion_client):
     workspace = test_common.create_workspace(connexion_client, organization['organization_id'], 'workspace-01', organization['user_id'])
     setting_notifications = test_common.create_setting_notifications(connexion_client, organization['organization_id'], 'workspace-01', organization['user_id'])
 
+    logger.debug(f"setting_notifications:{setting_notifications}")
+
     with test_common.requsts_mocker_default():
         #
         # validate error route
@@ -399,8 +447,8 @@ def test_notification_register(connexion_client):
             headers=request_parameters.request_headers(organization['user_id']),
             json=[])
 
-        assert response.status_code == 400, "create notifications valide body response error route"
-        
+        assert response.status_code == 400, "register notifications valide body response error route"
+
         # validate error destination id
         response = connexion_client.post(
             f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/notifications",
@@ -408,8 +456,8 @@ def test_notification_register(connexion_client):
             headers=request_parameters.request_headers(organization['user_id']),
             json=[sample_data_notifications_no_destination_id()])
 
-        assert response.status_code == 400, "create notifications valide destination_id response error route"
-        
+        assert response.status_code == 400, "register notifications valide destination_id response error route"
+
         # validate error func id
         response = connexion_client.post(
             f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/notifications",
@@ -417,8 +465,8 @@ def test_notification_register(connexion_client):
             headers=request_parameters.request_headers(organization['user_id']),
             json=[sample_data_notifications_no_func_id({"destination_id": setting_notifications[0].get("destination_id")})])
 
-        assert response.status_code == 400, "create notifications valide func_id response error route"
-        
+        assert response.status_code == 400, "register notifications valide func_id response error route"
+
         # validate error func_informations
         response = connexion_client.post(
             f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/notifications",
@@ -426,8 +474,8 @@ def test_notification_register(connexion_client):
             headers=request_parameters.request_headers(organization['user_id']),
             json=[sample_data_notifications_default({"destination_id": setting_notifications[0].get("destination_id"), "func_informations": "-"})])
 
-        assert response.status_code == 400, "create notifications valide func_informations response error route"
-        
+        assert response.status_code == 400, "register notifications valide func_informations response error route"
+
         # validate error conditions
         response = connexion_client.post(
             f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/notifications",
@@ -435,7 +483,42 @@ def test_notification_register(connexion_client):
             headers=request_parameters.request_headers(organization['user_id']),
             json=[sample_data_notifications_default({"destination_id": setting_notifications[0].get("destination_id"), "conditions": "-"})])
 
-        assert response.status_code == 400, "create notifications valide conditions response error route"
+        assert response.status_code == 400, "register notifications valide conditions response error route"
+
+        logger.debug("destination_id:{}".format(setting_notifications[0].get("id")))
+
+        # not found setting_notifications
+        response = connexion_client.post(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/notifications",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization['user_id']),
+            json=[sample_data_notifications_default({"destination_id": "not_found", "conditions": "-"})])
+
+        assert response.status_code == 404, "register notifications not found setting_notifications response error route"
+
+        logger.debug("destination_id:{}".format(setting_notifications[0].get("id")))
+
+        # validate error conditions
+        response = connexion_client.post(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/notifications",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization['user_id']),
+            json=[sample_data_notifications_default({"destination_id": setting_notifications[0].get("id")})])
+
+        assert response.status_code == 200, "register notifications OK response error route"
+
+    with test_common.requsts_mocker_default(), \
+            test_common.pymysql_execute_raise_exception_mocker(queries_notification.SQL_INSERT_NOTIFICATION_MESSAGE, Exception("DB Error Test")):
+        #
+        # DB error route
+        #
+        response = connexion_client.post(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/notifications",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization["user_id"]),
+            json=[sample_data_notifications_default({"destination_id": setting_notifications[0].get("id")})])
+
+        assert response.status_code == 500, "register notifications response code: db error"
 
 
 def sample_data_mail(id, update={}):

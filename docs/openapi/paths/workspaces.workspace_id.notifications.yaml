@@ -56,26 +56,48 @@ get:
       type: string
   - name: match
     in: query
-    description: "Specify exact match condition"
+    description: >
+      Specify exact match condition.
+      Separate with |(pipe), specify the item name in the odd numbered columns and the search character in the even numbered columns.
     schema:
-      type: string
-    style: deepObject
-    explode: true
+      type: array
+      items:
+        type: string
+    style: pipeDelimited
+    explode: false
   - name: like_before
     in: query
-    description: "Specifying conditions for beginning match"
+    description: >
+      Specifying conditions for beginning match.
+      Separate with |(pipe), specify the item name in the odd numbered columns and the search character in the even numbered columns.
     schema:
-      type: string
+      type: array
+      items:
+        type: string
+    style: pipeDelimited
+    explode: false
   - name: like_after
     in: query
-    description: "Specifying conditions for suffix match"
+    description: >
+      Specifying conditions for suffix match.
+      Separate with |(pipe), specify the item name in the odd numbered columns and the search character in the even numbered columns.
     schema:
-      type: string
+      type: array
+      items:
+        type: string
+    style: pipeDelimited
+    explode: false
   - name: like_all
     in: query
-    description: "Specifying conditions for fuzzy search"
+    description: >
+      Specifying conditions for fuzzy search.
+      Separate with |(pipe), specify the item name in the odd numbered columns and the search character in the even numbered columns.
     schema:
-      type: string
+      type: array
+      items:
+        type: string
+    style: pipeDelimited
+    explode: false
   responses:
     200:
       description: A successful response.

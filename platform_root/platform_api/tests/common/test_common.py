@@ -134,7 +134,7 @@ class pymysql_cursor_mocked():
 
     def __enter__(self):
         return self
-    
+
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.cursor.close()
 
@@ -267,43 +267,9 @@ def create_setting_notifications(connexion_client, organization_id, workspace_id
     """
     rows = []
     with requsts_mocker_default():
-        
-        id = "TEST_TEAMS"
-        kind = const.DESTINATION_KIND_TEAMS
-        dest_info = [
-            {"webhook": "https://xxxxxxxx.webhook.office.com/webhookb/xxxxxxxx-xxxxxx-xxxx-xxxx-xxxxxxxxxxxx"},
-            {"webhook": "https://xxxxxxxx.webhook.office.com/webhookb/xxxxxxxx-xxxxxx-xxxx-xxxx-xxxxxxxxxxxx"},
-        ]
-        conditions = {
-            "ita": {
-                "event_type": {
-                    "new": True, "evaluated": True, "timeout": True, "undetected": True,
-                }
-            }
-        }
 
-        json_create_settings_notifications = test_notification_service_controller.sample_data_settings_notifications(id, kind, dest_info, conditions)
-
-        rows.append(json_create_settings_notifications)
-        
-        id = "TEST_MAIL"
-        kind = const.DESTINATION_KIND_MAIL
-        dest_info = [
-            {"address_header": "to", "email": "test1@example.com"},
-            {"address_header": "cc", "email": "test2@example.com"},
-            {"address_header": "bcc", "email": "test3@example.com"},
-        ]
-        conditions = {
-            "ita": {
-                "event_type": {
-                    "new": True, "evaluated": True, "timeout": True, "undetected": True,
-                }
-            }
-        }
-
-        json_create_settings_notifications = test_notification_service_controller.sample_data_settings_notifications(id, kind, dest_info, conditions)
-
-        rows.append(json_create_settings_notifications)
+        rows.append(test_notification_service_controller.sample_data_mail('mix-mail-01'))
+        rows.append(test_notification_service_controller.sample_data_teams('mix-teams-01'))
 
     logger = logging.getLogger("TEST")
 
