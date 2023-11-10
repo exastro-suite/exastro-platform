@@ -76,6 +76,8 @@ tags:
   description: ワークスペースに関する操作(内部用)
 - name: InternalMaintenanceModeService
   description: メンテナンスモードに関する操作(内部用)
+- name: InternalNotificationService
+  description: 通知機能に関する操作(内部用)
 paths:
   "/api/platform/organizations":
       $ref: './paths/organizations.yaml'
@@ -181,6 +183,12 @@ paths:
 
   "/internal-api/platform/maintenance-mode-setting":
       $ref: './paths/internal_maintenance_mode_setting.yaml'
+
+  "/internal-api/{organization_id}/platform/workspaces/{workspace_id}/settings/notifications":
+      $ref: './paths/internal_workspaces.workspace_id.settings.notifications.yaml'
+
+  "/internal-api/{organization_id}/platform/workspaces/{workspace_id}/settings/notifications/{destination_id}":
+      $ref: './paths/internal_workspaces.workspace_id.settings.notifications.destination_id.yaml'
 
 components:
   schemas:
