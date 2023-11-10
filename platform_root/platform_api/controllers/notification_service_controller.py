@@ -22,6 +22,7 @@ import ulid
 from common_library.common import common, validation, const
 from common_library.common.db import DBconnector
 from common_library.common import multi_lang, encrypt
+from common_library.common import bl_notification_service
 from libs import queries_notification
 
 import globals
@@ -30,53 +31,22 @@ MSG_FUNCTION_ID = "34"
 
 
 @common.platform_exception_handler
-def settings_destination_get(organization_id, workspace_id, destination_id, query_string=None):  # noqa: E501
-    """Returns of settings destination
+def settings_destination_get(organization_id, workspace_id, destination_id):  # noqa: E501
+    """List returns list of settings notifications
 
-    :param organization_id: 
-    :type organization_id: str
-    :param workspace_id: 
-    :type workspace_id: str
-    :param destination_id: 
-    :type destination_id: str
-    :param query_string: 
-    :type query_string: str
+    Args:
+        organization_id (str): organization_id
+        workspace_id (str): workspace_id
+        destination_id (str): destination_id
 
-    :rtype: settings destination
+    Returns:
+        Response: http response
     """
-    # destination_id list get
-    with closing(DBconnector().connect_workspacedb(organization_id, workspace_id)) as conn:
-        with conn.cursor() as cursor:
-            if destination_id:
-                str_where = " WHERE destination_id = %(destination_id)s"
-                parameter = {
-                    "destination_id": destination_id,
-                }
-            else:
-                str_where = ""
-                parameter = {}
-
-            cursor.execute(queries_notification.SQL_QUERY_NOTIFICATION_DESTINATION + str_where, parameter)
-            result = cursor.fetchall()
-
-    data = []
-    for row in result:
-        # 該当のロールがある場合のみ、設定
-        # Set only if there is a corresponding role
-        # if row["DESTINATION_ID"] in posible_destination_id or posible_all_workspace:
-        row = {
-            "id": row["DESTINATION_ID"],
-            "name": row["DESTINATION_NAME"],
-            "kind": row["DESTINATION_KIND"],
-            "conditions": json.loads(row["CONDITIONS"]),
-            "destination_informations": json.loads(encrypt.decrypt_str(row["DESTINATION_INFORMATIONS"])),
-            "create_timestamp": common.datetime_to_str(row["CREATE_TIMESTAMP"]),
-            "create_user": row["CREATE_USER"],
-            "last_update_timestamp": common.datetime_to_str(row["LAST_UPDATE_TIMESTAMP"]),
-            "last_update_user": row["LAST_UPDATE_USER"],
-        }
-        data.append(row)
-
+    
+    globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
+    
+    data = bl_notification_service.settings_destination_get(organization_id, workspace_id, destination_id)
+    
     return common.response_200_ok(data)
 
 
@@ -201,52 +171,8 @@ def settings_notification_list(organization_id, workspace_id, event_type_true=No
 
     globals.logger.debug(f"event_type_true:{event_type_true} --- event_type_false:{event_type_false}")
 
-    WhereArray = []
-    # event_type Trueの抽出SQL作成
-    # Create extraction SQL for event_type True
-    if event_type_true:
-        for cond in event_type_true:
-            cond = common.rep_sql_json_para(cond)
-            WhereArray.append(f" AND JSON_EXTRACT(CONDITIONS, '$.{cond}') = True")
-    # event_type Falseの抽出SQL作成
-    # Create extraction SQL for event_type False
-    if event_type_false:
-        for cond in event_type_false:
-            cond = common.rep_sql_json_para(cond)
-            WhereArray.append(f" AND JSON_EXTRACT(CONDITIONS, '$.{cond}') = False")
-        
-    # 条件結合
-    # conditional join
-    if len(WhereArray) > 0:
-        Where = ' WHERE' + ''.join(WhereArray)[4:]
-    else:
-        Where = ''
-
-    globals.logger.debug(f"Where:{Where}")
+    data = bl_notification_service.settings_notification_list(organization_id, workspace_id, event_type_true, event_type_false)
     
-    # destination_id list get
-    with closing(DBconnector().connect_workspacedb(organization_id, workspace_id)) as conn:
-        with conn.cursor() as cursor:
-            cursor.execute(queries_notification.SQL_QUERY_NOTIFICATION_DESTINATION + Where)
-            result = cursor.fetchall()
-    data = []
-    for row in result:
-        # 該当のロールがある場合のみ、設定
-        # Set only if there is a corresponding role
-        # if row["DESTINATION_ID"] in posible_destination_id or posible_all_workspace:
-        row = {
-            "id": row["DESTINATION_ID"],
-            "name": row["DESTINATION_NAME"],
-            "kind": row["DESTINATION_KIND"],
-            "conditions": json.loads(row["CONDITIONS"]),
-            "destination_informations": json.loads(encrypt.decrypt_str(row["DESTINATION_INFORMATIONS"])),
-            "create_timestamp": common.datetime_to_str(row["CREATE_TIMESTAMP"]),
-            "create_user": row["CREATE_USER"],
-            "last_update_timestamp": common.datetime_to_str(row["LAST_UPDATE_TIMESTAMP"]),
-            "last_update_user": row["LAST_UPDATE_USER"],
-        }
-        data.append(row)
-
     return common.response_200_ok(data)
 
 
