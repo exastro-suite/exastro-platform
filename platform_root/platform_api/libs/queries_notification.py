@@ -54,3 +54,20 @@ LAST_UPDATE_USER
 );
 """
 
+SQL_INSERT_PROCESS_QUEUE = """
+INSERT INTO T_PROCESS_QUEUE
+(PROCESS_ID,
+PROCESS_KIND,
+PROCESS_EXEC_ID,
+ORGANIZATION_ID,
+WORKSPACE_ID,
+LAST_UPDATE_USER
+)VALUES(
+%(process_id)s,
+%(process_kind)s,
+%(process_exec_id)s,
+%(organization_id)s,
+%(workspace_id)s,
+%(last_update_user)s
+);
+"""

@@ -394,4 +394,37 @@ def notification_register(body, organization_id, workspace_id):  # noqa: E501
 
             conn.commit()
 
+    with closing(DBconnector().connect_platformdb()) as conn:
+        with conn.cursor() as cursor:
+            for notifications_row in insert_notifications:
+                parameter = {
+                    "process_id": ulid.new().str,
+                    "process_kind": const.PROCESS_KIND_NOTIFICATION,
+                    "process_exec_id": notifications_row.get("notification_id"),
+                    "organization_id": organization_id,
+                    "workspace_id": workspace_id,
+                    "last_update_user": user_id,
+                }
+                try:
+                    try:
+                        cursor.execute(queries_notification.SQL_INSERT_PROCESS_QUEUE, parameter)
+
+                        # QUEUEは1件ずつコミット
+                        # QUEUE commits one item at a time
+                        conn.commit()
+
+                    except Exception as e:
+                        globals.logger.error(f"exception:{e.args}")
+                        message_id = f"500-{MSG_FUNCTION_ID}003"
+                        message = multi_lang.get_text(
+                            message_id,
+                            "処理キューの登録に失敗しました(process id:{0})",
+                            parameter['process_id'],
+                        )
+                        raise common.InternalErrorException(message_id=message_id, message=message)
+
+                except Exception as e:
+                    conn.rollback()
+                    raise e
+
     return common.response_200_ok(data=None)
