@@ -471,7 +471,7 @@ class LanguageList:
     lang_array['500-23020'] = 'Failed to update client. (Target ID: {0}.{1})'
     lang_array['500-23021'] = 'Failed to disable realm (Target ID: {0})'
     lang_array['500-23022'] = 'Failed to delete realm (Target ID: {0})'
-    lang_array['500-23023'] = 'Failed to enable/disable the organization (Target ID:{0})'
+    #
     lang_array['500-23024'] = 'Failed to update organization (Target ID:{0})'
     lang_array['500-24001'] = 'Failed to get workspace role (Target ID: {0})'
     lang_array['500-24002'] = 'Role creation failed (target role: {})'
@@ -499,6 +499,7 @@ class LanguageList:
     lang_array['500-30001'] = 'Failed to delete offline session (Target ID: {0} user: {1} client: {2})'
     lang_array['500-34001'] = 'Failed to create notification destination (id:{0})'
     lang_array['500-34002'] = 'Failed to register message notification (destination id:{0})'
+    lang_array['500-34003'] = 'Failed to register process queue (process id:{0})'
     lang_array['500-90001'] = 'Failed to get client (Target ID: {0} client: {1})'
     lang_array['500-90002'] = 'Failed to get client role (Target ID: {0} client: {1})'
     lang_array['500-90003'] = 'Failed to create client (Target ID: {0} client: {1})'

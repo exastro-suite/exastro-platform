@@ -150,3 +150,7 @@ ALL_MAIL_HEADER = [
 NOTIFICATION_STATUS_UNSENT = "Unsent"           # 未送信
 NOTIFICATION_STATUS_SUCCESSFUL = "Successful"   # 送信成功
 NOTIFICATION_STATUS_FAILED = "Failed"           # 送信失敗
+
+# 処理区分
+# process kind
+PROCESS_KIND_NOTIFICATION = "NOTIFICATION"      # 通知処理
