@@ -402,7 +402,7 @@ def organization_get(organization_id):  # noqa: E501
 
             result = cursor.fetchall()
 
-    ret_realm = {} 
+    ret_realm = {}
     # globals.logger.debug(f"result:{result}")
 
     # オーガナイゼーションごとの情報を返却値に設定する
@@ -490,9 +490,9 @@ def organization_update(organization_id):  # noqa: E501
                                               organization_id)
                 raise common.InternalErrorException(message_id=message_id, message=message)
 
-    # オーガナイゼーションの有効／無効の切り替え
-    # Enable/disable organization
-    __realm_enabled_change(organization_id, user_id, organization_enabled)
+    # オーガナイゼーションの更新
+    # update organization
+    __realm_update(organization_id, organization_name, organization_enabled)
 
     return common.response_200_ok(None)
 
@@ -561,12 +561,12 @@ def organization_delete(organization_id):  # noqa: E501
                 queries_organizations.SQL_QUERY_WORKSPACE_DB_BY_ID,
                 {"organization_id": organization_id})
             workspaces = cursor.fetchall()
-    
+
             # ワークスペース数分処理する
             # Process several workspaces
             for workspace in workspaces:
                 workspace_id = workspace.get("WORKSPACE_ID")
-                
+
                 # Delete Platform Workspace Database
                 globals.logger.info(f"Delete Platform Workspace Database : organization_id={organization_id} workspace_id={workspace_id}")
                 dbinit.drop_database(DBconnector().get_dbinfo_workspace(organization_id, workspace_id))
@@ -1899,12 +1899,12 @@ def __realms_detail_get(organization_id, keycloak_org, org_row, org_informations
     return ret_realm
 
 
-def __realm_enabled_change(organization_id, user_id, organization_enbaled):
-    """realm to enabled/disabled change
+def __realm_update(organization_id, organization_name, organization_enbaled):
+    """realm update
 
     Args:
         organization_id (str): organization id
-        user_id (str): user id
+        organization_name (str): organization name
         organization_enbaled (bool): organization enabled
     """
 
@@ -1915,18 +1915,19 @@ def __realm_enabled_change(organization_id, user_id, organization_enbaled):
     token = __get_token()
 
     realm_json = {
+        "displayName": organization_name,
         "enabled": organization_enbaled,
     }
 
-    # realm登録
-    # realm registration to keycloak
+    # realm更新
+    # realm update to keycloak
     response = api_keycloak_realms.realm_update(organization_id, realm_json, token)
     if response.status_code not in [200, 204]:
         globals.logger.error(f"response.status_code:{response.status_code}")
         globals.logger.error(f"response.text:{response.text}")
-        message_id = f"500-{MSG_FUNCTION_ID}023"
+        message_id = f"500-{MSG_FUNCTION_ID}024"
         message = multi_lang.get_text(message_id,
-                                      "オーガナイゼーションの有効・無効の切り替えに失敗しました(対象ID:{0})",
+                                      "オーガナイゼーションの更新に失敗しました(対象ID:{0})",
                                       organization_id)
         raise common.InternalErrorException(message_id=message_id, message=message)
 
