@@ -35,18 +35,20 @@ get:
       type: array
       items:
         type: string
-    style: pipeDelimited
+    style: form
     explode: false
     description: When acquiring information where event_type is True, specify the corresponding item name
+    example: event_type_true=ita.event_type.new,ita.event_type.timeout
   - name: event_type_false
     in: query
     schema:
       type: array
       items:
         type: string
-    style: pipeDelimited
+    style: form
     explode: false
     description: When acquiring information where event_type is False, specify the corresponding item name
+    example: event_type_false=ita.event_type.evaluated,ita.event_type.undetected
   responses:
     200:
       description: A successful response.

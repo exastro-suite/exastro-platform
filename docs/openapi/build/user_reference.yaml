@@ -550,42 +550,43 @@ paths:
         - name: match
           in: query
           description: |
-            Specify exact match condition. Separate with |(pipe), specify the item name in the odd numbered columns and the search character in the even numbered columns.
+            Specify exact match condition. Separate with "," specify the item name in the odd numbered columns and the search character in the even numbered columns.
           schema:
             type: array
             items:
               type: string
-          style: pipeDelimited
+          style: form
           explode: false
+          example: 'match=save_year,2023,save_month,12'
         - name: like_before
           in: query
           description: |
-            Specifying conditions for beginning match. Separate with |(pipe), specify the item name in the odd numbered columns and the search character in the even numbered columns.
+            Specifying conditions for beginning match. Separate with "," specify the item name in the odd numbered columns and the search character in the even numbered columns.
           schema:
             type: array
             items:
               type: string
-          style: pipeDelimited
+          style: form
           explode: false
         - name: like_after
           in: query
           description: |
-            Specifying conditions for suffix match. Separate with |(pipe), specify the item name in the odd numbered columns and the search character in the even numbered columns.
+            Specifying conditions for suffix match. Separate with "," specify the item name in the odd numbered columns and the search character in the even numbered columns.
           schema:
             type: array
             items:
               type: string
-          style: pipeDelimited
+          style: form
           explode: false
         - name: like_all
           in: query
           description: |
-            Specifying conditions for fuzzy search. Separate with |(pipe), specify the item name in the odd numbered columns and the search character in the even numbered columns.
+            Specifying conditions for fuzzy search. Separate with "," specify the item name in the odd numbered columns and the search character in the even numbered columns.
           schema:
             type: array
             items:
               type: string
-          style: pipeDelimited
+          style: form
           explode: false
       responses:
         '200':

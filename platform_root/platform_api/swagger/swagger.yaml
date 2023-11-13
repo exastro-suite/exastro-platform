@@ -967,23 +967,25 @@ paths:
         description: "When acquiring information where event_type is True, specify\
           \ the corresponding item name"
         required: false
-        style: pipeDelimited
+        style: form
         explode: false
         schema:
           type: array
           items:
             type: string
+        example: "event_type_true=ita.event_type.new,ita.event_type.timeout"
       - name: event_type_false
         in: query
         description: "When acquiring information where event_type is False, specify\
           \ the corresponding item name"
         required: false
-        style: pipeDelimited
+        style: form
         explode: false
         schema:
           type: array
           items:
             type: string
+        example: "event_type_false=ita.event_type.evaluated,ita.event_type.undetected"
       responses:
         "200":
           description: A successful response.
@@ -1364,20 +1366,21 @@ paths:
       - name: match
         in: query
         description: |
-          Specify exact match condition. Separate with |(pipe), specify the item name in the odd numbered columns and the search character in the even numbered columns.
+          Specify exact match condition. Separate with "," specify the item name in the odd numbered columns and the search character in the even numbered columns.
         required: false
-        style: pipeDelimited
+        style: form
         explode: false
         schema:
           type: array
           items:
             type: string
+        example: "match=save_year,2023,save_month,12"
       - name: like_before
         in: query
         description: |
-          Specifying conditions for beginning match. Separate with |(pipe), specify the item name in the odd numbered columns and the search character in the even numbered columns.
+          Specifying conditions for beginning match. Separate with "," specify the item name in the odd numbered columns and the search character in the even numbered columns.
         required: false
-        style: pipeDelimited
+        style: form
         explode: false
         schema:
           type: array
@@ -1386,9 +1389,9 @@ paths:
       - name: like_after
         in: query
         description: |
-          Specifying conditions for suffix match. Separate with |(pipe), specify the item name in the odd numbered columns and the search character in the even numbered columns.
+          Specifying conditions for suffix match. Separate with "," specify the item name in the odd numbered columns and the search character in the even numbered columns.
         required: false
-        style: pipeDelimited
+        style: form
         explode: false
         schema:
           type: array
@@ -1397,9 +1400,9 @@ paths:
       - name: like_all
         in: query
         description: |
-          Specifying conditions for fuzzy search. Separate with |(pipe), specify the item name in the odd numbered columns and the search character in the even numbered columns.
+          Specifying conditions for fuzzy search. Separate with "," specify the item name in the odd numbered columns and the search character in the even numbered columns.
         required: false
-        style: pipeDelimited
+        style: form
         explode: false
         schema:
           type: array
