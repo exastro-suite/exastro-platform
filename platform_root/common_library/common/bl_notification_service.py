@@ -54,19 +54,18 @@ def settings_destination_get(organization_id, workspace_id, destination_id):  # 
             cursor.execute(queries_bl_notification.SQL_QUERY_NOTIFICATION_DESTINATION + str_where, parameter)
             result = cursor.fetchone()
 
-    data = []
     # 取得した結果が存在しない場合は、何もしない
     # If the obtained result does not exist, do nothing
     if result is not None:
         globals.logger.debug(f"result:{result}")
-        data.append(settings_notification_rowset(result))
+        data = settings_notification_rowset(result)
+
+        return data
     else:
         raise common.NotFoundException(
             message_id=f"404-{MSG_FUNCTION_ID}001",
             message=multi_lang.get_text(f"404-{MSG_FUNCTION_ID}001", "通知先情報が存在しません(id:{0})", destination_id)
         )
-
-    return data
 
 
 def settings_notification_rowset(row):
