@@ -1037,7 +1037,7 @@ def validate_destinations(body):
             False, 400, '400-{}002'.format(MSG_FUNCTION_ID), 'リクエストボディのパラメータ({0})が不正です。',
             'Json'
         )
-        
+
     if len(body) == 0:
         return result(
             False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
@@ -1132,7 +1132,7 @@ def validate_destination_kind(destination_kind):
             "/".join(const.ALL_DESTINATION_KIND),
             multi_lang.get_text('000-00146', "通知方法")
         )
-        
+
     return result(True)
 
 
@@ -1158,7 +1158,7 @@ def validate_destination_informations(destination_kind, destination_info):
         )
 
     if destination_kind == const.DESTINATION_KIND_MAIL:
-            
+
         if len(destination_info) > const.max_destination_email:
             return result(
                 False, 400, '400-{}018'.format(MSG_FUNCTION_ID), '指定可能な最大数を超えています。(項目:{0},最大数:{1})',
@@ -1248,35 +1248,129 @@ def validate_destination_conditions(conditions):
     Returns:
         result: Validation result
     """
-    for key, value in conditions.items():
-        if key not in const.ALL_CONDITIONS:
-            return result(
-                False, 400, '400-{}002'.format(MSG_FUNCTION_ID), 'リクエストボディのパラメータ({0})が不正です。',
-                f'conditions.{key}'
-            )
+    if conditions.get('ita', {}).get('event_type', {}).get('new', None) is None:
+        return result(
+            False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
+            multi_lang.get_text('000-00153', "新規イベント")
+        )
 
-    if type(conditions.get(const.CONDITIONS_ITA_EVENT_TYPE_NEW)) is not bool:
+    if type(conditions.get('ita', {}).get('event_type', {}).get('new', None)) is not bool:
         return result(
             False, 400, '400-{}024'.format(MSG_FUNCTION_ID), 'True/False 以外が指定されています。({0})',
             multi_lang.get_text('000-00153', "新規イベント")
         )
 
-    if type(conditions.get(const.CONDITIONS_ITA_EVENT_TYPE_EVALUATED)) is not bool:
+    if conditions.get('ita', {}).get('event_type', {}).get('evaluated', None) is None:
+        return result(
+            False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
+            multi_lang.get_text('000-00154', "既知（判定済み）")
+        )
+
+    if type(conditions.get('ita', {}).get('event_type', {}).get('evaluated', None)) is not bool:
         return result(
             False, 400, '400-{}024'.format(MSG_FUNCTION_ID), 'True/False 以外が指定されています。({0})',
             multi_lang.get_text('000-00154', "既知（判定済み）")
         )
 
-    if type(conditions.get(const.CONDITIONS_ITA_EVENT_TYPE_TIME_OUT)) is not bool:
+    if conditions.get('ita', {}).get('event_type', {}).get('timeout', None) is None:
+        return result(
+            False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
+            multi_lang.get_text('000-00155', "既知（時間切れ）")
+        )
+
+    if type(conditions.get('ita', {}).get('event_type', {}).get('timeout', None)) is not bool:
         return result(
             False, 400, '400-{}024'.format(MSG_FUNCTION_ID), 'True/False 以外が指定されています。({0})',
             multi_lang.get_text('000-00155', "既知（時間切れ）")
         )
 
-    if type(conditions.get(const.CONDITIONS_ITA_EVENT_TYPE_ITA_UNDETECTED)) is not bool:
+    if conditions.get('ita', {}).get('event_type', {}).get('undetected', None) is None:
+        return result(
+            False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
+            multi_lang.get_text('000-00156', "未知")
+        )
+    if type(conditions.get('ita', {}).get('event_type', {}).get('undetected', None)) is not bool:
         return result(
             False, 400, '400-{}024'.format(MSG_FUNCTION_ID), 'True/False 以外が指定されています。({0})',
             multi_lang.get_text('000-00156', "未知")
         )
 
     return result(True)
+
+
+def validate_notifications(body):
+    if type(body) is not list:
+        return result(
+            False, 400, '400-{}002'.format(MSG_FUNCTION_ID), 'リクエストボディのパラメータ({0})が不正です。',
+            'Json'
+        )
+
+    if len(body) == 0:
+        return result(
+            False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
+            multi_lang.get_text('000-00181', "メッセージ通知情報")
+        )
+
+    return result(True)
+
+
+def validate_func_id(func_id):
+    """validate func_id
+
+    Args:
+        func_id (str): func_id
+
+    Returns:
+        result: Validation result
+    """
+    if func_id is None or func_id == "":
+        return result(
+            False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
+            multi_lang.get_text('000-00182', "機能ID")
+        )
+
+    if len(func_id) > const.length_func_id:
+        return result(
+            False, 400, '400-{}012'.format(MSG_FUNCTION_ID), '指定可能な文字数を超えています。(項目:{0},最大文字数:{1})',
+            multi_lang.get_text('000-00182', "機能ID"),
+            str(const.length_func_id)
+        )
+
+    return result(True)
+
+
+def validate_func_informations(func_info):
+    """validate func_informations
+
+    Args:
+        func_info (dict): func_info
+
+    Returns:
+        result: Validation result
+    """
+    # if not common.is_json_format(func_info):
+    #     return result(
+    #         False, 400, '400-{}002'.format(MSG_FUNCTION_ID), 'リクエストボディのパラメータ({0})が不正です。',
+    #         'func_informations'
+    #     )
+
+    return result(True)
+
+
+def validate_notification_message(message):
+    """validate notification_message
+
+    Args:
+        message (dict): message
+
+    Returns:
+        result: Validation result
+    """
+    # if not common.is_json_format(message):
+    #     return result(
+    #         False, 400, '400-{}002'.format(MSG_FUNCTION_ID), 'リクエストボディのパラメータ({0})が不正です。',
+    #         'message'
+    #     )
+
+    return result(True)
+

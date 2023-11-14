@@ -1,4 +1,4 @@
-#   Copyright 2022 NEC Corporation
+#   Copyright 2023 NEC Corporation
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -14,10 +14,10 @@
 
 get:
   tags:
-  - NotificationService
+  - InternalNotificationService
   summary: Returns of settings destination
-  x-openapi-router-controller: controllers.notification_service_controller
-  operationId: settings_destination_get
+  x-openapi-router-controller: controllers.internal_notification_service_controller
+  operationId: internal_settings_destination_get
   parameters:
   - name: organization_id
     in: path
@@ -55,55 +55,4 @@ get:
         application/json:
           schema:
             $ref: '../schemas/runtimeError.yaml'
-put:
-  tags:
-  - NotificationService
-  summary: Put an settings destination
-  x-openapi-router-controller: controllers.notification_service_controller
-  operationId: settings_destination_put
-  parameters:
-  - name: organization_id
-    in: path
-    required: true
-    schema:
-      type: string
-  - name: workspace_id
-    in: path
-    required: true
-    schema:
-      type: string
-  - name: destination_id
-    in: path
-    required: true
-    schema:
-      type: string
-  requestBody:
-    content:
-      application/json:
-        schema:
-          $ref: '../schemas/settings.destinations.put.yaml'
-        examples:
-          mail settings:
-            $ref: "../schemas/settings.destinations.put.example.mail.yaml"
-          teams settings:
-            $ref: "../schemas/settings.destinations.put.example.teams.yaml"
-    required: true
-  responses:
-    200:
-      description: A successful response.
-      content:
-        application/json:
-          schema:
-            allOf:
-              - $ref: '../schemas/responseOk.yaml'
-              - type: object
-                properties:
-                  data:
-                    type: object
-                    example: null
-    default:
-      description: An unexpected error response.
-      content:
-        application/json:
-          schema:
-            $ref: '../schemas/runtimeError.yaml'
+            

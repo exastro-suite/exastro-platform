@@ -14,10 +14,10 @@
 
 get:
   tags:
-  - NotificationService
+  - InternalNotificationService
   summary: List returns list of settings notifications
-  x-openapi-router-controller: controllers.notification_service_controller
-  operationId: settings_notification_list
+  x-openapi-router-controller: controllers.internal_notification_service_controller
+  operationId: internal_settings_notification_list
   parameters:
   - name: organization_id
     in: path
@@ -35,20 +35,18 @@ get:
       type: array
       items:
         type: string
-    style: form
+    style: pipeDelimited
     explode: false
     description: When acquiring information where event_type is True, specify the corresponding item name
-    example: event_type_true=ita.event_type.new,ita.event_type.timeout
   - name: event_type_false
     in: query
     schema:
       type: array
       items:
         type: string
-    style: form
+    style: pipeDelimited
     explode: false
     description: When acquiring information where event_type is False, specify the corresponding item name
-    example: event_type_false=ita.event_type.evaluated,ita.event_type.undetected
   responses:
     200:
       description: A successful response.
@@ -63,55 +61,6 @@ get:
               $ref: "../schemas/settings.destinations.get.example.mail.yaml"
             teams settings:
               $ref: "../schemas/settings.destinations.get.example.teams.yaml"
-    default:
-      description: An unexpected error response.
-      content:
-        application/json:
-          schema:
-            $ref: '../schemas/runtimeError.yaml'
-post:
-  tags:
-  - NotificationService
-  summary: Create creates an settings notifications
-  x-openapi-router-controller: controllers.notification_service_controller
-  operationId: settings_notification_create
-  parameters:
-  - name: organization_id
-    in: path
-    required: true
-    schema:
-      type: string
-  - name: workspace_id
-    in: path
-    required: true
-    schema:
-      type: string
-  requestBody:
-    content:
-      application/json:
-        schema:
-          type: array
-          items:
-            $ref: '../schemas/settings.destinations.create.yaml'
-        examples:
-          mail settings:
-            $ref: "../schemas/settings.destinations.create.example.mail.yaml"
-          teams settings:
-            $ref: "../schemas/settings.destinations.create.example.teams.yaml"
-    required: true
-  responses:
-    200:
-      description: A successful response.
-      content:
-        application/json:
-          schema:
-            allOf:
-              - $ref: '../schemas/responseOk.yaml'
-              - type: object
-                properties:
-                  data:
-                    type: object
-                    example: null
     default:
       description: An unexpected error response.
       content:

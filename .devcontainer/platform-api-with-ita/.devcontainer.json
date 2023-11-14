@@ -32,6 +32,8 @@
 			}
 		},
 		"terminal.integrated.defaultProfile.linux": "bash",
+		// Remove trailing spaces when saving
+		"files.trimTrailingWhitespace": true,
 
 		// git menu setting
 		"git.allowNoVerifyCommit": true,
@@ -57,7 +59,7 @@
 
 		"python.linting.flake8Args": [
 			"--ignore=W293, W504",
-			"--max-line-length=150",
+			"--max-line-length=250",
 			"--max-complexity=20",
 		],
 

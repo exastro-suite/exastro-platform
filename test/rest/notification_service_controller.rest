@@ -12,7 +12,7 @@
 # share ws_id (同じものを複数記載すると最後の設定値が渡される)
 @ws_id = ws1
 
-# 1 api to ### 
+# 1 api to ###
 
 
 ### Get Notification
@@ -34,10 +34,11 @@ content-type: application/json
         "email": "example@example.com"
     }],
     "conditions": {
-        "ita.event_type.new": true,
-        "ita.event_type.evaluated": false,
-        "ita.event_type.time_out": true,
-        "ita.event_type.undetected": false
+      "ita": {
+        "event_type": {
+            "new": true, "evaluated": false, "timeout": true, "undetected": false
+        }
+      }
     }
   }
 ]
@@ -57,10 +58,11 @@ content-type: application/json
       "webhook": "https://example.com/teams"
     }],
     "conditions": {
-        "ita.event_type.new": true,
-        "ita.event_type.evaluated": false,
-        "ita.event_type.time_out": true,
-        "ita.event_type.undetected": false
+      "ita": {
+        "event_type": {
+          "new": true, "evaluated": true, "timeout": true, "undetected": true
+        }
+      }
     }
   }
 ]
@@ -73,9 +75,9 @@ content-type: application/json
 
 [
   {
-    "destination_id": "00000001Z7ZXFAED6872F6C9W8",
+    "destination_id": "destination-teams-01",
     "func_id": "00000000",
-    "func_information": {
+    "func_informations": {
       "key-1": "value-1",
       "key-2": "value-2"
     },
@@ -85,3 +87,44 @@ content-type: application/json
     }
   }
 ]
+
+
+### Get Notification Desitination get
+
+@dest_id = destination-mail-01
+GET {{base_org_url}}/api/{{org_id}}/platform/workspaces/{{ws_id}}/settings/notifications/{{dest_id}}
+Authorization: Basic {{org-user-id}} {{org-user-pw}}
+
+
+### Get Notification Desitination list
+
+GET {{base_org_url}}/api/{{org_id}}/platform/workspaces/{{ws_id}}/settings/notifications?event_type_true=ita.event_type.new,ita.event_type.evaluated&event_type_false=ita.event_type.timeout,ita.event_type.undetected
+Authorization: Basic {{org-user-id}} {{org-user-pw}}
+
+
+### Get Notification Desitination list
+
+GET {{base_org_url}}/api/{{org_id}}/platform/workspaces/{{ws_id}}/settings/notifications?event_type_false=ita.event_type.new
+Authorization: Basic {{org-user-id}} {{org-user-pw}}
+
+### Get Notification Desitination list
+
+GET {{base_org_url}}/api/{{org_id}}/platform/workspaces/{{ws_id}}/settings/notifications
+Authorization: Basic {{org-user-id}} {{org-user-pw}}
+
+### Get Notification list
+
+GET {{base_org_url}}/api/{{org_id}}/platform/workspaces/{{ws_id}}/notifications?match=string'""22/|ass&like_before="111//##""
+Authorization: Basic {{org-user-id}} {{org-user-pw}}
+accept: application/json
+
+### Get Notification list
+
+GET {{base_org_url}}/api/{{org_id}}/platform/workspaces/{{ws_id}}/notifications?mutch={"key":"aaa", "value":"cccc"}
+Authorization: Basic {{org-user-id}} {{org-user-pw}}
+accept: application/json
+
+
+### Get Notification list
+GET {{base_org_url}}/api/{{org_id}}/platform/workspaces/{{ws_id}}/notifications?page_size=100&current_page=1&details_info=false&match=ita.event_type.new,true,ita.event_type.timeout,true&like_before=ita.event_type.new,ue,ita.event_type.timeout,true&like_all=ita.event_type.timeout,t
+Authorization: Basic {{org-user-id}} {{org-user-pw}}

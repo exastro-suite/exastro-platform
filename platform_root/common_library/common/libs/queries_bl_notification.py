@@ -12,22 +12,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-title: Notification is a definition of Notification resource.
-type: object
-properties:
-  destination_id:
-    type: string
-    description: Destination ID is a 26-digit string
-  func_id:
-    type: string
-    description: Function ID unique to the caller (for filtering)
-  func_informations:
-    type: object
-    description: Caller-specific details (for filtering)
-  message:
-    type: object
-    description: Webhook systems simply pass the value as the body. For e-mail, construct Json after reserving title and text
-required:
-  - destination_id
-  - func_id
-  - message
+SQL_QUERY_NOTIFICATION_DESTINATION = """
+SELECT *
+FROM M_NOTIFICATION_DESTINATION
+"""

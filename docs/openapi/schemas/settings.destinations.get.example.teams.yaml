@@ -23,10 +23,14 @@ value:
         "name": "destinations of teams settings",
         "kind": "Teams",
         "conditions": {
-          "ita.event_type.new": false,
-          "ita.event_type.evaluated": false,
-          "ita.event_type.time_out": true,
-          "ita.event_type.undetected": true
+          "ita": {
+            "event_type": {
+              "new": true,
+              "evaluated": true,
+              "timeout": false,
+              "undetected": false
+            }
+          }
         },
         "destination_informations": [
           { "webhook": "https://xxxxxxxx.webhook.office.com/webhookb/xxxxxxxx-xxxxxx-xxxx-xxxx-xxxxxxxxxxxx" },

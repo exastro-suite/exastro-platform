@@ -1121,7 +1121,7 @@ components:
         func_id:
           type: string
           description: Function ID unique to the caller (for filtering)
-        func_information:
+        func_informations:
           type: object
           description: Caller-specific details (for filtering)
         message:
@@ -1544,6 +1544,10 @@ components:
           description: Destination name can be any string
         kind:
           type: string
+          enum:
+            - Mail
+            - Teams
+            - Webhook
           description: Select destination kind from Mail/Teams/Webhook
         conditions:
           $ref: '#/components/schemas/settingsDestinationConditions'
@@ -1570,6 +1574,10 @@ components:
           description: Destination name can be any string
         kind:
           type: string
+          enum:
+            - Mail
+            - Teams
+            - Webhook
           description: Select destination kind from Mail/Teams/Webhook
         conditions:
           $ref: '#/components/schemas/settingsDestinationConditions'
@@ -1607,23 +1615,35 @@ components:
       title: destinations conditions resource.
       type: object
       properties:
-        ita.event_type.new:
-          type: boolean
-          description: Whether to be notified of new events
-        ita.event_type.evaluated:
-          type: boolean
-          description: Whether to be notified of evaluated event
-        ita.event_type.time_out:
-          type: boolean
-          description: Whether to be notified of time_out event
-        ita.event_type.undetected:
-          type: boolean
-          description: Whether to be notified of undetected event
+        ita:
+          type: object
+          description: Exastro IT Automation conditions
+          properties:
+            event_type:
+              type: object
+              description: event type
+              properties:
+                new:
+                  type: boolean
+                  description: Whether to be notified of new events
+                evaluated:
+                  type: boolean
+                  description: Whether to be notified of evaluated event
+                timeout:
+                  type: boolean
+                  description: Whether to be notified of timeout event
+                undetected:
+                  type: boolean
+                  description: Whether to be notified of undetected event
+              required:
+                - new
+                - evaluated
+                - timeout
+                - undetected
+          required:
+            - event_type
       required:
-        - ita.event_type.new
-        - ita.event_type.evaluated
-        - ita.event_type.time_out
-        - ita.event_type.undetected
+        - ita
   securitySchemes:
     BearerAuth:
       description: Credentials or access token for API

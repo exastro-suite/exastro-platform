@@ -29,48 +29,76 @@ get:
     required: true
     schema:
       type: string
-  - name: PageSize
+  - name: page_size
     in: query
     description: "Maximum number of return values ​​at one time (default: 100)"
     schema:
       type: number
       minimum: 1
-  - name: CurrentPage
+      default: 100
+  - name: current_page
     in: query
     description: "Current display page (default: 1)"
     schema:
       type: number
       minimum: 1
-  - name: DetailsInfo
+      default: 1
+  - name: details_info
     in: query
     description: "With message output"
     schema:
       type: boolean
-  - name: FuncID
+      default: false
+  - name: func_id
     in: query
     description: "Filter by function ID"
     schema:
       type: string
-  - name: Match.key
+  - name: match
     in: query
-    description: "Specify exact match condition"
+    description: >
+      Specify exact match condition.
+      Separate with "," specify the item name in the odd numbered columns and the search character in the even numbered columns.
     schema:
-      type: string
-  - name: LikeBefore.key
+      type: array
+      items:
+        type: string
+    style: form
+    explode: false
+    example: match=save_year,2023,save_month,12
+  - name: like_before
     in: query
-    description: "Specifying conditions for beginning match"
+    description: >
+      Specifying conditions for beginning match.
+      Separate with "," specify the item name in the odd numbered columns and the search character in the even numbered columns.
     schema:
-      type: string
-  - name: LikeAfter.key
+      type: array
+      items:
+        type: string
+    style: form
+    explode: false
+  - name: like_after
     in: query
-    description: "Specifying conditions for suffix match"
+    description: >
+      Specifying conditions for suffix match.
+      Separate with "," specify the item name in the odd numbered columns and the search character in the even numbered columns.
     schema:
-      type: string
-  - name: LikeAll.key
+      type: array
+      items:
+        type: string
+    style: form
+    explode: false
+  - name: like_all
     in: query
-    description: "Specifying conditions for fuzzy search"
+    description: >
+      Specifying conditions for fuzzy search.
+      Separate with "," specify the item name in the odd numbered columns and the search character in the even numbered columns.
     schema:
-      type: string
+      type: array
+      items:
+        type: string
+    style: form
+    explode: false
   responses:
     200:
       description: A successful response.

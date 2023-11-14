@@ -17,23 +17,27 @@ value:
     "name": "destinations of mail settings",
     "kind": "Mail",
     "conditions": {
-      "ita.event_type.new": false,
-      "ita.event_type.evaluated": false,
-      "ita.event_type.time_out": true,
-      "ita.event_type.undetected": true
+      "ita": {
+        "event_type": {
+          "new": false,
+          "evaluated": false,
+          "timeout": true,
+          "undetected": true
+        }
+      }
     },
     "destination_informations": [
       {
         "address_header": "to",
-        "mail": "mike@example.com"
+        "email": "mike@example.com"
       },
       {
         "address_header": "cc",
-        "mail": "tommy@example.com"
+        "email": "tommy@example.com"
       },
       {
         "address_header": "bcc",
-        "mail": "nancy@example.com"
+        "email": "nancy@example.com"
       }
     ]
   }

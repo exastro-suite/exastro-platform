@@ -20,6 +20,7 @@ properties:
     description: Destination name can be any string
   kind:
     type: string
+    enum: [Mail, Teams, Webhook]
     description: Select destination kind from Mail/Teams/Webhook
   conditions:
     $ref: './settings.destinations.sub.conditions.yaml' 
