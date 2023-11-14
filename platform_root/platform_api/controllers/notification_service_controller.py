@@ -364,7 +364,7 @@ def notification_register(body, organization_id, workspace_id):  # noqa: E501
                     "conditions": destination.get('CONDITIONS'),
                     "func_id": row.get('func_id'),
                     "func_informations": json.dumps(row.get('func_informations')),
-                    "message_informations": json.dumps(row.get('message_informations')),
+                    "message_informations": json.dumps(row.get('message')),
                     "notification_status": const.NOTIFICATION_STATUS_UNSENT,
                     "notification_timestamp": None,
                     "create_user": user_id,
