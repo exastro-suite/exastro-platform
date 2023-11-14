@@ -523,6 +523,19 @@ def test_notification_register(connexion_client):
 
         assert response.status_code == 500, "register notifications response code: db error"
 
+    with test_common.requsts_mocker_default(), \
+            test_common.pymysql_execute_raise_exception_mocker(queries_notification.SQL_INSERT_PROCESS_QUEUE, Exception("DB Error Test")):
+        #
+        # DB error route
+        #
+        response = connexion_client.post(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/notifications",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization["user_id"]),
+            json=[sample_data_notifications_default({"destination_id": setting_notifications[0].get("id")})])
+
+        assert response.status_code == 500, "register notifications response code: db error"
+
 
 def test_settings_destination_get(connexion_client):
     """test settings_destination_get
