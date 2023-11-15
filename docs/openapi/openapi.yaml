@@ -190,6 +190,9 @@ paths:
   "/internal-api/{organization_id}/platform/workspaces/{workspace_id}/settings/notifications/{destination_id}":
       $ref: './paths/internal_workspaces.workspace_id.settings.notifications.destination_id.yaml'
 
+  "/internal-api/{organization_id}/platform/workspaces/{workspace_id}/notifications":
+      $ref: './paths/internal_workspaces.workspace_id.notifications.yaml'
+
 components:
   schemas:
     $ref: './schemas/_schemas.yaml'
