@@ -16,6 +16,7 @@ import ulid
 
 from common_library.common import const, validation
 from libs import queries_notification
+from common_library.common.libs import queries_bl_notification
 
 import logging
 
@@ -507,11 +508,12 @@ def test_notification_register(connexion_client):
             content_type='application/json',
             headers=request_parameters.request_headers(organization['user_id']),
             json=[sample_data_notifications_default({"destination_id": setting_notifications[0].get("id")})])
+        logger.debug(f"response_text:{response.text}")
 
-        assert response.status_code == 200, "register notifications OK response error route"
+        assert response.status_code == 200, "register notifications OK response route"
 
     with test_common.requsts_mocker_default(), \
-            test_common.pymysql_execute_raise_exception_mocker(queries_notification.SQL_INSERT_NOTIFICATION_MESSAGE, Exception("DB Error Test")):
+            test_common.pymysql_execute_raise_exception_mocker(queries_bl_notification.SQL_INSERT_NOTIFICATION_MESSAGE, Exception("DB Error Test")):
         #
         # DB error route
         #
@@ -524,7 +526,7 @@ def test_notification_register(connexion_client):
         assert response.status_code == 500, "register notifications response code: db error"
 
     with test_common.requsts_mocker_default(), \
-            test_common.pymysql_execute_raise_exception_mocker(queries_notification.SQL_INSERT_PROCESS_QUEUE, Exception("DB Error Test")):
+            test_common.pymysql_execute_raise_exception_mocker(queries_bl_notification.SQL_INSERT_PROCESS_QUEUE, Exception("DB Error Test")):
         #
         # DB error route
         #

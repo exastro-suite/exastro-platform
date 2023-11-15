@@ -5,6 +5,7 @@
 @org-user-pw = password
 @base_sys_url = http://platform-auth:{{sys-mng-port}}
 @base_org_url = http://platform-auth:{{org-mng-port}}
+@internal-api = http://platform-api:8000
 
 # share org_id (同じものを複数記載すると最後の設定値が渡される)
 @org_id = org1
@@ -77,9 +78,47 @@ content-type: application/json
   {
     "destination_id": "destination-teams-01",
     "func_id": "00000000",
+    "func_informations": []
+    "message": {
+      "title": "subjects",
+      "message": "event message"
+    }
+  }
+]
+
+### Register for message notifications
+POST {{base_org_url}}/api/{{org_id}}/platform/workspaces/{{ws_id}}/notifications
+Authorization: Basic {{org-user-id}} {{org-user-pw}}
+content-type: application/json
+
+[
+  {
+    "destination_id": "destination-teams-01",
+    "func_id": "00000000",
     "func_informations": {
       "key-1": "value-1",
       "key-2": "value-2"
+    },
+    "message": {
+      "title": "subjects",
+      "message": "event message"
+    }
+  }
+]
+
+
+### Register for message notifications (internal)
+POST {{internal-api}}/internal-api/{{org_id}}/platform/workspaces/{{ws_id}}/notifications
+User-Id: test-user-id
+content-type: application/json
+
+[
+  {
+    "destination_id": "destination-teams-01",
+    "func_id": "00000000",
+    "func_informations": {
+      "key-3": "value-3",
+      "key-4": "value-4"
     },
     "message": {
       "title": "subjects",
@@ -111,6 +150,18 @@ Authorization: Basic {{org-user-id}} {{org-user-pw}}
 
 GET {{base_org_url}}/api/{{org_id}}/platform/workspaces/{{ws_id}}/settings/notifications
 Authorization: Basic {{org-user-id}} {{org-user-pw}}
+
+
+### Get Notification Desitination get(Internal)
+
+GET {{internal-api}}/internal-api/{{org_id}}/platform/workspaces/{{ws_id}}/settings/notifications/{{dest_id}}
+User-Id: test-user-id
+
+
+### Get Notification Desitination list(Internal)
+
+GET {{internal-api}}/internal-api/{{org_id}}/platform/workspaces/{{ws_id}}/settings/notifications?event_type_true=ita.event_type.new
+User-Id: test-user-id
 
 ### Get Notification list
 
