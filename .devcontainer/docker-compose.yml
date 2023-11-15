@@ -172,6 +172,27 @@ services:
     networks:
       - exastro
 
+  platform-backyard:
+    user: 1000:1000
+    build:
+      dockerfile: ./platform_root/platform_backyard/Dockerfile
+      context: ../.
+      args:
+        - HTTP_PROXY=${HTTP_PROXY}
+        - http_proxy=${HTTP_PROXY}
+        - HTTPS_PROXY=${HTTPS_PROXY}
+        - https_proxy=${HTTPS_PROXY}
+    environment:
+      - TZ=Asia/Tokyo
+      - PYTHONIOENCODING=utf-8
+      - DB_HOST=platform-db
+      - DB_DATABASE=platform
+      - DB_USER=app_user
+      - DB_PASSWORD=password
+      - ENCRYPT_KEY=${ENCRYPT_KEY}
+    networks:
+      - exastro
+
   platform-migration-1:
     user: 1000:1000
     build:
