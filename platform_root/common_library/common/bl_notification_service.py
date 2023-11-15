@@ -14,8 +14,9 @@
 
 from contextlib import closing
 import json
+import ulid
 
-from common_library.common import common
+from common_library.common import common, validation, const
 from common_library.common.db import DBconnector
 from common_library.common import encrypt
 from common_library.common import multi_lang
@@ -129,5 +130,236 @@ def settings_notification_list(organization_id, workspace_id, event_type_true=No
     data = []
     for row in result:
         data.append(settings_notification_rowset(row))
+
+    return data
+
+
+def validate_notification_register(body):  # noqa: E501
+    """ register message notifications validate check
+
+    Args:
+        body (dict): json
+
+    Returns:
+        Response: validate response
+    """
+
+    # validation check
+    validate = validation.validate_notifications(body)
+    if not validate.ok:
+        return validate
+
+    for row in body:
+        validate = validation.validate_destination_id(row.get('destination_id'))
+        if not validate.ok:
+            return validate
+        validate = validation.validate_func_id(row.get('func_id'))
+        if not validate.ok:
+            return validate
+        globals.logger.debug("func_informations:{0}".format(row.get('func_informations')))
+        validate = validation.validate_func_informations(row.get('func_informations'))
+        if not validate.ok:
+            return validate
+        validate = validation.validate_notification_message(row.get('message'))
+        if not validate.ok:
+            return validate
+
+    return validation.result(True)
+
+
+def notification_register(body, organization_id, workspace_id, user_id):  # noqa: E501
+    """Register for message notifications
+
+    Args:
+        body (dict): json
+        organization_id (str): organization_id
+        workspace_id (str): workspace_id
+        user_id (str): user_id
+
+    Returns:
+        Response: http response
+    """
+
+    insert_notifications = []
+    with closing(DBconnector().connect_workspacedb(organization_id, workspace_id)) as conn:
+        with conn.cursor() as cursor:
+            for row in body:
+                destination_id = row.get('destination_id')
+                # destination_idの存在チェック
+                # exists check to destination_id
+                cursor.execute(
+                    queries_bl_notification.SQL_QUERY_NOTIFICATION_DESTINATION + " WHERE destination_id = %(destination_id)s",
+                    {"destination_id": destination_id}
+                )
+
+                destinations = cursor.fetchall()
+                if len(destinations) == 0:
+                    raise common.NotFoundException(
+                        message_id=f"404-{MSG_FUNCTION_ID}001",
+                        message=multi_lang.get_text(f"404-{MSG_FUNCTION_ID}001", "通知先情報が存在しません(id:{0})", destination_id)
+                    )
+                destination = destinations[0]
+
+                insert_notifications.append({
+                    "notification_id": ulid.new().str,
+                    "destination_id": destination.get('DESTINATION_ID'),
+                    "destination_name": destination.get('DESTINATION_NAME'),
+                    "destination_kind": destination.get('DESTINATION_KIND'),
+                    "destination_informations": destination.get('DESTINATION_INFORMATIONS'),
+                    "conditions": destination.get('CONDITIONS'),
+                    "func_id": row.get('func_id'),
+                    "func_informations": json.dumps(row.get('func_informations')),
+                    "message_informations": json.dumps(row.get('message')),
+                    "notification_status": const.NOTIFICATION_STATUS_UNSENT,
+                    "notification_timestamp": None,
+                    "create_user": user_id,
+                    "last_update_user": user_id
+                })
+
+    with closing(DBconnector().connect_workspacedb(organization_id, workspace_id)) as conn:
+        with conn.cursor() as cursor:
+            for parameter in insert_notifications:
+                try:
+                    try:
+                        cursor.execute(queries_bl_notification.SQL_INSERT_NOTIFICATION_MESSAGE, parameter)
+
+                    except Exception as e:
+                        globals.logger.error(f"exception:{e.args}")
+                        message_id = f"500-{MSG_FUNCTION_ID}002"
+                        message = multi_lang.get_text(
+                            message_id,
+                            "メッセージ通知の登録に失敗しました(destination id:{0})",
+                            parameter['destination_id'],
+                        )
+                        raise common.InternalErrorException(message_id=message_id, message=message)
+
+                except Exception as e:
+                    conn.rollback()
+                    raise e
+
+            conn.commit()
+
+    with closing(DBconnector().connect_platformdb()) as conn:
+        with conn.cursor() as cursor:
+            for notifications_row in insert_notifications:
+                parameter = {
+                    "process_id": ulid.new().str,
+                    "process_kind": const.PROCESS_KIND_NOTIFICATION,
+                    "process_exec_id": notifications_row.get("notification_id"),
+                    "organization_id": organization_id,
+                    "workspace_id": workspace_id,
+                    "last_update_user": user_id,
+                }
+                try:
+                    try:
+                        cursor.execute(queries_bl_notification.SQL_INSERT_PROCESS_QUEUE, parameter)
+
+                        # QUEUEは1件ずつコミット
+                        # QUEUE commits one item at a time
+                        conn.commit()
+
+                    except Exception as e:
+                        globals.logger.error(f"exception:{e.args}")
+                        message_id = f"500-{MSG_FUNCTION_ID}003"
+                        message = multi_lang.get_text(
+                            message_id,
+                            "処理キューの登録に失敗しました(process id:{0})",
+                            parameter['process_id'],
+                        )
+                        raise common.InternalErrorException(message_id=message_id, message=message)
+
+                except Exception as e:
+                    conn.rollback()
+                    raise e
+
+    return
+
+
+def notification_list(organization_id, workspace_id, page_size=None, current_page=None, details_info=None, func_id=None, match=None, like_before=None, like_after=None, like_all=None):  # noqa: E501
+    """
+    """
+
+    WhereArray = []
+    values = {}
+    # event_type Trueの抽出SQL作成
+    # Create extraction SQL for event_type True
+    if match:
+        col = True
+        colName = ""
+        for cond in match:
+            if col:
+                colName = common.rep_sql_json_para(cond)
+                col ^= True
+            else:
+                values.update({f"values{len(values)+1}": common.rep_sql_json_para(cond)})
+                WhereArray.append(f" AND JSON_EXTRACT(CONDITIONS, '$.{colName}') = %(values{len(values)})s")
+                col ^= True
+    if like_before:
+        col = True
+        colName = ""
+        for cond in like_before:
+            if col:
+                colName = common.rep_sql_json_para(cond)
+                col ^= True
+            else:
+                values.update({f"values{len(values)+1}": "%" + common.rep_sql_json_para(cond)})
+                WhereArray.append(f" AND JSON_EXTRACT(CONDITIONS, '$.{colName}') LIKE %(values{len(values)})s")
+                col ^= True
+    if like_after:
+        col = True
+        colName = ""
+        for cond in like_after:
+            if col:
+                colName = common.rep_sql_json_para(cond)
+                col ^= True
+            else:
+                values.update({f"values{len(values)+1}": common.rep_sql_json_para(cond) + "%"})
+                WhereArray.append(f" AND JSON_EXTRACT(CONDITIONS, '$.{colName}') LIKE %(values{len(values)})s")
+                col ^= True
+    if like_all:
+        col = True
+        colName = ""
+        for cond in like_all:
+            if col:
+                colName = common.rep_sql_json_para(cond)
+                col ^= True
+            else:
+                values.update({f"values{len(values)+1}": "%" + common.rep_sql_json_para(cond) + "%"})
+                WhereArray.append(f" AND JSON_EXTRACT(CONDITIONS, '$.{colName}') LIKE %(values{len(values)})s")
+                col ^= True
+    # 条件結合
+    # conditional join
+    if len(WhereArray) > 0:
+        Where = ' WHERE' + ''.join(WhereArray)[4:]
+    else:
+        Where = ''
+
+    globals.logger.debug(f"Where:{Where}")
+    globals.logger.debug(f"values:{values}")
+
+    """ ↓試験用のロジック"""
+    # destination_id list get
+    with closing(DBconnector().connect_workspacedb(organization_id, workspace_id)) as conn:
+        with conn.cursor() as cursor:
+            cursor.execute(queries_bl_notification.SQL_QUERY_NOTIFICATION_DESTINATION + Where, values)
+            result = cursor.fetchall()
+    data = []
+    for row in result:
+        # 該当のロールがある場合のみ、設定
+        # Set only if there is a corresponding role
+        # if row["DESTINATION_ID"] in posible_destination_id or posible_all_workspace:
+        row = {
+            "id": row["DESTINATION_ID"],
+            "name": row["DESTINATION_NAME"],
+            "kind": row["DESTINATION_KIND"],
+            "conditions": json.loads(row["CONDITIONS"]),
+            "destination_informations": json.loads(encrypt.decrypt_str(row["DESTINATION_INFORMATIONS"])),
+            "create_timestamp": common.datetime_to_str(row["CREATE_TIMESTAMP"]),
+            "create_user": row["CREATE_USER"],
+            "last_update_timestamp": common.datetime_to_str(row["LAST_UPDATE_TIMESTAMP"]),
+            "last_update_user": row["LAST_UPDATE_USER"],
+        }
+        data.append(row)
+    """ ↑試験用のロジック """
 
     return data

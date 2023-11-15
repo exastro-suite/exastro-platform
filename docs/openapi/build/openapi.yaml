@@ -2733,6 +2733,154 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/runtimeError'
+  '/internal-api/{organization_id}/platform/workspaces/{workspace_id}/notifications':
+    get:
+      tags:
+        - InternalNotificationService
+      summary: Returns a list of message notifications
+      x-openapi-router-controller: controllers.internal_notification_service_controller
+      operationId: internal_notification_list
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: workspace_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: page_size
+          in: query
+          description: 'Maximum number of return values ​​at one time (default: 100)'
+          schema:
+            type: number
+            minimum: 1
+            default: 100
+        - name: current_page
+          in: query
+          description: 'Current display page (default: 1)'
+          schema:
+            type: number
+            minimum: 1
+            default: 1
+        - name: details_info
+          in: query
+          description: With message output
+          schema:
+            type: boolean
+            default: false
+        - name: func_id
+          in: query
+          description: Filter by function ID
+          schema:
+            type: string
+        - name: match
+          in: query
+          description: |
+            Specify exact match condition. Separate with "," specify the item name in the odd numbered columns and the search character in the even numbered columns.
+          schema:
+            type: array
+            items:
+              type: string
+          style: form
+          explode: false
+          example: 'match=save_year,2023,save_month,12'
+        - name: like_before
+          in: query
+          description: |
+            Specifying conditions for beginning match. Separate with "," specify the item name in the odd numbered columns and the search character in the even numbered columns.
+          schema:
+            type: array
+            items:
+              type: string
+          style: form
+          explode: false
+        - name: like_after
+          in: query
+          description: |
+            Specifying conditions for suffix match. Separate with "," specify the item name in the odd numbered columns and the search character in the even numbered columns.
+          schema:
+            type: array
+            items:
+              type: string
+          style: form
+          explode: false
+        - name: like_all
+          in: query
+          description: |
+            Specifying conditions for fuzzy search. Separate with "," specify the item name in the odd numbered columns and the search character in the even numbered columns.
+          schema:
+            type: array
+            items:
+              type: string
+          style: form
+          explode: false
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - $ref: '#/components/schemas/workspaceList'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+    post:
+      tags:
+        - InternalNotificationService
+      summary: Register for message notifications
+      x-openapi-router-controller: controllers.internal_notification_service_controller
+      operationId: internal_notification_register
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: workspace_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/notifications.create'
+            examples:
+              mail message post:
+                $ref: '#/paths/~1api~1%7Borganization_id%7D~1platform~1workspaces~1%7Bworkspace_id%7D~1notifications/post/requestBody/content/application~1json/examples/mail%20message%20post'
+              teams message post:
+                $ref: '#/paths/~1api~1%7Borganization_id%7D~1platform~1workspaces~1%7Bworkspace_id%7D~1notifications/post/requestBody/content/application~1json/examples/teams%20message%20post'
+        required: true
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        example: null
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
 components:
   schemas:
     responseOk:
