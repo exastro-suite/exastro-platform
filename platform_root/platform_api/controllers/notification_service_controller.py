@@ -49,22 +49,20 @@ def settings_destination_get(organization_id, workspace_id, destination_id):  # 
     return common.response_200_ok(data)
 
 
-def settings_destination_put(body, organization_id, workspace_id, destination_id):  # noqa: E501
-    """Put an settings destination
+def settings_notification_put(body, organization_id, workspace_id, destination_id):  # noqa: E501
+    """Put an settings notification
 
-     # noqa: E501
+    Args:
+        body (dict): json
+        organization_id (str): organization_id
+        workspace_id (str): workspace_id
+        destination_id (str): destination_id
 
-    :param body:
-    :type body: dict | bytes
-    :param organization_id:
-    :type organization_id: str
-    :param workspace_id:
-    :type workspace_id: str
-    :param destination_id:
-    :type destination_id: str
-
-    :rtype: InlineResponse2002
+    Returns:
+        _type_: _description_
     """
+    if connexion.request.is_json:
+        body = SettingsDestinationPut.from_dict(connexion.request.get_json())  # noqa: E501
     return 'do some magic!'
 
 
@@ -241,3 +239,17 @@ def notification_list(organization_id, workspace_id, page_size=None, current_pag
     data = bl_notification_service.notification_list(organization_id, workspace_id, page_size, current_page, details_info, func_id, match, like_before, like_after, like_all)
 
     return common.response_200_ok(data)
+
+
+def notification_delete(organization_id, workspace_id, destination_id):  # noqa: E501
+    """Delete deletes an notification
+
+    Args:
+        organization_id (str): organization_id
+        workspace_id (str): workspace_id
+        destination_id (str): destination_id
+
+    Returns:
+        Response: http response
+    """
+    return 'do some magic!'
