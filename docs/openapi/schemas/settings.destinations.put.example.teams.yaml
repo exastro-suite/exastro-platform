@@ -19,7 +19,7 @@ value:
     "conditions": {
       "ita": {
         "event_type": {
-          "new": true, "evaluated": true, "timeout": false, "undetected": false
+          "new": true, "evaluated": true, "timeout": true, "undetected": true
         }
       }
     },

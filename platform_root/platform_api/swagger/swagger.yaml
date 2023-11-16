@@ -1284,8 +1284,8 @@ paths:
                       event_type:
                         new: true
                         evaluated: true
-                        timeout: false
-                        undetected: false
+                        timeout: true
+                        undetected: true
                   destination_informations:
                   - webhook: https://xxxxxxxx.webhook.office.com/webhookb/xxxxxxxx-xxxxxx-xxxx-xxxx-xxxxxxxxxxxx
                   - webhook: https://xxxxxxxx.webhook.office.com/webhookb/xxxxxxxx-xxxxxx-xxxx-xxxx-xxxxxxxxxxxx
