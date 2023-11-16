@@ -32,15 +32,16 @@ from libs import queries_process_queue, queries_health_check
 from libs.backyard_classes import SubProcessesManager, SubProcessParameter, SubProcessManager, Task, IntervalTiming
 
 # 終了指示のシグナル受信
-process_terminate = False
-
+process_terminate = False   # SIGTERM or SIGINT signal
+process_sigterm = False     # SIGTERM signal (Taskを中断して終了する / Interrupt and end the task)
+process_sigint = False      # SIGINT signal (Taskをやり終えて終了する / Finish the task and exit)
 
 def backyard_main_process():
     """main process
     """
     # シグナルのハンドライベント設定 / Signal handler event settings
-    signal.signal(signal.SIGTERM, backyard_process_signal_handler)
-    signal.signal(signal.SIGINT, backyard_process_signal_handler)
+    signal.signal(signal.SIGTERM, backyard_process_sigterm_handler)
+    signal.signal(signal.SIGINT, backyard_process_sigint_handler)
 
     log_queue = multiprocessing.Queue()
     globals.init(log_queue, main_process=True)
@@ -95,14 +96,16 @@ def backyard_main_process():
     # sub processへの受付終了指示 / Instructions to end reception for sub process
     sub_processes_mgr.set_sub_process_termination_request(force=True)
 
-    # sub processの終了 / End of sub process
     all_sub_process = sub_processes_mgr.get_sub_processes()
-    for sub_process in all_sub_process:
-        try:
-            # SIGTERMシグナル送信 / SIGTERM signal transmission
-            sub_process.terminate()
-        except Exception:
-            pass
+
+    if process_sigterm:
+        # sub processの終了 / End of sub process
+        for sub_process in all_sub_process:
+            try:
+                # SIGTERMシグナル送信 / SIGTERM signal transmission
+                sub_process.terminate()
+            except Exception:
+                pass
 
     for sub_process in all_sub_process:
         try:
@@ -110,6 +113,14 @@ def backyard_main_process():
             sub_process.join()
         except Exception:
             pass
+
+    if process_sigint:
+        # task受付を終了し静止状態に移行する
+        # Ends task acceptance and transitions to quiescent state
+        globals.logger.info('It has moved to a state where it can be safely stopped.')
+        globals.logger.critical('Please restart the container to resume')
+        while not process_sigterm:
+            time.sleep(1)
 
     globals.logger.info('TERMINATE main process')
     globals.terminate()
@@ -124,8 +135,8 @@ def backyard_sub_process(log_queue, parameter: SubProcessParameter):
         parameter (SubProcessParameter): sub process arguments
     """
     # シグナルのハンドライベント設定 / Signal handler event settings
-    signal.signal(signal.SIGTERM, backyard_process_signal_handler)
-    signal.signal(signal.SIGINT, backyard_process_signal_handler)
+    signal.signal(signal.SIGTERM, backyard_process_sigterm_handler)
+    signal.signal(signal.SIGINT, backyard_process_sigint_handler)
 
     # loggerの初期化 / Initializing logger
     globals.init(log_queue)
@@ -198,7 +209,7 @@ def backyard_sub_process(log_queue, parameter: SubProcessParameter):
             globals.logger.error(f'stack trace\n{traceback.format_exc()}')
             time.sleep(backyard_config.TASK_STATUS_WATCH_INTERVAL_SECONDS)
 
-        if process_terminate:
+        if process_sigterm:
             # taskの強制終了を行う / Force quit task
             cancel_all_tasks(sub_process_mgr)
 
@@ -256,7 +267,7 @@ def task_start_control(conn, sub_process_mgr: SubProcessManager, task_modules):
                     delete_queue(conn, queue_row)
                     
                     # task処理のclassのinstanceを生成する / Generate an instance of the task processing class
-                    task_executor = task_modules[queue_row['PROCESS_KIND']].TaskExecuter(queue_row)
+                    task_executor = eval(f"task_modules[queue_row['PROCESS_KIND']].{backyard_config.TASKS[queue_row['PROCESS_KIND']]['class']}")(queue_row)
 
                     # task処理のthreadを生成する / Generate a thread for task processing
                     task_thread = threading.Thread(
@@ -273,8 +284,8 @@ def task_start_control(conn, sub_process_mgr: SubProcessManager, task_modules):
                     sub_process_mgr.countdown_task_count()
                     raise
         except Exception as err:
-            globals.logger.debug(err)
-            globals.logger.debug(f'stack trace\n{traceback.format_exc()}')
+            globals.logger.error(err)
+            globals.logger.error(f'stack trace\n{traceback.format_exc()}')
         finally:
             # queueの更新をcommitする / Commit queue updates
             conn.commit()
@@ -365,8 +376,6 @@ def cancel_task_timeout_control(sub_process_mgr: SubProcessManager):
                 sub_process_mgr.set_terminating()
 
 
-            
-
 def get_queue(conn, running_task_queue: list, force_status_update_task: bool):
     """queueの取得 / Get queue
 
@@ -383,9 +392,13 @@ def get_queue(conn, running_task_queue: list, force_status_update_task: bool):
     # 実行してないPROCESS_KINDの情報を0件で追加 / Added 0 information about PROCESS_KIND that is not being executed.
     running_kind_grouping.update({key: [] for key in backyard_config.TASKS.keys() if key not in running_kind_grouping})
 
+    # queueをLockする / Lock the queue
+    with conn.cursor() as cursor:
+        cursor.execute(queries_process_queue.SQL_QUERY_PROCESS_LOCK)
+
     # queueの内容をDBから取得 / Get queue contents from DB
     with conn.cursor() as cursor:
-        cursor.execute(queries_process_queue.SQL_QUERY_PROCESS_QUEUE)
+        cursor.execute(queries_process_queue.SQL_QUERY_PROCESS, {"task_max_count": backyard_config.SUB_PROCESS_MAX_TASKS - len(running_task_queue)})
         queue = cursor.fetchall()
 
     # queueの情報をorganization_idでグルーピングし、last_update_timestampでソート
@@ -496,15 +509,32 @@ def delete_queue(conn, queue_row: dict):
         cursor.execute(queries_process_queue.SQL_QUERY_PROCESS_DELETE, {"process_id": queue_row["PROCESS_ID"]})
 
 
-def backyard_process_signal_handler(signum, frame):
-    """processへの終了指示（シグナル受信） / Termination instruction to process (signal reception)
+def backyard_process_sigterm_handler(signum, frame):
+    """processへの終了指示（SIGTERMシグナル受信） / Termination instruction to process (sigterm signal reception)
 
     Args:
         signum (_type_): signal handler parameter
         frame (_type_): signal handler parameter
     """
     global process_terminate
+    global process_sigterm
     process_terminate = True
+    process_sigterm = True
+    globals.logger.info('Receved signal : SIGTERM')
+
+
+def backyard_process_sigint_handler(signum, frame):
+    """processへの終了指示（SIGINTシグナル受信） / Termination instruction to process (sigint signal reception)
+
+    Args:
+        signum (_type_): signal handler parameter
+        frame (_type_): signal handler parameter
+    """
+    global process_terminate
+    global process_sigint
+    process_terminate = True
+    process_sigint = True
+    globals.logger.info('Receved signal : SIGINT')
 
 
 if __name__ == '__main__':

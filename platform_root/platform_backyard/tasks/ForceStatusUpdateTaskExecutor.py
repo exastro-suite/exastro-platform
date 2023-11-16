@@ -21,7 +21,7 @@ import backyard_const
 from tasks.BaseTaskExecutor import BaseTaskExecutor
 
 
-class TaskExecuter(BaseTaskExecutor):
+class ForceStatusUpdateTaskExecutor(BaseTaskExecutor):
     """強制ステータス更新
             何らかの要因でステータスが更新できなかったデータをエラーにする処理
         Force status update
@@ -35,32 +35,32 @@ class TaskExecuter(BaseTaskExecutor):
         Args:
             queue (dict): _description_
         """
-        self.__queue = queue
+        super().__init__(queue)
 
     def execute(self):
         """task実行
         """
-        globals.logger.info("START TASK FORCE UPDATE STATUS")
-
+        
         for process_kind, config in backyard_config.TASKS.items():
-            # 全てのprocess kindのforce_update_status_failedメソッドを呼び出す
+            # 全てのprocess kindのforce_update_statusメソッドを呼び出す
             # Call force_update_status_failed method of all process kind
 
             if process_kind == backyard_const.PROCESS_KIND_FORCE_STATUS_UPDATE:
                 continue
 
             try:
+                globals.logger.info(f"START {config['class']}.force_update_status")
                 module = import_module(config["module"])
-                module.TaskExecuter.force_update_status_failed()
+                eval(f"module.{config['class']}.force_update_status()")
             except Exception as err:
-                globals.logger.error(f"FAILD TASK FORCE UPDATE STATUS: {err}")
-                globals.logger.error(f'stack trace\n{traceback.format_exc()}')
-
-        globals.logger.info("FINISH TASK FORCE UPDATE STATUS")
+                globals.logger.error(f'{err}\n-- stack trace --\n{traceback.format_exc()}')
+            finally:
+                globals.logger.info(f"FINISH {config['class']}.force_update_status")
+        return True
 
     def cancel(self):
         pass
 
     @classmethod
-    def force_update_status_failed(cls):
+    def force_update_status(cls):
         pass

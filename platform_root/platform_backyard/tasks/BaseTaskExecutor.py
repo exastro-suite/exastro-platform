@@ -14,7 +14,8 @@
 import abc
 import threading
 import ctypes
-
+import globals
+import datetime
 from libs.exceptions import TaskTimeoutException
 
 
@@ -24,9 +25,15 @@ class BaseTaskExecutor(metaclass=abc.ABCMeta):
     Args:
         metaclass (_type_, optional): _description_. Defaults to abc.ABCMeta.
     """
-    def __init__(self):
+    def __init__(self, queue: dict):
         """constructor
         """
+        self.queue = queue
+        self.__task_info = (
+            f"kind:[{self.queue['PROCESS_KIND']}] / exec_id:[{self.queue['PROCESS_EXEC_ID']}] / " +
+            f"organization_id:[{self.queue['ORGANIZATION_ID']}] / workspace_id:[{self.queue['WORKSPACE_ID']}] / " +
+            f"timestamp:[{self.queue['LAST_UPDATE_TIMESTAMP']}]")
+
         # スレッドidの初期化 / Initializing thread id
         self.__thread_id = None
         self.__cancel_thread_id = None
@@ -34,14 +41,33 @@ class BaseTaskExecutor(metaclass=abc.ABCMeta):
     def execute_base(self):
         """task実行 / task execution
         """
-        self.__thread_id = ctypes.c_long(threading.get_ident())
-        self.execute()
-
+        globals.logger.info(f"START Task - {self.__task_info}")
+        start_time = datetime.datetime.now()
+        try:
+            self.__thread_id = ctypes.c_long(threading.get_ident())
+            result = self.execute()
+            
+            if result:
+                globals.logger.info(f"SUCCEED Task - {self.__task_info} / elapsed:[{(datetime.datetime.now() - start_time).total_seconds()}]")
+            else:
+                globals.logger.warning(f"FAILED Task - {self.__task_info} / elapsed:[{(datetime.datetime.now() - start_time).total_seconds()}]")
+        except Exception as err:
+            globals.logger.error(f"FAILED Task - {self.__task_info} / elapsed:[{(datetime.datetime.now() - start_time).total_seconds()}]")
+            
     def cancel_base(self):
         """task cancel実行 / task cancel execution
         """
-        self.__cancel_thread_id = ctypes.c_long(threading.get_ident())
-        self.cancel()
+        globals.logger.info(f"START Cancel Task - {self.__task_info}")
+        start_time = datetime.datetime.now()
+        try:
+            self.__cancel_thread_id = ctypes.c_long(threading.get_ident())
+            result = self.cancel()
+            if result:
+                globals.logger.info(f"SUCCEED Cancel Task - {self.__task_info} / elapsed:[{(datetime.datetime.now() - start_time).total_seconds()}]")
+            else:
+                globals.logger.warning(f"FAILED Task - {self.__task_info} / elapsed:[{(datetime.datetime.now() - start_time).total_seconds()}]")
+        except Exception:
+            globals.logger.error(f"FAILED Task - {self.__task_info} / elapsed:[{(datetime.datetime.now() - start_time).total_seconds()}]")
 
     def raise_timeout_exception(self):
         """task実行の中止(例外発行)
@@ -89,7 +115,7 @@ class BaseTaskExecutor(metaclass=abc.ABCMeta):
 
     @classmethod
     @abc.abstractmethod
-    def force_update_status_failed(cls):
+    def force_update_status(cls):
         """強制ステータス更新(継承先classでoverrideすること)
             Forced status update (override in inherited class)
 

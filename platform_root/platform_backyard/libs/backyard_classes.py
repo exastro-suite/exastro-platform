@@ -321,7 +321,7 @@ class SubProcessesManager():
             if process is not None:
                 if process.exitcode is not None:
                     # processが終了している場合 / If process has ended
-                    globals.logger.info(f"EXITED sub process: {process.pid:-04x} exitcode={process.exitcode}")
+                    globals.logger.info(f"EXITED sub process: {process.pid:05x} exitcode={process.exitcode}")
 
                     # 強制ステータス更新を実行するprocessが終了した場合、他のprocessに引き継ぐ必要がある
                     # If the process that executes the forced status update ends, it must be taken over by another process.
@@ -342,7 +342,7 @@ class SubProcessesManager():
             # 強制ステータス更新を実行するprocessを引き継がなければいけない場合、候補としていたprocessに書き換える
             # If it is necessary to take over the process that executes the forced status update, rewrite it to the candidate process.
             self.__force_upd_sts_exec_pid.value = take_turns_force_upd_sts_pid
-            globals.logger.info(f"Take Turns force_upd_sts_exec_pid: {self.__force_upd_sts_exec_pid.value:-04x}")
+            globals.logger.info(f"Take Turns force_upd_sts_exec_pid: {self.__force_upd_sts_exec_pid.value:05x}")
 
 
     def is_enough_sub_process(self):
@@ -435,7 +435,7 @@ class SubProcessesManager():
         for i, termination_req_time in enumerate(self.__sub_termination_req_times):
             if not force:
                 if termination_req_time is not None and datetime.datetime.now() >= termination_req_time:
-                    globals.logger.debug(f'TERMINATION REQUEST sub process:{self.__sub_processes[i].pid:x}')
+                    globals.logger.debug(f'TERMINATION REQUEST sub process:{self.__sub_processes[i].pid:05x}')
                     self.__sub_termination_req_flags[i] = 1
             else:
                 if termination_req_time is not None:
