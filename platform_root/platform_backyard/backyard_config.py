@@ -96,10 +96,12 @@ TASKS = {
         "timeout_seconds": int(os.environ.get(f'TASK_{const.PROCESS_KIND_NOTIFICATION}_TIMEOUT_SECONDS', '30')),
         "max_task_per_process": int(os.environ.get(f'TASK_{const.PROCESS_KIND_NOTIFICATION}_MAX_TASK_PER_PROCESS', str(SUB_PROCESS_MAX_TASKS))),
         "module": "tasks.NotificationTaskExecutor",
+        "class": "NotificationTaskExecutor"
     },
     backyard_const.PROCESS_KIND_FORCE_STATUS_UPDATE: {
         "timeout_seconds": int(os.environ.get(f'TASK_{backyard_const.PROCESS_KIND_FORCE_STATUS_UPDATE}_TIMEOUT_SECONDS', '60')),
         "max_task_per_process": 1,
         "module": "tasks.ForceStatusUpdateTaskExecutor",
+        "class": "ForceStatusUpdateTaskExecutor"
     }
 }

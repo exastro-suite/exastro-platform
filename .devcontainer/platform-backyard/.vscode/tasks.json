@@ -2,9 +2,15 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "Stop backyard",
+      "label": "Stop backyard (SIGTERM)",
       "type": "shell",
       "command": "kill $(ps -ef | grep '[b]ackyard.py' | grep -v  ' -- ' | awk 'BEGIN {FS=\" \"}{ print $2 }' | sort | head -n 1)",
+      "problemMatcher": []
+    },
+    {
+      "label": "Stop backyard (SIGINT)",
+      "type": "shell",
+      "command": "kill -2 $(ps -ef | grep '[b]ackyard.py' | grep -v  ' -- ' | awk 'BEGIN {FS=\" \"}{ print $2 }' | sort | head -n 1)",
       "problemMatcher": []
     },
     {

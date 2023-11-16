@@ -13,7 +13,7 @@
 #   limitations under the License.
 from tasks.BaseTaskExecutor import BaseTaskExecutor
 
-import globals
+import sys
 from contextlib import closing
 import traceback
 import requests
@@ -25,12 +25,13 @@ from common_library.common import encrypt, const
 
 from libs import queries_notification
 
+import globals
 import backyard_config
 import backyard_const
 from tasks import tasks_common
 
 
-class TaskExecuter(BaseTaskExecutor):
+class NotificationTaskExecutor(BaseTaskExecutor):
     """通知メッセージ送信 / Send notification message
 
     Args:
@@ -42,10 +43,10 @@ class TaskExecuter(BaseTaskExecutor):
         Args:
             queue (dict): queue
         """
-        self.__queue = queue
-        self.organization_id = self.__queue['ORGANIZATION_ID']
-        self.workspace_id = self.__queue['WORKSPACE_ID']
-        self.notification_id = self.__queue['PROCESS_EXEC_ID']
+        super().__init__(queue)
+        self.organization_id = self.queue['ORGANIZATION_ID']
+        self.workspace_id = self.queue['WORKSPACE_ID']
+        self.notification_id = self.queue['PROCESS_EXEC_ID']
 
     def execute(self):
         """メッセージ送信実行 / Execute message sending
@@ -54,10 +55,6 @@ class TaskExecuter(BaseTaskExecutor):
             Exception: _description_
             Exception: _description_
         """
-        globals.logger.info(
-            f"START TASK kind:{self.__queue['PROCESS_KIND']} exec_id:{self.__queue['PROCESS_EXEC_ID']}" +
-            f"organization_id:{self.__queue['ORGANIZATION_ID']} workspace_id:{self.__queue['WORKSPACE_ID']} timestamp:{self.__queue['LAST_UPDATE_TIMESTAMP']}")
-
         try:
             with closing(DBconnector().connect_workspacedb(self.organization_id, self.workspace_id)) as conn:
                 with conn.cursor() as cursor:
@@ -73,6 +70,7 @@ class TaskExecuter(BaseTaskExecutor):
                     destination_informations = json.loads(encrypt.decrypt_str(row['DESTINATION_INFORMATIONS']))
                     message_infomations = json.loads(row['MESSAGE_INFORMATIONS'])
 
+                    notification_status = const.NOTIFICATION_STATUS_FAILED
 
                     if row['DESTINATION_KIND'] == const.DESTINATION_KIND_TEAMS:
                         # Teamsへのメッセージ送信 / Send messages to Teams
@@ -92,12 +90,12 @@ class TaskExecuter(BaseTaskExecutor):
                         })
                     conn.commit()
 
-            globals.logger.info("SUCCEED TASK")
+            return notification_status == const.NOTIFICATION_STATUS_SUCCESSFUL
 
         except Exception as err:
-            globals.logger.error(f"FAILD TASK : {err}")
-            globals.logger.error(f'stack trace\n{traceback.format_exc()}')
+            globals.logger.error(f'{err}\n-- stack trace --\n{traceback.format_exc()}')
             self.__update_status_failed()
+            raise err
 
     def __send_message_teams(self, destination_informations, message_infomations):
         """teamsへのメッセージ送信 / Send messages to teams
@@ -140,16 +138,12 @@ class TaskExecuter(BaseTaskExecutor):
     def cancel(self):
         """task cancel
         """
-        globals.logger.info(
-            f"START TASK CANCEL kind:{self.__queue['PROCESS_KIND']} exec_id:{self.__queue['PROCESS_EXEC_ID']}" +
-            f"organization_id:{self.__queue['ORGANIZATION_ID']} workspace_id:{self.__queue['WORKSPACE_ID']} timestamp:{self.__queue['LAST_UPDATE_TIMESTAMP']}")
         try:
             # ステータスを失敗に更新する / Update status to failed
             self.__update_status_failed()
-            globals.logger.info("SUCCEED TASK CANCEL")
         except Exception as err:
-            globals.logger.error(f"FAILD TASK CANCEL: {err}")
-            globals.logger.error(f'stack trace\n{traceback.format_exc()}')
+            globals.logger.error(f'{err}\n-- stack trace --\n{traceback.format_exc()}')
+            raise err
 
     def __update_status_failed(self):
         """status update failed
@@ -170,20 +164,23 @@ class TaskExecuter(BaseTaskExecutor):
             raise err
 
     @classmethod
-    def force_update_status_failed(cls):
+    def force_update_status(cls):
         """強制ステータス更新 / Force status update
         """
-        globals.logger.info("START TASK FORCE UPDATE STATUS : NOTIFICATION")
         try:
-            # 全オーガナイゼーションを処理対象とする / Target all organizations
-            organizations = tasks_common.get_organizations()
-            for organization in organizations:
-                workspaces = tasks_common.get_workspaces(organization['ORGANIZATION_ID'])
+            with closing(DBconnector().connect_platformdb()) as conn_pf:
 
-                with closing(DBconnector().connect_platformdb()) as conn_pf:
+                # 全オーガナイゼーションを処理対象とする / Target all organizations
+                organizations = tasks_common.get_organizations()
+                for organization in organizations:
+                    workspaces = tasks_common.get_workspaces(organization['ORGANIZATION_ID'])
+
+                    # 全workspaceを処理対象とする / Process all workspaces
                     for workspace in workspaces:
                         with closing(DBconnector().connect_workspacedb(organization['ORGANIZATION_ID'], workspace['WORKSPACE_ID'])) as conn_ws:
+
                             with conn_ws.cursor() as cursor_ws:
+                                # UNSENT状態で一定時間経過したものを対象とする / Targets items that have been in UNSENT state for a certain period of time
                                 last_update_timestamp = datetime.datetime.now() - datetime.timedelta(seconds=backyard_config.FORCE_UPDATE_STATUS_PROGRASS_SECONDS)
                                 cursor_ws.execute(
                                     queries_notification.SQL_QUERY_NOTIFICATION_MESSAGE_UNSENT_LONGTIME,
@@ -191,7 +188,10 @@ class TaskExecuter(BaseTaskExecutor):
                                 rows = cursor_ws.fetchall()
 
                                 for row in rows:
+                                    # queueに情報が残ってないか確認する
                                     if not tasks_common.exists_queue(conn_pf, row['NOTIFICATION_ID']):
+                                        # queueに情報が残ってない場合、FAILD状態に更新する
+                                        # If there is no information left in the queue, update to FAILD status
                                         conn_ws.begin()
                                         try:
                                             cursor_ws.execute(
@@ -202,11 +202,10 @@ class TaskExecuter(BaseTaskExecutor):
                                                     "last_update_user": backyard_const.BACKYARD_USER_ID
                                                 })
                                             conn_ws.commit()
-                                            globals.logger.warning(f"FORCE UPDATE STATUS notification_id:{row['NOTIFICATION_ID']}")
-                                        except Exception:
+                                            globals.logger.warning(f"Force Failed notification_id:{row['NOTIFICATION_ID']}")
+                                        except Exception as err:
                                             conn_ws.rollback()
-            globals.logger.info("FINISH TASK FORCE UPDATE STATUS : NOTIFICATION")
-
+                                            globals.logger.error(f'{err}\n-- stack trace --\n{traceback.format_exc()}')
         except Exception as err:
-            globals.logger.error(f"FAILD TASK FORCE UPDATE STATUS : NOTIFICATION: {err}")
-            globals.logger.error(f'stack trace\n{traceback.format_exc()}')
+            globals.logger.error(f'{err}\n-- stack trace --\n{traceback.format_exc()}')
+            raise err
