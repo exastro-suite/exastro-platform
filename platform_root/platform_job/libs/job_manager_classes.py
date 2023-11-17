@@ -17,7 +17,7 @@ import datetime
 import multiprocessing
 import threading
 
-import backyard_config
+import job_manager_config
 import globals
 from tasks.BaseTaskExecutor import BaseTaskExecutor
 
@@ -40,7 +40,7 @@ class Task():
         # task実行thread / task execution thread
         self.thread = thread
         # task実行timeout時刻 / task execution timeout time
-        self.timeout = datetime.datetime.now() + datetime.timedelta(seconds=backyard_config.TASKS[queue['PROCESS_KIND']]['timeout_seconds'])
+        self.timeout = datetime.datetime.now() + datetime.timedelta(seconds=job_manager_config.TASKS[queue['PROCESS_KIND']]['timeout_seconds'])
         # task cancel thread
         self.cancel_thread = None
         # task cancel timeout時刻 / task cancel timeout time
@@ -80,10 +80,10 @@ class SubProcessManager():
         self.__sub_processes_ids[self.__arr_idx] = os.getpid()
         self.__tasks: list[Task] = []
         self.__cancel_timeout_tasks: list[Task] = []
-        self.interval_db_reconect = IntervalTiming(backyard_config.SUB_PROCESS_DB_RECONNECT_INTERVAL_SECONDS)
-        self.interval_db_health_check = IntervalTiming(backyard_config.SUB_PROCESS_DB_HEALTH_CHECK_INTERVAL_SECONDS)
+        self.interval_db_reconect = IntervalTiming(job_manager_config.SUB_PROCESS_DB_RECONNECT_INTERVAL_SECONDS)
+        self.interval_db_health_check = IntervalTiming(job_manager_config.SUB_PROCESS_DB_HEALTH_CHECK_INTERVAL_SECONDS)
         self.__force_upd_sts_exec_pid = force_upd_sts_exec_pid
-        self.__interval_force_upd_sts = IntervalTiming(backyard_config.FORCE_UPDATE_EXEC_INTERVAL_SECONDS)
+        self.__interval_force_upd_sts = IntervalTiming(job_manager_config.FORCE_UPDATE_EXEC_INTERVAL_SECONDS)
 
 
     def is_sheard_variables_normal(self):
@@ -129,12 +129,12 @@ class SubProcessManager():
         Returns:
             bool: True : 起動可能 / can launch
         """
-        if self.__sub_running_task_counts[self.__arr_idx] >= backyard_config.SUB_PROCESS_MAX_TASKS:
+        if self.__sub_running_task_counts[self.__arr_idx] >= job_manager_config.SUB_PROCESS_MAX_TASKS:
             # processのtask数が上限値に達している場合、起動不可
             # If the number of tasks in the process reaches the upper limit, it cannot be started.
             return False
 
-        if sum(self.__sub_running_task_counts) >= (backyard_config.SUB_PROCESS_MAX_TASKS * backyard_config.SUB_PROCESS_MAX_ACTIVE):
+        if sum(self.__sub_running_task_counts) >= (job_manager_config.SUB_PROCESS_MAX_TASKS * job_manager_config.SUB_PROCESS_MAX_ACTIVE):
             # sub process全体のタスク数が上限値に達している場合、起動不可
             # If the number of tasks in the entire sub process has reached the upper limit, it cannot be started.
             return False
@@ -155,14 +155,14 @@ class SubProcessManager():
         Returns:
             bool: True: 成功 / succeed
         """
-        if self.__sub_running_task_counts[self.__arr_idx] >= backyard_config.SUB_PROCESS_MAX_TASKS:
+        if self.__sub_running_task_counts[self.__arr_idx] >= job_manager_config.SUB_PROCESS_MAX_TASKS:
             # processのtask数が上限値に達しているため失敗
             # Failed because the number of tasks in process has reached the upper limit.
             return False
 
         # 全sub processのカウンターをロックする / Lock counters of all sub processes
         with self.__sub_running_task_counts.get_lock():
-            if sum(self.__sub_running_task_counts) >= (backyard_config.SUB_PROCESS_MAX_TASKS * backyard_config.SUB_PROCESS_MAX_ACTIVE):
+            if sum(self.__sub_running_task_counts) >= (job_manager_config.SUB_PROCESS_MAX_TASKS * job_manager_config.SUB_PROCESS_MAX_ACTIVE):
                 # 全processのtask数合計が上限値に達しているため失敗 / Failed because the total number of tasks for all processes has reached the upper limit.
                 return False
 
@@ -301,11 +301,11 @@ class SubProcessesManager():
         # sub process variables
         #  ※エリアを2倍用意しているのは、sub processの切り替え(終了指示～終了)タイミングで一時的に超えるため
         #    The reason why the area is twice as large is because it is temporarily exceeded when the sub process is switched (from the end instruction to the end).
-        self.__sub_processes: list[multiprocessing.Process] = [None] * (backyard_config.SUB_PROCESS_MAX_ACTIVE * 2)
-        self.__sub_processe_ids = multiprocessing.Array(ctypes.c_int, (backyard_config.SUB_PROCESS_MAX_ACTIVE * 2))
-        self.__sub_termination_req_times: list[datetime.datetime] = [None] * (backyard_config.SUB_PROCESS_MAX_ACTIVE * 2)
-        self.__sub_termination_req_flags = multiprocessing.Array(ctypes.c_int, (backyard_config.SUB_PROCESS_MAX_ACTIVE * 2))
-        self.__sub_running_task_counts = multiprocessing.Array(ctypes.c_int, (backyard_config.SUB_PROCESS_MAX_ACTIVE * 2))
+        self.__sub_processes: list[multiprocessing.Process] = [None] * (job_manager_config.SUB_PROCESS_MAX_ACTIVE * 2)
+        self.__sub_processe_ids = multiprocessing.Array(ctypes.c_int, (job_manager_config.SUB_PROCESS_MAX_ACTIVE * 2))
+        self.__sub_termination_req_times: list[datetime.datetime] = [None] * (job_manager_config.SUB_PROCESS_MAX_ACTIVE * 2)
+        self.__sub_termination_req_flags = multiprocessing.Array(ctypes.c_int, (job_manager_config.SUB_PROCESS_MAX_ACTIVE * 2))
+        self.__sub_running_task_counts = multiprocessing.Array(ctypes.c_int, (job_manager_config.SUB_PROCESS_MAX_ACTIVE * 2))
         self.__force_upd_sts_exec_pid = multiprocessing.Value(ctypes.c_int)
         self.__force_upd_sts_exec_pid.value = -1
 
@@ -352,7 +352,7 @@ class SubProcessesManager():
             bool: True : 足りている / enough
         """
         # 
-        return (backyard_config.SUB_PROCESS_MAX_ACTIVE <=
+        return (job_manager_config.SUB_PROCESS_MAX_ACTIVE <=
             len([i for i, process in enumerate(self.__sub_processes) if process is not None and self.__sub_termination_req_flags[i] == 0]))
 
     def generate_sub_process_parameter(self):
@@ -416,15 +416,15 @@ class SubProcessesManager():
         # 初回のsub process切り替えタイミングを平準化する時間を返す
         # Returns the time to level the initial sub process switching timing
         #
-        if self.__sub_process_seq >= backyard_config.SUB_PROCESS_MAX_ACTIVE:
+        if self.__sub_process_seq >= job_manager_config.SUB_PROCESS_MAX_ACTIVE:
             # sub processがMAX数まで上がりきった後は、configで指定した間隔を返す
             # After the sub process reaches the MAX number, returns the interval specified in config.
-            return datetime.timedelta(seconds=backyard_config.SUB_PROCESS_TERMINATE_REQUEST_SECONDS)
+            return datetime.timedelta(seconds=job_manager_config.SUB_PROCESS_TERMINATE_REQUEST_SECONDS)
         else:
             # sub processがMAX数まで上がりきるまでは、次の起動タイミングがずれるように時間をずらす
             # Until the number of sub processes reaches the maximum number, the next startup timing is shifted.
             return datetime.timedelta(
-                seconds=self.__sub_process_seq * backyard_config.SUB_PROCESS_TERMINATE_REQUEST_SECONDS / backyard_config.SUB_PROCESS_MAX_ACTIVE)
+                seconds=self.__sub_process_seq * job_manager_config.SUB_PROCESS_TERMINATE_REQUEST_SECONDS / job_manager_config.SUB_PROCESS_MAX_ACTIVE)
 
     def set_sub_process_termination_request(self, force: bool):
         """sub processに終了指示を行う / Instruct sub process to terminate

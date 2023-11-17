@@ -23,25 +23,34 @@ import random
 import ulid
 from contextlib import closing
 from importlib import import_module
+import pymysql.err
 
 import globals
-import backyard_config
-import backyard_const
+import job_manager_config
+import job_manager_const
 from common_library.common.db import DBconnector
 from libs import queries_process_queue, queries_health_check
-from libs.backyard_classes import SubProcessesManager, SubProcessParameter, SubProcessManager, Task, IntervalTiming
+from libs.job_manager_classes import SubProcessesManager, SubProcessParameter, SubProcessManager, Task, IntervalTiming
 
 # 終了指示のシグナル受信
 process_terminate = False   # SIGTERM or SIGINT signal
 process_sigterm = False     # SIGTERM signal (Taskを中断して終了する / Interrupt and end the task)
 process_sigint = False      # SIGINT signal (Taskをやり終えて終了する / Finish the task and exit)
 
-def backyard_main_process():
+
+def job_manager_main_process():
     """main process
     """
+    global process_terminate
+    global process_sigterm
+    global process_sigint
+    process_terminate = False
+    process_sigterm = False
+    process_sigint = False
+    
     # シグナルのハンドライベント設定 / Signal handler event settings
-    signal.signal(signal.SIGTERM, backyard_process_sigterm_handler)
-    signal.signal(signal.SIGINT, backyard_process_sigint_handler)
+    signal.signal(signal.SIGTERM, job_manager_process_sigterm_handler)
+    signal.signal(signal.SIGINT, job_manager_process_sigint_handler)
 
     log_queue = multiprocessing.Queue()
     globals.init(log_queue, main_process=True)
@@ -64,7 +73,7 @@ def backyard_main_process():
                 if sub_process_parameter is not None:
                     # processインスタンスの生成 / Generate process instance
                     new_sub_process = multiprocessing.Process(
-                        target=backyard_sub_process,
+                        target=job_manager_sub_process,
                         args=(log_queue, sub_process_parameter)
                     )
                     # sub processを追加
@@ -86,7 +95,7 @@ def backyard_main_process():
             globals.logger.error(err)
             globals.logger.error(f'stack trace\n{traceback.format_exc()}')
 
-        time.sleep(backyard_config.SUB_PROCESS_WATCH_INTERVAL_SECONDS)
+        time.sleep(job_manager_config.SUB_PROCESS_WATCH_INTERVAL_SECONDS)
 
     #
     # 終了処理 / End processing
@@ -127,23 +136,30 @@ def backyard_main_process():
     return
 
 
-def backyard_sub_process(log_queue, parameter: SubProcessParameter):
+def job_manager_sub_process(log_queue, parameter: SubProcessParameter):
     """sub process
 
     Args:
         log_queue (_type_): log queue
         parameter (SubProcessParameter): sub process arguments
     """
+    global process_terminate
+    global process_sigterm
+    global process_sigint
+    process_terminate = False
+    process_sigterm = False
+    process_sigint = False
+
     # シグナルのハンドライベント設定 / Signal handler event settings
-    signal.signal(signal.SIGTERM, backyard_process_sigterm_handler)
-    signal.signal(signal.SIGINT, backyard_process_sigint_handler)
+    signal.signal(signal.SIGTERM, job_manager_process_sigterm_handler)
+    signal.signal(signal.SIGINT, job_manager_process_sigint_handler)
 
     # loggerの初期化 / Initializing logger
     globals.init(log_queue)
     globals.logger.info('START sub process')
 
     # task classのインポート / Importing task class
-    task_modules = {kind: import_module(config["module"]) for kind, config in backyard_config.TASKS.items()}
+    task_modules = {kind: import_module(config["module"]) for kind, config in job_manager_config.TASKS.items()}
 
     # sub process管理情報の生成 / Generate sub process management information
     sub_process_mgr = parameter.genarate_sub_process_manager()
@@ -154,7 +170,7 @@ def backyard_sub_process(log_queue, parameter: SubProcessParameter):
             with closing(DBconnector().connect_platformdb()) as conn:
 
                 while (not process_terminate) and sub_process_mgr.is_process_continue():
-                    time.sleep(backyard_config.TASK_STATUS_WATCH_INTERVAL_SECONDS)
+                    time.sleep(job_manager_config.TASK_STATUS_WATCH_INTERVAL_SECONDS)
 
                     try:
                         if not sub_process_mgr.is_sheard_variables_normal():
@@ -207,11 +223,13 @@ def backyard_sub_process(log_queue, parameter: SubProcessParameter):
         except Exception as err:
             globals.logger.error(err)
             globals.logger.error(f'stack trace\n{traceback.format_exc()}')
-            time.sleep(backyard_config.TASK_STATUS_WATCH_INTERVAL_SECONDS)
+            time.sleep(job_manager_config.TASK_STATUS_WATCH_INTERVAL_SECONDS)
 
-        if process_sigterm:
-            # taskの強制終了を行う / Force quit task
-            cancel_all_tasks(sub_process_mgr)
+    globals.logger.info('EXIT sub process loop')
+
+    if process_sigterm:
+        # taskの強制終了を行う / Force quit task
+        cancel_all_tasks(sub_process_mgr)
 
     globals.logger.info('EXIT sub process')
     return
@@ -267,7 +285,7 @@ def task_start_control(conn, sub_process_mgr: SubProcessManager, task_modules):
                     delete_queue(conn, queue_row)
                     
                     # task処理のclassのinstanceを生成する / Generate an instance of the task processing class
-                    task_executor = eval(f"task_modules[queue_row['PROCESS_KIND']].{backyard_config.TASKS[queue_row['PROCESS_KIND']]['class']}")(queue_row)
+                    task_executor = eval(f"task_modules[queue_row['PROCESS_KIND']].{job_manager_config.TASKS[queue_row['PROCESS_KIND']]['class']}")(queue_row)
 
                     # task処理のthreadを生成する / Generate a thread for task processing
                     task_thread = threading.Thread(
@@ -309,10 +327,12 @@ def cancel_all_tasks(sub_process_mgr: SubProcessManager):
     Args:
         sub_process_mgr (SubProcessManager): sub process 管理情報 / sub process management information
     """
+    globals.logger.info(f'Start cancel_all_tasks')
     all_tasks = sub_process_mgr.get_all_tasks()
     cancel_tasks(all_tasks)
     for task in all_tasks:
         task.cancel_thread.join()
+    globals.logger.info(f'Finish cancel_all_tasks')
 
 
 def cancel_tasks(tasks: list[Task]):
@@ -335,10 +355,9 @@ def cancel_tasks(tasks: list[Task]):
                     daemon=True)
                 task.cancel_thread.start()
                 # cancel処理のtimeout時間を設定する / Set timeout time for cancel processing
-                task.cancel_timeout = datetime.datetime.now() + datetime.timedelta(seconds=backyard_config.TASK_CANCEL_TIMEOUT_SECONDS)
+                task.cancel_timeout = datetime.datetime.now() + datetime.timedelta(seconds=job_manager_config.TASK_CANCEL_TIMEOUT_SECONDS)
             except Exception as err:
-                globals.logger.debug(err)
-                globals.logger.debug(f'stack trace\n{traceback.format_exc()}')
+                globals.logger.debug(f'{err}\n---- stack trace ----\n{traceback.format_exc()}')
                 pass
 
 
@@ -371,7 +390,7 @@ def cancel_task_timeout_control(sub_process_mgr: SubProcessManager):
 
             # cancel timeoutした件数が一定値を超えた場合、sub processを終了する（メモリ圧迫の予防のため）
             # If the number of cancel timeouts exceeds a certain value, terminate the sub process (to prevent memory pressure)
-            if count_cancel_timeout >= backyard_config.SUB_PROCESS_MAX_CANCEL_TIMEOUT:
+            if count_cancel_timeout >= job_manager_config.SUB_PROCESS_MAX_CANCEL_TIMEOUT:
                 globals.logger.warning("Restarting process due to too many cancellation timeouts")
                 sub_process_mgr.set_terminating()
 
@@ -390,15 +409,14 @@ def get_queue(conn, running_task_queue: list, force_status_update_task: bool):
     # 実行中のtaskをPROCESS_KINDでグルーピング / Group running tasks by PROCESS_KIND
     running_kind_grouping = queue_grouping(running_task_queue, "PROCESS_KIND", "undefined")
     # 実行してないPROCESS_KINDの情報を0件で追加 / Added 0 information about PROCESS_KIND that is not being executed.
-    running_kind_grouping.update({key: [] for key in backyard_config.TASKS.keys() if key not in running_kind_grouping})
+    running_kind_grouping.update({key: [] for key in job_manager_config.TASKS.keys() if key not in running_kind_grouping})
 
-    # queueをLockする / Lock the queue
+    # queueの内容をDBから取得
+    #   lock失敗などで読み捨てになる可能性を考慮し最大の2倍の件数を取得
+    # Obtain the contents of the queue from the DB
+    #   taking into account the possibility of the read being discarded due to lock failure, etc., obtain twice the maximum number of items
     with conn.cursor() as cursor:
-        cursor.execute(queries_process_queue.SQL_QUERY_PROCESS_LOCK)
-
-    # queueの内容をDBから取得 / Get queue contents from DB
-    with conn.cursor() as cursor:
-        cursor.execute(queries_process_queue.SQL_QUERY_PROCESS, {"task_max_count": backyard_config.SUB_PROCESS_MAX_TASKS - len(running_task_queue)})
+        cursor.execute(queries_process_queue.SQL_QUERY_PROCESS, {"task_max_count": (job_manager_config.SUB_PROCESS_MAX_TASKS - len(running_task_queue)) * 2})
         queue = cursor.fetchall()
 
     # queueの情報をorganization_idでグルーピングし、last_update_timestampでソート
@@ -421,7 +439,7 @@ def get_queue(conn, running_task_queue: list, force_status_update_task: bool):
     if force_status_update_task:
         ret_queue.append({
             "PROCESS_ID": ulid.new().str,
-            "PROCESS_KIND": backyard_const.PROCESS_KIND_FORCE_STATUS_UPDATE,
+            "PROCESS_KIND": job_manager_const.PROCESS_KIND_FORCE_STATUS_UPDATE,
             "PROCESS_EXEC_ID": None,
             "ORGANIZATION_ID": None,
             "WORKSPACE_ID": None,
@@ -431,7 +449,7 @@ def get_queue(conn, running_task_queue: list, force_status_update_task: bool):
 
     # queueが残っているもしくはtotal task数が上限値未満の場合繰り返す
     # Repeat if the queue remains or the total number of tasks is less than the upper limit
-    while len(queue_org_grouping) > 0 and total_task_count < backyard_config.SUB_PROCESS_MAX_TASKS:
+    while len(queue_org_grouping) > 0 and total_task_count < job_manager_config.SUB_PROCESS_MAX_TASKS:
         # 次に処理をするorganization_idを決定する
         #   実行中または起動対象のtaskの総件数の昇順
         #   last_update_timestampの昇順
@@ -450,16 +468,35 @@ def get_queue(conn, running_task_queue: list, force_status_update_task: bool):
             key=lambda x: (x['task_count'], x['last_update_timestamp'], x['random'])
         )[0]['organization_id']
 
-        # 次に処理するPROCESS_KIND / PROCESS_KIND to process next
+        # 次に処理するqueue情報 / queue to process next
+        next_process_id = queue_org_grouping[next_organization_id][0]['PROCESS_ID']
         next_process_king = queue_org_grouping[next_organization_id][0]['PROCESS_KIND']
+            
+        if len(running_kind_grouping[next_process_king]) < job_manager_config.TASKS[next_process_king]['max_task_per_process']:
+            # 次に処理するPROCESS_KINDが条件に達していないときは、起動可能かの処理を進める
+            # If the next PROCESS_KIND to be processed does not meet the conditions, proceed with the process to see if it can be started.
 
-        if len(running_kind_grouping[next_process_king]) < backyard_config.TASKS[next_process_king]['max_task_per_process']:
-            # 次に処理するPROCESS_KINDが条件に達していないときは、起動対象としてreturn配列に追加
-            # If the next PROCESS_KIND to be processed does not meet the conditions, add it to the return array as a startup target
-            ret_queue.append(queue_org_grouping[next_organization_id][0])
-            running_kind_grouping[next_process_king].append(queue_org_grouping[next_organization_id][0])
-            running_org_grouping[next_organization_id].append(queue_org_grouping[next_organization_id][0])
-            total_task_count += 1
+            try:
+                # queueをLockする / Lock the queue
+                with conn.cursor() as cursor:
+                    cursor.execute(queries_process_queue.SQL_QUERY_PROCESS_LOCK, {"process_id": next_process_id})
+                    cursor.fetchone()
+                lock_succeed = True
+            except pymysql.err.OperationalError:
+                # Lock Error
+                lock_succeed = False
+                globals.logger.debug(err)
+            except Exception as err:
+                lock_succeed = False
+                globals.logger.error(f'{err}\n---- stack trace ----\n{traceback.format_exc()}')
+
+            if lock_succeed:
+                # queueのlockに成功した場合、起動対象としてreturn配列に追加
+                # If the queue is successfully locked, add it to the return array as a startup target
+                ret_queue.append(queue_org_grouping[next_organization_id][0])
+                running_kind_grouping[next_process_king].append(queue_org_grouping[next_organization_id][0])
+                running_org_grouping[next_organization_id].append(queue_org_grouping[next_organization_id][0])
+                total_task_count += 1
 
         # 次のqueue情報に進むためqueueの配列から削除 / Delete from queue array to proceed to next queue information
         del queue_org_grouping[next_organization_id][0]
@@ -509,7 +546,7 @@ def delete_queue(conn, queue_row: dict):
         cursor.execute(queries_process_queue.SQL_QUERY_PROCESS_DELETE, {"process_id": queue_row["PROCESS_ID"]})
 
 
-def backyard_process_sigterm_handler(signum, frame):
+def job_manager_process_sigterm_handler(signum, frame):
     """processへの終了指示（SIGTERMシグナル受信） / Termination instruction to process (sigterm signal reception)
 
     Args:
@@ -523,7 +560,7 @@ def backyard_process_sigterm_handler(signum, frame):
     globals.logger.info('Receved signal : SIGTERM')
 
 
-def backyard_process_sigint_handler(signum, frame):
+def job_manager_process_sigint_handler(signum, frame):
     """processへの終了指示（SIGINTシグナル受信） / Termination instruction to process (sigint signal reception)
 
     Args:
@@ -539,4 +576,4 @@ def backyard_process_sigint_handler(signum, frame):
 
 if __name__ == '__main__':
     # main processメイン処理
-    backyard_main_process()
+    job_manager_main_process()

@@ -12,9 +12,5 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-class db_health_check_error(Exception):
-    pass
-
-
 class TaskTimeoutException(Exception):
     pass

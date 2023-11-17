@@ -37,7 +37,7 @@ RUN dnf install -y \
 
 WORKDIR $APP_PATH
 
-COPY ./platform_root/platform_backyard/pyproject.toml ./platform_root/platform_backyard/poetry.lock $APP_PATH/
+COPY ./platform_root/platform_job/pyproject.toml ./platform_root/platform_job/poetry.lock $APP_PATH/
 RUN poetry install --only first_install
 RUN poetry install --without develop_build
 
@@ -84,11 +84,11 @@ RUN mkdir ~/.config \
 WORKDIR $APP_PATH
 
 COPY ./platform_root/version $APP_PATH/
-COPY ./platform_root/platform_backyard/ $APP_PATH/
+COPY ./platform_root/platform_job/ $APP_PATH/
 COPY ./platform_root/common_library/ $APP_PATH/common_library/
 COPY ./platform_root/common_resources/ $APP_PATH/common_resources/
 
-CMD ["python3","./backyard.py"]
+CMD ["python3","./job_manager.py"]
 
 #
 # Build for production
@@ -102,10 +102,10 @@ ARG APP_PATH
 WORKDIR $APP_PATH
 
 COPY ./platform_root/version $APP_PATH/
-COPY ./platform_root/platform_backyard/ $APP_PATH/
+COPY ./platform_root/platform_job/ $APP_PATH/
 COPY ./platform_root/common_library/ $APP_PATH/common_library/
 COPY ./platform_root/common_resources/ $APP_PATH/common_resources/
 
 USER $USERNAME
 
-CMD ["python3","./backyard.py"]
+CMD ["python3","./job_manager.py"]
