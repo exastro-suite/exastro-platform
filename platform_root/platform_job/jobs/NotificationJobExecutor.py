@@ -118,7 +118,8 @@ class NotificationJobExecutor(BaseJobExecutor):
                         "title": message_infomations.get("title"),
                         "text": message_infomations.get("message")
                     },
-                    headers={"Content-type": "application/json"})
+                    headers={"Content-type": "application/json"},
+                    timeout=job_manager_config.JOBS[const.PROCESS_KIND_NOTIFICATION]['extra_config']['teams_webhook_timeout'])
 
                 if resp_webhook.status_code < 200 or resp_webhook.status_code >= 300:
                     resp_webhook_text = resp_webhook.text

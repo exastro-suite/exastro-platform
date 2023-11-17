@@ -93,10 +93,13 @@ JOB_CANCEL_TIMEOUT_SECONDS = float(os.environ.get('JOB_CANCEL_TIMEOUT_SECONDS', 
 #
 JOBS = {
     const.PROCESS_KIND_NOTIFICATION: {
-        "timeout_seconds": int(os.environ.get(f'JOB_{const.PROCESS_KIND_NOTIFICATION}_TIMEOUT_SECONDS', '30')),
+        "timeout_seconds": int(os.environ.get(f'JOB_{const.PROCESS_KIND_NOTIFICATION}_TIMEOUT_SECONDS', '20')),
         "max_job_per_process": int(os.environ.get(f'JOB_{const.PROCESS_KIND_NOTIFICATION}_MAX_JOB_PER_PROCESS', str(SUB_PROCESS_MAX_JOBS))),
         "module": "jobs.NotificationJobExecutor",
-        "class": "NotificationJobExecutor"
+        "class": "NotificationJobExecutor",
+        "extra_config": {
+            "teams_webhook_timeout": float(os.environ.get(f'JOB_{const.PROCESS_KIND_NOTIFICATION}_TEAMS_WEBHOOK_TIMEOUT', '5.0')),
+        }
     },
     job_manager_const.PROCESS_KIND_FORCE_UPDATE_STATUS: {
         "timeout_seconds": int(os.environ.get(f'JOB_{job_manager_const.PROCESS_KIND_FORCE_UPDATE_STATUS}_TIMEOUT_SECONDS', '60')),
