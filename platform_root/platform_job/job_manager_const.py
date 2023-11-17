@@ -12,8 +12,8 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-# タスクの種類 / Type of task
-PROCESS_KIND_FORCE_STATUS_UPDATE = "_FORCE_STATUS_UPDATE"
+# タスクの種類 / Type of job
+PROCESS_KIND_FORCE_UPDATE_STATUS = "_FORCE_UPDATE_STATUS"
 
 # user id
 SYSTEM_USER_ID = 'system'

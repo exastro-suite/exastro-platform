@@ -11,7 +11,7 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
-from tasks.BaseTaskExecutor import BaseTaskExecutor
+from jobs.BaseJobExecutor import BaseJobExecutor
 
 import sys
 from contextlib import closing
@@ -28,14 +28,14 @@ from libs import queries_notification
 import globals
 import job_manager_config
 import job_manager_const
-from tasks import tasks_common
+from jobs import jobs_common
 
 
-class NotificationTaskExecutor(BaseTaskExecutor):
+class NotificationJobExecutor(BaseJobExecutor):
     """通知メッセージ送信 / Send notification message
 
     Args:
-        BaseTaskExecutor (_type_): _description_
+        BaseJobExecutor (_type_): _description_
     """
     def __init__(self, queue: dict):
         """constructor
@@ -136,7 +136,7 @@ class NotificationTaskExecutor(BaseTaskExecutor):
 
 
     def cancel(self):
-        """task cancel
+        """job cancel
         """
         try:
             # ステータスを失敗に更新する / Update status to failed
@@ -171,9 +171,9 @@ class NotificationTaskExecutor(BaseTaskExecutor):
             with closing(DBconnector().connect_platformdb()) as conn_pf:
 
                 # 全オーガナイゼーションを処理対象とする / Target all organizations
-                organizations = tasks_common.get_organizations()
+                organizations = jobs_common.get_organizations()
                 for organization in organizations:
-                    workspaces = tasks_common.get_workspaces(organization['ORGANIZATION_ID'])
+                    workspaces = jobs_common.get_workspaces(organization['ORGANIZATION_ID'])
 
                     # 全workspaceを処理対象とする / Process all workspaces
                     for workspace in workspaces:
@@ -189,7 +189,7 @@ class NotificationTaskExecutor(BaseTaskExecutor):
 
                                 for row in rows:
                                     # queueに情報が残ってないか確認する
-                                    if not tasks_common.exists_queue(conn_pf, row['NOTIFICATION_ID']):
+                                    if not jobs_common.exists_queue(conn_pf, row['NOTIFICATION_ID']):
                                         # queueに情報が残ってない場合、FAILD状態に更新する
                                         # If there is no information left in the queue, update to FAILD status
                                         conn_ws.begin()

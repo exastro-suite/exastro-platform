@@ -16,11 +16,11 @@ import threading
 import ctypes
 import globals
 import datetime
-from libs.exceptions import TaskTimeoutException
+from libs.exceptions import JobTimeoutException
 
 
-class BaseTaskExecutor(metaclass=abc.ABCMeta):
-    """task実行classの基底class / Base class of task execution class
+class BaseJobExecutor(metaclass=abc.ABCMeta):
+    """job実行classの基底class / Base class of job execution class
 
     Args:
         metaclass (_type_, optional): _description_. Defaults to abc.ABCMeta.
@@ -29,7 +29,7 @@ class BaseTaskExecutor(metaclass=abc.ABCMeta):
         """constructor
         """
         self.queue = queue
-        self.__task_info = (
+        self.__job_info = (
             f"kind:[{self.queue['PROCESS_KIND']}] / exec_id:[{self.queue['PROCESS_EXEC_ID']}] / " +
             f"organization_id:[{self.queue['ORGANIZATION_ID']}] / workspace_id:[{self.queue['WORKSPACE_ID']}] / " +
             f"timestamp:[{self.queue['LAST_UPDATE_TIMESTAMP']}]")
@@ -39,64 +39,64 @@ class BaseTaskExecutor(metaclass=abc.ABCMeta):
         self.__cancel_thread_id = None
 
     def execute_base(self):
-        """task実行 / task execution
+        """job実行 / job execution
         """
-        globals.logger.info(f"START Task - {self.__task_info}")
+        globals.logger.info(f"START job - {self.__job_info}")
         start_time = datetime.datetime.now()
         try:
             self.__thread_id = ctypes.c_long(threading.get_ident())
             result = self.execute()
             
             if result:
-                globals.logger.info(f"SUCCEED Task - {self.__task_info} / elapsed:[{(datetime.datetime.now() - start_time).total_seconds()}]")
+                globals.logger.info(f"SUCCEED Job - {self.__job_info} / elapsed:[{(datetime.datetime.now() - start_time).total_seconds()}]")
             else:
-                globals.logger.warning(f"FAILED Task - {self.__task_info} / elapsed:[{(datetime.datetime.now() - start_time).total_seconds()}]")
+                globals.logger.warning(f"FAILED Job - {self.__job_info} / elapsed:[{(datetime.datetime.now() - start_time).total_seconds()}]")
         except Exception as err:
-            globals.logger.error(f"FAILED Task - {self.__task_info} / elapsed:[{(datetime.datetime.now() - start_time).total_seconds()}]")
+            globals.logger.error(f"FAILED Job - {self.__job_info} / elapsed:[{(datetime.datetime.now() - start_time).total_seconds()}]")
             
     def cancel_base(self):
-        """task cancel実行 / task cancel execution
+        """job cancel実行 / job cancel execution
         """
-        globals.logger.info(f"START Cancel Task - {self.__task_info}")
+        globals.logger.info(f"START Cancel Job - {self.__job_info}")
         start_time = datetime.datetime.now()
         try:
             self.__cancel_thread_id = ctypes.c_long(threading.get_ident())
             result = self.cancel()
             if result:
-                globals.logger.info(f"SUCCEED Cancel Task - {self.__task_info} / elapsed:[{(datetime.datetime.now() - start_time).total_seconds()}]")
+                globals.logger.info(f"SUCCEED Cancel Job - {self.__job_info} / elapsed:[{(datetime.datetime.now() - start_time).total_seconds()}]")
             else:
-                globals.logger.warning(f"FAILED Task - {self.__task_info} / elapsed:[{(datetime.datetime.now() - start_time).total_seconds()}]")
+                globals.logger.warning(f"FAILED Job - {self.__job_info} / elapsed:[{(datetime.datetime.now() - start_time).total_seconds()}]")
         except Exception:
-            globals.logger.error(f"FAILED Task - {self.__task_info} / elapsed:[{(datetime.datetime.now() - start_time).total_seconds()}]")
+            globals.logger.error(f"FAILED Job - {self.__job_info} / elapsed:[{(datetime.datetime.now() - start_time).total_seconds()}]")
 
     def raise_timeout_exception(self):
-        """task実行の中止(例外発行)
-            Canceling task execution (raise exception)
+        """job実行の中止(例外発行)
+            Canceling job execution (raise exception)
 
         Returns:
             bool: True: success
         """
         rlt = ctypes.pythonapi.PyThreadState_SetAsyncExc(
             self.__thread_id,
-            ctypes.py_object(TaskTimeoutException))
+            ctypes.py_object(JobTimeoutException))
         return rlt == 1
 
     def raise_cancel_timeout_exception(self):
-        """task cancel実行の中止(例外発行)
-            task cancel Canceling execution (raise exception)
+        """job cancel実行の中止(例外発行)
+            job cancel Canceling execution (raise exception)
 
         Returns:
             bool: True: success
         """
         rlt = ctypes.pythonapi.PyThreadState_SetAsyncExc(
             self.__cancel_thread_id,
-            ctypes.py_object(TaskTimeoutException))
+            ctypes.py_object(JobTimeoutException))
         return rlt == 1
 
     @abc.abstractmethod
     def execute(self):
-        """task実行(継承先classでoverrideすること)
-            Execute task (override with inherited class)
+        """job実行(継承先classでoverrideすること)
+            Execute job (override with inherited class)
 
         Raises:
             NotImplementedError: _description_
@@ -105,8 +105,8 @@ class BaseTaskExecutor(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def cancel(self):
-        """task cancel実行(継承先classでoverrideすること)
-            Execute cancel task (override with inherited class)
+        """job cancel実行(継承先classでoverrideすること)
+            Execute cancel job (override with inherited class)
 
         Raises:
             NotImplementedError: _description_

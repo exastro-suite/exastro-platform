@@ -30,12 +30,12 @@ import job_manager_config
 import job_manager_const
 from common_library.common.db import DBconnector
 from libs import queries_process_queue, queries_health_check
-from libs.job_manager_classes import SubProcessesManager, SubProcessParameter, SubProcessManager, Task, IntervalTiming
+from libs.job_manager_classes import SubProcessesManager, SubProcessParameter, SubProcessManager, Job, IntervalTiming
 
 # 終了指示のシグナル受信
 process_terminate = False   # SIGTERM or SIGINT signal
-process_sigterm = False     # SIGTERM signal (Taskを中断して終了する / Interrupt and end the task)
-process_sigint = False      # SIGINT signal (Taskをやり終えて終了する / Finish the task and exit)
+process_sigterm = False     # SIGTERM signal (Jobを中断して終了する / Interrupt and end the job)
+process_sigint = False      # SIGINT signal (Jobをやり終えて終了する / Finish the job and exit)
 
 
 def job_manager_main_process():
@@ -124,8 +124,8 @@ def job_manager_main_process():
             pass
 
     if process_sigint:
-        # task受付を終了し静止状態に移行する
-        # Ends task acceptance and transitions to quiescent state
+        # job受付を終了し静止状態に移行する
+        # Ends job acceptance and transitions to quiescent state
         globals.logger.info('It has moved to a state where it can be safely stopped.')
         globals.logger.critical('Please restart the container to resume')
         while not process_sigterm:
@@ -158,8 +158,8 @@ def job_manager_sub_process(log_queue, parameter: SubProcessParameter):
     globals.init(log_queue)
     globals.logger.info('START sub process')
 
-    # task classのインポート / Importing task class
-    task_modules = {kind: import_module(config["module"]) for kind, config in job_manager_config.TASKS.items()}
+    # job classのインポート / Importing job class
+    job_modules = {kind: import_module(config["module"]) for kind, config in job_manager_config.JOBS.items()}
 
     # sub process管理情報の生成 / Generate sub process management information
     sub_process_mgr = parameter.genarate_sub_process_manager()
@@ -170,7 +170,7 @@ def job_manager_sub_process(log_queue, parameter: SubProcessParameter):
             with closing(DBconnector().connect_platformdb()) as conn:
 
                 while (not process_terminate) and sub_process_mgr.is_process_continue():
-                    time.sleep(job_manager_config.TASK_STATUS_WATCH_INTERVAL_SECONDS)
+                    time.sleep(job_manager_config.JOB_STATUS_WATCH_INTERVAL_SECONDS)
 
                     try:
                         if not sub_process_mgr.is_sheard_variables_normal():
@@ -195,23 +195,23 @@ def job_manager_sub_process(log_queue, parameter: SubProcessParameter):
                                 break
 
                         try:
-                            # taskの起動処理
-                            # Task startup process
-                            task_start_control(conn, sub_process_mgr, task_modules)
+                            # jobの起動処理
+                            # Job startup process
+                            job_start_control(conn, sub_process_mgr, job_modules)
                         except Exception:
                             pass
 
                         try:
-                            # task timeoutの起動処理
-                            # Task timeout startup process
-                            task_timeout_control(sub_process_mgr)
+                            # job timeoutの起動処理
+                            # Job timeout startup process
+                            job_timeout_control(sub_process_mgr)
                         except Exception:
                             pass
 
                         try:
-                            # task cancel timeoutの処理
-                            # Handling task cancel timeout
-                            cancel_task_timeout_control(sub_process_mgr)
+                            # job cancel timeoutの処理
+                            # Handling job cancel timeout
+                            cancel_job_timeout_control(sub_process_mgr)
                         except Exception:
                             pass
 
@@ -223,13 +223,13 @@ def job_manager_sub_process(log_queue, parameter: SubProcessParameter):
         except Exception as err:
             globals.logger.error(err)
             globals.logger.error(f'stack trace\n{traceback.format_exc()}')
-            time.sleep(job_manager_config.TASK_STATUS_WATCH_INTERVAL_SECONDS)
+            time.sleep(job_manager_config.JOB_STATUS_WATCH_INTERVAL_SECONDS)
 
     globals.logger.info('EXIT sub process loop')
 
     if process_sigterm:
-        # taskの強制終了を行う / Force quit task
-        cancel_all_tasks(sub_process_mgr)
+        # jobの強制終了を行う / Force quit job
+        cancel_all_jobs(sub_process_mgr)
 
     globals.logger.info('EXIT sub process')
     return
@@ -254,52 +254,52 @@ def is_healthy_db_connection(conn):
         return False
 
 
-def task_start_control(conn, sub_process_mgr: SubProcessManager, task_modules):
-    """task起動 / task launch
+def job_start_control(conn, sub_process_mgr: SubProcessManager, job_modules):
+    """job起動 / job launch
 
     Args:
         conn (_type_): db connection
         sub_process_mgr (SubProcessManager): sub process 管理情報 / sub process management information
-        task_modules (dict): 各taskのimport module / import module for each task
+        job_modules (dict): 各jobのimport module / import module for each job
     """
-    # 終了したtaskの情報クリア / Clear information on completed tasks
-    sub_process_mgr.refresh_task_status()
+    # 終了したjobの情報クリア / Clear information on completed jobs
+    sub_process_mgr.refresh_job_status()
 
-    # taskは起動可能かチェック / Check if task can be started
-    if sub_process_mgr.can_launch_task():
+    # jobは起動可能かチェック / Check if job can be started
+    if sub_process_mgr.can_launch_job():
         try:
             conn.begin()
             # queueから処理可能な処理対象の情報を取得する / Get information about processable objects from the queue
-            queue_rows = get_queue(conn, sub_process_mgr.get_running_task_queue(), sub_process_mgr.is_timing_of_force_updating_status())
+            queue_rows = get_queue(conn, sub_process_mgr.get_running_job_queue(), sub_process_mgr.is_timing_of_force_update_status())
 
             # 取得したqueue分処理する / Process the acquired queue
             for queue_row in queue_rows:
-                if not sub_process_mgr.countup_task_count():
-                    # taskの上限数に到達した場合 / When the maximum number of tasks is reached
+                if not sub_process_mgr.countup_job_count():
+                    # jobの上限数に到達した場合 / When the maximum number of jobs is reached
                     break
 
                 try:
-                    globals.logger.debug(f"Starting task : {queue_row['PROCESS_ID']} / {queue_row['PROCESS_KIND']}")
+                    globals.logger.debug(f"Starting job : {queue_row['PROCESS_ID']} / {queue_row['PROCESS_KIND']}")
 
                     # queueから起動対象のレコードを削除する / Delete the record to be launched from the queue
                     delete_queue(conn, queue_row)
                     
-                    # task処理のclassのinstanceを生成する / Generate an instance of the task processing class
-                    task_executor = eval(f"task_modules[queue_row['PROCESS_KIND']].{job_manager_config.TASKS[queue_row['PROCESS_KIND']]['class']}")(queue_row)
+                    # job処理のclassのinstanceを生成する / Generate an instance of the job processing class
+                    job_executor = eval(f"job_modules[queue_row['PROCESS_KIND']].{job_manager_config.JOBS[queue_row['PROCESS_KIND']]['class']}")(queue_row)
 
-                    # task処理のthreadを生成する / Generate a thread for task processing
-                    task_thread = threading.Thread(
-                        target=task_executor.execute_base,
+                    # job処理のthreadを生成する / Generate a thread for job processing
+                    job_thread = threading.Thread(
+                        target=job_executor.execute_base,
                         name=queue_row['PROCESS_ID'],
                         daemon=True)
-                    # task処理のthreadを開始する / Start a task processing thread
-                    task_thread.start()
-                    # taskの情報を追加する / Add task information
-                    sub_process_mgr.append_task(queue_row, task_thread, task_executor)
+                    # job処理のthreadを開始する / Start a job processing thread
+                    job_thread.start()
+                    # jobの情報を追加する / Add job information
+                    sub_process_mgr.append_job(queue_row, job_thread, job_executor)
                 except Exception:
-                    # 何らかの異常でtaskを開始できなかった場合、countupしたtask数を元に戻す
-                    # If the task cannot be started due to some abnormality, restore the counted up task number to the original number.
-                    sub_process_mgr.countdown_task_count()
+                    # 何らかの異常でjobを開始できなかった場合、countupしたjob数を元に戻す
+                    # If the job cannot be started due to some abnormality, restore the counted up job number to the original number.
+                    sub_process_mgr.countdown_job_count()
                     raise
         except Exception as err:
             globals.logger.error(err)
@@ -309,84 +309,84 @@ def task_start_control(conn, sub_process_mgr: SubProcessManager, task_modules):
             conn.commit()
 
 
-def task_timeout_control(sub_process_mgr: SubProcessManager):
+def job_timeout_control(sub_process_mgr: SubProcessManager):
     """timeout処理の制御 / Controlling timeout processing
 
     Args:
         sub_process_mgr (SubProcessManager): sub process 管理情報 / sub process management information
     """
-    # taskがtimeoutしたtaskの一覧を取得する / Get a list of tasks that have timed out
-    timeout_tasks = sub_process_mgr.get_timeout_tasks()
-    # timeoutのtaskを全てcancelする
-    cancel_tasks(timeout_tasks)
+    # jobがtimeoutしたjobの一覧を取得する / Get a list of jobs that have timed out
+    timeout_jobs = sub_process_mgr.get_timeout_jobs()
+    # timeoutのjobを全てcancelする
+    cancel_jobs(timeout_jobs)
 
 
-def cancel_all_tasks(sub_process_mgr: SubProcessManager):
-    """taskを全てcancelする / cancel all tasks
+def cancel_all_jobs(sub_process_mgr: SubProcessManager):
+    """jobを全てcancelする / cancel all jobs
 
     Args:
         sub_process_mgr (SubProcessManager): sub process 管理情報 / sub process management information
     """
-    globals.logger.info(f'Start cancel_all_tasks')
-    all_tasks = sub_process_mgr.get_all_tasks()
-    cancel_tasks(all_tasks)
-    for task in all_tasks:
-        task.cancel_thread.join()
-    globals.logger.info(f'Finish cancel_all_tasks')
+    globals.logger.info(f'Start cancel_all_jobs')
+    all_jobs = sub_process_mgr.get_all_jobs()
+    cancel_jobs(all_jobs)
+    for job in all_jobs:
+        job.cancel_thread.join()
+    globals.logger.info(f'Finish cancel_all_jobs')
 
 
-def cancel_tasks(tasks: list[Task]):
-    for task in tasks:
-        # timeoutのtaskに対して全て処理する / Process everything for timeout tasks
+def cancel_jobs(jobs: list[Job]):
+    for job in jobs:
+        # timeoutのjobに対して全て処理する / Process everything for timeout jobs
 
-        if task.thread.is_alive():
-            # timeoutしたtaskにtimeout例外を発行する / Issue a timeout exception for a task that has timed out
-            globals.logger.warning(f"Timeout task : {task.queue['PROCESS_ID']}")
-            task.task_executor.raise_timeout_exception()
+        if job.thread.is_alive():
+            # timeoutしたjobにtimeout例外を発行する / Issue a timeout exception for a job that has timed out
+            globals.logger.warning(f"Timeout job : {job.queue['PROCESS_ID']}")
+            job.job_executor.raise_timeout_exception()
 
-        if task.cancel_thread is None:
+        if job.cancel_thread is None:
             # cancel処理が起動していない場合、cancel処理を起動する / If the cancel process is not started, start the cancel process
-            globals.logger.debug(f"Cancel thread starting : {task.queue['PROCESS_ID']}")
+            globals.logger.debug(f"Cancel thread starting : {job.queue['PROCESS_ID']}")
             try:
                 # cancelのthreadを生成し開始する / Create and start a cancel thread
-                task.cancel_thread = threading.Thread(
-                    target=task.task_executor.cancel_base,
-                    name=f"{task.queue['PROCESS_ID']}_cancel",
+                job.cancel_thread = threading.Thread(
+                    target=job.job_executor.cancel_base,
+                    name=f"{job.queue['PROCESS_ID']}_cancel",
                     daemon=True)
-                task.cancel_thread.start()
+                job.cancel_thread.start()
                 # cancel処理のtimeout時間を設定する / Set timeout time for cancel processing
-                task.cancel_timeout = datetime.datetime.now() + datetime.timedelta(seconds=job_manager_config.TASK_CANCEL_TIMEOUT_SECONDS)
+                job.cancel_timeout = datetime.datetime.now() + datetime.timedelta(seconds=job_manager_config.JOB_CANCEL_TIMEOUT_SECONDS)
             except Exception as err:
                 globals.logger.debug(f'{err}\n---- stack trace ----\n{traceback.format_exc()}')
                 pass
 
 
-def cancel_task_timeout_control(sub_process_mgr: SubProcessManager):
+def cancel_job_timeout_control(sub_process_mgr: SubProcessManager):
     """cancel timeoutの制御 / Controlling cancel timeout
 
     Args:
         sub_process_mgr (SubProcessManager): sub process 管理情報 / sub process management information
     """
-    # taskのcancelがtimeoutしたtaskの一覧を取得する / Get a list of tasks whose cancel timed out
-    timeout_tasks = sub_process_mgr.get_cancel_timeout_tasks()
+    # jobのcancelがtimeoutしたjobの一覧を取得する / Get a list of jobs whose cancel timed out
+    timeout_jobs = sub_process_mgr.get_cancel_timeout_jobs()
 
-    for timeout_task in timeout_tasks:
-        # cancel timeoutのtask全てを処理する / Process all tasks with cancel timeout
+    for timeout_job in timeout_jobs:
+        # cancel timeoutのjob全てを処理する / Process all jobs with cancel timeout
 
-        if timeout_task.cancel_thread.is_alive():
-            # cancel timeoutしたtaskにtimeout例外を発行する / Issue a timeout exception for a task that has canceled timeout
-            globals.logger.warning(f"Cancel timeout task : {timeout_task.queue['PROCESS_ID']}")
-            timeout_task.task_executor.raise_cancel_timeout_exception()
+        if timeout_job.cancel_thread.is_alive():
+            # cancel timeoutしたjobにtimeout例外を発行する / Issue a timeout exception for a job that has canceled timeout
+            globals.logger.warning(f"Cancel timeout job : {timeout_job.queue['PROCESS_ID']}")
+            timeout_job.job_executor.raise_cancel_timeout_exception()
 
-            # 実行中taskからcancel timeoutしたtaskに移管する
-            # （何らかの要因でcancel threadが応答しなくなり新たなtask起動できなくなる状態を防ぐため）
-            # Transfer from a running task to a task that has canceled timeout
-            # (to prevent a situation where the cancel thread becomes unresponsive for some reason and cannot start a new task)
-            sub_process_mgr.transfer_cancel_timeout(timeout_task)
+            # 実行中jobからcancel timeoutしたjobに移管する
+            # （何らかの要因でcancel threadが応答しなくなり新たなjob起動できなくなる状態を防ぐため）
+            # Transfer from a running job to a job that has canceled timeout
+            # (to prevent a situation where the cancel thread becomes unresponsive for some reason and cannot start a new job)
+            sub_process_mgr.transfer_cancel_timeout(timeout_job)
 
             # cancel timeoutした件数を取得する / Get the number of cancel timeouts
             count_cancel_timeout = sub_process_mgr.count_cancel_timeout()
-            globals.logger.debug(f"cancel timeout task count: {count_cancel_timeout}")
+            globals.logger.debug(f"cancel timeout job count: {count_cancel_timeout}")
 
             # cancel timeoutした件数が一定値を超えた場合、sub processを終了する（メモリ圧迫の予防のため）
             # If the number of cancel timeouts exceeds a certain value, terminate the sub process (to prevent memory pressure)
@@ -395,51 +395,51 @@ def cancel_task_timeout_control(sub_process_mgr: SubProcessManager):
                 sub_process_mgr.set_terminating()
 
 
-def get_queue(conn, running_task_queue: list, force_status_update_task: bool):
+def get_queue(conn, running_job_queue: list, force_update_status_job: bool):
     """queueの取得 / Get queue
 
     Args:
         conn (_type_): DB connection
-        running_task_queue (list): 実行中のtaskのqueue / queue of running tasks
-        force_status_update_task (bool): 強制ステータス更新タスク起動有無 / Whether or not to start the forced status update task
+        running_job_queue (list): 実行中のjobのqueue / queue of running jobs
+        force_update_status_job (bool): 強制ステータス更新タスク起動有無 / Whether or not to start the forced status update job
 
     Returns:
-        list: task起動対象のqueue情報 / Queue information for task activation
+        list: job起動対象のqueue情報 / Queue information for job activation
     """
-    # 実行中のtaskをPROCESS_KINDでグルーピング / Group running tasks by PROCESS_KIND
-    running_kind_grouping = queue_grouping(running_task_queue, "PROCESS_KIND", "undefined")
+    # 実行中のjobをPROCESS_KINDでグルーピング / Group running jobs by PROCESS_KIND
+    running_kind_grouping = queue_grouping(running_job_queue, "PROCESS_KIND", "undefined")
     # 実行してないPROCESS_KINDの情報を0件で追加 / Added 0 information about PROCESS_KIND that is not being executed.
-    running_kind_grouping.update({key: [] for key in job_manager_config.TASKS.keys() if key not in running_kind_grouping})
+    running_kind_grouping.update({key: [] for key in job_manager_config.JOBS.keys() if key not in running_kind_grouping})
 
     # queueの内容をDBから取得
     #   lock失敗などで読み捨てになる可能性を考慮し最大の2倍の件数を取得
     # Obtain the contents of the queue from the DB
     #   taking into account the possibility of the read being discarded due to lock failure, etc., obtain twice the maximum number of items
     with conn.cursor() as cursor:
-        cursor.execute(queries_process_queue.SQL_QUERY_PROCESS, {"task_max_count": (job_manager_config.SUB_PROCESS_MAX_TASKS - len(running_task_queue)) * 2})
+        cursor.execute(queries_process_queue.SQL_QUERY_PROCESS, {"job_max_count": (job_manager_config.SUB_PROCESS_MAX_JOBS - len(running_job_queue)) * 2})
         queue = cursor.fetchall()
 
     # queueの情報をorganization_idでグルーピングし、last_update_timestampでソート
     # Group queue information by organization_id and sort by last_update_timestamp
     queue_org_grouping = queue_grouping(queue, "ORGANIZATION_ID", "_platform", "LAST_UPDATE_TIMESTAMP")
 
-    # 実行中のtaskをorganization_idでグルーピング / Group running tasks by organization_id
-    running_org_grouping = queue_grouping(running_task_queue, "ORGANIZATION_ID", "_platform")
+    # 実行中のjobをorganization_idでグルーピング / Group running jobs by organization_id
+    running_org_grouping = queue_grouping(running_job_queue, "ORGANIZATION_ID", "_platform")
     # 実行してないorganization_idの情報を0件で追加 / Add information of organization_id that is not executed with 0 items
     running_org_grouping.update({key: [] for key in queue_org_grouping.keys() if key not in running_org_grouping})
 
-    # totalで実行中のtask数 / Number of tasks running in total
-    total_task_count = len(running_task_queue)
+    # totalで実行中のjob数 / Number of jobs running in total
+    total_job_count = len(running_job_queue)
 
     # return値の配列を初期化 / Initialize return value array
     ret_queue = []
 
-    # 強制ステータス更新のtaskの起動要求がなされている場合、return値の配列に追加する
-    # If a request is made to start a forced status update task, add it to the return value array.
-    if force_status_update_task:
+    # 強制ステータス更新のjobの起動要求がなされている場合、return値の配列に追加する
+    # If a request is made to start a forced status update job, add it to the return value array.
+    if force_update_status_job:
         ret_queue.append({
             "PROCESS_ID": ulid.new().str,
-            "PROCESS_KIND": job_manager_const.PROCESS_KIND_FORCE_STATUS_UPDATE,
+            "PROCESS_KIND": job_manager_const.PROCESS_KIND_FORCE_UPDATE_STATUS,
             "PROCESS_EXEC_ID": None,
             "ORGANIZATION_ID": None,
             "WORKSPACE_ID": None,
@@ -447,32 +447,32 @@ def get_queue(conn, running_task_queue: list, force_status_update_task: bool):
             "LAST_UPDATE_USER": None
         })
 
-    # queueが残っているもしくはtotal task数が上限値未満の場合繰り返す
-    # Repeat if the queue remains or the total number of tasks is less than the upper limit
-    while len(queue_org_grouping) > 0 and total_task_count < job_manager_config.SUB_PROCESS_MAX_TASKS:
+    # queueが残っているもしくはtotal job数が上限値未満の場合繰り返す
+    # Repeat if the queue remains or the total number of jobs is less than the upper limit
+    while len(queue_org_grouping) > 0 and total_job_count < job_manager_config.SUB_PROCESS_MAX_JOBS:
         # 次に処理をするorganization_idを決定する
-        #   実行中または起動対象のtaskの総件数の昇順
+        #   実行中または起動対象のjobの総件数の昇順
         #   last_update_timestampの昇順
         #   乱数の昇順（特定のorganization_idが有利にならないように）
         # Determine the organization_id to process next
-        #   Ascending order of total number of tasks being executed or started
+        #   Ascending order of total number of jobs being executed or started
         #   Ascending order of last_update_timestamp
         #   Ascending random numbers (so that no particular organization_id has an advantage)
         next_organization_id = sorted(
             [{
                 "organization_id": organization_id,
-                "task_count": len(running_org_grouping[organization_id]),
+                "job_count": len(running_org_grouping[organization_id]),
                 "last_update_timestamp": queue_org_grouping[organization_id][0]['LAST_UPDATE_TIMESTAMP'],
                 "random": random.randrange(999999),
             } for organization_id in queue_org_grouping.keys()],
-            key=lambda x: (x['task_count'], x['last_update_timestamp'], x['random'])
+            key=lambda x: (x['job_count'], x['last_update_timestamp'], x['random'])
         )[0]['organization_id']
 
         # 次に処理するqueue情報 / queue to process next
         next_process_id = queue_org_grouping[next_organization_id][0]['PROCESS_ID']
         next_process_king = queue_org_grouping[next_organization_id][0]['PROCESS_KIND']
             
-        if len(running_kind_grouping[next_process_king]) < job_manager_config.TASKS[next_process_king]['max_task_per_process']:
+        if len(running_kind_grouping[next_process_king]) < job_manager_config.JOBS[next_process_king]['max_job_per_process']:
             # 次に処理するPROCESS_KINDが条件に達していないときは、起動可能かの処理を進める
             # If the next PROCESS_KIND to be processed does not meet the conditions, proceed with the process to see if it can be started.
 
@@ -482,7 +482,7 @@ def get_queue(conn, running_task_queue: list, force_status_update_task: bool):
                     cursor.execute(queries_process_queue.SQL_QUERY_PROCESS_LOCK, {"process_id": next_process_id})
                     cursor.fetchone()
                 lock_succeed = True
-            except pymysql.err.OperationalError:
+            except pymysql.err.OperationalError as err:
                 # Lock Error
                 lock_succeed = False
                 globals.logger.debug(err)
@@ -496,7 +496,7 @@ def get_queue(conn, running_task_queue: list, force_status_update_task: bool):
                 ret_queue.append(queue_org_grouping[next_organization_id][0])
                 running_kind_grouping[next_process_king].append(queue_org_grouping[next_organization_id][0])
                 running_org_grouping[next_organization_id].append(queue_org_grouping[next_organization_id][0])
-                total_task_count += 1
+                total_job_count += 1
 
         # 次のqueue情報に進むためqueueの配列から削除 / Delete from queue array to proceed to next queue information
         del queue_org_grouping[next_organization_id][0]

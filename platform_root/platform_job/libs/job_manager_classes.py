@@ -19,38 +19,38 @@ import threading
 
 import job_manager_config
 import globals
-from tasks.BaseTaskExecutor import BaseTaskExecutor
+from jobs.BaseJobExecutor import BaseJobExecutor
 
 
-class Task():
-    """task管理class / task management class
+class Job():
+    """job管理class / job management class
     """
-    def __init__(self, queue: dict, thread: threading.Thread, task_executor: BaseTaskExecutor):
+    def __init__(self, queue: dict, thread: threading.Thread, job_executor: BaseJobExecutor):
         """constructor
 
         Args:
             queue (dict): queue record
-            thread (threading.Thread): task実行thread / task execution thread
-            task_executor (BaseTaskExecutor): task実行class instance / task execution class instance
+            thread (threading.Thread): job実行thread / job execution thread
+            job_executor (BaseJobExecutor): job実行class instance / job execution class instance
         """
         # queue record
         self.queue = queue
-        # task実行class instance / task execution class instance
-        self.task_executor = task_executor
-        # task実行thread / task execution thread
+        # job実行class instance / job execution class instance
+        self.job_executor = job_executor
+        # job実行thread / job execution thread
         self.thread = thread
-        # task実行timeout時刻 / task execution timeout time
-        self.timeout = datetime.datetime.now() + datetime.timedelta(seconds=job_manager_config.TASKS[queue['PROCESS_KIND']]['timeout_seconds'])
-        # task cancel thread
+        # job実行timeout時刻 / job execution timeout time
+        self.timeout = datetime.datetime.now() + datetime.timedelta(seconds=job_manager_config.JOBS[queue['PROCESS_KIND']]['timeout_seconds'])
+        # job cancel thread
         self.cancel_thread = None
-        # task cancel timeout時刻 / task cancel timeout time
+        # job cancel timeout時刻 / job cancel timeout time
         self.cancel_timeout = None
 
     def __eq__(self, other):
-        """taskの等価比較 / Equality comparison of tasks
+        """jobの等価比較 / Equality comparison of jobs
 
         Args:
-            other (Task): 比較対象 / targets for comparison
+            other (Job): 比較対象 / targets for comparison
 
         Returns:
             bool: 比較結果 / Comparison result
@@ -63,27 +63,27 @@ class SubProcessManager():
         SubProcessParameter.genarate_sub_process_managerメソッドでinstanceを生成すること
         Generate an instance using the SubProcessParameter.genarate_sub_process_manager method
     """
-    def __init__(self, array_index, sub_processes_ids, sub_termination_req_flags, sub_running_task_counts, force_upd_sts_exec_pid):
+    def __init__(self, array_index, sub_processes_ids, sub_termination_req_flags, sub_running_job_counts, force_upd_sts_exec_pid):
         """constructor 
 
         Args:
             array_index (int): 共有メモリ配列の当該processのindex / index of the process in the shared memory array
             sub_processes_ids (_type_): sub processのprocess id / process id of sub process
             sub_termination_req_flags (_type_): sub processへの終了要求のフラグ / Flag for termination request to sub process
-            sub_running_task_counts (_type_): sub process実行task数 / Number of sub process execution tasks
+            sub_running_job_counts (_type_): sub process実行job数 / Number of sub process execution jobs
             force_upd_sts_exec_pid (_type_): force status updateを行うsub processのprocess id / process id of sub process that performs force status update
         """
         self.__arr_idx = array_index
         self.__sub_processes_ids = sub_processes_ids
         self.__sub_termination_req_flags = sub_termination_req_flags
-        self.__sub_running_task_counts = sub_running_task_counts
+        self.__sub_running_job_counts = sub_running_job_counts
         self.__sub_processes_ids[self.__arr_idx] = os.getpid()
-        self.__tasks: list[Task] = []
-        self.__cancel_timeout_tasks: list[Task] = []
+        self.__jobs: list[Job] = []
+        self.__cancel_timeout_jobs: list[Job] = []
         self.interval_db_reconect = IntervalTiming(job_manager_config.SUB_PROCESS_DB_RECONNECT_INTERVAL_SECONDS)
         self.interval_db_health_check = IntervalTiming(job_manager_config.SUB_PROCESS_DB_HEALTH_CHECK_INTERVAL_SECONDS)
         self.__force_upd_sts_exec_pid = force_upd_sts_exec_pid
-        self.__interval_force_upd_sts = IntervalTiming(job_manager_config.FORCE_UPDATE_EXEC_INTERVAL_SECONDS)
+        self.__interval_force_upd_sts = IntervalTiming(job_manager_config.FORCE_UPDATE_STATUS_INTERVAL_SECONDS)
 
 
     def is_sheard_variables_normal(self):
@@ -102,122 +102,122 @@ class SubProcessManager():
         Returns:
             bool: True : continue
         """
-        return self.__sub_termination_req_flags[self.__arr_idx] == 0 or len(self.__tasks) > 0
+        return self.__sub_termination_req_flags[self.__arr_idx] == 0 or len(self.__jobs) > 0
 
-    def refresh_task_status(self):
-        """taskの状態で管理情報を更新する / Update management information in task status
+    def refresh_job_status(self):
+        """jobの状態で管理情報を更新する / Update management information in job status
         """
         # 配列を後ろから処理（deleteするため) / Process the array from behind (to delete)
-        for i in range(len(self.__tasks) - 1, -1, -1):
-            if self.__tasks[i].thread.is_alive():
-                # taskが実行中の場合は何もしない / Do nothing if task is running
+        for i in range(len(self.__jobs) - 1, -1, -1):
+            if self.__jobs[i].thread.is_alive():
+                # jobが実行中の場合は何もしない / Do nothing if job is running
                 continue
 
-            if self.__tasks[i].cancel_thread is not None and self.__tasks[i].cancel_thread.is_alive():
-                # task cancelが実行中の場合は何もしない / Do nothing if task cancel is running
+            if self.__jobs[i].cancel_thread is not None and self.__jobs[i].cancel_thread.is_alive():
+                # job cancelが実行中の場合は何もしない / Do nothing if job cancel is running
                 continue
 
-            # taskがexecuteもcancel実行中でない場合は削除する / Delete if task is not executing or canceling
-            del self.__tasks[i]
+            # jobがexecuteもcancel実行中でない場合は削除する / Delete if job is not executing or canceling
+            del self.__jobs[i]
 
-        # 実行中のtask数を共有メモリに書き込む / Write the number of running tasks to shared memory
-        self.__sub_running_task_counts[self.__arr_idx] = len(self.__tasks)
+        # 実行中のjob数を共有メモリに書き込む / Write the number of running jobs to shared memory
+        self.__sub_running_job_counts[self.__arr_idx] = len(self.__jobs)
 
-    def can_launch_task(self):
-        """taskが起動可能か判定する / Determine if task can be started
+    def can_launch_job(self):
+        """jobが起動可能か判定する / Determine if job can be started
 
         Returns:
             bool: True : 起動可能 / can launch
         """
-        if self.__sub_running_task_counts[self.__arr_idx] >= job_manager_config.SUB_PROCESS_MAX_TASKS:
-            # processのtask数が上限値に達している場合、起動不可
-            # If the number of tasks in the process reaches the upper limit, it cannot be started.
+        if self.__sub_running_job_counts[self.__arr_idx] >= job_manager_config.SUB_PROCESS_MAX_JOBS:
+            # processのjob数が上限値に達している場合、起動不可
+            # If the number of jobs in the process reaches the upper limit, it cannot be started.
             return False
 
-        if sum(self.__sub_running_task_counts) >= (job_manager_config.SUB_PROCESS_MAX_TASKS * job_manager_config.SUB_PROCESS_MAX_ACTIVE):
+        if sum(self.__sub_running_job_counts) >= (job_manager_config.SUB_PROCESS_MAX_JOBS * job_manager_config.SUB_PROCESS_ACCEPTABLE):
             # sub process全体のタスク数が上限値に達している場合、起動不可
-            # If the number of tasks in the entire sub process has reached the upper limit, it cannot be started.
+            # If the number of jobs in the entire sub process has reached the upper limit, it cannot be started.
             return False
 
         return True
 
-    def get_running_task_queue(self):
-        """実行中taskのqueue情報を返す / Returns queue information of the running task
+    def get_running_job_queue(self):
+        """実行中jobのqueue情報を返す / Returns queue information of the running job
 
         Returns:
             list: list of queue
         """
-        return [task.queue for task in self.__tasks]
+        return [job.queue for job in self.__jobs]
 
-    def countup_task_count(self):
-        """実行中のtask数をcount upする / Count up the number of running tasks
+    def countup_job_count(self):
+        """実行中のjob数をcount upする / Count up the number of running jobs
 
         Returns:
             bool: True: 成功 / succeed
         """
-        if self.__sub_running_task_counts[self.__arr_idx] >= job_manager_config.SUB_PROCESS_MAX_TASKS:
-            # processのtask数が上限値に達しているため失敗
-            # Failed because the number of tasks in process has reached the upper limit.
+        if self.__sub_running_job_counts[self.__arr_idx] >= job_manager_config.SUB_PROCESS_MAX_JOBS:
+            # processのjob数が上限値に達しているため失敗
+            # Failed because the number of jobs in process has reached the upper limit.
             return False
 
         # 全sub processのカウンターをロックする / Lock counters of all sub processes
-        with self.__sub_running_task_counts.get_lock():
-            if sum(self.__sub_running_task_counts) >= (job_manager_config.SUB_PROCESS_MAX_TASKS * job_manager_config.SUB_PROCESS_MAX_ACTIVE):
-                # 全processのtask数合計が上限値に達しているため失敗 / Failed because the total number of tasks for all processes has reached the upper limit.
+        with self.__sub_running_job_counts.get_lock():
+            if sum(self.__sub_running_job_counts) >= (job_manager_config.SUB_PROCESS_MAX_JOBS * job_manager_config.SUB_PROCESS_ACCEPTABLE):
+                # 全processのjob数合計が上限値に達しているため失敗 / Failed because the total number of jobs for all processes has reached the upper limit.
                 return False
 
-            self.__sub_running_task_counts[self.__arr_idx] += 1
+            self.__sub_running_job_counts[self.__arr_idx] += 1
             return True
 
-    def countdown_task_count(self):
-        """実行中のtask数をcount downする / Count down the number of running tasks
+    def countdown_job_count(self):
+        """実行中のjob数をcount downする / Count down the number of running jobs
         """
-        self.__sub_running_task_counts[self.__arr_idx] -= 1
+        self.__sub_running_job_counts[self.__arr_idx] -= 1
 
-    def append_task(self, queue: dict, thread: threading.Thread, task_executor: BaseTaskExecutor):
-        """Taskを追加する / Add a task
+    def append_job(self, queue: dict, thread: threading.Thread, job_executor: BaseJobExecutor):
+        """Jobを追加する / Add a job
 
         Args:
             queue (dict): queue record
-            thread (threading.Thread): task実行thread / task execution thread
-            task_executor (BaseTaskExecutor): task実行class instance / task execution class instance
+            thread (threading.Thread): job実行thread / job execution thread
+            job_executor (BaseJobExecutor): job実行class instance / job execution class instance
         """
-        self.__tasks.append(Task(queue, thread, task_executor))
+        self.__jobs.append(Job(queue, thread, job_executor))
 
-    def get_timeout_tasks(self):
-        """timeout時間になったtaskを取得する / Get the task whose timeout time has reached
+    def get_timeout_jobs(self):
+        """timeout時間になったjobを取得する / Get the job whose timeout time has reached
 
         Returns:
-            list: timeout task list
+            list: timeout job list
         """
-        return [task for task in self.__tasks if datetime.datetime.now() >= task.timeout]
+        return [job for job in self.__jobs if datetime.datetime.now() >= job.timeout]
 
-    def get_all_tasks(self):
-        """全てのtaskを取得する
+    def get_all_jobs(self):
+        """全てのjobを取得する
 
         Returns:
-            list: task list
+            list: job list
         """
-        return self.__tasks
+        return self.__jobs
 
-    def get_cancel_timeout_tasks(self):
-        """cancel timeout時間になっているtaskを取得する / Get the task whose cancel timeout has expired
+    def get_cancel_timeout_jobs(self):
+        """cancel timeout時間になっているjobを取得する / Get the job whose cancel timeout has expired
 
         Returns:
-            list: cancel timeout task list
+            list: cancel timeout job list
         """
-        return [task for task in self.__tasks if task.cancel_timeout is not None and datetime.datetime.now() >= task.cancel_timeout]
+        return [job for job in self.__jobs if job.cancel_timeout is not None and datetime.datetime.now() >= job.cancel_timeout]
 
-    def transfer_cancel_timeout(self, cancel_timeout_task: Task):
-        """指定taskをtask管理対象から除外する / Exclude the specified task from task management
+    def transfer_cancel_timeout(self, cancel_timeout_job: Job):
+        """指定jobをjob管理対象から除外する / Exclude the specified job from job management
 
         Args:
-            cancel_timeout_task (Task): 対象task / Target task
+            cancel_timeout_job (Job): 対象job / Target job
         """
-        task_index = [i for i, task in enumerate(self.__tasks) if task == cancel_timeout_task]
-        if len(task_index) > 0:
-            self.__cancel_timeout_tasks.append(self.__tasks[task_index[0]])
-            del self.__tasks[task_index[0]]
+        job_index = [i for i, job in enumerate(self.__jobs) if job == cancel_timeout_job]
+        if len(job_index) > 0:
+            self.__cancel_timeout_jobs.append(self.__jobs[job_index[0]])
+            del self.__jobs[job_index[0]]
 
     def count_cancel_timeout(self):
         """cancel timeoutで管理対象外に置いた件数を取得する / Get the number of items left unmanaged by cancel timeout
@@ -225,14 +225,14 @@ class SubProcessManager():
         Returns:
             int : 件数 / number
         """
-        return len(self.__cancel_timeout_tasks)
+        return len(self.__cancel_timeout_jobs)
 
     def set_terminating(self):
         """sub processを終了要求状態にする / Put sub process in termination request state
         """
         self.__sub_termination_req_flags[self.__arr_idx] = 1
 
-    def is_timing_of_force_updating_status(self):
+    def is_timing_of_force_update_status(self):
         """強制ステータス更新処理を起動するタイミングか判定する / Determine when it is time to start forced status update processing
 
         Returns:
@@ -252,20 +252,20 @@ class SubProcessParameter():
         SubProcessesManager.generate_sub_process_parameterメソッドでinstanceを生成すること
         Generate an instance using the SubProcessesManager.generate_sub_process_parameter method
     """
-    def __init__(self, array_index, sub_processes_ids, sub_termination_req_flags, sub_running_task_counts, force_upd_sts_exec_pid):
+    def __init__(self, array_index, sub_processes_ids, sub_termination_req_flags, sub_running_job_counts, force_upd_sts_exec_pid):
         """constructor
 
         Args:
             array_index (int): 共有メモリ配列の当該processのindex / index of the process in the shared memory array
             sub_processes_ids (_type_): sub processのprocess id / process id of sub process
             sub_termination_req_flags (_type_): sub processへの終了要求のフラグ / Flag for termination request to sub process
-            sub_running_task_counts (_type_): sub process実行task数 / Number of sub process execution tasks
-            force_upd_sts_exec_pid (_type_): force status updateを行うsub processのprocess id / process id of sub process that performs force status update
+            sub_running_job_counts (_type_): sub process実行job数 / Number of sub process execution jobs
+            force_upd_sts_exec_pid (_type_): force update statusを行うsub processのprocess id / process id of sub process that performs force update status
         """
         self.__arr_idx = array_index
         self.__sub_processes_ids = sub_processes_ids
         self.__sub_termination_req_flags = sub_termination_req_flags
-        self.__sub_running_task_counts = sub_running_task_counts
+        self.__sub_running_job_counts = sub_running_job_counts
         self.__force_upd_sts_exec_pid = force_upd_sts_exec_pid
 
     def get_array_index(self):
@@ -286,7 +286,7 @@ class SubProcessParameter():
             self.__arr_idx,
             self.__sub_processes_ids,
             self.__sub_termination_req_flags,
-            self.__sub_running_task_counts,
+            self.__sub_running_job_counts,
             self.__force_upd_sts_exec_pid
         )
 
@@ -301,11 +301,11 @@ class SubProcessesManager():
         # sub process variables
         #  ※エリアを2倍用意しているのは、sub processの切り替え(終了指示～終了)タイミングで一時的に超えるため
         #    The reason why the area is twice as large is because it is temporarily exceeded when the sub process is switched (from the end instruction to the end).
-        self.__sub_processes: list[multiprocessing.Process] = [None] * (job_manager_config.SUB_PROCESS_MAX_ACTIVE * 2)
-        self.__sub_processe_ids = multiprocessing.Array(ctypes.c_int, (job_manager_config.SUB_PROCESS_MAX_ACTIVE * 2))
-        self.__sub_termination_req_times: list[datetime.datetime] = [None] * (job_manager_config.SUB_PROCESS_MAX_ACTIVE * 2)
-        self.__sub_termination_req_flags = multiprocessing.Array(ctypes.c_int, (job_manager_config.SUB_PROCESS_MAX_ACTIVE * 2))
-        self.__sub_running_task_counts = multiprocessing.Array(ctypes.c_int, (job_manager_config.SUB_PROCESS_MAX_ACTIVE * 2))
+        self.__sub_processes: list[multiprocessing.Process] = [None] * (job_manager_config.SUB_PROCESS_ACCEPTABLE * 2)
+        self.__sub_processe_ids = multiprocessing.Array(ctypes.c_int, (job_manager_config.SUB_PROCESS_ACCEPTABLE * 2))
+        self.__sub_termination_req_times: list[datetime.datetime] = [None] * (job_manager_config.SUB_PROCESS_ACCEPTABLE * 2)
+        self.__sub_termination_req_flags = multiprocessing.Array(ctypes.c_int, (job_manager_config.SUB_PROCESS_ACCEPTABLE * 2))
+        self.__sub_running_job_counts = multiprocessing.Array(ctypes.c_int, (job_manager_config.SUB_PROCESS_ACCEPTABLE * 2))
         self.__force_upd_sts_exec_pid = multiprocessing.Value(ctypes.c_int)
         self.__force_upd_sts_exec_pid.value = -1
 
@@ -332,7 +332,7 @@ class SubProcessesManager():
                     self.__sub_processes[i] = None
                     self.__sub_termination_req_times[i] = None
                     self.__sub_termination_req_flags[i] = 0
-                    self.__sub_running_task_counts[i] = 0
+                    self.__sub_running_job_counts[i] = 0
                 else:
                     # 実行中のprocessを強制ステータス更新を実行するprocessの候補として保持する
                     # Keep the running process as a candidate for executing forced status update
@@ -352,7 +352,7 @@ class SubProcessesManager():
             bool: True : 足りている / enough
         """
         # 
-        return (job_manager_config.SUB_PROCESS_MAX_ACTIVE <=
+        return (job_manager_config.SUB_PROCESS_ACCEPTABLE <=
             len([i for i, process in enumerate(self.__sub_processes) if process is not None and self.__sub_termination_req_flags[i] == 0]))
 
     def generate_sub_process_parameter(self):
@@ -371,7 +371,7 @@ class SubProcessesManager():
                 unused_array_indexes[0],
                 self.__sub_processe_ids,
                 self.__sub_termination_req_flags,
-                self.__sub_running_task_counts,
+                self.__sub_running_job_counts,
                 self.__force_upd_sts_exec_pid,
             )
 
@@ -394,7 +394,7 @@ class SubProcessesManager():
         # sub processの終了要求時間を設定 / Set sub process termination request time
         self.__sub_termination_req_times[i] = datetime.datetime.now() + self.__terminatiton_req_timedelta()
         self.__sub_termination_req_flags[i] = 0
-        self.__sub_running_task_counts[i] = 0
+        self.__sub_running_job_counts[i] = 0
         return True
 
     def __unused_array_indexes(self):
@@ -416,7 +416,7 @@ class SubProcessesManager():
         # 初回のsub process切り替えタイミングを平準化する時間を返す
         # Returns the time to level the initial sub process switching timing
         #
-        if self.__sub_process_seq >= job_manager_config.SUB_PROCESS_MAX_ACTIVE:
+        if self.__sub_process_seq >= job_manager_config.SUB_PROCESS_ACCEPTABLE:
             # sub processがMAX数まで上がりきった後は、configで指定した間隔を返す
             # After the sub process reaches the MAX number, returns the interval specified in config.
             return datetime.timedelta(seconds=job_manager_config.SUB_PROCESS_TERMINATE_REQUEST_SECONDS)
@@ -424,7 +424,7 @@ class SubProcessesManager():
             # sub processがMAX数まで上がりきるまでは、次の起動タイミングがずれるように時間をずらす
             # Until the number of sub processes reaches the maximum number, the next startup timing is shifted.
             return datetime.timedelta(
-                seconds=self.__sub_process_seq * job_manager_config.SUB_PROCESS_TERMINATE_REQUEST_SECONDS / job_manager_config.SUB_PROCESS_MAX_ACTIVE)
+                seconds=self.__sub_process_seq * job_manager_config.SUB_PROCESS_TERMINATE_REQUEST_SECONDS / job_manager_config.SUB_PROCESS_ACCEPTABLE)
 
     def set_sub_process_termination_request(self, force: bool):
         """sub processに終了指示を行う / Instruct sub process to terminate
