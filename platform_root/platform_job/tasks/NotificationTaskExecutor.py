@@ -26,8 +26,8 @@ from common_library.common import encrypt, const
 from libs import queries_notification
 
 import globals
-import backyard_config
-import backyard_const
+import job_manager_config
+import job_manager_const
 from tasks import tasks_common
 
 
@@ -86,7 +86,7 @@ class NotificationTaskExecutor(BaseTaskExecutor):
                         {
                             "notification_id": self.notification_id,
                             "notification_status": notification_status,
-                            "last_update_user": backyard_const.BACKYARD_USER_ID
+                            "last_update_user": job_manager_const.SYSTEM_USER_ID
                         })
                     conn.commit()
 
@@ -156,7 +156,7 @@ class NotificationTaskExecutor(BaseTaskExecutor):
                         {
                             "notification_id": self.notification_id,
                             "notification_status": const.NOTIFICATION_STATUS_FAILED,
-                            "last_update_user": backyard_const.BACKYARD_USER_ID
+                            "last_update_user": job_manager_const.SYSTEM_USER_ID
                         })
                     conn.commit()
         except Exception as err:
@@ -181,7 +181,7 @@ class NotificationTaskExecutor(BaseTaskExecutor):
 
                             with conn_ws.cursor() as cursor_ws:
                                 # UNSENT状態で一定時間経過したものを対象とする / Targets items that have been in UNSENT state for a certain period of time
-                                last_update_timestamp = datetime.datetime.now() - datetime.timedelta(seconds=backyard_config.FORCE_UPDATE_STATUS_PROGRASS_SECONDS)
+                                last_update_timestamp = datetime.datetime.now() - datetime.timedelta(seconds=job_manager_config.FORCE_UPDATE_STATUS_PROGRASS_SECONDS)
                                 cursor_ws.execute(
                                     queries_notification.SQL_QUERY_NOTIFICATION_MESSAGE_UNSENT_LONGTIME,
                                     {"last_update_timestamp": last_update_timestamp, "notification_status": const.NOTIFICATION_STATUS_UNSENT})
@@ -199,7 +199,7 @@ class NotificationTaskExecutor(BaseTaskExecutor):
                                                 {
                                                     "notification_id": row['NOTIFICATION_ID'],
                                                     "notification_status": const.NOTIFICATION_STATUS_FAILED,
-                                                    "last_update_user": backyard_const.BACKYARD_USER_ID
+                                                    "last_update_user": job_manager_const.SYSTEM_USER_ID
                                                 })
                                             conn_ws.commit()
                                             globals.logger.warning(f"Force Failed notification_id:{row['NOTIFICATION_ID']}")

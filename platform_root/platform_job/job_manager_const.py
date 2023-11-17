@@ -16,7 +16,7 @@
 PROCESS_KIND_FORCE_STATUS_UPDATE = "_FORCE_STATUS_UPDATE"
 
 # user id
-BACKYARD_USER_ID = 'system'
+SYSTEM_USER_ID = 'system'
 
 # oranization status
 ORG_STATUS_CREATE_COMPLETE = "Organization Create Complete"

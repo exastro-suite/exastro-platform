@@ -17,7 +17,7 @@ from contextlib import closing
 from common_library.common.db import DBconnector
 from libs import queries_common, queries_process_queue
 
-import backyard_const
+import job_manager_const
 
 
 def get_organizations():
@@ -26,7 +26,7 @@ def get_organizations():
             cursor.execute(queries_common.SQL_QUERY_ORGANIZATION)
             rows = cursor.fetchall()
 
-    return [row for row in rows if json.loads(row["INFORMATIONS"]).get('status') == backyard_const.ORG_STATUS_CREATE_COMPLETE]
+    return [row for row in rows if json.loads(row["INFORMATIONS"]).get('status') == job_manager_const.ORG_STATUS_CREATE_COMPLETE]
 
 
 def get_workspaces(organization_id):

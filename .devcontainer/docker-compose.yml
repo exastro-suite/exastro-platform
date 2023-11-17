@@ -172,10 +172,10 @@ services:
     networks:
       - exastro
 
-  platform-backyard:
+  platform-job:
     user: 1000:1000
     build:
-      dockerfile: ./platform_root/platform_backyard/Dockerfile
+      dockerfile: ./platform_root/platform_job/Dockerfile
       context: ../.
       args:
         - HTTP_PROXY=${HTTP_PROXY}

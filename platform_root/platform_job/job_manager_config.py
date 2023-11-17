@@ -14,7 +14,7 @@
 import os
 
 from common_library.common import const
-import backyard_const
+import job_manager_const
 
 #
 # SUB PROCESSを再起動するインターバル 
@@ -98,8 +98,8 @@ TASKS = {
         "module": "tasks.NotificationTaskExecutor",
         "class": "NotificationTaskExecutor"
     },
-    backyard_const.PROCESS_KIND_FORCE_STATUS_UPDATE: {
-        "timeout_seconds": int(os.environ.get(f'TASK_{backyard_const.PROCESS_KIND_FORCE_STATUS_UPDATE}_TIMEOUT_SECONDS', '60')),
+    job_manager_const.PROCESS_KIND_FORCE_STATUS_UPDATE: {
+        "timeout_seconds": int(os.environ.get(f'TASK_{job_manager_const.PROCESS_KIND_FORCE_STATUS_UPDATE}_TIMEOUT_SECONDS', '60')),
         "max_task_per_process": 1,
         "module": "tasks.ForceStatusUpdateTaskExecutor",
         "class": "ForceStatusUpdateTaskExecutor"

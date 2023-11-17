@@ -15,8 +15,8 @@ import globals
 from importlib import import_module
 import traceback
 
-import backyard_config
-import backyard_const
+import job_manager_config
+import job_manager_const
 
 from tasks.BaseTaskExecutor import BaseTaskExecutor
 
@@ -41,11 +41,11 @@ class ForceStatusUpdateTaskExecutor(BaseTaskExecutor):
         """task実行
         """
         
-        for process_kind, config in backyard_config.TASKS.items():
+        for process_kind, config in job_manager_config.TASKS.items():
             # 全てのprocess kindのforce_update_statusメソッドを呼び出す
             # Call force_update_status_failed method of all process kind
 
-            if process_kind == backyard_const.PROCESS_KIND_FORCE_STATUS_UPDATE:
+            if process_kind == job_manager_const.PROCESS_KIND_FORCE_STATUS_UPDATE:
                 continue
 
             try:
