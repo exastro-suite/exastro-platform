@@ -127,3 +127,67 @@ html {
     overflow: auto !important;
     text-overflow: clip !important;
 }
+
+/* ボタンを表示するエリア / Button area */
+.switchArea {
+    line-height: 34px;
+    letter-spacing: 0;
+    text-align: center;
+    font-size: 14px;
+
+    position: relative;
+    margin: 0%;
+    width: 78px;
+    background: transparent;
+}
+
+/* チェックボックス / checkbox */
+.switchArea input[type="checkbox"] {
+    display: none;
+}
+
+/* チェックボックスのラベル（標準）/ checkbox label with "OFF" */
+.switchArea label {
+    display: block;
+    box-sizing: border-box;
+    height: 34px;
+    border: 2px solid var(--black20);
+    border-radius: 17px;
+}
+
+/* チェックボックスのラベル（ONのとき）/ checkbox label with "ON" */
+.switchArea input[type="checkbox"]:checked +label {
+    border-color: var(--focusColor);
+}
+
+/* 表示する文字（標準）/ display font with "OFF" */
+.switchArea label span:after{
+    content: "OFF";
+    padding: 0 0 0 20px;
+    color: var(--black20);
+}
+
+/* 表示する文字（ONのとき）/ display font with "ON" */
+.switchArea input[type="checkbox"]:checked + label span:after{
+    content: "ON";
+    padding: 0 20px 0 0;
+    color: var(--focusColor);
+}
+
+/* 丸部分のSTYLE（標準）/ style of circle with "OFF" */
+.switchArea #switchImg {
+    position: absolute;
+    width: 26px;
+    height: 26px;
+    background: var(--black20);
+    top: 4px;
+    left: 4px;
+    border-radius: 13px;
+    transition: .2s;
+}
+
+/* === 丸部分のSTYLE（ONのとき）/ style of circle with "ON" */
+.switchArea input[type="checkbox"]:checked ~ #switchImg {
+    transform: translateX(44px);
+    background: var(--focusColor);
+}

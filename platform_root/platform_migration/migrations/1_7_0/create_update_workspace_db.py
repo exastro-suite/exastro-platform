@@ -206,6 +206,11 @@ class create_update_workspace_db:
 
         globals.logger.info(f"[{self.step_count}/{self.step_max}] ### Start func:{inspect.currentframe().f_code.co_name}")
 
+        # DBが存在する場合は、処理しない
+        # If DB exists, do not process
+        if workspace_db_exsits_check(organization_id, workspace_id):
+            return
+
         dbinit = DBinit()
         ws_dbinfo = dbinit.generate_dbinfo(dbinit.prefix_workspace_db)
 
@@ -240,3 +245,24 @@ class create_update_workspace_db:
         globals.logger.info(f"[{self.step_count}/{self.step_max}] ### Succeed func:{inspect.currentframe().f_code.co_name}")
 
         return
+
+
+def workspace_db_exsits_check(organization_id, workspace_id):
+    """worskspace database exists check
+
+    Args:
+        organization_id (str): organization id
+        workspace_id (str): workspace id
+
+    Returns:
+        Boolean: True:Exists false:Not Exists
+    """
+
+    try:
+        # Database存在チェック
+        # database exists check
+        with closing(DBconnector().connect_workspacedb(organization_id, workspace_id)):
+            # 存在するためチェック終了
+            return True
+    except Exception:
+        return False

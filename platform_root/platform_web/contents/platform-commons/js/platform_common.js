@@ -150,6 +150,32 @@ function replaceLanguageText() {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
+//   Json Key Link to Text
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+function json_key_link_to_text(json, key_parent) {
+    var ret = "";
+    console.log("json:" + json);
+    for (var key in json){
+        console.log("key:" + key);
+        console.log("key_parent:" + key_parent);
+        obj = json[key];
+        if (isObject(obj)){
+            ret = json_key_link_to_text(obj, key_parent + key + ".");
+        }
+        else{
+            ret += key_parent + key + ": " + json[key] + "\n";
+        }
+    }
+    return ret;
+}
+
+function isObject(value) {
+    return value !== null && typeof value === 'object'
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
 //   Display Topic Path
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -203,12 +229,14 @@ function displayMenu(curent) {
             <li class="menuItem"><a class="menuLink" id="menu_workspace" href="#" tabindex="-1">${getText("000-80005", "ワークスペース管理")}</a></li>
             <li class="menuItem"><a class="menuLink" id="menu_account_management" href="#" style="display: none;">${getText("000-80006", "ユーザー管理")}</a></li>
             <li class="menuItem"><a class="menuLink" id="menu_role_management" href="#" style="display: none;">${getText("000-80007", "ロール管理")}</a></li>
+            <li class="menuItem"><a class="menuLink" id="menu_settings_notifications" href="#">${getText("000-00183", "通知管理")}</a></li>
         `);
 
         $('#menu_workspace').attr('href', location_conf.href.workspaces.list.replace(/{organization_id}/g, CommonAuth.getRealm()));
         $('#menu_account_management').attr('href', location_conf.href.users.list.replace(/{organization_id}/g, CommonAuth.getRealm()));
         $('#menu_role_management').attr('href', location_conf.href.roles.list.replace(/{organization_id}/g, CommonAuth.getRealm()));
-    
+        $('#menu_settings_notifications').attr('href', location_conf.href.workspaces.settings.notifications.workspaces.replace(/{organization_id}/g, CommonAuth.getRealm()));
+
         if (CommonAuth.hasAuthority("_og-usr-mt")) {
             $("#menu_account_management").css("display", "");
         }
