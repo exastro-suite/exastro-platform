@@ -41,7 +41,7 @@ class BaseJobExecutor(metaclass=abc.ABCMeta):
     def execute_base(self):
         """job実行 / job execution
         """
-        globals.logger.info(f"START job - {self.__job_info}")
+        globals.logger.info(f"START Job - {self.__job_info}")
         start_time = datetime.datetime.now()
         try:
             self.__thread_id = ctypes.c_long(threading.get_ident())
