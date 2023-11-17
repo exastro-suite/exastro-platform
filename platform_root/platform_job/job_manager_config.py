@@ -21,7 +21,7 @@ import job_manager_const
 # Interval for restarting SUB PROCESS
 #
 # この時間経過でqueueの受付を終了し、実行中タスクを終了後SUB PROCESSが終了する
-# Once this time has elapsed, the queue reception will be terminated, and the SUB PROCESS will terminate after completing the running task.
+# Once this time has elapsed, the queue reception will be terminated, and the SUB PROCESS will terminate after completing the running job.
 #
 SUB_PROCESS_TERMINATE_REQUEST_SECONDS = int(os.environ.get('SUB_PROCESS_TERMINATE_REQUEST_SECONDS', str(60 * 60 * 3)))
 
@@ -29,13 +29,13 @@ SUB_PROCESS_TERMINATE_REQUEST_SECONDS = int(os.environ.get('SUB_PROCESS_TERMINAT
 # queueを受付けるSUB PROCESSの総数
 # Total number of SUB PROCESS that accept queues
 #
-SUB_PROCESS_MAX_ACTIVE = int(os.environ.get('SUB_PROCESS_MAX_ACTIVE', '2'))
+SUB_PROCESS_ACCEPTABLE = int(os.environ.get('SUB_PROCESS_ACCEPTABLE', '2'))
 
 #
-# SUB PROCESS毎の最大同時実行task数
-# Maximum number of concurrently executing tasks for each SUB PROCESS
+# SUB PROCESS毎の最大同時実行job数
+# Maximum number of concurrently executing jobs for each SUB PROCESS
 #
-SUB_PROCESS_MAX_TASKS = int(os.environ.get('SUB_PROCESS_MAX_TASKS', '10'))
+SUB_PROCESS_MAX_JOBS = int(os.environ.get('SUB_PROCESS_MAX_JOBS', '10'))
 
 #
 # SUB PROCESSの状態確認インターバル
@@ -62,46 +62,46 @@ SUB_PROCESS_DB_HEALTH_CHECK_INTERVAL_SECONDS = int(os.environ.get('SUB_PROCESS_D
 SUB_PROCESS_MAX_CANCEL_TIMEOUT = int(os.environ.get('SUB_PROCESS_MAX_CANCEL_TIMEOUT', '10'))
 
 #
-# TASKの状態確認するインターバル
-# Interval to check TASK status
+# JOBの状態確認するインターバル
+# Interval to check JOB status
 #
-TASK_STATUS_WATCH_INTERVAL_SECONDS = float(os.environ.get('TASK_STATUS_WATCH_INTERVAL_SECONDS', '1.0'))
+JOB_STATUS_WATCH_INTERVAL_SECONDS = float(os.environ.get('JOB_STATUS_WATCH_INTERVAL_SECONDS', '1.0'))
 
 #
-# TASKのステータスを強制的にエラーにするTASKの起動インターバル
-# TASK startup interval that forces the TASK status to error
+# JOBのステータスを強制的にエラーにするJOBの起動インターバル
+# JOB startup interval that forces the JOB status to error
 #
-FORCE_UPDATE_EXEC_INTERVAL_SECONDS = int(os.environ.get('FORCE_UPDATE_EXEC_INTERVAL_SECONDS', '60'))
+FORCE_UPDATE_STATUS_INTERVAL_SECONDS = int(os.environ.get('FORCE_UPDATE_STATUS_INTERVAL_SECONDS', '60'))
 
 #
-# TASKのステータスを強制的にエラーにする最終更新日時からの経過時間
-# Elapsed time since last update to force TASK status to error
+# JOBのステータスを強制的にエラーにする最終更新日時からの経過時間
+# Elapsed time since last update to force JOB status to error
 #
-FORCE_UPDATE_STATUS_PROGRASS_SECONDS = int(os.environ.get('FORCE_UPDATE_EXEC_INTERVAL_SECONDS', '600'))
+FORCE_UPDATE_STATUS_PROGRASS_SECONDS = int(os.environ.get('FORCE_UPDATE_STATUS_PROGRASS_SECONDS', '600'))
 
 #
 # タスクのキャンセルtimeout時間
-# Task cancellation timeout seconds
+# Job cancellation timeout seconds
 #
-TASK_CANCEL_TIMEOUT_SECONDS = float(os.environ.get('TASK_CANCEL_TIMEOUT_SECONDS', '5.0'))
+JOB_CANCEL_TIMEOUT_SECONDS = float(os.environ.get('JOB_CANCEL_TIMEOUT_SECONDS', '5.0'))
 
 #
-# タスクの種類毎の設定 / Settings for each type of task
-#   timeout_seconds         :   taskのtimeout秒 / task timeout seconds
-#   max_task_per_process    :   プロセス毎に同時実行可能なtask数 / Number of tasks that can be executed simultaneously per process
-#   module                  :   taskを処理するclassのmodule
+# タスクの種類毎の設定 / Settings for each type of job
+#   timeout_seconds         :   jobのtimeout秒 / job timeout seconds
+#   max_job_per_process    :   プロセス毎に同時実行可能なjob数 / Number of jobs that can be executed simultaneously per process
+#   module                  :   jobを処理するclassのmodule
 #
-TASKS = {
+JOBS = {
     const.PROCESS_KIND_NOTIFICATION: {
-        "timeout_seconds": int(os.environ.get(f'TASK_{const.PROCESS_KIND_NOTIFICATION}_TIMEOUT_SECONDS', '30')),
-        "max_task_per_process": int(os.environ.get(f'TASK_{const.PROCESS_KIND_NOTIFICATION}_MAX_TASK_PER_PROCESS', str(SUB_PROCESS_MAX_TASKS))),
-        "module": "tasks.NotificationTaskExecutor",
-        "class": "NotificationTaskExecutor"
+        "timeout_seconds": int(os.environ.get(f'JOB_{const.PROCESS_KIND_NOTIFICATION}_TIMEOUT_SECONDS', '30')),
+        "max_job_per_process": int(os.environ.get(f'JOB_{const.PROCESS_KIND_NOTIFICATION}_MAX_JOB_PER_PROCESS', str(SUB_PROCESS_MAX_JOBS))),
+        "module": "jobs.NotificationJobExecutor",
+        "class": "NotificationJobExecutor"
     },
-    job_manager_const.PROCESS_KIND_FORCE_STATUS_UPDATE: {
-        "timeout_seconds": int(os.environ.get(f'TASK_{job_manager_const.PROCESS_KIND_FORCE_STATUS_UPDATE}_TIMEOUT_SECONDS', '60')),
-        "max_task_per_process": 1,
-        "module": "tasks.ForceStatusUpdateTaskExecutor",
-        "class": "ForceStatusUpdateTaskExecutor"
+    job_manager_const.PROCESS_KIND_FORCE_UPDATE_STATUS: {
+        "timeout_seconds": int(os.environ.get(f'JOB_{job_manager_const.PROCESS_KIND_FORCE_UPDATE_STATUS}_TIMEOUT_SECONDS', '60')),
+        "max_job_per_process": 1,
+        "module": "jobs.ForceUpdateStatusJobExecutor",
+        "class": "ForceUpdateStatusJobExecutor"
     }
 }
