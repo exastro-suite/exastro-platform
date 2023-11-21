@@ -18,9 +18,10 @@ SELECT * FROM T_NOTIFICATION_MESSAGE WHERE NOTIFICATION_ID = %(notification_id)s
 
 SQL_UPDATE_STATUS_NOTIFICATION_MESSAGE = """
 UPDATE T_NOTIFICATION_MESSAGE
-    SET NOTIFICATION_STATUS =   %(notification_status)s
-    ,   LAST_UPDATE_USER    =   %(last_update_user)s
-    WHERE   NOTIFICATION_ID =   %(notification_id)s
+    SET NOTIFICATION_STATUS     =   %(notification_status)s
+    ,   LAST_UPDATE_USER        =   %(last_update_user)s
+    WHERE   NOTIFICATION_ID     =   %(notification_id)s
+    AND     NOTIFICATION_STATUS =   %(notification_status_now)s
 """
 
 SQL_QUERY_NOTIFICATION_MESSAGE_UNSENT_LONGTIME = """

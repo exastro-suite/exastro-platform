@@ -1,3 +1,4 @@
+#!/bin/bash
 #   Copyright 2022 NEC Corporation
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,14 +13,16 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-# タスクの種類 / Type of job
-PROCESS_KIND_FORCE_UPDATE_STATUS = "_FORCE_UPDATE_STATUS"
+BASEDIR=$(dirname $0)
 
-# user id
-SYSTEM_USER_ID = 'system'
+$(
+    cd "${BASEDIR}";
+    sudo docker compose rm -s -f;
+)
 
-# oranization status
-ORG_STATUS_CREATE_COMPLETE = "Organization Create Complete"
+sudo docker compose -f "${BASEDIR}/docker-compose.yml" up;
 
-# unit test trace log
-LOG_RECONNECT = "Reconnect DB"
+$(
+    cd "${BASEDIR}";
+    sudo docker compose rm -s -f;
+)
