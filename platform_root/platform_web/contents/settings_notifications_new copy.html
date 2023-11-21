@@ -125,33 +125,27 @@
                                                     <tr class="tBodyTr tr">
                                                         <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1"><div class="ci" style="text-align: left;"><span text-id="000-82011">通知方法</span><span class="tHeadRequired" text-id="000-80024">必須</span></div></td>
                                                         <td class="tBodyTd td" rowspan="1" colspan="1"><div class="ci">
-                                                            <div>
-                                                                <input type="radio" value="Mail" class="tableEditInputText" name="form_destination_kind" id="form_destination_kind_mail"><label for="form_destination_kind_mail">Mail</label>
-                                                                <input type="radio" value="Teams" class="tableEditInputText" name="form_destination_kind" id="form_destination_kind_teams"><label for="form_destination_kind_teams">Teams</label>
-                                                                <input type="radio" value="WebHook" class="tableEditInputText" name="form_destination_kind" id="form_destination_kind_webhook"><label for="form_destination_kind_webhook">WebHook</label>
-                                                            </div>
+                                                            <input type="radio" value="Mail" class="tableEditInputText" name="form_destination_kind" id="form_destination_kind_mail" description-id=".description_mail"><label for="form_destination_kind_mail">Mail</label>
+                                                            <input type="radio" value="Teams" class="tableEditInputText" name="form_destination_kind" id="form_destination_kind_teams" description-id=".description_teams"><label for="form_destination_kind_teams">Teams</label>
+                                                            <input type="radio" value="WebHook" class="tableEditInputText" name="form_destination_kind" id="form_destination_kind_webhook" description-id=".description_webhook"><label for="form_destination_kind_webhook">WebHook</label>
                                                             <span class="validate_error" id="message_destination_kind"></span>
                                                         </div></td>
 
                                                         <td class="tBodyTd td" rowspan="1" colspan="1"><div class="ci textOverWrap">
+                                                            <button data-type="tableTry" data-action="normal" style="width:200px;" class="itaButton tableHeaderMainMenuButton button" id="button_try"><span class="inner"><span class="icon icon-message"></span><span text-id="000-87016">テスト送信</span></span></button>
                                                         </div></td>
                                                     </tr>
                                                     <tr class="tBodyTr tr">
                                                         <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1"><div class="ci" style="text-align: left;"><span text-id="000-00150">通知先</span><span class="tHeadRequired" text-id="000-80024">必須</span></div></td>
                                                         <td class="tBodyTd td" rowspan="1" colspan="1"><div class="ci">
-                                                            <span class="ci destination_informations destination_informations_Mail" style="display: none;">to:</span><input type="text" value="" class="tableEditInputText inputText input inputTextWidthAdjustment destination_informations" name="form_destination_informations_Mail" id="form_destination_informations_mail_to" maxlength="4000" style="display: none;">
-                                                            <span class="ci destination_informations destination_informations_Mail" style="display: none;">cc:</span><input type="text" value="" class="tableEditInputText inputText input inputTextWidthAdjustment destination_informations" name="form_destination_informations_Mail" id="form_destination_informations_mail_cc" maxlength="4000" style="display: none;">
-                                                            <span class="ci destination_informations destination_informations_Mail" style="display: none;">bcc:</span><input type="text" value="" class="tableEditInputText inputText input inputTextWidthAdjustment destination_informations" name="form_destination_informations_Mail" id="form_destination_informations_mail_bcc" maxlength="4000" style="display: none;">
-                                                            <span class="ci destination_informations destination_informations_Teams" style="display: none;">url:</span><input type="text" value="" class="tableEditInputText inputText input inputTextWidthAdjustment destination_informations" name="form_destination_informations_Teams" id="form_destination_informations_teams" maxlength="4000" style="display: none;">
-                                                            <span class="ci destination_informations destination_informations_WebHook" style="display: none;">url:</span><input type="text" value="" class="tableEditInputText inputText input inputTextWidthAdjustment destination_informations" name="form_destination_informations_WebHook" id="form_destination_informations_webhook" maxlength="4000" style="display: none;">
-                                                            <span class="ci destination_informations destination_informations_WebHook" style="display: none;">header:</span><input type="text" value="" class="tableEditInputText inputText input inputTextWidthAdjustment destination_informations" name="form_destination_informations_WebHook" id="form_destination_informations_webhook_header" maxlength="4000" style="display: none;">
+                                                            <textarea rows="6" wrap="soft" data-key="remarks" data-id="4" data-required="0" data-int-min="0" data-int-max="4000" id="form_description_informations" class="tebleEditTextArea textarea input textareaAdjustment" maxlength="4000"></textarea>
                                                             <span class="validate_error" id="message_destination_informations"></span>
                                                         </div></td>
                                                         <td class="tBodyTd td" rowspan="1" colspan="1">
-                                                            <div class="ci pre destination_informations description_no_select" text-id="000-87020">通知方法を選択してください</div>
-                                                            <div class="ci pre destination_informations description_Mail" style="display: none;"></div>
-                                                            <div class="ci pre destination_informations description_Teams" style="display: none;"></div>
-                                                            <div class="ci pre destination_informations description_WebHook" style="display: none;"></div>
+                                                            <div class="ci pre destination_informations_description description_no_select" text-id="000-87020">通知方法を選択してください</div>
+                                                            <div class="ci pre destination_informations_description description_mail" style="display: none;"></div>
+                                                            <div class="ci pre destination_informations_description description_teams" style="display: none;"></div>
+                                                            <div class="ci pre destination_informations_description description_webhook" style="display: none;"></div>
                                                         </td>
                                                     </tr>
                                                     <tr class="tBodyTr tr">

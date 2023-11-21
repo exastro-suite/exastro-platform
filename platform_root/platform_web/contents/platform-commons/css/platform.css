@@ -128,6 +128,13 @@ html {
     text-overflow: clip !important;
 }
 
+.ci.pre {
+    word-break: break-all!important;
+    white-space: pre !important;
+    overflow: auto !important;
+    text-overflow: clip !important;
+}
+
 /* ボタンを表示するエリア / Button area */
 .switchArea {
     line-height: 34px;
@@ -136,7 +143,7 @@ html {
     font-size: 14px;
 
     position: relative;
-    margin: 0%;
+    margin: auto;
     width: 78px;
     background: transparent;
 }

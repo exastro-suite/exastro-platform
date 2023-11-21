@@ -980,3 +980,139 @@ function maintenanceMode() {
         console.error( error );
     });
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//   Settings Notifications Common
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+const settings_notifications_common = {
+    validate: {
+        //
+        // validate destination id
+        //
+        destination_id: function(destination_id) {
+            if(destination_id === "") {
+                return {
+                    "result": false,
+                    "message": getText("400-00011", "必須項目が不足しています。({0})", getText("000-00145", "通知先ID"))
+                }
+            } else if(destination_id.replace(/[a-zA-Z0-9_-]/g,"") !== "") {
+                return {
+                    "result": false,
+                    "message": getText("400-00017", "指定できない文字が含まれています。(項目:{0},指定可能な文字:{1})",
+                                    getText("000-00145", "通知先ID"),
+                                    getText("000-31001", "半角英数・ハイフン・アンダースコア")
+                                )
+                }
+
+            } else if( ! destination_id.match(/^[a-zA-Z]/)) {
+                return {
+                    "result": false,
+                    "message": getText("400-00014", "先頭の文字にアルファベット以外が指定されています。({0})", getText("000-00145", "通知先ID"))
+                }
+            } else {
+                return {
+                    "result": true,
+                    "message": ""
+                }
+            }
+        },
+
+        //
+        // validate destination name
+        //
+        destination_name: function(destination_name) {
+            if(destination_name === "") {
+                return {
+                    "result": false,
+                    "message": getText("400-00011", "必須項目が不足しています。({0})", getText("000-00146", "通知先名"))
+                }
+            } else {
+                return {
+                    "result": true,
+                    "message": ""
+                }
+            }
+        },
+
+        //
+        // validate destination kind
+        //
+        destination_kind: function(destination_kind) {
+            console.log("destination_kind: " + destination_kind);
+            if(destination_kind.length === 0) {
+                return {
+                    "result": false,
+                    "message": getText("400-00011", "必須項目が不足しています。({0})", getText("000-00147", "通知方法"))
+                }
+            } else {
+                return {
+                    "result": true,
+                    "message": ""
+                }
+            }
+        },
+
+        //
+        // validate description informations (mail)
+        //
+        destination_informations_mail: function(destination_informations_to, destination_informations_cc, destination_informations_bcc) {
+            if(destination_informations_to === "" && destination_informations_cc === "" && destination_informations_bcc === "") {
+                return {
+                    "result": false,
+                    "message": getText("400-00011", "必須項目が不足しています。({0})", getText("000-00150", "通知先"))
+                }
+            } else {
+                split_informations_to = destination_informations_to.split(';');
+                split_informations_cc = destination_informations_cc.split(';');
+                split_informations_bcc = destination_informations_bcc.split(';');
+                if ((split_informations_to.length + split_informations_cc.length + split_informations_bcc.length) > 50){
+                    return {
+                        "result": false,
+                        "message": getText("400-87001", "メールアドレスの指定が最大50件を超えています。({0})", getText("000-00150", "通知先"))
+                    }
+                } else {
+                    return {
+                        "result": true,
+                        "message": ""
+                    }
+                }
+            }
+        },
+
+        //
+        // validate description informations (teams)
+        //
+        destination_informations_teams: function(destination_informations_teams) {
+            if(destination_informations_teams === "") {
+                return {
+                    "result": false,
+                    "message": getText("400-00011", "必須項目が不足しています。({0})", getText("000-00150", "通知先"))
+                }
+            } else {
+                return {
+                    "result": true,
+                    "message": ""
+                }
+            }
+        },
+
+        //
+        // validate description informations (webhook)
+        //
+        destination_informations_webhook: function(destination_informations_webhook, destination_informations_webhook_header) {
+            if(destination_informations_webhook === "") {
+                return {
+                    "result": false,
+                    "message": getText("400-00011", "必須項目が不足しています。({0})", getText("000-00150", "通知先"))
+                }
+            } else {
+                return {
+                    "result": true,
+                    "message": ""
+                }
+            }
+        },
+    }
+}
