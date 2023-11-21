@@ -98,7 +98,8 @@ JOBS = {
         "module": "jobs.NotificationJobExecutor",
         "class": "NotificationJobExecutor",
         "extra_config": {
-            "teams_webhook_timeout": float(os.environ.get(f'JOB_{const.PROCESS_KIND_NOTIFICATION}_TEAMS_WEBHOOK_TIMEOUT', '5.0')),
+            "teams_connection_timeout": float(os.environ.get(f'JOB_{const.PROCESS_KIND_NOTIFICATION}_TEAMS_CONNECTION_TIMEOUT', '3.0')),
+            "teams_read_timeout": float(os.environ.get(f'JOB_{const.PROCESS_KIND_NOTIFICATION}_TEAMS_READ_TIMEOUT', '10.0')),
         }
     },
     job_manager_const.PROCESS_KIND_FORCE_UPDATE_STATUS: {

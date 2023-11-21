@@ -35,7 +35,7 @@ from libs.job_manager_classes import SubProcessesManager, SubProcessParameter, S
 # 終了指示のシグナル受信
 process_terminate = False   # SIGTERM or SIGINT signal
 process_sigterm = False     # SIGTERM signal (Jobを中断して終了する / Interrupt and end the job)
-process_sigint = False      # SIGINT signal (Jobをやり終えて終了する / Finish the job and exit)
+process_sigint = False      # SIGINT signal (Jobをやり終えて停止する / Finish the job and stop)
 
 
 def job_manager_main_process():
@@ -52,8 +52,7 @@ def job_manager_main_process():
     signal.signal(signal.SIGTERM, job_manager_process_sigterm_handler)
     signal.signal(signal.SIGINT, job_manager_process_sigint_handler)
 
-    log_queue = multiprocessing.Queue()
-    globals.init(log_queue, main_process=True)
+    globals.init(main_process=True)
     globals.logger.info('START main process')
 
     # sub process管理用クラス / sub process management class
@@ -74,7 +73,7 @@ def job_manager_main_process():
                     # processインスタンスの生成 / Generate process instance
                     new_sub_process = multiprocessing.Process(
                         target=job_manager_sub_process,
-                        args=(log_queue, sub_process_parameter)
+                        args=(sub_process_parameter,)
                     )
                     # sub processを追加
                     sub_processes_mgr.append_new_process(sub_process_parameter, new_sub_process)
@@ -136,7 +135,7 @@ def job_manager_main_process():
     return
 
 
-def job_manager_sub_process(log_queue, parameter: SubProcessParameter):
+def job_manager_sub_process(parameter: SubProcessParameter):
     """sub process
 
     Args:
@@ -155,7 +154,7 @@ def job_manager_sub_process(log_queue, parameter: SubProcessParameter):
     signal.signal(signal.SIGINT, job_manager_process_sigint_handler)
 
     # loggerの初期化 / Initializing logger
-    globals.init(log_queue)
+    globals.init()
     globals.logger.info('START sub process')
 
     # job classのインポート / Importing job class
@@ -182,7 +181,7 @@ def job_manager_sub_process(log_queue, parameter: SubProcessParameter):
                         if sub_process_mgr.interval_db_reconect.is_passed():
                             # DBの再接続時間になったのでループを抜ける
                             # It's time to reconnect the DB, so exit the loop.
-                            globals.logger.debug("Reconnect DB")
+                            globals.logger.debug(job_manager_const.LOG_RECONNECT)
                             break
 
                         if sub_process_mgr.interval_db_health_check.is_passed():
@@ -480,8 +479,7 @@ def get_queue(conn, running_job_queue: list, force_update_status_job: bool):
                 # queueをLockする / Lock the queue
                 with conn.cursor() as cursor:
                     cursor.execute(queries_process_queue.SQL_QUERY_PROCESS_LOCK, {"process_id": next_process_id})
-                    cursor.fetchone()
-                lock_succeed = True
+                    lock_succeed = cursor.fetchone() is not None
             except pymysql.err.OperationalError as err:
                 # Lock Error
                 lock_succeed = False
