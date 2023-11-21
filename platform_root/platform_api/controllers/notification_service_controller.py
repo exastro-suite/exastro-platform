@@ -49,6 +49,7 @@ def settings_destination_get(organization_id, workspace_id, destination_id):  # 
     return common.response_200_ok(data)
 
 
+@common.platform_exception_handler
 def settings_notification_put(body, organization_id, workspace_id, destination_id):  # noqa: E501
     """Put an settings notification
 
@@ -61,9 +62,77 @@ def settings_notification_put(body, organization_id, workspace_id, destination_i
     Returns:
         _type_: _description_
     """
-    if connexion.request.is_json:
-        body = SettingsDestinationPut.from_dict(connexion.request.get_json())  # noqa: E501
-    return 'do some magic!'
+    # if connexion.request.is_json:
+    #     body = SettingsDestinationPut.from_dict(connexion.request.get_json())  # noqa: E501
+    globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
+
+    with closing(DBconnector().connect_workspacedb(organization_id, workspace_id)) as conn:
+        with conn.cursor() as cursor:
+            # destination_idの存在チェック
+            # exists check to destination_id
+            cursor.execute(
+                queries_notification.SQL_QUERY_NOTIFICATION_DESTINATION + " WHERE destination_id = %(destination_id)s",
+                {"destination_id": destination_id})
+            result = cursor.fetchall()
+
+    if len(result) <= 0:
+        message_id = f"404-{MSG_FUNCTION_ID}001"
+        raise common.NotFoundException(
+            message_id=message_id,
+            message=multi_lang.get_text(message_id, "通知先情報が存在しません(id:{0})", destination_id)
+        )
+
+    # # 更新する情報の取得
+    # # get information to be updated
+    # body = connexion.request.get_json()
+
+    destination_name = body.get('name')
+    destination_kind = body.get('kind')
+    info = body.get("destination_informations")
+    conditions = body.get('conditions')
+    user_id = connexion.request.headers.get("User-id")
+
+    # validation check
+    validate = validation.validate_destination_name(destination_name)
+    if not validate.ok:
+        return common.response_validation_error(validate)
+
+    validate = validation.validate_destination_kind(destination_kind)
+    if not validate.ok:
+        return common.response_validation_error(validate)
+
+    validate = validation.validate_destination_informations(destination_kind, info)
+    if not validate.ok:
+        return common.response_validation_error(validate)
+
+    validate = validation.validate_destination_conditions(conditions)
+    if not validate.ok:
+        return common.response_validation_error(validate)
+
+    # 通知先更新
+    # update Notification
+    db = DBconnector()
+    with closing(db.connect_workspacedb(organization_id, workspace_id)) as conn:
+        with conn.cursor() as cursor:
+            # Check workspace exists
+            cursor.execute(
+                queries_notification.SQL_QUERY_NOTIFICATION_DESTINATION + " WHERE destination_id = %(destination_id)s FOR UPDATE",
+                {"destination_id": destination_id}
+            )
+
+            parameter = {
+                "destination_id": destination_id,
+                "destination_name": destination_name,
+                "destination_kind": destination_kind,
+                "destination_informations": encrypt.encrypt_str(json.dumps(info)),
+                "conditions": json.dumps(conditions),
+                "last_update_user": user_id
+            }
+            cursor.execute(queries_notification.SQL_UPDATE_NOTIFICATION_DESTINATION, parameter)
+
+            conn.commit()
+
+    return common.response_200_ok(None)
 
 
 @common.platform_exception_handler
