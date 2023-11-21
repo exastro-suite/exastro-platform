@@ -381,7 +381,7 @@ def user_update(body, organization_id, user_id):  # noqa: E501
 
     token = json.loads(token_response.text)["access_token"]
 
-    if body.get("enabled") == False:
+    if body.get("enabled") is False:
         # organization role user情報取得
         # get organization role user information
         response = api_keycloak_roles.role_uesrs_get(
