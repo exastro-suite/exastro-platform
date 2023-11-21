@@ -867,3 +867,24 @@ def sample_data_notifications_default(update={}):
             "message": "message",
         },
     }, **update)
+
+
+def settings_notification_put(connexion_client):
+    """test settings_notification_put
+
+    Args:
+        connexion_client (_type_): _description_
+    """
+    organization = test_common.create_organization(connexion_client)
+    workspace = test_common.create_workspace(connexion_client, organization['organization_id'], 'workspace-01', organization['user_id'])
+    setting_notifications = test_common.create_setting_notifications(connexion_client, organization['organization_id'], 'workspace-01', organization['user_id'])
+
+    logger.debug(f"setting_notifications:{setting_notifications}")
+
+    with test_common.requsts_mocker_default():
+        response = connexion_client.get(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/settings/notifications/not_id",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization['user_id']))
+
+        assert response.status_code == 404, "get notifications destination response error route"

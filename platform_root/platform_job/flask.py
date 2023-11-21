@@ -1,4 +1,4 @@
-#   Copyright 2023 NEC Corporation
+#   Copyright 2022 NEC Corporation
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -12,29 +12,15 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-value:
-  {
-    "name": "destinations of mail settings",
-    "kind": "Mail",
-    "conditions": {
-      "ita": {
-        "event_type": {
-          "new": true, "evaluated": true, "timeout": true, "undetected": true
+# common_libraryを使うためのflaskのダミー
+# flask dummy for using common_library
+
+def jsonify():
+    pass
+
+
+class request():
+    def headers():
+        return {
+            "Language": "en"
         }
-      }
-    },
-    "destination_informations": [
-      {
-        "address_header": "to",
-        "email": "mike@example.com"
-      },
-      {
-        "address_header": "cc",
-        "email": "tommy@example.com"
-      },
-      {
-        "address_header": "bcc",
-        "email": "nancy@example.com"
-      }
-    ]
-  }
