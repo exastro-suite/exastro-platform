@@ -257,7 +257,7 @@ $(function(){
             hide_progress();
             alertMessage(getText("000-80018", "処理結果"), getText("000-87021", "通知先を作成しました"),
             () => {
-                window.location = location_conf.href.workspaces.settings.notifications.detail.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{workspace_id}/g, workspace_id);
+                window.location = location_conf.href.workspaces.settings.notifications.detail.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{workspace_id}/g, workspace_id).replace(/{destination_id}/g, $('#form_destination_id').val());
             });
         }).catch(() => {
             hide_progress();
