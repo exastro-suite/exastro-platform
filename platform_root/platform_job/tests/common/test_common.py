@@ -47,7 +47,7 @@ def ita_api_admin_origin():
     return f'{os.environ["ITA_API_ADMIN_PROTOCOL"]}://{os.environ["ITA_API_ADMIN_HOST"]}:{os.environ["ITA_API_ADMIN_PORT"]}'
 
 
-def check_state(timeout: float, conditions):
+def check_state(timeout: float, conditions, conditions_value=True):
     """一定時間内に条件が成立するか判定する
         Determine if the condition is met within a certain amount of time
 
@@ -60,9 +60,11 @@ def check_state(timeout: float, conditions):
     """
     timeout_time = datetime.datetime.now() + datetime.timedelta(seconds=timeout)
     while datetime.datetime.now() < timeout_time:
-        if conditions():
+        result = conditions()
+        if result == conditions_value:
             return True
         time.sleep(0.1)
+    print(f"** check_state Last Value:{result}")
     return False
 
 

@@ -63,7 +63,7 @@ class SubProcessManager():
         SubProcessParameter.genarate_sub_process_managerメソッドでinstanceを生成すること
         Generate an instance using the SubProcessParameter.genarate_sub_process_manager method
     """
-    def __init__(self, array_index, sub_processes_ids, sub_termination_req_flags, sub_terminated_flags, sub_running_job_counts, force_upd_sts_exec_pid):
+    def __init__(self, array_index, sub_processes_ids, sub_termination_req_flags, sub_terminated_flags, force_upd_sts_exec_pid, force_upd_sts_exec_time):
         """constructor
 
         Args:
@@ -71,21 +71,21 @@ class SubProcessManager():
             sub_processes_ids (_type_): sub processのprocess id / process id of sub process
             sub_termination_req_flags (_type_): sub processへの終了要求のフラグ / Flag for termination request to sub process
             sub_terminated_flags (_type_): sub process終了済みのフラグ / Sub process completed flag
-            sub_running_job_counts (_type_): sub process実行job数 / Number of sub process execution jobs
             force_upd_sts_exec_pid (_type_): force status updateを行うsub processのprocess id / process id of sub process that performs force status update
+            force_upd_sts_exec_time (_type_): force update statusを行う時間 / Time to force update status
         """
         self.__arr_idx = array_index
         self.__sub_processes_ids = sub_processes_ids
         self.__sub_termination_req_flags = sub_termination_req_flags
         self.__sub_terminated_flags = sub_terminated_flags
-        self.__sub_running_job_counts = sub_running_job_counts
         self.__sub_processes_ids[self.__arr_idx] = os.getpid()
         self.__jobs: list[Job] = []
         self.__cancel_timeout_jobs: list[Job] = []
         self.interval_db_reconect = IntervalTiming(job_manager_config.SUB_PROCESS_DB_RECONNECT_INTERVAL_SECONDS)
         self.interval_db_health_check = IntervalTiming(job_manager_config.SUB_PROCESS_DB_HEALTH_CHECK_INTERVAL_SECONDS)
         self.__force_upd_sts_exec_pid = force_upd_sts_exec_pid
-        self.__interval_force_upd_sts = IntervalTiming(job_manager_config.FORCE_UPDATE_STATUS_INTERVAL_SECONDS)
+        self.__force_upd_sts_exec_time = force_upd_sts_exec_time
+        # self.__interval_force_upd_sts = IntervalTiming(job_manager_config.FORCE_UPDATE_STATUS_INTERVAL_SECONDS)
 
     def is_sheard_variables_normal(self):
         """共有メモリの正常性確認 / Checking the health of shared memory
@@ -121,23 +121,15 @@ class SubProcessManager():
             # jobがexecuteもcancel実行中でない場合は削除する / Delete if job is not executing or canceling
             del self.__jobs[i]
 
-        # 実行中のjob数を共有メモリに書き込む / Write the number of running jobs to shared memory
-        self.__sub_running_job_counts[self.__arr_idx] = len(self.__jobs)
-
     def can_launch_job(self):
         """jobが起動可能か判定する / Determine if job can be started
 
         Returns:
             bool: True : 起動可能 / can launch
         """
-        if self.__sub_running_job_counts[self.__arr_idx] >= job_manager_config.SUB_PROCESS_MAX_JOBS:
+        if len(self.__jobs) >= job_manager_config.SUB_PROCESS_MAX_JOBS:
             # processのjob数が上限値に達している場合、起動不可
             # If the number of jobs in the process reaches the upper limit, it cannot be started.
-            return False
-
-        if sum(self.__sub_running_job_counts) >= (job_manager_config.SUB_PROCESS_MAX_JOBS * job_manager_config.SUB_PROCESS_ACCEPTABLE):
-            # sub process全体のタスク数が上限値に達している場合、起動不可
-            # If the number of jobs in the entire sub process has reached the upper limit, it cannot be started.
             return False
 
         return True
@@ -149,31 +141,6 @@ class SubProcessManager():
             list: list of queue
         """
         return [job.queue for job in self.__jobs]
-
-    def countup_job_count(self):
-        """実行中のjob数をcount upする / Count up the number of running jobs
-
-        Returns:
-            bool: True: 成功 / succeed
-        """
-        if self.__sub_running_job_counts[self.__arr_idx] >= job_manager_config.SUB_PROCESS_MAX_JOBS:
-            # processのjob数が上限値に達しているため失敗
-            # Failed because the number of jobs in process has reached the upper limit.
-            return False
-
-        # 全sub processのカウンターをロックする / Lock counters of all sub processes
-        with self.__sub_running_job_counts.get_lock():
-            if sum(self.__sub_running_job_counts) >= (job_manager_config.SUB_PROCESS_MAX_JOBS * job_manager_config.SUB_PROCESS_ACCEPTABLE):
-                # 全processのjob数合計が上限値に達しているため失敗 / Failed because the total number of jobs for all processes has reached the upper limit.
-                return False
-
-            self.__sub_running_job_counts[self.__arr_idx] += 1
-            return True
-
-    def countdown_job_count(self):
-        """実行中のjob数をcount downする / Count down the number of running jobs
-        """
-        self.__sub_running_job_counts[self.__arr_idx] -= 1
 
     def append_job(self, queue: dict, thread: threading.Thread, job_executor: BaseJobExecutor):
         """Jobを追加する / Add a job
@@ -245,10 +212,11 @@ class SubProcessManager():
         Returns:
             bool: True : 実行するタイミングである / It's time to execute
         """
-        if self.__interval_force_upd_sts.is_passed():
+        if self.__force_upd_sts_exec_time.value <= datetime.datetime.timestamp(datetime.datetime.now()):
             # 強制ステータス更新処理は複数のプロセスで動かす必要は無いので、指定されたプロセスの場合のみTrueを返す
             # Forced status update processing does not need to run in multiple processes, so it returns True only for the specified process.
             if os.getpid() == self.__force_upd_sts_exec_pid.value:
+                self.__force_upd_sts_exec_time.value = datetime.datetime.timestamp(datetime.datetime.now() + datetime.timedelta(seconds=job_manager_config.FORCE_UPDATE_STATUS_INTERVAL_SECONDS))
                 return True
             else:
                 return False
@@ -259,7 +227,7 @@ class SubProcessParameter():
         SubProcessesManager.generate_sub_process_parameterメソッドでinstanceを生成すること
         Generate an instance using the SubProcessesManager.generate_sub_process_parameter method
     """
-    def __init__(self, array_index, sub_processes_ids, sub_termination_req_flags, sub_terminated_flags, sub_running_job_counts, force_upd_sts_exec_pid):
+    def __init__(self, array_index, sub_processes_ids, sub_termination_req_flags, sub_terminated_flags, force_upd_sts_exec_pid, force_upd_sts_exec_time):
         """constructor
 
         Args:
@@ -267,15 +235,15 @@ class SubProcessParameter():
             sub_processes_ids (_type_): sub processのprocess id / process id of sub process
             sub_termination_req_flags (_type_): sub processへの終了要求のフラグ / Flag for termination request to sub process
             sub_terminated_flags (_type_): sub process終了済みのフラグ / Sub process completed flag
-            sub_running_job_counts (_type_): sub process実行job数 / Number of sub process execution jobs
             force_upd_sts_exec_pid (_type_): force update statusを行うsub processのprocess id / process id of sub process that performs force update status
+            force_upd_sts_exec_time (_type_): force update statusを行う時間 / Time to force update status
         """
         self.__arr_idx = array_index
         self.__sub_processes_ids = sub_processes_ids
         self.__sub_termination_req_flags = sub_termination_req_flags
         self.__sub_terminated_flags = sub_terminated_flags
-        self.__sub_running_job_counts = sub_running_job_counts
         self.__force_upd_sts_exec_pid = force_upd_sts_exec_pid
+        self.__force_upd_sts_exec_time = force_upd_sts_exec_time
 
     def get_array_index(self):
         """共有メモリの使用indexを返す / Return shared memory usage index
@@ -296,8 +264,8 @@ class SubProcessParameter():
             self.__sub_processes_ids,
             self.__sub_termination_req_flags,
             self.__sub_terminated_flags,
-            self.__sub_running_job_counts,
-            self.__force_upd_sts_exec_pid
+            self.__force_upd_sts_exec_pid,
+            self.__force_upd_sts_exec_time,
         )
 
 
@@ -316,9 +284,10 @@ class SubProcessesManager():
         self.__sub_termination_req_times: list[datetime.datetime] = [None] * (job_manager_config.SUB_PROCESS_ACCEPTABLE * 2)
         self.__sub_termination_req_flags = multiprocessing.Array(ctypes.c_int, (job_manager_config.SUB_PROCESS_ACCEPTABLE * 2))
         self.__sub_terminated_flags = multiprocessing.Array(ctypes.c_int, (job_manager_config.SUB_PROCESS_ACCEPTABLE * 2))
-        self.__sub_running_job_counts = multiprocessing.Array(ctypes.c_int, (job_manager_config.SUB_PROCESS_ACCEPTABLE * 2))
         self.__force_upd_sts_exec_pid = multiprocessing.Value(ctypes.c_int)
         self.__force_upd_sts_exec_pid.value = -1
+        self.__force_upd_sts_exec_time = multiprocessing.Value(ctypes.c_double)
+        self.__force_upd_sts_exec_time.value = datetime.datetime.timestamp(datetime.datetime.now() + datetime.timedelta(seconds=job_manager_config.FORCE_UPDATE_STATUS_INTERVAL_SECONDS))
 
     def refresh_sub_process_status(self):
         """全sub processの状態を更新する / Update the status of all sub processes
@@ -348,7 +317,6 @@ class SubProcessesManager():
                     self.__sub_processes[i] = None
                     self.__sub_termination_req_times[i] = None
                     self.__sub_termination_req_flags[i] = 0
-                    self.__sub_running_job_counts[i] = 0
                     self.__sub_terminated_flags[i] = 0
                 elif self.__sub_termination_req_flags[i] == 0:
                     # 実行中のprocessを強制ステータス更新を実行するprocessの候補として保持する
@@ -388,8 +356,8 @@ class SubProcessesManager():
                 self.__sub_processe_ids,
                 self.__sub_termination_req_flags,
                 self.__sub_terminated_flags,
-                self.__sub_running_job_counts,
                 self.__force_upd_sts_exec_pid,
+                self.__force_upd_sts_exec_time,
             )
 
     def append_new_process(self, parameter: SubProcessParameter, process: multiprocessing.Process):
@@ -412,7 +380,6 @@ class SubProcessesManager():
         self.__sub_termination_req_times[i] = datetime.datetime.now() + self.__terminatiton_req_timedelta()
         self.__sub_termination_req_flags[i] = 0
         self.__sub_terminated_flags[i] = 0
-        self.__sub_running_job_counts[i] = 0
         return True
 
     def __unused_array_indexes(self):

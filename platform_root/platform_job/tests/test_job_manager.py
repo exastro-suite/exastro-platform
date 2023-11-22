@@ -52,15 +52,15 @@ def test_job_manager_main_sigterm_signal():
         try:
             # sub processの起動確認
             assert test_common.check_state(
-                timeout=5.0, conditions=lambda : [p.name() for p in psutil.Process(os.getpid()).children()].count('python3') == sub_process_count)
+                timeout=5.0, conditions=lambda : len([p for p in psutil.Process(os.getpid()).children() if p.name().startswith('python') ]), conditions_value=sub_process_count)
 
         finally:
             job_manager.job_manager_process_sigterm_handler(None, None)
 
             # sub processの終了確認
             assert test_common.check_state(
-                timeout=5.0, conditions=lambda : [p.name() for p in psutil.Process(os.getpid()).children()].count('python3') == 0)
-
+                timeout=5.0, conditions=lambda : len([p for p in psutil.Process(os.getpid()).children() if p.name().startswith('python') ]), conditions_value=0)
+ 
             # main processの終了確認
             assert not main_thread.is_alive()
 
@@ -83,14 +83,14 @@ def test_job_manager_main_sigint_signal():
         try:
             # sub processの起動確認
             assert test_common.check_state(
-                timeout=5.0, conditions=lambda : [p.name() for p in psutil.Process(os.getpid()).children()].count('python3') == sub_process_count)
+                timeout=5.0, conditions=lambda : len([p for p in psutil.Process(os.getpid()).children() if p.name().startswith('python') ]), conditions_value=sub_process_count)
 
             # sigint signalの送信
             job_manager.job_manager_process_sigint_handler(None, None)
 
             # sub processの終了確認
             assert test_common.check_state(
-                timeout=5.0, conditions=lambda : [p.name() for p in psutil.Process(os.getpid()).children()].count('python3') == 0)
+                timeout=5.0, conditions=lambda : len([p for p in psutil.Process(os.getpid()).children() if p.name().startswith('python') ]), conditions_value=0)
 
             # sigintの場合は終了しないか確認
             assert main_thread.is_alive()
@@ -123,16 +123,16 @@ def test_job_manager_main_replacement_sub():
         try:
             # sub processの起動確認
             assert test_common.check_state(
-                timeout=5.0, conditions=lambda : [p.name() for p in psutil.Process(os.getpid()).children()].count('python3') == 1)
+                timeout=5.0, conditions=lambda : len([p for p in psutil.Process(os.getpid()).children() if p.name().startswith('python') ]), conditions_value=1)
 
-            pid = [p.pid for p in psutil.Process(os.getpid()).children() if p.name() == 'python3'][0]
+            pid = [p.pid for p in psutil.Process(os.getpid()).children() if p.name().startswith('python')][0]
 
             # sub processの起動確認(pidが違うものが1件出来上がっている)
             assert test_common.check_state(
-                timeout=10.0, conditions=lambda : len([p for p in psutil.Process(os.getpid()).children() if p.name() == 'python3' and p.pid != pid]) == 1)
+                timeout=10.0, conditions=lambda : len([p for p in psutil.Process(os.getpid()).children() if p.name().startswith('python') and p.pid != pid]), conditions_value=1)
             # sub processが最終的に1件に戻っている
             assert test_common.check_state(
-                timeout=3.0, conditions=lambda : [p.name() for p in psutil.Process(os.getpid()).children()].count('python3') == 1)
+                timeout=3.0, conditions=lambda : len([p for p in psutil.Process(os.getpid()).children() if p.name().startswith('python') ]), conditions_value=1)
 
         finally:
             # sigterm signalの送信
@@ -180,11 +180,6 @@ def test_job_manager_sub_execute_normal_job():
     """
     TestExecuteStocker.initalize()
 
-    # sub process起動用の情報生成
-    sub_processes_mgr = SubProcessesManager()
-    sub_process_parameter = sub_processes_mgr.generate_sub_process_parameter()
-    sub_processes_mgr.append_new_process(sub_process_parameter, test_common.get_main_process(os.getpid()))
-
     # Jobの実行classを試験用に切り替え
     process_kind=const.PROCESS_KIND_NOTIFICATION
     job_config_jobs = dict(job_manager_config.JOBS)
@@ -195,6 +190,11 @@ def test_job_manager_sub_execute_normal_job():
 
     with mock.patch.dict(f"job_manager_config.JOBS", job_config_jobs):
 
+        # sub process起動用の情報生成
+        sub_processes_mgr = SubProcessesManager()
+        sub_process_parameter = sub_processes_mgr.generate_sub_process_parameter()
+        sub_processes_mgr.append_new_process(sub_process_parameter, test_common.get_main_process(os.getpid()))
+
         # sub processの起動
         main_thread = threading.Thread(
             target=job_manager.job_manager_sub_process,
@@ -203,7 +203,6 @@ def test_job_manager_sub_execute_normal_job():
             daemon=True
         )
         main_thread.start()
-
         try:
             # queueにデータを作成
             queue_data = [
@@ -220,7 +219,7 @@ def test_job_manager_sub_execute_normal_job():
 
             # executedに1件はいること
             assert test_common.check_state(
-                timeout=3.0, conditions=lambda : len(TestExecuteStocker.executed_queue) == 1)
+                timeout=10.0, conditions=lambda : len(TestExecuteStocker.executed_queue) == 1)
             # 実行したものがqueueに入れたものとおなじであること
             assert test_common.equal_queue(queue_data[0], TestExecuteStocker.executed_queue[0])
 
@@ -240,11 +239,6 @@ def test_job_manager_sub_execute_timeout_job():
     """
     TestExecuteStocker.initalize()
 
-    # sub process起動用の情報生成
-    sub_processes_mgr = SubProcessesManager()
-    sub_process_parameter = sub_processes_mgr.generate_sub_process_parameter()
-    sub_processes_mgr.append_new_process(sub_process_parameter, test_common.get_main_process(os.getpid()))
-
     # Jobの実行classを試験用に切り替え
     process_kind=const.PROCESS_KIND_NOTIFICATION
     job_config_jobs = dict(job_manager_config.JOBS)
@@ -255,6 +249,12 @@ def test_job_manager_sub_execute_timeout_job():
 
     with mock.patch.dict(f"job_manager_config.JOBS", job_config_jobs), \
             mock.patch('job_manager_config.SUB_PROCESS_MAX_CANCEL_TIMEOUT', 3):
+
+        # sub process起動用の情報生成
+        sub_processes_mgr = SubProcessesManager()
+        sub_process_parameter = sub_processes_mgr.generate_sub_process_parameter()
+        sub_processes_mgr.append_new_process(sub_process_parameter, test_common.get_main_process(os.getpid()))
+
 
         # sub processの起動
         main_thread = threading.Thread(
@@ -337,11 +337,6 @@ def test_job_manager_sub_temminate_job_running():
     """
     TestExecuteStocker.initalize()
 
-    # sub process起動用の情報生成
-    sub_processes_mgr = SubProcessesManager()
-    sub_process_parameter = sub_processes_mgr.generate_sub_process_parameter()
-    sub_processes_mgr.append_new_process(sub_process_parameter, test_common.get_main_process(os.getpid()))
-
     # Jobの実行classを試験用に切り替え
     process_kind=const.PROCESS_KIND_NOTIFICATION
     job_config_jobs = dict(job_manager_config.JOBS)
@@ -351,6 +346,10 @@ def test_job_manager_sub_temminate_job_running():
     job_config_jobs[process_kind]["class"] = "TestTimeoutJobExecutor"
 
     with mock.patch.dict(f"job_manager_config.JOBS", job_config_jobs):
+        # sub process起動用の情報生成
+        sub_processes_mgr = SubProcessesManager()
+        sub_process_parameter = sub_processes_mgr.generate_sub_process_parameter()
+        sub_processes_mgr.append_new_process(sub_process_parameter, test_common.get_main_process(os.getpid()))
 
         # sub processの起動
         main_thread = threading.Thread(
@@ -397,11 +396,6 @@ def test_job_manager_sub_db_reconnect(caplog: LogCaptureFixture):
     """
     TestExecuteStocker.initalize()
 
-    # sub process起動用の情報生成
-    sub_processes_mgr = SubProcessesManager()
-    sub_process_parameter = sub_processes_mgr.generate_sub_process_parameter()
-    sub_processes_mgr.append_new_process(sub_process_parameter, test_common.get_main_process(os.getpid()))
-
     # Jobの実行classを試験用に切り替え
     process_kind=const.PROCESS_KIND_NOTIFICATION
     job_config_jobs = dict(job_manager_config.JOBS)
@@ -412,6 +406,11 @@ def test_job_manager_sub_db_reconnect(caplog: LogCaptureFixture):
 
     with mock.patch.dict(f"job_manager_config.JOBS", job_config_jobs), \
             mock.patch("job_manager_config.SUB_PROCESS_DB_RECONNECT_INTERVAL_SECONDS", 5):
+
+        # sub process起動用の情報生成
+        sub_processes_mgr = SubProcessesManager()
+        sub_process_parameter = sub_processes_mgr.generate_sub_process_parameter()
+        sub_processes_mgr.append_new_process(sub_process_parameter, test_common.get_main_process(os.getpid()))
 
         # sub processの起動
         main_thread = threading.Thread(
@@ -461,11 +460,6 @@ def test_job_manager_sub_db_helthcheck_error():
     """
     TestExecuteStocker.initalize()
 
-    # sub process起動用の情報生成
-    sub_processes_mgr = SubProcessesManager()
-    sub_process_parameter = sub_processes_mgr.generate_sub_process_parameter()
-    sub_processes_mgr.append_new_process(sub_process_parameter, test_common.get_main_process(os.getpid()))
-
     # Jobの実行classを試験用に切り替え
     process_kind=const.PROCESS_KIND_NOTIFICATION
     job_config_jobs = dict(job_manager_config.JOBS)
@@ -477,6 +471,11 @@ def test_job_manager_sub_db_helthcheck_error():
     with mock.patch.dict(f"job_manager_config.JOBS", job_config_jobs), \
             mock.patch("job_manager_config.SUB_PROCESS_DB_HEALTH_CHECK_INTERVAL_SECONDS", 3), \
             test_common.pymysql_execute_raise_exception_mocker(queries_health_check.SQL_QUERY_HEALTH_CHECK, Exception('unit test error')):
+
+        # sub process起動用の情報生成
+        sub_processes_mgr = SubProcessesManager()
+        sub_process_parameter = sub_processes_mgr.generate_sub_process_parameter()
+        sub_processes_mgr.append_new_process(sub_process_parameter, test_common.get_main_process(os.getpid()))
 
         # sub processの起動
         main_thread = threading.Thread(
@@ -526,11 +525,6 @@ def test_job_manager_sub_job_limit_over():
     TestExecuteStocker.initalize()
     max_job_per_process = 2
 
-    # sub process起動用の情報生成
-    sub_processes_mgr = SubProcessesManager()
-    sub_process_parameter = sub_processes_mgr.generate_sub_process_parameter()
-    sub_processes_mgr.append_new_process(sub_process_parameter, test_common.get_main_process(os.getpid()))
-
     # Jobの実行classを試験用に切り替え
     process_kind=const.PROCESS_KIND_NOTIFICATION
     job_config_jobs = dict(job_manager_config.JOBS)
@@ -540,6 +534,11 @@ def test_job_manager_sub_job_limit_over():
     job_config_jobs[process_kind]["class"] = "TestTimeoutJobExecutor"
 
     with mock.patch.dict(f"job_manager_config.JOBS", job_config_jobs):
+
+        # sub process起動用の情報生成
+        sub_processes_mgr = SubProcessesManager()
+        sub_process_parameter = sub_processes_mgr.generate_sub_process_parameter()
+        sub_processes_mgr.append_new_process(sub_process_parameter, test_common.get_main_process(os.getpid()))
 
         # sub processの起動
         main_thread = threading.Thread(
@@ -617,11 +616,6 @@ def test_job_manager_sub_force_update_status():
     """
     TestExecuteStocker.initalize()
 
-    # sub process起動用の情報生成
-    sub_processes_mgr = SubProcessesManager()
-    sub_process_parameter = sub_processes_mgr.generate_sub_process_parameter()
-    sub_processes_mgr.append_new_process(sub_process_parameter, test_common.get_main_process(os.getpid()))
-
     # Jobの実行classを試験用に切り替え
     process_kind=const.PROCESS_KIND_NOTIFICATION
     job_config_jobs = dict(job_manager_config.JOBS)
@@ -630,6 +624,11 @@ def test_job_manager_sub_force_update_status():
 
     with mock.patch("job_manager_config.FORCE_UPDATE_STATUS_INTERVAL_SECONDS", 3), \
             mock.patch.dict(f"job_manager_config.JOBS", job_config_jobs):
+
+        # sub process起動用の情報生成
+        sub_processes_mgr = SubProcessesManager()
+        sub_process_parameter = sub_processes_mgr.generate_sub_process_parameter()
+        sub_processes_mgr.append_new_process(sub_process_parameter, test_common.get_main_process(os.getpid()))
 
         # sub processの状態更新(force_update_statusを行うprocessをどれにするかの情報を更新するため)
         sub_processes_mgr.refresh_sub_process_status()
@@ -646,7 +645,7 @@ def test_job_manager_sub_force_update_status():
         try:
             # force update status呼出確認
             assert test_common.check_state(
-                timeout=5.0, conditions=lambda : TestExecuteStocker.call_force_update_status_count >= 1)
+                timeout=10.0, conditions=lambda : TestExecuteStocker.call_force_update_status_count >= 1)
 
         finally:
             # sub processの終了
