@@ -50,24 +50,31 @@ $(function(){
     function display_main(workspaces) {
         console.log("[CALL] display_main");
 
-        const row_template = $('#conditions_list .datarow-template').clone(true).removeClass('datarow-template').addClass('datarow').prop('outerHTML');
-        const row_template_sub = $('#conditions_list .datarow-template-sub').clone(true).removeClass('datarow-template-sub').addClass('datarow').prop('outerHTML');
+        const row_template_top = $('#conditions_list .datarow-template-top').clone(true).removeClass('datarow-template').addClass('datarow').prop('outerHTML');
+        const row_template_2nd = $('#conditions_list .datarow-template-2nd').clone(true).removeClass('datarow-template-sub').addClass('datarow').prop('outerHTML');
+        const row_template_3rd = $('#conditions_list .datarow-template-3rd').clone(true).removeClass('datarow-template-sub').addClass('datarow').prop('outerHTML');
         // 固定のイベントタイプを指定
         // Specify a fixed event type
         let html='';
-        html += row_template
-            .replace(/\${conditions_group_name}/g, fn.cv('IT Automation','',true))
+        html += row_template_top
+            .replace(/\${conditions_all_count}/g, 4)
+            .replace(/\${conditions_group_name}/g, getText("000-87022", "OASE／イベント種別"))
             .replace(/\${conditions_group_count}/g, 4)
-            .replace(/\${conditions_name}/g, fn.cv(getText("000-00153", '新規イベント'),'',true))
-            .replace(/\${conditions_key}/g, 'ita_event_type_new');
-        html += row_template_sub
-            .replace(/\${conditions_name}/g, fn.cv(getText("000-00154", '既知（判定済み）'),'',true))
+            .replace(/\${conditions_name}/g, getText("000-00153", '新規'))
+            .replace(/\${conditions_key}/g, 'ita_event_type_new')
+            .replace(/\${conditions_remarks}/g, getText("000-87023", "OASEで利用されるイベントの種別ごとに通知の有無を選択します。") + "<br>" +
+            getText("000-87024", "　新規：OASEエージェントから収集、あるいは、外部システムから受け取った直後のイベント") + "<br>" +
+            getText("000-87025", "　既知（判定済）：いずれかのルールにマッチしたイベント") + "<br>" +
+            getText("000-87026", "　既知（時間切れ）：一部の条件には当てはまったものの、全ての条件に当てはまらないまま、有効期限が切れたイベント") + "<br>" +
+            getText("000-87027", "　未知：ルールやルール内の条件の一切にあてはまらなかったイベント"));
+        html += row_template_3rd
+            .replace(/\${conditions_name}/g, getText("000-00154", '既知（判定済み）'))
             .replace(/\${conditions_key}/g, 'ita_event_type_evaluated');
-        html += row_template_sub
-            .replace(/\${conditions_name}/g, fn.cv(getText("000-00155", '既知（時間切れ）'),'',true))
+        html += row_template_3rd
+            .replace(/\${conditions_name}/g, getText("000-00155", '既知（時間切れ）'))
             .replace(/\${conditions_key}/g, 'ita_event_type_timeout');
-        html += row_template_sub
-            .replace(/\${conditions_name}/g, fn.cv(getText("000-00156", '未知'),'',true))
+        html += row_template_3rd
+            .replace(/\${conditions_name}/g, getText("000-00156", '未知'))
             .replace(/\${conditions_key}/g, 'ita_event_type_undetected');
         $("#conditions_list tbody").append(html);
         $("#conditions_list .datarow").css('display', '');
@@ -75,7 +82,7 @@ $(function(){
         let destination_id = ULID.ulid();
         $('#form_destination_id').val('ND' + destination_id.toUpperCase());
 
-        $('.description_Mail').html(getText('000-87017', 'email形式 (最大50メールアドレス)<br>※複数のメールアドレスを指定する場合は「;（セミコロン）」記号を<br>区切り文字として使用します'));
+        $('.description_Mail').html(getText('000-87017', 'email形式 (最大{0}メールアドレス)<br>※複数のメールアドレスを指定する場合は「;（セミコロン）」「,（カンマ）」記号<br>または、改行を区切り文字として使用します', MAX_MAIL_COUNT));
         $('.description_Teams').html(getText('000-87018', 'url形式'));
         $('.description_WebHook').html(getText('000-87019', '1行目 url形式<br>2行目 ヘッダー内容'));
 
@@ -93,6 +100,7 @@ $(function(){
             $('.destination_informations_' + id).css('display', '');
 
             $('input[name="form_destination_informations_' + id + '"]').css('display', '');
+            $('textarea[name="form_destination_informations_' + id + '"]').css('display', '');
         });
 
         //
@@ -166,25 +174,40 @@ $(function(){
             split_informations_mail_cc = $("#form_destination_informations_mail_cc").val();
             split_informations_mail_bcc = $("#form_destination_informations_mail_bcc").val();
             if (split_informations_mail_to !== ""){
-                var mail = {
-                    "address_header": "to",
-                    "email": split_informations_mail_to,
-                }
-                destination_informations.push(mail);
+                split_informations_mail_to.split(/,|\n|;/).forEach(address => {
+                    address = address.trim();
+                    if (address !== ""){
+                        var mail = {
+                            "address_header": "to",
+                            "email": address,
+                        }
+                        destination_informations.push(mail);
+                    }
+                });
             }
             if (split_informations_mail_cc !== ""){
-                var mail = {
-                    "address_header": "cc",
-                    "email": split_informations_mail_cc,
-                }
-                destination_informations.push(mail);
+                split_informations_mail_cc.split(/,|\n|;/).forEach(address => {
+                    address = address.trim();
+                    if (address !== ""){
+                            var mail = {
+                            "address_header": "cc",
+                            "email": address,
+                        }
+                        destination_informations.push(mail);
+                    }
+                });
             }
             if (split_informations_mail_bcc !== ""){
-                var mail = {
-                    "address_header": "bcc",
-                    "email": split_informations_mail_bcc,
-                }
-                destination_informations.push(mail);
+                split_informations_mail_bcc.split(/,|\n|;/).forEach(address => {
+                    address = address.trim();
+                    if (address !== ""){
+                            var mail = {
+                            "address_header": "bcc",
+                            "email": address,
+                        }
+                        destination_informations.push(mail);
+                    }
+                });
             }
         }
         else if (destination_kind === "Teams"){

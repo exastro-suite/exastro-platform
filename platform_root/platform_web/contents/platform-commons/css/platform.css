@@ -137,10 +137,11 @@ html {
 
 /* ボタンを表示するエリア / Button area */
 .switchArea {
-    line-height: 34px;
+    line-height: 32px;
     letter-spacing: 0;
     text-align: center;
     font-size: 14px;
+    font-weight: bold;
 
     position: relative;
     margin: auto;
@@ -157,9 +158,11 @@ html {
 .switchArea label {
     display: block;
     box-sizing: border-box;
-    height: 34px;
-    border: 2px solid var(--black20);
-    border-radius: 17px;
+    height: 32px;
+    border: 3px solid var(--black20);
+    border-radius: 16px;
+    cursor: hand;
+    box-shadow: 0 0 2px gray;
 }
 
 /* チェックボックスのラベル（ONのとき）/ checkbox label with "ON" */
@@ -184,12 +187,12 @@ html {
 /* 丸部分のSTYLE（標準）/ style of circle with "OFF" */
 .switchArea #switchImg {
     position: absolute;
-    width: 26px;
-    height: 26px;
+    width: 22px;
+    height: 22px;
     background: var(--black20);
-    top: 4px;
-    left: 4px;
-    border-radius: 13px;
+    top: 5px;
+    left: 5px;
+    border-radius: 10px;
     transition: .2s;
 }
 

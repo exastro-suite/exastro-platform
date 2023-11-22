@@ -21,6 +21,12 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 const DEFAULT_ROWS_PER_PAGE = 100;
 
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//   Max Mail count
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+const MAX_MAIL_COUNT = 100;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -172,6 +178,23 @@ function json_key_link_to_text(json, key_parent) {
 
 function isObject(value) {
     return value !== null && typeof value === 'object'
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//   Array not empty count
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+function array_not_empty_count(arr) {
+    var cnt = 0;
+    if (arr !== ""){
+        arr.forEach(str => {
+            str = str.trim();
+            if (str !== "") cnt++;
+        });
+    }
+
+    return cnt;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1064,13 +1087,14 @@ const settings_notifications_common = {
                     "message": getText("400-00011", "必須項目が不足しています。({0})", getText("000-00150", "通知先"))
                 }
             } else {
-                split_informations_to = destination_informations_to.split(';');
-                split_informations_cc = destination_informations_cc.split(';');
-                split_informations_bcc = destination_informations_bcc.split(';');
-                if ((split_informations_to.length + split_informations_cc.length + split_informations_bcc.length) > 50){
+                split_informations_to = destination_informations_to.split(/,|\n|;/);
+                split_informations_cc = destination_informations_cc.split(/,|\n|;/);
+                split_informations_bcc = destination_informations_bcc.split(/,|\n|;/);
+
+                if ((array_not_empty_count(split_informations_to) + array_not_empty_count(split_informations_cc) + array_not_empty_count(split_informations_bcc)) > MAX_MAIL_COUNT){
                     return {
                         "result": false,
-                        "message": getText("400-87001", "メールアドレスの指定が最大50件を超えています。({0})", getText("000-00150", "通知先"))
+                        "message": getText("400-87001", "メールアドレスの指定が最大{0}件を超えています。({1})", MAX_MAIL_COUNT, getText("000-00150", "通知先"))
                     }
                 } else {
                     return {
@@ -1116,3 +1140,4 @@ const settings_notifications_common = {
         },
     }
 }
+

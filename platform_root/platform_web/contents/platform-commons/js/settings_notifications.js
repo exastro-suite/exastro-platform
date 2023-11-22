@@ -108,13 +108,22 @@ $(function(){
             const row_template = $('#settings_notification_list .datarow-template').clone(true).removeClass('datarow-template').addClass('datarow').prop('outerHTML');
             let html='';
             for(var row of settings_notifications) {
-                let str_conditions = json_key_link_to_text(row.conditions, "");
-                console.log("conditions : " + row.conditions + " -> " + str_conditions);
+                var ita_event_type_new = fn.cv(row.conditions.ita.event_type.new,false,true) ? getText("000-00184", 'する') : getText("000-00185", 'しない');
+                var ita_event_type_evaluated = fn.cv(row.conditions.ita.event_type.evaluated,false,true) ? getText("000-00184", 'する') : getText("000-00185", 'しない');
+                var ita_event_type_timeout = fn.cv(row.conditions.ita.event_type.timeout,false,true) ? getText("000-00184", 'する') : getText("000-00185", 'しない');
+                var ita_event_type_undetected = fn.cv(row.conditions.ita.event_type.undetected,false,true) ? getText("000-00184", 'する') : getText("000-00185", 'しない');
+
+                str_conditions = "";
+                str_conditions += getText("000-87022", "OASE／イベント種別") + ":" + getText("000-00153", '新規') + ":" + ita_event_type_new + "<br>";
+                str_conditions += getText("000-87022", "OASE／イベント種別") + ":" + getText("000-00154", '既知（判定済み）') + ":" + ita_event_type_evaluated + "<br>";
+                str_conditions += getText("000-87022", "OASE／イベント種別") + ":" + getText("000-00155", '既知（時間切れ）') + ":" + ita_event_type_timeout + "<br>";
+                str_conditions += getText("000-87022", "OASE／イベント種別") + ":" + getText("000-00156", '未知') + ":" + ita_event_type_undetected + "<br>";
+
                 html += row_template
                     .replace(/\${destination_id}/g, fn.cv(row.id,'',true))
                     .replace(/\${destination_name}/g, fn.cv(row.name,'',true))
                     .replace(/\${destination_kind}/g, fn.cv(row.kind,'',true))
-                    .replace(/\${destination_conditions}/g, fn.cv(str_conditions,'',true))
+                    .replace(/\${destination_conditions}/g, str_conditions)
                     .replace(/\${last_update_date_time}/g, fn.date(new Date(row.last_update_timestamp),'yyyy/MM/dd HH:mm:ss'));
             }
             $("#settings_notification_list tbody").append(html);

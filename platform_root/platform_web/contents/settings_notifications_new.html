@@ -126,9 +126,26 @@
                                                         <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1"><div class="ci" style="text-align: left;"><span text-id="000-82011">通知方法</span><span class="tHeadRequired" text-id="000-80024">必須</span></div></td>
                                                         <td class="tBodyTd td" rowspan="1" colspan="1"><div class="ci">
                                                             <div>
-                                                                <input type="radio" value="Mail" class="tableEditInputText" name="form_destination_kind" id="form_destination_kind_mail"><label for="form_destination_kind_mail">Mail</label>
-                                                                <input type="radio" value="Teams" class="tableEditInputText" name="form_destination_kind" id="form_destination_kind_teams"><label for="form_destination_kind_teams">Teams</label>
-                                                                <input type="radio" value="WebHook" class="tableEditInputText" name="form_destination_kind" id="form_destination_kind_webhook"><label for="form_destination_kind_webhook">WebHook</label>
+                                                                <ul class="commonRadioList">
+                                                                    <li class="commonRadioItem">
+                                                                        <div class="radioTextWrap defaultRadioTextWrap">
+                                                                            <input type="radio" value="Mail" id="form_destination_kind_mail" name="form_destination_kind" class="radioText">
+                                                                            <label for="form_destination_kind_mail" class="radioTextLabel"><span class="radioTextMark"></span><span class="radioTextText">Mail</span></label>
+                                                                        </div>
+                                                                    </li>
+                                                                    <li class="commonRadioItem">
+                                                                        <div class="radioTextWrap defaultRadioTextWrap">
+                                                                            <input type="radio" value="Teams" id="form_destination_kind_teams" name="form_destination_kind" class="radioText">
+                                                                            <label for="form_destination_kind_teams" class="radioTextLabel"><span class="radioTextMark"></span><span class="radioTextText">Teams</span></label>
+                                                                        </div>
+                                                                    </li>
+                                                                    <!-- <li class="commonRadioItem">
+                                                                        <div class="radioTextWrap defaultRadioTextWrap">
+                                                                            <input type="radio" value="WebHook" id="form_destination_kind_webhook" name="form_destination_kind" class="radioText">
+                                                                            <label for="form_destination_kind_webhook" class="radioTextLabel"><span class="radioTextMark"></span><span class="radioTextText">WebHook</span></label>
+                                                                        </div>
+                                                                    </li> -->
+                                                                </ul>
                                                             </div>
                                                             <span class="validate_error" id="message_destination_kind"></span>
                                                         </div></td>
@@ -139,12 +156,18 @@
                                                     <tr class="tBodyTr tr">
                                                         <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1"><div class="ci" style="text-align: left;"><span text-id="000-00150">通知先</span><span class="tHeadRequired" text-id="000-80024">必須</span></div></td>
                                                         <td class="tBodyTd td" rowspan="1" colspan="1"><div class="ci">
-                                                            <span class="ci destination_informations destination_informations_Mail" style="display: none;">to:</span><input type="text" value="" class="tableEditInputText inputText input inputTextWidthAdjustment destination_informations" name="form_destination_informations_Mail" id="form_destination_informations_mail_to" maxlength="4000" style="display: none;">
-                                                            <span class="ci destination_informations destination_informations_Mail" style="display: none;">cc:</span><input type="text" value="" class="tableEditInputText inputText input inputTextWidthAdjustment destination_informations" name="form_destination_informations_Mail" id="form_destination_informations_mail_cc" maxlength="4000" style="display: none;">
-                                                            <span class="ci destination_informations destination_informations_Mail" style="display: none;">bcc:</span><input type="text" value="" class="tableEditInputText inputText input inputTextWidthAdjustment destination_informations" name="form_destination_informations_Mail" id="form_destination_informations_mail_bcc" maxlength="4000" style="display: none;">
-                                                            <span class="ci destination_informations destination_informations_Teams" style="display: none;">url:</span><input type="text" value="" class="tableEditInputText inputText input inputTextWidthAdjustment destination_informations" name="form_destination_informations_Teams" id="form_destination_informations_teams" maxlength="4000" style="display: none;">
-                                                            <span class="ci destination_informations destination_informations_WebHook" style="display: none;">url:</span><input type="text" value="" class="tableEditInputText inputText input inputTextWidthAdjustment destination_informations" name="form_destination_informations_WebHook" id="form_destination_informations_webhook" maxlength="4000" style="display: none;">
-                                                            <span class="ci destination_informations destination_informations_WebHook" style="display: none;">header:</span><input type="text" value="" class="tableEditInputText inputText input inputTextWidthAdjustment destination_informations" name="form_destination_informations_WebHook" id="form_destination_informations_webhook_header" maxlength="4000" style="display: none;">
+                                                            <span class="ci destination_informations destination_informations_Mail" style="display: none;">to:</span>
+                                                            <textarea wrap="soft" data-id="4" data-required="0" data-int-min="0" data-int-max="4000" id="form_destination_informations_mail_to" name="form_destination_informations_Mail" class="tebleEditTextArea textarea input textareaAdjustment destination_informations" maxlength="4000" style="overflow-y:scroll; display: none;"></textarea>
+                                                            <span class="ci destination_informations destination_informations_Mail" style="display: none;">cc:</span>
+                                                            <textarea wrap="soft" data-id="4" data-required="0" data-int-min="0" data-int-max="4000" id="form_destination_informations_mail_cc" name="form_destination_informations_Mail" class="tebleEditTextArea textarea input textareaAdjustment destination_informations" maxlength="4000" style="overflow-y:scroll; display: none;"></textarea>
+                                                            <span class="ci destination_informations destination_informations_Mail" style="display: none;">bcc:</span>
+                                                            <textarea wrap="soft" data-id="4" data-required="0" data-int-min="0" data-int-max="4000" id="form_destination_informations_mail_bcc" name="form_destination_informations_Mail" class="tebleEditTextArea textarea input textareaAdjustment destination_informations" maxlength="4000" style="overflow-y:scroll; display: none;"></textarea>
+                                                            <span class="ci destination_informations destination_informations_Teams" style="display: none;">url:</span>
+                                                            <input type="text" value="" class="tableEditInputText inputText input inputTextWidthAdjustment destination_informations" name="form_destination_informations_Teams" id="form_destination_informations_teams" maxlength="4000" style="display: none;">
+                                                            <span class="ci destination_informations destination_informations_WebHook" style="display: none;">url:</span>
+                                                            <input type="text" value="" class="tableEditInputText inputText input inputTextWidthAdjustment destination_informations" name="form_destination_informations_WebHook" id="form_destination_informations_webhook" maxlength="4000" style="display: none;">
+                                                            <span class="ci destination_informations destination_informations_WebHook" style="display: none;">header:</span>
+                                                            <input type="text" value="" class="tableEditInputText inputText input inputTextWidthAdjustment destination_informations" name="form_destination_informations_WebHook" id="form_destination_informations_webhook_header" maxlength="4000" style="display: none;">
                                                             <span class="validate_error" id="message_destination_informations"></span>
                                                         </div></td>
                                                         <td class="tBodyTd td" rowspan="1" colspan="1">
@@ -154,9 +177,9 @@
                                                             <div class="ci pre destination_informations description_WebHook" style="display: none;"></div>
                                                         </td>
                                                     </tr>
-                                                    <tr class="tBodyTr tr">
-                                                        <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1"><div class="ci" style="text-align: left;" text-id="000-00152">イベントタイプ</div></td>
-                                                        <td class="tBodyTd td" rowspan="1" colspan="1"><div class="ci">
+                                                    <!-- <tr class="tBodyTr tr">
+                                                        <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1"><div class="ci" style="text-align: left;" text-id="000-00186">送信設定</div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1"><div class="ci" style="padding: 0;">
                                                             <table class="table" width="100%" id="conditions_list">
                                                                 <thead class="thead">
                                                                     <tr class="tHeadTr tr">
@@ -186,6 +209,46 @@
                                                             </table>
                                                         </div></td>
                                                         <td class="tBodyTd td" rowspan="1" colspan="1"></td>
+                                                    </tr> -->
+                                                </tbody>
+                                            </table>
+                                            <table class="table" width="100%" id="conditions_list">
+                                                <thead class="thead">
+                                                    <tr class="tHeadTr tr">
+                                                        <th class="tHeadTh popup th" rowspan="1" colspan="3" title="内容" attr-text-id="title="><div class="ci" text-id="000-00121">内容</div></th>
+                                                        <th class="tHeadTh popup th" rowspan="1" colspan="1" title="通知" attr-text-id="title="><div class="ci" text-id="000-00125">通知</div></th>
+                                                        <th class="tHeadTh popup th" rowspan="1" colspan="1" title="備考" attr-text-id="title=000-80023"><div class="ci" text-id="000-80023">備考</div></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody class="tbody" style="max-width: 100%;">
+                                                    <tr class="tBodyTr tr datarow-template-top" style="cursor:pointer; display:none">
+                                                        <td class="tBodyLeftSticky tBodyTh td" rowspan="${conditions_all_count}" colspan="1" ><div class="ci" text-id="000-00186">送信設定</div></td>
+                                                        <td class="tBodyLeftSticky tBodyTd td group_count" rowspan="${conditions_group_count}" colspan="1" ><div class="ci">${conditions_group_name}</div></td>
+                                                        <td class="tBodyLeftSticky tBodyTd td" rowspan="1" colspan="1" ><div class="ci">${conditions_name}</div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1" ><div class="ci">
+                                                            <div class="switchArea">
+                                                                <input type="checkbox" id="${conditions_key}"><label for="${conditions_key}"><span></span></label><div id="switchImg"></div>
+                                                            </div>
+                                                        </div></td>
+                                                        <td class="tBodyTd td" rowspan="${conditions_group_count}" colspan="1"><div class="ci textOverWrap" style="width: 860px;max-width: 100%;">${conditions_remarks}</div></td>
+                                                    </tr>
+                                                    <tr class="tBodyTr tr datarow-template-2nd" style="cursor:pointer; display:none">
+                                                        <td class="tBodyLeftSticky tBodyTd td group_count" rowspan="${conditions_group_count}" colspan="1" ><div class="ci">${conditions_group_name}</div></td>
+                                                        <td class="tBodyLeftSticky tBodyTd td" rowspan="1" colspan="1" ><div class="ci">${conditions_name}</div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1" ><div class="ci">
+                                                            <div class="switchArea">
+                                                                <input type="checkbox" id="${conditions_key}"><label for="${conditions_key}"><span></span></label><div id="switchImg"></div>
+                                                            </div>
+                                                        </div></td>
+                                                        <td class="tBodyTd td" rowspan="${conditions_group_count}" colspan="1"><div class="ci textOverWrap">${conditions_remarks}</div></td>
+                                                    </tr>
+                                                    <tr class="tBodyTr tr datarow-template-3rd" style="cursor:pointer; display:none">
+                                                        <td class="tBodyLeftSticky tBodyTd td" rowspan="1" colspan="1" ><div class="ci">${conditions_name}</div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1" ><div class="ci">
+                                                            <div class="switchArea">
+                                                                <input type="checkbox" id="${conditions_key}"><label for="${conditions_key}"><span></span></label><div id="switchImg"></div>
+                                                            </div>
+                                                        </div></td>
                                                     </tr>
                                                 </tbody>
                                             </table>
