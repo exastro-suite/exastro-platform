@@ -21,6 +21,12 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 const DEFAULT_ROWS_PER_PAGE = 100;
 
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//   Max Mail count
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+const MAX_MAIL_COUNT = 100;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -150,6 +156,49 @@ function replaceLanguageText() {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
+//   Json Key Link to Text
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+function json_key_link_to_text(json, key_parent) {
+    var ret = "";
+    console.log("json:" + json);
+    for (var key in json){
+        console.log("key:" + key);
+        console.log("key_parent:" + key_parent);
+        obj = json[key];
+        if (isObject(obj)){
+            ret = json_key_link_to_text(obj, key_parent + key + ".");
+        }
+        else{
+            ret += key_parent + key + ": " + json[key] + "\n";
+        }
+    }
+    return ret;
+}
+
+function isObject(value) {
+    return value !== null && typeof value === 'object'
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//   Array not empty count
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+function array_not_empty_count(arr) {
+    var cnt = 0;
+    if (arr !== ""){
+        arr.forEach(str => {
+            str = str.trim();
+            if (str !== "") cnt++;
+        });
+    }
+
+    return cnt;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
 //   Display Topic Path
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -203,12 +252,14 @@ function displayMenu(curent) {
             <li class="menuItem"><a class="menuLink" id="menu_workspace" href="#" tabindex="-1">${getText("000-80005", "ワークスペース管理")}</a></li>
             <li class="menuItem"><a class="menuLink" id="menu_account_management" href="#" style="display: none;">${getText("000-80006", "ユーザー管理")}</a></li>
             <li class="menuItem"><a class="menuLink" id="menu_role_management" href="#" style="display: none;">${getText("000-80007", "ロール管理")}</a></li>
+            <li class="menuItem"><a class="menuLink" id="menu_settings_notifications" href="#">${getText("000-00183", "通知管理")}</a></li>
         `);
 
         $('#menu_workspace').attr('href', location_conf.href.workspaces.list.replace(/{organization_id}/g, CommonAuth.getRealm()));
         $('#menu_account_management').attr('href', location_conf.href.users.list.replace(/{organization_id}/g, CommonAuth.getRealm()));
         $('#menu_role_management').attr('href', location_conf.href.roles.list.replace(/{organization_id}/g, CommonAuth.getRealm()));
-    
+        $('#menu_settings_notifications').attr('href', location_conf.href.workspaces.settings.notifications.workspaces.replace(/{organization_id}/g, CommonAuth.getRealm()));
+
         if (CommonAuth.hasAuthority("_og-usr-mt")) {
             $("#menu_account_management").css("display", "");
         }
@@ -952,3 +1003,141 @@ function maintenanceMode() {
         console.error( error );
     });
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//   Settings Notifications Common
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+const settings_notifications_common = {
+    validate: {
+        //
+        // validate destination id
+        //
+        destination_id: function(destination_id) {
+            if(destination_id === "") {
+                return {
+                    "result": false,
+                    "message": getText("400-00011", "必須項目が不足しています。({0})", getText("000-00145", "通知先ID"))
+                }
+            } else if(destination_id.replace(/[a-zA-Z0-9_-]/g,"") !== "") {
+                return {
+                    "result": false,
+                    "message": getText("400-00017", "指定できない文字が含まれています。(項目:{0},指定可能な文字:{1})",
+                                    getText("000-00145", "通知先ID"),
+                                    getText("000-31001", "半角英数・ハイフン・アンダースコア")
+                                )
+                }
+
+            } else if( ! destination_id.match(/^[a-zA-Z]/)) {
+                return {
+                    "result": false,
+                    "message": getText("400-00014", "先頭の文字にアルファベット以外が指定されています。({0})", getText("000-00145", "通知先ID"))
+                }
+            } else {
+                return {
+                    "result": true,
+                    "message": ""
+                }
+            }
+        },
+
+        //
+        // validate destination name
+        //
+        destination_name: function(destination_name) {
+            if(destination_name === "") {
+                return {
+                    "result": false,
+                    "message": getText("400-00011", "必須項目が不足しています。({0})", getText("000-00146", "通知先名"))
+                }
+            } else {
+                return {
+                    "result": true,
+                    "message": ""
+                }
+            }
+        },
+
+        //
+        // validate destination kind
+        //
+        destination_kind: function(destination_kind) {
+            console.log("destination_kind: " + destination_kind);
+            if(destination_kind.length === 0) {
+                return {
+                    "result": false,
+                    "message": getText("400-00011", "必須項目が不足しています。({0})", getText("000-00147", "通知方法"))
+                }
+            } else {
+                return {
+                    "result": true,
+                    "message": ""
+                }
+            }
+        },
+
+        //
+        // validate description informations (mail)
+        //
+        destination_informations_mail: function(destination_informations_to, destination_informations_cc, destination_informations_bcc) {
+            if(destination_informations_to === "" && destination_informations_cc === "" && destination_informations_bcc === "") {
+                return {
+                    "result": false,
+                    "message": getText("400-00011", "必須項目が不足しています。({0})", getText("000-00150", "通知先"))
+                }
+            } else {
+                split_informations_to = destination_informations_to.split(/,|\n|;/);
+                split_informations_cc = destination_informations_cc.split(/,|\n|;/);
+                split_informations_bcc = destination_informations_bcc.split(/,|\n|;/);
+
+                if ((array_not_empty_count(split_informations_to) + array_not_empty_count(split_informations_cc) + array_not_empty_count(split_informations_bcc)) > MAX_MAIL_COUNT){
+                    return {
+                        "result": false,
+                        "message": getText("400-87001", "メールアドレスの指定が最大{0}件を超えています。({1})", MAX_MAIL_COUNT, getText("000-00150", "通知先"))
+                    }
+                } else {
+                    return {
+                        "result": true,
+                        "message": ""
+                    }
+                }
+            }
+        },
+
+        //
+        // validate description informations (teams)
+        //
+        destination_informations_teams: function(destination_informations_teams) {
+            if(destination_informations_teams === "") {
+                return {
+                    "result": false,
+                    "message": getText("400-00011", "必須項目が不足しています。({0})", getText("000-00150", "通知先"))
+                }
+            } else {
+                return {
+                    "result": true,
+                    "message": ""
+                }
+            }
+        },
+
+        //
+        // validate description informations (webhook)
+        //
+        destination_informations_webhook: function(destination_informations_webhook, destination_informations_webhook_header) {
+            if(destination_informations_webhook === "") {
+                return {
+                    "result": false,
+                    "message": getText("400-00011", "必須項目が不足しています。({0})", getText("000-00150", "通知先"))
+                }
+            } else {
+                return {
+                    "result": true,
+                    "message": ""
+                }
+            }
+        },
+    }
+}
+

@@ -60,6 +60,38 @@ AUTH_PATTERN = [
         ]
     },
     {
+        "url": r"^/api/(?P<org_id>[^/][^/]*)/platform/workspaces/(?P<ws_id>[^/][^/]*)/settings/notifications/?$",
+        "auth": [
+            {
+                "method": ["POST"],
+                "roles": [
+                    {"client": "{org_id}-workspaces", "role": const.ORG_AUTH_WS_MAINTE},
+                ]
+            }
+        ]
+    },
+    {
+        "url": r"^/api/(?P<org_id>[^/][^/]*)/platform/workspaces/(?P<ws_id>[^/][^/]*)/settings/notifications/(?P<destination_id>[^/][^/]*)($|/.*$)",
+        "auth": [
+            {
+                "method": ["GET"],
+                "roles": [
+                    {"client": "{org_id}-workspaces", "role": "{ws_id}"},
+                    {"client": "{org_id}-workspaces", "role": const.WS_AUTH_ADMIN},
+                    {"client": "{org_id}-workspaces", "role": const.ORG_AUTH_WS_MAINTE},
+                    {"client": "{org_id}-workspaces", "role": const.ORG_AUTH_WS_ROLE_MAINTE},
+                ]
+            },
+            {
+                "method": ["PUT", "PATCH", "DELETE"],
+                "roles": [
+                    {"client": "{org_id}-workspaces", "role": const.WS_AUTH_ADMIN},
+                    {"client": "{org_id}-workspaces", "role": const.ORG_AUTH_WS_MAINTE},
+                ]
+            }
+        ]
+    },
+    {
         "url": r"^/api/(?P<org_id>[^/][^/]*)/platform/users($|/.*$)",
         "auth": [
             {
