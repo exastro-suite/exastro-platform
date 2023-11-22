@@ -12,6 +12,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 import os
+import sys
 import multiprocessing
 import logging
 import logging.handlers
@@ -19,6 +20,7 @@ import logging.handlers
 logger = None
 __log_queue = None
 __log_listener = None
+
 
 def init(main_process=False, pytest=False):
     global logger
@@ -29,16 +31,16 @@ def init(main_process=False, pytest=False):
         logger = logging.getLogger()
 
         if pytest:
-            console_handler = logging.StreamHandler()
-            console_formatter = logging.Formatter('[%(asctime)s] [%(process)05x:%(threadName)s] [%(levelname)-5s] %(message)s')
+            console_handler = logging.StreamHandler(sys.stdout)
+            console_formatter = logging.Formatter('[%(asctime)s] [%(process)06d:%(threadName)s] [%(levelname)-5s] %(message)s')
             console_handler.setFormatter(console_formatter)
             logger.addHandler(console_handler)
             logger.setLevel(os.environ.get('LOG_LEVEL', logging.INFO))
-            
+
         elif main_process:
             log_queue = multiprocessing.Queue()
-            console_handler = logging.StreamHandler()
-            console_formatter = logging.Formatter('[%(asctime)s] [%(process)05x:%(threadName)s] [%(levelname)-5s] %(message)s')
+            console_handler = logging.StreamHandler(sys.stdout)
+            console_formatter = logging.Formatter('[%(asctime)s] [%(process)06d:%(threadName)s] [%(levelname)-5s] %(message)s')
             console_handler.setFormatter(console_formatter)
 
             queue_handler = logging.handlers.QueueHandler(log_queue)

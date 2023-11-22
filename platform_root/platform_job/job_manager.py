@@ -47,7 +47,7 @@ def job_manager_main_process():
     process_terminate = False
     process_sigterm = False
     process_sigint = False
-    
+
     # シグナルのハンドライベント設定 / Signal handler event settings
     signal.signal(signal.SIGTERM, job_manager_process_sigterm_handler)
     signal.signal(signal.SIGINT, job_manager_process_sigint_handler)
@@ -224,12 +224,13 @@ def job_manager_sub_process(parameter: SubProcessParameter):
             globals.logger.error(f'stack trace\n{traceback.format_exc()}')
             time.sleep(job_manager_config.JOB_STATUS_WATCH_INTERVAL_SECONDS)
 
-    globals.logger.info('EXIT sub process loop')
+    globals.logger.debug('Sub process loop exited')
 
     if process_sigterm:
         # jobの強制終了を行う / Force quit job
         cancel_all_jobs(sub_process_mgr)
 
+    sub_process_mgr.set_terminated_flag()
     globals.logger.info('EXIT sub process')
     return
 
@@ -282,7 +283,7 @@ def job_start_control(conn, sub_process_mgr: SubProcessManager, job_modules):
 
                     # queueから起動対象のレコードを削除する / Delete the record to be launched from the queue
                     delete_queue(conn, queue_row)
-                    
+
                     # job処理のclassのinstanceを生成する / Generate an instance of the job processing class
                     job_executor = eval(f"job_modules[queue_row['PROCESS_KIND']].{job_manager_config.JOBS[queue_row['PROCESS_KIND']]['class']}")(queue_row)
 
@@ -470,7 +471,7 @@ def get_queue(conn, running_job_queue: list, force_update_status_job: bool):
         # 次に処理するqueue情報 / queue to process next
         next_process_id = queue_org_grouping[next_organization_id][0]['PROCESS_ID']
         next_process_king = queue_org_grouping[next_organization_id][0]['PROCESS_KIND']
-            
+
         if len(running_kind_grouping[next_process_king]) < job_manager_config.JOBS[next_process_king]['max_job_per_process']:
             # 次に処理するPROCESS_KINDが条件に達していないときは、起動可能かの処理を進める
             # If the next PROCESS_KIND to be processed does not meet the conditions, proceed with the process to see if it can be started.

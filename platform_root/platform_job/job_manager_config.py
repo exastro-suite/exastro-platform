@@ -17,73 +17,73 @@ from common_library.common import const
 import job_manager_const
 
 #
-# SUB PROCESSを再起動するインターバル 
+# SUB PROCESSを再起動するインターバル
 # Interval for restarting SUB PROCESS
 #
 # この時間経過でqueueの受付を終了し、実行中タスクを終了後SUB PROCESSが終了する
 # Once this time has elapsed, the queue reception will be terminated, and the SUB PROCESS will terminate after completing the running job.
 #
-SUB_PROCESS_TERMINATE_REQUEST_SECONDS = int(os.environ.get('SUB_PROCESS_TERMINATE_REQUEST_SECONDS', str(60 * 60 * 3)))
+SUB_PROCESS_TERMINATE_REQUEST_SECONDS = int(os.environ.get('SUB_PROCESS_TERMINATE_REQUEST_SECONDS'))
 
 #
 # queueを受付けるSUB PROCESSの総数
 # Total number of SUB PROCESS that accept queues
 #
-SUB_PROCESS_ACCEPTABLE = int(os.environ.get('SUB_PROCESS_ACCEPTABLE', '2'))
+SUB_PROCESS_ACCEPTABLE = int(os.environ.get('SUB_PROCESS_ACCEPTABLE'))
 
 #
 # SUB PROCESS毎の最大同時実行job数
 # Maximum number of concurrently executing jobs for each SUB PROCESS
 #
-SUB_PROCESS_MAX_JOBS = int(os.environ.get('SUB_PROCESS_MAX_JOBS', '10'))
+SUB_PROCESS_MAX_JOBS = int(os.environ.get('SUB_PROCESS_MAX_JOBS'))
 
 #
 # SUB PROCESSの状態確認インターバル
 # SUB PROCESS status check interval
 #
-SUB_PROCESS_WATCH_INTERVAL_SECONDS = float(os.environ.get('SUB_PROCESS_WATCH_INTERVAL_SECONDS', '1.0'))
+SUB_PROCESS_WATCH_INTERVAL_SECONDS = float(os.environ.get('SUB_PROCESS_WATCH_INTERVAL_SECONDS'))
 
 #
 # SUB PROCESSでDBの再接続を行うインターバル
 # Interval for reconnecting the DB with SUB PROCESS
 #
-SUB_PROCESS_DB_RECONNECT_INTERVAL_SECONDS = int(os.environ.get('SUB_PROCESS_DB_RECONNECT_INTERVAL_SECONDS', '60'))
+SUB_PROCESS_DB_RECONNECT_INTERVAL_SECONDS = int(os.environ.get('SUB_PROCESS_DB_RECONNECT_INTERVAL_SECONDS'))
 
 #
 # SUB PROCESSのDB接続の正常性確認を行うインターバル
 # Interval for checking the normality of SUB PROCESS DB connection
 #
-SUB_PROCESS_DB_HEALTH_CHECK_INTERVAL_SECONDS = int(os.environ.get('SUB_PROCESS_DB_HEALTH_CHECK_INTERVAL_SECONDS', '5'))
+SUB_PROCESS_DB_HEALTH_CHECK_INTERVAL_SECONDS = int(os.environ.get('SUB_PROCESS_DB_HEALTH_CHECK_INTERVAL_SECONDS'))
 
 #
 # SUB PROCESSの再起動を行うcancel timeout回数の閾値
 # Threshold for cancel timeout times to restart SUB PROCESS
 #
-SUB_PROCESS_MAX_CANCEL_TIMEOUT = int(os.environ.get('SUB_PROCESS_MAX_CANCEL_TIMEOUT', '10'))
+SUB_PROCESS_MAX_CANCEL_TIMEOUT = int(os.environ.get('SUB_PROCESS_MAX_CANCEL_TIMEOUT'))
 
 #
 # JOBの状態確認するインターバル
 # Interval to check JOB status
 #
-JOB_STATUS_WATCH_INTERVAL_SECONDS = float(os.environ.get('JOB_STATUS_WATCH_INTERVAL_SECONDS', '1.0'))
+JOB_STATUS_WATCH_INTERVAL_SECONDS = float(os.environ.get('JOB_STATUS_WATCH_INTERVAL_SECONDS'))
 
 #
 # JOBのステータスを強制的にエラーにするJOBの起動インターバル
 # JOB startup interval that forces the JOB status to error
 #
-FORCE_UPDATE_STATUS_INTERVAL_SECONDS = int(os.environ.get('FORCE_UPDATE_STATUS_INTERVAL_SECONDS', '60'))
+FORCE_UPDATE_STATUS_INTERVAL_SECONDS = int(os.environ.get('FORCE_UPDATE_STATUS_INTERVAL_SECONDS'))
 
 #
 # JOBのステータスを強制的にエラーにする最終更新日時からの経過時間
 # Elapsed time since last update to force JOB status to error
 #
-FORCE_UPDATE_STATUS_PROGRASS_SECONDS = int(os.environ.get('FORCE_UPDATE_STATUS_PROGRASS_SECONDS', '600'))
+FORCE_UPDATE_STATUS_PROGRASS_SECONDS = int(os.environ.get('FORCE_UPDATE_STATUS_PROGRASS_SECONDS'))
 
 #
 # タスクのキャンセルtimeout時間
 # Job cancellation timeout seconds
 #
-JOB_CANCEL_TIMEOUT_SECONDS = float(os.environ.get('JOB_CANCEL_TIMEOUT_SECONDS', '5.0'))
+JOB_CANCEL_TIMEOUT_SECONDS = float(os.environ.get('JOB_CANCEL_TIMEOUT_SECONDS'))
 
 #
 # タスクの種類毎の設定 / Settings for each type of job
@@ -93,17 +93,17 @@ JOB_CANCEL_TIMEOUT_SECONDS = float(os.environ.get('JOB_CANCEL_TIMEOUT_SECONDS', 
 #
 JOBS = {
     const.PROCESS_KIND_NOTIFICATION: {
-        "timeout_seconds": int(os.environ.get(f'JOB_{const.PROCESS_KIND_NOTIFICATION}_TIMEOUT_SECONDS', '20')),
-        "max_job_per_process": int(os.environ.get(f'JOB_{const.PROCESS_KIND_NOTIFICATION}_MAX_JOB_PER_PROCESS', str(SUB_PROCESS_MAX_JOBS))),
+        "timeout_seconds": int(os.environ.get('JOB_NOTIFICATION_TIMEOUT_SECONDS')),
+        "max_job_per_process": int(os.environ.get('JOB_NOTIFICATION_MAX_JOB_PER_PROCESS', str(SUB_PROCESS_MAX_JOBS))),
         "module": "jobs.NotificationJobExecutor",
         "class": "NotificationJobExecutor",
         "extra_config": {
-            "teams_connection_timeout": float(os.environ.get(f'JOB_{const.PROCESS_KIND_NOTIFICATION}_TEAMS_CONNECTION_TIMEOUT', '3.0')),
-            "teams_read_timeout": float(os.environ.get(f'JOB_{const.PROCESS_KIND_NOTIFICATION}_TEAMS_READ_TIMEOUT', '10.0')),
+            "teams_connection_timeout": float(os.environ.get('JOB_NOTIFICATION_TEAMS_CONNECTION_TIMEOUT')),
+            "teams_read_timeout": float(os.environ.get('JOB_NOTIFICATION_TEAMS_READ_TIMEOUT')),
         }
     },
     job_manager_const.PROCESS_KIND_FORCE_UPDATE_STATUS: {
-        "timeout_seconds": int(os.environ.get(f'JOB_{job_manager_const.PROCESS_KIND_FORCE_UPDATE_STATUS}_TIMEOUT_SECONDS', '60')),
+        "timeout_seconds": int(os.environ.get('JOB_FORCE_UPDATE_STATUS_TIMEOUT_SECONDS')),
         "max_job_per_process": 1,
         "module": "jobs.ForceUpdateStatusJobExecutor",
         "class": "ForceUpdateStatusJobExecutor"

@@ -63,19 +63,21 @@ class SubProcessManager():
         SubProcessParameter.genarate_sub_process_managerメソッドでinstanceを生成すること
         Generate an instance using the SubProcessParameter.genarate_sub_process_manager method
     """
-    def __init__(self, array_index, sub_processes_ids, sub_termination_req_flags, sub_running_job_counts, force_upd_sts_exec_pid):
-        """constructor 
+    def __init__(self, array_index, sub_processes_ids, sub_termination_req_flags, sub_terminated_flags, sub_running_job_counts, force_upd_sts_exec_pid):
+        """constructor
 
         Args:
             array_index (int): 共有メモリ配列の当該processのindex / index of the process in the shared memory array
             sub_processes_ids (_type_): sub processのprocess id / process id of sub process
             sub_termination_req_flags (_type_): sub processへの終了要求のフラグ / Flag for termination request to sub process
+            sub_terminated_flags (_type_): sub process終了済みのフラグ / Sub process completed flag
             sub_running_job_counts (_type_): sub process実行job数 / Number of sub process execution jobs
             force_upd_sts_exec_pid (_type_): force status updateを行うsub processのprocess id / process id of sub process that performs force status update
         """
         self.__arr_idx = array_index
         self.__sub_processes_ids = sub_processes_ids
         self.__sub_termination_req_flags = sub_termination_req_flags
+        self.__sub_terminated_flags = sub_terminated_flags
         self.__sub_running_job_counts = sub_running_job_counts
         self.__sub_processes_ids[self.__arr_idx] = os.getpid()
         self.__jobs: list[Job] = []
@@ -84,7 +86,6 @@ class SubProcessManager():
         self.interval_db_health_check = IntervalTiming(job_manager_config.SUB_PROCESS_DB_HEALTH_CHECK_INTERVAL_SECONDS)
         self.__force_upd_sts_exec_pid = force_upd_sts_exec_pid
         self.__interval_force_upd_sts = IntervalTiming(job_manager_config.FORCE_UPDATE_STATUS_INTERVAL_SECONDS)
-
 
     def is_sheard_variables_normal(self):
         """共有メモリの正常性確認 / Checking the health of shared memory
@@ -230,7 +231,13 @@ class SubProcessManager():
     def set_terminating(self):
         """sub processを終了要求状態にする / Put sub process in termination request state
         """
+        globals.logger.info('Termination request sub process')
         self.__sub_termination_req_flags[self.__arr_idx] = 1
+
+    def set_terminated_flag(self):
+        """sub processが終了したフラグを設定 / Set flag that sub process has finished
+        """
+        self.__sub_terminated_flags[self.__arr_idx] = 1
 
     def is_timing_of_force_update_status(self):
         """強制ステータス更新処理を起動するタイミングか判定する / Determine when it is time to start forced status update processing
@@ -252,19 +259,21 @@ class SubProcessParameter():
         SubProcessesManager.generate_sub_process_parameterメソッドでinstanceを生成すること
         Generate an instance using the SubProcessesManager.generate_sub_process_parameter method
     """
-    def __init__(self, array_index, sub_processes_ids, sub_termination_req_flags, sub_running_job_counts, force_upd_sts_exec_pid):
+    def __init__(self, array_index, sub_processes_ids, sub_termination_req_flags, sub_terminated_flags, sub_running_job_counts, force_upd_sts_exec_pid):
         """constructor
 
         Args:
             array_index (int): 共有メモリ配列の当該processのindex / index of the process in the shared memory array
             sub_processes_ids (_type_): sub processのprocess id / process id of sub process
             sub_termination_req_flags (_type_): sub processへの終了要求のフラグ / Flag for termination request to sub process
+            sub_terminated_flags (_type_): sub process終了済みのフラグ / Sub process completed flag
             sub_running_job_counts (_type_): sub process実行job数 / Number of sub process execution jobs
             force_upd_sts_exec_pid (_type_): force update statusを行うsub processのprocess id / process id of sub process that performs force update status
         """
         self.__arr_idx = array_index
         self.__sub_processes_ids = sub_processes_ids
         self.__sub_termination_req_flags = sub_termination_req_flags
+        self.__sub_terminated_flags = sub_terminated_flags
         self.__sub_running_job_counts = sub_running_job_counts
         self.__force_upd_sts_exec_pid = force_upd_sts_exec_pid
 
@@ -286,6 +295,7 @@ class SubProcessParameter():
             self.__arr_idx,
             self.__sub_processes_ids,
             self.__sub_termination_req_flags,
+            self.__sub_terminated_flags,
             self.__sub_running_job_counts,
             self.__force_upd_sts_exec_pid
         )
@@ -305,6 +315,7 @@ class SubProcessesManager():
         self.__sub_processe_ids = multiprocessing.Array(ctypes.c_int, (job_manager_config.SUB_PROCESS_ACCEPTABLE * 2))
         self.__sub_termination_req_times: list[datetime.datetime] = [None] * (job_manager_config.SUB_PROCESS_ACCEPTABLE * 2)
         self.__sub_termination_req_flags = multiprocessing.Array(ctypes.c_int, (job_manager_config.SUB_PROCESS_ACCEPTABLE * 2))
+        self.__sub_terminated_flags = multiprocessing.Array(ctypes.c_int, (job_manager_config.SUB_PROCESS_ACCEPTABLE * 2))
         self.__sub_running_job_counts = multiprocessing.Array(ctypes.c_int, (job_manager_config.SUB_PROCESS_ACCEPTABLE * 2))
         self.__force_upd_sts_exec_pid = multiprocessing.Value(ctypes.c_int)
         self.__force_upd_sts_exec_pid.value = -1
@@ -319,9 +330,14 @@ class SubProcessesManager():
         # 全processを処理 / Process all processes
         for i, process in enumerate(self.__sub_processes):
             if process is not None:
+                if self.__sub_terminated_flags[i] == 1 and process.exitcode is None:
+                    globals.logger.info(f"Kill sub process: {process.pid:06d}")
+                    # プログラムが終了しているのにprocessが終了しないケース（たまに発生する）
+                    process.kill()
+
                 if process.exitcode is not None:
                     # processが終了している場合 / If process has ended
-                    globals.logger.info(f"EXITED sub process: {process.pid:05x} exitcode={process.exitcode}")
+                    globals.logger.info(f"EXITED sub process: {process.pid:06d} exitcode={process.exitcode}")
 
                     # 強制ステータス更新を実行するprocessが終了した場合、他のprocessに引き継ぐ必要がある
                     # If the process that executes the forced status update ends, it must be taken over by another process.
@@ -333,7 +349,8 @@ class SubProcessesManager():
                     self.__sub_termination_req_times[i] = None
                     self.__sub_termination_req_flags[i] = 0
                     self.__sub_running_job_counts[i] = 0
-                else:
+                    self.__sub_terminated_flags[i] = 0
+                elif self.__sub_termination_req_flags[i] == 0:
                     # 実行中のprocessを強制ステータス更新を実行するprocessの候補として保持する
                     # Keep the running process as a candidate for executing forced status update
                     take_turns_force_upd_sts_pid = process.pid
@@ -342,8 +359,7 @@ class SubProcessesManager():
             # 強制ステータス更新を実行するprocessを引き継がなければいけない場合、候補としていたprocessに書き換える
             # If it is necessary to take over the process that executes the forced status update, rewrite it to the candidate process.
             self.__force_upd_sts_exec_pid.value = take_turns_force_upd_sts_pid
-            globals.logger.info(f"Take Turns force_upd_sts_exec_pid: {self.__force_upd_sts_exec_pid.value:05x}")
-
+            globals.logger.info(f"Take Turns force_upd_sts_exec_pid: {self.__force_upd_sts_exec_pid.value:06d}")
 
     def is_enough_sub_process(self):
         """sub processの数が足りているかを返す / Returns whether there are enough sub processes
@@ -351,9 +367,9 @@ class SubProcessesManager():
         Returns:
             bool: True : 足りている / enough
         """
-        # 
+        #
         return (job_manager_config.SUB_PROCESS_ACCEPTABLE <=
-            len([i for i, process in enumerate(self.__sub_processes) if process is not None and self.__sub_termination_req_flags[i] == 0]))
+                len([i for i, process in enumerate(self.__sub_processes) if process is not None and self.__sub_termination_req_flags[i] == 0]))
 
     def generate_sub_process_parameter(self):
         """sub processのパラメータを生成する / Generate parameters for sub process
@@ -371,6 +387,7 @@ class SubProcessesManager():
                 unused_array_indexes[0],
                 self.__sub_processe_ids,
                 self.__sub_termination_req_flags,
+                self.__sub_terminated_flags,
                 self.__sub_running_job_counts,
                 self.__force_upd_sts_exec_pid,
             )
@@ -394,6 +411,7 @@ class SubProcessesManager():
         # sub processの終了要求時間を設定 / Set sub process termination request time
         self.__sub_termination_req_times[i] = datetime.datetime.now() + self.__terminatiton_req_timedelta()
         self.__sub_termination_req_flags[i] = 0
+        self.__sub_terminated_flags[i] = 0
         self.__sub_running_job_counts[i] = 0
         return True
 
@@ -435,7 +453,7 @@ class SubProcessesManager():
         for i, termination_req_time in enumerate(self.__sub_termination_req_times):
             if not force:
                 if termination_req_time is not None and datetime.datetime.now() >= termination_req_time:
-                    globals.logger.debug(f'TERMINATION REQUEST sub process:{self.__sub_processes[i].pid:05x}')
+                    globals.logger.info(f'Termination request sub process:{self.__sub_processes[i].pid:06d}')
                     self.__sub_termination_req_flags[i] = 1
             else:
                 if termination_req_time is not None:
@@ -452,7 +470,7 @@ class SubProcessesManager():
     def kill_oldest_sub_process(self):
         """一番古いsub processをkillする / kill the oldest sub process
         """
-        sub_process_idx = self.__sub_termination_req_times.index(min(self.__sub_termination_req_times)) 
+        sub_process_idx = self.__sub_termination_req_times.index(min(self.__sub_termination_req_times))
         self.__sub_processes[sub_process_idx].kill()
 
 
