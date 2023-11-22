@@ -45,7 +45,7 @@ length_destination_name = 255
 length_destination_email = 255
 length_destination_teams_webhook = 1024
 max_destination_email = 500
-max_destination_teams_webhook = 500
+max_destination_teams_webhook = 1
 length_func_id = 100
 
 # ロール種別
