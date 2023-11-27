@@ -143,8 +143,12 @@
                                                     </tr>
                                                     <tr class="tBodyTr tr">
                                                         <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1"><div class="ci" style="text-align: left;"><span text-id="000-00150">通知先</span><span class="tHeadRequired" text-id="000-80024">必須</span></div></td>
-                                                        <td class="tBodyTd td" rowspan="1" colspan="1"><div class="ci" id="text_destination_kind">
-                                                        </div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1">
+                                                            <div class="ci" id="text_destination_informations_mail_to" style="display: none;"></div>
+                                                            <div class="ci" id="text_destination_informations_mail_cc" style="display: none;"></div>
+                                                            <div class="ci" id="text_destination_informations_mail_bcc" style="display: none;"></div>
+                                                            <div class="ci" id="text_destination_informations_teams" style="display: none;"></div>
+                                                        </td>
                                                     </tr>
                                                     <tr class="tBodyTr tr">
                                                         <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1"><div class="ci" style="text-align: left;" text-id="000-00141">最終更新日時</div></td>
@@ -161,18 +165,18 @@
                                                     </tr>
                                                 </thead>
                                                 <tbody class="tbody" style="max-width: 100%;">
-                                                    <tr class="tBodyTr tr datarow-template-top" style="cursor:pointer; display:none">
-                                                        <td class="tBodyLeftSticky tBodyTh td" rowspan="${conditions_all_count}" colspan="1" ><div class="ci" text-id="000-00186">送信設定</div></td>
+                                                    <tr class="tBodyTr tr datarow-template-top" style="display:none">
+                                                        <td class="tBodyLeftSticky tBodyTh td" style="width: 25%;" rowspan="${conditions_all_count}" colspan="1" ><div class="ci" text-id="000-00186">送信設定</div></td>
+                                                        <td class="tBodyLeftSticky tBodyTd td group_count" style="width: 25%;" rowspan="${conditions_group_count}" colspan="1" ><div class="ci">${conditions_group_name}</div></td>
+                                                        <td class="tBodyLeftSticky tBodyTd td" style="width: 25%;" rowspan="1" colspan="1" ><div class="ci">${conditions_name}</div></td>
+                                                        <td class="tBodyTd td" rowspan="1" style="width: 25%;" colspan="1" ><div class="ci">${conditions_value}</div></td>
+                                                    </tr>
+                                                    <tr class="tBodyTr tr datarow-template-2nd" style="display:none">
                                                         <td class="tBodyLeftSticky tBodyTd td group_count" rowspan="${conditions_group_count}" colspan="1" ><div class="ci">${conditions_group_name}</div></td>
                                                         <td class="tBodyLeftSticky tBodyTd td" rowspan="1" colspan="1" ><div class="ci">${conditions_name}</div></td>
                                                         <td class="tBodyTd td" rowspan="1" colspan="1" ><div class="ci">${conditions_value}</div></td>
                                                     </tr>
-                                                    <tr class="tBodyTr tr datarow-template-2nd" style="cursor:pointer; display:none">
-                                                        <td class="tBodyLeftSticky tBodyTd td group_count" rowspan="${conditions_group_count}" colspan="1" ><div class="ci">${conditions_group_name}</div></td>
-                                                        <td class="tBodyLeftSticky tBodyTd td" rowspan="1" colspan="1" ><div class="ci">${conditions_name}</div></td>
-                                                        <td class="tBodyTd td" rowspan="1" colspan="1" ><div class="ci">${conditions_value}</div></td>
-                                                    </tr>
-                                                    <tr class="tBodyTr tr datarow-template-3rd" style="cursor:pointer; display:none">
+                                                    <tr class="tBodyTr tr datarow-template-3rd" style="display:none">
                                                         <td class="tBodyLeftSticky tBodyTd td" rowspan="1" colspan="1" ><div class="ci">${conditions_name}</div></td>
                                                         <td class="tBodyTd td" rowspan="1" colspan="1" ><div class="ci">${conditions_value}</div></td>
                                                     </tr>

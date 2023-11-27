@@ -78,7 +78,7 @@ $(function(){
         // display Delete settings notification destination button
         //
         $('.button_delete_destination').on('click',() => {
-            delete_workspace();
+            delete_destination(destination_row.name);
         });
         if(CommonAuth.getAdminWorkspaces().indexOf(workspace_id) !== -1 || CommonAuth.hasAuthority(RolesCommon.ORG_AUTH_WS_MAINTE)) {
             $('.button_delete_destination').prop('disabled', false);
@@ -93,13 +93,14 @@ $(function(){
         $("#text_destination_id").text(destination_row.id);
         $("#text_destination_name").text(destination_row.name);
         $("#text_destination_kind").text(destination_row.kind);
+        settings_notifications_common.set_destination_informations_text(destination_row.kind, destination_row.destination_informations);
 
         try { $("#text_last_update_date_time").text(fn.date(new Date(destination_row.last_update_timestamp),'yyyy/MM/dd HH:mm:ss'))} catch(e) { }
 
-        var ita_event_type_new = fn.cv(destination_row.conditions.ita.event_type.new,false,true) ? getText("000-00184", 'する') : getText("000-00185", 'しない');
-        var ita_event_type_evaluated = fn.cv(destination_row.conditions.ita.event_type.evaluated,false,true) ? getText("000-00184", 'する') : getText("000-00185", 'しない');
-        var ita_event_type_timeout = fn.cv(destination_row.conditions.ita.event_type.timeout,false,true) ? getText("000-00184", 'する') : getText("000-00185", 'しない');
-        var ita_event_type_undetected = fn.cv(destination_row.conditions.ita.event_type.undetected,false,true) ? getText("000-00184", 'する') : getText("000-00185", 'しない');
+        var ita_event_type_new = fn.cv(destination_row.conditions.ita.event_type.new,false,false) ? getText("000-00184", 'する') : getText("000-00185", 'しない');
+        var ita_event_type_evaluated = fn.cv(destination_row.conditions.ita.event_type.evaluated,false,false) ? getText("000-00184", 'する') : getText("000-00185", 'しない');
+        var ita_event_type_timeout = fn.cv(destination_row.conditions.ita.event_type.timeout,false,false) ? getText("000-00184", 'する') : getText("000-00185", 'しない');
+        var ita_event_type_undetected = fn.cv(destination_row.conditions.ita.event_type.undetected,false,false) ? getText("000-00184", 'する') : getText("000-00185", 'しない');
 
         const row_template_top = $('#conditions_list .datarow-template-top').clone(true).removeClass('datarow-template').addClass('datarow').prop('outerHTML');
         const row_template_2nd = $('#conditions_list .datarow-template-2nd').clone(true).removeClass('datarow-template-sub').addClass('datarow').prop('outerHTML');
@@ -127,7 +128,7 @@ $(function(){
 
     }
 
-    function delete_workspace() {
+    function delete_destination(destination_name) {
         console.log("[CALL] confirm_delete");
 
         deleteConfirmMessage(
@@ -149,7 +150,7 @@ $(function(){
                     },
                 }).then(() => {
                     hide_progress();
-                    alertMessage(getText("000-80018", "処理結果"), getText("000-82007", "ワークスペースを削除しました。"),
+                    alertMessage(getText("000-80018", "処理結果"), getText("000-87012", "通知先設定を削除しました。"),
                         () => {
                             window.location.href = location_conf.href.workspaces.settings.notifications.list.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{workspace_id}/g, workspace_id);
                         });
