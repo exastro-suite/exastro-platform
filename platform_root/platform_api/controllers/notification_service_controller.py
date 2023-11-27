@@ -82,10 +82,9 @@ def settings_notification_put(body, organization_id, workspace_id, destination_i
             message=multi_lang.get_text(message_id, "通知先情報が存在しません(id:{0})", destination_id)
         )
 
-    # # 更新する情報の取得
-    # # get information to be updated
+    # 更新する情報の取得
+    # get information to be updated
     # body = connexion.request.get_json()
-
     destination_name = body.get('name')
     destination_kind = body.get('kind')
     info = body.get("destination_informations")
