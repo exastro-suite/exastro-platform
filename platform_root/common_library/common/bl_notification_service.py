@@ -395,7 +395,7 @@ def settings_notification_delete(organization_id, workspace_id, destination_id, 
 
             if r_ita_notification_destination.status_code != 200:
                 message_id = f"500-{MSG_FUNCTION_ID}002"
-                message = multi_lang.get_text(message_id, "利用中の通知先の取得に失敗しました(menu:{0} column:{1})", [key, item])
+                message = multi_lang.get_text(message_id, "利用中の通知先の取得に失敗しました(menu:{0} column:{1})", key, item)
                 raise common.InternalErrorException(message_id=message_id, message=message)
 
             result_dict = r_ita_notification_destination.json()
@@ -406,7 +406,7 @@ def settings_notification_delete(organization_id, workspace_id, destination_id, 
 
     if destination_id in check_id_list:
         message_id = f"400-{MSG_FUNCTION_ID}001"
-        message = multi_lang.get_text(message_id, "指定された通知先は利用されているため削除できません(destination id:{0})", [destination_id])
+        message = multi_lang.get_text(message_id, "指定された通知先は利用されているため削除できません(destination id:{0})", destination_id)
         raise common.BadRequestException(message_id=message_id, message=message)
 
     with closing(DBconnector().connect_workspacedb(organization_id, workspace_id)) as conn:
@@ -420,7 +420,7 @@ def settings_notification_delete(organization_id, workspace_id, destination_id, 
                 message = multi_lang.get_text(
                     message_id,
                     "通知先の削除に失敗しました(destination id:{0})",
-                    [destination_id],
+                    destination_id
                 )
                 raise common.InternalErrorException(message_id=message_id, message=message)
 

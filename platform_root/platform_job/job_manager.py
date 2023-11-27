@@ -52,6 +52,9 @@ def job_manager_main_process():
     signal.signal(signal.SIGTERM, job_manager_process_sigterm_handler)
     signal.signal(signal.SIGINT, job_manager_process_sigint_handler)
 
+    # 乱数の初期化
+    random.seed()
+
     globals.init(main_process=True)
     globals.logger.info('START main process')
 
@@ -151,6 +154,9 @@ def job_manager_sub_process(parameter: SubProcessParameter):
     # シグナルのハンドライベント設定 / Signal handler event settings
     signal.signal(signal.SIGTERM, job_manager_process_sigterm_handler)
     signal.signal(signal.SIGINT, job_manager_process_sigint_handler)
+
+    # 乱数の初期化
+    random.seed()
 
     # loggerの初期化 / Initializing logger
     globals.init()
