@@ -30,9 +30,9 @@ class BaseJobExecutor(metaclass=abc.ABCMeta):
         """
         self.queue = queue
         self.__job_info = (
-            f"kind:[{self.queue['PROCESS_KIND']}] / exec_id:[{self.queue['PROCESS_EXEC_ID']}] / " +
-            f"organization_id:[{self.queue['ORGANIZATION_ID']}] / workspace_id:[{self.queue['WORKSPACE_ID']}] / " +
-            f"timestamp:[{self.queue['LAST_UPDATE_TIMESTAMP']}]")
+            f"kind:[{self.queue.get('PROCESS_KIND')}] / exec_id:[{self.queue.get('PROCESS_EXEC_ID')}] / " +
+            f"organization_id:[{self.queue.get('ORGANIZATION_ID')}] / workspace_id:[{self.queue.get('WORKSPACE_ID')}] / " +
+            f"timestamp:[{self.queue.get('LAST_UPDATE_TIMESTAMP')}]")
 
         # スレッドidの初期化 / Initializing thread id
         self.__thread_id = None
@@ -51,8 +51,10 @@ class BaseJobExecutor(metaclass=abc.ABCMeta):
                 globals.logger.info(f"SUCCEED Job - {self.__job_info} / elapsed:[{(datetime.datetime.now() - start_time).total_seconds()}]")
             else:
                 globals.logger.warning(f"FAILED Job - {self.__job_info} / elapsed:[{(datetime.datetime.now() - start_time).total_seconds()}]")
+            return result
         except Exception as err:
             globals.logger.error(f"FAILED Job - {self.__job_info} / elapsed:[{(datetime.datetime.now() - start_time).total_seconds()}]")
+            return False
             
     def cancel_base(self):
         """job cancel実行 / job cancel execution
@@ -65,9 +67,11 @@ class BaseJobExecutor(metaclass=abc.ABCMeta):
             if result:
                 globals.logger.info(f"SUCCEED Cancel Job - {self.__job_info} / elapsed:[{(datetime.datetime.now() - start_time).total_seconds()}]")
             else:
-                globals.logger.warning(f"FAILED Job - {self.__job_info} / elapsed:[{(datetime.datetime.now() - start_time).total_seconds()}]")
+                globals.logger.warning(f"FAILED Cancel Job - {self.__job_info} / elapsed:[{(datetime.datetime.now() - start_time).total_seconds()}]")
+            return result
         except Exception:
-            globals.logger.error(f"FAILED Job - {self.__job_info} / elapsed:[{(datetime.datetime.now() - start_time).total_seconds()}]")
+            globals.logger.error(f"FAILED Cancel Job - {self.__job_info} / elapsed:[{(datetime.datetime.now() - start_time).total_seconds()}]")
+            return False
 
     def raise_timeout_exception(self):
         """job実行の中止(例外発行)
@@ -79,6 +83,7 @@ class BaseJobExecutor(metaclass=abc.ABCMeta):
         rlt = ctypes.pythonapi.PyThreadState_SetAsyncExc(
             self.__thread_id,
             ctypes.py_object(JobTimeoutException))
+        globals.logger.debug(f"Raise JobTimeoutException execute_thread id:[{self.__thread_id}] result:[{rlt}]")
         return rlt == 1
 
     def raise_cancel_timeout_exception(self):
@@ -91,6 +96,7 @@ class BaseJobExecutor(metaclass=abc.ABCMeta):
         rlt = ctypes.pythonapi.PyThreadState_SetAsyncExc(
             self.__cancel_thread_id,
             ctypes.py_object(JobTimeoutException))
+        globals.logger.debug(f"Raise JobTimeoutException cancel_thread id:[{self.__cancel_thread_id}] result:[{rlt}]")
         return rlt == 1
 
     @abc.abstractmethod

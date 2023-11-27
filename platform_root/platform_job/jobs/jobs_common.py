@@ -21,6 +21,11 @@ import job_manager_const
 
 
 def get_organizations():
+    """get oranization list (filter create complete)
+
+    Returns:
+        list: oranization list
+    """
     with closing(DBconnector().connect_platformdb()) as conn:
         with conn.cursor() as cursor:
             cursor.execute(queries_common.SQL_QUERY_ORGANIZATION)
@@ -29,7 +34,15 @@ def get_organizations():
     return [row for row in rows if json.loads(row["INFORMATIONS"]).get('status') == job_manager_const.ORG_STATUS_CREATE_COMPLETE]
 
 
-def get_workspaces(organization_id):
+def get_workspaces(organization_id: str):
+    """get workspace list
+
+    Args:
+        organization_id (str): organization id
+
+    Returns:
+        list: workspace list
+    """
     try:
         with closing(DBconnector().connect_orgdb(organization_id)) as conn:
             with conn.cursor() as cursor:
@@ -39,7 +52,16 @@ def get_workspaces(organization_id):
         return []
 
 
-def exists_queue(conn, process_exec_id):
+def exists_queue(conn, process_exec_id: str):
+    """check queue exists
+
+    Args:
+        conn (_type_): db connection (platform db)
+        process_exec_id (str): process_exec_id
+
+    Returns:
+        bool: True: exists queue
+    """
     with conn.cursor() as cursor:
         cursor.execute(
             queries_process_queue.SQL_QUERY_PROCESS_QUEUE_EXEC_ID,

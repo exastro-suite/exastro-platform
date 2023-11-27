@@ -86,7 +86,8 @@ class NotificationJobExecutor(BaseJobExecutor):
                         {
                             "notification_id": self.notification_id,
                             "notification_status": notification_status,
-                            "last_update_user": job_manager_const.SYSTEM_USER_ID
+                            "last_update_user": job_manager_const.SYSTEM_USER_ID,
+                            "notification_status_now": const.NOTIFICATION_STATUS_UNSENT,
                         })
                     conn.commit()
 
@@ -119,7 +120,10 @@ class NotificationJobExecutor(BaseJobExecutor):
                         "text": message_infomations.get("message")
                     },
                     headers={"Content-type": "application/json"},
-                    timeout=job_manager_config.JOBS[const.PROCESS_KIND_NOTIFICATION]['extra_config']['teams_webhook_timeout'])
+                    timeout=(
+                        job_manager_config.JOBS[const.PROCESS_KIND_NOTIFICATION]['extra_config']['teams_connection_timeout'],
+                        job_manager_config.JOBS[const.PROCESS_KIND_NOTIFICATION]['extra_config']['teams_read_timeout'],
+                    ))
 
                 if resp_webhook.status_code < 200 or resp_webhook.status_code >= 300:
                     resp_webhook_text = resp_webhook.text
@@ -135,16 +139,16 @@ class NotificationJobExecutor(BaseJobExecutor):
         else:
             return const.NOTIFICATION_STATUS_SUCCESSFUL
 
-
     def cancel(self):
         """job cancel
         """
         try:
             # ステータスを失敗に更新する / Update status to failed
             self.__update_status_failed()
+            return True
         except Exception as err:
             globals.logger.error(f'{err}\n-- stack trace --\n{traceback.format_exc()}')
-            raise err
+            return False
 
     def __update_status_failed(self):
         """status update failed
@@ -157,7 +161,8 @@ class NotificationJobExecutor(BaseJobExecutor):
                         {
                             "notification_id": self.notification_id,
                             "notification_status": const.NOTIFICATION_STATUS_FAILED,
-                            "last_update_user": job_manager_const.SYSTEM_USER_ID
+                            "last_update_user": job_manager_const.SYSTEM_USER_ID,
+                            "notification_status_now": const.NOTIFICATION_STATUS_UNSENT,
                         })
                     conn.commit()
         except Exception as err:
@@ -200,7 +205,8 @@ class NotificationJobExecutor(BaseJobExecutor):
                                                 {
                                                     "notification_id": row['NOTIFICATION_ID'],
                                                     "notification_status": const.NOTIFICATION_STATUS_FAILED,
-                                                    "last_update_user": job_manager_const.SYSTEM_USER_ID
+                                                    "last_update_user": job_manager_const.SYSTEM_USER_ID,
+                                                    "notification_status_now": const.NOTIFICATION_STATUS_UNSENT,
                                                 })
                                             conn_ws.commit()
                                             globals.logger.warning(f"Force Failed notification_id:{row['NOTIFICATION_ID']}")

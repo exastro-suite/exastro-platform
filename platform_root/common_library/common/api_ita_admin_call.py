@@ -167,3 +167,39 @@ def ita_workspace_delete(organization_id, workspace_id, user_id, encode_roles, l
     globals.logger.debug(request_response.text)
 
     return request_response
+
+
+def ita_notification_destination(organization_id, workspace_id, menu, column, user_id, encode_roles, language):
+    """IT Automation 使用中通知先取得 Get notification destination that ITA is using
+    Args:
+        organization_id (str): organization id
+        workspace_id (str): workspace id
+        menu (str): menu name rest
+        column (str): column name rest
+        user_id (str): user id
+        encode_roles (str): encode roles
+        language (str): language
+    Returns:
+        Response: HTTP Respose (success : .status_code=200)
+    """
+
+    globals.logger.debug(
+        'Get notification destination that ITA is using. organization_id={}, workspace_id={}, menu={}, column={}'
+        .format(organization_id, workspace_id, menu, column)
+    )
+
+    header_para = {
+        "User-Id": user_id,
+        "Roles": encode_roles,
+        "Language": language,
+    }
+
+    globals.logger.debug("GET ITA notification destination 送信")
+    api_url = __get_api_url_ita_admin()
+    request_response = requests.get(
+        "{}/api/{}/workspaces/{}/ita/menu/{}/info/notifications/destinations/{}/".format(api_url, organization_id, workspace_id, menu, column),
+        headers=header_para
+    )
+    globals.logger.debug(request_response.text)
+
+    return request_response

@@ -35,7 +35,7 @@ from libs.job_manager_classes import SubProcessesManager, SubProcessParameter, S
 # 終了指示のシグナル受信
 process_terminate = False   # SIGTERM or SIGINT signal
 process_sigterm = False     # SIGTERM signal (Jobを中断して終了する / Interrupt and end the job)
-process_sigint = False      # SIGINT signal (Jobをやり終えて終了する / Finish the job and exit)
+process_sigint = False      # SIGINT signal (Jobをやり終えて停止する / Finish the job and stop)
 
 
 def job_manager_main_process():
@@ -47,13 +47,12 @@ def job_manager_main_process():
     process_terminate = False
     process_sigterm = False
     process_sigint = False
-    
+
     # シグナルのハンドライベント設定 / Signal handler event settings
     signal.signal(signal.SIGTERM, job_manager_process_sigterm_handler)
     signal.signal(signal.SIGINT, job_manager_process_sigint_handler)
 
-    log_queue = multiprocessing.Queue()
-    globals.init(log_queue, main_process=True)
+    globals.init(main_process=True)
     globals.logger.info('START main process')
 
     # sub process管理用クラス / sub process management class
@@ -74,7 +73,7 @@ def job_manager_main_process():
                     # processインスタンスの生成 / Generate process instance
                     new_sub_process = multiprocessing.Process(
                         target=job_manager_sub_process,
-                        args=(log_queue, sub_process_parameter)
+                        args=(sub_process_parameter,)
                     )
                     # sub processを追加
                     sub_processes_mgr.append_new_process(sub_process_parameter, new_sub_process)
@@ -92,8 +91,7 @@ def job_manager_main_process():
 
         except Exception as err:
             # 例外が発生しても処理は継続する / Processing continues even if an exception occurs
-            globals.logger.error(err)
-            globals.logger.error(f'stack trace\n{traceback.format_exc()}')
+            globals.logger.error(f'{err}\n---- stack trace ----\n{traceback.format_exc()}')
 
         time.sleep(job_manager_config.SUB_PROCESS_WATCH_INTERVAL_SECONDS)
 
@@ -136,7 +134,7 @@ def job_manager_main_process():
     return
 
 
-def job_manager_sub_process(log_queue, parameter: SubProcessParameter):
+def job_manager_sub_process(parameter: SubProcessParameter):
     """sub process
 
     Args:
@@ -155,7 +153,7 @@ def job_manager_sub_process(log_queue, parameter: SubProcessParameter):
     signal.signal(signal.SIGINT, job_manager_process_sigint_handler)
 
     # loggerの初期化 / Initializing logger
-    globals.init(log_queue)
+    globals.init()
     globals.logger.info('START sub process')
 
     # job classのインポート / Importing job class
@@ -182,7 +180,7 @@ def job_manager_sub_process(log_queue, parameter: SubProcessParameter):
                         if sub_process_mgr.interval_db_reconect.is_passed():
                             # DBの再接続時間になったのでループを抜ける
                             # It's time to reconnect the DB, so exit the loop.
-                            globals.logger.debug("Reconnect DB")
+                            globals.logger.debug(job_manager_const.LOG_RECONNECT)
                             break
 
                         if sub_process_mgr.interval_db_health_check.is_passed():
@@ -198,39 +196,38 @@ def job_manager_sub_process(log_queue, parameter: SubProcessParameter):
                             # jobの起動処理
                             # Job startup process
                             job_start_control(conn, sub_process_mgr, job_modules)
-                        except Exception:
-                            pass
+                        except Exception as err:
+                            globals.logger.error(f'{err}\n---- stack trace ----\n{traceback.format_exc()}')
 
                         try:
                             # job timeoutの起動処理
                             # Job timeout startup process
                             job_timeout_control(sub_process_mgr)
-                        except Exception:
-                            pass
+                        except Exception as err:
+                            globals.logger.error(f'{err}\n---- stack trace ----\n{traceback.format_exc()}')
 
                         try:
                             # job cancel timeoutの処理
                             # Handling job cancel timeout
                             cancel_job_timeout_control(sub_process_mgr)
-                        except Exception:
-                            pass
+                        except Exception as err:
+                            globals.logger.error(f'{err}\n---- stack trace ----\n{traceback.format_exc()}')
 
                     except Exception as err:
                         # 例外が発生しても処理は継続する / Processing continues even if an exception occurs
-                        globals.logger.error(err)
-                        globals.logger.error(f'stack trace\n{traceback.format_exc()}')
+                        globals.logger.error(f'{err}\n---- stack trace ----\n{traceback.format_exc()}')
 
         except Exception as err:
-            globals.logger.error(err)
-            globals.logger.error(f'stack trace\n{traceback.format_exc()}')
+            globals.logger.error(f'{err}\n---- stack trace ----\n{traceback.format_exc()}')
             time.sleep(job_manager_config.JOB_STATUS_WATCH_INTERVAL_SECONDS)
 
-    globals.logger.info('EXIT sub process loop')
+    globals.logger.debug('Sub process loop exited')
 
     if process_sigterm:
         # jobの強制終了を行う / Force quit job
         cancel_all_jobs(sub_process_mgr)
 
+    sub_process_mgr.set_terminated_flag()
     globals.logger.info('EXIT sub process')
     return
 
@@ -274,36 +271,23 @@ def job_start_control(conn, sub_process_mgr: SubProcessManager, job_modules):
 
             # 取得したqueue分処理する / Process the acquired queue
             for queue_row in queue_rows:
-                if not sub_process_mgr.countup_job_count():
-                    # jobの上限数に到達した場合 / When the maximum number of jobs is reached
-                    break
+                globals.logger.debug(f"Starting job : {queue_row['PROCESS_ID']} / {queue_row['PROCESS_KIND']}")
 
-                try:
-                    globals.logger.debug(f"Starting job : {queue_row['PROCESS_ID']} / {queue_row['PROCESS_KIND']}")
+                # queueから起動対象のレコードを削除する / Delete the record to be launched from the queue
+                delete_queue(conn, queue_row)
 
-                    # queueから起動対象のレコードを削除する / Delete the record to be launched from the queue
-                    delete_queue(conn, queue_row)
-                    
-                    # job処理のclassのinstanceを生成する / Generate an instance of the job processing class
-                    job_executor = eval(f"job_modules[queue_row['PROCESS_KIND']].{job_manager_config.JOBS[queue_row['PROCESS_KIND']]['class']}")(queue_row)
+                # job処理のclassのinstanceを生成する / Generate an instance of the job processing class
+                job_executor = eval(f"job_modules[queue_row['PROCESS_KIND']].{job_manager_config.JOBS[queue_row['PROCESS_KIND']]['class']}")(queue_row)
 
-                    # job処理のthreadを生成する / Generate a thread for job processing
-                    job_thread = threading.Thread(
-                        target=job_executor.execute_base,
-                        name=queue_row['PROCESS_ID'],
-                        daemon=True)
-                    # job処理のthreadを開始する / Start a job processing thread
-                    job_thread.start()
-                    # jobの情報を追加する / Add job information
-                    sub_process_mgr.append_job(queue_row, job_thread, job_executor)
-                except Exception:
-                    # 何らかの異常でjobを開始できなかった場合、countupしたjob数を元に戻す
-                    # If the job cannot be started due to some abnormality, restore the counted up job number to the original number.
-                    sub_process_mgr.countdown_job_count()
-                    raise
-        except Exception as err:
-            globals.logger.error(err)
-            globals.logger.error(f'stack trace\n{traceback.format_exc()}')
+                # job処理のthreadを生成する / Generate a thread for job processing
+                job_thread = threading.Thread(
+                    target=job_executor.execute_base,
+                    name=queue_row['PROCESS_ID'],
+                    daemon=True)
+                # job処理のthreadを開始する / Start a job processing thread
+                job_thread.start()
+                # jobの情報を追加する / Add job information
+                sub_process_mgr.append_job(queue_row, job_thread, job_executor)
         finally:
             # queueの更新をcommitする / Commit queue updates
             conn.commit()
@@ -471,7 +455,7 @@ def get_queue(conn, running_job_queue: list, force_update_status_job: bool):
         # 次に処理するqueue情報 / queue to process next
         next_process_id = queue_org_grouping[next_organization_id][0]['PROCESS_ID']
         next_process_king = queue_org_grouping[next_organization_id][0]['PROCESS_KIND']
-            
+
         if len(running_kind_grouping[next_process_king]) < job_manager_config.JOBS[next_process_king]['max_job_per_process']:
             # 次に処理するPROCESS_KINDが条件に達していないときは、起動可能かの処理を進める
             # If the next PROCESS_KIND to be processed does not meet the conditions, proceed with the process to see if it can be started.
@@ -480,8 +464,7 @@ def get_queue(conn, running_job_queue: list, force_update_status_job: bool):
                 # queueをLockする / Lock the queue
                 with conn.cursor() as cursor:
                     cursor.execute(queries_process_queue.SQL_QUERY_PROCESS_LOCK, {"process_id": next_process_id})
-                    cursor.fetchone()
-                lock_succeed = True
+                    lock_succeed = cursor.fetchone() is not None
             except pymysql.err.OperationalError as err:
                 # Lock Error
                 lock_succeed = False

@@ -12,35 +12,51 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 import os
+import sys
+import multiprocessing
 import logging
 import logging.handlers
 
 logger = None
-log_listener = None
+__log_queue = None
+__log_listener = None
 
 
-def init(log_queue, main_process=False):
+def init(main_process=False, pytest=False):
     global logger
-    global log_listener
+    global __log_queue
+    global __log_listener
 
-    if main_process:
-        console_handler = logging.StreamHandler()
-        console_formatter = logging.Formatter('[%(asctime)s] [%(process)05x:%(threadName)s] [%(levelname)-5s] %(message)s')
-        console_handler.setFormatter(console_formatter)
+    if logger is None:
+        logger = logging.getLogger()
 
-    logger = logging.getLogger()
+        if pytest:
+            console_handler = logging.StreamHandler(sys.stdout)
+            console_formatter = logging.Formatter('[%(asctime)s] [%(process)06d:%(threadName)s] [%(levelname)-5s] %(message)s')
+            console_handler.setFormatter(console_formatter)
+            logger.addHandler(console_handler)
+            logger.setLevel(os.environ.get('LOG_LEVEL', logging.INFO))
 
-    if main_process:
-        queue_handler = logging.handlers.QueueHandler(log_queue)
-        # queue_fomatter = logging.Formatter('[%(asctime)s] [%(process)x:%(threadName)s] [%(levelname)-s] %(message)s')
-        # queue_handler.setFormatter(queue_fomatter)
-        logger.addHandler(queue_handler)
-        logger.setLevel(os.environ.get('LOG_LEVEL', logging.INFO))
+        elif main_process:
+            log_queue = multiprocessing.Queue()
+            console_handler = logging.StreamHandler(sys.stdout)
+            console_formatter = logging.Formatter('[%(asctime)s] [%(process)06d:%(threadName)s] [%(levelname)-5s] %(message)s')
+            console_handler.setFormatter(console_formatter)
 
-    if main_process:
-        log_listener = logging.handlers.QueueListener(log_queue, console_handler)
-        log_listener.start()
+            queue_handler = logging.handlers.QueueHandler(log_queue)
+            # queue_fomatter = logging.Formatter('[%(asctime)s] [%(process)x:%(threadName)s] [%(levelname)-s] %(message)s')
+            # queue_handler.setFormatter(queue_fomatter)
+            logger.addHandler(queue_handler)
+            logger.setLevel(os.environ.get('LOG_LEVEL', logging.INFO))
+
+            __log_listener = logging.handlers.QueueListener(log_queue, console_handler)
+            __log_listener.start()
 
 
 def terminate():
-    log_listener.stop()
+    global __log_listener
+    try:
+        if __log_listener is not None:
+            __log_listener.stop()
+    except Exception as err:
+        pass
