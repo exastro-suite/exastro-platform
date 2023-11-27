@@ -201,7 +201,8 @@ width: 632px!important;
 white-space: normal!important;
 }
 /* checkbox */
-.checkboxWrap {
+.checkboxWrap,
+.radioWrap {
 overflow: hidden;
 display: inline-block;
 position: relative;
@@ -209,10 +210,15 @@ z-index: 0;
 width: 18px; height: 18px;
 border-radius: 2px;
 }
-.checkboxWrap:focus-within {
+.radioWrap {
+border-radius: 50%;
+}
+.checkboxWrap:focus-within,
+.radioWrap:focus-within {
 box-shadow: 0 0 0 1px var(--white100), 0 0 0 3px var(--focusColor);
 }
-.checkboxLabel {
+.checkboxLabel,
+.radioLabel {
 display: block;
 position: absolute;
 left: 0; top: 0;
@@ -224,27 +230,34 @@ border: 1px solid var(--black50);
 border-radius: 4px;
 pointer-events: none;
 }
-.checkbox {
+.radioLabel {
+border-radius: 50%;
+}
+.checkbox,
+.radio {
 position: absolute;
 left: 0; top: 0;
-z-index: 1;
+z-index: -1;
 opacity: 0;
-cursor: pointer;
 }
 .checkbox:checked ~ .checkboxLabel,
-.checkboxText:checked ~ .checkboxTextLabel > .checkboxTextMark {
+.radio:checked ~ .radioLabel,
+.checkboxText:checked ~ .checkboxTextLabel > .checkboxTextMark,
+.radioText:checked ~ .radioTextLabel > .radioTextMark {
 background-color: var(--mainColor80);
 background-image: linear-gradient( rgba(255,255,255,.2), rgba(255,255,255,0) );
 border-color: var(--mainColor100);
+}
+.checkboxTextOneOrMore .checkboxText:checked ~ .checkboxTextLabel > .checkboxTextMark {
+background-color: var(--mainColor10);
 }
 .checkbox:checked ~ .checkboxLabel::after,
 .checkboxText:checked ~ .checkboxTextLabel > .checkboxTextMark::after {
 content: '';
 display: block;
 position: absolute;
-left: 50%;
-top: 50%;
 z-index: 2;
+left: 50%; top: 50%;
 transform: translate( -50%,calc( -50% - 3px ) ) rotate(-45deg);
 width: 14px;
 height: 9px;
@@ -252,20 +265,56 @@ border: 3px solid transparent;
 border-left-color: #FFF;
 border-bottom-color: #FFF;
 }
+.checkboxTextOneOrMore .checkboxText:checked ~ .checkboxTextLabel > .checkboxTextMark::after {
+transform: translate(-50%,-50%);
+width: 12px; height: 2px;
+background-color: var(--mainColor80);
+border: none;
+}
+.radio:checked ~ .radioLabel::after {
+content: '';
+display: block;
+position: absolute;
+z-index: 2;
+left: 50%; top: 50%;
+transform: translate(-50%,-50%);
+width: 7px; height: 7px;
+background-color: #FFF;
+border-radius: 50%;
+animation: radio .3s;
+}
+@keyframes radio {
+0% { transform: translate(-50%,-50%) scale(1.5); }
+50% { transform: translate(-50%,-50%) scale(.5); }
+100% { transform: translate(-50%,-50%) scale(1); }
+}
+.checkboxWrap:hover .checkboxLabel,
+.radioWrap:hover .radioLabel {
+background-image: none;
+border-color: var(--accentColor100);
+border-width: 2px;
+}
+.checkboxWrap:hover .checkbox:checked ~ .checkboxLabel,
+.radioWrap:hover .radio:checked ~ .radioLabel {
+background-color: var(--accentColor100);
+}
 /* checkbox text */
-.checkboxTextWrap {
+.checkboxTextWrap,
+.radioTextWrap {
 overflow: hidden;
 position: relative;
 z-index: 0;
 }
-.checkboxText {
+.checkboxText,
+.radioText {
 position: absolute;
 left: 0; top: 0;
 z-index: 1;
 opacity: 0;
 cursor: pointer;
 }
-.checkboxTextLabel {
+.checkboxTextLabel,
+.radioTextLabel {
 display: inline-flex;
 align-items: center;
 width: 100%; height: 32px;
@@ -278,7 +327,8 @@ font-size: 14px;
 cursor: pointer;
 user-select: none;
 }
-.checkboxTextMark {
+.checkboxTextMark,
+.radioTextMark {
 position: relative;
 z-index: 0;
 width: 18px; height: 18px;
@@ -288,23 +338,67 @@ background-image: linear-gradient(rgba(255,255,255,0), rgba(0,0,0,.075), rgba(25
 border: 1px solid var(--black50);
 border-radius: 4px;
 }
-.checkboxText:focus ~ .checkboxTextLabel {
+.radioTextMark {
+border-radius: 50%;
+}
+.narrowRadioTextWrap .radioTextLabel {
+min-height: 24px;
+padding: 0 4px;
+letter-spacing: .25px;
+font-size: 12px;
+}
+.narrowRadioTextWrap .radioTextMark {
+width: 14px; height: 14px;
+margin-right: 6px;
+}
+.radioText:checked ~ .radioTextLabel .radioTextMark::after {
+content: '';
+display: block;
+position: absolute;
+z-index: 2;
+left: 50%; top: 50%;
+transform: translate(-50%,-50%);
+width: 7px; height: 7px;
+background-color: #FFF;
+border-radius: 50%;
+animation: radio .3s;
+}
+.checkboxText:focus ~ .checkboxTextLabel,
+.radioText:focus ~ .radioTextLabel {
 background-color: var(--focusBackColor);
 border-color: var(--focusColor);
 }
-.checkboxText ~ .checkboxTextLabel:hover {
+.checkboxText ~ .checkboxTextLabel:hover,
+.radioText ~ .radioTextLabel:hover {
 background-color: transparent;
 border-color: transparent;
 }
-.checkboxText ~ .checkboxTextLabel:hover > .checkboxTextMark {
+.checkboxText ~ .checkboxTextLabel:hover > .checkboxTextMark,
+.radioText ~ .radioTextLabel:hover > .radioTextMark {
 background-image: none;
 border-color: var(--accentColor100);
 border-width: 2px;
 }
-.checkboxText:checked ~ .checkboxTextLabel:hover > .checkboxTextMark {
+.checkboxTextOneOrMore .checkboxText:checked ~ .checkboxTextLabel:hover > .checkboxTextMark {
+background-color: var(--accentColor10);
+}
+.checkboxTextOneOrMore .checkboxText:checked ~ .checkboxTextLabel:hover > .checkboxTextMark::after {
 background-color: var(--accentColor100);
 }
-
+.checkboxText:disabled ~ .checkboxTextLabel,
+.radioText:disabled ~ .radioTextLabel {
+cursor: default;
+}
+.checkboxText:disabled ~ .checkboxTextLabel > .checkboxTextMark {
+background-color: var(--black60)!important;
+background-image: none!important;
+border-color: transparent!important;
+opacity: .2;
+}
+.checkbox:disabled ~ .checkboxLabel::after,
+.checkboxText:disabled ~ .checkboxTextLabel > .checkboxTextMark::after {
+opacity: .8;
+}
 
 /* button */
 .button {
@@ -1724,17 +1818,25 @@ background-color: var(--mainColor60);
 z-index: 5;
 }
 .tHeadRowSelect,
-.tBodyRowSelect {
+.tBodyRowSelect,
+.tBodyRowRadioSelect {
 cursor: pointer;
 }
+.tBodyRowSelect > .ci,
+.tBodyRowRadioSelect > .ci {
+padding: 3px 8px;
+line-height: 1;
+}
 .tHeadRowSelect:hover .checkboxLabel,
-.tBodyRowSelect:hover .checkboxLabel {
+.tBodyRowSelect:hover .checkboxLabel,
+.tBodyRowRadioSelect:hover .radioLabel {
 background-image: none;
 border-color: var(--accentColor100);
 border-width: 2px;
 }
 .tHeadRowSelect:hover .checkbox:checked ~ .checkboxLabel,
-.tBodyRowSelect:hover .checkbox:checked ~ .checkboxLabel {
+.tBodyRowSelect:hover .checkbox:checked ~ .checkboxLabel,
+.tBodyRowRadioSelect:hover .radio:checked ~ .radioLabel {
 background-color: var(--accentColor100);
 }
 .tHeadRowSelect > .ci,
@@ -2850,7 +2952,7 @@ gap: 16px;
 .datePickerMenuItem {
 width: 50%;
 }
-    
+
 /*
 ##################################################
    Calendar
@@ -2978,7 +3080,7 @@ border-radius: 17px;
 .calTd.endCell {
 background-color: transparent!important;
 }
-    
+
 /*
 ##################################################
   メニュー情報表示
@@ -3193,7 +3295,7 @@ white-space: nowrap;
 text-overflow: ellipsis;
 }
 .operationLogFooterTitle {
-padding-left: 16px; 
+padding-left: 16px;
 }
 .operationLogFooterItem {
 margin-left: 12px; padding: 12px;
@@ -3240,7 +3342,7 @@ line-height: 1.5;
 letter-spacing: .5px;
 font-size: 16px;
 animation: messageShow .2s linear forwards;
-} 
+}
 @keyframes messageShow {
 to { transform: translateY(0); }
 }
@@ -3491,7 +3593,7 @@ justify-content: flex-end;
 gap: 16px;
 }
 .commonMenuItem {
-flex: 1 1 100%; 
+flex: 1 1 100%;
 max-width: 50%;
 }
 .commonButton {
@@ -3526,7 +3628,7 @@ padding: 16px;
 letter-spacing: .25px;
 line-height: 1.75;
 font-size: 16px;
-} 
+}
 .alertMessageIconBlock {
 display: flex;
 align-items: center;

@@ -309,6 +309,7 @@ def notification_list(organization_id, workspace_id, page_size=None, current_pag
     return common.response_200_ok(data)
 
 
+@common.platform_exception_handler
 def notification_delete(organization_id, workspace_id, destination_id):  # noqa: E501
     """Delete deletes an notification
 
@@ -320,4 +321,20 @@ def notification_delete(organization_id, workspace_id, destination_id):  # noqa:
     Returns:
         Response: http response
     """
-    return 'do some magic!'
+
+    globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
+    globals.logger.debug(f"destination_id:{destination_id}")
+
+    r = connexion.request
+
+    user_id = r.headers.get("User-id")
+    encode_roles = r.headers.get("Roles")
+    language = r.headers.get("Language")
+
+    globals.logger.debug(f"user_id:{user_id}")
+    globals.logger.debug(f"roles:{encode_roles}")
+    globals.logger.debug(f"language:{language}")
+
+    bl_notification_service.settings_notification_delete(organization_id, workspace_id, destination_id, user_id, encode_roles, language)
+
+    return common.response_200_ok(data=None)
