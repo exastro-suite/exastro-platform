@@ -34,6 +34,10 @@ var api_conf = {
                     "post": "/api/{organization_id}/platform/workspaces/{workspace_id}/settings/notifications",
                     "put": "/api/{organization_id}/platform/workspaces/{workspace_id}/settings/notifications/{destination_id}",
                     "delete": "/api/{organization_id}/platform/workspaces/{workspace_id}/settings/notifications/{destination_id}",
+
+                    "detail": {
+                        "get": "/api/{organization_id}/platform/workspaces/{workspace_id}/settings/notifications/{destination_id}",
+                    },
                 },
             },
             "notifications": {

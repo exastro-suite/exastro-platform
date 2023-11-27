@@ -108,10 +108,10 @@ $(function(){
             const row_template = $('#settings_notification_list .datarow-template').clone(true).removeClass('datarow-template').addClass('datarow').prop('outerHTML');
             let html='';
             for(var row of settings_notifications) {
-                var ita_event_type_new = fn.cv(row.conditions.ita.event_type.new,false,true) ? getText("000-00184", 'する') : getText("000-00185", 'しない');
-                var ita_event_type_evaluated = fn.cv(row.conditions.ita.event_type.evaluated,false,true) ? getText("000-00184", 'する') : getText("000-00185", 'しない');
-                var ita_event_type_timeout = fn.cv(row.conditions.ita.event_type.timeout,false,true) ? getText("000-00184", 'する') : getText("000-00185", 'しない');
-                var ita_event_type_undetected = fn.cv(row.conditions.ita.event_type.undetected,false,true) ? getText("000-00184", 'する') : getText("000-00185", 'しない');
+                var ita_event_type_new = fn.cv(row.conditions.ita.event_type.new,false,false) ? getText("000-00184", 'する') : getText("000-00185", 'しない');
+                var ita_event_type_evaluated = fn.cv(row.conditions.ita.event_type.evaluated,false,false) ? getText("000-00184", 'する') : getText("000-00185", 'しない');
+                var ita_event_type_timeout = fn.cv(row.conditions.ita.event_type.timeout,false,false) ? getText("000-00184", 'する') : getText("000-00185", 'しない');
+                var ita_event_type_undetected = fn.cv(row.conditions.ita.event_type.undetected,false,false) ? getText("000-00184", 'する') : getText("000-00185", 'しない');
 
                 str_conditions = "";
                 str_conditions += getText("000-87022", "OASE／イベント種別") + ":" + getText("000-00153", '新規') + ":" + ita_event_type_new + "<br>";
