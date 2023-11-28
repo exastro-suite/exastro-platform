@@ -126,6 +126,22 @@ $(function(){
         $("#conditions_list tbody").append(html);
         $("#conditions_list .datarow").css('display', '');
 
+        //
+        // notification test button
+        //
+        $('#button_test').on('click',() => {
+            confirmMessage(getText("000-80030", "確認"), getText("000-87036", "テスト通知を行いますか？<br><br>タイトル・本文：notification testで通知されます。"),
+                () => {
+                    // OK
+                    $('#button_test').prop('disabled',true);
+                    notification_test(destination_row);
+                },
+                () => {
+                    // Cancel
+                    return;
+                }
+            )
+        });
     }
 
     function delete_destination(destination_name) {
@@ -164,5 +180,55 @@ $(function(){
     function disabled_button() {
         $('.button_edit_destination').prop('disabled', true);
         $('.button_delete_destination').prop('disabled', true);
+    }
+
+    //
+    // register setting notification destination
+    //
+    function notification_test(destination_row) {
+
+        var message = {}
+        if (destination_row.kind === DESTINATION_KIND_MAIL){
+            message = {
+                "title": "notification test",
+                "message": "notification test"
+            };
+        }
+        else if (destination_row.kind === DESTINATION_KIND_TEAMS){
+            message = {
+                "title": "notification test",
+                "text": "notification test"
+            };
+        }
+
+        let reqbody = [
+            {
+                "destination_id": destination_row.id,
+                "func_id": "TEST",
+                "func_informations": {},
+                "message": message
+            }
+        ];
+
+        show_progress();
+        call_api_promise(
+            {
+                type: "POST",
+                url: api_conf.api.workspaces.notifications.post.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{workspace_id}/g, workspace_id),
+                headers: {
+                    Authorization: "Bearer " + CommonAuth.getToken(),
+                },
+                data: JSON.stringify(reqbody),
+                contentType: "application/json",
+                dataType: "json",
+            }
+        ).then(() => {
+            hide_progress();
+            $('#button_test').prop('disabled',false);
+            alertMessage(getText("000-80018", "処理結果"), getText("000-87035", "テスト通知を完了しました。結果が通知先に送信されるまでお待ちください。"));
+        }).catch(() => {
+            hide_progress();
+            $('#button_test').prop('disabled',false);
+        })
     }
 });

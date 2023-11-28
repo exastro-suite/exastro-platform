@@ -201,3 +201,23 @@ html {
     transform: translateX(44px);
     background: var(--focusColor);
 }
+
+.overflowAuto::-webkit-scrollbar {
+    width: 10px!important;
+    height: 10px!important;
+}
+.overflowAuto::-webkit-scrollbar-track {
+    background: linear-gradient(darkgray,gray);
+}
+.overflowAuto::-webkit-scrollbar-thumb {
+    background: rgba( 255,255,255,.6 );
+    border-radius:5px;
+    border: 1px solid black;
+}
+/* Firefox */
+.overflowAuto {
+    overflow: auto!important;
+    text-overflow: clip!important;
+    scrollbar-width: thin!important;
+    scrollbar-color: #999 #222;
+}

@@ -1609,6 +1609,22 @@ color: var(--black80);
 overflow: auto;
 flex: 1 1 auto;
 }
+.tableFilter,
+.tableWrap {
+flex: 1 1 auto;
+position: relative;
+z-index: 5;
+overflow: auto;
+background-color: rgba(0,0,0,.05);
+border: 1px solid rgba( 0,0,0,.1);
+}
+.initFilterStandBy .tableWrap,
+.noData .tableWrap {
+flex: 0 0 auto;
+}
+.tableStandBy .tableWrap {
+visibility: hidden!important;
+}
 
 /* Table general */
 .table {

@@ -1101,16 +1101,18 @@ const settings_notifications_common = {
             });
             if (mail_to.length > 0){
                 mail_to = mail_to.slice( 0, -1 );
-                $("#text_destination_informations_mail_to").css('display', '');
             }
             if (mail_cc.length > 0){
                 mail_cc = mail_cc.slice( 0, -1 );
-                $("#text_destination_informations_mail_cc").css('display', '');
             }
             if (mail_bcc.length > 0){
                 mail_bcc = mail_bcc.slice( 0, -1 );
-                $("#text_destination_informations_mail_bcc").css('display', '');
             }
+            $("#text_destination_informations_mail_to").css('display', '');
+            $("#hr_destination_informations_mail_to").css('display', '');
+            $("#text_destination_informations_mail_cc").css('display', '');
+            $("#hr_destination_informations_mail_cc").css('display', '');
+            $("#text_destination_informations_mail_bcc").css('display', '');
             $("#text_destination_informations_mail_to").text("to: " + mail_to);
             $("#text_destination_informations_mail_cc").text("cc: " + mail_cc);
             $("#text_destination_informations_mail_bcc").text("bcc: " + mail_bcc)
