@@ -87,6 +87,13 @@ $(function(){
             $('.button_delete_destination').css('cursor', 'not-allowed');
         }
 
+        if(CommonAuth.getAdminWorkspaces().indexOf(workspace_id) !== -1 || CommonAuth.hasAuthority(RolesCommon.ORG_AUTH_WS_MAINTE)) {
+            $('#button_test').prop('disabled', false);
+        } else {
+            $('#button_test').prop('disabled', true);
+            $('#button_test').css('cursor', 'not-allowed');
+        }
+
         //
         // display workspace detail
         //
@@ -180,6 +187,7 @@ $(function(){
     function disabled_button() {
         $('.button_edit_destination').prop('disabled', true);
         $('.button_delete_destination').prop('disabled', true);
+        $('.button_test').prop('disabled', true);
     }
 
     //
