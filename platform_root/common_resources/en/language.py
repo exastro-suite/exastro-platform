@@ -154,6 +154,7 @@ class LanguageList:
     lang_array['000-80045'] = 'Yes, Cancellation'
     lang_array['000-80046'] = 'Apply'
     lang_array['000-80047'] = 'setting'
+    lang_array['000-80048'] = 'Due to maintenance, you cannot create a workspace.'
     lang_array['000-81001'] = 'Edit accouont'
     lang_array['000-81002'] = 'Change password'
     lang_array['000-81003'] = 'Two-factor authentication settings'
@@ -542,8 +543,8 @@ class LanguageList:
     lang_array['500-34001'] = 'Failed to create notification destination (id:{0})'
     lang_array['500-34002'] = 'Failed to register message notification (destination id:{0})'
     lang_array['500-34003'] = 'Failed to register process queue (process id:{0})'
-
-
+    lang_array['500-35001'] = 'Failed to delete notification destination (destination id:{0})'
+    lang_array['500-35002'] = 'Failed to get notification destination in use (menu:{0} column:{1})'
     lang_array['500-90001'] = 'Failed to get client (Target ID: {0} client: {1})'
     lang_array['500-90002'] = 'Failed to get client role (Target ID: {0} client: {1})'
     lang_array['500-90003'] = 'Failed to create client (Target ID: {0} client: {1})'
