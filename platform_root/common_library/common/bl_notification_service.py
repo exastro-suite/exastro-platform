@@ -21,6 +21,7 @@ from common_library.common.db import DBconnector
 from common_library.common import encrypt
 from common_library.common import multi_lang
 from common_library.common.libs import queries_bl_notification
+from common_library.common import api_ita_admin_call
 
 
 import globals
@@ -363,3 +364,64 @@ def notification_list(organization_id, workspace_id, page_size=None, current_pag
     """ ↑試験用のロジック """
 
     return data
+
+
+def settings_notification_delete(organization_id, workspace_id, destination_id, user_id, roles, language):
+    """Delete a notification destination
+
+    Args:
+        organization_id (str): organization_id
+        workspace_id (str): workspace_id
+        destination_id (str): destination_id
+        user_id (str): user_id
+        roles (str): roles
+        language (str): language
+    """
+
+    # ITAに通知先IDを利用しているか問い合わせる
+    # 通知先として利用されている場合は削除不可とするため、エラーを返す
+    check_target = {
+        "rule": [
+            "before_notification_destination",
+            "after_notification_destination"
+        ]
+    }
+
+    check_id_list = []
+    for key, value in check_target.items():
+        for item in value:
+            r_ita_notification_destination = api_ita_admin_call.ita_notification_destination(
+                organization_id, workspace_id, key, item, user_id, roles, language)
+
+            if r_ita_notification_destination.status_code != 200:
+                message_id = f"500-{MSG_FUNCTION_ID}002"
+                message = multi_lang.get_text(message_id, "利用中の通知先の取得に失敗しました(menu:{0} column:{1})", key, item)
+                raise common.InternalErrorException(message_id=message_id, message=message)
+
+            result_dict = r_ita_notification_destination.json()
+            check_id_list.extend(json.loads(result_dict.get("data")))
+
+    #  重複を排除する
+    check_id_list = list(set(check_id_list))
+
+    if destination_id in check_id_list:
+        message_id = f"400-{MSG_FUNCTION_ID}001"
+        message = multi_lang.get_text(message_id, "指定された通知先は利用されているため削除できません(destination id:{0})", destination_id)
+        raise common.BadRequestException(message_id=message_id, message=message)
+
+    with closing(DBconnector().connect_workspacedb(organization_id, workspace_id)) as conn:
+        with conn.cursor() as cursor:
+            try:
+                cursor.execute(queries_bl_notification.SQL_DELETE_NOTIFICATION_DESTINATION, {"destination_id": destination_id})
+                conn.commit()
+            except Exception as e:
+                globals.logger.error(f"exception:{e.args}")
+                message_id = f"500-{MSG_FUNCTION_ID}001"
+                message = multi_lang.get_text(
+                    message_id,
+                    "通知先の削除に失敗しました(destination id:{0})",
+                    destination_id
+                )
+                raise common.InternalErrorException(message_id=message_id, message=message)
+
+    return None

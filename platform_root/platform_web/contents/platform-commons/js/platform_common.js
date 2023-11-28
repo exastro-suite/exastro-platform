@@ -21,6 +21,20 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 const DEFAULT_ROWS_PER_PAGE = 100;
 
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//   Max Mail count
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+const MAX_MAIL_COUNT = 100;
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//   destination kind const defination
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+const DESTINATION_KIND_MAIL = 'Mail';
+const DESTINATION_KIND_TEAMS = 'Teams';
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -150,6 +164,49 @@ function replaceLanguageText() {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
+//   Json Key Link to Text
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+function json_key_link_to_text(json, key_parent) {
+    var ret = "";
+    console.log("json:" + json);
+    for (var key in json){
+        console.log("key:" + key);
+        console.log("key_parent:" + key_parent);
+        obj = json[key];
+        if (isObject(obj)){
+            ret = json_key_link_to_text(obj, key_parent + key + ".");
+        }
+        else{
+            ret += key_parent + key + ": " + json[key] + "\n";
+        }
+    }
+    return ret;
+}
+
+function isObject(value) {
+    return value !== null && typeof value === 'object'
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//   Array not empty count
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+function array_not_empty_count(arr) {
+    var cnt = 0;
+    if (arr !== ""){
+        arr.forEach(str => {
+            str = str.trim();
+            if (str !== "") cnt++;
+        });
+    }
+
+    return cnt;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
 //   Display Topic Path
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -203,12 +260,14 @@ function displayMenu(curent) {
             <li class="menuItem"><a class="menuLink" id="menu_workspace" href="#" tabindex="-1">${getText("000-80005", "ワークスペース管理")}</a></li>
             <li class="menuItem"><a class="menuLink" id="menu_account_management" href="#" style="display: none;">${getText("000-80006", "ユーザー管理")}</a></li>
             <li class="menuItem"><a class="menuLink" id="menu_role_management" href="#" style="display: none;">${getText("000-80007", "ロール管理")}</a></li>
+            <li class="menuItem"><a class="menuLink" id="menu_settings_notifications" href="#">${getText("000-00183", "通知管理")}</a></li>
         `);
 
         $('#menu_workspace').attr('href', location_conf.href.workspaces.list.replace(/{organization_id}/g, CommonAuth.getRealm()));
         $('#menu_account_management').attr('href', location_conf.href.users.list.replace(/{organization_id}/g, CommonAuth.getRealm()));
         $('#menu_role_management').attr('href', location_conf.href.roles.list.replace(/{organization_id}/g, CommonAuth.getRealm()));
-    
+        $('#menu_settings_notifications').attr('href', location_conf.href.workspaces.settings.notifications.workspaces.replace(/{organization_id}/g, CommonAuth.getRealm()));
+
         if (CommonAuth.hasAuthority("_og-usr-mt")) {
             $("#menu_account_management").css("display", "");
         }
@@ -952,3 +1011,306 @@ function maintenanceMode() {
         console.error( error );
     });
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//   Settings Notifications Common
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+const settings_notifications_common = {
+
+    "set_conditions": function() {
+
+        const row_template_top = $('#conditions_list .datarow-template-top').clone(true).removeClass('datarow-template').addClass('datarow').prop('outerHTML');
+        const row_template_2nd = $('#conditions_list .datarow-template-2nd').clone(true).removeClass('datarow-template-sub').addClass('datarow').prop('outerHTML');
+        const row_template_3rd = $('#conditions_list .datarow-template-3rd').clone(true).removeClass('datarow-template-sub').addClass('datarow').prop('outerHTML');
+        // 固定のイベントタイプを指定
+        // Specify a fixed event type
+        let html='';
+        html += row_template_top
+            .replace(/\${conditions_all_count}/g, 4)
+            .replace(/\${conditions_group_name}/g, getText("000-87022", "OASE／イベント種別"))
+            .replace(/\${conditions_group_count}/g, 4)
+            .replace(/\${conditions_name}/g, getText("000-00153", '新規'))
+            .replace(/\${conditions_key}/g, 'ita_event_type_new')
+            .replace(/\${conditions_remarks}/g, getText("000-87023", "OASEで利用されるイベントの種別ごとに通知の有無を選択します。") + "<br>" +
+            getText("000-87024", "　新規：OASEエージェントから収集、あるいは、外部システムから受け取った直後のイベント") + "<br>" +
+            getText("000-87025", "　既知（判定済）：いずれかのルールにマッチしたイベント") + "<br>" +
+            getText("000-87026", "　既知（時間切れ）：一部の条件には当てはまったものの、全ての条件に当てはまらないまま、有効期限が切れたイベント") + "<br>" +
+            getText("000-87027", "　未知：ルールやルール内の条件の一切にあてはまらなかったイベント"));
+        html += row_template_3rd
+            .replace(/\${conditions_name}/g, getText("000-00154", '既知（判定済み）'))
+            .replace(/\${conditions_key}/g, 'ita_event_type_evaluated');
+        html += row_template_3rd
+            .replace(/\${conditions_name}/g, getText("000-00155", '既知（時間切れ）'))
+            .replace(/\${conditions_key}/g, 'ita_event_type_timeout');
+        html += row_template_3rd
+            .replace(/\${conditions_name}/g, getText("000-00156", '未知'))
+            .replace(/\${conditions_key}/g, 'ita_event_type_undetected');
+        $("#conditions_list tbody").append(html);
+        $("#conditions_list .datarow").css('display', '');
+    },
+
+    "set_destination_informations": function(kind, destination_informations) {
+        if (kind === DESTINATION_KIND_MAIL){
+            $("#form_destination_kind_mail").prop('checked', true);
+            var mail_to = "";
+            var mail_cc = "";
+            var mail_bcc = "";
+            destination_informations.forEach(function(element){
+                if (fn.cv(element.address_header, '', false) === "to"){
+                    mail_to += fn.cv(element.email, '', false) + ";";
+                }
+                else if (fn.cv(element.address_header, '', false) === "cc"){
+                    mail_cc += fn.cv(element.email, '', false) + ";";
+                }
+                else if (fn.cv(element.address_header, '', false) === "bcc"){
+                    mail_bcc += fn.cv(element.email, '', false) + ";";
+                }
+            });
+            if (mail_to.length > 0) mail_to = mail_to.slice( 0, -1 );
+            if (mail_cc.length > 0) mail_cc = mail_cc.slice( 0, -1 );
+            if (mail_bcc.length > 0) mail_bcc = mail_bcc.slice( 0, -1 );
+            $("#form_destination_informations_mail_to").val(mail_to);
+            $("#form_destination_informations_mail_cc").val(mail_cc);
+            $("#form_destination_informations_mail_bcc").val(mail_bcc)
+        }
+        else if (kind === DESTINATION_KIND_TEAMS){
+            $("#form_destination_kind_teams").prop('checked', true);
+            destination_informations.forEach(function(element){
+                $("#form_destination_informations_teams").val(fn.cv(element.webhook, '', false));
+            });
+        }
+    },
+
+    "set_destination_informations_text": function(kind, destination_informations) {
+        if (kind === DESTINATION_KIND_MAIL){
+            var mail_to = "";
+            var mail_cc = "";
+            var mail_bcc = "";
+            destination_informations.forEach(function(element){
+                if (fn.cv(element.address_header, '', false) === "to"){
+                    mail_to += fn.cv(element.email, '', false) + ";";
+                }
+                else if (fn.cv(element.address_header, '', false) === "cc"){
+                    mail_cc += fn.cv(element.email, '', false) + ";";
+                }
+                else if (fn.cv(element.address_header, '', false) === "bcc"){
+                    mail_bcc += fn.cv(element.email, '', false) + ";";
+                }
+            });
+            if (mail_to.length > 0){
+                mail_to = mail_to.slice( 0, -1 );
+                $("#text_destination_informations_mail_to").css('display', '');
+            }
+            if (mail_cc.length > 0){
+                mail_cc = mail_cc.slice( 0, -1 );
+                $("#text_destination_informations_mail_cc").css('display', '');
+            }
+            if (mail_bcc.length > 0){
+                mail_bcc = mail_bcc.slice( 0, -1 );
+                $("#text_destination_informations_mail_bcc").css('display', '');
+            }
+            $("#text_destination_informations_mail_to").text("to: " + mail_to);
+            $("#text_destination_informations_mail_cc").text("cc: " + mail_cc);
+            $("#text_destination_informations_mail_bcc").text("bcc: " + mail_bcc)
+        }
+        else if (kind === DESTINATION_KIND_TEAMS){
+            $("#text_destination_informations_teams").css('display', '');
+            destination_informations.forEach(function(element){
+                $("#text_destination_informations_teams").text(fn.cv(element.webhook, '', false));
+            });
+        }
+    },
+
+    "get_destination_informations": function() {
+
+        var destination_informations = [];
+        var destination_kind = $("input[name=form_destination_kind]:checked").val();
+        if (destination_kind === "Mail"){
+            split_informations_mail_to = $("#form_destination_informations_mail_to").val();
+            split_informations_mail_cc = $("#form_destination_informations_mail_cc").val();
+            split_informations_mail_bcc = $("#form_destination_informations_mail_bcc").val();
+            if (split_informations_mail_to !== ""){
+                split_informations_mail_to.split(/,|\n|;/).forEach(address => {
+                    address = address.trim();
+                    if (address !== ""){
+                        var mail = {
+                            "address_header": "to",
+                            "email": address,
+                        }
+                        destination_informations.push(mail);
+                    }
+                });
+            }
+            if (split_informations_mail_cc !== ""){
+                split_informations_mail_cc.split(/,|\n|;/).forEach(address => {
+                    address = address.trim();
+                    if (address !== ""){
+                            var mail = {
+                            "address_header": "cc",
+                            "email": address,
+                        }
+                        destination_informations.push(mail);
+                    }
+                });
+            }
+            if (split_informations_mail_bcc !== ""){
+                split_informations_mail_bcc.split(/,|\n|;/).forEach(address => {
+                    address = address.trim();
+                    if (address !== ""){
+                            var mail = {
+                            "address_header": "bcc",
+                            "email": address,
+                        }
+                        destination_informations.push(mail);
+                    }
+                });
+            }
+        }
+        else if (destination_kind === "Teams"){
+            var teams = { "webhook": $("#form_destination_informations_teams").val() }
+            destination_informations.push(teams);
+        }
+        else if (destination_kind === "WebHook"){
+            var webhook = {
+                "url": $("#form_destination_informations_webhook").val(),
+                "header": $("#form_destination_informations_webhook_header").val()
+            }
+            destination_informations.push(webhook);
+        }
+
+        return destination_informations;
+    },
+
+    validate: {
+        //
+        // validate destination id
+        //
+        destination_id: function(destination_id) {
+            if(destination_id === "") {
+                return {
+                    "result": false,
+                    "message": getText("400-00011", "必須項目が不足しています。({0})", getText("000-00145", "通知先ID"))
+                }
+            } else if(destination_id.replace(/[a-zA-Z0-9_-]/g,"") !== "") {
+                return {
+                    "result": false,
+                    "message": getText("400-00017", "指定できない文字が含まれています。(項目:{0},指定可能な文字:{1})",
+                                    getText("000-00145", "通知先ID"),
+                                    getText("000-31001", "半角英数・ハイフン・アンダースコア")
+                                )
+                }
+
+            } else if( ! destination_id.match(/^[a-zA-Z]/)) {
+                return {
+                    "result": false,
+                    "message": getText("400-00014", "先頭の文字にアルファベット以外が指定されています。({0})", getText("000-00145", "通知先ID"))
+                }
+            } else {
+                return {
+                    "result": true,
+                    "message": ""
+                }
+            }
+        },
+
+        //
+        // validate destination name
+        //
+        destination_name: function(destination_name) {
+            if(destination_name === "") {
+                return {
+                    "result": false,
+                    "message": getText("400-00011", "必須項目が不足しています。({0})", getText("000-00146", "通知先名"))
+                }
+            } else {
+                return {
+                    "result": true,
+                    "message": ""
+                }
+            }
+        },
+
+        //
+        // validate destination kind
+        //
+        destination_kind: function(destination_kind) {
+            console.log("destination_kind: " + destination_kind);
+            if(destination_kind.length === 0) {
+                return {
+                    "result": false,
+                    "message": getText("400-00011", "必須項目が不足しています。({0})", getText("000-00147", "通知方法"))
+                }
+            } else {
+                return {
+                    "result": true,
+                    "message": ""
+                }
+            }
+        },
+
+        //
+        // validate description informations (mail)
+        //
+        destination_informations_mail: function(destination_informations_to, destination_informations_cc, destination_informations_bcc) {
+            if(destination_informations_to === "" && destination_informations_cc === "" && destination_informations_bcc === "") {
+                return {
+                    "result": false,
+                    "message": getText("400-00011", "必須項目が不足しています。({0})", getText("000-00150", "通知先"))
+                }
+            } else {
+                split_informations_to = destination_informations_to.split(/,|\n|;/);
+                split_informations_cc = destination_informations_cc.split(/,|\n|;/);
+                split_informations_bcc = destination_informations_bcc.split(/,|\n|;/);
+
+                if ((array_not_empty_count(split_informations_to) + array_not_empty_count(split_informations_cc) + array_not_empty_count(split_informations_bcc)) > MAX_MAIL_COUNT){
+                    return {
+                        "result": false,
+                        "message": getText("400-87001", "メールアドレスの指定が最大{0}件を超えています。({1})", MAX_MAIL_COUNT, getText("000-00150", "通知先"))
+                    }
+                } else {
+                    return {
+                        "result": true,
+                        "message": ""
+                    }
+                }
+            }
+        },
+
+        //
+        // validate description informations (teams)
+        //
+        destination_informations_teams: function(destination_informations_teams) {
+            if(destination_informations_teams === "") {
+                return {
+                    "result": false,
+                    "message": getText("400-00011", "必須項目が不足しています。({0})", getText("000-00150", "通知先"))
+                }
+            } else {
+                return {
+                    "result": true,
+                    "message": ""
+                }
+            }
+        },
+
+        //
+        // validate description informations (webhook)
+        //
+        destination_informations_webhook: function(destination_informations_webhook, destination_informations_webhook_header) {
+            if(destination_informations_webhook === "") {
+                return {
+                    "result": false,
+                    "message": getText("400-00011", "必須項目が不足しています。({0})", getText("000-00150", "通知先"))
+                }
+            } else {
+                return {
+                    "result": true,
+                    "message": ""
+                }
+            }
+        },
+    }
+}
+

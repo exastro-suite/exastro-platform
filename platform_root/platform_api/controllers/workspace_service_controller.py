@@ -315,6 +315,11 @@ def __workspace_database_create(organization_id, workspace_id, create_user):
 
     globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
 
+    # DBが存在する場合は、処理しない
+    # If DB exists, do not process
+    if workspace_db_exsits_check(organization_id, workspace_id):
+        return
+
     dbinit = DBinit()
     ws_dbinfo = dbinit.generate_dbinfo(dbinit.prefix_workspace_db)
 
@@ -339,14 +344,34 @@ def __workspace_database_create(organization_id, workspace_id, create_user):
         message_id = f"500-{MSG_FUNCTION_ID}009"
         message = multi_lang.get_text(
             message_id,
-            "Workspace Database 作成に失敗しました(organization id:{0} workspace id:{1} database:{2})",
+            "Workspace Database 作成に失敗しました(organization id:{0} workspace id:{1})",
             organization_id,
             workspace_id,
-            ws_dbinfo.db_database,
         )
         raise common.InternalErrorException(message_id=message_id, message=message)
 
     return
+
+
+def workspace_db_exsits_check(organization_id, workspace_id):
+    """worskspace database exists check
+
+    Args:
+        organization_id (str): organization id
+        workspace_id (str): workspace id
+
+    Returns:
+        Boolean: True:Exists false:Not Exists
+    """
+
+    try:
+        # Database存在チェック
+        # database exists check
+        with closing(DBconnector().connect_workspacedb(organization_id, workspace_id)):
+            # 存在するためチェック終了
+            return True
+    except Exception:
+        return False
 
 
 @common.platform_exception_handler

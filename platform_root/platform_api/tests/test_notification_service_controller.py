@@ -11,12 +11,14 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
+from unittest import mock
 from tests.common import request_parameters, test_common
 import ulid
 
 from common_library.common import const, validation
 from libs import queries_notification
 from common_library.common.libs import queries_bl_notification
+from common_library.common import api_ita_admin_call
 
 import logging
 
@@ -635,6 +637,121 @@ def test_settings_notification_list(connexion_client):
         assert not response.json["data"][0].get("conditions", {}).get("ita", {}).get("event_type", {}).get("evaluated"), "get notifications destination id check"
 
 
+def test_settings_notification_destination_delete(connexion_client):
+    """test settings_destination_get
+
+    Args:
+        connexion_client (_type_): _description_
+    """
+
+    organization = test_common.create_organization(connexion_client)
+    workspace = test_common.create_workspace(connexion_client, organization['organization_id'], 'workspace-01', organization['user_id'])
+    setting_notifications = test_common.create_setting_notifications(connexion_client, organization['organization_id'], 'workspace-01', organization['user_id'])
+
+    class MockResponse:
+        def __init__(self, json_data, status_code):
+            self.json_data = json_data
+            self.status_code = status_code
+
+        def json(self):
+            return self.json_data
+
+    logger.debug(f"setting_notifications:{setting_notifications}")
+
+    with test_common.requsts_mocker_default():
+        # organization_id not specified
+        response = connexion_client.delete(
+            f"/api//platform/workspaces/{workspace['workspace_id']}/settings/notifications/{setting_notifications[0]['id']}",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization['user_id']))
+
+        assert response.status_code == 404, "organization_id not specified. error route"
+
+        # Incorrect organization_id
+        response = connexion_client.delete(
+            f"/api/example/platform/workspaces/{workspace['workspace_id']}/settings/notifications/{setting_notifications[0]['id']}",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization['user_id']))
+
+        assert response.status_code == 500, "Incorrect organization_id. error route"
+
+        # workspace_id not specified
+        response = connexion_client.delete(
+            f"/api/{organization['organization_id']}/platform/workspaces//settings/notifications/{setting_notifications[0]['id']}",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization['user_id']))
+
+        assert response.status_code == 404, "workspace_id not specified. error route"
+
+        # Incorrect workspace_id
+        response = connexion_client.delete(
+            f"/api/{organization['organization_id']}/platform/workspaces/example/settings/notifications/{setting_notifications[0]['id']}",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization['user_id']))
+
+        assert response.status_code == 500, "Incorrect workspace_id. error route"
+
+        # destination_id not specified
+        response = connexion_client.delete(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/settings/notifications/",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization['user_id']))
+
+        assert response.status_code == 404, "destination_id not specified. error route"
+
+    with test_common.requsts_mocker_default(), \
+            mock.patch.object(api_ita_admin_call, 'ita_notification_destination', return_value='1') as mock_obj:
+
+        mock_obj.return_value = MockResponse({'data': '["mix-mail-01"]'}, 200)
+        # destination_id in use
+        response = connexion_client.delete(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/settings/notifications/{setting_notifications[0]['id']}",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization['user_id']))
+
+        assert response.status_code == 400, "destination_id in use"
+        assert response.json["result"] == "400-35001", "destination_id in use"
+        assert response.json["message"] == "The specified notification destination is in use and cannot be deleted (destination id:{0})", "destination_id in use"
+
+        mock_obj.return_value = MockResponse({'data': '[]'}, 500)
+        # ITA API Error
+        response = connexion_client.delete(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/settings/notifications/{setting_notifications[0]['id']}",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization['user_id']))
+
+        assert response.status_code == 500, "ITA API Error"
+        assert response.json["result"] == "500-35002", "ITA API Error"
+        assert response.json["message"] == "Failed to get notification destination in use (menu:{0} column:{1})", "ITA API Error"
+
+        mock_obj.return_value = MockResponse({'data': '[]'}, 200)
+        # normal route 1
+        response = connexion_client.delete(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/settings/notifications/{setting_notifications[0]['id']}",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization['user_id']))
+
+        assert response.status_code == 200, "normal route"
+        assert response.json["result"] == "000-00000", "normal route"
+        assert response.json["message"] == "SUCCESS", "normal route"
+        assert response.json["data"] is None, "normal route"
+
+    with test_common.requsts_mocker_default(), \
+            test_common.pymysql_execute_raise_exception_mocker(queries_bl_notification.SQL_DELETE_NOTIFICATION_DESTINATION, Exception("DB Error Test")), \
+            mock.patch.object(api_ita_admin_call, 'ita_notification_destination', return_value='1') as mock_obj:
+
+        mock_obj.return_value = MockResponse({'data': '[]'}, 200)
+        # DB error route
+        response = connexion_client.delete(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/settings/notifications/{setting_notifications[1]['id']}",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization['user_id']))
+
+        assert response.status_code == 500, "DB error route"
+        assert response.json["result"] == "500-35001"
+        assert response.json["message"] == "Failed to delete notification destination (destination id:{0})", "DB error route"
+
+
 def sample_data_mail(id, update={}):
     """sample data mail setting
 
@@ -867,3 +984,24 @@ def sample_data_notifications_default(update={}):
             "message": "message",
         },
     }, **update)
+
+
+def settings_notification_put(connexion_client):
+    """test settings_notification_put
+
+    Args:
+        connexion_client (_type_): _description_
+    """
+    organization = test_common.create_organization(connexion_client)
+    workspace = test_common.create_workspace(connexion_client, organization['organization_id'], 'workspace-01', organization['user_id'])
+    setting_notifications = test_common.create_setting_notifications(connexion_client, organization['organization_id'], 'workspace-01', organization['user_id'])
+
+    logger.debug(f"setting_notifications:{setting_notifications}")
+
+    with test_common.requsts_mocker_default():
+        response = connexion_client.get(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/settings/notifications/not_id",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization['user_id']))
+
+        assert response.status_code == 404, "get notifications destination response error route"

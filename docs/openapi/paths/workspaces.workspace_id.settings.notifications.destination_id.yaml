@@ -58,9 +58,9 @@ get:
 put:
   tags:
   - NotificationService
-  summary: Put an settings destination
+  summary: Put an settings notification
   x-openapi-router-controller: controllers.notification_service_controller
-  operationId: settings_destination_put
+  operationId: settings_notification_put
   parameters:
   - name: organization_id
     in: path
@@ -101,6 +101,41 @@ put:
                   data:
                     type: object
                     example: null
+    default:
+      description: An unexpected error response.
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'
+delete:
+  tags:
+  - NotificationService
+  summary: Delete deletes an notification
+  x-openapi-router-controller: controllers.notification_service_controller
+  operationId: notification_delete
+  parameters:
+  - name: organization_id
+    in: path
+    required: true
+    schema:
+      type: string
+  - name: workspace_id
+    in: path
+    required: true
+    schema:
+      type: string
+  - name: destination_id
+    in: path
+    required: true
+    schema:
+      type: string
+  responses:
+    200:
+      description: A successful response.
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/responseOk.yaml'
     default:
       description: An unexpected error response.
       content:

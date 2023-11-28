@@ -28,6 +28,21 @@ var api_conf = {
                     "get": "/api/{organization_id}/platform/workspaces/{workspace_id}/members",
                 },
             },
+            "settings": {
+                "notifications": {
+                    "get": "/api/{organization_id}/platform/workspaces/{workspace_id}/settings/notifications",
+                    "post": "/api/{organization_id}/platform/workspaces/{workspace_id}/settings/notifications",
+                    "put": "/api/{organization_id}/platform/workspaces/{workspace_id}/settings/notifications/{destination_id}",
+                    "delete": "/api/{organization_id}/platform/workspaces/{workspace_id}/settings/notifications/{destination_id}",
+
+                    "detail": {
+                        "get": "/api/{organization_id}/platform/workspaces/{workspace_id}/settings/notifications/{destination_id}",
+                    },
+                },
+            },
+            "notifications": {
+                "post": "/api/{organization_id}/platform/workspaces/{workspace_id}/notifications",
+            },
         },
         "roles": {
             "post": "/api/{organization_id}/platform/roles",
@@ -91,13 +106,22 @@ var location_conf = {
             "list": "/{organization_id}/platform/workspaces",
             "detail": "/{organization_id}/platform/workspaces/{workspace_id}",
             "edit": "/{organization_id}/platform/workspaces/{workspace_id}/edit",
-            "ita": "/{organization_id}/workspaces/{workspace_id}/ita/"
+            "ita": "/{organization_id}/workspaces/{workspace_id}/ita/",
+            "settings": {
+                "notifications": {
+                    "workspaces": "/{organization_id}/platform/settings/notifications",
+                    "new" : "/{organization_id}/platform/workspaces/{workspace_id}/settings/notifications/_new",
+                    "list": "/{organization_id}/platform/workspaces/{workspace_id}/settings/notifications",
+                    "detail": "/{organization_id}/platform/workspaces/{workspace_id}/settings/notifications/{destination_id}",
+                    "edit": "/{organization_id}/platform/workspaces/{workspace_id}/settings/notifications/{destination_id}/edit",
+                },
+            },
         },
         "roles": {
             "new": "/{organization_id}/platform/roles/_new",
             "list": "/{organization_id}/platform/roles",
             "edit": "/{organization_id}/platform/roles/{role_name}",
-            "user": "/{organization_id}/platform/roles/{role_name}/user"
+            "user": "/{organization_id}/platform/roles/{role_name}/user",
         },
         "users": {
             "new": "/{organization_id}/platform/users/_new",
@@ -122,7 +146,7 @@ var location_conf = {
             },
             "account_edit": "/auth/realms/{realm_name}/account/",
             "update_password": "/auth/realms/{realm_name}/account/password",
-            "two_factor_auth": "/auth/realms/{realm_name}/account/totp"
+            "two_factor_auth": "/auth/realms/{realm_name}/account/totp",
         },
 
         "organizations": {
