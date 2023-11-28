@@ -1004,7 +1004,7 @@ function maintenanceMode() {
             const message = document.querySelector('.modeMessageText');
             if ( container !== null && message !== null ) {
                 container.classList.add('inMaintenanceMode');
-                message.textContent = 'メンテナンス中のため、ワークスペース作成を行うことができません。';
+                message.textContent = getText('000-80048', 'メンテナンス中のため、ワークスペース作成を行うことができません。');
             }
         }
     }).catch(function( error ){
