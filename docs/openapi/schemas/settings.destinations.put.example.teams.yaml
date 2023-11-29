@@ -24,8 +24,6 @@ value:
       }
     },
     "destination_informations": [
-      { "webhook": "https://xxxxxxxx.webhook.office.com/webhookb/xxxxxxxx-xxxxxx-xxxx-xxxx-xxxxxxxxxxxx" },
-      { "webhook": "https://xxxxxxxx.webhook.office.com/webhookb/xxxxxxxx-xxxxxx-xxxx-xxxx-xxxxxxxxxxxx" },
       { "webhook": "https://xxxxxxxx.webhook.office.com/webhookb/xxxxxxxx-xxxxxx-xxxx-xxxx-xxxxxxxxxxxx" }
     ]
   }

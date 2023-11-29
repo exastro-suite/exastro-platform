@@ -33,8 +33,6 @@ value:
           }
         },
         "destination_informations": [
-          { "webhook": "https://xxxxxxxx.webhook.office.com/webhookb/xxxxxxxx-xxxxxx-xxxx-xxxx-xxxxxxxxxxxx" },
-          { "webhook": "https://xxxxxxxx.webhook.office.com/webhookb/xxxxxxxx-xxxxxx-xxxx-xxxx-xxxxxxxxxxxx" },
           { "webhook": "https://xxxxxxxx.webhook.office.com/webhookb/xxxxxxxx-xxxxxx-xxxx-xxxx-xxxxxxxxxxxx" }
         ],
         "create_timestamp": "2023-11-02T05:36:41.258Z",
