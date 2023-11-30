@@ -1039,8 +1039,6 @@ paths:
                             undetected: false
                       destination_informations:
                       - webhook: https://xxxxxxxx.webhook.office.com/webhookb/xxxxxxxx-xxxxxx-xxxx-xxxx-xxxxxxxxxxxx
-                      - webhook: https://xxxxxxxx.webhook.office.com/webhookb/xxxxxxxx-xxxxxx-xxxx-xxxx-xxxxxxxxxxxx
-                      - webhook: https://xxxxxxxx.webhook.office.com/webhookb/xxxxxxxx-xxxxxx-xxxx-xxxx-xxxxxxxxxxxx
                       create_timestamp: 2023-11-02T05:36:41.258Z
                       create_user: string
                       last_update_timestamp: 2023-11-02T05:36:41.258Z
@@ -1112,8 +1110,6 @@ paths:
                         timeout: false
                         undetected: false
                   destination_informations:
-                  - webhook: https://xxxxxxxx.webhook.office.com/webhookb/xxxxxxxx-xxxxxx-xxxx-xxxx-xxxxxxxxxxxx
-                  - webhook: https://xxxxxxxx.webhook.office.com/webhookb/xxxxxxxx-xxxxxx-xxxx-xxxx-xxxxxxxxxxxx
                   - webhook: https://xxxxxxxx.webhook.office.com/webhookb/xxxxxxxx-xxxxxx-xxxx-xxxx-xxxxxxxxxxxx
         required: true
       responses:
@@ -1211,8 +1207,6 @@ paths:
                             undetected: false
                       destination_informations:
                       - webhook: https://xxxxxxxx.webhook.office.com/webhookb/xxxxxxxx-xxxxxx-xxxx-xxxx-xxxxxxxxxxxx
-                      - webhook: https://xxxxxxxx.webhook.office.com/webhookb/xxxxxxxx-xxxxxx-xxxx-xxxx-xxxxxxxxxxxx
-                      - webhook: https://xxxxxxxx.webhook.office.com/webhookb/xxxxxxxx-xxxxxx-xxxx-xxxx-xxxxxxxxxxxx
                       create_timestamp: 2023-11-02T05:36:41.258Z
                       create_user: string
                       last_update_timestamp: 2023-11-02T05:36:41.258Z
@@ -1264,8 +1258,8 @@ paths:
                   conditions:
                     ita:
                       event_type:
-                        new: false
-                        evaluated: false
+                        new: true
+                        evaluated: true
                         timeout: true
                         undetected: true
                   destination_informations:
@@ -1287,8 +1281,6 @@ paths:
                         timeout: true
                         undetected: true
                   destination_informations:
-                  - webhook: https://xxxxxxxx.webhook.office.com/webhookb/xxxxxxxx-xxxxxx-xxxx-xxxx-xxxxxxxxxxxx
-                  - webhook: https://xxxxxxxx.webhook.office.com/webhookb/xxxxxxxx-xxxxxx-xxxx-xxxx-xxxxxxxxxxxx
                   - webhook: https://xxxxxxxx.webhook.office.com/webhookb/xxxxxxxx-xxxxxx-xxxx-xxxx-xxxxxxxxxxxx
         required: true
       responses:

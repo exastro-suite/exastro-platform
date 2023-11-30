@@ -62,7 +62,6 @@
                     </div>
                 </header>
             </div>
-            <div class="modeMessage"><p class="modeMessageText"></p></div>
             <div class="containerBody">
                 <aside id="menu" class="">
                     <!--
@@ -127,27 +126,29 @@
                                                 </thead>
                                                 <tbody class="tbody">
                                                     <tr class="tBodyTr tr">
-                                                        <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1"><div class="ci" style="text-align: left;"><span text-id="000-00145">通知先ID</span><span class="tHeadRequired" text-id="000-80024">必須</span></div></td>
+                                                        <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1"><div class="ci" style="text-align: left;" text-id="000-00145">通知先ID</div></td>
                                                         <td class="tBodyTd td" rowspan="1" colspan="1"><div class="ci" id="text_destination_id">
                                                         </div></td>
                                                     </tr>
                                                     <tr class="tBodyTr tr">
-                                                        <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1"><div class="ci" style="text-align: left;"><span text-id="000-00146">通知先名</span><span class="tHeadRequired" text-id="000-80024">必須</span></div></td>
-                                                        <td class="tBodyTd td" rowspan="1" colspan="1"><div class="ci" id="text_destination_name">
+                                                        <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1"><div class="ci" style="text-align: left;" text-id="000-00146">通知先名</div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1"><div class="ci textOverWrap" id="text_destination_name">
                                                         </div></td>
                                                     </tr>
                                                     <tr class="tBodyTr tr">
-                                                        <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1"><div class="ci" style="text-align: left;"><span text-id="000-82011">通知方法</span><span class="tHeadRequired" text-id="000-80024">必須</span></div></td>
+                                                        <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1"><div class="ci" style="text-align: left;" text-id="000-82011">通知方法</div></td>
                                                         <td class="tBodyTd td" rowspan="1" colspan="1"><div class="ci" id="text_destination_kind">
                                                         </div></td>
                                                     </tr>
                                                     <tr class="tBodyTr tr">
-                                                        <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1"><div class="ci" style="text-align: left;"><span text-id="000-00150">通知先</span><span class="tHeadRequired" text-id="000-80024">必須</span></div></td>
+                                                        <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1"><div class="ci" style="text-align: left;" text-id="000-00150">通知先</div></td>
                                                         <td class="tBodyTd td" rowspan="1" colspan="1">
-                                                            <div class="ci" id="text_destination_informations_mail_to" style="display: none;"></div>
-                                                            <div class="ci" id="text_destination_informations_mail_cc" style="display: none;"></div>
-                                                            <div class="ci" id="text_destination_informations_mail_bcc" style="display: none;"></div>
-                                                            <div class="ci" id="text_destination_informations_teams" style="display: none;"></div>
+                                                            <div class="ci textOverWrap" id="text_destination_informations_mail_to" style="display: none;"></div>
+                                                            <hr id="hr_destination_informations_mail_to" style="display: none;">
+                                                            <div class="ci textOverWrap" id="text_destination_informations_mail_cc" style="display: none;"></div>
+                                                            <hr id="hr_destination_informations_mail_cc" style="display: none;">
+                                                            <div class="ci textOverWrap" id="text_destination_informations_mail_bcc" style="display: none;"></div>
+                                                            <div class="ci textOverWrap" id="text_destination_informations_teams" style="display: none;"></div>
                                                         </td>
                                                     </tr>
                                                     <tr class="tBodyTr tr">
@@ -183,6 +184,7 @@
                                                 </tbody>
                                             </table>
                                         </div>
+                                        <button data-type="tableNew" data-action="restore" style="width:200px;" class="itaButton tableHeaderMainMenuButton button" id="button_test"><span class="inner"><span class="icon icon-message"></span><span text-id="000-80025">通知テスト</span></span></button>
                                     </div>
                                 </div>
                             </section>

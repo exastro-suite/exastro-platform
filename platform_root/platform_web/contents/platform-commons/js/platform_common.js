@@ -1004,7 +1004,7 @@ function maintenanceMode() {
             const message = document.querySelector('.modeMessageText');
             if ( container !== null && message !== null ) {
                 container.classList.add('inMaintenanceMode');
-                message.textContent = 'メンテナンス中のため、ワークスペース作成を行うことができません。';
+                message.textContent = getText('000-80048', 'メンテナンス中のため、ワークスペース作成を行うことができません。');
             }
         }
     }).catch(function( error ){
@@ -1054,26 +1054,10 @@ const settings_notifications_common = {
     "set_destination_informations": function(kind, destination_informations) {
         if (kind === DESTINATION_KIND_MAIL){
             $("#form_destination_kind_mail").prop('checked', true);
-            var mail_to = "";
-            var mail_cc = "";
-            var mail_bcc = "";
-            destination_informations.forEach(function(element){
-                if (fn.cv(element.address_header, '', false) === "to"){
-                    mail_to += fn.cv(element.email, '', false) + ";";
-                }
-                else if (fn.cv(element.address_header, '', false) === "cc"){
-                    mail_cc += fn.cv(element.email, '', false) + ";";
-                }
-                else if (fn.cv(element.address_header, '', false) === "bcc"){
-                    mail_bcc += fn.cv(element.email, '', false) + ";";
-                }
-            });
-            if (mail_to.length > 0) mail_to = mail_to.slice( 0, -1 );
-            if (mail_cc.length > 0) mail_cc = mail_cc.slice( 0, -1 );
-            if (mail_bcc.length > 0) mail_bcc = mail_bcc.slice( 0, -1 );
-            $("#form_destination_informations_mail_to").val(mail_to);
-            $("#form_destination_informations_mail_cc").val(mail_cc);
-            $("#form_destination_informations_mail_bcc").val(mail_bcc)
+            ret_mail = settings_notifications_common.get_mail_destination_informations(destination_informations);
+            $("#form_destination_informations_mail_to").val(ret_mail.mail_to);
+            $("#form_destination_informations_mail_cc").val(ret_mail.mail_cc);
+            $("#form_destination_informations_mail_bcc").val(ret_mail.mail_bcc)
         }
         else if (kind === DESTINATION_KIND_TEAMS){
             $("#form_destination_kind_teams").prop('checked', true);
@@ -1085,35 +1069,15 @@ const settings_notifications_common = {
 
     "set_destination_informations_text": function(kind, destination_informations) {
         if (kind === DESTINATION_KIND_MAIL){
-            var mail_to = "";
-            var mail_cc = "";
-            var mail_bcc = "";
-            destination_informations.forEach(function(element){
-                if (fn.cv(element.address_header, '', false) === "to"){
-                    mail_to += fn.cv(element.email, '', false) + ";";
-                }
-                else if (fn.cv(element.address_header, '', false) === "cc"){
-                    mail_cc += fn.cv(element.email, '', false) + ";";
-                }
-                else if (fn.cv(element.address_header, '', false) === "bcc"){
-                    mail_bcc += fn.cv(element.email, '', false) + ";";
-                }
-            });
-            if (mail_to.length > 0){
-                mail_to = mail_to.slice( 0, -1 );
-                $("#text_destination_informations_mail_to").css('display', '');
-            }
-            if (mail_cc.length > 0){
-                mail_cc = mail_cc.slice( 0, -1 );
-                $("#text_destination_informations_mail_cc").css('display', '');
-            }
-            if (mail_bcc.length > 0){
-                mail_bcc = mail_bcc.slice( 0, -1 );
-                $("#text_destination_informations_mail_bcc").css('display', '');
-            }
-            $("#text_destination_informations_mail_to").text("to: " + mail_to);
-            $("#text_destination_informations_mail_cc").text("cc: " + mail_cc);
-            $("#text_destination_informations_mail_bcc").text("bcc: " + mail_bcc)
+            ret_mail = settings_notifications_common.get_mail_destination_informations(destination_informations);
+            $("#text_destination_informations_mail_to").css('display', '');
+            $("#hr_destination_informations_mail_to").css('display', '');
+            $("#text_destination_informations_mail_cc").css('display', '');
+            $("#hr_destination_informations_mail_cc").css('display', '');
+            $("#text_destination_informations_mail_bcc").css('display', '');
+            $("#text_destination_informations_mail_to").text("to: " + ret_mail.mail_to);
+            $("#text_destination_informations_mail_cc").text("cc: " + ret_mail.mail_cc);
+            $("#text_destination_informations_mail_bcc").text("bcc: " + ret_mail.mail_bcc)
         }
         else if (kind === DESTINATION_KIND_TEAMS){
             $("#text_destination_informations_teams").css('display', '');
@@ -1121,6 +1085,33 @@ const settings_notifications_common = {
                 $("#text_destination_informations_teams").text(fn.cv(element.webhook, '', false));
             });
         }
+    },
+
+    "get_mail_destination_informations": function(destination_informations) {
+        var mail_to = "";
+        var mail_cc = "";
+        var mail_bcc = "";
+        destination_informations.forEach(function(element){
+            if (fn.cv(element.address_header, '', false) === "to"){
+                mail_to += fn.cv(element.email, '', false) + ", ";
+            }
+            else if (fn.cv(element.address_header, '', false) === "cc"){
+                mail_cc += fn.cv(element.email, '', false) + ", ";
+            }
+            else if (fn.cv(element.address_header, '', false) === "bcc"){
+                mail_bcc += fn.cv(element.email, '', false) + ", ";
+            }
+        });
+        if (mail_to.length > 0){
+            mail_to = mail_to.slice( 0, -2 );
+        }
+        if (mail_cc.length > 0){
+            mail_cc = mail_cc.slice( 0, -2 );
+        }
+        if (mail_bcc.length > 0){
+            mail_bcc = mail_bcc.slice( 0, -2 );
+        }
+        return { mail_to: mail_to, mail_cc: mail_cc, mail_bcc: mail_bcc, }
     },
 
     "get_destination_informations": function() {

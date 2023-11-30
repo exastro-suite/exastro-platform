@@ -986,7 +986,7 @@ def sample_data_notifications_default(update={}):
     }, **update)
 
 
-def settings_notification_put(connexion_client):
+def test_settings_notification_put(connexion_client):
     """test settings_notification_put
 
     Args:
@@ -999,9 +999,91 @@ def settings_notification_put(connexion_client):
     logger.debug(f"setting_notifications:{setting_notifications}")
 
     with test_common.requsts_mocker_default():
+        #
+        # validate get normal
+        #
         response = connexion_client.get(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/settings/notifications/not_id",
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/settings/notifications/{setting_notifications[0]['id']}",
             content_type='application/json',
             headers=request_parameters.request_headers(organization['user_id']))
+        data = response.json["data"]
 
-        assert response.status_code == 404, "get notifications destination response error route"
+        #
+        # validate error route
+        #
+        # validate get id not found
+        response = connexion_client.put(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/settings/notifications/not_id",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization['user_id']),
+            json=data)
+
+        assert response.status_code == 404, "update notifications destination response error route"
+
+        # validate error body
+        response = connexion_client.put(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/settings/notifications/{setting_notifications[0]['id']}",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization['user_id']),
+            json=[])
+
+        assert response.status_code == 400, "update notifications valide body response error route"
+
+        # validate error name
+        response = connexion_client.put(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/settings/notifications/{setting_notifications[0]['id']}",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization['user_id']),
+            json=sample_data_mail('name-test-01', {"name": "".ljust(const.length_destination_name + 1, "_")}))
+
+        assert response.status_code == 400, "update notifications valide name response error route"
+
+        # validate error kind
+        response = connexion_client.put(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/settings/notifications/{setting_notifications[0]['id']}",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization['user_id']),
+            json=sample_data_mail('kind-test-01', {"kind": "other"}))
+
+        assert response.status_code == 400, "update notifications valide kind response error route"
+
+        # validate error destination_informations
+        response = connexion_client.put(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/settings/notifications/{setting_notifications[0]['id']}",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization['user_id']),
+            json=sample_data_mail('informations-test-01', {"destination_informations": []}))
+
+        assert response.status_code == 400, "update notifications valide informations response error route"
+
+        # validate error conditions
+        # ※conditionsのvalidateエラーは通らない（open-apiのvalidationエラーで先に弾かれる）が一応テスト
+        response = connexion_client.put(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/settings/notifications/{setting_notifications[0]['id']}",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization['user_id']),
+            json=sample_data_mail('conditions-test-01', {"conditions": None}))
+
+        assert response.status_code == 400, "update notifications valide conditions response error route"
+
+        response = connexion_client.put(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/settings/notifications/{setting_notifications[0]['id']}",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization["user_id"]),
+            json=sample_data_mail(setting_notifications[0]['id']))
+
+        assert response.status_code == 200, "update notifications response code OK route"
+
+    with test_common.requsts_mocker_default(), \
+            test_common.pymysql_execute_raise_exception_mocker(queries_notification.SQL_UPDATE_NOTIFICATION_DESTINATION, Exception("DB Error Test")):
+        #
+        # DB error route
+        #
+        response = connexion_client.put(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/settings/notifications/{setting_notifications[0]['id']}",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization["user_id"]),
+            json=sample_data_mail('mail-db-error'))
+
+        assert response.status_code == 500, "update notifications response code: db error"
+

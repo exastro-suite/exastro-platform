@@ -106,7 +106,7 @@ $(function(){
         });
 
         if (destination_row.kind === DESTINATION_KIND_MAIL){
-            $('#form_destination_kind_mail  ').trigger('click');
+            $('#form_destination_kind_mail').trigger('click');
         }
         else if (destination_row.kind === DESTINATION_KIND_TEAMS){
             $('#form_destination_kind_teams').trigger('click');
