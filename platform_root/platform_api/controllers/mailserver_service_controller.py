@@ -26,6 +26,8 @@ from libs import queries_mailserver
 
 import globals
 
+MSG_FUNCTION_ID = "36"
+
 
 @common.platform_exception_handler
 def settings_mailserver_get(organization_id):  # noqa: E501
