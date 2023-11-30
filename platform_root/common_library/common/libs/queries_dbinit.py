@@ -56,6 +56,7 @@ SQL_ORGANIZATION_CREATE_TABLES = [
     CREATE TABLE IF NOT EXISTS M_SMTP_SERVER
     (
         SMTP_ID		                    VARCHAR(36) NOT NULL,                       -- 送信サーバーID
+        SMTP_HOST		                VARCHAR(1024),                              -- 送信サーバーのホスト
         SMTP_PORT		                INT,                                        -- 送信サーバーのポート番号
         SEND_FROM		                VARCHAR(255),                               -- 送信元のメールアドレス
         SEND_NAME		                VARCHAR(100),                               -- 送信元の表示名
