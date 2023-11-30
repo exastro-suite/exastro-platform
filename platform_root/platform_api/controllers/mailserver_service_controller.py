@@ -26,6 +26,8 @@ from libs import queries_notification
 
 import globals
 
+MSG_FUNCTION_ID = "36"
+
 
 def settings_mailserver_get(organization_id):  # noqa: E501
     """List returns list of settings mailserver
