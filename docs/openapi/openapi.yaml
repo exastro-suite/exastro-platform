@@ -66,6 +66,8 @@ tags:
   description: メンテナンスモードに関する操作
 - name: NotificationService
   description: 通知機能に関する操作
+- name: MailserverService
+  description: メールサーバーに関する操作
 - name: InternalCommonService
   description: 共通(内部用)
 - name: InternalPlanService
@@ -92,7 +94,6 @@ paths:
       $ref: './paths/user.current.refresh_tokens.yaml'
   "/api/platform/users/_current/refresh_tokens":
       $ref: './paths/user.current.refresh_tokens.platform.yaml'
-
 
   "/api/platform/{organization_id}/plans":
       $ref: './paths/plans.organizations.yaml'
@@ -152,6 +153,9 @@ paths:
 
   "/api/{organization_id}/platform/maintenance-mode-setting":
       $ref: './paths/maintenance_mode_setting_organizations.yaml'
+
+  "/api/{organization_id}/platform/settings/mailserver":
+      $ref: './paths/settings.mailserver.yaml'
 
   # "/api/{organization_id}/platform/settings/mailserver":
   #     $ref: './paths/organizations.organization_id.settings.mailserver.yaml'
