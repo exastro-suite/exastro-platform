@@ -49,6 +49,8 @@ tags:
     description: メンテナンスモードに関する操作
   - name: NotificationService
     description: 通知機能に関する操作
+  - name: MailserverService
+    description: メールサーバーに関する操作
   - name: InternalCommonService
     description: 共通(内部用)
   - name: InternalPlanService
@@ -2095,6 +2097,98 @@ paths:
               schema:
                 $ref: '#/components/schemas/runtimeError'
       x-openapi-router-controller: controllers.maintenance_mode_setting_controller
+  '/api/{org_id}/platform/settings/mailserver':
+    get:
+      tags:
+        - MailserverService
+      summary: Returns of settings Mailserver
+      x-openapi-router-controller: controllers.mailserver_service_controller
+      operationId: settings_mailserver_get
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - $ref: '#/components/schemas/settingsMailserverList'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+    post:
+      tags:
+        - MailserverService
+      summary: Create creates an settings mailserver
+      x-openapi-router-controller: controllers.mailserver_service_controller
+      operationId: settings_mailserver_create
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/settingsMailserverCreate'
+        required: true
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        example: null
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+    delete:
+      tags:
+        - MailserverService
+      summary: Delete deletes an mailserver
+      x-openapi-router-controller: controllers.mailserver_service_controller
+      operationId: mailserver_delete
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responseOk'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
   /internal-api/alive:
     get:
       tags:
@@ -3970,6 +4064,101 @@ components:
             - event_type
       required:
         - ita
+    settingsMailserverCreate:
+      title: mailserver is a mailserver of mailserver resource.
+      type: object
+      properties:
+        SMTP_HOST:
+          type: string
+          description: Outgoing Server Host
+        SMTP_PORT:
+          type: string
+          description: Outgoing server port number
+        SEND_FROM:
+          type: string
+          description: Sender's email address
+        SEND_NAME:
+          type: string
+          description: The display name of the sender
+        REPLAY_TO:
+          type: string
+          description: Reply-to email address
+        REPLAY_NAME:
+          type: string
+          description: Reply-to display name
+        ENVELOPE_FROM:
+          type: string
+          description: Sender's email address
+        SSL_ENABLE:
+          type: boolean
+          description: SSL on/off
+        START_TLS_ENABLE:
+          type: boolean
+          description: StartTLS on/off
+        AUTHENTICATION_ENABLE:
+          type: boolean
+          description: Certified or not
+        AUTHENTICATION_USER:
+          type: string
+          description: Authenticated users
+        AUTHENTICATION_PASSWORD:
+          type: string
+          description: Authentication password
+      required:
+        - SMTP_HOST
+        - SMTP_PORT
+        - SEND_FROM
+    settingsMailserverList:
+      title: mailserver is list of Mailserver resources.
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            allOf:
+              - $ref: '#/components/schemas/settingsMailserverGet'
+              - $ref: '#/components/schemas/responseStat'
+    settingsMailserverGet:
+      title: mailserver is a definition of Mailserver resource.
+      type: object
+      properties:
+        SMTP_HOST:
+          type: string
+          description: Outgoing Server Host
+        SMTP_PORT:
+          type: string
+          example: 25
+          description: Outgoing server port number
+        SEND_FROM:
+          type: string
+          description: Sender's email address
+        SEND_NAME:
+          type: string
+          description: The display name of the sender
+        REPLAY_TO:
+          type: string
+          description: Reply-to email address
+        REPLAY_NAME:
+          type: string
+          description: Reply-to display name
+        ENVELOPE_FROM:
+          type: string
+          description: Sender's email address
+        SSL_ENABLE:
+          type: boolean
+          description: SSL on/off
+        START_TLS_ENABLE:
+          type: boolean
+          description: StartTLS on/off
+        AUTHENTICATION_ENABLE:
+          type: boolean
+          description: Certified or not
+        AUTHENTICATION_USER:
+          type: string
+          description: Authenticated users
+        AUTHENTICATION_PASSWORD:
+          type: string
+          description: Authentication password
   securitySchemes:
     BearerAuth:
       description: Credentials or access token for API

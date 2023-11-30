@@ -140,4 +140,9 @@ settingsDestinationSubDestinationInformationsTeams:
   $ref: "./settings.destinations.sub.destination_informations.teams.yaml"
 settingsDestinationConditions:
   $ref: "./settings.destinations.sub.conditions.yaml"
-
+settingsMailserverCreate:
+  $ref: "./settings.mailserver.create.yaml"
+settingsMailserverList:
+  $ref: "./settings.mailserverList.yaml"
+settingsMailserverGet:
+  $ref: "./settings.mailserver.yaml"
