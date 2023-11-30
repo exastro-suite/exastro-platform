@@ -154,7 +154,7 @@ paths:
   "/api/{organization_id}/platform/maintenance-mode-setting":
       $ref: './paths/maintenance_mode_setting_organizations.yaml'
 
-  "/api/{org_id}/platform/settings/mailserver":
+  "/api/{organization_id}/platform/settings/mailserver":
       $ref: './paths/settings.mailserver.yaml'
 
   # "/api/{organization_id}/platform/settings/mailserver":

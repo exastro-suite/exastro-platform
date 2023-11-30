@@ -2097,7 +2097,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/runtimeError'
       x-openapi-router-controller: controllers.maintenance_mode_setting_controller
-  '/api/{org_id}/platform/settings/mailserver':
+  '/api/{organization_id}/platform/settings/mailserver':
     get:
       tags:
         - MailserverService
