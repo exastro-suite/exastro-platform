@@ -686,7 +686,7 @@ def validate_user_email(user_email):
 
     try:
         # Check that the email address is valid.
-        validate_email(user_email, check_deliverability=False, allow_smtputf8=False)
+        validate_email(user_email, check_deliverability=False, allow_smtputf8=False, test_environment=True)
 
     except EmailNotValidError:
         return result(
@@ -1195,7 +1195,7 @@ def validate_destination_informations(destination_kind, destination_info):
 
             try:
                 # Check that the email address is valid.
-                validate_email(row['email'], check_deliverability=False, allow_smtputf8=False)
+                validate_email(row['email'], check_deliverability=False, allow_smtputf8=False, test_environment=True)
 
             except EmailNotValidError:
                 return result(
