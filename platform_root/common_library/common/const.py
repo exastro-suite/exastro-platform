@@ -154,3 +154,7 @@ NOTIFICATION_STATUS_FAILED = "Failed"           # 送信失敗
 # 処理区分
 # process kind
 PROCESS_KIND_NOTIFICATION = "NOTIFICATION"      # 通知処理
+
+# smtp_idのデフォルト
+# Default when smtp_id
+DEFAULT_SMTP_ID = "_default"

@@ -30,6 +30,14 @@ const MAX_MAIL_COUNT = 100;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
+//   destination kind const defination
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+const DESTINATION_KIND_MAIL = 'Mail';
+const DESTINATION_KIND_TEAMS = 'Teams';
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
 //   Get Text Multi Language Support
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -996,7 +1004,7 @@ function maintenanceMode() {
             const message = document.querySelector('.modeMessageText');
             if ( container !== null && message !== null ) {
                 container.classList.add('inMaintenanceMode');
-                message.textContent = 'メンテナンス中のため、ワークスペース作成を行うことができません。';
+                message.textContent = getText('000-80048', 'メンテナンス中のため、ワークスペース作成を行うことができません。');
             }
         }
     }).catch(function( error ){
@@ -1010,6 +1018,162 @@ function maintenanceMode() {
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 const settings_notifications_common = {
+
+    "set_conditions": function() {
+
+        const row_template_top = $('#conditions_list .datarow-template-top').clone(true).removeClass('datarow-template').addClass('datarow').prop('outerHTML');
+        const row_template_2nd = $('#conditions_list .datarow-template-2nd').clone(true).removeClass('datarow-template-sub').addClass('datarow').prop('outerHTML');
+        const row_template_3rd = $('#conditions_list .datarow-template-3rd').clone(true).removeClass('datarow-template-sub').addClass('datarow').prop('outerHTML');
+        // 固定のイベントタイプを指定
+        // Specify a fixed event type
+        let html='';
+        html += row_template_top
+            .replace(/\${conditions_all_count}/g, 4)
+            .replace(/\${conditions_group_name}/g, getText("000-87022", "OASE／イベント種別"))
+            .replace(/\${conditions_group_count}/g, 4)
+            .replace(/\${conditions_name}/g, getText("000-00153", '新規'))
+            .replace(/\${conditions_key}/g, 'ita_event_type_new')
+            .replace(/\${conditions_remarks}/g, getText("000-87023", "OASEで利用されるイベントの種別ごとに通知の有無を選択します。") + "<br>" +
+            getText("000-87024", "　新規：OASEエージェントから収集、あるいは、外部システムから受け取った直後のイベント") + "<br>" +
+            getText("000-87025", "　既知（判定済）：いずれかのルールにマッチしたイベント") + "<br>" +
+            getText("000-87026", "　既知（時間切れ）：一部の条件には当てはまったものの、全ての条件に当てはまらないまま、有効期限が切れたイベント") + "<br>" +
+            getText("000-87027", "　未知：ルールやルール内の条件の一切にあてはまらなかったイベント"));
+        html += row_template_3rd
+            .replace(/\${conditions_name}/g, getText("000-00154", '既知（判定済み）'))
+            .replace(/\${conditions_key}/g, 'ita_event_type_evaluated');
+        html += row_template_3rd
+            .replace(/\${conditions_name}/g, getText("000-00155", '既知（時間切れ）'))
+            .replace(/\${conditions_key}/g, 'ita_event_type_timeout');
+        html += row_template_3rd
+            .replace(/\${conditions_name}/g, getText("000-00156", '未知'))
+            .replace(/\${conditions_key}/g, 'ita_event_type_undetected');
+        $("#conditions_list tbody").append(html);
+        $("#conditions_list .datarow").css('display', '');
+    },
+
+    "set_destination_informations": function(kind, destination_informations) {
+        if (kind === DESTINATION_KIND_MAIL){
+            $("#form_destination_kind_mail").prop('checked', true);
+            ret_mail = settings_notifications_common.get_mail_destination_informations(destination_informations);
+            $("#form_destination_informations_mail_to").val(ret_mail.mail_to);
+            $("#form_destination_informations_mail_cc").val(ret_mail.mail_cc);
+            $("#form_destination_informations_mail_bcc").val(ret_mail.mail_bcc)
+        }
+        else if (kind === DESTINATION_KIND_TEAMS){
+            $("#form_destination_kind_teams").prop('checked', true);
+            destination_informations.forEach(function(element){
+                $("#form_destination_informations_teams").val(fn.cv(element.webhook, '', false));
+            });
+        }
+    },
+
+    "set_destination_informations_text": function(kind, destination_informations) {
+        if (kind === DESTINATION_KIND_MAIL){
+            ret_mail = settings_notifications_common.get_mail_destination_informations(destination_informations);
+            $("#text_destination_informations_mail_to").css('display', '');
+            $("#hr_destination_informations_mail_to").css('display', '');
+            $("#text_destination_informations_mail_cc").css('display', '');
+            $("#hr_destination_informations_mail_cc").css('display', '');
+            $("#text_destination_informations_mail_bcc").css('display', '');
+            $("#text_destination_informations_mail_to").text("to: " + ret_mail.mail_to);
+            $("#text_destination_informations_mail_cc").text("cc: " + ret_mail.mail_cc);
+            $("#text_destination_informations_mail_bcc").text("bcc: " + ret_mail.mail_bcc)
+        }
+        else if (kind === DESTINATION_KIND_TEAMS){
+            $("#text_destination_informations_teams").css('display', '');
+            destination_informations.forEach(function(element){
+                $("#text_destination_informations_teams").text(fn.cv(element.webhook, '', false));
+            });
+        }
+    },
+
+    "get_mail_destination_informations": function(destination_informations) {
+        var mail_to = "";
+        var mail_cc = "";
+        var mail_bcc = "";
+        destination_informations.forEach(function(element){
+            if (fn.cv(element.address_header, '', false) === "to"){
+                mail_to += fn.cv(element.email, '', false) + ", ";
+            }
+            else if (fn.cv(element.address_header, '', false) === "cc"){
+                mail_cc += fn.cv(element.email, '', false) + ", ";
+            }
+            else if (fn.cv(element.address_header, '', false) === "bcc"){
+                mail_bcc += fn.cv(element.email, '', false) + ", ";
+            }
+        });
+        if (mail_to.length > 0){
+            mail_to = mail_to.slice( 0, -2 );
+        }
+        if (mail_cc.length > 0){
+            mail_cc = mail_cc.slice( 0, -2 );
+        }
+        if (mail_bcc.length > 0){
+            mail_bcc = mail_bcc.slice( 0, -2 );
+        }
+        return { mail_to: mail_to, mail_cc: mail_cc, mail_bcc: mail_bcc, }
+    },
+
+    "get_destination_informations": function() {
+
+        var destination_informations = [];
+        var destination_kind = $("input[name=form_destination_kind]:checked").val();
+        if (destination_kind === "Mail"){
+            split_informations_mail_to = $("#form_destination_informations_mail_to").val();
+            split_informations_mail_cc = $("#form_destination_informations_mail_cc").val();
+            split_informations_mail_bcc = $("#form_destination_informations_mail_bcc").val();
+            if (split_informations_mail_to !== ""){
+                split_informations_mail_to.split(/,|\n|;/).forEach(address => {
+                    address = address.trim();
+                    if (address !== ""){
+                        var mail = {
+                            "address_header": "to",
+                            "email": address,
+                        }
+                        destination_informations.push(mail);
+                    }
+                });
+            }
+            if (split_informations_mail_cc !== ""){
+                split_informations_mail_cc.split(/,|\n|;/).forEach(address => {
+                    address = address.trim();
+                    if (address !== ""){
+                            var mail = {
+                            "address_header": "cc",
+                            "email": address,
+                        }
+                        destination_informations.push(mail);
+                    }
+                });
+            }
+            if (split_informations_mail_bcc !== ""){
+                split_informations_mail_bcc.split(/,|\n|;/).forEach(address => {
+                    address = address.trim();
+                    if (address !== ""){
+                            var mail = {
+                            "address_header": "bcc",
+                            "email": address,
+                        }
+                        destination_informations.push(mail);
+                    }
+                });
+            }
+        }
+        else if (destination_kind === "Teams"){
+            var teams = { "webhook": $("#form_destination_informations_teams").val() }
+            destination_informations.push(teams);
+        }
+        else if (destination_kind === "WebHook"){
+            var webhook = {
+                "url": $("#form_destination_informations_webhook").val(),
+                "header": $("#form_destination_informations_webhook_header").val()
+            }
+            destination_informations.push(webhook);
+        }
+
+        return destination_informations;
+    },
+
     validate: {
         //
         // validate destination id

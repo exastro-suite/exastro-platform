@@ -22,6 +22,7 @@ CREATE_TABLES = [
     -- メールサーバー設定 / Setting mail server
     CREATE TABLE IF NOT EXISTS M_SMTP_SERVER
     (
+        SMTP_ID		                    VARCHAR(36) NOT NULL,                       -- 送信サーバーID
         SMTP_PORT		                INT,                                        -- 送信サーバーのポート番号
         SEND_FROM		                VARCHAR(255),                               -- 送信元のメールアドレス
         SEND_NAME		                VARCHAR(100),                               -- 送信元の表示名
@@ -36,7 +37,8 @@ CREATE_TABLES = [
         CREATE_TIMESTAMP		        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,    -- 作成日時
         CREATE_USER		                VARCHAR(40),                                -- 作成者
         LAST_UPDATE_TIMESTAMP		    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,    -- 最終更新日時
-        LAST_UPDATE_USER		        VARCHAR(40)                                 -- 最終更新者
+        LAST_UPDATE_USER		        VARCHAR(40),                                -- 最終更新者
+        PRIMARY KEY (SMTP_ID)
     )ENGINE = InnoDB, CHARSET = utf8mb4, COLLATE = utf8mb4_bin, ROW_FORMAT=COMPRESSED ,KEY_BLOCK_SIZE=8;
     """,
     """

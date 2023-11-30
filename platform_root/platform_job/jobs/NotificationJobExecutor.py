@@ -117,7 +117,7 @@ class NotificationJobExecutor(BaseJobExecutor):
                     destination_information['webhook'],
                     json={
                         "title": message_infomations.get("title"),
-                        "text": message_infomations.get("message")
+                        "text": message_infomations.get("message").replace('\n','<br/>')
                     },
                     headers={"Content-type": "application/json"},
                     timeout=(
