@@ -55,9 +55,7 @@ post:
     content:
       application/json:
         schema:
-          type: array
-          items:
-            $ref: '../schemas/settings.mailserver.create.yaml'
+          $ref: '../schemas/settings.mailserver.create.yaml'
     required: true
   responses:
     200:
