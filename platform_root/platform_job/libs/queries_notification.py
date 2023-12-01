@@ -29,3 +29,8 @@ SELECT * FROM T_NOTIFICATION_MESSAGE
     WHERE   NOTIFICATION_STATUS     =   %(notification_status)s
     AND     LAST_UPDATE_TIMESTAMP   <   %(last_update_timestamp)s
 """
+
+SQL_QUERY_M_SMTP_SERVER = """
+SELECT * FROM M_SMTP_SERVER
+    WHERE   SMTP_ID =   %(smtp_id)s
+"""

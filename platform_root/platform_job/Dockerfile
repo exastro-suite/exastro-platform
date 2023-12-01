@@ -87,6 +87,10 @@ ENV JOB_NOTIFICATION_TIMEOUT_SECONDS=20
 ENV JOB_NOTIFICATION_TEAMS_CONNECTION_TIMEOUT=3.0
 #   teams webhook read timeout
 ENV JOB_NOTIFICATION_TEAMS_READ_TIMEOUT=10.0
+#   smtp timeout
+ENV JOB_NOTIFICATION_SMTP_TIMEOUT=10.0
+#   smtps ssl verify TRUE/FALSE
+ENV JOB_NOTIFICATION_SMTPS_SSL_VERIFY_ENABLED=TRUE
 
 # 強制ステータス更新Jobの設定 / Force status update job settings
 #   Jobタイムアウト / Job timeout

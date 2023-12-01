@@ -13,15 +13,20 @@
 #   limitations under the License.
 from jobs.BaseJobExecutor import BaseJobExecutor
 
+import os
 import sys
 from contextlib import closing
 import traceback
 import requests
 import datetime
 import json
+import ssl
+from smtplib import SMTP, SMTP_SSL
+from email.message import EmailMessage
+from email.utils import formatdate, formataddr
 
 from common_library.common.db import DBconnector
-from common_library.common import encrypt, const
+from common_library.common import encrypt, const, common
 
 from libs import queries_notification
 
@@ -77,8 +82,7 @@ class NotificationJobExecutor(BaseJobExecutor):
                         notification_status = self.__send_message_teams(destination_informations, message_infomations)
 
                     if row['DESTINATION_KIND'] == const.DESTINATION_KIND_MAIL:
-                        # TODO : メール送信
-                        pass
+                        notification_status = self.__send_message_mail(destination_informations, message_infomations)
 
                     # 送信結果を書き込む / Write the transmission result
                     cursor.execute(
@@ -130,7 +134,7 @@ class NotificationJobExecutor(BaseJobExecutor):
                     raise Exception(f"response code:{resp_webhook.status_code}")
 
             except Exception as err:
-                globals.logger.warning(f"teams webhook : {err}")
+                globals.logger.warning(f'{err}\n-- stack trace --\n{traceback.format_exc()}')
                 globals.logger.debug(f"teams webhook response text\n{resp_webhook_text}")
                 faild_send = True
 
@@ -138,6 +142,99 @@ class NotificationJobExecutor(BaseJobExecutor):
             return const.NOTIFICATION_STATUS_FAILED
         else:
             return const.NOTIFICATION_STATUS_SUCCESSFUL
+
+    def __send_message_mail(self, destination_informations, message_infomations):
+        """mailへのメッセージ送信 / Send messages to email
+
+        Args:
+            destination_informations (dict): 通知先 / Notification destination
+            message_infomations (dict): 通知メッセージ / notification message
+
+        Returns:
+            str: result(notification_status)
+        """
+        try:
+            # SMTP Serverの情報取得 / Get SMTP server information
+            smtp_conn_info = self.__get_smtp_connection_info()
+            if smtp_conn_info is None:
+                raise Exception(f"M_SMTP_SERVER not found")
+
+            # 送信メッセージの作成 / Creating outgoing messages
+            email_message = EmailMessage()
+            email_message.set_content(message_infomations.get("message"))
+            email_message['Subject'] = message_infomations.get("title")
+            email_message['From'] = formataddr((smtp_conn_info['SEND_NAME'], smtp_conn_info['SEND_FROM']))
+            email_message['To'] = ",".join([dest['email'] for dest in destination_informations if dest['address_header'] == const.MAIL_HEADER_TO])
+            email_message['Cc'] = ",".join([dest['email'] for dest in destination_informations if dest['address_header'] == const.MAIL_HEADER_CC])
+            email_message['Bcc'] = ",".join([dest['email'] for dest in destination_informations if dest['address_header'] == const.MAIL_HEADER_BCC])
+            if not common.is_none_or_empty_string(smtp_conn_info['REPLAY_TO']):
+                email_message['reply-to'] = formataddr((smtp_conn_info['REPLAY_NAME'], smtp_conn_info['REPLAY_TO']))
+
+            envelope_from = smtp_conn_info['ENVELOPE_FROM'] if not common.is_none_or_empty_string(smtp_conn_info['ENVELOPE_FROM']) else smtp_conn_info['SEND_FROM']
+            envelope_to = [dest['email'] for dest in destination_informations]
+
+            # メッセージ送信
+            with self.__connect_smtp(smtp_conn_info) as smtp:
+                smtp.send_message(email_message, from_addr=envelope_from, to_addrs=envelope_to)
+
+            return const.NOTIFICATION_STATUS_SUCCESSFUL
+
+        except Exception as err:
+            globals.logger.warning(f'{err}\n-- stack trace --\n{traceback.format_exc()}')
+            return const.NOTIFICATION_STATUS_FAILED
+
+    def __get_smtp_connection_info(self):
+        """SMTP server情報取得 / Get SMTP server information
+
+        Returns:
+            dict: SMTP server information
+        """
+        with closing(DBconnector().connect_orgdb(self.organization_id)) as conn:
+            with conn.cursor() as cursor:
+                cursor.execute(queries_notification.SQL_QUERY_M_SMTP_SERVER, {"smtp_id": const.DEFAULT_SMTP_ID})
+                return cursor.fetchone()
+
+    def __connect_smtp(self, smtp_conn_info):
+        """SMTP接続処理 / SMTP connection processing
+
+        Args:
+            smtp_conn_info (dict): SMTP server information
+
+        Returns:
+            SMTP | SMTP_SSL: SMTP server connection
+        """
+        smtp = None
+        if smtp_conn_info['START_TLS_ENABLE'] == 1:
+            smtp = SMTP(
+                host=smtp_conn_info['SMTP_HOST'],
+                port=smtp_conn_info['SMTP_PORT'],
+                timeout=job_manager_config.JOBS[const.PROCESS_KIND_NOTIFICATION]['extra_config']['smtp_timeout'])
+            smtp.starttls()
+
+        elif smtp_conn_info['SSL_ENABLE'] == 1:
+            if job_manager_config.JOBS[const.PROCESS_KIND_NOTIFICATION]['extra_config']['smtps_ssl_verify_enabled']:
+                context = ssl.create_default_context()
+            else:
+                context = ssl._create_unverified_context()
+
+            smtp = SMTP_SSL(
+                host=smtp_conn_info['SMTP_HOST'],
+                port=smtp_conn_info['SMTP_PORT'],
+                context=context,
+                timeout=job_manager_config.JOBS[const.PROCESS_KIND_NOTIFICATION]['extra_config']['smtp_timeout'])
+        else:
+            smtp = SMTP(
+                host=smtp_conn_info['SMTP_HOST'],
+                port=smtp_conn_info['SMTP_PORT'],
+                timeout=job_manager_config.JOBS[const.PROCESS_KIND_NOTIFICATION]['extra_config']['smtp_timeout'])
+
+        if smtp_conn_info['AUTHENTICATION_ENABLE'] == 1:
+            smtp.login(smtp_conn_info['AUTHENTICATION_USER'], encrypt.decrypt_str(smtp_conn_info['AUTHENTICATION_PASSWORD']))
+
+        if os.environ.get('LOG_LEVEL') == 'DEBUG':
+            smtp.set_debuglevel(1)
+
+        return smtp
 
     def cancel(self):
         """job cancel

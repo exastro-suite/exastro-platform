@@ -13,7 +13,7 @@
 #   limitations under the License.
 import os
 
-from common_library.common import const
+from common_library.common import const, common
 import job_manager_const
 
 #
@@ -100,6 +100,8 @@ JOBS = {
         "extra_config": {
             "teams_connection_timeout": float(os.environ.get('JOB_NOTIFICATION_TEAMS_CONNECTION_TIMEOUT')),
             "teams_read_timeout": float(os.environ.get('JOB_NOTIFICATION_TEAMS_READ_TIMEOUT')),
+            "smtp_timeout": float(os.environ.get('JOB_NOTIFICATION_SMTP_TIMEOUT')),
+            "smtps_ssl_verify_enabled": common.val_to_boolean(os.environ.get('JOB_NOTIFICATION_SMTPS_SSL_VERIFY_ENABLED', 'TRUE')),
         }
     },
     job_manager_const.PROCESS_KIND_FORCE_UPDATE_STATUS: {
