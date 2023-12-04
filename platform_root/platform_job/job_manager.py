@@ -92,6 +92,9 @@ def job_manager_main_process():
             # sub processへの終了要求を設定 / Set termination request to sub process
             sub_processes_mgr.set_sub_process_termination_request(force=False)
 
+            # interval job 実行processの設定 / interval job Execution process settings
+            sub_processes_mgr.set_interval_job_execute_process()
+
         except Exception as err:
             # 例外が発生しても処理は継続する / Processing continues even if an exception occurs
             globals.logger.error(f'{err}\n---- stack trace ----\n{traceback.format_exc()}')
@@ -123,14 +126,6 @@ def job_manager_main_process():
             sub_process.join()
         except Exception:
             pass
-
-    if process_sigint:
-        # job受付を終了し静止状態に移行する
-        # Ends job acceptance and transitions to quiescent state
-        globals.logger.info('It has moved to a state where it can be safely stopped.')
-        globals.logger.critical('Please restart the container to resume')
-        while not process_sigterm:
-            time.sleep(1)
 
     globals.logger.info('TERMINATE main process')
     globals.terminate()
@@ -272,11 +267,21 @@ def job_start_control(conn, sub_process_mgr: SubProcessManager, job_modules):
     if sub_process_mgr.can_launch_job():
         try:
             conn.begin()
+
+            # 定期実行のjobを取得する / Get a regularly executed job
+            start_interval_jobs = get_start_interval_jobs(sub_process_mgr)
+
             # queueから処理可能な処理対象の情報を取得する / Get information about processable objects from the queue
-            queue_rows = get_queue(conn, sub_process_mgr.get_running_job_queue(), sub_process_mgr.is_timing_of_force_update_status())
+            queue_rows = get_queue(
+                    conn,
+                    sub_process_mgr.get_running_job_queue(),
+                    job_manager_config.SUB_PROCESS_MAX_JOBS - len(sub_process_mgr.get_running_job_queue()) - len(start_interval_jobs))
+
+            # interval実行jobとqueue実行jobを結合する / Combine interval execution job and queue execution job
+            start_jobs = start_interval_jobs + queue_rows
 
             # 取得したqueue分処理する / Process the acquired queue
-            for queue_row in queue_rows:
+            for queue_row in start_jobs:
                 globals.logger.debug(f"Starting job : {queue_row['PROCESS_ID']} / {queue_row['PROCESS_KIND']}")
 
                 # queueから起動対象のレコードを削除する / Delete the record to be launched from the queue
@@ -326,6 +331,11 @@ def cancel_all_jobs(sub_process_mgr: SubProcessManager):
 
 
 def cancel_jobs(jobs: list[Job]):
+    """Jobのcancelを行う
+
+    Args:
+        jobs (list[Job]): cancel対象job / Job to be canceled
+    """
     for job in jobs:
         # timeoutのjobに対して全て処理する / Process everything for timeout jobs
 
@@ -385,13 +395,40 @@ def cancel_job_timeout_control(sub_process_mgr: SubProcessManager):
                 sub_process_mgr.set_terminating()
 
 
-def get_queue(conn, running_job_queue: list, force_update_status_job: bool):
+def get_start_interval_jobs(sub_process_mgr: SubProcessManager):
+    """開始するinterval jobを取得 / Get interval job to start
+
+    Args:
+        sub_process_mgr (SubProcessManager): _description_
+
+    Returns:
+        list: job queue
+    """
+    running_jobs = sub_process_mgr.get_running_job_queue()
+    start_jobs = sub_process_mgr.get_timing_of_interval_job_start()[:(job_manager_config.SUB_PROCESS_MAX_JOBS - len(running_jobs))]
+
+    ret_queue = []
+    for job in start_jobs:
+        sub_process_mgr.set_next_interval_job_start_time(job)
+        ret_queue.append({
+            "PROCESS_ID": ulid.new().str,
+            "PROCESS_KIND": job,
+            "PROCESS_EXEC_ID": None,
+            "ORGANIZATION_ID": None,
+            "WORKSPACE_ID": None,
+            "LAST_UPDATE_TIMESTAMP": datetime.datetime.now(),
+            "LAST_UPDATE_USER": None
+        })
+    return ret_queue
+
+
+def get_queue(conn, running_job_queue: list, get_queue_len: int):
     """queueの取得 / Get queue
 
     Args:
         conn (_type_): DB connection
         running_job_queue (list): 実行中のjobのqueue / queue of running jobs
-        force_update_status_job (bool): 強制ステータス更新タスク起動有無 / Whether or not to start the forced status update job
+        get_queue_len(int): queueから取得する最大数 / Maximum number to retrieve from queue
 
     Returns:
         list: job起動対象のqueue情報 / Queue information for job activation
@@ -406,7 +443,7 @@ def get_queue(conn, running_job_queue: list, force_update_status_job: bool):
     # Obtain the contents of the queue from the DB
     #   taking into account the possibility of the read being discarded due to lock failure, etc., obtain twice the maximum number of items
     with conn.cursor() as cursor:
-        cursor.execute(queries_process_queue.SQL_QUERY_PROCESS, {"job_max_count": (job_manager_config.SUB_PROCESS_MAX_JOBS - len(running_job_queue)) * 2})
+        cursor.execute(queries_process_queue.SQL_QUERY_PROCESS, {"job_max_count": get_queue_len * 2})
         queue = cursor.fetchall()
 
     # queueの情報をorganization_idでグルーピングし、last_update_timestampでソート
@@ -418,28 +455,12 @@ def get_queue(conn, running_job_queue: list, force_update_status_job: bool):
     # 実行してないorganization_idの情報を0件で追加 / Add information of organization_id that is not executed with 0 items
     running_org_grouping.update({key: [] for key in queue_org_grouping.keys() if key not in running_org_grouping})
 
-    # totalで実行中のjob数 / Number of jobs running in total
-    total_job_count = len(running_job_queue)
-
     # return値の配列を初期化 / Initialize return value array
     ret_queue = []
 
-    # 強制ステータス更新のjobの起動要求がなされている場合、return値の配列に追加する
-    # If a request is made to start a forced status update job, add it to the return value array.
-    if force_update_status_job:
-        ret_queue.append({
-            "PROCESS_ID": ulid.new().str,
-            "PROCESS_KIND": job_manager_const.PROCESS_KIND_FORCE_UPDATE_STATUS,
-            "PROCESS_EXEC_ID": None,
-            "ORGANIZATION_ID": None,
-            "WORKSPACE_ID": None,
-            "LAST_UPDATE_TIMESTAMP": datetime.datetime.now(),
-            "LAST_UPDATE_USER": None
-        })
-
-    # queueが残っているもしくはtotal job数が上限値未満の場合繰り返す
-    # Repeat if the queue remains or the total number of jobs is less than the upper limit
-    while len(queue_org_grouping) > 0 and total_job_count < job_manager_config.SUB_PROCESS_MAX_JOBS:
+    # queueが残っているもしくは取得job数が上限値未満の場合繰り返す
+    # Repeat if the maximum number of jobs to be retrieved from the queue remains or the number of jobs to be retrieved is less than the upper limit.
+    while len(queue_org_grouping) > 0 and len(ret_queue) < get_queue_len:
         # 次に処理をするorganization_idを決定する
         #   実行中または起動対象のjobの総件数の昇順
         #   last_update_timestampの昇順
@@ -485,7 +506,6 @@ def get_queue(conn, running_job_queue: list, force_update_status_job: bool):
                 ret_queue.append(queue_org_grouping[next_organization_id][0])
                 running_kind_grouping[next_process_king].append(queue_org_grouping[next_organization_id][0])
                 running_org_grouping[next_organization_id].append(queue_org_grouping[next_organization_id][0])
-                total_job_count += 1
 
         # 次のqueue情報に進むためqueueの配列から削除 / Delete from queue array to proceed to next queue information
         del queue_org_grouping[next_organization_id][0]
