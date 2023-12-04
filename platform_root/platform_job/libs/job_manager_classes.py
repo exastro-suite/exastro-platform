@@ -224,7 +224,13 @@ class SubProcessManager():
         Returns:
             list: job kinds
         """
-        return [job_kind for job_kind in self.__interval_job_kinds if self.is_timing_of_interval_job_start(job_kind)]
+        # jobの開始予定時間の早い順に返す
+        return [job_kind_info['job_kind'] for job_kind_info in sorted(
+            [{
+                "job_kind": job_kind,
+                "start_time": self.get_next_interval_job_start_time(job_kind),
+            } for job_kind in self.__interval_job_kinds if self.is_timing_of_interval_job_start(job_kind)],
+            key=lambda x: x['start_time'])]
 
     def is_timing_of_interval_job_start(self, job_kind):
         """Jobを起動するタイミングか判定する / Determine when it is time to start a job
@@ -242,6 +248,18 @@ class SubProcessManager():
             return True
         else:
             return False
+
+    def get_next_interval_job_start_time(self, job_kind):
+        """Jobを起動する時間 / Time to start the Job
+
+        Args:
+            job_kind (str): job kind
+
+        Returns:
+            datetime.datetime: Time to start the Job
+        """
+        job_index = self.__interval_job_kinds.index(job_kind)
+        return  datetime.datetime.fromtimestamp(self.__interval_job_exec_times[job_index])
 
     def set_next_interval_job_start_time(self, job_kind):
         """interval jobが次に開始する時間を設定する / interval Set the next time the job starts
@@ -440,7 +458,7 @@ class SubProcessesManager():
                 # Switch the process if it is assigned to a process that cannot be started
                 if self.__interval_job_exec_pids[i] not in startable_pids:
                     self.__interval_job_exec_pids[i] = startable_pids[random.randrange(len(startable_pids))]
-                    globals.logger.debug(f"Set process to run interval job : job_kind[{job_kind}] pid[{self.__interval_job_exec_pids[i]}]")
+                    globals.logger.debug(f"Set process to run interval job : job_kind:[{job_kind}] pid:[{self.__interval_job_exec_pids[i]}]")
 
     def __unused_array_indexes(self):
         """使用していない共有メモリのindexを返す / Return unused shared memory indexes
