@@ -92,8 +92,9 @@ def test_job_manager_main_sigint_signal():
             assert test_common.check_state(
                 timeout=5.0, conditions=lambda : len([p for p in psutil.Process(os.getpid()).children() if p.name().startswith('python') ]), conditions_value=0)
 
-            # sigintの場合は終了しないか確認
-            assert main_thread.is_alive()
+            # 終了しているか確認
+            assert test_common.check_state(
+                timeout=3.0, conditions=lambda : not main_thread.is_alive())
 
         finally:
             # sigterm signalの送信
@@ -617,21 +618,18 @@ def test_job_manager_sub_force_update_status():
     TestExecuteStocker.initalize()
 
     # Jobの実行classを試験用に切り替え
-    process_kind=const.PROCESS_KIND_NOTIFICATION
     job_config_jobs = dict(job_manager_config.JOBS)
-    job_config_jobs[process_kind]["module"] = "tests.jobs.TestJobExecutor"
-    job_config_jobs[process_kind]["class"] = "TestNormalJobExecutor"
+    job_config_jobs[const.PROCESS_KIND_NOTIFICATION]["module"] = "tests.jobs.TestJobExecutor"
+    job_config_jobs[const.PROCESS_KIND_NOTIFICATION]["class"] = "TestNormalJobExecutor"
 
-    with mock.patch("job_manager_config.FORCE_UPDATE_STATUS_INTERVAL_SECONDS", 3), \
-            mock.patch.dict(f"job_manager_config.JOBS", job_config_jobs):
+    job_config_jobs[job_manager_const.PROCESS_KIND_FORCE_UPDATE_STATUS]["job_interval"] = 3
+
+    with mock.patch.dict(f"job_manager_config.JOBS", job_config_jobs):
 
         # sub process起動用の情報生成
         sub_processes_mgr = SubProcessesManager()
         sub_process_parameter = sub_processes_mgr.generate_sub_process_parameter()
         sub_processes_mgr.append_new_process(sub_process_parameter, test_common.get_main_process(os.getpid()))
-
-        # sub processの状態更新(force_update_statusを行うprocessをどれにするかの情報を更新するため)
-        sub_processes_mgr.refresh_sub_process_status()
 
         # sub processの起動
         main_thread = threading.Thread(
@@ -641,6 +639,11 @@ def test_job_manager_sub_force_update_status():
             daemon=True
         )
         main_thread.start()
+        time.sleep(1.0)
+
+        # sub processの状態更新(force_update_statusを行うprocessをどれにするかの情報を更新するため)
+        sub_processes_mgr.refresh_sub_process_status()
+        sub_processes_mgr.set_interval_job_execute_process()
 
         try:
             # force update status呼出確認

@@ -69,12 +69,6 @@ ENV SUB_PROCESS_MAX_CANCEL_TIMEOUT=10
 # JOBの状態確認するインターバル / Interval to check JOB status
 ENV JOB_STATUS_WATCH_INTERVAL_SECONDS=1.0
 
-# ステータスを強制的にエラーにするJOBの起動インターバル / JOB startup interval that forces the status to error
-ENV FORCE_UPDATE_STATUS_INTERVAL_SECONDS=180
-
-# ステータスを強制的にエラーにする最終更新日時からの経過時間 / Elapsed time since last update to force status to error
-ENV FORCE_UPDATE_STATUS_PROGRASS_SECONDS=600
-
 # タスクのキャンセルtimeout時間 / Job cancellation timeout seconds
 ENV JOB_CANCEL_TIMEOUT_SECONDS=5.0
 
@@ -95,6 +89,12 @@ ENV JOB_NOTIFICATION_SMTPS_SSL_VERIFY_ENABLED=TRUE
 # 強制ステータス更新Jobの設定 / Force status update job settings
 #   Jobタイムアウト / Job timeout
 ENV JOB_FORCE_UPDATE_STATUS_TIMEOUT_SECONDS=60
+#   ステータスを強制的にエラーにするJOBの起動インターバル / JOB startup interval that forces the status to error
+ENV JOB_FORCE_UPDATE_STATUS_INTERVAL_SECONDS=180
+
+#   ステータスを強制的にエラーにする最終更新日時からの経過時間 / Elapsed time since last update to force status to error
+ENV JOB_FORCE_UPDATE_STATUS_PROGRASS_SECONDS=600
+
 
 
 #

@@ -71,13 +71,13 @@ JOB_STATUS_WATCH_INTERVAL_SECONDS = float(os.environ.get('JOB_STATUS_WATCH_INTER
 # JOBのステータスを強制的にエラーにするJOBの起動インターバル
 # JOB startup interval that forces the JOB status to error
 #
-FORCE_UPDATE_STATUS_INTERVAL_SECONDS = int(os.environ.get('FORCE_UPDATE_STATUS_INTERVAL_SECONDS'))
+# FORCE_UPDATE_STATUS_INTERVAL_SECONDS = int(os.environ.get('FORCE_UPDATE_STATUS_INTERVAL_SECONDS'))
 
 #
 # JOBのステータスを強制的にエラーにする最終更新日時からの経過時間
 # Elapsed time since last update to force JOB status to error
 #
-FORCE_UPDATE_STATUS_PROGRASS_SECONDS = int(os.environ.get('FORCE_UPDATE_STATUS_PROGRASS_SECONDS'))
+# FORCE_UPDATE_STATUS_PROGRASS_SECONDS = int(os.environ.get('FORCE_UPDATE_STATUS_PROGRASS_SECONDS'))
 
 #
 # タスクのキャンセルtimeout時間
@@ -94,9 +94,10 @@ JOB_CANCEL_TIMEOUT_SECONDS = float(os.environ.get('JOB_CANCEL_TIMEOUT_SECONDS'))
 JOBS = {
     const.PROCESS_KIND_NOTIFICATION: {
         "timeout_seconds": int(os.environ.get('JOB_NOTIFICATION_TIMEOUT_SECONDS')),
-        "max_job_per_process": int(os.environ.get('JOB_NOTIFICATION_MAX_JOB_PER_PROCESS', str(SUB_PROCESS_MAX_JOBS))),
         "module": "jobs.NotificationJobExecutor",
         "class": "NotificationJobExecutor",
+        "job_trigger": "queue",
+        "max_job_per_process": int(os.environ.get('JOB_NOTIFICATION_MAX_JOB_PER_PROCESS', str(SUB_PROCESS_MAX_JOBS))),
         "extra_config": {
             "teams_connection_timeout": float(os.environ.get('JOB_NOTIFICATION_TEAMS_CONNECTION_TIMEOUT')),
             "teams_read_timeout": float(os.environ.get('JOB_NOTIFICATION_TEAMS_READ_TIMEOUT')),
@@ -106,8 +107,12 @@ JOBS = {
     },
     job_manager_const.PROCESS_KIND_FORCE_UPDATE_STATUS: {
         "timeout_seconds": int(os.environ.get('JOB_FORCE_UPDATE_STATUS_TIMEOUT_SECONDS')),
-        "max_job_per_process": 1,
         "module": "jobs.ForceUpdateStatusJobExecutor",
-        "class": "ForceUpdateStatusJobExecutor"
+        "class": "ForceUpdateStatusJobExecutor",
+        "job_trigger": "interval_timer",
+        "job_interval": int(os.environ.get('JOB_FORCE_UPDATE_STATUS_INTERVAL_SECONDS')),
+        "extra_config": {
+            "prograss_seconds": int(os.environ.get('JOB_FORCE_UPDATE_STATUS_PROGRASS_SECONDS'))
+        }
     }
 }

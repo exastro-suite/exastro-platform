@@ -21,7 +21,7 @@ import requests
 import datetime
 import json
 import ssl
-from smtplib import SMTP, SMTP_SSL
+import smtplib
 from email.message import EmailMessage
 from email.utils import formatdate, formataddr
 
@@ -205,7 +205,7 @@ class NotificationJobExecutor(BaseJobExecutor):
         """
         smtp = None
         if smtp_conn_info['START_TLS_ENABLE'] == 1:
-            smtp = SMTP(
+            smtp = smtplib.SMTP(
                 host=smtp_conn_info['SMTP_HOST'],
                 port=smtp_conn_info['SMTP_PORT'],
                 timeout=job_manager_config.JOBS[const.PROCESS_KIND_NOTIFICATION]['extra_config']['smtp_timeout'])
@@ -217,13 +217,13 @@ class NotificationJobExecutor(BaseJobExecutor):
             else:
                 context = ssl._create_unverified_context()
 
-            smtp = SMTP_SSL(
+            smtp = smtplib.SMTP_SSL(
                 host=smtp_conn_info['SMTP_HOST'],
                 port=smtp_conn_info['SMTP_PORT'],
                 context=context,
                 timeout=job_manager_config.JOBS[const.PROCESS_KIND_NOTIFICATION]['extra_config']['smtp_timeout'])
         else:
-            smtp = SMTP(
+            smtp = smtplib.SMTP(
                 host=smtp_conn_info['SMTP_HOST'],
                 port=smtp_conn_info['SMTP_PORT'],
                 timeout=job_manager_config.JOBS[const.PROCESS_KIND_NOTIFICATION]['extra_config']['smtp_timeout'])
@@ -284,7 +284,8 @@ class NotificationJobExecutor(BaseJobExecutor):
 
                             with conn_ws.cursor() as cursor_ws:
                                 # UNSENT状態で一定時間経過したものを対象とする / Targets items that have been in UNSENT state for a certain period of time
-                                last_update_timestamp = datetime.datetime.now() - datetime.timedelta(seconds=job_manager_config.FORCE_UPDATE_STATUS_PROGRASS_SECONDS)
+                                last_update_timestamp = (datetime.datetime.now() - datetime.timedelta(
+                                    seconds=job_manager_config.JOBS[job_manager_const.PROCESS_KIND_FORCE_UPDATE_STATUS]['extra_config']['prograss_seconds']))
                                 cursor_ws.execute(
                                     queries_notification.SQL_QUERY_NOTIFICATION_MESSAGE_UNSENT_LONGTIME,
                                     {"last_update_timestamp": last_update_timestamp, "notification_status": const.NOTIFICATION_STATUS_UNSENT})
