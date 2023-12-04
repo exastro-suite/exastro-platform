@@ -1,0 +1,57 @@
+#   Copyright 2023 NEC Corporation
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+
+title: mailserver is a mailserver of mailserver resource.
+type: object
+properties:
+  SMTP_HOST:
+    type: string
+    description: Outgoing Server Host
+  SMTP_PORT:
+    type: string
+    description: Outgoing server port number
+  SEND_FROM:
+    type: string
+    description: Sender's email address
+  SEND_NAME:
+    type: string
+    description: The display name of the sender
+  REPLAY_TO:
+    type: string
+    description: Reply-to email address
+  REPLAY_NAME:
+    type: string
+    description: Reply-to display name
+  ENVELOPE_FROM:
+    type: string
+    description: Sender's email address
+  SSL_ENABLE:
+    type: boolean
+    description: SSL on/off
+  START_TLS_ENABLE:
+    type: boolean
+    description: StartTLS on/off
+  AUTHENTICATION_ENABLE:
+    type: boolean
+    description: Certified or not
+  AUTHENTICATION_USER:
+    type: string
+    description: Authenticated users
+  AUTHENTICATION_PASSWORD:
+    type: string
+    description: Authentication password
+required:
+  - SMTP_HOST
+  - SMTP_PORT
+  - SEND_FROM

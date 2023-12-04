@@ -2240,6 +2240,101 @@ components:
             - event_type
       required:
         - ita
+    settingsMailserverCreate:
+      title: mailserver is a mailserver of mailserver resource.
+      type: object
+      properties:
+        SMTP_HOST:
+          type: string
+          description: Outgoing Server Host
+        SMTP_PORT:
+          type: string
+          description: Outgoing server port number
+        SEND_FROM:
+          type: string
+          description: Sender's email address
+        SEND_NAME:
+          type: string
+          description: The display name of the sender
+        REPLAY_TO:
+          type: string
+          description: Reply-to email address
+        REPLAY_NAME:
+          type: string
+          description: Reply-to display name
+        ENVELOPE_FROM:
+          type: string
+          description: Sender's email address
+        SSL_ENABLE:
+          type: boolean
+          description: SSL on/off
+        START_TLS_ENABLE:
+          type: boolean
+          description: StartTLS on/off
+        AUTHENTICATION_ENABLE:
+          type: boolean
+          description: Certified or not
+        AUTHENTICATION_USER:
+          type: string
+          description: Authenticated users
+        AUTHENTICATION_PASSWORD:
+          type: string
+          description: Authentication password
+      required:
+        - SMTP_HOST
+        - SMTP_PORT
+        - SEND_FROM
+    settingsMailserverList:
+      title: mailserver is list of Mailserver resources.
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            allOf:
+              - $ref: '#/components/schemas/settingsMailserverGet'
+              - $ref: '#/components/schemas/responseStat'
+    settingsMailserverGet:
+      title: mailserver is a definition of Mailserver resource.
+      type: object
+      properties:
+        SMTP_HOST:
+          type: string
+          description: Outgoing Server Host
+        SMTP_PORT:
+          type: string
+          example: 25
+          description: Outgoing server port number
+        SEND_FROM:
+          type: string
+          description: Sender's email address
+        SEND_NAME:
+          type: string
+          description: The display name of the sender
+        REPLAY_TO:
+          type: string
+          description: Reply-to email address
+        REPLAY_NAME:
+          type: string
+          description: Reply-to display name
+        ENVELOPE_FROM:
+          type: string
+          description: Sender's email address
+        SSL_ENABLE:
+          type: boolean
+          description: SSL on/off
+        START_TLS_ENABLE:
+          type: boolean
+          description: StartTLS on/off
+        AUTHENTICATION_ENABLE:
+          type: boolean
+          description: Certified or not
+        AUTHENTICATION_USER:
+          type: string
+          description: Authenticated users
+        AUTHENTICATION_PASSWORD:
+          type: string
+          description: Authentication password
   securitySchemes:
     BearerAuth:
       description: Credentials or access token for API
