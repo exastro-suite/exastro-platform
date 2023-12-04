@@ -1,0 +1,207 @@
+/*
+#   Copyright 2023 NEC Corporation
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+*/
+
+$(function(){
+
+    CommonAuth.onAuthSuccess(() => {
+        new CommonUi(`#container`);
+        load_main();
+    });
+
+    function load_main() {
+        Promise.all([
+            // Load Common Contents
+            loadCommonContents(),
+
+            // get Workspace List
+            call_api_promise_get_settings_mailserver(),
+
+        ]).then(function(results) {
+            // Display Menu
+            displayMenu('menu_settings_mailserver');
+            // Display Topic Path
+            displayTopicPath([
+                {"text": getText("000-88002", "メール送信サーバー設定"), "href": location_conf.href.settings.mailserver.replace(/{organization_id}/g, CommonAuth.getRealm())}
+            ]);
+
+            display_main(results[1].data);
+            finish_onload_progress();
+            enabled_button();
+        }).catch((e) => {
+            console.log('[ERROR] load_main catch');
+            finish_onload_progress_at_error();
+            if(typeof e != "undefined") console.log(e);
+            return;
+        });
+    }
+
+    function call_api_promise_get_settings_mailserver() {
+        return call_api_promise({
+            type: "GET",
+            url: api_conf.api.settings.mailserver.get.replace(/{organization_id}/g, CommonAuth.getRealm()),
+            headers: {
+                Authorization: "Bearer " + CommonAuth.getToken(),
+            },
+            contentType: "application/json",
+            dataType: "json",
+        });
+    }
+
+    function display_main(mailserver) {
+        console.log("[CALL] display_main");
+
+        //
+        // display Delete settings notification destination button
+        //
+        $('#button_reset').on('click',() => {
+            delete_destination();
+        });
+        if(CommonAuth.getAdminWorkspaces().indexOf(workspace_id) !== -1 || CommonAuth.hasAuthority(RolesCommon.ORG_AUTH_UPDATE)) {
+            $('#button_reset').prop('disabled', false);
+        } else {
+            $('#button_reset').prop('disabled', true);
+            $('#button_reset').css('cursor', 'not-allowed');
+        }
+
+        //
+        // display mailserver detail
+        //
+        $("#form_smtp_host").val(mailserver.smtp_host);
+        $("#form_smtp_port").val(mailserver.smtp_port);
+        $("#form_send_from").val(mailserver.send_from);
+        $("#form_send_name").val(mailserver.send_name);
+        $("#form_replay_to").val(mailserver.replay_to);
+        $("#form_replay_name").val(mailserver.replay_name);
+        $("#form_envelope_from").val(mailserver.envelope_from);
+        $('#form_ssl_enable').prop("checked", fn.cv(mailserver.ssl_enable, false, false));
+        $('#form_start_tls_enable').prop("checked", fn.cv(mailserver.start_tls_enable, false, false));
+        $('#form_authentication_enable').prop("checked", fn.cv(mailserver.authentication_enable, false, false));
+        if (mailserver.authentication_enable){
+            $("#form_authentication_user").val(mailserver.authentication_user);
+            $("#form_authentication_password").val('*'.repeat(8));
+        }
+
+        //
+        // register button
+        //
+        $('#button_register').on('click',() => {
+            $('#button_register').prop('disabled',true);
+            if( ! validate_register() ) {
+                $('#button_register').prop('disabled',false);
+                return;
+            }
+            settings_mailserver_register();
+        });
+    }
+
+    function delete_destination() {
+        console.log("[CALL] confirm_delete");
+
+        deleteConfirmMessage(
+            getText("000-80017", "実行確認"),
+            getText("000-87010", "メール送信サーバーの設定をリセットしてもよろしいですか？"),
+            getText("000-87011", "通知種別メールのメッセージ通知は一切できなくなります。"),
+            getText("000-00199", "リセット"),
+            () => {
+                disabled_button();
+                show_progress();
+
+                // APIを呼出す
+                call_api_promise({
+                    type: "DELETE",
+                    url: api_conf.api.settings.mailserver.delete.replace(/{organization_id}/g, CommonAuth.getRealm()),
+                    headers: {
+                        Authorization: "Bearer " + CommonAuth.getToken(),
+                    },
+                }).then(() => {
+                    hide_progress();
+                    alertMessage(getText("000-80018", "処理結果"), getText("000-87012", "メール送信サーバー設定をリセットしました。"),
+                        () => {
+                            window.location.href = location_conf.href.settings.mailserver.replace(/{organization_id}/g, CommonAuth.getRealm());
+                        });
+                }).catch(() => {
+                    hide_progress();
+                });
+            }
+        );
+    }
+
+    //
+    // validate register
+    //
+    function validate_register() {
+        console.log("--- validate check start ----");
+        let result=true;
+
+        // validate smtp_host
+        validate = settings_mailserver_common.validate.destination_id($("#form_smtp_host").val());
+        result = result && validate.result;
+        $("#message_smtp_host").text(validate.message);
+
+
+        console.log("--- validate check end [" + result + "] ----");
+
+        return result;
+    }
+
+    //
+    // register setting mailserver
+    //
+    function settings_mailserver_register() {
+        let reqbody = {
+            "smtp_host": $('#form_smtp_host').val(),
+            "smtp_port": $('#form_smtp_port').val(),
+            "send_from": $('#form_send_from').val(),
+            "send_name": $('#form_send_name').val(),
+            "replay_to": $('#form_replay_to').val(),
+            "replay_name": $('#form_replay_name').val(),
+            "envelope_from": $('#form_envelope_from').val(),
+            "ssl_enable": $('#form_ssl_enable').prop("checked"),
+            "start_tls_enable": $('#form_start_tls_enable').prop("checked"),
+            "authentication_enable": $('#form_authentication_enable').prop("checked"),
+            "authentication_user": $('#form_authentication_enable').prop("checked") ? $('#from_authentication_user').val() : '',
+            "authentication_password": $('#form_authentication_enable').prop("checked") ? $('#from_authentication_password').val() : '',
+        }
+
+        show_progress();
+        call_api_promise(
+            {
+                type: "POST",
+                url: api_conf.api.settings.mailserver.post.replace(/{organization_id}/g, CommonAuth.getRealm()),
+                headers: {
+                    Authorization: "Bearer " + CommonAuth.getToken(),
+                },
+                data: JSON.stringify(reqbody),
+                contentType: "application/json",
+                dataType: "json",
+            }
+        ).then(() => {
+            hide_progress();
+            alertMessage(getText("000-80018", "処理結果"), getText("000-88022", "メール送信サーバー設定を登録しました"),
+            () => {
+                window.location = location_conf.href.settings.mailserver.replace(/{organization_id}/g, CommonAuth.getRealm());
+            });
+        }).catch(() => {
+            hide_progress();
+            $('#button_register').prop('disabled',false);
+        })
+    }
+
+    function disabled_button() {
+        $('#button_register').prop('disabled', true);
+        $('#button_reset').prop('disabled', true);
+    }
+});

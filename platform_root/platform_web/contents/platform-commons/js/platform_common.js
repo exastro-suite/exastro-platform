@@ -261,14 +261,16 @@ function displayMenu(curent) {
             <li class="menuItem"><a class="menuLink" id="menu_account_management" href="#" style="display: none;">${getText("000-80006", "ユーザー管理")}</a></li>
             <li class="menuItem"><a class="menuLink" id="menu_role_management" href="#" style="display: none;">${getText("000-80007", "ロール管理")}</a></li>
             <li class="menuItem"><a class="menuLink" id="menu_settings_notifications" href="#">${getText("000-00183", "通知管理")}</a></li>
+            <li class="menuItem"><a class="menuLink" id="menu_settings_mailserver" href="#">${getText("000-00183", "メール送信サーバー設定")}</a></li>
         `);
 
         $('#menu_workspace').attr('href', location_conf.href.workspaces.list.replace(/{organization_id}/g, CommonAuth.getRealm()));
         $('#menu_account_management').attr('href', location_conf.href.users.list.replace(/{organization_id}/g, CommonAuth.getRealm()));
         $('#menu_role_management').attr('href', location_conf.href.roles.list.replace(/{organization_id}/g, CommonAuth.getRealm()));
         $('#menu_settings_notifications').attr('href', location_conf.href.workspaces.settings.notifications.workspaces.replace(/{organization_id}/g, CommonAuth.getRealm()));
+        $('#menu_settings_mailserver').attr('href', location_conf.href.settings.mailserver.replace(/{organization_id}/g, CommonAuth.getRealm()));
 
-        if (CommonAuth.hasAuthority("_og-usr-mt")) {
+        if (CommonAuth.hasAuthority(RolesCommon.ORG_AUTH_USER_MAINTE)) {
             $("#menu_account_management").css("display", "");
         }
         let adminWorkspaces = CommonAuth.getAdminWorkspaces();
@@ -278,6 +280,9 @@ function displayMenu(curent) {
         ||  CommonAuth.hasAuthority(RolesCommon.ORG_AUTH_WS_ROLE_USER)
         ||  adminWorkspaces.length > 0) {
             $("#menu_role_management").css("display", "");
+        }
+        if (CommonAuth.hasAuthority(RolesCommon.ORG_AUTH_UPDATE)) {
+            $("#menu_settings_mailserver").css("display", "");
         }
     }
 
