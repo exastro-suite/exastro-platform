@@ -20,6 +20,7 @@ import traceback
 import requests
 import datetime
 import json
+import random
 import ssl
 import smtplib
 from email.message import EmailMessage
@@ -275,11 +276,20 @@ class NotificationJobExecutor(BaseJobExecutor):
 
                 # 全オーガナイゼーションを処理対象とする / Target all organizations
                 organizations = jobs_common.get_organizations()
+
+                # 実行順序を不定にする / Make the execution order undefined
+                random.shuffle(organizations)
+
                 for organization in organizations:
                     workspaces = jobs_common.get_workspaces(organization['ORGANIZATION_ID'])
 
+                    # 実行順序を不定にする / Make the execution order undefined
+                    random.shuffle(workspaces)
+
                     # 全workspaceを処理対象とする / Process all workspaces
                     for workspace in workspaces:
+                        globals.logger.debug(f"Start force update status : ORGANIZATION_ID:[{organization['ORGANIZATION_ID']}] / WORKSPACE_ID:[{workspace['WORKSPACE_ID']}]")
+
                         with closing(DBconnector().connect_workspacedb(organization['ORGANIZATION_ID'], workspace['WORKSPACE_ID'])) as conn_ws:
 
                             with conn_ws.cursor() as cursor_ws:
