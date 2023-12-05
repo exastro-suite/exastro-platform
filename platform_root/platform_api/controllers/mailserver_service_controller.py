@@ -12,19 +12,14 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-import connexion
-from contextlib import closing
-import json
 import inspect
-import pymysql
+from contextlib import closing
 
-from common_library.common import common, validation,const
-from common_library.common.db import DBconnector
-from common_library.common import multi_lang, encrypt
-from common_library.common import bl_notification_service
-from libs import queries_mailserver
-
+import connexion
 import globals
+from common_library.common import bl_mailserver_service, common, const, encrypt, multi_lang
+from common_library.common.db import DBconnector
+from libs import queries_mailserver
 
 MSG_FUNCTION_ID = "36"
 
@@ -74,6 +69,7 @@ def settings_mailserver_get(organization_id):  # noqa: E501
     return common.response_200_ok(data)
 
 
+@common.platform_exception_handler
 def settings_mailserver_create(body, organization_id):  # noqa: E501
     """Create creates an settings mailserver
 
@@ -82,11 +78,28 @@ def settings_mailserver_create(body, organization_id):  # noqa: E501
         organization_id (str): organization_id
 
     Returns:
-        _type_: _description_
+        Response: http response
     """
-    # if connexion.request.is_json:
-    #     body = [SettingsMailserverCreate.from_dict(d) for d in connexion.request.get_json()]  # noqa: E501
-    return 'do some magic!'
+
+    globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
+
+    r = connexion.request
+
+    body = r.get_json()
+    globals.logger.debug(f"body:\n{body}")
+
+    user_id = r.headers.get("User-id")
+    globals.logger.debug(f"user_id:{user_id}")
+
+    body = bl_mailserver_service.set_default_value_of_settings_mailserver(body)
+
+    validate = bl_mailserver_service.validate_setting_mailserver(body)
+    if not validate.ok:
+        return common.response_validation_error(validate)
+
+    bl_mailserver_service.settings_mailserver_register_or_update(body, organization_id, user_id)
+
+    return common.response_200_ok(data=None)
 
 
 @common.platform_exception_handler
