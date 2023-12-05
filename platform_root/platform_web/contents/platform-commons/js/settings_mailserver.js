@@ -92,7 +92,6 @@ $(function(){
         $('#form_authentication_enable').prop("checked", fn.cv(row.authentication_enable, false, false));
         if (row.authentication_enable){
             $("#form_authentication_user").val(row.authentication_user);
-            $("#form_authentication_password").val('*'.repeat(8));
         }
         $('#form_authentication_enable').attr("checked", "checked").change();
 
@@ -163,10 +162,37 @@ $(function(){
         let result=true;
 
         // validate smtp_host
-        validate = settings_mailserver_common.validate.destination_id($("#form_smtp_host").val());
+        validate = settings_mailserver_common.validate.smtp_host($("#form_smtp_host").val());
         result = result && validate.result;
         $("#message_smtp_host").text(validate.message);
 
+        // validate smtp_port
+        validate = settings_mailserver_common.validate.smtp_port($("#form_smtp_port").val());
+        result = result && validate.result;
+        $("#message_smtp_port").text(validate.message);
+
+        // validate send_from
+        validate = settings_mailserver_common.validate.send_from($("#form_send_from").val());
+        result = result && validate.result;
+        $("#message_send_from").text(validate.message);
+
+        // validate ssl_and_start_tls
+        validate = settings_mailserver_common.validate.ssl_and_start_tls($('#form_ssl_enable').prop("checked"), $('#form_start_tls_enable').prop("checked"));
+        result = result && validate.result;
+        $("#message_start_tls_enable").text(validate.message);
+
+        // Checks to be made when authentication is enabled
+        if ($('#form_authentication_enable').prop("checked")){
+            // validate authentication_user
+            validate = settings_mailserver_common.validate.authentication_user($("#form_authentication_user").val());
+            result = result && validate.result;
+            $("#message_authentication_user").text(validate.message);
+
+            // validate authentication_password
+            validate = settings_mailserver_common.validate.authentication_password($("#form_authentication_password").val());
+            result = result && validate.result;
+            $("#message_authentication_password").text(validate.message);
+        }
 
         console.log("--- validate check end [" + result + "] ----");
 

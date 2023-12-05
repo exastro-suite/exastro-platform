@@ -101,23 +101,23 @@
                                                 </thead>
                                                 <tbody class="tbody">
                                                     <tr class="tBodyTr tr">
-                                                        <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1"><div class="ci" style="text-align: left;"><span text-id="000-88004">SMTPサーバーホスト</span><span class="tHeadRequired" text-id="000-80024">必須</span></div></td>
+                                                        <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1"><div class="ci" style="text-align: left;"><span text-id="000-00187">SMTPサーバーホスト</span><span class="tHeadRequired" text-id="000-80024">必須</span></div></td>
                                                         <td class="tBodyTd td" rowspan="1" colspan="1"><div class="ci">
                                                             <input type="text" value="" class="tableEditInputText inputText input inputTextWidthAdjustment" id="form_smtp_host" maxlength="1024">
                                                             <span class="validate_error" id="message_smtp_host"></span>
                                                         </div></td>
-                                                        <td class="tBodyTd td" rowspan="1" colspan="1"><div class="ci textOverWrap" text-id="000-88016">最大1024文字 / 使用可能文字：半角英数</div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1"><div class="ci textOverWrap" text-id="000-88016">最大1024文字 / 使用可能文字：半角文字</div></td>
                                                     </tr>
                                                     <tr class="tBodyTr tr">
-                                                        <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1"><div class="ci" style="text-align: left;"><span text-id="000-88005">SMTPサーバーポート</span><span class="tHeadRequired" text-id="000-80024">必須</span></div></td>
+                                                        <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1"><div class="ci" style="text-align: left;"><span text-id="000-00188">SMTPサーバーポート</span><span class="tHeadRequired" text-id="000-80024">必須</span></div></td>
                                                         <td class="tBodyTd td" rowspan="1" colspan="1"><div class="ci">
-                                                            <input type="text" value="" class="tableEditInputText inputText input inputTextWidthAdjustment" id="form_smtp_port" maxlength="5">
+                                                            <input type="text" value="" class="tableEditInputText inputNumber input inputTextWidthAdjustment" id="form_smtp_port" maxlength="5" style="width: 60px;">
                                                             <span class="validate_error" id="message_smtp_port"></span>
                                                         </div></td>
                                                         <td class="tBodyTd td" rowspan="1" colspan="1"><div class="ci textOverWrap" text-id="000-88017">使用可能文字：半角数字</div></td>
                                                     </tr>
                                                     <tr class="tBodyTr tr">
-                                                        <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1"><div class="ci" style="text-align: left;"><span text-id="000-88006">送信元メールアドレス</span><span class="tHeadRequired" text-id="000-80024">必須</span></div></td>
+                                                        <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1"><div class="ci" style="text-align: left;"><span text-id="000-00189">送信元メールアドレス</span><span class="tHeadRequired" text-id="000-80024">必須</span></div></td>
                                                         <td class="tBodyTd td" rowspan="1" colspan="1"><div class="ci">
                                                             <input type="text" value="" class="tableEditInputText inputText input inputTextWidthAdjustment" id="form_send_from" maxlength="255">
                                                             <span class="validate_error" id="message_send_from"></span>
@@ -125,7 +125,7 @@
                                                         <td class="tBodyTd td" rowspan="1" colspan="1"><div class="ci textOverWrap" text-id="000-88018">最大255文字 / 使用可能文字：Eメールアドレス形式</div></td>
                                                     </tr>
                                                     <tr class="tBodyTr tr">
-                                                        <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1"><div class="ci" style="text-align: left;" text-id="000-88007">送信元の表示名</div></td>
+                                                        <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1"><div class="ci" style="text-align: left;" text-id="000-00190">送信元表示名</div></td>
                                                         <td class="tBodyTd td" rowspan="1" colspan="1"><div class="ci">
                                                             <input type="text" value="" class="tableEditInputText inputText input inputTextWidthAdjustment" id="form_send_name" maxlength="100">
                                                             <span class="validate_error" id="message_send_name"></span>
@@ -133,7 +133,7 @@
                                                         <td class="tBodyTd td" rowspan="1" colspan="1"><div class="ci textOverWrap" text-id="000-88019">最大100文字 / 使用可能文字：全角・半角文字</div></td>
                                                     </tr>
                                                     <tr class="tBodyTr tr">
-                                                        <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1"><div class="ci" style="text-align: left;" text-id="000-88008">返信先メールアドレス</div></td>
+                                                        <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1"><div class="ci" style="text-align: left;" text-id="000-00191">返信先メールアドレス</div></td>
                                                         <td class="tBodyTd td" rowspan="1" colspan="1"><div class="ci">
                                                             <input type="text" value="" class="tableEditInputText inputText input inputTextWidthAdjustment" id="form_replay_to" maxlength="255">
                                                             <span class="validate_error" id="message_replay_to"></span>
@@ -141,7 +141,7 @@
                                                         <td class="tBodyTd td" rowspan="1" colspan="1"><div class="ci textOverWrap" text-id="000-88018">最大255文字 / 使用可能文字：Eメールアドレス形式</div></td>
                                                     </tr>
                                                     <tr class="tBodyTr tr">
-                                                        <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1"><div class="ci" style="text-align: left;" text-id="000-88009">返信先の表示名</div></td>
+                                                        <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1"><div class="ci" style="text-align: left;" text-id="000-00192">返信先表示名</div></td>
                                                         <td class="tBodyTd td" rowspan="1" colspan="1"><div class="ci">
                                                             <input type="text" value="" class="tableEditInputText inputText input inputTextWidthAdjustment" id="form_replay_name" maxlength="255">
                                                             <span class="validate_error" id="message_replay_name"></span>
@@ -149,7 +149,7 @@
                                                         <td class="tBodyTd td" rowspan="1" colspan="1"><div class="ci textOverWrap" text-id="000-88019">最大100文字 / 使用可能文字：全角・半角文字</div></td>
                                                     </tr>
                                                     <tr class="tBodyTr tr">
-                                                        <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1"><div class="ci" style="text-align: left;" text-id="000-88010">差出人メールアドレス</div></td>
+                                                        <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1"><div class="ci" style="text-align: left;" text-id="000-00193">差出人メールアドレス</div></td>
                                                         <td class="tBodyTd td" rowspan="1" colspan="1"><div class="ci">
                                                             <input type="text" value="" class="tableEditInputText inputText input inputTextWidthAdjustment" id="form_envelope_from" maxlength="255">
                                                             <span class="validate_error" id="message_envelope_from"></span>
@@ -157,7 +157,7 @@
                                                         <td class="tBodyTd td" rowspan="1" colspan="1"><div class="ci textOverWrap" text-id="000-88018">最大255文字 / 使用可能文字：Eメールアドレス形式</div></td>
                                                     </tr>
                                                     <tr class="tBodyTr tr">
-                                                        <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1"><div class="ci" style="text-align: left;" text-id="000-88011">SSLあり</div></td>
+                                                        <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1"><div class="ci" style="text-align: left;" text-id="000-00194">SSLあり</div></td>
                                                         <td class="tBodyTd td" rowspan="1" colspan="1"><div class="ci">
                                                             <input type="checkbox" value="" id="form_ssl_enable" checked>
                                                             <span class="validate_error" id="message_ssl_enable"></span>
@@ -165,7 +165,7 @@
                                                         <td class="tBodyTd td" rowspan="1" colspan="1"><div class="ci"></div></td>
                                                     </tr>
                                                     <tr class="tBodyTr tr">
-                                                        <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1"><div class="ci" style="text-align: left;" text-id="000-88012">StartTLSあり</div></td>
+                                                        <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1"><div class="ci" style="text-align: left;" text-id="000-00195">StartTLSあり</div></td>
                                                         <td class="tBodyTd td" rowspan="1" colspan="1"><div class="ci">
                                                             <input type="checkbox" value="" id="form_start_tls_enable" checked>
                                                             <span class="validate_error" id="message_start_tls_enable"></span>
@@ -173,7 +173,7 @@
                                                         <td class="tBodyTd td" rowspan="1" colspan="1"><div class="ci"></div></td>
                                                     </tr>
                                                     <tr class="tBodyTr tr">
-                                                        <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1"><div class="ci" style="text-align: left;" text-id="000-88013">認証あり</div></td>
+                                                        <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1"><div class="ci" style="text-align: left;" text-id="000-00196">認証あり</div></td>
                                                         <td class="tBodyTd td" rowspan="1" colspan="1"><div class="ci">
                                                             <input type="checkbox" value="" tr-id="mail_authentication" id="form_authentication_enable" checked>
                                                             <span class="validate_error" id="message_authentication_enable"></span>
@@ -181,7 +181,7 @@
                                                         <td class="tBodyTd td" rowspan="1" colspan="1"><div class="ci"></div></td>
                                                     </tr>
                                                     <tr class="tBodyTr tr mail_authentication" style="display: none;">
-                                                        <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1"><div class="ci" style="text-align: left;"><span text-id="000-88014">認証ユーザー名</span><span class="tHeadRequired" text-id="000-80024">必須</span></div></td>
+                                                        <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1"><div class="ci" style="text-align: left;"><span text-id="000-00197">認証ユーザー</span><span class="tHeadRequired" text-id="000-80024">必須</span></div></td>
                                                         <td class="tBodyTd td" rowspan="1" colspan="1"><div class="ci">
                                                             <input type="text" value="" class="tableEditInputText inputText input inputTextWidthAdjustment" id="form_authentication_user" maxlength="255">
                                                             <span class="validate_error" id="message_authentication_user"></span>
@@ -189,7 +189,7 @@
                                                         <td class="tBodyTd td" rowspan="1" colspan="1"><div class="ci textOverWrap" text-id="000-88020">最大255文字 / 使用可能文字：半角英数</div></td>
                                                     </tr>
                                                     <tr class="tBodyTr tr mail_authentication" style="display: none;">
-                                                        <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1"><div class="ci" style="text-align: left;"><span text-id="000-88015">認証パスワード</span><span class="tHeadRequired" text-id="000-80024">必須</span></div></td>
+                                                        <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1"><div class="ci" style="text-align: left;"><span text-id="000-00198">認証パスワード</span><span class="tHeadRequired" text-id="000-80024">必須</span></div></td>
                                                         <td class="tBodyTd td" rowspan="1" colspan="1"><div class="ci">
                                                             <input type="password" value="" class="tableEditInputText inputText input inputTextWidthAdjustment" id="form_authentication_password" maxlength="255">
                                                             <span class="validate_error" id="message_authentication_password"></span>

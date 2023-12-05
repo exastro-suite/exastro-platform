@@ -1407,20 +1407,20 @@ def validate_smtp_host(host):
     if host == "":
         return result(
             False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
-            multi_lang.get_text('000-00187', "送信サーバーホスト")
+            multi_lang.get_text('000-00187', "SMTPサーバーホスト")
         )
 
     if len(host) > const.length_smtp_host:
         return result(
             False, 400, '400-{}012'.format(MSG_FUNCTION_ID), '指定可能な文字数を超えています。(項目:{0},最大文字数:{1})',
-            multi_lang.get_text('000-00187', "送信サーバーホスト"),
+            multi_lang.get_text('000-00187', "SMTPサーバーホスト"),
             str(const.length_smtp_host)
         )
 
     if not re.match(RE_HOST_CHARACTERS, host):
         return result(
             False, 400, '400-{}028'.format(MSG_FUNCTION_ID), 'ホストの形式に誤りがあります。({0})',
-            multi_lang.get_text('000-00187', "送信サーバーホスト")
+            multi_lang.get_text('000-00187', "SMTPサーバーホスト")
         )
 
     check_list = host.split(".")
@@ -1431,7 +1431,7 @@ def validate_smtp_host(host):
             if (length < const.min_length_separated_by_period_mark or length > const.max_length_separated_by_period_mark):
                 return result(
                     False, 400, '400-{}028'.format(MSG_FUNCTION_ID), 'ホストの形式に誤りがあります。({0})',
-                    multi_lang.get_text('000-00187', "送信サーバーホスト")
+                    multi_lang.get_text('000-00187', "SMTPサーバーホスト")
                 )
 
     return result(True)
@@ -1454,7 +1454,7 @@ def validate_smtp_port(port):
     if not port.isdecimal():
         return result(
             False, 400, '400-{}029'.format(MSG_FUNCTION_ID), '数値の変換に失敗しました。(項目:{0},対象の値:{1})',
-            multi_lang.get_text('000-00188', "送信サーバーポート番号"),
+            multi_lang.get_text('000-00188', "SMTPサーバーポート"),
             port
         )
 
@@ -1463,7 +1463,7 @@ def validate_smtp_port(port):
         return result(
             False, 400, '400-{}030'.format(MSG_FUNCTION_ID),
             '数値が最小値より小さいまたは最大値より大きな値となっています。(項目:{0},対象の値:{1},最小値:{2},最大値:{3})',
-            multi_lang.get_text('000-00188', "送信サーバーポート番号"),
+            multi_lang.get_text('000-00188', "SMTPサーバーポート"),
             port,
             const.mix_smtp_port,
             const.max_smtp_port
