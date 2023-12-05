@@ -1707,7 +1707,6 @@ components:
           description: Outgoing Server Host
         smtp_port:
           type: string
-          example: 25
           description: Outgoing server port number
         send_from:
           type: string
@@ -1736,9 +1735,6 @@ components:
         authentication_user:
           type: string
           description: Authenticated users
-        authentication_password:
-          type: string
-          description: Authentication password
   securitySchemes:
     BearerAuth:
       description: Credentials or access token for API
