@@ -15,40 +15,40 @@
 title: mailserver is a mailserver of mailserver resource.
 type: object
 properties:
-  SMTP_HOST:
+  smtp_host:
     type: string
     description: Outgoing Server Host
-  SMTP_PORT:
+  smtp_port:
     type: string
     description: Outgoing server port number
-  SEND_FROM:
+  send_from:
     type: string
     description: Sender's email address
-  SEND_NAME:
+  send_name:
     type: string
     description: The display name of the sender
-  REPLAY_TO:
+  replay_to:
     type: string
     description: Reply-to email address
-  REPLAY_NAME:
+  replay_name:
     type: string
     description: Reply-to display name
-  ENVELOPE_FROM:
+  envelope_from:
     type: string
     description: Sender's email address
-  SSL_ENABLE:
+  ssl_enable:
     type: boolean
     description: SSL on/off
-  START_TLS_ENABLE:
+  start_tls_enable:
     type: boolean
     description: StartTLS on/off
-  AUTHENTICATION_ENABLE:
+  authentication_enable:
     type: boolean
     description: Certified or not
-  AUTHENTICATION_USER:
+  authentication_user:
     type: string
     description: Authenticated users
-  AUTHENTICATION_PASSWORD:
+  authentication_password:
     type: string
     description: Authentication password
 required:

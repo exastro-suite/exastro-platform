@@ -19,7 +19,9 @@ from contextlib import closing
 import traceback
 import requests
 import datetime
+import time
 import json
+import random
 import ssl
 import smtplib
 from email.message import EmailMessage
@@ -275,42 +277,64 @@ class NotificationJobExecutor(BaseJobExecutor):
 
                 # 全オーガナイゼーションを処理対象とする / Target all organizations
                 organizations = jobs_common.get_organizations()
+
+                # 実行順序を不定にする / Make the execution order undefined
+                random.shuffle(organizations)
+
                 for organization in organizations:
-                    workspaces = jobs_common.get_workspaces(organization['ORGANIZATION_ID'])
+                    # 連続でconnectするとpymysql.err.OperationalError: (1040, 'Too many connections')が発生することがあるので、sleepする
+                    # If you connect continuously, pymysql.err.OperationalError: (1040, 'Too many connections') may occur, so sleep
+                    time.sleep(0.1)
 
-                    # 全workspaceを処理対象とする / Process all workspaces
-                    for workspace in workspaces:
-                        with closing(DBconnector().connect_workspacedb(organization['ORGANIZATION_ID'], workspace['WORKSPACE_ID'])) as conn_ws:
+                    try:
+                        workspaces = jobs_common.get_workspaces(organization['ORGANIZATION_ID'])
 
-                            with conn_ws.cursor() as cursor_ws:
-                                # UNSENT状態で一定時間経過したものを対象とする / Targets items that have been in UNSENT state for a certain period of time
-                                last_update_timestamp = (datetime.datetime.now() - datetime.timedelta(
-                                    seconds=job_manager_config.JOBS[job_manager_const.PROCESS_KIND_FORCE_UPDATE_STATUS]['extra_config']['prograss_seconds']))
-                                cursor_ws.execute(
-                                    queries_notification.SQL_QUERY_NOTIFICATION_MESSAGE_UNSENT_LONGTIME,
-                                    {"last_update_timestamp": last_update_timestamp, "notification_status": const.NOTIFICATION_STATUS_UNSENT})
-                                rows = cursor_ws.fetchall()
+                        # 実行順序を不定にする / Make the execution order undefined
+                        random.shuffle(workspaces)
 
-                                for row in rows:
-                                    # queueに情報が残ってないか確認する
-                                    if not jobs_common.exists_queue(conn_pf, row['NOTIFICATION_ID']):
-                                        # queueに情報が残ってない場合、FAILD状態に更新する
-                                        # If there is no information left in the queue, update to FAILD status
-                                        conn_ws.begin()
-                                        try:
-                                            cursor_ws.execute(
-                                                queries_notification.SQL_UPDATE_STATUS_NOTIFICATION_MESSAGE,
-                                                {
-                                                    "notification_id": row['NOTIFICATION_ID'],
-                                                    "notification_status": const.NOTIFICATION_STATUS_FAILED,
-                                                    "last_update_user": job_manager_const.SYSTEM_USER_ID,
-                                                    "notification_status_now": const.NOTIFICATION_STATUS_UNSENT,
-                                                })
-                                            conn_ws.commit()
-                                            globals.logger.warning(f"Force Failed notification_id:{row['NOTIFICATION_ID']}")
-                                        except Exception as err:
-                                            conn_ws.rollback()
-                                            globals.logger.error(f'{err}\n-- stack trace --\n{traceback.format_exc()}')
+                        # 全workspaceを処理対象とする / Process all workspaces
+                        for workspace in workspaces:
+                            # 連続でconnectするとpymysql.err.OperationalError: (1040, 'Too many connections')が発生することがあるので、sleepする
+                            # If you connect continuously, pymysql.err.OperationalError: (1040, 'Too many connections') may occur, so sleep
+                            time.sleep(0.1)
+
+                            globals.logger.debug(f"Start force update status : ORGANIZATION_ID:[{organization['ORGANIZATION_ID']}] / WORKSPACE_ID:[{workspace['WORKSPACE_ID']}]")
+
+                            with closing(DBconnector().connect_workspacedb(organization['ORGANIZATION_ID'], workspace['WORKSPACE_ID'])) as conn_ws:
+
+                                with conn_ws.cursor() as cursor_ws:
+                                    # UNSENT状態で一定時間経過したものを対象とする / Targets items that have been in UNSENT state for a certain period of time
+                                    last_update_timestamp = (datetime.datetime.now() - datetime.timedelta(
+                                        seconds=job_manager_config.JOBS[job_manager_const.PROCESS_KIND_FORCE_UPDATE_STATUS]['extra_config']['prograss_seconds']))
+                                    cursor_ws.execute(
+                                        queries_notification.SQL_QUERY_NOTIFICATION_MESSAGE_UNSENT_LONGTIME,
+                                        {"last_update_timestamp": last_update_timestamp, "notification_status": const.NOTIFICATION_STATUS_UNSENT})
+                                    rows = cursor_ws.fetchall()
+
+                                    for row in rows:
+                                        # queueに情報が残ってないか確認する
+                                        if not jobs_common.exists_queue(conn_pf, row['NOTIFICATION_ID']):
+                                            # queueに情報が残ってない場合、FAILD状態に更新する
+                                            # If there is no information left in the queue, update to FAILD status
+                                            conn_ws.begin()
+                                            try:
+                                                cursor_ws.execute(
+                                                    queries_notification.SQL_UPDATE_STATUS_NOTIFICATION_MESSAGE,
+                                                    {
+                                                        "notification_id": row['NOTIFICATION_ID'],
+                                                        "notification_status": const.NOTIFICATION_STATUS_FAILED,
+                                                        "last_update_user": job_manager_const.SYSTEM_USER_ID,
+                                                        "notification_status_now": const.NOTIFICATION_STATUS_UNSENT,
+                                                    })
+                                                conn_ws.commit()
+                                                globals.logger.warning(f"Force Failed notification_id:{row['NOTIFICATION_ID']}")
+                                            except Exception as err:
+                                                conn_ws.rollback()
+                                                globals.logger.error(f'{err}\n-- stack trace --\n{traceback.format_exc()}')
+
+                    except Exception as err:
+                        globals.logger.error(f'{err}\n-- stack trace --\n{traceback.format_exc()}')
+
         except Exception as err:
             globals.logger.error(f'{err}\n-- stack trace --\n{traceback.format_exc()}')
             raise err
