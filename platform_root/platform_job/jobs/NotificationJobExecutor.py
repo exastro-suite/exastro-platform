@@ -36,6 +36,7 @@ import globals
 import job_manager_config
 import job_manager_const
 from jobs import jobs_common
+from libs.exceptions import JobTimeoutException
 
 
 class NotificationJobExecutor(BaseJobExecutor):
@@ -327,11 +328,17 @@ class NotificationJobExecutor(BaseJobExecutor):
                                                         "notification_status_now": const.NOTIFICATION_STATUS_UNSENT,
                                                     })
                                                 conn_ws.commit()
-                                                globals.logger.warning(f"Force Failed notification_id:{row['NOTIFICATION_ID']}")
+                                                globals.logger.info(f"Set failed notification_id:{row['NOTIFICATION_ID']}")
+
+                                            except JobTimeoutException as err:
+                                                conn_ws.rollback()
+                                                raise err # TimeoutException時は即終了する
                                             except Exception as err:
                                                 conn_ws.rollback()
                                                 globals.logger.error(f'{err}\n-- stack trace --\n{traceback.format_exc()}')
 
+                    except JobTimeoutException as err:
+                        raise err # TimeoutException時は即終了する
                     except Exception as err:
                         globals.logger.error(f'{err}\n-- stack trace --\n{traceback.format_exc()}')
 
