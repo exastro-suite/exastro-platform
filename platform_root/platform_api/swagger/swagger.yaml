@@ -52,7 +52,7 @@ tags:
   description: メンテナンスモードに関する操作
 - name: NotificationService
   description: 通知機能に関する操作
-- name: MailserverService
+- name: MailserverSettings
   description: メールサーバーに関する操作
 - name: InternalCommonService
   description: 共通(内部用)
@@ -2098,7 +2098,7 @@ paths:
   /api/{organization_id}/platform/settings/mailserver:
     get:
       tags:
-      - MailserverService
+      - MailserverSettings
       summary: Returns of settings Mailserver
       operationId: settings_mailserver_get
       parameters:
@@ -2122,10 +2122,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/runtimeError'
-      x-openapi-router-controller: controllers.mailserver_service_controller
+      x-openapi-router-controller: controllers.organization_setting_service_controller
     post:
       tags:
-      - MailserverService
+      - MailserverSettings
       summary: Create creates an settings mailserver
       operationId: settings_mailserver_create
       parameters:
@@ -2155,12 +2155,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/runtimeError'
-      x-openapi-router-controller: controllers.mailserver_service_controller
+      x-openapi-router-controller: controllers.organization_setting_service_controller
     delete:
       tags:
-      - MailserverService
+      - MailserverSettings
       summary: Delete deletes an mailserver
-      operationId: mailserver_delete
+      operationId: setting_mailserver_delete
       parameters:
       - name: organization_id
         in: path
@@ -2182,7 +2182,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/runtimeError'
-      x-openapi-router-controller: controllers.mailserver_service_controller
+      x-openapi-router-controller: controllers.organization_setting_service_controller
   /internal-api/alive:
     get:
       tags:
@@ -3958,40 +3958,40 @@ components:
       - SMTP_PORT
       type: object
       properties:
-        SMTP_HOST:
+        smtp_host:
           type: string
           description: Outgoing Server Host
-        SMTP_PORT:
+        smtp_port:
           type: string
           description: Outgoing server port number
-        SEND_FROM:
+        send_from:
           type: string
           description: Sender's email address
-        SEND_NAME:
+        send_name:
           type: string
           description: The display name of the sender
-        REPLAY_TO:
+        replay_to:
           type: string
           description: Reply-to email address
-        REPLAY_NAME:
+        replay_name:
           type: string
           description: Reply-to display name
-        ENVELOPE_FROM:
+        envelope_from:
           type: string
           description: Sender's email address
-        SSL_ENABLE:
+        ssl_enable:
           type: boolean
           description: SSL on/off
-        START_TLS_ENABLE:
+        start_tls_enable:
           type: boolean
           description: StartTLS on/off
-        AUTHENTICATION_ENABLE:
+        authentication_enable:
           type: boolean
           description: Certified or not
-        AUTHENTICATION_USER:
+        authentication_user:
           type: string
           description: Authenticated users
-        AUTHENTICATION_PASSWORD:
+        authentication_password:
           type: string
           description: Authentication password
     settingsMailserverList:
@@ -4008,41 +4008,41 @@ components:
       title: mailserver is a definition of Mailserver resource.
       type: object
       properties:
-        SMTP_HOST:
+        smtp_host:
           type: string
           description: Outgoing Server Host
-        SMTP_PORT:
+        smtp_port:
           type: string
           description: Outgoing server port number
           example: "25"
-        SEND_FROM:
+        send_from:
           type: string
           description: Sender's email address
-        SEND_NAME:
+        send_name:
           type: string
           description: The display name of the sender
-        REPLAY_TO:
+        replay_to:
           type: string
           description: Reply-to email address
-        REPLAY_NAME:
+        replay_name:
           type: string
           description: Reply-to display name
-        ENVELOPE_FROM:
+        envelope_from:
           type: string
           description: Sender's email address
-        SSL_ENABLE:
+        ssl_enable:
           type: boolean
           description: SSL on/off
-        START_TLS_ENABLE:
+        start_tls_enable:
           type: boolean
           description: StartTLS on/off
-        AUTHENTICATION_ENABLE:
+        authentication_enable:
           type: boolean
           description: Certified or not
-        AUTHENTICATION_USER:
+        authentication_user:
           type: string
           description: Authenticated users
-        AUTHENTICATION_PASSWORD:
+        authentication_password:
           type: string
           description: Authentication password
     inline_response_200:

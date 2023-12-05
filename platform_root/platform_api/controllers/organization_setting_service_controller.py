@@ -103,7 +103,7 @@ def settings_mailserver_create(body, organization_id):  # noqa: E501
 
 
 @common.platform_exception_handler
-def mailserver_delete(organization_id):  # noqa: E501
+def setting_mailserver_delete(organization_id):  # noqa: E501
     """Delete deletes an mailserver
 
     Args:
