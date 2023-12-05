@@ -59,7 +59,6 @@ def settings_mailserver_get(organization_id):  # noqa: E501
             "start_tls_enable": row["START_TLS_ENABLE"],
             "authentication_enable": row["AUTHENTICATION_ENABLE"],
             "authentication_user": row["AUTHENTICATION_USER"],
-            "authentication_password": encrypt.decrypt_str(row["AUTHENTICATION_PASSWORD"]),
             "create_timestamp": common.datetime_to_str(row["CREATE_TIMESTAMP"]),
             "create_user": row["CREATE_USER"],
             "last_update_timestamp": common.datetime_to_str(row["LAST_UPDATE_TIMESTAMP"]),

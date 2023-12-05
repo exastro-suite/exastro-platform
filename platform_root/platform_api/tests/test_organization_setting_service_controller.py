@@ -30,7 +30,20 @@ def test_settings_mailserver_get(connexion_client):
         connexion_client (_type_): _description_
     """
 
-    pass
+    organization = test_common.create_organization(connexion_client)
+
+    with test_common.requsts_mocker_default():
+        #
+        # validate get normal
+        #
+        response = connexion_client.get(
+            f"/api/{organization['organization_id']}/platform/settings/mailserver",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization['user_id']))
+
+        assert response.status_code == 200, "get settings mailserver response OK route"
+
+        pass
 
 
 def test_settings_mailserver_create(connexion_client):
@@ -96,14 +109,24 @@ def test_settings_mailserver_create(connexion_client):
         pass
 
 
-def test_mailserver_delete(connexion_client):
+def test_setting_mailserver_delete(connexion_client):
     """test mailserver_delete
 
     Args:
         connexion_client (_type_): _description_
     """
 
-    pass
+    organization = test_common.create_organization(connexion_client)
+
+    with test_common.requsts_mocker_default():
+        response = connexion_client.delete(
+            f"/api/{organization['organization_id']}/platform/settings/mailserver",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization['user_id']))
+
+        assert response.status_code == 200, "normal route"
+
+        pass
 
 
 def test_mailserver_validate(connexion_client):

@@ -52,6 +52,6 @@ properties:
     type: string
     description: Authentication password
 required:
-  - SMTP_HOST
-  - SMTP_PORT
-  - SEND_FROM
+  - smtp_host
+  - smtp_port
+  - send_from
