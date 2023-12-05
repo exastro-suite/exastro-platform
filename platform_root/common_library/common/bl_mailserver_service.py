@@ -51,18 +51,18 @@ def settings_mailserver_register_or_update(body, organization_id, user_id):
 
             parameter = {
                 "smtp_id": const.DEFAULT_SMTP_ID,
-                "smtp_host": body.get("SMTP_HOST"),
-                "smtp_port": int(body.get("SMTP_PORT")),
-                "send_from": body.get("SEND_FROM"),
-                "send_name": body.get("SEND_NAME"),
-                "replay_to": body.get("REPLAY_TO"),
-                "replay_name": body.get("REPLAY_NAME"),
-                "envelope_from": body.get("ENVELOPE_FROM"),
-                "ssl_enable": body.get("SSL_ENABLE") if body.get("SSL_ENABLE") is not None else False,
-                "start_tls_enable": body.get("START_TLS_ENABLE") if body.get("START_TLS_ENABLE") is not None else False,
-                "authentication_enable": body.get("AUTHENTICATION_ENABLE") if body.get("AUTHENTICATION_ENABLE") is not None else False,
-                "authentication_user": body.get("AUTHENTICATION_USER"),
-                "authentication_password": encrypt.encrypt_str(body.get("AUTHENTICATION_PASSWORD")),
+                "smtp_host": body.get("smtp_host"),
+                "smtp_port": int(body.get("smtp_port")),
+                "send_from": body.get("send_from"),
+                "send_name": body.get("send_name"),
+                "replay_to": body.get("replay_to"),
+                "replay_name": body.get("replay_name"),
+                "envelope_from": body.get("envelope_from"),
+                "ssl_enable": body.get("ssl_enable") if body.get("ssl_enable") is not None else False,
+                "start_tls_enable": body.get("start_tls_enable") if body.get("start_tls_enable") is not None else False,
+                "authentication_enable": body.get("authentication_enable") if body.get("authentication_enable") is not None else False,
+                "authentication_user": body.get("authentication_user"),
+                "authentication_password": encrypt.encrypt_str(body.get("authentication_password")),
                 "create_user": user_id,
                 "last_update_user": user_id
             }
@@ -100,9 +100,9 @@ def set_default_value_of_settings_mailserver(body):
         body (dict): json
     """
 
-    body["SSL_ENABLE"] = body["SSL_ENABLE"] if not body.get("SSL_ENABLE") is None else False
-    body["START_TLS_ENABLE"] = body["START_TLS_ENABLE"] if not body.get("START_TLS_ENABLE") is None else False
-    body["AUTHENTICATION_ENABLE"] = body["AUTHENTICATION_ENABLE"] if not body.get("AUTHENTICATION_ENABLE") is None else False
+    body["ssl_enable"] = body["ssl_enable"] if not body.get("ssl_enable") is None else False
+    body["start_tls_enable"] = body["start_tls_enable"] if not body.get("start_tls_enable") is None else False
+    body["authentication_enable"] = body["authentication_enable"] if not body.get("authentication_enable") is None else False
 
     return body
 
@@ -118,62 +118,62 @@ def validate_setting_mailserver(body):
     if not validate.ok:
         return validate
 
-    validate = validation.validate_smtp_host(body.get("SMTP_HOST"))
+    validate = validation.validate_smtp_host(body.get("smtp_host"))
     if not validate.ok:
         return validate
 
-    validate = validation.validate_smtp_port(body.get("SMTP_PORT"))
+    validate = validation.validate_smtp_port(body.get("smtp_port"))
     if not validate.ok:
         return validate
 
-    validate = validation.validate_send_from(body.get("SEND_FROM"))
+    validate = validation.validate_send_from(body.get("send_from"))
     if not validate.ok:
         return validate
 
-    validate = validation.validate_send_name(body.get("SEND_NAME"))
+    validate = validation.validate_send_name(body.get("send_name"))
     if not validate.ok:
         return validate
 
-    validate = validation.validate_replay_to(body.get("REPLAY_TO"))
+    validate = validation.validate_replay_to(body.get("replay_to"))
     if not validate.ok:
         return validate
 
-    validate = validation.validate_replay_name(body.get("REPLAY_NAME"))
+    validate = validation.validate_replay_name(body.get("replay_name"))
     if not validate.ok:
         return validate
 
-    validate = validation.validate_envelope_from(body.get("ENVELOPE_FROM"))
+    validate = validation.validate_envelope_from(body.get("envelope_from"))
     if not validate.ok:
         return validate
 
-    validate = validation.validate_ssl_enable(body.get("SSL_ENABLE"))
+    validate = validation.validate_ssl_enable(body.get("ssl_enable"))
     if not validate.ok:
         return validate
 
-    validate = validation.validate_start_tls_enable(body.get("START_TLS_ENABLE"))
+    validate = validation.validate_start_tls_enable(body.get("start_tls_enable"))
     if not validate.ok:
         return validate
 
-    validate = validation.complex_validate_ssl_start_tls(body.get("SSL_ENABLE"), body.get("START_TLS_ENABLE"))
+    validate = validation.complex_validate_ssl_start_tls(body.get("ssl_enable"), body.get("start_tls_enable"))
     if not validate.ok:
         return validate
 
-    validate = validation.validate_authentication_enable(body.get("AUTHENTICATION_ENABLE"))
+    validate = validation.validate_authentication_enable(body.get("authentication_enable"))
     if not validate.ok:
         return validate
 
-    validate = validation.validate_authentication_user(body.get("AUTHENTICATION_USER"))
+    validate = validation.validate_authentication_user(body.get("authentication_user"))
     if not validate.ok:
         return validate
 
-    validate = validation.validate_authentication_password(body.get("AUTHENTICATION_PASSWORD"))
+    validate = validation.validate_authentication_password(body.get("authentication_password"))
     if not validate.ok:
         return validate
 
     validate = validation.complex_validate_authentication_user_password(
-        body.get("AUTHENTICATION_ENABLE"),
-        body.get("AUTHENTICATION_USER"),
-        body.get("AUTHENTICATION_PASSWORD")
+        body.get("authentication_enable"),
+        body.get("authentication_user"),
+        body.get("authentication_password")
     )
     if not validate.ok:
         return validate
