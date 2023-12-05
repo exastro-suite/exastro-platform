@@ -180,7 +180,7 @@
                                                         </div></td>
                                                         <td class="tBodyTd td" rowspan="1" colspan="1"><div class="ci"></div></td>
                                                     </tr>
-                                                    <tr class="tBodyTr tr mail_authentication" zstyle="display: none;">
+                                                    <tr class="tBodyTr tr mail_authentication" style="display: none;">
                                                         <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1"><div class="ci" style="text-align: left;"><span text-id="000-88014">認証ユーザー名</span><span class="tHeadRequired" text-id="000-80024">必須</span></div></td>
                                                         <td class="tBodyTd td" rowspan="1" colspan="1"><div class="ci">
                                                             <input type="text" value="" class="tableEditInputText inputText input inputTextWidthAdjustment" id="form_authentication_user" maxlength="255">
@@ -188,7 +188,7 @@
                                                         </div></td>
                                                         <td class="tBodyTd td" rowspan="1" colspan="1"><div class="ci textOverWrap" text-id="000-88020">最大255文字 / 使用可能文字：半角英数</div></td>
                                                     </tr>
-                                                    <tr class="tBodyTr tr mail_authentication" zstyle="display: none;">
+                                                    <tr class="tBodyTr tr mail_authentication" style="display: none;">
                                                         <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1"><div class="ci" style="text-align: left;"><span text-id="000-88015">認証パスワード</span><span class="tHeadRequired" text-id="000-80024">必須</span></div></td>
                                                         <td class="tBodyTd td" rowspan="1" colspan="1"><div class="ci">
                                                             <input type="password" value="" class="tableEditInputText inputText input inputTextWidthAdjustment" id="form_authentication_password" maxlength="255">
@@ -199,8 +199,16 @@
                                                 </tbody>
                                             </table>
                                         </div>
-                                        <button data-action="positive" style="width:200px;" class="itaButton tableHeaderMainMenuButton button" id="button_register"><span class="inner"><span class="icon icon-edit"></span><span text-id="000-80025">登録</span></span></button>
-                                        <button data-action="negative" style="width:200px;" class="itaButton tableHeaderMainMenuButton button" id="button_reset"><span class="inner"><span class="icon icon-reset"></span><span text-id="000-00199">リセット</span></span></button>
+                                        <div class="tableHeader">
+                                            <ul class="tableHeaderMainMenuList">
+                                                <li class="tableHeaderMainMenuItem">
+                                                    <button data-action="positive" style="width:200px;" class="itaButton tableHeaderMainMenuButton button" id="button_register"><span class="inner"><span class="icon icon-edit"></span><span text-id="000-80025">登録</span></span></button>
+                                                </li>
+                                                <li class="tableHeaderMainMenuItem">
+                                                    <button data-action="negative" style="width:200px;" class="itaButton tableHeaderMainMenuButton button" id="button_reset"><span class="inner"><span class="icon icon-reset"></span><span text-id="000-00199">リセット</span></span></button>
+                                                </li>
+                                            </ul>
+                                        </div>
                                     </div>
                                 </div>
                             </section>

@@ -98,12 +98,12 @@ var api_conf = {
         },
         "settings": {
             "mailserver": {
-                "get": "/api/{organization_id}/platform/mailserver",
-                "post": "/api/{organization_id}/platform/mailserver",
-                "delete": "/api/{organization_id}/platform/mailserver",
+                "get": "/api/{organization_id}/platform/settings/mailserver",
+                "post": "/api/{organization_id}/platform/settings/mailserver",
+                "delete": "/api/{organization_id}/platform/settings/mailserver",
             },
         },
-    }
+}
 }
 
 var location_conf = {

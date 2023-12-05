@@ -26,7 +26,7 @@ $(function(){
             // Load Common Contents
             loadCommonContents(),
 
-            // get Workspace List
+            // get settings mailserver
             call_api_promise_get_settings_mailserver(),
 
         ]).then(function(results) {
@@ -39,7 +39,7 @@ $(function(){
 
             display_main(results[1].data);
             finish_onload_progress();
-            enabled_button();
+
         }).catch((e) => {
             console.log('[ERROR] load_main catch');
             finish_onload_progress_at_error();
@@ -60,8 +60,9 @@ $(function(){
         });
     }
 
-    function display_main(mailserver) {
+    function display_main(row) {
         console.log("[CALL] display_main");
+        console.log("row: " + row);
 
         //
         // display Delete settings notification destination button
@@ -69,7 +70,7 @@ $(function(){
         $('#button_reset').on('click',() => {
             delete_destination();
         });
-        if(CommonAuth.getAdminWorkspaces().indexOf(workspace_id) !== -1 || CommonAuth.hasAuthority(RolesCommon.ORG_AUTH_UPDATE)) {
+        if(CommonAuth.hasAuthority(RolesCommon.ORG_AUTH_UPDATE)) {
             $('#button_reset').prop('disabled', false);
         } else {
             $('#button_reset').prop('disabled', true);
@@ -79,20 +80,21 @@ $(function(){
         //
         // display mailserver detail
         //
-        $("#form_smtp_host").val(mailserver.smtp_host);
-        $("#form_smtp_port").val(mailserver.smtp_port);
-        $("#form_send_from").val(mailserver.send_from);
-        $("#form_send_name").val(mailserver.send_name);
-        $("#form_replay_to").val(mailserver.replay_to);
-        $("#form_replay_name").val(mailserver.replay_name);
-        $("#form_envelope_from").val(mailserver.envelope_from);
-        $('#form_ssl_enable').prop("checked", fn.cv(mailserver.ssl_enable, false, false));
-        $('#form_start_tls_enable').prop("checked", fn.cv(mailserver.start_tls_enable, false, false));
-        $('#form_authentication_enable').prop("checked", fn.cv(mailserver.authentication_enable, false, false));
-        if (mailserver.authentication_enable){
-            $("#form_authentication_user").val(mailserver.authentication_user);
+        $("#form_smtp_host").val(row.smtp_host);
+        $("#form_smtp_port").val(row.smtp_port);
+        $("#form_send_from").val(row.send_from);
+        $("#form_send_name").val(row.send_name);
+        $("#form_replay_to").val(row.replay_to);
+        $("#form_replay_name").val(row.replay_name);
+        $("#form_envelope_from").val(row.envelope_from);
+        $('#form_ssl_enable').prop("checked", fn.cv(row.ssl_enable, false, false));
+        $('#form_start_tls_enable').prop("checked", fn.cv(row.start_tls_enable, false, false));
+        $('#form_authentication_enable').prop("checked", fn.cv(row.authentication_enable, false, false));
+        if (row.authentication_enable){
+            $("#form_authentication_user").val(row.authentication_user);
             $("#form_authentication_password").val('*'.repeat(8));
         }
+        $('#form_authentication_enable').attr("checked", "checked").change();
 
         //
         // register button
@@ -105,6 +107,19 @@ $(function(){
             }
             settings_mailserver_register();
         });
+
+        //
+        // authentication_enable change
+        //
+        $('input[id="form_authentication_enable"]').change(function() {
+            tr_id = $(this).attr('tr-id');
+            if ($(this).is(':checked')){
+                $("." + tr_id).css('display', '');
+            }
+            else{
+                $("." + tr_id).css('display', 'None');
+            }
+        });
     }
 
     function delete_destination() {
@@ -113,6 +128,7 @@ $(function(){
         deleteConfirmMessage(
             getText("000-80017", "実行確認"),
             getText("000-87010", "メール送信サーバーの設定をリセットしてもよろしいですか？"),
+            CommonAuth.getRealm() + getText("000-88002", "メール送信サーバー設定"),
             getText("000-87011", "通知種別メールのメッセージ通知は一切できなくなります。"),
             getText("000-00199", "リセット"),
             () => {
