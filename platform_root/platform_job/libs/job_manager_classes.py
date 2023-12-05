@@ -16,6 +16,7 @@ import ctypes
 import datetime
 import multiprocessing
 import threading
+import random
 
 import job_manager_config
 import globals
@@ -63,7 +64,16 @@ class SubProcessManager():
         SubProcessParameter.genarate_sub_process_managerメソッドでinstanceを生成すること
         Generate an instance using the SubProcessParameter.genarate_sub_process_manager method
     """
-    def __init__(self, array_index, sub_processes_ids, sub_termination_req_flags, sub_terminated_flags, force_upd_sts_exec_pid, force_upd_sts_exec_time):
+    def __init__(
+        self,
+        array_index,
+        sub_processes_ids,
+        sub_termination_req_flags,
+        sub_terminated_flags,
+        interval_job_kinds,
+        interval_job_exec_pids,
+        interval_job_exec_times,
+        ):
         """constructor
 
         Args:
@@ -79,13 +89,15 @@ class SubProcessManager():
         self.__sub_termination_req_flags = sub_termination_req_flags
         self.__sub_terminated_flags = sub_terminated_flags
         self.__sub_processes_ids[self.__arr_idx] = os.getpid()
+
+        self.__interval_job_kinds = interval_job_kinds
+        self.__interval_job_exec_pids = interval_job_exec_pids
+        self.__interval_job_exec_times = interval_job_exec_times
+
         self.__jobs: list[Job] = []
         self.__cancel_timeout_jobs: list[Job] = []
         self.interval_db_reconect = IntervalTiming(job_manager_config.SUB_PROCESS_DB_RECONNECT_INTERVAL_SECONDS)
         self.interval_db_health_check = IntervalTiming(job_manager_config.SUB_PROCESS_DB_HEALTH_CHECK_INTERVAL_SECONDS)
-        self.__force_upd_sts_exec_pid = force_upd_sts_exec_pid
-        self.__force_upd_sts_exec_time = force_upd_sts_exec_time
-        # self.__interval_force_upd_sts = IntervalTiming(job_manager_config.FORCE_UPDATE_STATUS_INTERVAL_SECONDS)
 
     def is_sheard_variables_normal(self):
         """共有メモリの正常性確認 / Checking the health of shared memory
@@ -206,20 +218,58 @@ class SubProcessManager():
         """
         self.__sub_terminated_flags[self.__arr_idx] = 1
 
-    def is_timing_of_force_update_status(self):
-        """強制ステータス更新処理を起動するタイミングか判定する / Determine when it is time to start forced status update processing
+    def get_timing_of_interval_job_start(self):
+        """起動するタイミングのjob kind取得 / Get job kind at start time
+
+        Returns:
+            list: job kinds
+        """
+        # jobの開始予定時間の早い順に返す
+        return [job_kind_info['job_kind'] for job_kind_info in sorted(
+            [{
+                "job_kind": job_kind,
+                "start_time": self.get_next_interval_job_start_time(job_kind),
+            } for job_kind in self.__interval_job_kinds if self.is_timing_of_interval_job_start(job_kind)],
+            key=lambda x: x['start_time'])]
+
+    def is_timing_of_interval_job_start(self, job_kind):
+        """Jobを起動するタイミングか判定する / Determine when it is time to start a job
+
+        Args:
+            job_kind (str): job kind
 
         Returns:
             bool: True : 実行するタイミングである / It's time to execute
         """
-        if self.__force_upd_sts_exec_time.value <= datetime.datetime.timestamp(datetime.datetime.now()):
-            # 強制ステータス更新処理は複数のプロセスで動かす必要は無いので、指定されたプロセスの場合のみTrueを返す
-            # Forced status update processing does not need to run in multiple processes, so it returns True only for the specified process.
-            if os.getpid() == self.__force_upd_sts_exec_pid.value:
-                self.__force_upd_sts_exec_time.value = datetime.datetime.timestamp(datetime.datetime.now() + datetime.timedelta(seconds=job_manager_config.FORCE_UPDATE_STATUS_INTERVAL_SECONDS))
-                return True
-            else:
-                return False
+        job_index = self.__interval_job_kinds.index(job_kind)
+        if self.__interval_job_exec_pids[job_index] != os.getpid():
+            return False
+        if self.__interval_job_exec_times[job_index] <= datetime.datetime.timestamp(datetime.datetime.now()):
+            return True
+        else:
+            return False
+
+    def get_next_interval_job_start_time(self, job_kind):
+        """Jobを起動する時間 / Time to start the Job
+
+        Args:
+            job_kind (str): job kind
+
+        Returns:
+            datetime.datetime: Time to start the Job
+        """
+        job_index = self.__interval_job_kinds.index(job_kind)
+        return  datetime.datetime.fromtimestamp(self.__interval_job_exec_times[job_index])
+
+    def set_next_interval_job_start_time(self, job_kind):
+        """interval jobが次に開始する時間を設定する / interval Set the next time the job starts
+
+        Args:
+            job_kind (str): job kind
+        """
+        job_index = self.__interval_job_kinds.index(job_kind)
+        self.__interval_job_exec_times[job_index] = datetime.datetime.timestamp(
+            datetime.datetime.now() + datetime.timedelta(seconds=job_manager_config.JOBS[job_kind]['job_interval']))
 
 
 class SubProcessParameter():
@@ -227,7 +277,16 @@ class SubProcessParameter():
         SubProcessesManager.generate_sub_process_parameterメソッドでinstanceを生成すること
         Generate an instance using the SubProcessesManager.generate_sub_process_parameter method
     """
-    def __init__(self, array_index, sub_processes_ids, sub_termination_req_flags, sub_terminated_flags, force_upd_sts_exec_pid, force_upd_sts_exec_time):
+    def __init__(
+            self,
+            array_index,
+            sub_processes_ids,
+            sub_termination_req_flags,
+            sub_terminated_flags,
+            interval_job_kinds,
+            interval_job_exec_pids,
+            interval_job_exec_times,
+            ):
         """constructor
 
         Args:
@@ -235,15 +294,17 @@ class SubProcessParameter():
             sub_processes_ids (_type_): sub processのprocess id / process id of sub process
             sub_termination_req_flags (_type_): sub processへの終了要求のフラグ / Flag for termination request to sub process
             sub_terminated_flags (_type_): sub process終了済みのフラグ / Sub process completed flag
-            force_upd_sts_exec_pid (_type_): force update statusを行うsub processのprocess id / process id of sub process that performs force update status
-            force_upd_sts_exec_time (_type_): force update statusを行う時間 / Time to force update status
+            interval_job_kinds (list): interval実行のjob kind / job kind of interval execution
+            interval_job_exec_pids (_type_): interval実行のjobを実行するprocess id / process id to run job for interval execution
+            interval_job_exec_times (_type_): interval実行のjobを実行する時間 / Time to run job for interval execution
         """
         self.__arr_idx = array_index
         self.__sub_processes_ids = sub_processes_ids
         self.__sub_termination_req_flags = sub_termination_req_flags
         self.__sub_terminated_flags = sub_terminated_flags
-        self.__force_upd_sts_exec_pid = force_upd_sts_exec_pid
-        self.__force_upd_sts_exec_time = force_upd_sts_exec_time
+        self.__interval_job_kinds = interval_job_kinds
+        self.__interval_job_exec_pids = interval_job_exec_pids
+        self.__interval_job_exec_times = interval_job_exec_times
 
     def get_array_index(self):
         """共有メモリの使用indexを返す / Return shared memory usage index
@@ -264,10 +325,10 @@ class SubProcessParameter():
             self.__sub_processes_ids,
             self.__sub_termination_req_flags,
             self.__sub_terminated_flags,
-            self.__force_upd_sts_exec_pid,
-            self.__force_upd_sts_exec_time,
+            self.__interval_job_kinds,
+            self.__interval_job_exec_pids,
+            self.__interval_job_exec_times
         )
-
 
 class SubProcessesManager():
     """全sub process管理class / All sub process management classes
@@ -279,23 +340,35 @@ class SubProcessesManager():
         # sub process variables
         #  ※エリアを2倍用意しているのは、sub processの切り替え(終了指示～終了)タイミングで一時的に超えるため
         #    The reason why the area is twice as large is because it is temporarily exceeded when the sub process is switched (from the end instruction to the end).
+
+        #   process class instance
         self.__sub_processes: list[multiprocessing.Process] = [None] * (job_manager_config.SUB_PROCESS_ACCEPTABLE * 2)
+        #   sub process pid
         self.__sub_processe_ids = multiprocessing.Array(ctypes.c_int, (job_manager_config.SUB_PROCESS_ACCEPTABLE * 2))
+        #   sub process terminate request time
         self.__sub_termination_req_times: list[datetime.datetime] = [None] * (job_manager_config.SUB_PROCESS_ACCEPTABLE * 2)
+        #   sub process terminate request flag : 0:not request/ 1:request
         self.__sub_termination_req_flags = multiprocessing.Array(ctypes.c_int, (job_manager_config.SUB_PROCESS_ACCEPTABLE * 2))
+        #   sub process terminated
         self.__sub_terminated_flags = multiprocessing.Array(ctypes.c_int, (job_manager_config.SUB_PROCESS_ACCEPTABLE * 2))
-        self.__force_upd_sts_exec_pid = multiprocessing.Value(ctypes.c_int)
-        self.__force_upd_sts_exec_pid.value = -1
-        self.__force_upd_sts_exec_time = multiprocessing.Value(ctypes.c_double)
-        self.__force_upd_sts_exec_time.value = datetime.datetime.timestamp(datetime.datetime.now() + datetime.timedelta(seconds=job_manager_config.FORCE_UPDATE_STATUS_INTERVAL_SECONDS))
+
+        # interval_timer job variables
+        self.__interval_job_kinds = [
+            job_kind for job_kind, job_config in job_manager_config.JOBS.items() if job_config['job_trigger'] == "interval_timer"]
+        #   jobを実行するprocess id / process id to run the job
+        self.__interval_job_exec_pids = multiprocessing.Array(ctypes.c_int, len(self.__interval_job_kinds))
+        #   jobを実行する時間 / time to run job
+        self.__interval_job_exec_times = multiprocessing.Array(ctypes.c_double, len(self.__interval_job_kinds))
+        #   initialize interval_timer job variables
+        for i, job_kind in enumerate(self.__interval_job_kinds):
+            self.__interval_job_exec_pids[i] = -1
+            self.__interval_job_exec_times[i] = (datetime.datetime.timestamp(
+                datetime.datetime.now() + datetime.timedelta(seconds=job_manager_config.JOBS[job_kind]['job_interval'])
+            ))
 
     def refresh_sub_process_status(self):
         """全sub processの状態を更新する / Update the status of all sub processes
         """
-        # 強制ステータス更新を実行するprocessの変更用の変数 / Variable for changing process that executes forced status update
-        take_turns_force_upd_sts = self.__force_upd_sts_exec_pid.value == -1
-        take_turns_force_upd_sts_pid = -1
-
         # 全processを処理 / Process all processes
         for i, process in enumerate(self.__sub_processes):
             if process is not None:
@@ -308,26 +381,11 @@ class SubProcessesManager():
                     # processが終了している場合 / If process has ended
                     globals.logger.info(f"EXITED sub process: {process.pid:06d} exitcode={process.exitcode}")
 
-                    # 強制ステータス更新を実行するprocessが終了した場合、他のprocessに引き継ぐ必要がある
-                    # If the process that executes the forced status update ends, it must be taken over by another process.
-                    if process.pid == self.__force_upd_sts_exec_pid.value:
-                        take_turns_force_upd_sts = True
-
                     # 管理情報を初期化する / Initialize management information
                     self.__sub_processes[i] = None
                     self.__sub_termination_req_times[i] = None
                     self.__sub_termination_req_flags[i] = 0
                     self.__sub_terminated_flags[i] = 0
-                elif self.__sub_termination_req_flags[i] == 0:
-                    # 実行中のprocessを強制ステータス更新を実行するprocessの候補として保持する
-                    # Keep the running process as a candidate for executing forced status update
-                    take_turns_force_upd_sts_pid = process.pid
-
-        if take_turns_force_upd_sts:
-            # 強制ステータス更新を実行するprocessを引き継がなければいけない場合、候補としていたprocessに書き換える
-            # If it is necessary to take over the process that executes the forced status update, rewrite it to the candidate process.
-            self.__force_upd_sts_exec_pid.value = take_turns_force_upd_sts_pid
-            globals.logger.info(f"Take Turns force_upd_sts_exec_pid: {self.__force_upd_sts_exec_pid.value:06d}")
 
     def is_enough_sub_process(self):
         """sub processの数が足りているかを返す / Returns whether there are enough sub processes
@@ -356,8 +414,9 @@ class SubProcessesManager():
                 self.__sub_processe_ids,
                 self.__sub_termination_req_flags,
                 self.__sub_terminated_flags,
-                self.__force_upd_sts_exec_pid,
-                self.__force_upd_sts_exec_time,
+                self.__interval_job_kinds,
+                self.__interval_job_exec_pids,
+                self.__interval_job_exec_times,
             )
 
     def append_new_process(self, parameter: SubProcessParameter, process: multiprocessing.Process):
@@ -381,6 +440,25 @@ class SubProcessesManager():
         self.__sub_termination_req_flags[i] = 0
         self.__sub_terminated_flags[i] = 0
         return True
+
+    def set_interval_job_execute_process(self):
+        """interval job 実行processの設定 / interval job Execution process settings
+        """
+        # Job開始可能なprocess id / Job startable process id
+        startable_pids = [
+            self.__sub_processe_ids[i]
+            for i, process in enumerate(self.__sub_processes)
+                if process is not None and self.__sub_termination_req_flags[i] == 0
+        ]
+        if len(startable_pids) == 0:
+            globals.logger.debug("No process that can start the job")
+        else:
+            for i, job_kind in enumerate(self.__interval_job_kinds):
+                # 開始可能でないprocessに割り当たっていた場合、プロセスを切り替える
+                # Switch the process if it is assigned to a process that cannot be started
+                if self.__interval_job_exec_pids[i] not in startable_pids:
+                    self.__interval_job_exec_pids[i] = startable_pids[random.randrange(len(startable_pids))]
+                    globals.logger.debug(f"Set process to run interval job : job_kind:[{job_kind}] pid:[{self.__interval_job_exec_pids[i]}]")
 
     def __unused_array_indexes(self):
         """使用していない共有メモリのindexを返す / Return unused shared memory indexes

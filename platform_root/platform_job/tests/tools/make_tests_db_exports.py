@@ -259,7 +259,7 @@ def sample_data_organization(id, update={}):
                     }
                 ],
                 "requiredActions": [
-                    "UPDATE_PROFILE"
+                    # "UPDATE_PROFILE"
                 ],
                 "enabled": True
             }
