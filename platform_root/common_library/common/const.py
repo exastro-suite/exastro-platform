@@ -47,6 +47,18 @@ length_destination_teams_webhook = 1024
 max_destination_email = 500
 max_destination_teams_webhook = 1
 length_func_id = 100
+length_smtp_host = 1024
+min_length_separated_by_period_mark = 1
+max_length_separated_by_period_mark = 63
+mix_smtp_port = 0
+max_smtp_port = 65535
+length_send_from = 255
+length_send_name = 100
+length_replay_to = 255
+length_replay_name = 100
+length_envelope_from = 255
+length_authentication_user = 255
+length_authentication_password = 255
 
 # ロール種別
 # Role Kind
