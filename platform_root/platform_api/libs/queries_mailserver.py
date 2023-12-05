@@ -24,6 +24,6 @@ DELETE
 FROM
 M_SMTP_SERVER
 WHERE
-SMTP_ID = %(destination_id)s
+SMTP_ID = %(smtp_id)s
 ;
 """
