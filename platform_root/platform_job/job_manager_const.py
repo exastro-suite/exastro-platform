@@ -23,3 +23,6 @@ ORG_STATUS_CREATE_COMPLETE = "Organization Create Complete"
 
 # unit test trace log
 LOG_RECONNECT = "Reconnect DB"
+
+# Version Text
+VERSION_TEXT_PATH = "/app/version"

@@ -58,6 +58,9 @@ def job_manager_main_process():
     globals.init(main_process=True)
     globals.logger.info('START main process')
 
+    # migration完了まで待つ / Wait until migration completes
+    wait_until_migration_completed()
+
     # sub process管理用クラス / sub process management class
     sub_processes_mgr = SubProcessesManager()
 
@@ -130,6 +133,30 @@ def job_manager_main_process():
     globals.logger.info('TERMINATE main process')
     globals.terminate()
     return
+
+
+def wait_until_migration_completed():
+    """migration完了まで待つ / Wait until migration completes
+    """
+    with open(job_manager_const.VERSION_TEXT_PATH) as fp:
+        version_text = str.strip(fp.readline())
+
+    while True:
+        try:
+            with closing(DBconnector().connect_platformdb()) as conn, conn.cursor() as cursor:
+                cursor.execute(queries_health_check.SQL_QUERY_VERSION)
+                version = cursor.fetchone()
+                if version is None:
+                    raise Exception('Version Not Found')
+                if version_text == version.get('VERSION'):
+                    globals.logger.info(f"Migration completed : {version_text}")
+                    break
+
+                raise Exception(f"Version mismatch : application:[{version_text}] database:[{version.get('VERSION')}]")
+
+        except Exception as err:
+            globals.logger.info(f"Wait until migration completed : {err}")
+            time.sleep(job_manager_config.SUB_PROCESS_WATCH_INTERVAL_SECONDS)
 
 
 def job_manager_sub_process(parameter: SubProcessParameter):
