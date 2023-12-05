@@ -38,6 +38,7 @@ def settings_mailserver_get(organization_id):  # noqa: E501
     globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
 
     # DB取得
+    # DB Acquisition
     parameter = {"smtp_id": const.DEFAULT_SMTP_ID}
     with closing(DBconnector().connect_orgdb(organization_id)) as conn:
         with conn.cursor() as cursor:
@@ -47,24 +48,23 @@ def settings_mailserver_get(organization_id):  # noqa: E501
     data = {}
     if row is not None:
         data = {
-            "SMTP_HOST": row["SMTP_HOST"],
-            "SMTP_PORT": row["SMTP_PORT"],
-            "SEND_FROM": row["SEND_FROM"],
-            "SEND_NAME": row["SEND_NAME"],
-            "REPLAY_TO": row["REPLAY_TO"],
-            "REPLAY_NAME": row["REPLAY_NAME"],
-            "ENVELOPE_FROM": row["ENVELOPE_FROM"],
-            "SSL_ENABLE": row["SSL_ENABLE"],
-            "START_TLS_ENABLE": row["START_TLS_ENABLE"],
-            "AUTHENTICATION_ENABLE": row["AUTHENTICATION_ENABLE"],
-            "AUTHENTICATION_USER": row["AUTHENTICATION_USER"],
-            "AUTHENTICATION_PASSWORD": encrypt.decrypt_str(row["AUTHENTICATION_PASSWORD"]),
+            "smtp_host": row["SMTP_HOST"],
+            "smtp_port": row["SMTP_PORT"],
+            "send_from": row["SEND_FROM"],
+            "send_name": row["SEND_NAME"],
+            "replay_to": row["REPLAY_TO"],
+            "replay_name": row["REPLAY_NAME"],
+            "envelope_from": row["ENVELOPE_FROM"],
+            "ssl_enable": row["SSL_ENABLE"],
+            "start_tls_enable": row["START_TLS_ENABLE"],
+            "authentication_enable": row["AUTHENTICATION_ENABLE"],
+            "authentication_user": row["AUTHENTICATION_USER"],
+            "authentication_password": encrypt.decrypt_str(row["AUTHENTICATION_PASSWORD"]),
             "create_timestamp": common.datetime_to_str(row["CREATE_TIMESTAMP"]),
             "create_user": row["CREATE_USER"],
             "last_update_timestamp": common.datetime_to_str(row["LAST_UPDATE_TIMESTAMP"]),
             "last_update_user": row["LAST_UPDATE_USER"],
         }
-        data.append(row)
 
     return common.response_200_ok(data)
 
@@ -103,7 +103,7 @@ def settings_mailserver_create(body, organization_id):  # noqa: E501
 
 
 @common.platform_exception_handler
-def mailserver_delete(organization_id):  # noqa: E501
+def setting_mailserver_delete(organization_id):  # noqa: E501
     """Delete deletes an mailserver
 
     Args:
@@ -113,16 +113,6 @@ def mailserver_delete(organization_id):  # noqa: E501
         Response: http response
     """
     globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
-
-    r = connexion.request
-
-    user_id = r.headers.get("User-id")
-    encode_roles = r.headers.get("Roles")
-    language = r.headers.get("Language")
-
-    globals.logger.debug(f"user_id:{user_id}")
-    globals.logger.debug(f"roles:{encode_roles}")
-    globals.logger.debug(f"language:{language}")
 
     with closing(DBconnector().connect_orgdb(organization_id)) as conn:
         with conn.cursor() as cursor:
