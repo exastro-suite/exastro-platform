@@ -2116,6 +2116,26 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/inline_response_200_23'
+              example:
+                value:
+                  result: 200
+                  message: SUCCESS
+                  ts: 2023-11-02T05:36:41.258Z
+                  data:
+                    smtp_host: smtp.host
+                    smtp_port: "587"
+                    send_from: sender@example.com
+                    send_name: sender
+                    replay_to: replay@example.com
+                    replay_name: replay
+                    envelope_from: envelope@example.com
+                    ssl_enable: false
+                    start_tls_enable: true
+                    authentication_enable: false
+                    create_timestamp: 2023-11-02T05:36:41.258Z
+                    create_user: string
+                    last_update_timestamp: 2023-11-02T05:36:41.258Z
+                    last_update_user: string
         default:
           description: An unexpected error response.
           content:
@@ -2141,6 +2161,18 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/settingsMailserverCreate'
+            example:
+              value:
+                smtp_host: smtp.host
+                smtp_port: "587"
+                send_from: sender@example.com
+                send_name: sender
+                replay_to: replay@example.com
+                replay_name: replay
+                envelope_from: envelope@example.com
+                ssl_enable: false
+                start_tls_enable: true
+                authentication_enable: false
         required: true
       responses:
         "200":
@@ -3960,10 +3992,10 @@ components:
       properties:
         smtp_host:
           type: string
-          description: Outgoing Server Host
+          description: SMTP Server Host
         smtp_port:
           type: string
-          description: Outgoing server port number
+          description: SMTP server port number
         send_from:
           type: string
           description: Sender's email address
@@ -3978,19 +4010,19 @@ components:
           description: Reply-to display name
         envelope_from:
           type: string
-          description: Sender's email address
+          description: Envelope from email address
         ssl_enable:
           type: boolean
-          description: SSL on/off
+          description: SSL enable
         start_tls_enable:
           type: boolean
-          description: StartTLS on/off
+          description: StartTLS enable
         authentication_enable:
           type: boolean
-          description: Certified or not
+          description: Authentication enable
         authentication_user:
           type: string
-          description: Authenticated users
+          description: Authentication users
         authentication_password:
           type: string
           description: Authentication password
@@ -4010,10 +4042,10 @@ components:
       properties:
         smtp_host:
           type: string
-          description: Outgoing Server Host
+          description: SMTP Server Host
         smtp_port:
           type: string
-          description: Outgoing server port number
+          description: SMTP server port number
         send_from:
           type: string
           description: Sender's email address
@@ -4028,19 +4060,19 @@ components:
           description: Reply-to display name
         envelope_from:
           type: string
-          description: Sender's email address
+          description: Envelope from email address
         ssl_enable:
           type: boolean
-          description: SSL on/off
+          description: SSL enable
         start_tls_enable:
           type: boolean
-          description: StartTLS on/off
+          description: StartTLS enable
         authentication_enable:
           type: boolean
-          description: Certified or not
+          description: Authentication enable
         authentication_user:
           type: string
-          description: Authenticated users
+          description: Authentication users
     inline_response_200:
       allOf:
       - $ref: '#/components/schemas/responseOk'
