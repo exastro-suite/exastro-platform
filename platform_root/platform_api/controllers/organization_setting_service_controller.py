@@ -17,7 +17,7 @@ from contextlib import closing
 
 import connexion
 import globals
-from common_library.common import bl_mailserver_service, common, const, encrypt, multi_lang
+from common_library.common import bl_organization_setting_service, common, const, multi_lang
 from common_library.common.db import DBconnector
 from libs import queries_mailserver
 
@@ -90,13 +90,13 @@ def settings_mailserver_create(body, organization_id):  # noqa: E501
     user_id = r.headers.get("User-id")
     globals.logger.debug(f"user_id:{user_id}")
 
-    body = bl_mailserver_service.set_default_value_of_settings_mailserver(body)
+    body = bl_organization_setting_service.set_default_value_of_settings_mailserver(body)
 
-    validate = bl_mailserver_service.validate_setting_mailserver(body)
+    validate = bl_organization_setting_service.validate_setting_mailserver(body)
     if not validate.ok:
         return common.response_validation_error(validate)
 
-    bl_mailserver_service.settings_mailserver_register_or_update(body, organization_id, user_id)
+    bl_organization_setting_service.settings_mailserver_register_or_update(body, organization_id, user_id)
 
     return common.response_200_ok(data=None)
 
