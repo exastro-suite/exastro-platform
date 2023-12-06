@@ -15,8 +15,7 @@
 from contextlib import closing
 
 import globals
-from common_library.common import (common, const, encrypt, multi_lang,
-                                   validation)
+from common_library.common import common, const, encrypt, multi_lang, validation
 from common_library.common.db import DBconnector
 from common_library.common.libs import queries_bl_mailserver
 
@@ -34,21 +33,6 @@ def settings_mailserver_register_or_update(body, organization_id, user_id):
 
     with closing(DBconnector().connect_orgdb(organization_id)) as conn:
         with conn.cursor() as cursor:
-            cursor.execute(queries_bl_mailserver.SQL_QUERY_MAILSERVER)
-
-            count = len(cursor.fetchall())
-            globals.logger.debug(f"M_NOTIFICATION_DESTINATIONのデータ件数:{count}")
-
-            # M_NOTIFICATION_DESTINATIONのデータ件数は0or1を想定しているため、2件以上存在する場合は例外とする
-            if count > 1:
-                message_id = f"500-{MSG_FUNCTION_ID}001"
-                message = multi_lang.get_text(
-                    message_id,
-                    "メールサーバー設定のデータ件数が不正なため処理を中断します(データ件数:{0})",
-                    count
-                )
-                raise common.InternalErrorException(message_id=message_id, message=message)
-
             parameter = {
                 "smtp_id": const.DEFAULT_SMTP_ID,
                 "smtp_host": body.get("smtp_host"),
@@ -58,29 +42,32 @@ def settings_mailserver_register_or_update(body, organization_id, user_id):
                 "replay_to": body.get("replay_to"),
                 "replay_name": body.get("replay_name"),
                 "envelope_from": body.get("envelope_from"),
-                "ssl_enable": body.get("ssl_enable") if body.get("ssl_enable") is not None else False,
-                "start_tls_enable": body.get("start_tls_enable") if body.get("start_tls_enable") is not None else False,
-                "authentication_enable": body.get("authentication_enable") if body.get("authentication_enable") is not None else False,
+                "ssl_enable": body.get("ssl_enable"),
+                "start_tls_enable": body.get("start_tls_enable"),
+                "authentication_enable": body.get("authentication_enable"),
                 "authentication_user": body.get("authentication_user"),
                 "authentication_password": encrypt.encrypt_str(body.get("authentication_password")),
                 "create_user": user_id,
                 "last_update_user": user_id
             }
-
             globals.logger.debug(f"parameter:\n{parameter}")
+
+            cursor.execute(queries_bl_mailserver.SQL_QUERY_MAILSERVER, {"smtp_id": const.DEFAULT_SMTP_ID})
+            count = len(cursor.fetchall())
+            globals.logger.debug(f"M_NOTIFICATION_DESTINATIONのデータ件数:{count}")
 
             try:
                 if count == 0:
-                    globals.logger.info("M_NOTIFICATION_DESTINATIONにINSERTを実施")
+                    globals.logger.debug("M_NOTIFICATION_DESTINATIONにINSERTを実施")
                     cursor.execute(queries_bl_mailserver.SQL_INSERT_MAILSERVER, parameter)
                 else:
-                    globals.logger.info("M_NOTIFICATION_DESTINATIONにUPDATEを実施")
-                    cursor.execute(queries_bl_mailserver.SQL_UPDATE_QUERY, parameter)
+                    globals.logger.debug("M_NOTIFICATION_DESTINATIONにUPDATEを実施")
+                    cursor.execute(queries_bl_mailserver.SQL_UPDATE_MAILSERVER, parameter)
 
                 conn.commit()
             except Exception as e:
                 globals.logger.error(f"exception:{e.args}")
-                message_id = f"500-{MSG_FUNCTION_ID}002"
+                message_id = f"500-{MSG_FUNCTION_ID}001"
                 message = multi_lang.get_text(
                     message_id,
                     "メールサーバー設定の登録・更新に失敗しました",
@@ -100,6 +87,8 @@ def set_default_value_of_settings_mailserver(body):
         body (dict): json
     """
 
+    # requestBodyで値が渡されなかった場合（body.getの結果がNoneになる）、デフォルト値を設定する
+    # If no value is passed in requestBody (body.get results in None), set a default value
     body["ssl_enable"] = body["ssl_enable"] if not body.get("ssl_enable") is None else False
     body["start_tls_enable"] = body["start_tls_enable"] if not body.get("start_tls_enable") is None else False
     body["authentication_enable"] = body["authentication_enable"] if not body.get("authentication_enable") is None else False

@@ -1387,9 +1387,11 @@ def validate_mailserver(body):
     """
 
     # 以下のパターンはswaggerで弾くので、チェック不要
-    # bodyの型がobject(dict)以外
-    # bodyがNone
-
+    # ・bodyの型がobject(dict)以外
+    # ・bodyがNone
+    # The following patterns are played by swagger, so no need to check
+    # ・The type of body is other than object (dict).
+    # ・body is None
     return result(True)
 
 
@@ -1404,6 +1406,7 @@ def validate_smtp_host(host):
     """
 
     # Noneの場合はswaggerで弾かれるためチェック不要
+    # If None, it is played by swagger and does not need to be checked.
     if host == "":
         return result(
             False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
@@ -1425,6 +1428,7 @@ def validate_smtp_host(host):
 
     check_list = host.split(".")
     # 「.」を用いたスプリットで要素数が2以上の配列が生成された場合、「.」が使用されていると判断し以下のチェックもおこなう
+    # 「.」 is used to generate an array with more than two elements, it is assumed that 「.」 is used and the following checks are also performed
     if len(check_list) > 1:
         for item in check_list:
             length = len(item)
@@ -1447,9 +1451,13 @@ def validate_smtp_port(port):
         result: Validation result
     """
 
-    # 未指定や空文字の場合はデフォルト値を適用するため、以降のチェックは実施しない
-    if port is None or port == "":
-        return result(True)
+    # Noneの場合はswaggerで弾かれるためチェック不要
+    # If None, it is played by swagger and does not need to be checked.
+    if port == "":
+        return result(
+            False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
+            multi_lang.get_text('000-00187', "送信サーバーポート番号")
+        )
 
     if not port.isdecimal():
         return result(
@@ -1459,13 +1467,13 @@ def validate_smtp_port(port):
         )
 
     tmp = int(port)
-    if tmp < const.mix_smtp_port or tmp > const.max_smtp_port:
+    if tmp < const.min_smtp_port or tmp > const.max_smtp_port:
         return result(
             False, 400, '400-{}030'.format(MSG_FUNCTION_ID),
             '数値が最小値より小さいまたは最大値より大きな値となっています。(項目:{0},対象の値:{1},最小値:{2},最大値:{3})',
             multi_lang.get_text('000-00188', "SMTPサーバーポート"),
             port,
-            const.mix_smtp_port,
+            const.min_smtp_port,
             const.max_smtp_port
         )
 
@@ -1483,6 +1491,7 @@ def validate_send_from(send_from):
     """
 
     # Noneの場合はswaggerで弾かれるためチェック不要
+    # If None, it is played by swagger and does not need to be checked.
     if send_from == "":
         return result(
             False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
@@ -1520,6 +1529,7 @@ def validate_send_name(name):
     """
 
     # 未指定や空文字の場合は以降のチェックは実施しない
+    # If none or empty, subsequent checks are not performed.
     if name is None or name == "":
         return result(True)
 
@@ -1544,6 +1554,7 @@ def validate_replay_to(replay_to):
     """
 
     # 未指定や空文字の場合は以降のチェックは実施しない
+    # If none or empty, subsequent checks are not performed.
     if replay_to is None or replay_to == "":
         return result(True)
 
@@ -1578,6 +1589,7 @@ def validate_replay_name(name):
     """
 
     # 未指定や空文字の場合は以降のチェックは実施しない
+    # If none or empty, subsequent checks are not performed.
     if name is None or name == "":
         return result(True)
 
@@ -1602,6 +1614,7 @@ def validate_envelope_from(envelope_from):
     """
 
     # 未指定や空文字の場合は以降のチェックは実施しない
+    # If none or empty, subsequent checks are not performed.
     if envelope_from is None or envelope_from == "":
         return result(True)
 
@@ -1635,8 +1648,8 @@ def validate_ssl_enable(ssl_enable):
         result: Validation result
     """
 
-    # swaggerでboolの判定は行っているので、何もチェックする必要が無い
-
+    # swaggerでboolの判定は行っているので、何もチェックしない
+    # Since bool is determined by swagger, nothing is checked.
     return result(True)
 
 
@@ -1650,8 +1663,8 @@ def validate_start_tls_enable(start_tls_enable):
         result: Validation result
     """
 
-    # swaggerでboolの判定は行っているので、何もチェックする必要が無い
-
+    # swaggerでboolの判定は行っているので、何もチェックしない
+    # Since bool is determined by swagger, nothing is checked.
     return result(True)
 
 
@@ -1666,10 +1679,11 @@ def complex_validate_ssl_start_tls(ssl_enable, start_tls_enable):
         result: Validation result
     """
 
-    # どちらも同じ値の場合NGとする
-    if ssl_enable == start_tls_enable:
+    # どちらもTrueの場合NGとする
+    # If both are True, NG is assumed.
+    if ssl_enable is True and start_tls_enable is True:
         return result(
-            False, 400, '400-{}031'.format(MSG_FUNCTION_ID), 'SSLおよびStartTLSはどちらか片方を有効にしてください。'
+            False, 400, '400-{}031'.format(MSG_FUNCTION_ID), 'SSLおよびStartTLSを同時に有効にすることはできません。'
         )
 
     return result(True)
@@ -1685,8 +1699,8 @@ def validate_authentication_enable(authentication_enable):
         result: Validation result
     """
 
-    # swaggerでboolの判定は行っているので、何もチェックする必要が無い
-
+    # swaggerでboolの判定は行っているので、何もチェックしない
+    # Since bool is determined by swagger, nothing is checked.
     return result(True)
 
 
@@ -1701,6 +1715,7 @@ def validate_authentication_user(authentication_user):
     """
 
     # 未指定や空文字の場合は以降のチェックは実施しない
+    # If none or empty, subsequent checks are not performed.
     if authentication_user is None or authentication_user == "":
         return result(True)
 
@@ -1715,7 +1730,7 @@ def validate_authentication_user(authentication_user):
 
 
 def validate_authentication_password(authentication_password):
-    """validate authentication_user
+    """validate authentication_password
 
     Args:
         authentication_password (str): authentication_password
@@ -1725,6 +1740,7 @@ def validate_authentication_password(authentication_password):
     """
 
     # 未指定や空文字の場合は以降のチェックは実施しない
+    # If none or empty, subsequent checks are not performed.
     if authentication_password is None or authentication_password == "":
         return result(True)
 
@@ -1754,6 +1770,7 @@ def complex_validate_authentication_user_password(authentication_enable, authent
     authentication_password_check_condition = authentication_password is None or authentication_password == ""
 
     # authentication_enableがtrueの場合、どちらも値の指定を必須とする
+    # If authentication_enable is true, both require a value to be specified
     if authentication_enable and (authentication_user_check_condition or authentication_password_check_condition):
         return result(
             False, 400, '400-{}032'.format(MSG_FUNCTION_ID), '認証を有効にする場合、認証ユーザーおよび認証パスワードは必須となります。'

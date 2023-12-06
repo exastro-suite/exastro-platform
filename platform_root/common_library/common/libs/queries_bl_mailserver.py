@@ -17,6 +17,8 @@ SELECT
 *
 FROM
 M_SMTP_SERVER
+WHERE
+SMTP_ID = %(smtp_id)s
 ;
 """
 
@@ -59,7 +61,7 @@ VALUES (
 ;
 """
 
-SQL_UPDATE_QUERY = """
+SQL_UPDATE_MAILSERVER = """
 UPDATE M_SMTP_SERVER
 SET
 SMTP_HOST = %(smtp_host)s,
@@ -74,7 +76,7 @@ START_TLS_ENABLE = %(start_tls_enable)s,
 AUTHENTICATION_ENABLE = %(authentication_enable)s,
 AUTHENTICATION_USER = %(authentication_user)s,
 AUTHENTICATION_PASSWORD = %(authentication_password)s,
-LAST_UPDATE_USER` = %(last_update_user)s
+LAST_UPDATE_USER = %(last_update_user)s
 WHERE
 SMTP_ID = %(smtp_id)s
 ;
