@@ -2246,10 +2246,10 @@ components:
       properties:
         smtp_host:
           type: string
-          description: Outgoing Server Host
+          description: SMTP Server Host
         smtp_port:
           type: string
-          description: Outgoing server port number
+          description: SMTP server port number
         send_from:
           type: string
           description: Sender's email address
@@ -2264,19 +2264,19 @@ components:
           description: Reply-to display name
         envelope_from:
           type: string
-          description: Sender's email address
+          description: Envelope from email address
         ssl_enable:
           type: boolean
-          description: SSL on/off
+          description: SSL enable
         start_tls_enable:
           type: boolean
-          description: StartTLS on/off
+          description: StartTLS enable
         authentication_enable:
           type: boolean
-          description: Certified or not
+          description: Authentication enable
         authentication_user:
           type: string
-          description: Authenticated users
+          description: Authentication users
         authentication_password:
           type: string
           description: Authentication password
@@ -2300,10 +2300,10 @@ components:
       properties:
         smtp_host:
           type: string
-          description: Outgoing Server Host
+          description: SMTP Server Host
         smtp_port:
           type: string
-          description: Outgoing server port number
+          description: SMTP server port number
         send_from:
           type: string
           description: Sender's email address
@@ -2318,19 +2318,19 @@ components:
           description: Reply-to display name
         envelope_from:
           type: string
-          description: Sender's email address
+          description: Envelope from email address
         ssl_enable:
           type: boolean
-          description: SSL on/off
+          description: SSL enable
         start_tls_enable:
           type: boolean
-          description: StartTLS on/off
+          description: StartTLS enable
         authentication_enable:
           type: boolean
-          description: Certified or not
+          description: Authentication enable
         authentication_user:
           type: string
-          description: Authenticated users
+          description: Authentication users
   securitySchemes:
     BearerAuth:
       description: Credentials or access token for API

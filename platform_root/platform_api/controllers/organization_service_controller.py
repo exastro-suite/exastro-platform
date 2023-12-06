@@ -1602,13 +1602,9 @@ def __ita_create(organization_id, user_id, options_ita):
     if response.status_code not in [200, 409]:
         globals.logger.error(f"response.status_code:{response.status_code}")
         globals.logger.error(f"response.text:{response.text}")
-        message_id = f"500-{MSG_FUNCTION_ID}013"
-        message = multi_lang.get_text(
-            message_id,
-            "Exastro IT Automationのorganization作成に失敗しました。(対象ID:{0})",
-            organization_id
-        )
-        raise common.InternalErrorException(message_id=message_id, message=message)
+        return_json = json.loads(response.text)
+
+        raise common.OtherException(status_code=response.status_code, data=return_json.get("data"), message_id=return_json.get("result"), message=return_json.get("message"))
 
     globals.logger.debug(response.text)
 
