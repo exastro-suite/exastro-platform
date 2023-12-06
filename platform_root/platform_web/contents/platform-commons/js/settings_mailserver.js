@@ -84,8 +84,8 @@ $(function(){
         $("#form_smtp_port").val(row.smtp_port);
         $("#form_send_from").val(row.send_from);
         $("#form_send_name").val(row.send_name);
-        $("#form_replay_to").val(row.replay_to);
-        $("#form_replay_name").val(row.replay_name);
+        $("#form_reply_to").val(row.replay_to);
+        $("#form_reply_name").val(row.replay_name);
         $("#form_envelope_from").val(row.envelope_from);
         $('#form_ssl_enable').prop("checked", fn.cv(row.ssl_enable, false, false));
         $('#form_start_tls_enable').prop("checked", fn.cv(row.start_tls_enable, false, false));
@@ -208,14 +208,14 @@ $(function(){
             "smtp_port": $('#form_smtp_port').val(),
             "send_from": $('#form_send_from').val(),
             "send_name": $('#form_send_name').val(),
-            "replay_to": $('#form_replay_to').val(),
-            "replay_name": $('#form_replay_name').val(),
+            "replay_to": $('#form_reply_to').val(),
+            "replay_name": $('#form_reply_name').val(),
             "envelope_from": $('#form_envelope_from').val(),
             "ssl_enable": $('#form_ssl_enable').prop("checked"),
             "start_tls_enable": $('#form_start_tls_enable').prop("checked"),
             "authentication_enable": $('#form_authentication_enable').prop("checked"),
-            "authentication_user": $('#form_authentication_enable').prop("checked") ? $('#from_authentication_user').val() : '',
-            "authentication_password": $('#form_authentication_enable').prop("checked") ? $('#from_authentication_password').val() : '',
+            "authentication_user": $('#form_authentication_enable').prop("checked") ? $('#form_authentication_user').val() : '',
+            "authentication_password": $('#form_authentication_enable').prop("checked") ? $('#form_authentication_password').val() : '',
         }
 
         show_progress();

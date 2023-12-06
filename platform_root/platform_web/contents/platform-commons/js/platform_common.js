@@ -1332,12 +1332,12 @@ const settings_mailserver_common = {
                     "result": false,
                     "message": getText("400-00011", "必須項目が不足しています。({0})", getText("000-00187", "SMTPサーバーホスト"))
                 }
-            } else if(smtp_host.replace(/^[\x20-\x7e]*$/g,"") !== "") {
+            } else if(smtp_host.replace(/^[a-zA-Z0-9-.]+$/g,"") !== "") {
                 return {
                     "result": false,
                     "message": getText("400-00017", "指定できない文字が含まれています。(項目:{0},指定可能な文字:{1})",
                                     getText("000-00187", "SMTPサーバーホスト"),
-                                    getText("000-31002", "半角文字")
+                                    getText("000-31002", "半角英数字・ハイフン・ピリオド")
                                 )
                 }
             } else {

@@ -3953,9 +3953,9 @@ components:
     settingsMailserverCreate:
       title: mailserver is a mailserver of mailserver resource.
       required:
-      - SEND_FROM
-      - SMTP_HOST
-      - SMTP_PORT
+      - send_from
+      - smtp_host
+      - smtp_port
       type: object
       properties:
         smtp_host:
