@@ -111,7 +111,7 @@
                                                             <input type="text" value="" class="tableEditInputText inputText input inputTextWidthAdjustment" id="form_destination_id" maxlength="36">
                                                             <span class="validate_error" id="message_destination_id"></span>
                                                         </div></td>
-                                                        <td class="tBodyTd td" rowspan="1" colspan="1"><div class="ci textOverWrap" text-id="000-82016">最大36文字 / 使用可能文字：半角英数・ハイフン・アンダースコア</div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1"><div class="ci textOverWrap" text-id="000-87037">最大36文字 / 使用可能文字：半角英数・ハイフン・アンダースコア</div></td>
                                                     </tr>
                                                     <tr class="tBodyTr tr">
                                                         <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1"><div class="ci" style="text-align: left;"><span text-id="000-00146">通知先名</span><span class="tHeadRequired" text-id="000-80024">必須</span></div></td>
@@ -119,7 +119,7 @@
                                                             <input type="text" value="" class="tableEditInputText inputText input inputTextWidthAdjustment" id="form_destination_name" maxlength="255">
                                                             <span class="validate_error" id="message_destination_name"></span>
                                                         </div></td>
-                                                        <td class="tBodyTd td" rowspan="1" colspan="1"><div class="ci textOverWrap" text-id="000-82017">最大255文字 / 使用可能文字：全角・半角文字</div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1"><div class="ci textOverWrap" text-id="000-87038">最大255文字 / 使用可能文字：全角・半角文字</div></td>
                                                     </tr>
                                                     <tr class="tBodyTr tr">
                                                         <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1"><div class="ci" style="text-align: left;"><span text-id="000-82011">通知方法</span><span class="tHeadRequired" text-id="000-80024">必須</span></div></td>
@@ -176,39 +176,6 @@
                                                             <div class="ci pre destination_informations description_WebHook" style="display: none;"></div>
                                                         </td>
                                                     </tr>
-                                                    <!-- <tr class="tBodyTr tr">
-                                                        <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1"><div class="ci" style="text-align: left;" text-id="000-00186">送信設定</div></td>
-                                                        <td class="tBodyTd td" rowspan="1" colspan="1"><div class="ci" style="padding: 0;">
-                                                            <table class="table" width="100%" id="conditions_list">
-                                                                <thead class="thead">
-                                                                    <tr class="tHeadTr tr">
-                                                                        <th class="tHeadTh popup th" rowspan="1" colspan="2" title="IT Automation" attr-text-id="title="><div class="ci" text-id="000-00121">内容</div></th>
-                                                                        <th class="tHeadTh popup th" rowspan="1" colspan="1" title="通知" attr-text-id="title="><div class="ci" text-id="000-00125">通知</div></th>
-                                                                    </tr>
-                                                                </thead>
-                                                                <tbody class="tbody">
-                                                                    <tr class="tBodyTr tr datarow-template" style="cursor:pointer; display:none">
-                                                                        <td class="tBodyLeftSticky tBodyTh td group_count" rowspan="${conditions_group_count}" colspan="1" ><div class="ci">${conditions_group_name}</div></td>
-                                                                        <td class="tBodyLeftSticky tBodyTd td" rowspan="1" colspan="1" ><div class="ci">${conditions_name}</div></td>
-                                                                        <td class="tBodyTd td" rowspan="1" colspan="1" ><div class="ci">
-                                                                            <div class="switchArea">
-                                                                                <input type="checkbox" id="${conditions_key}"><label for="${conditions_key}"><span></span></label><div id="switchImg"></div>
-                                                                            </div>
-                                                                        </div></td>
-                                                                    </tr>
-                                                                    <tr class="tBodyTr tr datarow-template-sub" style="cursor:pointer; display:none">
-                                                                        <td class="tBodyLeftSticky tBodyTd td" rowspan="1" colspan="1" ><div class="ci">${conditions_name}</div></td>
-                                                                        <td class="tBodyTd td" rowspan="1" colspan="1" ><div class="ci">
-                                                                            <div class="switchArea">
-                                                                                <input type="checkbox" id="${conditions_key}"><label for="${conditions_key}"><span></span></label><div id="switchImg"></div>
-                                                                            </div>
-                                                                        </div></td>
-                                                                    </tr>
-                                                                </tbody>
-                                                            </table>
-                                                        </div></td>
-                                                        <td class="tBodyTd td" rowspan="1" colspan="1"></td>
-                                                    </tr> -->
                                                 </tbody>
                                             </table>
                                             <table class="table" width="100%" id="conditions_list">
@@ -252,7 +219,13 @@
                                                 </tbody>
                                             </table>
                                         </div>
-                                        <button data-type="tableNew" data-action="positive" style="width:200px;" class="itaButton tableHeaderMainMenuButton button" id="button_register"><span class="inner"><span class="icon icon-edit"></span><span text-id="000-80025">登録</span></span></button>
+                                        <div class="tableHeader">
+                                            <ul class="tableHeaderMainMenuList">
+                                                <li class="tableHeaderMainMenuItem">
+                                                    <button data-type="tableNew" data-action="positive" style="width:200px;" class="itaButton tableHeaderMainMenuButton button" id="button_register"><span class="inner"><span class="icon icon-edit"></span><span text-id="000-80025">登録</span></span></button>
+                                                </li>
+                                            </ul>
+                                        </div>
                                     </div>
                                 </div>
                             </section>

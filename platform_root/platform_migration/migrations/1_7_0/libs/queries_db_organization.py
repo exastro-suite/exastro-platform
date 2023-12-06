@@ -27,8 +27,8 @@ CREATE_TABLES = [
         SMTP_PORT		                INT,                                        -- 送信サーバーのポート番号
         SEND_FROM		                VARCHAR(255),                               -- 送信元のメールアドレス
         SEND_NAME		                VARCHAR(100),                               -- 送信元の表示名
-        REPLAY_TO		                VARCHAR(255),                               -- 返信先のメールアドレス
-        REPLAY_NAME		                VARCHAR(100),                               -- 返信先の表示名
+        REPLY_TO		                VARCHAR(255),                               -- 返信先のメールアドレス
+        REPLY_NAME		                VARCHAR(100),                               -- 返信先の表示名
         ENVELOPE_FROM		            VARCHAR(255),                               -- 差出人のメールアドレス
         SSL_ENABLE		                BOOLEAN DEFAULT 0,                          -- SSL有無（既定：FALSE）
         START_TLS_ENABLE		        BOOLEAN DEFAULT 0,                          -- StartTLS有無（既定：FALSE）
