@@ -103,7 +103,7 @@ def test_organization_api(connexion_client):
             headers=request_parameters.request_headers())
 
         assert response.status_code == 200, "get organization setting response code"
-        
+
         # updated value check
         assert response.json["data"]["token"]["refresh_token_max_lifespan_enabled"] \
             == json_update_setting["token"]["refresh_token_max_lifespan_enabled"], "updated value check : refresh_token_max_lifespan_enabled"
@@ -236,7 +236,7 @@ def test_organization_create(connexion_client):
             content_type='application/json',
             headers=request_parameters.request_headers(),
             json=sample_data_organization('_'))
-        
+
         assert response.status_code == 400, "create organization response code validate error"
 
         # validate error name
@@ -247,6 +247,20 @@ def test_organization_create(connexion_client):
             json=sample_data_organization('organization-01', {"name": "".ljust(const.length_organization_name + 1, "_")}))
 
         assert response.status_code == 400, "create organization response code validate error"
+
+    with test_common.requsts_mocker_default(), \
+            mock.patch.object(api_ita_admin_call, 'ita_notification_destination', return_value='1') as mock_obj:
+
+        mock_obj.return_value = MockResponse({'data': '[]'}, 500)
+
+        response = connexion_client.post(
+            '/api/platform/organizations',
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization['user_id']))
+
+        assert response.status_code == 500, "ITA API Error"
+        assert response.json["result"] == "500-35002", "ITA API Error"
+        assert response.json["message"] == "Failed to get notification destination in use (menu:{0} column:{1})", "ITA API Error"
 
 
 def sample_data_organization(id, update={}):
