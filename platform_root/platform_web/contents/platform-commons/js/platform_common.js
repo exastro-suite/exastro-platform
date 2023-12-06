@@ -38,6 +38,15 @@ const DESTINATION_KIND_TEAMS = 'Teams';
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
+//   encryption method type port defatult value
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+const ENCRYPTION_METHOD_NONE = 25;
+const ENCRYPTION_METHOD_SSL = 465;
+const ENCRYPTION_METHOD_TLS = 587;
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
 //   Get Text Multi Language Support
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1379,22 +1388,6 @@ const settings_mailserver_common = {
                 return {
                     "result": false,
                     "message": getText("400-00011", "必須項目が不足しています。({0})", getText("000-00189", "送信元メールアドレス"))
-                }
-            } else {
-                return {
-                    "result": true,
-                    "message": ""
-                }
-            }
-        },
-        //
-        // validate ssl and StartTLS
-        //
-        ssl_and_start_tls: function(ssl_enable, start_tls_enable) {
-            if(ssl_enable && start_tls_enable) {
-                return {
-                    "result": false,
-                    "message": getText("400-00031", "SSLおよびStartTLSを同時に有効にすることはできません。")
                 }
             } else {
                 return {

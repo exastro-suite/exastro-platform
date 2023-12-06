@@ -67,14 +67,14 @@ $(function(){
         //
         // display Delete settings notification destination button
         //
-        $('#button_reset').on('click',() => {
+        $('#button_delete').on('click',() => {
             delete_destination();
         });
         if(CommonAuth.hasAuthority(RolesCommon.ORG_AUTH_UPDATE)) {
-            $('#button_reset').prop('disabled', false);
+            $('#button_delete').prop('disabled', false);
         } else {
-            $('#button_reset').prop('disabled', true);
-            $('#button_reset').css('cursor', 'not-allowed');
+            $('#button_delete').prop('disabled', true);
+            $('#button_delete').css('cursor', 'not-allowed');
         }
 
         //
@@ -84,11 +84,11 @@ $(function(){
         $("#form_smtp_port").val(row.smtp_port);
         $("#form_send_from").val(row.send_from);
         $("#form_send_name").val(row.send_name);
-        $("#form_reply_to").val(row.replay_to);
-        $("#form_reply_name").val(row.replay_name);
+        $("#form_reply_to").val(row.reply_to);
+        $("#form_reply_name").val(row.reply_name);
         $("#form_envelope_from").val(row.envelope_from);
-        $('#form_ssl_enable').prop("checked", fn.cv(row.ssl_enable, false, false));
-        $('#form_start_tls_enable').prop("checked", fn.cv(row.start_tls_enable, false, false));
+        $('#form_encryption_method_ssl').prop("checked", fn.cv(row.ssl_enable, false, false));
+        $('#form_encryption_method_tls').prop("checked", fn.cv(row.start_tls_enable, false, false));
         $('#form_authentication_enable').prop("checked", fn.cv(row.authentication_enable, false, false));
         if (row.authentication_enable){
             $("#form_authentication_user").val(row.authentication_user);
@@ -119,6 +119,40 @@ $(function(){
                 $("." + tr_id).css('display', 'None');
             }
         });
+
+        //
+        // encryption_method change
+        //
+        $('input[name="form_encryption_method"]').change(function() {
+            if ($(this).val() === 'None'){
+                $('#form_smtp_port').val(ENCRYPTION_METHOD_NONE);
+            }
+            else if ($(this).val() === 'SSL'){
+                $('#form_smtp_port').val(ENCRYPTION_METHOD_SSL);
+            }
+            else if ($(this).val() === 'StartTLS'){
+                $('#form_smtp_port').val(ENCRYPTION_METHOD_TLS);
+            }
+        });
+
+        //
+        // detail expand button
+        //
+        $('#button_expand').on('click',() => {
+            $('#button_expand').prop('disabled',true);
+            group = $('#button_expand').attr('exapnd-group');
+            if ($('#span_button_expand').attr('exapnd-mode') === 'icon-expansion') {
+                $('#span_button_expand').removeClass('icon-expansion').addClass('icon-shrink');
+                $('#span_button_expand').attr('exapnd-mode', 'icon-shrink');
+                $('.'+group).css('display', '');
+            }
+            else{
+                $('#span_button_expand').removeClass('icon-shrink').addClass('icon-expansion');
+                $('#span_button_expand').attr('exapnd-mode', 'icon-expansion');
+                $('.'+group).css('display', 'none');
+            }
+            $('#button_expand').prop('disabled',false);
+        });
     }
 
     function delete_destination() {
@@ -126,10 +160,10 @@ $(function(){
 
         deleteConfirmMessage(
             getText("000-80017", "実行確認"),
-            getText("000-87010", "メール送信サーバーの設定をリセットしてもよろしいですか？"),
+            getText("000-88005", "メール送信サーバーの設定を削除してもよろしいですか？"),
             CommonAuth.getRealm() + getText("000-88002", "メール送信サーバー設定"),
-            getText("000-87011", "通知種別メールのメッセージ通知は一切できなくなります。"),
-            getText("000-00199", "リセット"),
+            getText("000-88006", "通知種別がメールのメッセージ通知は一切できなくなります。"),
+            getText("000-88007", "削除"),
             () => {
                 disabled_button();
                 show_progress();
@@ -143,7 +177,7 @@ $(function(){
                     },
                 }).then(() => {
                     hide_progress();
-                    alertMessage(getText("000-80018", "処理結果"), getText("000-87012", "メール送信サーバー設定をリセットしました。"),
+                    alertMessage(getText("000-80018", "処理結果"), getText("000-88008", "メール送信サーバー設定を削除しました。"),
                         () => {
                             window.location.href = location_conf.href.settings.mailserver.replace(/{organization_id}/g, CommonAuth.getRealm());
                         });
@@ -176,11 +210,6 @@ $(function(){
         result = result && validate.result;
         $("#message_send_from").text(validate.message);
 
-        // validate ssl_and_start_tls
-        validate = settings_mailserver_common.validate.ssl_and_start_tls($('#form_ssl_enable').prop("checked"), $('#form_start_tls_enable').prop("checked"));
-        result = result && validate.result;
-        $("#message_start_tls_enable").text(validate.message);
-
         // Checks to be made when authentication is enabled
         if ($('#form_authentication_enable').prop("checked")){
             // validate authentication_user
@@ -208,11 +237,11 @@ $(function(){
             "smtp_port": $('#form_smtp_port').val(),
             "send_from": $('#form_send_from').val(),
             "send_name": $('#form_send_name').val(),
-            "replay_to": $('#form_reply_to').val(),
-            "replay_name": $('#form_reply_name').val(),
+            "reply_to": $('#form_reply_to').val(),
+            "reply_name": $('#form_reply_name').val(),
             "envelope_from": $('#form_envelope_from').val(),
-            "ssl_enable": $('#form_ssl_enable').prop("checked"),
-            "start_tls_enable": $('#form_start_tls_enable').prop("checked"),
+            "ssl_enable": $('#form_encryption_method_ssl').prop("checked"),
+            "start_tls_enable": $('#form_encryption_method_tls').prop("checked"),
             "authentication_enable": $('#form_authentication_enable').prop("checked"),
             "authentication_user": $('#form_authentication_enable').prop("checked") ? $('#form_authentication_user').val() : '',
             "authentication_password": $('#form_authentication_enable').prop("checked") ? $('#form_authentication_password').val() : '',
@@ -244,6 +273,6 @@ $(function(){
 
     function disabled_button() {
         $('#button_register').prop('disabled', true);
-        $('#button_reset').prop('disabled', true);
+        $('#button_delete').prop('disabled', true);
     }
 });
