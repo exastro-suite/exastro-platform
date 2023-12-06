@@ -39,8 +39,8 @@ def settings_mailserver_register_or_update(body, organization_id, user_id):
                 "smtp_port": int(body.get("smtp_port")),
                 "send_from": body.get("send_from"),
                 "send_name": body.get("send_name"),
-                "replay_to": body.get("replay_to"),
-                "replay_name": body.get("replay_name"),
+                "reply_to": body.get("reply_to"),
+                "reply_name": body.get("reply_name"),
                 "envelope_from": body.get("envelope_from"),
                 "ssl_enable": body.get("ssl_enable"),
                 "start_tls_enable": body.get("start_tls_enable"),
@@ -123,11 +123,11 @@ def validate_setting_mailserver(body):
     if not validate.ok:
         return validate
 
-    validate = validation.validate_replay_to(body.get("replay_to"))
+    validate = validation.validate_reply_to(body.get("reply_to"))
     if not validate.ok:
         return validate
 
-    validate = validation.validate_replay_name(body.get("replay_name"))
+    validate = validation.validate_reply_name(body.get("reply_name"))
     if not validate.ok:
         return validate
 

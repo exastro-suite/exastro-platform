@@ -1543,11 +1543,11 @@ def validate_send_name(name):
     return result(True)
 
 
-def validate_replay_to(replay_to):
+def validate_reply_to(reply_to):
     """validate replay to
 
     Args:
-        replay_to (str): replay_to
+        reply_to (str): reply_to
 
     Returns:
         result: Validation result
@@ -1555,19 +1555,19 @@ def validate_replay_to(replay_to):
 
     # 未指定や空文字の場合は以降のチェックは実施しない
     # If none or empty, subsequent checks are not performed.
-    if replay_to is None or replay_to == "":
+    if reply_to is None or reply_to == "":
         return result(True)
 
-    if len(replay_to) > const.length_replay_to:
+    if len(reply_to) > const.length_reply_to:
         return result(
             False, 400, '400-{}012'.format(MSG_FUNCTION_ID), '指定可能な文字数を超えています。(項目:{0},最大文字数:{1})',
             multi_lang.get_text('000-00191', "返信先メールアドレス"),
-            str(const.length_replay_to)
+            str(const.length_reply_to)
         )
 
     try:
         # Check that the email address is valid.
-        validate_email(replay_to, check_deliverability=False, allow_smtputf8=False, test_environment=True)
+        validate_email(reply_to, check_deliverability=False, allow_smtputf8=False, test_environment=True)
 
     except EmailNotValidError:
         return result(
@@ -1578,7 +1578,7 @@ def validate_replay_to(replay_to):
     return result(True)
 
 
-def validate_replay_name(name):
+def validate_reply_name(name):
     """validate replay name
 
     Args:
@@ -1593,11 +1593,11 @@ def validate_replay_name(name):
     if name is None or name == "":
         return result(True)
 
-    if len(name) > const.length_replay_name:
+    if len(name) > const.length_reply_name:
         return result(
             False, 400, '400-{}012'.format(MSG_FUNCTION_ID), '指定可能な文字数を超えています。(項目:{0},最大文字数:{1})',
             multi_lang.get_text('000-00192', "返信先表示名"),
-            str(const.length_replay_name)
+            str(const.length_reply_name)
         )
 
     return result(True)

@@ -116,7 +116,7 @@ def test_execute_mail_smtp_normally():
     mail_to = ["test_to1@test"]
     mail_cc = []
     mail_bcc = []
-    
+
     mserver = make_mailserver_setting(organization_id,{
         "SMTP_HOST": "test_mailserver",
         "SMTP_PORT": 25,
@@ -218,13 +218,13 @@ def test_execute_mail_smtp_tls_normally():
     mail_to = []
     mail_cc = ["test_cc1@test"]
     mail_bcc = []
-    
+
     mserver = make_mailserver_setting(organization_id,{
         "SMTP_HOST": "test_mailserver",
         "SMTP_PORT": 587,
         "SEND_FROM": "from@test",
         "SEND_NAME": "from_name",
-        "REPLAY_TO": "replay@test",
+        "REPLY_TO": "replay@test",
         "ENVELOPE_FROM": "envelope_from@test",
         "START_TLS_ENABLE": 1,
         "AUTHENTICATION_ENABLE": 1,
@@ -271,7 +271,7 @@ def test_execute_mail_smtp_tls_normally():
         assert smtp_instances[0].message.get('To', "").replace(" ","") == ",".join(mail_to)
         assert smtp_instances[0].message.get('Cc', "").replace(" ","") == ",".join(mail_cc)
         assert smtp_instances[0].message.get('Bcc', "").replace(" ","") == ",".join(mail_bcc)
-        assert smtp_instances[0].message.get('reply-to', "") == formataddr((mserver['REPLAY_NAME'], mserver['REPLAY_TO']))
+        assert smtp_instances[0].message.get('reply-to', "") == formataddr((mserver['REPLY_NAME'], mserver['REPLY_TO']))
         assert smtp_instances[0].from_addr == mserver['ENVELOPE_FROM']
         assert sorted(smtp_instances[0].to_addrs) == sorted(mail_to + mail_cc + mail_bcc)
 
@@ -287,14 +287,14 @@ def test_execute_mail_smtp_ssl_normally():
     mail_to = []
     mail_cc = []
     mail_bcc = ["test_bcc1@test"]
-    
+
     mserver = make_mailserver_setting(organization_id,{
         "SMTP_HOST": "test_mailserver",
         "SMTP_PORT": 465,
         "SEND_FROM": "from@test",
         "SEND_NAME": "from_name",
-        "REPLAY_TO": "replay@test",
-        "REPLAY_NAME": "replay_name",
+        "REPLY_TO": "replay@test",
+        "REPLY_NAME": "reply_name",
         "ENVELOPE_FROM": "envelope_from@test",
         "SSL_ENABLE": 1,
         "AUTHENTICATION_ENABLE": 1,
@@ -341,7 +341,7 @@ def test_execute_mail_smtp_ssl_normally():
         assert smtp_instances[0].message.get('To', "").replace(" ","") == ",".join(mail_to)
         assert smtp_instances[0].message.get('Cc', "").replace(" ","") == ",".join(mail_cc)
         assert smtp_instances[0].message.get('Bcc', "").replace(" ","") == ",".join(mail_bcc)
-        assert smtp_instances[0].message.get('reply-to', "") == formataddr((mserver['REPLAY_NAME'], mserver['REPLAY_TO']))
+        assert smtp_instances[0].message.get('reply-to', "") == formataddr((mserver['REPLY_NAME'], mserver['REPLY_TO']))
         assert smtp_instances[0].from_addr == mserver['ENVELOPE_FROM']
         assert sorted(smtp_instances[0].to_addrs) == sorted(mail_to + mail_cc + mail_bcc)
 
@@ -551,8 +551,8 @@ def make_mailserver_setting(organization_id: str, smtp_server: dict):
         "SMTP_PORT": None,
         "SEND_FROM": None,
         "SEND_NAME": None,
-        "REPLAY_TO": None,
-        "REPLAY_NAME": None,
+        "REPLY_TO": None,
+        "REPLY_NAME": None,
         "ENVELOPE_FROM": None,
         "SSL_ENABLE": 0,
         "START_TLS_ENABLE": 0,
@@ -573,8 +573,8 @@ def make_mailserver_setting(organization_id: str, smtp_server: dict):
                         SMTP_PORT,
                         SEND_FROM,
                         SEND_NAME,
-                        REPLAY_TO,
-                        REPLAY_NAME,
+                        REPLY_TO,
+                        REPLY_NAME,
                         ENVELOPE_FROM,
                         SSL_ENABLE,
                         START_TLS_ENABLE,
@@ -588,8 +588,8 @@ def make_mailserver_setting(organization_id: str, smtp_server: dict):
                         %(SMTP_PORT)s,
                         %(SEND_FROM)s,
                         %(SEND_NAME)s,
-                        %(REPLAY_TO)s,
-                        %(REPLAY_NAME)s,
+                        %(REPLY_TO)s,
+                        %(REPLY_NAME)s,
                         %(ENVELOPE_FROM)s,
                         %(SSL_ENABLE)s,
                         %(START_TLS_ENABLE)s,
@@ -612,7 +612,7 @@ def make_notification_mail(organization_id: str, workspace_id: str, mails_to: li
         "NOTIFICATION_ID": notification_id,
         "DESTINATION_KIND": const.DESTINATION_KIND_MAIL,
         "DESTINATION_INFORMATIONS": encrypt.encrypt_str(json.dumps(
-                [{"address_header": const.MAIL_HEADER_TO, "email": mail} for mail in mails_to] + 
+                [{"address_header": const.MAIL_HEADER_TO, "email": mail} for mail in mails_to] +
                 [{"address_header": const.MAIL_HEADER_CC, "email": mail} for mail in mails_cc] +
                 [{"address_header": const.MAIL_HEADER_BCC, "email": mail} for mail in mails_bcc]
             )),
@@ -723,7 +723,7 @@ class mocked_smtp_base():
     @classmethod
     def add_instances(cls, instance):
         cls.instances.append(instance)
-    
+
     @classmethod
     def get_instances(cls):
         return cls.instances
