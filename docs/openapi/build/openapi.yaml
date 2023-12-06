@@ -2129,8 +2129,8 @@ paths:
                     smtp_port: '587'
                     send_from: sender@example.com
                     send_name: sender
-                    replay_to: replay@example.com
-                    replay_name: replay
+                    reply_to: replay@example.com
+                    reply_name: replay
                     envelope_from: envelope@example.com
                     ssl_enable: false
                     start_tls_enable: true
@@ -2168,8 +2168,8 @@ paths:
                 smtp_port: '587'
                 send_from: sender@example.com
                 send_name: sender
-                replay_to: replay@example.com
-                replay_name: replay
+                reply_to: replay@example.com
+                reply_name: replay
                 envelope_from: envelope@example.com
                 ssl_enable: false
                 start_tls_enable: true
@@ -4110,10 +4110,10 @@ components:
         send_name:
           type: string
           description: The display name of the sender
-        replay_to:
+        reply_to:
           type: string
           description: Reply-to email address
-        replay_name:
+        reply_name:
           type: string
           description: Reply-to display name
         envelope_from:
@@ -4164,10 +4164,10 @@ components:
         send_name:
           type: string
           description: The display name of the sender
-        replay_to:
+        reply_to:
           type: string
           description: Reply-to email address
-        replay_name:
+        reply_name:
           type: string
           description: Reply-to display name
         envelope_from:
