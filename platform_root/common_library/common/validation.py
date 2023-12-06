@@ -1648,7 +1648,7 @@ def validate_ssl_enable(ssl_enable):
         result: Validation result
     """
 
-    # swaggerでboolの判定は行っているので、何もチェックする必要が無い
+    # swaggerでboolの判定は行っているので、何もチェックしない
     # Since bool is determined by swagger, nothing is checked.
     return result(True)
 
@@ -1663,7 +1663,7 @@ def validate_start_tls_enable(start_tls_enable):
         result: Validation result
     """
 
-    # swaggerでboolの判定は行っているので、何もチェックする必要が無い
+    # swaggerでboolの判定は行っているので、何もチェックしない
     # Since bool is determined by swagger, nothing is checked.
     return result(True)
 
