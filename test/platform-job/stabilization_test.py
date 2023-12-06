@@ -43,7 +43,7 @@ def main():
             ws_id = testdata.ORGANIZATIONS[org_id]['workspace_id'][i%3]
             queue.append(make_notification_mail(
                 org_id,
-                ws_id, 
+                ws_id,
                 env.mail_to[:random.randrange(len(env.mail_to))+1],
                 env.mail_to[:random.randrange(len(env.mail_to))],
                 env.mail_to[:random.randrange(len(env.mail_to))],
@@ -66,8 +66,8 @@ def set_mail_server():
                         SMTP_PORT,
                         SEND_FROM,
                         SEND_NAME,
-                        REPLAY_TO,
-                        REPLAY_NAME,
+                        REPLY_TO,
+                        REPLY_NAME,
                         ENVELOPE_FROM,
                         SSL_ENABLE,
                         START_TLS_ENABLE,
@@ -81,8 +81,8 @@ def set_mail_server():
                         %(SMTP_PORT)s,
                         %(SEND_FROM)s,
                         %(SEND_NAME)s,
-                        %(REPLAY_TO)s,
-                        %(REPLAY_NAME)s,
+                        %(REPLY_TO)s,
+                        %(REPLY_NAME)s,
                         %(ENVELOPE_FROM)s,
                         %(SSL_ENABLE)s,
                         %(START_TLS_ENABLE)s,
@@ -172,7 +172,7 @@ def make_notification_mail(organization_id: str, workspace_id: str, mails_to: li
         "NOTIFICATION_ID": notification_id,
         "DESTINATION_KIND": const.DESTINATION_KIND_MAIL,
         "DESTINATION_INFORMATIONS": encrypt.encrypt_str(json.dumps(
-                [{"address_header": const.MAIL_HEADER_TO, "email": mail} for mail in mails_to] + 
+                [{"address_header": const.MAIL_HEADER_TO, "email": mail} for mail in mails_to] +
                 [{"address_header": const.MAIL_HEADER_CC, "email": mail} for mail in mails_cc] +
                 [{"address_header": const.MAIL_HEADER_BCC, "email": mail} for mail in mails_bcc]
             )),

@@ -27,10 +27,10 @@ properties:
   send_name:
     type: string
     description: The display name of the sender
-  replay_to:
+  reply_to:
     type: string
     description: Reply-to email address
-  replay_name:
+  reply_name:
     type: string
     description: Reply-to display name
   envelope_from:

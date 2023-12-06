@@ -96,8 +96,8 @@ def test_settings_mailserver_create(connexion_client):
         assert create_data["SMTP_PORT"] == int(tmp_json["smtp_port"]), "create mailserver"
         assert create_data["SEND_FROM"] == tmp_json["send_from"], "create mailserver"
         assert create_data["SEND_NAME"] == tmp_json["send_name"], "create mailserver"
-        assert create_data["REPLAY_TO"] == tmp_json["replay_to"], "create mailserver"
-        assert create_data["REPLAY_NAME"] == tmp_json["replay_name"], "create mailserver"
+        assert create_data["REPLY_TO"] == tmp_json["reply_to"], "create mailserver"
+        assert create_data["REPLY_NAME"] == tmp_json["reply_name"], "create mailserver"
         assert create_data["ENVELOPE_FROM"] == tmp_json["envelope_from"], "create mailserver"
         assert bool(create_data["SSL_ENABLE"]) == bool(tmp_json["ssl_enable"]), "create mailserver"
         assert bool(create_data["START_TLS_ENABLE"]) == bool(tmp_json["start_tls_enable"]), "create mailserver"
@@ -140,8 +140,8 @@ def test_settings_mailserver_create(connexion_client):
         assert update_data["SMTP_PORT"] == int(tmp_json["smtp_port"]), "update mailserver"
         assert update_data["SEND_FROM"] == tmp_json["send_from"], "update mailserver"
         assert update_data["SEND_NAME"] == tmp_json["send_name"], "update mailserver"
-        assert update_data["REPLAY_TO"] == tmp_json["replay_to"], "update mailserver"
-        assert update_data["REPLAY_NAME"] == tmp_json["replay_name"], "update mailserver"
+        assert update_data["REPLY_TO"] == tmp_json["reply_to"], "update mailserver"
+        assert update_data["REPLY_NAME"] == tmp_json["reply_name"], "update mailserver"
         assert update_data["ENVELOPE_FROM"] == tmp_json["envelope_from"], "update mailserver"
         assert bool(update_data["SSL_ENABLE"]) == bool(tmp_json["ssl_enable"]), "update mailserver"
         assert bool(update_data["START_TLS_ENABLE"]) == bool(tmp_json["start_tls_enable"]), "update mailserver"
@@ -296,25 +296,25 @@ def test_settings_mailserver_create(connexion_client):
         assert response.status_code == 400, "SEND_NAME numeric"
         assert response.status == "400 BAD REQUEST", "SEND_NAME numeric"
 
-        # REPLAY_TO
+        # REPLY_TO
         response = connexion_client.post(
             f"/api/{organization['organization_id']}/platform/settings/mailserver",
             content_type='application/json',
             headers=request_parameters.request_headers(organization["user_id"]),
-            json=__sample_update_data({"replay_to": 1}))
+            json=__sample_update_data({"reply_to": 1}))
 
-        assert response.status_code == 400, "REPLAY_TO numeric"
-        assert response.status == "400 BAD REQUEST", "REPLAY_TO numeric"
+        assert response.status_code == 400, "REPLY_TO numeric"
+        assert response.status == "400 BAD REQUEST", "REPLY_TO numeric"
 
-        # REPLAY_NAME
+        # REPLY_NAME
         response = connexion_client.post(
             f"/api/{organization['organization_id']}/platform/settings/mailserver",
             content_type='application/json',
             headers=request_parameters.request_headers(organization["user_id"]),
-            json=__sample_update_data({"replay_name": 1}))
+            json=__sample_update_data({"reply_name": 1}))
 
-        assert response.status_code == 400, "REPLAY_NAME numeric"
-        assert response.status == "400 BAD REQUEST", "REPLAY_NAME numeric"
+        assert response.status_code == 400, "REPLY_NAME numeric"
+        assert response.status == "400 BAD REQUEST", "REPLY_NAME numeric"
 
         # ENVELOPE_FROM
         response = connexion_client.post(
@@ -565,55 +565,55 @@ def test_mailserver_validate(connexion_client):
     assert validate.message_id == "400-00012", "create SMTP server validate SEND_NAME : max length + 1"
 
     #
-    # validate REPLAY_TO
+    # validate REPLY_TO
     #
     # validate : empty string
-    validate = validation.validate_replay_to("")
-    assert validate.ok, "create SMTP server validate REPLAY_TO : empty string"
+    validate = validation.validate_reply_to("")
+    assert validate.ok, "create SMTP server validate REPLY_TO : empty string"
 
     # validate : None
-    validate = validation.validate_replay_to(None)
-    assert validate.ok, "create SMTP server validate REPLAY_TO : None"
+    validate = validation.validate_reply_to(None)
+    assert validate.ok, "create SMTP server validate REPLY_TO : None"
 
     # validate : length
     tmp = "@example.com"
 
     # 本来なら文字数が最大と同じ値のためvaliate.ok==trueになるべきだが、その後のformatのチェックでエラーとなるためNG前提のassertとする
     # Although validate.ok==true should be set because the number of characters is the same as the maximum, the subsequent format check will result in an error, and therefore, the assert is assumed to be NG.
-    validate = validation.validate_replay_to("t".ljust(const.length_replay_to - len(tmp), "a") + tmp)
-    assert not validate.ok, "create SMTP server validate REPLAY_TO : max length"
-    assert validate.message_id == "400-00023", "create SMTP server validate REPLAY_TO : max length"
+    validate = validation.validate_reply_to("t".ljust(const.length_reply_to - len(tmp), "a") + tmp)
+    assert not validate.ok, "create SMTP server validate REPLY_TO : max length"
+    assert validate.message_id == "400-00023", "create SMTP server validate REPLY_TO : max length"
 
-    validate = validation.validate_replay_to("t".ljust(const.length_replay_to - len(tmp) + 1, "a") + tmp)
-    assert not validate.ok, "create SMTP server validate REPLAY_TO : max length + 1"
-    assert validate.message_id == "400-00012", "create SMTP server validate REPLAY_TO : max length + 1"
+    validate = validation.validate_reply_to("t".ljust(const.length_reply_to - len(tmp) + 1, "a") + tmp)
+    assert not validate.ok, "create SMTP server validate REPLY_TO : max length + 1"
+    assert validate.message_id == "400-00012", "create SMTP server validate REPLY_TO : max length + 1"
 
     # format
-    validate = validation.validate_replay_to("test@example.com")
-    assert validate.ok, "create SMTP server validate REPLAY_TO : format"
+    validate = validation.validate_reply_to("test@example.com")
+    assert validate.ok, "create SMTP server validate REPLY_TO : format"
 
-    validate = validation.validate_replay_to("test@@example.com")
-    assert not validate.ok, "create SMTP server validate REPLAY_TO : invalid format"
-    assert validate.message_id == "400-00023", "create SMTP server validate REPLAY_TO : invalid format"
+    validate = validation.validate_reply_to("test@@example.com")
+    assert not validate.ok, "create SMTP server validate REPLY_TO : invalid format"
+    assert validate.message_id == "400-00023", "create SMTP server validate REPLY_TO : invalid format"
 
     #
-    # validate REPLAY_NAME
+    # validate REPLY_NAME
     #
     # validate : empty string
-    validate = validation.validate_replay_name("")
-    assert validate.ok, "create SMTP server validate REPLAY_NAME : empty string"
+    validate = validation.validate_reply_name("")
+    assert validate.ok, "create SMTP server validate REPLY_NAME : empty string"
 
     # validate : None
-    validate = validation.validate_replay_name(None)
-    assert validate.ok, "create SMTP server validate REPLAY_NAME : None"
+    validate = validation.validate_reply_name(None)
+    assert validate.ok, "create SMTP server validate REPLY_NAME : None"
 
     # validate : length
-    validate = validation.validate_replay_name("t".ljust(const.length_replay_name, "a"))
-    assert validate.ok, "create SMTP server validate REPLAY_NAME : max length"
+    validate = validation.validate_reply_name("t".ljust(const.length_reply_name, "a"))
+    assert validate.ok, "create SMTP server validate REPLY_NAME : max length"
 
-    validate = validation.validate_replay_name("t".ljust(const.length_replay_name + 1, "a"))
-    assert not validate.ok, "create SMTP server validate REPLAY_NAME : max length + 1"
-    assert validate.message_id == "400-00012", "create SMTP server validate REPLAY_NAME : max length + 1"
+    validate = validation.validate_reply_name("t".ljust(const.length_reply_name + 1, "a"))
+    assert not validate.ok, "create SMTP server validate REPLY_NAME : max length + 1"
+    assert validate.message_id == "400-00012", "create SMTP server validate REPLY_NAME : max length + 1"
 
     #
     # validate ENVELOPE_FROM
@@ -738,8 +738,8 @@ def __sample_create_data(update={}):
             "smtp_port": "2525",
             "send_from": "send@example.com",
             "send_name": "送信元名",
-            "replay_to": "replay-to@example.com",
-            "replay_name": "返信先名",
+            "reply_to": "replay-to@example.com",
+            "reply_name": "返信先名",
             "envelope_from": "envelope-from@example.com",
             "ssl_enable": True,
             "start_tls_enable": False,
@@ -758,8 +758,8 @@ def __sample_update_data(update={}):
             "smtp_port": "2526",
             "send_from": "send@update.example.com",
             "send_name": "更新後送信元名",
-            "replay_to": "replay-to@update.example.com",
-            "replay_name": "更新後返信先名",
+            "reply_to": "replay-to@update.example.com",
+            "reply_name": "更新後返信先名",
             "envelope_from": "envelope-from@update.example.com",
             "ssl_enable": False,
             "start_tls_enable": True,

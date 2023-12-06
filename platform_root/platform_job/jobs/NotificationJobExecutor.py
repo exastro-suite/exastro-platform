@@ -170,8 +170,8 @@ class NotificationJobExecutor(BaseJobExecutor):
             email_message['To'] = ",".join([dest['email'] for dest in destination_informations if dest['address_header'] == const.MAIL_HEADER_TO])
             email_message['Cc'] = ",".join([dest['email'] for dest in destination_informations if dest['address_header'] == const.MAIL_HEADER_CC])
             email_message['Bcc'] = ",".join([dest['email'] for dest in destination_informations if dest['address_header'] == const.MAIL_HEADER_BCC])
-            if not common.is_none_or_empty_string(smtp_conn_info['REPLAY_TO']):
-                email_message['reply-to'] = formataddr((smtp_conn_info['REPLAY_NAME'], smtp_conn_info['REPLAY_TO']))
+            if not common.is_none_or_empty_string(smtp_conn_info['REPLY_TO']):
+                email_message['reply-to'] = formataddr((smtp_conn_info['REPLY_NAME'], smtp_conn_info['REPLY_TO']))
 
             envelope_from = smtp_conn_info['ENVELOPE_FROM'] if not common.is_none_or_empty_string(smtp_conn_info['ENVELOPE_FROM']) else smtp_conn_info['SEND_FROM']
             envelope_to = [dest['email'] for dest in destination_informations]

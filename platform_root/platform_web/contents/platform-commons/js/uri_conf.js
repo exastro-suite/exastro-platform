@@ -95,8 +95,15 @@ var api_conf = {
         },
         "maintenance-mode-setting": {
             "get": "/api/{organization_id}/platform/maintenance-mode-setting"
-        }
-    }
+        },
+        "settings": {
+            "mailserver": {
+                "get": "/api/{organization_id}/platform/settings/mailserver",
+                "post": "/api/{organization_id}/platform/settings/mailserver",
+                "delete": "/api/{organization_id}/platform/settings/mailserver",
+            },
+        },
+}
 }
 
 var location_conf = {
@@ -109,7 +116,7 @@ var location_conf = {
             "ita": "/{organization_id}/workspaces/{workspace_id}/ita/",
             "settings": {
                 "notifications": {
-                    "workspaces": "/{organization_id}/platform/settings/notifications",
+                    "workspaces": "/{organization_id}/platform/workspaces/_settings/notifications",
                     "new" : "/{organization_id}/platform/workspaces/{workspace_id}/settings/notifications/_new",
                     "list": "/{organization_id}/platform/workspaces/{workspace_id}/settings/notifications",
                     "detail": "/{organization_id}/platform/workspaces/{workspace_id}/settings/notifications/{destination_id}",
@@ -164,6 +171,9 @@ var location_conf = {
         },
         "keycloak": {
             "console": "/auth/admin/master/console",
-        }
+        },
+        "settings": {
+            "mailserver": "/{organization_id}/platform/settings/mailserver",
+        },
     }
 }
