@@ -40,6 +40,9 @@ def encrypt_str(strdata):
     Returns:
         str: Encrypted string - 暗号化した文字列
     """
+    if strdata is None:
+        return None
+
     iv = get_random_bytes(IV_LENGTH)
     aes = AES.new(ENCRYPT_KEY, AES.MODE_CBC, iv)
     encdata = iv + aes.encrypt(Padding.pad(strdata.encode(), AES_PAD_BLOCK_SIZE, AES_PAD_STYLE))
@@ -55,6 +58,9 @@ def decrypt_str(encstrdata):
     Returns:
         str: Decrypted string - 復号した文字列
     """
+    if encstrdata is None:
+        return None
+
     encdata = base64.b64decode(encstrdata.encode())
     iv = encdata[:IV_LENGTH]
     aes = AES.new(ENCRYPT_KEY, AES.MODE_CBC, iv)
