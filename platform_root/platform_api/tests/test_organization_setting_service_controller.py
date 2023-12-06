@@ -19,6 +19,8 @@ from pymysql.cursors import Cursor
 from tests.common import request_parameters, test_common
 from common_library.common import const, validation
 from common_library.common.libs import queries_bl_mailserver
+from libs import queries_mailserver
+
 
 logger = logging.getLogger(__name__)
 
@@ -33,6 +35,17 @@ def test_settings_mailserver_get(connexion_client):
     organization = test_common.create_organization(connexion_client)
 
     with test_common.requsts_mocker_default():
+        #
+        # validate get id not found
+        #
+        response = connexion_client.get(
+            f"/api/{organization['organization_id']}/platform/settings/mailserver/not_id",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization['user_id']))
+
+        assert response.status_code == 404, "get settings mailserver response error route"
+
+
         #
         # validate get normal
         #
@@ -125,6 +138,18 @@ def test_setting_mailserver_delete(connexion_client):
             headers=request_parameters.request_headers(organization['user_id']))
 
         assert response.status_code == 200, "normal route"
+
+    with test_common.requsts_mocker_default(), \
+            test_common.pymysql_execute_raise_exception_mocker(queries_mailserver.SQL_DELETE_SMTP_SERVER, Exception("DB Error Test")):
+        #
+        # DB error route
+        #
+        response = connexion_client.delete(
+            f"/api/{organization['organization_id']}/platform/settings/mailserver",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization['user_id']))
+
+        assert response.status_code == 500, "DB error route"
 
         pass
 
