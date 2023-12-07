@@ -71,8 +71,11 @@ $(function(){
             delete_destination();
         });
         if(CommonAuth.hasAuthority(RolesCommon.ORG_AUTH_UPDATE)) {
+            $('#button_register').prop('disabled', false);
             $('#button_delete').prop('disabled', false);
         } else {
+            $('#button_register').prop('disabled', true);
+            $('#button_register').css('cursor', 'not-allowed');
             $('#button_delete').prop('disabled', true);
             $('#button_delete').css('cursor', 'not-allowed');
         }
@@ -93,7 +96,6 @@ $(function(){
         if (row.authentication_enable){
             $("#form_authentication_user").val(row.authentication_user);
         }
-        $('#form_authentication_enable').attr("checked", "checked").change();
 
         //
         // register button
@@ -153,6 +155,16 @@ $(function(){
             }
             $('#button_expand').prop('disabled',false);
         });
+
+        $('#form_authentication_enable').attr("checked", "checked").change();
+
+        if (fn.cv(row.send_name, '', false) !== "" ||
+            fn.cv(row.reply_to, '', false) !== "" ||
+            fn.cv(row.reply_name, '', false) !== "" ||
+            fn.cv(row.envelope_from, '', false) !== ""){
+            $('#button_expand').click();
+        }
+
     }
 
     function delete_destination() {
