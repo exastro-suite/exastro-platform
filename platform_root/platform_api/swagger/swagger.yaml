@@ -172,6 +172,12 @@ paths:
                 value:
                   name: name of org1
                   enabled: true
+                  optionsIta:
+                    drivers:
+                      terraform_cloud_ep: true
+                      terraform_cli: true
+                      ci_cd: true
+                      oase: true
         required: true
       responses:
         "200":
@@ -3198,7 +3204,7 @@ components:
           type: object
           description: Organization Add Json Parameter (json of KeyCloak)
         optionsIta:
-          $ref: '#/components/schemas/organizationCreate_optionsIta'
+          $ref: '#/components/schemas/apiplatformorganizationsorganization_id_optionsIta'
     organizationUserCreate:
       title: organization-user is a definition of User resource.
       required:
@@ -4084,6 +4090,25 @@ components:
         properties:
           data:
             $ref: '#/components/schemas/organization'
+    apiplatformorganizationsorganization_id_optionsIta_drivers:
+      type: object
+      properties:
+        terraform_cloud_ep:
+          type: boolean
+        terraform_cli:
+          type: boolean
+        ci_cd:
+          type: boolean
+        oase:
+          type: boolean
+      description: "terraform_cloud_ep: Terraform-Cloud/EP driver <br/>terraform_cli:\
+        \ Terraform-CLI driver, <br/>ci_cd: CI/CD for IaC, <br/>oase: OASE, "
+    apiplatformorganizationsorganization_id_optionsIta:
+      type: object
+      properties:
+        drivers:
+          $ref: '#/components/schemas/apiplatformorganizationsorganization_id_optionsIta_drivers'
+      description: Organization Add Json Parameter (json of exastro-it-automation)
     organizations_organization_id_body:
       oneOf:
       - title: organization is a definition of Organization resource.
@@ -4099,6 +4124,8 @@ components:
             type: boolean
             description: organization enabled(true) or disabled(false)
             example: true
+          optionsIta:
+            $ref: '#/components/schemas/apiplatformorganizationsorganization_id_optionsIta'
     inline_response_200_2:
       allOf:
       - $ref: '#/components/schemas/responseOk'
@@ -4280,20 +4307,6 @@ components:
         id:
           type: string
           example: plan-1
-    organizationCreate_optionsIta:
-      type: object
-      properties:
-        no_install_driver:
-          type: array
-          items:
-            type: string
-            description: "terraform_cloud_ep: Terraform-Cloud/EPドライバ, <br/>terraform_cli:\
-              \ Terraform-CLIドライバ, <br/>ci_cd: CI/CD for IaC "
-            enum:
-            - terraform_cloud_ep
-            - terraform_cli
-            - ci_cd
-      description: Organization Add Json Parameter (json of exastro-it-automation)
     organizationSetting_token:
       type: object
       properties:
