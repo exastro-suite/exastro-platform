@@ -17,6 +17,8 @@ SELECT
 *
 FROM
 M_SMTP_SERVER
+WHERE
+SMTP_ID = %(smtp_id)s
 ;
 """
 
@@ -28,8 +30,8 @@ SMTP_HOST,
 SMTP_PORT,
 SEND_FROM,
 SEND_NAME,
-REPLAY_TO,
-REPLAY_NAME,
+REPLY_TO,
+REPLY_NAME,
 ENVELOPE_FROM,
 SSL_ENABLE,
 START_TLS_ENABLE,
@@ -45,8 +47,8 @@ VALUES (
 %(smtp_port)s,
 %(send_from)s,
 %(send_name)s,
-%(replay_to)s,
-%(replay_name)s,
+%(reply_to)s,
+%(reply_name)s,
 %(envelope_from)s,
 %(ssl_enable)s,
 %(start_tls_enable)s,
@@ -59,22 +61,22 @@ VALUES (
 ;
 """
 
-SQL_UPDATE_QUERY = """
+SQL_UPDATE_MAILSERVER = """
 UPDATE M_SMTP_SERVER
 SET
 SMTP_HOST = %(smtp_host)s,
 SMTP_PORT = %(smtp_port)s,
 SEND_FROM = %(send_from)s,
 SEND_NAME = %(send_name)s,
-REPLAY_TO = %(replay_to)s,
-REPLAY_NAME = %(replay_name)s,
+REPLY_TO = %(reply_to)s,
+REPLY_NAME = %(reply_name)s,
 ENVELOPE_FROM = %(envelope_from)s,
 SSL_ENABLE = %(ssl_enable)s,
 START_TLS_ENABLE = %(start_tls_enable)s,
 AUTHENTICATION_ENABLE = %(authentication_enable)s,
 AUTHENTICATION_USER = %(authentication_user)s,
 AUTHENTICATION_PASSWORD = %(authentication_password)s,
-LAST_UPDATE_USER` = %(last_update_user)s
+LAST_UPDATE_USER = %(last_update_user)s
 WHERE
 SMTP_ID = %(smtp_id)s
 ;

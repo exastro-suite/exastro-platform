@@ -52,7 +52,7 @@ tags:
   description: メンテナンスモードに関する操作
 - name: NotificationService
   description: 通知機能に関する操作
-- name: MailserverService
+- name: MailserverSettings
   description: メールサーバーに関する操作
 - name: InternalCommonService
   description: 共通(内部用)
@@ -172,6 +172,12 @@ paths:
                 value:
                   name: name of org1
                   enabled: true
+                  optionsIta:
+                    drivers:
+                      terraform_cloud_ep: true
+                      terraform_cli: true
+                      ci_cd: true
+                      oase: true
         required: true
       responses:
         "200":
@@ -2098,7 +2104,7 @@ paths:
   /api/{organization_id}/platform/settings/mailserver:
     get:
       tags:
-      - MailserverService
+      - MailserverSettings
       summary: Returns of settings Mailserver
       operationId: settings_mailserver_get
       parameters:
@@ -2116,16 +2122,36 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/inline_response_200_23'
+              example:
+                value:
+                  result: 200
+                  message: SUCCESS
+                  ts: 2023-11-02T05:36:41.258Z
+                  data:
+                    smtp_host: smtp.host
+                    smtp_port: "587"
+                    send_from: sender@example.com
+                    send_name: sender
+                    reply_to: replay@example.com
+                    reply_name: replay
+                    envelope_from: envelope@example.com
+                    ssl_enable: false
+                    start_tls_enable: true
+                    authentication_enable: false
+                    create_timestamp: 2023-11-02T05:36:41.258Z
+                    create_user: string
+                    last_update_timestamp: 2023-11-02T05:36:41.258Z
+                    last_update_user: string
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/runtimeError'
-      x-openapi-router-controller: controllers.mailserver_service_controller
+      x-openapi-router-controller: controllers.organization_setting_service_controller
     post:
       tags:
-      - MailserverService
+      - MailserverSettings
       summary: Create creates an settings mailserver
       operationId: settings_mailserver_create
       parameters:
@@ -2141,6 +2167,18 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/settingsMailserverCreate'
+            example:
+              value:
+                smtp_host: smtp.host
+                smtp_port: "587"
+                send_from: sender@example.com
+                send_name: sender
+                reply_to: replay@example.com
+                reply_name: replay
+                envelope_from: envelope@example.com
+                ssl_enable: false
+                start_tls_enable: true
+                authentication_enable: false
         required: true
       responses:
         "200":
@@ -2155,12 +2193,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/runtimeError'
-      x-openapi-router-controller: controllers.mailserver_service_controller
+      x-openapi-router-controller: controllers.organization_setting_service_controller
     delete:
       tags:
-      - MailserverService
+      - MailserverSettings
       summary: Delete deletes an mailserver
-      operationId: mailserver_delete
+      operationId: setting_mailserver_delete
       parameters:
       - name: organization_id
         in: path
@@ -2182,7 +2220,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/runtimeError'
-      x-openapi-router-controller: controllers.mailserver_service_controller
+      x-openapi-router-controller: controllers.organization_setting_service_controller
   /internal-api/alive:
     get:
       tags:
@@ -3166,7 +3204,7 @@ components:
           type: object
           description: Organization Add Json Parameter (json of KeyCloak)
         optionsIta:
-          $ref: '#/components/schemas/organizationCreate_optionsIta'
+          $ref: '#/components/schemas/apiplatformorganizationsorganization_id_optionsIta'
     organizationUserCreate:
       title: organization-user is a definition of User resource.
       required:
@@ -3953,45 +3991,45 @@ components:
     settingsMailserverCreate:
       title: mailserver is a mailserver of mailserver resource.
       required:
-      - SEND_FROM
-      - SMTP_HOST
-      - SMTP_PORT
+      - send_from
+      - smtp_host
+      - smtp_port
       type: object
       properties:
-        SMTP_HOST:
+        smtp_host:
           type: string
-          description: Outgoing Server Host
-        SMTP_PORT:
+          description: SMTP Server Host
+        smtp_port:
           type: string
-          description: Outgoing server port number
-        SEND_FROM:
+          description: SMTP server port number
+        send_from:
           type: string
           description: Sender's email address
-        SEND_NAME:
+        send_name:
           type: string
           description: The display name of the sender
-        REPLAY_TO:
+        reply_to:
           type: string
           description: Reply-to email address
-        REPLAY_NAME:
+        reply_name:
           type: string
           description: Reply-to display name
-        ENVELOPE_FROM:
+        envelope_from:
           type: string
-          description: Sender's email address
-        SSL_ENABLE:
+          description: Envelope from email address
+        ssl_enable:
           type: boolean
-          description: SSL on/off
-        START_TLS_ENABLE:
+          description: SSL enable
+        start_tls_enable:
           type: boolean
-          description: StartTLS on/off
-        AUTHENTICATION_ENABLE:
+          description: StartTLS enable
+        authentication_enable:
           type: boolean
-          description: Certified or not
-        AUTHENTICATION_USER:
+          description: Authentication enable
+        authentication_user:
           type: string
-          description: Authenticated users
-        AUTHENTICATION_PASSWORD:
+          description: Authentication users
+        authentication_password:
           type: string
           description: Authentication password
     settingsMailserverList:
@@ -4008,43 +4046,39 @@ components:
       title: mailserver is a definition of Mailserver resource.
       type: object
       properties:
-        SMTP_HOST:
+        smtp_host:
           type: string
-          description: Outgoing Server Host
-        SMTP_PORT:
+          description: SMTP Server Host
+        smtp_port:
           type: string
-          description: Outgoing server port number
-          example: "25"
-        SEND_FROM:
+          description: SMTP server port number
+        send_from:
           type: string
           description: Sender's email address
-        SEND_NAME:
+        send_name:
           type: string
           description: The display name of the sender
-        REPLAY_TO:
+        reply_to:
           type: string
           description: Reply-to email address
-        REPLAY_NAME:
+        reply_name:
           type: string
           description: Reply-to display name
-        ENVELOPE_FROM:
+        envelope_from:
           type: string
-          description: Sender's email address
-        SSL_ENABLE:
+          description: Envelope from email address
+        ssl_enable:
           type: boolean
-          description: SSL on/off
-        START_TLS_ENABLE:
+          description: SSL enable
+        start_tls_enable:
           type: boolean
-          description: StartTLS on/off
-        AUTHENTICATION_ENABLE:
+          description: StartTLS enable
+        authentication_enable:
           type: boolean
-          description: Certified or not
-        AUTHENTICATION_USER:
+          description: Authentication enable
+        authentication_user:
           type: string
-          description: Authenticated users
-        AUTHENTICATION_PASSWORD:
-          type: string
-          description: Authentication password
+          description: Authentication users
     inline_response_200:
       allOf:
       - $ref: '#/components/schemas/responseOk'
@@ -4056,6 +4090,25 @@ components:
         properties:
           data:
             $ref: '#/components/schemas/organization'
+    apiplatformorganizationsorganization_id_optionsIta_drivers:
+      type: object
+      properties:
+        terraform_cloud_ep:
+          type: boolean
+        terraform_cli:
+          type: boolean
+        ci_cd:
+          type: boolean
+        oase:
+          type: boolean
+      description: "terraform_cloud_ep: Terraform-Cloud/EP driver <br/>terraform_cli:\
+        \ Terraform-CLI driver, <br/>ci_cd: CI/CD for IaC, <br/>oase: OASE, "
+    apiplatformorganizationsorganization_id_optionsIta:
+      type: object
+      properties:
+        drivers:
+          $ref: '#/components/schemas/apiplatformorganizationsorganization_id_optionsIta_drivers'
+      description: Organization Add Json Parameter (json of exastro-it-automation)
     organizations_organization_id_body:
       oneOf:
       - title: organization is a definition of Organization resource.
@@ -4071,6 +4124,8 @@ components:
             type: boolean
             description: organization enabled(true) or disabled(false)
             example: true
+          optionsIta:
+            $ref: '#/components/schemas/apiplatformorganizationsorganization_id_optionsIta'
     inline_response_200_2:
       allOf:
       - $ref: '#/components/schemas/responseOk'
@@ -4252,20 +4307,6 @@ components:
         id:
           type: string
           example: plan-1
-    organizationCreate_optionsIta:
-      type: object
-      properties:
-        no_install_driver:
-          type: array
-          items:
-            type: string
-            description: "terraform_cloud_ep: Terraform-Cloud/EPドライバ, <br/>terraform_cli:\
-              \ Terraform-CLIドライバ, <br/>ci_cd: CI/CD for IaC "
-            enum:
-            - terraform_cloud_ep
-            - terraform_cli
-            - ci_cd
-      description: Organization Add Json Parameter (json of exastro-it-automation)
     organizationSetting_token:
       type: object
       properties:

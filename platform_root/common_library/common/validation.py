@@ -25,6 +25,7 @@ MSG_FUNCTION_ID = "00"
 RE_ID_USABLE_CHARACTERS = r'[a-zA-Z0-9_-]'
 RE_ID_USABLE_FIRST_CHARACTER = r'[a-zA-Z]'
 RE_EMAIL_USABLE_CHARACTERS = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
+RE_HOST_CHARACTERS = r'^[a-zA-Z0-9-.]+$'
 
 ORG_RESERVED_WORDS = [
     {"text": "master", "re": r"^master$"},
@@ -1374,3 +1375,405 @@ def validate_notification_message(message):
 
     return result(True)
 
+
+def validate_mailserver(body):
+    """validate mailserver
+
+    Args:
+        body (dict): json
+
+    Returns:
+        result: Validation result
+    """
+
+    # 以下のパターンはswaggerで弾くので、チェック不要
+    # ・bodyの型がobject(dict)以外
+    # ・bodyがNone
+    # The following patterns are played by swagger, so no need to check
+    # ・The type of body is other than object (dict).
+    # ・body is None
+    return result(True)
+
+
+def validate_smtp_host(host):
+    """validate smtp host
+
+    Args:
+        host (str): host
+
+    Returns:
+        result: Validation result
+    """
+
+    # Noneの場合はswaggerで弾かれるためチェック不要
+    # If None, it is played by swagger and does not need to be checked.
+    if host == "":
+        return result(
+            False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
+            multi_lang.get_text('000-00187', "SMTPサーバーホスト")
+        )
+
+    if len(host) > const.length_smtp_host:
+        return result(
+            False, 400, '400-{}012'.format(MSG_FUNCTION_ID), '指定可能な文字数を超えています。(項目:{0},最大文字数:{1})',
+            multi_lang.get_text('000-00187', "SMTPサーバーホスト"),
+            str(const.length_smtp_host)
+        )
+
+    if not re.match(RE_HOST_CHARACTERS, host):
+        return result(
+            False, 400, '400-{}028'.format(MSG_FUNCTION_ID), 'ホストの形式に誤りがあります。({0})',
+            multi_lang.get_text('000-00187', "SMTPサーバーホスト")
+        )
+
+    check_list = host.split(".")
+    # 「.」を用いたスプリットで要素数が2以上の配列が生成された場合、「.」が使用されていると判断し以下のチェックもおこなう
+    # 「.」 is used to generate an array with more than two elements, it is assumed that 「.」 is used and the following checks are also performed
+    if len(check_list) > 1:
+        for item in check_list:
+            length = len(item)
+            if (length < const.min_length_separated_by_period_mark or length > const.max_length_separated_by_period_mark):
+                return result(
+                    False, 400, '400-{}028'.format(MSG_FUNCTION_ID), 'ホストの形式に誤りがあります。({0})',
+                    multi_lang.get_text('000-00187', "SMTPサーバーホスト")
+                )
+
+    return result(True)
+
+
+def validate_smtp_port(port):
+    """validate smtp port
+
+    Args:
+        port (str): port
+
+    Returns:
+        result: Validation result
+    """
+
+    # Noneの場合はswaggerで弾かれるためチェック不要
+    # If None, it is played by swagger and does not need to be checked.
+    if port == "":
+        return result(
+            False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
+            multi_lang.get_text('000-00187', "送信サーバーポート番号")
+        )
+
+    if not port.isdecimal():
+        return result(
+            False, 400, '400-{}029'.format(MSG_FUNCTION_ID), '数値の変換に失敗しました。(項目:{0},対象の値:{1})',
+            multi_lang.get_text('000-00188', "SMTPサーバーポート"),
+            port
+        )
+
+    tmp = int(port)
+    if tmp < const.min_smtp_port or tmp > const.max_smtp_port:
+        return result(
+            False, 400, '400-{}030'.format(MSG_FUNCTION_ID),
+            '数値が最小値より小さいまたは最大値より大きな値となっています。(項目:{0},対象の値:{1},最小値:{2},最大値:{3})',
+            multi_lang.get_text('000-00188', "SMTPサーバーポート"),
+            port,
+            const.min_smtp_port,
+            const.max_smtp_port
+        )
+
+    return result(True)
+
+
+def validate_send_from(send_from):
+    """validate send from
+
+    Args:
+        send_from (str): send_from
+
+    Returns:
+        result: Validation result
+    """
+
+    # Noneの場合はswaggerで弾かれるためチェック不要
+    # If None, it is played by swagger and does not need to be checked.
+    if send_from == "":
+        return result(
+            False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
+            multi_lang.get_text('000-00189', "送信元メールアドレス")
+        )
+
+    if len(send_from) > const.length_send_from:
+        return result(
+            False, 400, '400-{}012'.format(MSG_FUNCTION_ID), '指定可能な文字数を超えています。(項目:{0},最大文字数:{1})',
+            multi_lang.get_text('000-00189', "送信元メールアドレス"),
+            str(const.length_send_from)
+        )
+
+    try:
+        # Check that the email address is valid.
+        validate_email(send_from, check_deliverability=False, allow_smtputf8=False, test_environment=True)
+
+    except EmailNotValidError:
+        return result(
+            False, 400, '400-{}023'.format(MSG_FUNCTION_ID), 'メールアドレスの形式に誤りがあります。({0})',
+            multi_lang.get_text('000-00189', "送信元メールアドレス")
+        )
+
+    return result(True)
+
+
+def validate_send_name(name):
+    """validate send name
+
+    Args:
+        name (str): name
+
+    Returns:
+        result: Validation result
+    """
+
+    # 未指定や空文字の場合は以降のチェックは実施しない
+    # If none or empty, subsequent checks are not performed.
+    if name is None or name == "":
+        return result(True)
+
+    if len(name) > const.length_send_name:
+        return result(
+            False, 400, '400-{}012'.format(MSG_FUNCTION_ID), '指定可能な文字数を超えています。(項目:{0},最大文字数:{1})',
+            multi_lang.get_text('000-00190', "送信元表示名"),
+            str(const.length_send_name)
+        )
+
+    return result(True)
+
+
+def validate_reply_to(reply_to):
+    """validate replay to
+
+    Args:
+        reply_to (str): reply_to
+
+    Returns:
+        result: Validation result
+    """
+
+    # 未指定や空文字の場合は以降のチェックは実施しない
+    # If none or empty, subsequent checks are not performed.
+    if reply_to is None or reply_to == "":
+        return result(True)
+
+    if len(reply_to) > const.length_reply_to:
+        return result(
+            False, 400, '400-{}012'.format(MSG_FUNCTION_ID), '指定可能な文字数を超えています。(項目:{0},最大文字数:{1})',
+            multi_lang.get_text('000-00191', "返信先メールアドレス"),
+            str(const.length_reply_to)
+        )
+
+    try:
+        # Check that the email address is valid.
+        validate_email(reply_to, check_deliverability=False, allow_smtputf8=False, test_environment=True)
+
+    except EmailNotValidError:
+        return result(
+            False, 400, '400-{}023'.format(MSG_FUNCTION_ID), 'メールアドレスの形式に誤りがあります。({0})',
+            multi_lang.get_text('000-00191', "返信先メールアドレス")
+        )
+
+    return result(True)
+
+
+def validate_reply_name(name):
+    """validate replay name
+
+    Args:
+        name (str): name
+
+    Returns:
+        result: Validation result
+    """
+
+    # 未指定や空文字の場合は以降のチェックは実施しない
+    # If none or empty, subsequent checks are not performed.
+    if name is None or name == "":
+        return result(True)
+
+    if len(name) > const.length_reply_name:
+        return result(
+            False, 400, '400-{}012'.format(MSG_FUNCTION_ID), '指定可能な文字数を超えています。(項目:{0},最大文字数:{1})',
+            multi_lang.get_text('000-00192', "返信先表示名"),
+            str(const.length_reply_name)
+        )
+
+    return result(True)
+
+
+def validate_envelope_from(envelope_from):
+    """validate envelope from
+
+    Args:
+        envelope_from (str): envelope_from
+
+    Returns:
+        result: Validation result
+    """
+
+    # 未指定や空文字の場合は以降のチェックは実施しない
+    # If none or empty, subsequent checks are not performed.
+    if envelope_from is None or envelope_from == "":
+        return result(True)
+
+    if len(envelope_from) > const.length_envelope_from:
+        return result(
+            False, 400, '400-{}012'.format(MSG_FUNCTION_ID), '指定可能な文字数を超えています。(項目:{0},最大文字数:{1})',
+            multi_lang.get_text('000-00193', "差出人メールアドレス"),
+            str(const.length_envelope_from)
+        )
+
+    try:
+        # Check that the email address is valid.
+        validate_email(envelope_from, check_deliverability=False, allow_smtputf8=False, test_environment=True)
+
+    except EmailNotValidError:
+        return result(
+            False, 400, '400-{}023'.format(MSG_FUNCTION_ID), 'メールアドレスの形式に誤りがあります。({0})',
+            multi_lang.get_text('000-00193', "差出人メールアドレス")
+        )
+
+    return result(True)
+
+
+def validate_ssl_enable(ssl_enable):
+    """validate ssl enable
+
+    Args:
+        ssl_enable (bool): ssl_enable
+
+    Returns:
+        result: Validation result
+    """
+
+    # swaggerでboolの判定は行っているので、何もチェックしない
+    # Since bool is determined by swagger, nothing is checked.
+    return result(True)
+
+
+def validate_start_tls_enable(start_tls_enable):
+    """validate start tls enable
+
+    Args:
+        start_tls_enable (bool): start_tls_enable
+
+    Returns:
+        result: Validation result
+    """
+
+    # swaggerでboolの判定は行っているので、何もチェックしない
+    # Since bool is determined by swagger, nothing is checked.
+    return result(True)
+
+
+def complex_validate_ssl_start_tls(ssl_enable, start_tls_enable):
+    """complex validate ssl, start_tls
+
+    Args:
+        ssl_enable (bool): ssl_enable
+        start_tls_enable (bool): start_tls_enable
+
+    Returns:
+        result: Validation result
+    """
+
+    # どちらもTrueの場合NGとする
+    # If both are True, NG is assumed.
+    if ssl_enable is True and start_tls_enable is True:
+        return result(
+            False, 400, '400-{}031'.format(MSG_FUNCTION_ID), 'SSLおよびStartTLSを同時に有効にすることはできません。'
+        )
+
+    return result(True)
+
+
+def validate_authentication_enable(authentication_enable):
+    """validate authentication enable
+
+    Args:
+        authentication_enable (bool): authentication_enable
+
+    Returns:
+        result: Validation result
+    """
+
+    # swaggerでboolの判定は行っているので、何もチェックしない
+    # Since bool is determined by swagger, nothing is checked.
+    return result(True)
+
+
+def validate_authentication_user(authentication_user):
+    """validate authentication_user
+
+    Args:
+        authentication_user (str): authentication_user
+
+    Returns:
+        result: Validation result
+    """
+
+    # 未指定や空文字の場合は以降のチェックは実施しない
+    # If none or empty, subsequent checks are not performed.
+    if authentication_user is None or authentication_user == "":
+        return result(True)
+
+    if len(authentication_user) > const.length_authentication_user:
+        return result(
+            False, 400, '400-{}012'.format(MSG_FUNCTION_ID), '指定可能な文字数を超えています。(項目:{0},最大文字数:{1})',
+            multi_lang.get_text('000-00197', "認証ユーザー"),
+            str(const.length_authentication_user)
+        )
+
+    return result(True)
+
+
+def validate_authentication_password(authentication_password):
+    """validate authentication_password
+
+    Args:
+        authentication_password (str): authentication_password
+
+    Returns:
+        result: Validation result
+    """
+
+    # 未指定や空文字の場合は以降のチェックは実施しない
+    # If none or empty, subsequent checks are not performed.
+    if authentication_password is None or authentication_password == "":
+        return result(True)
+
+    if len(authentication_password) > const.length_authentication_password:
+        return result(
+            False, 400, '400-{}012'.format(MSG_FUNCTION_ID), '指定可能な文字数を超えています。(項目:{0},最大文字数:{1})',
+            multi_lang.get_text('000-00198', "認証パスワード"),
+            str(const.length_authentication_password)
+        )
+
+    return result(True)
+
+
+def complex_validate_authentication_user_password(authentication_enable, authentication_user, authentication_password):
+    """complex validate authentication enable, user, passowrd
+
+    Args:
+        authentication_enable (bool): authentication_enable
+        authentication_user (str): authentication_user
+        authentication_password (str): authentication_password
+
+    Returns:
+        result: Validation result
+    """
+
+    authentication_user_check_condition = authentication_user is None or authentication_user == ""
+    authentication_password_check_condition = authentication_password is None or authentication_password == ""
+
+    # authentication_enableがtrueの場合、どちらも値の指定を必須とする
+    # If authentication_enable is true, both require a value to be specified
+    if authentication_enable and (authentication_user_check_condition or authentication_password_check_condition):
+        return result(
+            False, 400, '400-{}032'.format(MSG_FUNCTION_ID), '認証を有効にする場合、認証ユーザーおよび認証パスワードは必須となります。'
+        )
+
+    return result(True)

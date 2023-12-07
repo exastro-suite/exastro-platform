@@ -38,6 +38,15 @@ const DESTINATION_KIND_TEAMS = 'Teams';
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
+//   encryption method type port defatult value
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+const ENCRYPTION_METHOD_NONE = 25;
+const ENCRYPTION_METHOD_SSL = 465;
+const ENCRYPTION_METHOD_TLS = 587;
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
 //   Get Text Multi Language Support
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -261,14 +270,16 @@ function displayMenu(curent) {
             <li class="menuItem"><a class="menuLink" id="menu_account_management" href="#" style="display: none;">${getText("000-80006", "ユーザー管理")}</a></li>
             <li class="menuItem"><a class="menuLink" id="menu_role_management" href="#" style="display: none;">${getText("000-80007", "ロール管理")}</a></li>
             <li class="menuItem"><a class="menuLink" id="menu_settings_notifications" href="#">${getText("000-00183", "通知管理")}</a></li>
+            <li class="menuItem"><a class="menuLink" id="menu_settings_mailserver" href="#" style="display: none;">${getText("000-00183", "メール送信サーバー設定")}</a></li>
         `);
 
         $('#menu_workspace').attr('href', location_conf.href.workspaces.list.replace(/{organization_id}/g, CommonAuth.getRealm()));
         $('#menu_account_management').attr('href', location_conf.href.users.list.replace(/{organization_id}/g, CommonAuth.getRealm()));
         $('#menu_role_management').attr('href', location_conf.href.roles.list.replace(/{organization_id}/g, CommonAuth.getRealm()));
         $('#menu_settings_notifications').attr('href', location_conf.href.workspaces.settings.notifications.workspaces.replace(/{organization_id}/g, CommonAuth.getRealm()));
+        $('#menu_settings_mailserver').attr('href', location_conf.href.settings.mailserver.replace(/{organization_id}/g, CommonAuth.getRealm()));
 
-        if (CommonAuth.hasAuthority("_og-usr-mt")) {
+        if (CommonAuth.hasAuthority(RolesCommon.ORG_AUTH_USER_MAINTE)) {
             $("#menu_account_management").css("display", "");
         }
         let adminWorkspaces = CommonAuth.getAdminWorkspaces();
@@ -278,6 +289,9 @@ function displayMenu(curent) {
         ||  CommonAuth.hasAuthority(RolesCommon.ORG_AUTH_WS_ROLE_USER)
         ||  adminWorkspaces.length > 0) {
             $("#menu_role_management").css("display", "");
+        }
+        if (CommonAuth.hasAuthority(RolesCommon.ORG_AUTH_UPDATE)) {
+            $("#menu_settings_mailserver").css("display", "");
         }
     }
 
@@ -342,7 +356,13 @@ function call_api_promise(ajaxparam, api_description, succeed_httpcodes = [200])
                 let msg;
                 try {
                     msg = `status:[${jqXHR.status}]`
-                    msg += `\nmessage_id:[${jqXHR.responseJSON.result}]\n${jqXHR.responseJSON.message}`;
+                    if ('result' in jqXHR.responseJSON){
+                        msg += `\nmessage_id:[${jqXHR.responseJSON.result}]\n${jqXHR.responseJSON.message}`;
+                    }
+                    else if ('detail' in jqXHR.responseJSON)
+                    {
+                        msg += ` ${jqXHR.responseJSON.title}\n${jqXHR.responseJSON.detail}`;
+                    }
                 } catch(e) { }
 
                 console.log(`[ERROR] ${ajaxparam.type} ${ajaxparam.url}\n${msg}`);
@@ -1305,3 +1325,108 @@ const settings_notifications_common = {
     }
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//   Settings Mailserver Common
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+const settings_mailserver_common = {
+    validate: {
+        //
+        // validate smtp server host
+        //
+        smtp_host: function(smtp_host) {
+            if(smtp_host === "") {
+                return {
+                    "result": false,
+                    "message": getText("400-00011", "必須項目が不足しています。({0})", getText("000-00187", "SMTPサーバーホスト"))
+                }
+            } else if(smtp_host.replace(/^[a-zA-Z0-9-.]+$/g,"") !== "") {
+                return {
+                    "result": false,
+                    "message": getText("400-00017", "指定できない文字が含まれています。(項目:{0},指定可能な文字:{1})",
+                                    getText("000-00187", "SMTPサーバーホスト"),
+                                    getText("000-31002", "半角英数字・ハイフン・ピリオド")
+                                )
+                }
+            } else {
+                return {
+                    "result": true,
+                    "message": ""
+                }
+            }
+        },
+        //
+        // validate smtp server port
+        //
+        smtp_port: function(smtp_port) {
+            if(smtp_port === "") {
+                return {
+                    "result": false,
+                    "message": getText("400-00011", "必須項目が不足しています。({0})", getText("000-00188", "SMTPサーバーポート"))
+                }
+            } else if(smtp_port.replace(/[0-9]/g,"") !== "") {
+                return {
+                    "result": false,
+                    "message": getText("400-00017", "指定できない文字が含まれています。(項目:{0},指定可能な文字:{1})",
+                                    getText("000-00188", "SMTPサーバーポート"),
+                                    getText("000-31002", "半角数字")
+                                )
+                }
+            } else {
+                return {
+                    "result": true,
+                    "message": ""
+                }
+            }
+        },
+        //
+        // validate sender mail adrress
+        //
+        send_from: function(send_from) {
+            if(send_from === "") {
+                return {
+                    "result": false,
+                    "message": getText("400-00011", "必須項目が不足しています。({0})", getText("000-00189", "送信元メールアドレス"))
+                }
+            } else {
+                return {
+                    "result": true,
+                    "message": ""
+                }
+            }
+        },
+        //
+        // validate Authentication user
+        //
+        authentication_user: function(authentication_user) {
+            if(authentication_user === "") {
+                return {
+                    "result": false,
+                    "message": getText("400-00011", "必須項目が不足しています。({0})", getText("000-00197", "認証ユーザー"))
+                }
+            } else {
+                return {
+                    "result": true,
+                    "message": ""
+                }
+            }
+        },
+        //
+        // validate Authentication password
+        //
+        authentication_password: function(authentication_password) {
+            if(authentication_password === "") {
+                return {
+                    "result": false,
+                    "message": getText("400-00011", "必須項目が不足しています。({0})", getText("000-00198", "認証パスワード"))
+                }
+            } else {
+                return {
+                    "result": true,
+                    "message": ""
+                }
+            }
+        },
+    }
+}

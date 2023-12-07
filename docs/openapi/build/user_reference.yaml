@@ -1316,15 +1316,18 @@ components:
           type: object
           description: Organization Add Json Parameter (json of exastro-it-automation)
           properties:
-            no_install_driver:
-              type: array
-              items:
-                description: 'terraform_cloud_ep: Terraform-Cloud/EPドライバ, <br/>terraform_cli: Terraform-CLIドライバ, <br/>ci_cd: CI/CD for IaC '
-                type: string
-                enum:
-                  - terraform_cloud_ep
-                  - terraform_cli
-                  - ci_cd
+            drivers:
+              type: object
+              description: 'terraform_cloud_ep: Terraform-Cloud/EP driver <br/>terraform_cli: Terraform-CLI driver, <br/>ci_cd: CI/CD for IaC, <br/>oase: OASE, '
+              properties:
+                terraform_cloud_ep:
+                  type: boolean
+                terraform_cli:
+                  type: boolean
+                ci_cd:
+                  type: boolean
+                oase:
+                  type: boolean
       required:
         - id
     organizationUserCreate:
@@ -2244,46 +2247,46 @@ components:
       title: mailserver is a mailserver of mailserver resource.
       type: object
       properties:
-        SMTP_HOST:
+        smtp_host:
           type: string
-          description: Outgoing Server Host
-        SMTP_PORT:
+          description: SMTP Server Host
+        smtp_port:
           type: string
-          description: Outgoing server port number
-        SEND_FROM:
+          description: SMTP server port number
+        send_from:
           type: string
           description: Sender's email address
-        SEND_NAME:
+        send_name:
           type: string
           description: The display name of the sender
-        REPLAY_TO:
+        reply_to:
           type: string
           description: Reply-to email address
-        REPLAY_NAME:
+        reply_name:
           type: string
           description: Reply-to display name
-        ENVELOPE_FROM:
+        envelope_from:
           type: string
-          description: Sender's email address
-        SSL_ENABLE:
+          description: Envelope from email address
+        ssl_enable:
           type: boolean
-          description: SSL on/off
-        START_TLS_ENABLE:
+          description: SSL enable
+        start_tls_enable:
           type: boolean
-          description: StartTLS on/off
-        AUTHENTICATION_ENABLE:
+          description: StartTLS enable
+        authentication_enable:
           type: boolean
-          description: Certified or not
-        AUTHENTICATION_USER:
+          description: Authentication enable
+        authentication_user:
           type: string
-          description: Authenticated users
-        AUTHENTICATION_PASSWORD:
+          description: Authentication users
+        authentication_password:
           type: string
           description: Authentication password
       required:
-        - SMTP_HOST
-        - SMTP_PORT
-        - SEND_FROM
+        - smtp_host
+        - smtp_port
+        - send_from
     settingsMailserverList:
       title: mailserver is list of Mailserver resources.
       type: object
@@ -2298,43 +2301,39 @@ components:
       title: mailserver is a definition of Mailserver resource.
       type: object
       properties:
-        SMTP_HOST:
+        smtp_host:
           type: string
-          description: Outgoing Server Host
-        SMTP_PORT:
+          description: SMTP Server Host
+        smtp_port:
           type: string
-          example: 25
-          description: Outgoing server port number
-        SEND_FROM:
+          description: SMTP server port number
+        send_from:
           type: string
           description: Sender's email address
-        SEND_NAME:
+        send_name:
           type: string
           description: The display name of the sender
-        REPLAY_TO:
+        reply_to:
           type: string
           description: Reply-to email address
-        REPLAY_NAME:
+        reply_name:
           type: string
           description: Reply-to display name
-        ENVELOPE_FROM:
+        envelope_from:
           type: string
-          description: Sender's email address
-        SSL_ENABLE:
+          description: Envelope from email address
+        ssl_enable:
           type: boolean
-          description: SSL on/off
-        START_TLS_ENABLE:
+          description: SSL enable
+        start_tls_enable:
           type: boolean
-          description: StartTLS on/off
-        AUTHENTICATION_ENABLE:
+          description: StartTLS enable
+        authentication_enable:
           type: boolean
-          description: Certified or not
-        AUTHENTICATION_USER:
+          description: Authentication enable
+        authentication_user:
           type: string
-          description: Authenticated users
-        AUTHENTICATION_PASSWORD:
-          type: string
-          description: Authentication password
+          description: Authentication users
   securitySchemes:
     BearerAuth:
       description: Credentials or access token for API

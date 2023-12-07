@@ -12,6 +12,10 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
+SQL_QUERY_VERSION = """
+SELECT * FROM T_PLATFORM_VERSION WHERE ID = 1
+"""
+
 SQL_QUERY_HEALTH_CHECK = """
 SELECT 1
 """

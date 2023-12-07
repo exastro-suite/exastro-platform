@@ -12,36 +12,18 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-import logging
+SQL_QUERY_SMTP_SERVER = """
+SELECT *
+FROM M_SMTP_SERVER
+WHERE
+SMTP_ID = %(smtp_id)s
+"""
 
-logger = logging.getLogger(__name__)
-
-
-def test_settings_mailserver_get(connexion_client):
-    """test settings_mailserver_get
-
-    Args:
-        connexion_client (_type_): _description_
-    """
-
-    pass
-
-
-def test_settings_mailserver_create(connexion_client):
-    """test settings_notification_create
-
-    Args:
-        connexion_client (_type_): _description_
-    """
-
-    pass
-
-
-def test_mailserver_delete(connexion_client):
-    """test mailserver_delete
-
-    Args:
-        connexion_client (_type_): _description_
-    """
-
-    pass
+SQL_DELETE_SMTP_SERVER = """
+DELETE
+FROM
+M_SMTP_SERVER
+WHERE
+SMTP_ID = %(smtp_id)s
+;
+"""
