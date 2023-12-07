@@ -1316,15 +1316,18 @@ components:
           type: object
           description: Organization Add Json Parameter (json of exastro-it-automation)
           properties:
-            no_install_driver:
-              type: array
-              items:
-                description: 'terraform_cloud_ep: Terraform-Cloud/EPドライバ, <br/>terraform_cli: Terraform-CLIドライバ, <br/>ci_cd: CI/CD for IaC '
-                type: string
-                enum:
-                  - terraform_cloud_ep
-                  - terraform_cli
-                  - ci_cd
+            drivers:
+              type: object
+              description: 'terraform_cloud_ep: Terraform-Cloud/EP driver <br/>terraform_cli: Terraform-CLI driver, <br/>ci_cd: CI/CD for IaC, <br/>oase: OASE, '
+              properties:
+                terraform_cloud_ep:
+                  type: boolean
+                terraform_cli:
+                  type: boolean
+                ci_cd:
+                  type: boolean
+                oase:
+                  type: boolean
       required:
         - id
     organizationUserCreate:

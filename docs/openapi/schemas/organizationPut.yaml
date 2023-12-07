@@ -22,6 +22,26 @@ properties:
     type: boolean
     description: organization enabled(true) or disabled(false)
     example: true
+  optionsIta:
+    type: object
+    description: Organization Add Json Parameter (json of exastro-it-automation)
+    properties:
+      drivers:
+        type: object
+        description: "terraform_cloud_ep: Terraform-Cloud/EP driver
+          <br/>terraform_cli: Terraform-CLI driver,
+          <br/>ci_cd: CI/CD for IaC,
+          <br/>oase: OASE,
+          "
+        properties:
+          terraform_cloud_ep:
+            type: boolean
+          terraform_cli:
+            type: boolean
+          ci_cd:
+            type: boolean
+          oase:
+            type: boolean
 required:
   - name
   - enabled
