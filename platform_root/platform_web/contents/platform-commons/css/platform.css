@@ -221,3 +221,16 @@ html {
     scrollbar-width: thin!important;
     scrollbar-color: #999 #222;
 }
+
+.datarow.deleted {
+    color: #999;
+    font-weight: bold;
+}
+.datarow.deleted > td {
+    background-color: #CCC !important;
+}
+
+.datarow.appended {
+    color: #444;
+    font-weight: bold;
+}
