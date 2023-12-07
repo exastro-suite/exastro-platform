@@ -1,4 +1,4 @@
-#   Copyright 2022 NEC Corporation
+#   Copyright 2023 NEC Corporation
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -12,17 +12,18 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-# タスクの種類 / Type of job
-PROCESS_KIND_FORCE_UPDATE_STATUS = "_FORCE_UPDATE_STATUS"
+SQL_QUERY_SMTP_SERVER = """
+SELECT *
+FROM M_SMTP_SERVER
+WHERE
+SMTP_ID = %(smtp_id)s
+"""
 
-# user id
-SYSTEM_USER_ID = 'system'
-
-# oranization status
-ORG_STATUS_CREATE_COMPLETE = "Organization Create Complete"
-
-# unit test trace log
-LOG_RECONNECT = "Reconnect DB"
-
-# Version Text
-VERSION_TEXT_PATH = "/app/version"
+SQL_DELETE_SMTP_SERVER = """
+DELETE
+FROM
+M_SMTP_SERVER
+WHERE
+SMTP_ID = %(smtp_id)s
+;
+"""

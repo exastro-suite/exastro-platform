@@ -14,9 +14,9 @@
 
 get:
   tags:
-  - MailserverService
+  - MailserverSettings
   summary: Returns of settings Mailserver
-  x-openapi-router-controller: controllers.mailserver_service_controller
+  x-openapi-router-controller: controllers.organization_setting_service_controller
   operationId: settings_mailserver_get
   parameters:
   - name: organization_id
@@ -33,6 +33,8 @@ get:
             allOf:
               - $ref: '../schemas/responseOk.yaml'
               - $ref: '../schemas/settings.mailserverList.yaml'
+          example:
+              $ref: "../schemas/settings.mailserver.example.yaml"
     default:
       description: An unexpected error response.
       content:
@@ -41,9 +43,9 @@ get:
             $ref: '../schemas/runtimeError.yaml'
 post:
   tags:
-  - MailserverService
+  - MailserverSettings
   summary: Create creates an settings mailserver
-  x-openapi-router-controller: controllers.mailserver_service_controller
+  x-openapi-router-controller: controllers.organization_setting_service_controller
   operationId: settings_mailserver_create
   parameters:
   - name: organization_id
@@ -55,9 +57,9 @@ post:
     content:
       application/json:
         schema:
-          type: array
-          items:
-            $ref: '../schemas/settings.mailserver.create.yaml'
+          $ref: '../schemas/settings.mailserver.create.yaml'
+        example:
+          $ref: '../schemas/settings.mailserver.create.example.yaml'
     required: true
   responses:
     200:
@@ -80,10 +82,10 @@ post:
             $ref: '../schemas/runtimeError.yaml'
 delete:
   tags:
-  - MailserverService
+  - MailserverSettings
   summary: Delete deletes an mailserver
-  x-openapi-router-controller: controllers.mailserver_service_controller
-  operationId: mailserver_delete
+  x-openapi-router-controller: controllers.organization_setting_service_controller
+  operationId: setting_mailserver_delete
   parameters:
   - name: organization_id
     in: path

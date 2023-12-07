@@ -128,6 +128,7 @@ services:
       - NODE_EXTRA_CA_CERTS=/etc/ssl/certs/ca-certificates.crt
       - NODE_TLS_REJECT_UNAUTHORIZED=${NODE_TLS_REJECT_UNAUTHORIZED:-1}
       - NETWORK_ID=${NETWORK_ID:-}
+      - JOB_NOTIFICATION_SMTPS_SSL_VERIFY_ENABLED=FALSE
   platform-web:
     build:
       target: develop_build

@@ -60,14 +60,14 @@ SQL_ORGANIZATION_CREATE_TABLES = [
         SMTP_PORT		                INT,                                        -- 送信サーバーのポート番号
         SEND_FROM		                VARCHAR(255),                               -- 送信元のメールアドレス
         SEND_NAME		                VARCHAR(100),                               -- 送信元の表示名
-        REPLAY_TO		                VARCHAR(255),                               -- 返信先のメールアドレス
-        REPLAY_NAME		                VARCHAR(100),                               -- 返信先の表示名
+        REPLY_TO		                VARCHAR(255),                               -- 返信先のメールアドレス
+        REPLY_NAME		                VARCHAR(100),                               -- 返信先の表示名
         ENVELOPE_FROM		            VARCHAR(255),                               -- 差出人のメールアドレス
         SSL_ENABLE		                BOOLEAN DEFAULT 0,                          -- SSL有無（既定：FALSE）
         START_TLS_ENABLE		        BOOLEAN DEFAULT 0,                          -- StartTLS有無（既定：FALSE）
         AUTHENTICATION_ENABLE		    BOOLEAN DEFAULT 0,                          -- 認証有無（既定：FALSE）
         AUTHENTICATION_USER		        VARCHAR(255),                               -- 認証ユーザー
-        AUTHENTICATION_PASSWORD		    VARCHAR(255),                               -- 認証パスワード（暗号化）
+        AUTHENTICATION_PASSWORD		    VARCHAR(1024),                              -- 認証パスワード（暗号化）
         CREATE_TIMESTAMP		        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,    -- 作成日時
         CREATE_USER		                VARCHAR(40),                                -- 作成者
         LAST_UPDATE_TIMESTAMP		    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,    -- 最終更新日時

@@ -1,0 +1,239 @@
+<!--
+#   Copyright 2022 NEC Corporation
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+-->
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="format-detection" content="telephone=no,email=no,address=no">
+        <meta name="theme-color" content="#002B62">
+        <title text-id="000-88001">
+            メール送信サーバー設定 / 通知管理 / Exastro Platform
+        </title>
+        <link rel="stylesheet" href="/_/platform-commons/css/platform.css?ver=__BUILD_VERSION__">
+
+        <script type="text/javascript" src="/auth/js/keycloak.js?ver=__BUILD_VERSION__"></script>
+        <script type="text/javascript" src="/_/common-auth/js/exastro-common-auth-config.js?ver=__BUILD_VERSION__"></script>
+        <script type="text/javascript" src="/_/common-auth/js/exastro-common-auth.js?ver=__BUILD_VERSION__"></script>
+        <script src="/_/platform-commons/common/js/jquery.js?ver=__BUILD_VERSION__"></script>
+
+        <link rel="stylesheet" href="/_/platform-commons/css/custom_properties.css?ver=__BUILD_VERSION__">
+        <link rel="stylesheet" href="/_/platform-commons/css/common.css?ver=__BUILD_VERSION__">
+        <link rel="stylesheet" href="/_/platform-commons/css/dialog.css?ver=__BUILD_VERSION__">
+
+        <script src="/_/platform-commons/common/js/words.js?ver=__BUILD_VERSION__"></script>
+        <script src="/_/platform-commons/common/js/common.js?ver=__BUILD_VERSION__"></script>
+        <script src="/_/platform-commons/common/js/dialog.js?ver=__BUILD_VERSION__"></script>
+        <script src="/_/platform-commons/common/js/ui.js?ver=__BUILD_VERSION__"></script>
+
+        <script src="/_/platform-commons/js/platform_common.js?ver=__BUILD_VERSION__"></script>
+        <script src="/_/platform-commons/js/uri_conf.js?ver=__BUILD_VERSION__"></script>
+        <script src="/_/platform-commons/js/settings_mailserver.js?ver=__BUILD_VERSION__"></script>
+
+    </head>
+    <body>
+        <div id="container">
+            <div class="containerHeader">
+                <header id="header">
+                    <div class="logo">
+                        <img class="logoImage" src="/_/platform-commons/img/Exastro-logo2-white-rgb.svg?ver=__BUILD_VERSION__" alt="Exastro" style="height:32px; margin:5px 18px;">
+                    </div>
+                    <div class="topicPath">
+                        <ol class="topichPathList" style="visibility:hidden;">
+                        </ol>
+                    </div>
+                    <div class="headerMenu">
+                        <ul class="headerMenuList">
+                            <li class="userInfomation headerMenuItem">
+                            </li>
+                        </ul>
+                    </div>
+                </header>
+            </div>
+            <div class="containerBody">
+                <aside id="menu" class="">
+                    <div class="menuBody">
+                        <nav class="menuNavi">
+                            <ul class="menuList" style="display:none;">
+                            </ul>
+                        </nav>
+                    </div>
+                </aside>
+                <main id="main" style="visibility:hidden;">
+                    <div id="content">
+                        <div class="contentHeader">
+                            <h1 class="contentTitle"><span class="contentTitleInner" text-id="000-88002">メール送信サーバー設定</span></h1>
+                            <p class="contentMenuInfo" text-id="000-88002">メール送信用のSMTPサーバーを設定してください。</p>
+                        </div>
+                        <div class="contentBody">
+                            <div class="contentMenu">
+                                <ul class="contentMenuList">
+                                    <li class="contentMenuItem">
+                                        <a class="contentMenuLink tabOpen" href="#mailServer" tabindex="-1">
+                                            <span class="inner" text-id="000-87037">メール送信サーバー設定</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <section class="section tabOpen" id="mailServer">
+                                <div class="sectionBody">
+                                    <div id="MT" class="tableContainer viewTable">
+                                        <div class="tableBody">
+                                            <table class="table" width="100%">
+                                                <thead class="thead">
+                                                    <tr class="tHeadTr tr">
+                                                        <th data-id="c1" data-rest="id" class="tHeadTh popup th" rowspan="1" colspan="1" title="項目名" attr-text-id="title=000-80020" width="250px;"><div class="ci" text-id="000-80020">項目名</div></th>
+                                                        <th data-id="c2" data-rest="name" class="tHeadTh popup th" rowspan="1" colspan="1" title="設定値" attr-text-id="title=000-80021" style="min-width:400px;"><div class="ci" text-id="000-80021">設定値</div></th>
+                                                        <th data-id="c3" data-rest="name" class="tHeadTh popup th" rowspan="1" colspan="1" title="備考" attr-text-id="title=000-80023"><div class="ci" text-id="000-80023">備考</div></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody class="tbody">
+                                                    <tr class="tBodyTr tr">
+                                                        <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1"><div class="ci" style="text-align: left;"><span text-id="000-00187">SMTPサーバーホスト</span><span class="tHeadRequired" text-id="000-80024">必須</span></div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1"><div class="ci">
+                                                            <input type="text" value="" class="tableEditInputText inputText input inputTextWidthAdjustment" id="form_smtp_host" maxlength="1024">
+                                                            <span class="validate_error" id="message_smtp_host"></span>
+                                                        </div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1"><div class="ci textOverWrap" text-id="000-88016">最大1024文字 / 使用可能文字：半角英数字・ハイフン・ピリオド</div></td>
+                                                    </tr>
+                                                    <tr class="tBodyTr tr">
+                                                        <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1"><div class="ci" style="text-align: left;" text-id="000-00200">暗号化方式</div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1"><div class="ci">
+                                                            <div>
+                                                                <ul class="commonRadioList">
+                                                                    <li class="commonRadioItem">
+                                                                        <div class="radioTextWrap defaultRadioTextWrap">
+                                                                            <input type="radio" value="None" id="form_encryption_method_none" name="form_encryption_method" class="radioText" checked>
+                                                                            <label for="form_encryption_method_none" class="radioTextLabel"><span class="radioTextMark"></span><span class="radioTextText" text-id="000-00201">なし</span></label>
+                                                                        </div>
+                                                                    </li>
+                                                                    <li class="commonRadioItem">
+                                                                        <div class="radioTextWrap defaultRadioTextWrap">
+                                                                            <input type="radio" value="SSL" id="form_encryption_method_ssl" name="form_encryption_method" class="radioText">
+                                                                            <label for="form_encryption_method_ssl" class="radioTextLabel"><span class="radioTextMark"></span><span class="radioTextText" text-id="000-00202">SSL</span></label>
+                                                                        </div>
+                                                                    </li>
+                                                                    <li class="commonRadioItem">
+                                                                        <div class="radioTextWrap defaultRadioTextWrap">
+                                                                            <input type="radio" value="StartTLS" id="form_encryption_method_tls" name="form_encryption_method" class="radioText">
+                                                                            <label for="form_encryption_method_tls" class="radioTextLabel"><span class="radioTextMark"></span><span class="radioTextText" text-id="000-00203">StartTLS</span></label>
+                                                                        </div>
+                                                                    </li>
+                                                                </ul>
+                                                            </div>
+                                                        </div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1"><div class="ci"></div></td>
+                                                    </tr>
+                                                    <tr class="tBodyTr tr">
+                                                        <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1"><div class="ci" style="text-align: left;"><span text-id="000-00188">SMTPサーバーポート</span><span class="tHeadRequired" text-id="000-80024">必須</span></div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1"><div class="ci">
+                                                            <input type="text" value="" class="tableEditInputText inputNumber input inputTextWidthAdjustment" id="form_smtp_port" maxlength="5" style="width: 60px;">
+                                                            <span class="validate_error" id="message_smtp_port"></span>
+                                                        </div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1"><div class="ci textOverWrap" text-id="000-88017">使用可能文字：半角数字</div></td>
+                                                    </tr>
+                                                    <tr class="tBodyTr tr">
+                                                        <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1"><div class="ci" style="text-align: left;" text-id="000-00196">認証あり</div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1"><div class="ci">
+                                                            <input type="checkbox" value="" tr-id="mail_authentication" id="form_authentication_enable" checked>
+                                                            <span class="validate_error" id="message_authentication_enable"></span>
+                                                        </div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1"><div class="ci"></div></td>
+                                                    </tr>
+                                                    <tr class="tBodyTr tr mail_authentication" style="display: none;">
+                                                        <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1"><div class="ci" style="text-align: left;"><span text-id="000-00197">認証ユーザー</span><span class="tHeadRequired" text-id="000-80024">必須</span></div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1"><div class="ci">
+                                                            <input type="text" value="" class="tableEditInputText inputText input inputTextWidthAdjustment" id="form_authentication_user" maxlength="255">
+                                                            <span class="validate_error" id="message_authentication_user"></span>
+                                                        </div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1"><div class="ci textOverWrap" text-id="000-88020">最大255文字 / 使用可能文字：半角英数</div></td>
+                                                    </tr>
+                                                    <tr class="tBodyTr tr mail_authentication" style="display: none;">
+                                                        <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1"><div class="ci" style="text-align: left;"><span text-id="000-00198">認証パスワード</span><span class="tHeadRequired" text-id="000-80024">必須</span></div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1"><div class="ci">
+                                                            <input type="password" value="" class="tableEditInputText inputText input inputTextWidthAdjustment" id="form_authentication_password" maxlength="255">
+                                                            <span class="validate_error" id="message_authentication_password"></span>
+                                                        </div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1"><div class="ci textOverWrap" text-id="000-88020">最大255文字 / 使用可能文字：半角英数</div></td>
+                                                    </tr>
+                                                    <tr class="tBodyTr tr">
+                                                        <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1"><div class="ci" style="text-align: left;"><span text-id="000-00189">送信元メールアドレス(From)</span><span class="tHeadRequired" text-id="000-80024">必須</span></div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1"><div class="ci">
+                                                            <input type="text" value="" class="tableEditInputText inputText input inputTextWidthAdjustment" id="form_send_from" maxlength="255">
+                                                            <span class="validate_error" id="message_send_from"></span>
+                                                        </div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1"><div class="ci textOverWrap" text-id="000-88018">最大255文字 / 使用可能文字：Eメールアドレス形式</div></td>
+                                                    </tr>
+                                                    <tr class="tBodyTr tr">
+                                                        <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="3"><div class="ci" style="max-width: 100%; width: 100%; text-align: right;">
+                                                            <button data-action="negative" exapnd-group="group-detail" class="itaButton tableHeaderMainMenuButton button" id="button_expand"><span class="icon icon-expansion" style="padding: 2px; border: 1px solid gray; color: black;" id="span_button_expand" exapnd-mode="icon-expansion"></span></button>
+                                                        </div></td>
+                                                    </tr>
+                                                    <tr class="tBodyTr tr group-detail" style="display: none;">
+                                                        <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1"><div class="ci" style="text-align: left;" text-id="000-00190">送信元表示名</div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1"><div class="ci">
+                                                            <input type="text" value="" class="tableEditInputText inputText input inputTextWidthAdjustment" id="form_send_name" maxlength="100">
+                                                            <span class="validate_error" id="message_send_name"></span>
+                                                        </div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1"><div class="ci textOverWrap" text-id="000-88019">最大100文字 / 使用可能文字：全角・半角文字</div></td>
+                                                    </tr>
+                                                    <tr class="tBodyTr tr group-detail" style="display: none;">
+                                                        <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1"><div class="ci" style="text-align: left;" text-id="000-00191">返信先メールアドレス(Replay-to)</div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1"><div class="ci">
+                                                            <input type="text" value="" class="tableEditInputText inputText input inputTextWidthAdjustment" id="form_reply_to" maxlength="255">
+                                                            <span class="validate_error" id="message_reply_to"></span>
+                                                        </div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1"><div class="ci textOverWrap" text-id="000-88018">最大255文字 / 使用可能文字：Eメールアドレス形式</div></td>
+                                                    </tr>
+                                                    <tr class="tBodyTr tr group-detail" style="display: none;">
+                                                        <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1"><div class="ci" style="text-align: left;" text-id="000-00192">返信先表示名</div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1"><div class="ci">
+                                                            <input type="text" value="" class="tableEditInputText inputText input inputTextWidthAdjustment" id="form_reply_name" maxlength="255">
+                                                            <span class="validate_error" id="message_reply_name"></span>
+                                                        </div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1"><div class="ci textOverWrap" text-id="000-88019">最大100文字 / 使用可能文字：全角・半角文字</div></td>
+                                                    </tr>
+                                                    <tr class="tBodyTr tr group-detail" style="display: none;">
+                                                        <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1"><div class="ci" style="text-align: left;" text-id="000-00193">差出人メールアドレス(Envelope from)</div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1"><div class="ci">
+                                                            <input type="text" value="" class="tableEditInputText inputText input inputTextWidthAdjustment" id="form_envelope_from" maxlength="255">
+                                                            <span class="validate_error" id="message_envelope_from"></span>
+                                                        </div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1"><div class="ci textOverWrap" text-id="000-88018">最大255文字 / 使用可能文字：Eメールアドレス形式</div></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <div class="tableHeader">
+                                            <ul class="tableHeaderMainMenuList">
+                                                <li class="tableHeaderMainMenuItem">
+                                                    <button data-action="positive" style="width:200px;" class="itaButton tableHeaderMainMenuButton button" id="button_register"><span class="inner"><span class="icon icon-edit"></span><span text-id="000-80025">登録</span></span></button>
+                                                </li>
+                                                <li class="tableHeaderMainMenuItem">
+                                                    <button data-action="danger" style="width:200px;" class="itaButton tableHeaderMainMenuButton button" id="button_delete"><span class="inner"><span class="icon icon-trash"></span><span text-id="000-00199">設定削除</span></span></button>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+                        </div>
+                    </div>
+                </main>
+            </div>
+            <div class="containerLoading"></div>
+        </div>
+    </body>
+</html>

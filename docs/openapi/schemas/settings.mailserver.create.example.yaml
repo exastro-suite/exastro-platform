@@ -1,4 +1,4 @@
-#   Copyright 2022 NEC Corporation
+#   Copyright 2023 NEC Corporation
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -12,17 +12,16 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-# タスクの種類 / Type of job
-PROCESS_KIND_FORCE_UPDATE_STATUS = "_FORCE_UPDATE_STATUS"
-
-# user id
-SYSTEM_USER_ID = 'system'
-
-# oranization status
-ORG_STATUS_CREATE_COMPLETE = "Organization Create Complete"
-
-# unit test trace log
-LOG_RECONNECT = "Reconnect DB"
-
-# Version Text
-VERSION_TEXT_PATH = "/app/version"
+value:
+  {
+    "smtp_host": "smtp.host",
+    "smtp_port": "587",
+    "send_from": "sender@example.com",
+    "send_name": "sender",
+    "reply_to": "replay@example.com",
+    "reply_name": "replay",
+    "envelope_from": "envelope@example.com",
+    "ssl_enable": false,
+    "start_tls_enable": true,
+    "authentication_enable": false
+  }

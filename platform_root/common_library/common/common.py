@@ -604,3 +604,15 @@ def rep_sql_json_para(str):
     str = str.replace("%", "")
 
     return str
+
+
+def is_none_or_empty_string(str):
+    """is None or EmptyString
+
+    Args:
+        str (str): check str
+
+    Returns:
+        bool: True : None or Empty String
+    """
+    return str is None or str == ""
