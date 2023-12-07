@@ -34,7 +34,7 @@ CREATE_TABLES = [
         START_TLS_ENABLE		        BOOLEAN DEFAULT 0,                          -- StartTLS有無（既定：FALSE）
         AUTHENTICATION_ENABLE		    BOOLEAN DEFAULT 0,                          -- 認証有無（既定：FALSE）
         AUTHENTICATION_USER		        VARCHAR(255),                               -- 認証ユーザー
-        AUTHENTICATION_PASSWORD		    VARCHAR(255),                               -- 認証パスワード（暗号化）
+        AUTHENTICATION_PASSWORD		    VARCHAR(1024),                              -- 認証パスワード（暗号化）
         CREATE_TIMESTAMP		        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,    -- 作成日時
         CREATE_USER		                VARCHAR(40),                                -- 作成者
         LAST_UPDATE_TIMESTAMP		    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,    -- 最終更新日時
