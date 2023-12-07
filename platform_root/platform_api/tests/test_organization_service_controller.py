@@ -17,6 +17,9 @@ from unittest import mock
 from tests.common import request_parameters, test_common
 from common_library.common import const, validation
 from common_library.common import maintenancemode
+from common_library.common import api_ita_admin_call
+import re
+import requests_mock
 
 
 def test_organization_api(connexion_client):
@@ -212,6 +215,14 @@ def test_organization_create(connexion_client):
         connexion_client (_type_): _description_
         mocker (_type_): _description_
     """
+    class MockResponse:
+        def __init__(self, json_data, status_code):
+            self.json_data = json_data
+            self.status_code = status_code
+
+        def json(self):
+            return self.json_data
+
     #
     # maintenance mode
     #
@@ -248,19 +259,22 @@ def test_organization_create(connexion_client):
 
         assert response.status_code == 400, "create organization response code validate error"
 
-    with test_common.requsts_mocker_default(), \
-            mock.patch.object(api_ita_admin_call, 'ita_notification_destination', return_value='1') as mock_obj:
-
-        mock_obj.return_value = MockResponse({'data': '[]'}, 500)
+    with test_common.requsts_mocker_default() as requests_mocker:
+        requests_mocker.register_uri(
+            requests_mock.POST,
+            re.compile(rf'^{test_common.ita_api_admin_origin()}/api/organizations/organization-01/ita/'),
+            status_code=400,
+            json={"result": "400-36003", "message": "Failed"})
 
         response = connexion_client.post(
             '/api/platform/organizations',
             content_type='application/json',
-            headers=request_parameters.request_headers(organization['user_id']))
+            headers=request_parameters.request_headers(),
+            json=sample_data_organization('organization-01'))
 
-        assert response.status_code == 500, "ITA API Error"
-        assert response.json["result"] == "500-35002", "ITA API Error"
-        assert response.json["message"] == "Failed to get notification destination in use (menu:{0} column:{1})", "ITA API Error"
+        assert response.status_code == 400, "ITA API Error"
+        assert response.json["result"] == "400-36003", "ITA API Error"
+        assert response.json["message"] == "Failed", "ITA API Error"
 
 
 def sample_data_organization(id, update={}):

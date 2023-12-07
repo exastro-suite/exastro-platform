@@ -1604,7 +1604,7 @@ def __ita_create(organization_id, user_id, options_ita):
         globals.logger.error(f"response.text:{response.text}")
         return_json = json.loads(response.text)
 
-        raise common.OtherException(status_code=response.status_code, data=return_json.get("data"), message_id=return_json.get("result"), message=return_json.get("message"))
+        raise common.CallException(status_code=response.status_code, data=return_json.get("data"), message_id=return_json.get("result"), message=return_json.get("message"))
 
     globals.logger.debug(response.text)
 
