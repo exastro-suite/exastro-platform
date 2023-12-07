@@ -17,6 +17,16 @@
 $(function(){
     const organization_id = window.location.pathname.split("/")[3];
 
+    //
+    // 起動時点の値の定義
+    //
+    let org_before = null;
+    let plan_before = null;
+    // 編集中のプランの定義
+    let plan_after = null;
+
+    let plan_master = null;
+
     CommonAuth.onAuthSuccess(() => {
         new CommonUi(`#container`);
         // maintenanceMode();
@@ -28,15 +38,12 @@ $(function(){
             // Load Common Contents
             loadCommonContents(),
             // get organization List
-            call_api_promise({
-                type: "GET",
-                url: api_conf.api.organizations.detail.get.replace('{organization_id}', organization_id),
-                headers: {
-                    Authorization: "Bearer " + CommonAuth.getToken(),
-                },
-                contentType: "application/json",
-                dataType: "json",
-            }),
+            call_api_promise_get_organization_detail(),
+            // get plan of the organization
+            call_api_promise_get_organization_plans(),
+            // get plans
+            call_api_promise_get_plans(),
+
         ]).then(function(results) {
             // Display Menu
             displayMenu('menu_organizations');
@@ -45,7 +52,15 @@ $(function(){
                 {"text": getText("000-85001", "オーガナイゼーション一覧"), "href": location_conf.href.organizations.list },
                 {"text": getText("000-85035", "オーガナイゼーション編集"), "href": location_conf.href.organizations.edit.replace(/{organization_id}/g, organization_id) },
             ]);
-            display_main(results[1].data);
+            org_before = results[1].data;
+            plan_before = results[2].data.sort((a,b) => a.start_datetime > b.start_datetime? 1: -1);
+            plan_after = JSON.parse(JSON.stringify(plan_before));
+            plan_master = results[3].data;
+            display_main(org_before, plan_after, plan_master);
+            // register button
+            $('#button_register').on('click',() => {
+                on_click_button_register();
+            });
             finish_onload_progress();
 
         }).catch((e) => {
@@ -56,7 +71,43 @@ $(function(){
         });
     }
 
-    function display_main(row) {
+    function call_api_promise_get_organization_detail() {
+        return call_api_promise({
+            type: "GET",
+                url: api_conf.api.organizations.detail.get.replace('{organization_id}', organization_id),
+                headers: {
+                    Authorization: "Bearer " + CommonAuth.getToken(),
+                },
+                contentType: "application/json",
+                dataType: "json",
+        });
+    }
+
+    function call_api_promise_get_organization_plans() {
+        return call_api_promise({
+            type: "GET",
+                url: api_conf.api.organizations.plans.get.replace('{organization_id}', organization_id),
+                headers: {
+                    Authorization: "Bearer " + CommonAuth.getToken(),
+                },
+                contentType: "application/json",
+                dataType: "json",
+        });
+    }
+
+    function call_api_promise_get_plans() {
+        return call_api_promise({
+            type: "GET",
+                url: api_conf.api.plans.get,
+                headers: {
+                    Authorization: "Bearer " + CommonAuth.getToken(),
+                },
+                contentType: "application/json",
+                dataType: "json",
+        });
+    }
+
+    function display_main(row, org_plans, plans) {
         console.log("[CALL] display_main");
 
         //
@@ -64,26 +115,25 @@ $(function(){
         //
         $("#text_organization_id").text(row.id);
         $("#form_organization_name").val(row.name);
-        try { $("#text_active_plan").text(row.active_plan.id)} catch(e) { }
+        const plan_name = (plans.find(plan => plan.id == row.active_plan.id)??{name:"_default plan"}).name
+        try { $("#text_active_plan").text(plan_name)} catch(e) { }
         try { $("#text_status").text(row.status)} catch(e) { }
         $("#form_organization_enabled").prop("checked", row.enabled);
 
         //
-        // オーガナイゼーション管理者一覧の表示 - organization managers list display
+        // オーガナイゼーションに紐づいているリソースプラン一覧の表示 - plan of the organization list display
         //
-        display_organization_managers_list(row.organization_managers);
+        display_organization_plan_list(org_plans);
 
         //
-        // register button
+        //リソースプランIDの一覧をモーダルに表示
         //
-        $('#button_register').on('click',() => {
-            $('#button_register').prop('disabled',true);
-            if( ! validate_register() ) {
-                $('#button_register').prop('disabled',false);
-                return;
-            }
-            organization_register();
-        });
+        display_org_plans_list(plans);
+
+        //
+        // オーガナイゼーションにリソースプランを設定 - set plan to the organization
+        //
+        $('.button_edit_organization_plan').prop('disabled', false);
 
         if(OrganizationsCommon.enabled_check.edit_button(row.status)) {
             $('#button_register').prop('disabled', false);
@@ -94,45 +144,297 @@ $(function(){
 
     }
 
-    //
-    // オーガナイゼーション管理者一覧の表示 - display organization managers list
-    //
-    function display_organization_managers_list(users) {
+    function display_org_plans_list(plans){
 
-        // 明細行を削除
-        $('#organization_managers_list .datarow').remove();
+        //
+        // List configurable plans list
+        // プラン一覧をリスト化する
+        //
 
-        if (users.length == 0) {
-            // 0件の時はnotfoudの表示
-            $('#organization_managers_list .notfound').css('display','');
-        } else {
-            // 1件以上の時はnotfoudの表示を消す
-            $('#organization_managers_list .notfound').css('display','none');
-            // 明細のテンプレート行からhtmlを取り出す
-            // ※class名を"datarow-template"から"datarow"に変更しておく
-            const row_template = $('#organization_managers_list .datarow-template').clone(true).removeClass('datarow-template').addClass('datarow').prop('outerHTML');
+        planListData = [];
+        for(let row of plans) {
+            planListData.push({
+                plan_id: row.id,
+                plan_name: row.name,
+                last_update_timestamp: row.last_update_timestamp,
+            });
+        }
 
-            // 明細にデータを埋め込み行を明細を作りこむ
-            for(let i = 0; i < users.length; ++i) {
-                const user = users[i];
+        //
+        // Display a list of plans
+        // プラン一覧を表示する
+        //
 
-                row_html = row_template
-                    .replace(/\${user_id}/g, fn.cv(user.id,'',true))
-                    .replace(/\${username}/g, fn.cv(user.username,'',true))
-                    .replace(/\${firstName}/g, fn.cv(user.firstName,'',true))
-                    .replace(/\${lastName}/g, fn.cv(user.lastName,'',true))
-                    .replace(/\${enabled}/g, user.enabled ? '<span class="icon icon-check"></span>' : '')
-                    .replace(/\${create_timestamp}/g, fn.date(new Date(user.create_timestamp),'yyyy/MM/dd HH:mm:ss'))
-                $("#organization_managers_list tbody").append(row_html);
+        const sortKey = 'last_update_timestamp';
+        const sortreverse = 1;
+        planListData.sort(function(a, b){
+            const as = a[sortKey].toLowerCase(), bs = b[sortKey].toLowerCase();
+            if ( as < bs ) {
+                return sortreverse * 1;
+            } else if ( as > bs ) {
+                return sortreverse * -1;
+            } else {
+                return 0;
+            }
+        });
+
+        let html = '';
+        $(".form_plan_id").children().remove();
+        $('.form_plan_id').append($('<option>').html('').val(''));
+        for(var row of planListData) {
+            if (row["plan_id"].charAt(0) != '_')
+            {
+                $('.form_plan_id').append($('<option>').html(fn.cv(row.plan_id,'',true)+':'+fn.cv(row.plan_name,'',true)).val(row.plan_id));
             }
         }
-        $('#organization_managers_list .datarow').css('display','');
+    }
+
+    function disabled_button() {
+        $('#button_register').prop('disabled',true);
+        $('.button_edit_organization').prop('disabled', true);
+        $('.button_delete_organization').prop('disabled', true);
+        $('.button_delete_organization_plan').prop('disabled', true);
+        $('.button_edit_organization_plan').prop('disabled', true);
+    }
+    function enabled_button() {
+        $('#button_register').prop('disabled',false);
+        $('.button_edit_organization').prop('disabled', false);
+        $('.button_delete_organization').prop('disabled', false);
+        $('.button_delete_organization_plan').not('.deleted').prop('disabled', false);
+        $('.button_edit_organization_plan').prop('disabled', false);
+    }
+
+    //
+    // リソースプラン一覧の表示 - display plans list
+    //
+    function display_organization_plan_list(plans) {
+
+        // 明細行を削除
+        $('#organization_plan_list .datarow').remove();
+
+        if (plans.length == 0) {
+            // 0件の時はnotfoudの表示
+            $('#organization_plan_list .notfound').css('display','');
+        } else {
+            // 1件以上の時はnotfoudの表示を消す
+            $('#organization_plan_list .notfound').css('display','none');
+
+            //
+            // sort organization plan list
+            //
+            const sortKey = 'start_datetime';
+            const sortreverse = 1;
+            plans.sort(function(a, b){
+                const as = a[sortKey].toLowerCase(), bs = b[sortKey].toLowerCase();
+                if ( as < bs ) {
+                    return sortreverse * 1;
+                } else if ( as > bs ) {
+                    return sortreverse * -1;
+                } else if(a.delete === true && typeof b.delete === "undefined") {
+                    return sortreverse * 1;
+                } else if(typeof a.delete === "undefined" && b.delete === true) {
+                    return sortreverse * -1;
+                } else if(typeof a.create_timestamp !== "undefined" && typeof b.create_timestamp === "undefined") {
+                    return sortreverse * 1;
+                } else if(typeof a.create_timestamp === "undefined" && typeof b.create_timestamp !== "undefined") {
+                    return sortreverse * -1;
+                } else {
+                    return 0;
+                }
+            });
+
+            // 明細のテンプレート行からhtmlを取り出す
+            // ※class名を"datarow-template"から"datarow"に変更しておく
+            const row_template = $('#organization_plan_list .datarow-template').clone(true).removeClass('datarow-template').addClass('datarow').prop('outerHTML');
+
+            // 明細にデータを埋め込み行を明細を作りこむ
+            for(let i = 0; i < plans.length; ++i) {
+                const plan = plans[i];
+                const plan_name = (plan_master.find(plan_master_row => plan_master_row.id == plan.id)??{name:"_default plan"}).name
+
+                // const view_start_datetime = plan.start_datetime;
+
+                row_html = row_template
+                    .replace(/\${plan_id}/g, fn.cv(plan.id,'',true))
+                    .replace(/\${plan_name}/g, fn.cv(plan_name,'',true))
+                    .replace(/\${plan_start_datetime}/g, fn.date(new Date(plan.start_datetime),'yyyy/MM/dd HH:mm:ss'))
+                    .replace(/\${plan_create_timestamp}/g, (typeof plan.create_timestamp) !== "undefined"? fn.date(new Date(plan.create_timestamp),'yyyy/MM/dd HH:mm:ss'): "-")
+                    .replace(/\${plan_create_user}/g, fn.cv(plan.create_user,'',true))
+                    .replace(/\${changed}/g, plan.delete? "deleted": plan.add? "appended" : "")
+                    .replace(/\${button_disabled}/g, plan.delete? "disabled": "")
+
+                $("#organization_plan_list tbody").append(row_html);
+            }
+        }
+        //
+        // オーガナイゼーションに紐づいているリソースプランの削除 - delete plan to the organization
+        //
+        $('.button_delete_organization_plan').on('click',function() {
+            delete_organization_plan($(this).attr('data-id'), $(this).attr('data-start-datetime'));
+        });
+        //$('.button_delete_organization_plan').prop('disabled', false);
+
+        $('#organization_plan_list .datarow').css('display','');
+    }
+
+    //
+    // オーガナイゼーションにリソースプランを設定 - set plan to the organization
+    //
+
+    // モーダル画面表示
+    $('#button_detail_modal_open').on('click',() => {
+        edit_organization_plan_open();
+    });
+
+    function edit_organization_plan_open() {
+        console.log("[CALL] edit_organization_plan_open");
+
+        const edit_dialog = new Dialog({
+            mode: 'modeless',
+            position: 'center',
+            width: 'auto',
+            header: {
+                title: getText("000-85044", "リソースプラン設定"),
+            },
+            footer: {
+                button: {
+                    set: { text: getText("000-80046", "適用"), action: "positive" },
+                    cancel: { text: getText("000-80013", "キャンセル"), action: "normal" }
+                }
+            },
+        },
+        {
+            set: function() {
+                if( ! validate_register_plan(edit_dialog) ) {
+                    return;
+                }
+                modal_edit_button(edit_dialog);
+                edit_dialog.close();
+            },
+            cancel: function() {
+                edit_dialog.close();
+            }
+        });
+        edit_dialog.open($("#organization_plan_detail_dialog").html());
+        console.log("edit_dialog:");
+        console.log(edit_dialog);
+
+        const dialogBody = $(edit_dialog.$.dbody);
+
+        // set event
+        dialogBody.find('#btn_start_time').on('click', function() {
+
+            $input = dialogBody.find("#edit_start_time");
+
+            fn.datePickerDialog('date', true, getText("000-00125", "プラン開始日時"), $input.val() ).then(function( result ){
+                if ( result !== 'cancel') {
+                    $input.val( result.date ).change().focus().trigger('input');
+                }
+            });
+        });
     }
 
     //
     // validate register
     //
-    function validate_register() {
+    function validate_register_plan(dialog) {
+        const dialogBody = $(dialog.$.dbody);
+
+        console.log("--- validate check start ----");
+        let result=true;
+
+        // validate plan id
+        dialogBody.find("#message_edit_plan_id").text("");
+
+        if(dialogBody.find("#edit_plan_id").val() === "") {
+            dialogBody.find("#message_edit_plan_id").text(getText("400-00011", "必須項目が不足しています。({0})", getText("000-00121", "リソースプランID")));
+            result = false;
+        }
+
+        // validate start time
+        dialogBody.find("#message_edit_start_time").text("");
+
+        if(dialogBody.find("#edit_start_time").val() === "") {
+            dialogBody.find("#message_edit_start_time").text(
+                getText("400-00011", "必須項目が不足しています。({0})", getText("000-00125", "プラン開始日時")));
+            result = false;
+
+        } else if(!fn.checkDate(dialogBody.find("#edit_start_time").val())) {
+            dialogBody.find("#message_edit_start_time").text(
+                getText("400-00020", "日時形式以外が指定されています。({0})",getText("000-00125", "プラン開始日時")));
+            result = false;
+
+        }
+        for(let i = 0; i < plan_after.length; ++i){
+            if(dialogBody.find("#edit_start_time").val().replaceAll( '/', '-' ) === plan_after[i].start_datetime && typeof plan_after[i].delete === "undefined"){
+                dialogBody.find("#message_edit_start_time").text(
+                    getText("400-00033", "指定されたプラン開始日時は既に登録されています。({0})",getText("000-00125", "プラン開始日時")));
+                result = false;
+            }
+        }
+        console.log("--- validate check end [" + result + "] ----");
+
+        return result;
+    }
+
+    //
+    // モーダル画面の設定ボタン
+    //
+    function modal_edit_button(dialog) {
+        const dialogBody = $(dialog.$.dbody)
+
+        let reqbody =   {
+            "id":dialogBody.find("#edit_plan_id").val(),
+            "start_datetime":dialogBody.find("#edit_start_time").val().replaceAll( '/', '-' ),
+            "add":true,
+        }
+
+        plan_after.push(reqbody);
+
+        display_organization_plan_list(plan_after);
+    }
+
+    //
+    // オーガナイゼーションに紐づいているリソースプランの削除 - delete plan to the organization
+    //
+    function delete_organization_plan(plan_id, plan_start_datetime) {
+        console.log("[CALL] confirm_delete");
+
+        CancellationConfirmMessage(
+            getText("000-85041", "解除確認"),
+            getText("000-85042", "以下のリソースプランを解除してよろしいですか？"),
+            [ getText("000-00121", "リソースプランID") + " : " + plan_id,
+              getText("000-00125", "プラン開始日時") + " : " + plan_start_datetime ],
+            getText("000-85043", "解除した場合は、現在適用中のリソースプランが変更される可能性があります"),
+            plan_id,
+            () => {
+
+                for(let i = 0; i < plan_after.length; ++i){
+                    if(plan_after[i].start_datetime === plan_start_datetime.replaceAll( '/', '-' )){
+                        plan_after[i].delete = true;
+                    }
+                }
+                plan_after = plan_after.filter((r) => !(r.delete === true && typeof r.create_timestamp === "undefined"))
+
+                // for(let i = plan_after.length -1; i >= 0; --i){
+                //     if(plan_after[i].start_datetime === plan_start_datetime.replaceAll( '/', '-' )){
+                //         if(typeof r.create_timestamp === "undefined") {
+                //             plan_after.splice(i,1);
+                //         } else {
+                //             plan_after[i].delete = true;
+                //         }
+                //     }
+                // }
+
+                display_organization_plan_list(plan_after);
+            }
+        );
+    }
+
+    //
+    // validate register
+    //
+    function validate_register_org_name() {
         console.log("--- validate check start ----");
         let result=true;
 
@@ -146,18 +448,92 @@ $(function(){
         return result;
     }
 
+    function on_click_button_register() {
+        disabled_button();
+        if( ! validate_register_org_name() ) {
+            enabled_button();
+            return;
+        }
+
+        new Promise((resolve, reject) => {
+            show_progress();
+            resolve();
+        }).then(() => {
+            return org_exclusion_check();
+        }).then(() => {
+            return organization_register();
+        }).then(() => {
+            return organization_plan_delete();
+        }).then(() => {
+            return organization_plan_register();
+        }).then(() => {
+            console.log("then :on_click_button_register");
+            hide_progress();
+            alertMessage(getText("000-80018", "処理結果"), getText("000-85038", "オーガナイゼーションを変更しました"),
+            () => {
+                window.location = location_conf.href.organizations.list;
+            });
+        }).catch((e) => {
+            console.log("catch:on_click_button_register");
+            console.log(e);
+            hide_progress();
+            enabled_button();
+        });
+    }
+
+    function org_exclusion_check() {
+        return new Promise((resolve, reject) => {
+            Promise.all([
+                // get organization List
+                call_api_promise_get_organization_detail(),
+                call_api_promise_get_organization_plans(),
+            ]).then(function(results) {
+                console.log("-- org_exclusion_check --");
+                let org_latest = results[0].data;
+                let plan_latest = results[1].data.sort((a,b) => a.start_datetime > b.start_datetime? 1: -1);
+                if (JSON.stringify(org_latest) !== JSON.stringify(org_before)) {
+                    hide_progress();
+                    alertMessage(getText("000-80018", "処理結果"),
+                    getText("000-85048",'編集中に他のユーザーによって変更されました。{0}に戻り、再度編集してください。',
+                    getText("000-85001", "オーガナイゼーション一覧")),
+                    () => {
+                        reject();
+                    });
+                    return;
+                }
+                if (JSON.stringify(plan_latest) !== JSON.stringify(plan_before)) {
+                    hide_progress();
+                    alertMessage(getText("000-80018", "処理結果"),
+                    getText("000-85048",'編集中に他のユーザーによって変更されました。{0}に戻り、再度編集してください。',
+                    getText("000-85001", "オーガナイゼーション一覧")),
+                    () => {
+                        reject();
+                    });
+                    return;
+                }
+                resolve();
+
+            }).catch((e) => {
+                reject();
+                /*
+                console.log("org exclusion error");
+                console.log(e);
+                hide_progress();
+                $('#button_register').prop('disabled',false);
+                */
+            });
+        });
+    }
+
     //
     // register organization
     //
     function organization_register() {
-
         let reqbody =   {
             "name": $('#form_organization_name').val(),
             "enabled": ($('#form_organization_enabled').prop('checked') ? true : false),
         }
-
-        show_progress();
-        call_api_promise(
+        return call_api_promise(
             {
                 type: "PUT",
                 url: api_conf.api.organizations.detail.put.replace(/{organization_id}/g, organization_id),
@@ -167,17 +543,59 @@ $(function(){
                 data: JSON.stringify(reqbody),
                 contentType: "application/json",
                 dataType: "json",
-            }
-        ).then(() => {
-            hide_progress();
-            alertMessage(getText("000-80018", "処理結果"), getText("000-85038", "オーガナイゼーションを変更しました"),
-            () => {
-                window.location = location_conf.href.organizations.list;
-            });
-        }).catch(() => {
-            hide_progress();
-            $('#button_register').prop('disabled',false);
-        })
+        });
     }
 
+    //
+    // delete organization plan
+    //
+    function organization_plan_delete() {
+        const promises = [];
+
+        // delete organization plan
+        for(let i = 0; i < plan_after.length; ++i){
+            if(plan_after[i].delete === true && typeof plan_after[i].create_timestamp !== "undefined"){
+                const promise = call_api_promise({
+                    type: "DELETE",
+                    url: api_conf.api.organizations.plans.delete.replace(/{organization_id}/g, organization_id).replace(/{plan_start_datetime}/g, plan_after[i].start_datetime),
+                    headers: {
+                        Authorization: "Bearer " + CommonAuth.getToken(),
+                    },
+                });
+                promises.push(promise);
+            }
+        }
+        return Promise.all(promises);
+    }
+
+    //
+    // register organization plan
+    //
+    function organization_plan_register() {
+        const promises = [];
+
+        // delete organization plan
+        for(let i = 0; i < plan_after.length; ++i){
+            if(plan_after[i].add === true && typeof plan_after[i].delete === "undefined"){
+                let reqbody = {
+                    "id":plan_after[i].id,
+                    "start_datetime":plan_after[i].start_datetime
+                }
+                const promise = call_api_promise(
+                    {
+                        type: "POST",
+                        url: api_conf.api.organizations.plans.post.replace(/{organization_id}/g, organization_id),
+                        headers: {
+                            Authorization: "Bearer " + CommonAuth.getToken(),
+                        },
+                        data: JSON.stringify(reqbody),
+                        contentType: "application/json",
+                        dataType: "json",
+                    }
+                );
+                promises.push(promise);
+            }
+        }
+        return Promise.all(promises);
+    }
 });
