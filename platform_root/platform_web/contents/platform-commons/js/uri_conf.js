@@ -88,6 +88,11 @@ var api_conf = {
                 "delete": "/api/platform/{organization_id}/plans/{plan_start_datetime}"
             },
         },
+        "it-automation": {
+            "settings": {
+                "get": "/api/ita/settings/"
+            }
+        },
         "plans": {
             "get": "/api/platform/plans",
             "getPlanItem": "/api/platform/plan_items",
