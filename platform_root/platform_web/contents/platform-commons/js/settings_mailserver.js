@@ -143,14 +143,14 @@ $(function(){
         $('#button_expand').on('click',() => {
             $('#button_expand').prop('disabled',true);
             group = $('#button_expand').attr('exapnd-group');
-            if ($('#span_button_expand').attr('exapnd-mode') === 'icon-expansion') {
-                $('#span_button_expand').removeClass('icon-expansion').addClass('icon-shrink');
-                $('#span_button_expand').attr('exapnd-mode', 'icon-shrink');
+            if ($('#span_button_expand').attr('exapnd-mode') === 'icon-plus') {
+                $('#span_button_expand').removeClass('icon-plus').addClass('icon-minus');
+                $('#span_button_expand').attr('exapnd-mode', 'icon-minus');
                 $('.'+group).css('display', '');
             }
             else{
-                $('#span_button_expand').removeClass('icon-shrink').addClass('icon-expansion');
-                $('#span_button_expand').attr('exapnd-mode', 'icon-expansion');
+                $('#span_button_expand').removeClass('icon-minus').addClass('icon-plus');
+                $('#span_button_expand').attr('exapnd-mode', 'icon-plus');
                 $('.'+group).css('display', 'none');
             }
             $('#button_expand').prop('disabled',false);
