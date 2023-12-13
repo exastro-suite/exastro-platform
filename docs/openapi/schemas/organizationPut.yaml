@@ -42,6 +42,11 @@ properties:
             type: boolean
           oase:
             type: boolean
+        required:
+          - terraform_cloud_ep
+          - terraform_cli
+          - ci_cd
+          - oase
 required:
   - name
   - enabled

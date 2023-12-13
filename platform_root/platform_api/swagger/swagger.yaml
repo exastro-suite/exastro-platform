@@ -3179,6 +3179,8 @@ components:
           type: boolean
           description: organization enabled(true) or disabled(false)
           example: true
+        optionsIta:
+          $ref: '#/components/schemas/organization_optionsIta'
         status:
           type: string
           example: Organization Create Complete
@@ -3204,7 +3206,7 @@ components:
           type: object
           description: Organization Add Json Parameter (json of KeyCloak)
         optionsIta:
-          $ref: '#/components/schemas/apiplatformorganizationsorganization_id_optionsIta'
+          $ref: '#/components/schemas/organizationCreate_optionsIta'
     organizationUserCreate:
       title: organization-user is a definition of User resource.
       required:
@@ -4091,6 +4093,11 @@ components:
           data:
             $ref: '#/components/schemas/organization'
     apiplatformorganizationsorganization_id_optionsIta_drivers:
+      required:
+      - ci_cd
+      - oase
+      - terraform_cli
+      - terraform_cloud_ep
       type: object
       properties:
         terraform_cloud_ep:
@@ -4307,6 +4314,41 @@ components:
         id:
           type: string
           example: plan-1
+    organization_optionsIta_drivers:
+      type: object
+      properties:
+        terraform_cloud_ep:
+          type: boolean
+        terraform_cli:
+          type: boolean
+        ci_cd:
+          type: boolean
+        oase:
+          type: boolean
+    organization_optionsIta:
+      type: object
+      properties:
+        drivers:
+          $ref: '#/components/schemas/organization_optionsIta_drivers'
+    organizationCreate_optionsIta_drivers:
+      type: object
+      properties:
+        terraform_cloud_ep:
+          type: boolean
+        terraform_cli:
+          type: boolean
+        ci_cd:
+          type: boolean
+        oase:
+          type: boolean
+      description: "terraform_cloud_ep: Terraform-Cloud/EP driver <br/>terraform_cli:\
+        \ Terraform-CLI driver, <br/>ci_cd: CI/CD for IaC, <br/>oase: OASE, "
+    organizationCreate_optionsIta:
+      type: object
+      properties:
+        drivers:
+          $ref: '#/components/schemas/organizationCreate_optionsIta_drivers'
+      description: Organization Add Json Parameter (json of exastro-it-automation)
     organizationSetting_token:
       type: object
       properties:
