@@ -12,14 +12,17 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
+import json
+import re
+from contextlib import closing
 from unittest import mock
 
-from tests.common import request_parameters, test_common
-from common_library.common import const, validation
-from common_library.common import maintenancemode
-from common_library.common import api_ita_admin_call
-import re
 import requests_mock
+import ulid
+from common_library.common import const, maintenancemode, validation
+from common_library.common.db import DBconnector
+from libs import queries_organizations
+from tests.common import request_parameters, test_common
 
 
 def test_organization_api(connexion_client):
@@ -277,6 +280,494 @@ def test_organization_create(connexion_client):
         assert response.json["message"] == "Failed", "ITA API Error"
 
 
+def test_organization_update(connexion_client):
+    """test organization update
+
+    Args:
+        connexion_client (_type_): _description_
+    """
+
+    organization = test_common.create_organization(connexion_client)
+
+    #
+    # maintenance mode
+    #
+    with test_common.requsts_mocker_default(), \
+            mock.patch.object(maintenancemode, 'maintenace_mode_get', return_value='1'):
+
+        response = connexion_client.put(
+            f'/api/platform/organizations/{organization["organization_id"]}',
+            content_type='application/json',
+            headers=request_parameters.request_headers(),
+            json=sample_data_organization_update())
+
+        assert response.status_code == 498, "create organization response code = maintenancemode"
+
+    #
+    # validation error route
+    #
+    with test_common.requsts_mocker_default():
+        # validate : name is None
+        response = connexion_client.put(
+            f'/api/platform/organizations/{organization["organization_id"]}',
+            content_type='application/json',
+            headers=request_parameters.request_headers(),
+            json=sample_data_organization_update({"name": None}))
+
+        assert response.status_code == 400, "name is none"
+        assert response.status == "400 BAD REQUEST", "name is none"
+
+        # validate : name is not exist
+        tmp = sample_data_organization_update()
+        tmp.pop("name")
+        response = connexion_client.put(
+            f'/api/platform/organizations/{organization["organization_id"]}',
+            content_type='application/json',
+            headers=request_parameters.request_headers(),
+            json=tmp)
+
+        assert response.status_code == 400, "name is not exist"
+        assert response.status == "400 BAD REQUEST", "name is not exist"
+
+        # validate : name == ""
+        response = connexion_client.put(
+            f'/api/platform/organizations/{organization["organization_id"]}',
+            content_type='application/json',
+            headers=request_parameters.request_headers(),
+            json=sample_data_organization_update({"name": ""}))
+
+        assert response.status_code == 400, "validation error"
+        assert response.json["result"] == "400-00011", "validation error"
+
+        # validate : name is max length
+        response = connexion_client.put(
+            f'/api/platform/organizations/{organization["organization_id"]}',
+            content_type='application/json',
+            headers=request_parameters.request_headers(),
+            json=sample_data_organization_update({"name": "".ljust(const.length_organization_name, "a")}))
+
+        assert response.status_code == 200, "max length"
+
+        # validate : name is max length + 1
+        response = connexion_client.put(
+            f'/api/platform/organizations/{organization["organization_id"]}',
+            content_type='application/json',
+            headers=request_parameters.request_headers(),
+            json=sample_data_organization_update({"name": "".ljust(const.length_organization_name + 1, "a")}))
+
+        assert response.status_code == 400, "max length + 1"
+        assert response.json["result"] == "400-00012", "max length + 1"
+
+        # validate: optionsIta is not exist
+        tmp = sample_data_organization_update()
+        tmp.pop("optionsIta")
+        response = connexion_client.put(
+            f'/api/platform/organizations/{organization["organization_id"]}',
+            content_type='application/json',
+            headers=request_parameters.request_headers(),
+            json=tmp)
+
+        assert response.status_code == 400, "optionsIta is not exist"
+        assert response.status == "400 BAD REQUEST", "optionsIta is not exist"
+
+        # validate: optionsIta == {}
+        response = connexion_client.put(
+            f'/api/platform/organizations/{organization["organization_id"]}',
+            content_type='application/json',
+            headers=request_parameters.request_headers(),
+            json=sample_data_organization_update({"optionsIta": None}))
+
+        assert response.status_code == 400, "optionsIta == {}"
+        assert response.status == "400 BAD REQUEST", "optionsIta == {}"
+
+        # validate: optionsIta == {}
+        response = connexion_client.put(
+            f'/api/platform/organizations/{organization["organization_id"]}',
+            content_type='application/json',
+            headers=request_parameters.request_headers(),
+            json=sample_data_organization_update({"optionsIta": {}}))
+
+        assert response.status_code == 400, "optionsIta == {}"
+        assert response.status == "400 BAD REQUEST", "optionsIta == {}"
+
+        # validate: dirivers == {}
+        response = connexion_client.put(
+            f'/api/platform/organizations/{organization["organization_id"]}',
+            content_type='application/json',
+            headers=request_parameters.request_headers(),
+            json=sample_data_organization_update({"optionsIta": {"dirivers": {}}}))
+
+        assert response.status_code == 400, "optionsIta == {}"
+        assert response.status == "400 BAD REQUEST", "optionsIta == {}"
+
+        # validate: terraform_cloud_ep is not exist
+        response = connexion_client.put(
+            f'/api/platform/organizations/{organization["organization_id"]}',
+            content_type='application/json',
+            headers=request_parameters.request_headers(),
+            json=sample_data_organization_update({"optionsIta": {
+                "dirivers": {
+                    "terraform_cli": True,
+                    "ci_cd": False,
+                    "oase": False
+                }
+            }}))
+
+        assert response.status_code == 400, "terraform_cloud_ep is not exist"
+        assert response.status == "400 BAD REQUEST", "terraform_cloud_ep is not exist"
+
+        # validate: terraform_cli is not exist
+        response = connexion_client.put(
+            f'/api/platform/organizations/{organization["organization_id"]}',
+            content_type='application/json',
+            headers=request_parameters.request_headers(),
+            json=sample_data_organization_update({"optionsIta": {
+                "dirivers": {
+                    "terraform_cloud_ep": False,
+                    "ci_cd": False,
+                    "oase": False
+                }
+            }}))
+
+        assert response.status_code == 400, "terraform_cli is not exist"
+        assert response.status == "400 BAD REQUEST", "terraform_cli is not exist"
+
+        # validate: ci_cd is not exist
+        response = connexion_client.put(
+            f'/api/platform/organizations/{organization["organization_id"]}',
+            content_type='application/json',
+            headers=request_parameters.request_headers(),
+            json=sample_data_organization_update({"optionsIta": {
+                "dirivers": {
+                    "terraform_cloud_ep": False,
+                    "terraform_cli": True,
+                    "oase": False
+                }
+            }}))
+
+        assert response.status_code == 400, "ci_cd is not exist"
+        assert response.status == "400 BAD REQUEST", "ci_cd is not exist"
+
+        # validate: oase is not exist
+        response = connexion_client.put(
+            f'/api/platform/organizations/{organization["organization_id"]}',
+            content_type='application/json',
+            headers=request_parameters.request_headers(),
+            json=sample_data_organization_update({"optionsIta": {
+                "dirivers": {
+                    "terraform_cloud_ep": False,
+                    "terraform_cli": True,
+                    "ci_cd": False
+                }
+            }}))
+
+        assert response.status_code == 400, "oase is not exist"
+        assert response.status == "400 BAD REQUEST", "oase is not exist"
+
+        # validate: terraform_cloud_ep is None
+        response = connexion_client.put(
+            f'/api/platform/organizations/{organization["organization_id"]}',
+            content_type='application/json',
+            headers=request_parameters.request_headers(),
+            json=sample_data_organization_update({"optionsIta": {
+                "dirivers": {
+                    "terraform_cloud_ep": None,
+                    "terraform_cli": True,
+                    "ci_cd": False,
+                    "oase": False
+                }
+            }}))
+
+        assert response.status_code == 400, "terraform_cloud_ep is None"
+        assert response.status == "400 BAD REQUEST", "terraform_cloud_ep is None"
+
+        # validate: terraform_cli is None
+        response = connexion_client.put(
+            f'/api/platform/organizations/{organization["organization_id"]}',
+            content_type='application/json',
+            headers=request_parameters.request_headers(),
+            json=sample_data_organization_update({"optionsIta": {
+                "dirivers": {
+                    "terraform_cloud_ep": True,
+                    "terraform_cli": None,
+                    "ci_cd": False,
+                    "oase": False
+                }
+            }}))
+
+        assert response.status_code == 400, "terraform_cli is None"
+        assert response.status == "400 BAD REQUEST", "terraform_cli is None"
+
+        # validate: ci_cd is None
+        response = connexion_client.put(
+            f'/api/platform/organizations/{organization["organization_id"]}',
+            content_type='application/json',
+            headers=request_parameters.request_headers(),
+            json=sample_data_organization_update({"optionsIta": {
+                "dirivers": {
+                    "terraform_cloud_ep": True,
+                    "terraform_cli": False,
+                    "ci_cd": None,
+                    "oase": False
+                }
+            }}))
+
+        assert response.status_code == 400, "ci_cd is None"
+        assert response.status == "400 BAD REQUEST", "ci_cd is None"
+
+        # validate: oase is None
+        response = connexion_client.put(
+            f'/api/platform/organizations/{organization["organization_id"]}',
+            content_type='application/json',
+            headers=request_parameters.request_headers(),
+            json=sample_data_organization_update({"optionsIta": {
+                "dirivers": {
+                    "terraform_cloud_ep": True,
+                    "terraform_cli": False,
+                    "ci_cd": False,
+                    "oase": None
+                }
+            }}))
+
+        assert response.status_code == 400, "oase is None"
+        assert response.status == "400 BAD REQUEST", "oase is None"
+
+        # validate: terraform_cloud_ep is string
+        response = connexion_client.put(
+            f'/api/platform/organizations/{organization["organization_id"]}',
+            content_type='application/json',
+            headers=request_parameters.request_headers(),
+            json=sample_data_organization_update({"optionsIta": {
+                "dirivers": {
+                    "terraform_cloud_ep": "True",
+                    "terraform_cli": False,
+                    "ci_cd": False,
+                    "oase": False
+                }
+            }}))
+
+        assert response.status_code == 400, "terraform_cloud_ep is string"
+        assert response.status == "400 BAD REQUEST", "terraform_cloud_ep is string"
+
+        # validate: terraform_cli is string
+        response = connexion_client.put(
+            f'/api/platform/organizations/{organization["organization_id"]}',
+            content_type='application/json',
+            headers=request_parameters.request_headers(),
+            json=sample_data_organization_update({"optionsIta": {
+                "dirivers": {
+                    "terraform_cloud_ep": True,
+                    "terraform_cli": "False",
+                    "ci_cd": False,
+                    "oase": False
+                }
+            }}))
+
+        assert response.status_code == 400, "terraform_cli is string"
+        assert response.status == "400 BAD REQUEST", "terraform_cli is string"
+
+        # validate: ci_cd is string
+        response = connexion_client.put(
+            f'/api/platform/organizations/{organization["organization_id"]}',
+            content_type='application/json',
+            headers=request_parameters.request_headers(),
+            json=sample_data_organization_update({"optionsIta": {
+                "dirivers": {
+                    "terraform_cloud_ep": True,
+                    "terraform_cli": False,
+                    "ci_cd": "False",
+                    "oase": False
+                }
+            }}))
+
+        assert response.status_code == 400, "ci_cd is string"
+        assert response.status == "400 BAD REQUEST", "ci_cd is string"
+
+        # validate: oase is string
+        response = connexion_client.put(
+            f'/api/platform/organizations/{organization["organization_id"]}',
+            content_type='application/json',
+            headers=request_parameters.request_headers(),
+            json=sample_data_organization_update({"optionsIta": {
+                "dirivers": {
+                    "terraform_cloud_ep": True,
+                    "terraform_cli": False,
+                    "ci_cd": False,
+                    "oase": "False"
+                }
+            }}))
+
+        assert response.status_code == 400, "oase is string"
+        assert response.status == "400 BAD REQUEST", "oase is string"
+
+        # validate: terraform_cloud_ep is integer
+        response = connexion_client.put(
+            f'/api/platform/organizations/{organization["organization_id"]}',
+            content_type='application/json',
+            headers=request_parameters.request_headers(),
+            json=sample_data_organization_update({"optionsIta": {
+                "dirivers": {
+                    "terraform_cloud_ep": 1,
+                    "terraform_cli": False,
+                    "ci_cd": False,
+                    "oase": False
+                }
+            }}))
+
+        assert response.status_code == 400, "terraform_cloud_ep is integer"
+        assert response.status == "400 BAD REQUEST", "terraform_cloud_ep is integer"
+
+        # validate: terraform_cli is integer
+        response = connexion_client.put(
+            f'/api/platform/organizations/{organization["organization_id"]}',
+            content_type='application/json',
+            headers=request_parameters.request_headers(),
+            json=sample_data_organization_update({"optionsIta": {
+                "dirivers": {
+                    "terraform_cloud_ep": True,
+                    "terraform_cli": 0,
+                    "ci_cd": False,
+                    "oase": False
+                }
+            }}))
+
+        assert response.status_code == 400, "terraform_cli is integer"
+        assert response.status == "400 BAD REQUEST", "terraform_cli is integer"
+
+        # validate: ci_cd is integer
+        response = connexion_client.put(
+            f'/api/platform/organizations/{organization["organization_id"]}',
+            content_type='application/json',
+            headers=request_parameters.request_headers(),
+            json=sample_data_organization_update({"optionsIta": {
+                "dirivers": {
+                    "terraform_cloud_ep": True,
+                    "terraform_cli": False,
+                    "ci_cd": 0,
+                    "oase": False
+                }
+            }}))
+
+        assert response.status_code == 400, "ci_cd is integer"
+        assert response.status == "400 BAD REQUEST", "ci_cd is integer"
+
+        # validate: oase is integer
+        response = connexion_client.put(
+            f'/api/platform/organizations/{organization["organization_id"]}',
+            content_type='application/json',
+            headers=request_parameters.request_headers(),
+            json=sample_data_organization_update({"optionsIta": {
+                "dirivers": {
+                    "terraform_cloud_ep": True,
+                    "terraform_cli": False,
+                    "ci_cd": False,
+                    "oase": 0
+                }
+            }}))
+
+        assert response.status_code == 400, "oase is integer"
+        assert response.status == "400 BAD REQUEST", "oase is integer"
+
+    #
+    # DB Error
+    #
+    with test_common.requsts_mocker_default(), \
+            test_common.pymysql_execute_raise_exception_mocker(queries_organizations.SQL_UPDATE_ORGANIZATION, Exception("DB Error Test")):
+
+        response = connexion_client.put(
+            f'/api/platform/organizations/{organization["organization_id"]}',
+            content_type='application/json',
+            headers=request_parameters.request_headers(),
+            json=sample_data_organization_update())
+
+        assert response.status_code == 500, "DB Error"
+        assert response.json["result"] == "500-23024", "DB Error"
+
+    #
+    # ITA API Error
+    #
+    with test_common.requsts_mocker_default() as requests_mocker:
+        requests_mocker.register_uri(
+            requests_mock.ANY,
+            re.compile(rf'^{test_common.ita_api_admin_origin()}/api/organizations/{organization["organization_id"]}/ita/'),
+            status_code=400,
+            json={"result": "400-36003", "message": "Failed"})
+
+        response = connexion_client.put(
+            f'/api/platform/organizations/{organization["organization_id"]}',
+            content_type='application/json',
+            headers=request_parameters.request_headers(),
+            json=sample_data_organization_update())
+
+        assert response.status_code == 400, "ITA API Error"
+        assert response.json["result"] == "400-36003", "ITA API Error"
+        assert response.json["message"] == "Failed", "ITA API Error"
+
+    #
+    # normal root
+    #
+    with test_common.requsts_mocker_default():
+
+        organization_id = (f"unittest-{ulid.new().str.lower()}")[0:const.length_organization_id]
+        json_parameter = sample_data_organization(
+            organization_id,
+            {
+                "optionsIta": {
+                    "drivers": {
+                        "terraform_cloud_ep": False,
+                        "terraform_cli": True,
+                        "ci_cd": False,
+                        "oase": False
+                    }
+                }
+            }
+        )
+
+        resp_post_org = connexion_client.post(
+            '/api/platform/organizations',
+            content_type='application/json',
+            headers=request_parameters.request_headers(),
+            json=json_parameter)
+
+        assert resp_post_org.status_code == 200, "Create organization"
+
+        org_info = __fetch_organization_informations(organization_id)
+        drivers = json.loads(org_info["INFORMATIONS"])["ext_options"]["options_ita"]["drivers"]
+        assert drivers["terraform_cloud_ep"] is False, "create status"
+        assert drivers["terraform_cli"] is True, "create status"
+        assert drivers["ci_cd"] is False, "create status"
+        assert drivers["oase"] is False, "create status"
+
+        # normal root
+        tmp = sample_data_organization_update(
+            {
+                "optionsIta": {
+                    "drivers": {
+                        "terraform_cloud_ep": True,
+                        "terraform_cli": False,
+                        "ci_cd": True,
+                        "oase": True
+                    }
+                }
+            }
+        )
+        response = connexion_client.put(
+            f'/api/platform/organizations/{organization_id}',
+            content_type='application/json',
+            headers=request_parameters.request_headers(),
+            json=tmp
+        )
+
+        assert response.status_code == 200, "normal root"
+
+        updated_org_info = __fetch_organization_informations(organization_id)
+        drivers = json.loads(updated_org_info["INFORMATIONS"])["ext_options"]["options_ita"]["drivers"]
+        assert drivers["terraform_cloud_ep"] is True, "update status"
+        assert drivers["terraform_cli"] is False, "update status"
+        assert drivers["ci_cd"] is False, "update status"
+        assert drivers["oase"] is False, "update status"
+
+
 def sample_data_organization(id, update={}):
     """create organization parameter
 
@@ -312,3 +803,35 @@ def sample_data_organization(id, update={}):
         "options": {},
         "optionsIta": {}
     }, **update)
+
+
+def sample_data_organization_update(update={}):
+    """update organization parameter
+
+    Args:
+        update (dict, optional): update dict. Defaults to {}.
+
+    Returns:
+        dict: create organization parameter
+    """
+    return dict({
+        "name": "name of org2",
+        "enabled": True,
+        "optionsIta": {
+            "drivers": {
+                "terraform_cloud_ep": True,
+                "terraform_cli": True,
+                "ci_cd": True,
+                "oase": True
+            }
+        }
+    }, **update)
+
+
+def __fetch_organization_informations(organization_id):
+    with closing(DBconnector().connect_platformdb()) as conn:
+        with conn.cursor() as cursor:
+            cursor.execute("SELECT INFORMATIONS FROM T_ORGANIZATION WHERE ORGANIZATION_ID = %(organization_id)s", {"organization_id": organization_id})
+            row = cursor.fetchone()
+
+    return row
