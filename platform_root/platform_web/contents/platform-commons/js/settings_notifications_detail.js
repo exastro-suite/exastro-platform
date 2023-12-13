@@ -196,18 +196,10 @@ $(function(){
     function notification_test(destination_row) {
 
         var message = {}
-        if (destination_row.kind === DESTINATION_KIND_MAIL){
-            message = {
-                "title": "notification test",
-                "message": "notification test"
-            };
-        }
-        else if (destination_row.kind === DESTINATION_KIND_TEAMS){
-            message = {
-                "title": "notification test",
-                "text": "notification test"
-            };
-        }
+        message = {
+            "title": "notification test",
+            "message": "notification test"
+        };
 
         let reqbody = [
             {
