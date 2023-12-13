@@ -423,6 +423,14 @@ def organization_get(organization_id):  # noqa: E501
             # Get detailed information
             ret_realm = __realms_detail_get(organization_id, keycloak_realms, row, org_informations, token)
 
+            # ITA organization情報取得
+            # ITA organization information acquisition
+            try:
+                ita_org = __get_ita_organization(organization_id)
+                ret_realm['optionsIta'] = ita_org['data']['optionsita']
+            except common.CallException:
+                pass
+
     return common.response_200_ok(ret_realm)
 
 
@@ -648,6 +656,14 @@ def organization_list():
             # 詳細情報取得
             # Get detailed information
             ret_realm = __realms_detail_get(organization_id, keycloak_org, row, org_informations, token)
+
+            # ITA organization情報取得（接続エラー以外のエラーが発生しても一覧は返す）
+            # Get ITA organization information (a list will be returned even if an error other than a connection error occurs)
+            try:
+                ita_org = __get_ita_organization(organization_id)
+                ret_realm['optionsIta'] = ita_org['data']['optionsita']
+            except common.CallException:
+                pass
 
             ret_realms.append(ret_realm)
 
@@ -1928,6 +1944,31 @@ def __realm_update(organization_id, organization_name, organization_enbaled):
         raise common.InternalErrorException(message_id=message_id, message=message)
 
     return
+
+
+def __get_ita_organization(organization_id):
+    """_summary_
+
+    Args:
+        organization_id (_type_): _description_
+
+    Returns:
+        dict: _description_
+    """
+    header_para = {
+        "User-Id": request.headers.get("User-Id"),
+        "Roles": request.headers.get("Roles"),
+        "Language": request.headers.get("Language"),
+    }
+
+    # 呼び出し先設定
+    # Call destination setting
+    api_url = "{}://{}:{}".format(os.environ['ITA_API_ADMIN_PROTOCOL'], os.environ['ITA_API_ADMIN_HOST'], os.environ['ITA_API_ADMIN_PORT'])
+    response = requests.get(f"{api_url}/api/organizations/{organization_id}/ita/", headers=header_para)
+    if response.status_code != 200:
+        raise common.CallException(response.status_code, message_id=response.json.get('result'), message=response.json('message'))
+
+    return json.loads(response.text)
 
 
 @common.platform_exception_handler

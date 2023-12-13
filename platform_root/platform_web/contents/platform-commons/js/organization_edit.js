@@ -43,7 +43,8 @@ $(function(){
             call_api_promise_get_organization_plans(),
             // get plans
             call_api_promise_get_plans(),
-
+            // get all ita driver options
+            call_api_promise_get_ita_all_drivers(),
         ]).then(function(results) {
             // Display Menu
             displayMenu('menu_organizations');
@@ -56,7 +57,7 @@ $(function(){
             plan_before = results[2].data.sort((a,b) => a.start_datetime > b.start_datetime? 1: -1);
             plan_after = JSON.parse(JSON.stringify(plan_before));
             plan_master = results[3].data;
-            display_main(org_before, plan_after, plan_master);
+            display_main(org_before, plan_after, plan_master, results[4].data);
             // register button
             $('#button_register').on('click',() => {
                 on_click_button_register();
@@ -107,7 +108,17 @@ $(function(){
         });
     }
 
-    function display_main(row, org_plans, plans) {
+    function call_api_promise_get_ita_all_drivers() {
+        return call_api_promise({
+            type: "GET",
+            url: api_conf.api["it-automation"].settings.get,
+            headers: {
+                Authorization: "Bearer " + CommonAuth.getToken(),
+            },
+        });
+    }
+
+    function display_main(row, org_plans, plans, ita_all_drivers) {
         console.log("[CALL] display_main");
 
         //
@@ -129,6 +140,11 @@ $(function(){
         //リソースプランIDの一覧をモーダルに表示
         //
         display_org_plans_list(plans);
+
+        //
+        // Ita drivers option
+        //
+        display_ita_drivers(ita_all_drivers, row.optionsIta);
 
         //
         // オーガナイゼーションにリソースプランを設定 - set plan to the organization
@@ -277,9 +293,26 @@ $(function(){
         $('#organization_plan_list .datarow').css('display','');
     }
 
-    //
-    // オーガナイゼーションにリソースプランを設定 - set plan to the organization
-    //
+    function display_ita_drivers(ita_all_drivers, optionsIta) {
+
+        if(typeof optionsIta === "undefined" || optionsIta === null) {
+            alertMessage(getText("000-80018", "処理結果"), getText("000-80050", "情報取得に失敗したため編集できません"));
+            throw new Error("failed get optionIta");
+        } else {
+            const row_template = $('.ita-option-drivers .datarow-template').clone(true).removeClass('datarow-template').addClass('datarow').prop('outerHTML');
+            let html='';
+            for(var row of ita_all_drivers.drivers.options) {
+                html += row_template
+                .replace(/\${id}/g, fn.cv(row.id,'',true))
+                .replace(/\${name}/g, fn.cv(row.name,'',true))
+                .replace(/\${checked}/g, optionsIta.drivers[row.id]? "checked": "")
+                .replace(/\${readonly_display}/g, optionsIta.drivers[row.id]? "": "display: none")
+                .replace(/\${edit_display}/g, optionsIta.drivers[row.id]? "display: none": "")
+            }
+            $(".ita-option-drivers").append(html);
+            $(".ita-option-drivers .datarow").css('display', '');
+        }
+    }
 
     // モーダル画面表示
     $('#button_detail_modal_open').on('click',() => {
@@ -529,9 +562,17 @@ $(function(){
     // register organization
     //
     function organization_register() {
+        const ita_install_drivers = {}
+        $('.ita-option-drivers .datarow .ita-option-driver').each(function() {
+            ita_install_drivers[$(this).val()] = $(this).prop("checked");
+        })
+
         let reqbody =   {
             "name": $('#form_organization_name').val(),
             "enabled": ($('#form_organization_enabled').prop('checked') ? true : false),
+            "optionsIta": {
+                "drivers": ita_install_drivers
+            }
         }
         return call_api_promise(
             {
