@@ -296,6 +296,11 @@ paths:
                               type: boolean
                             oase:
                               type: boolean
+                          required:
+                            - terraform_cloud_ep
+                            - terraform_cli
+                            - ci_cd
+                            - oase
                   required:
                     - name
                     - enabled
@@ -712,6 +717,20 @@ components:
           type: boolean
           description: organization enabled(true) or disabled(false)
           example: true
+        optionsIta:
+          type: object
+          properties:
+            drivers:
+              type: object
+              properties:
+                terraform_cloud_ep:
+                  type: boolean
+                terraform_cli:
+                  type: boolean
+                ci_cd:
+                  type: boolean
+                oase:
+                  type: boolean
         status:
           type: string
           example: Organization Create Complete
