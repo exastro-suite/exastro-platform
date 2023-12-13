@@ -47,6 +47,9 @@ properties:
           - terraform_cli
           - ci_cd
           - oase
+    required:
+      - drivers
 required:
   - name
   - enabled
+  - optionsIta

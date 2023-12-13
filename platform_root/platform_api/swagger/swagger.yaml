@@ -4111,6 +4111,8 @@ components:
       description: "terraform_cloud_ep: Terraform-Cloud/EP driver <br/>terraform_cli:\
         \ Terraform-CLI driver, <br/>ci_cd: CI/CD for IaC, <br/>oase: OASE, "
     apiplatformorganizationsorganization_id_optionsIta:
+      required:
+      - drivers
       type: object
       properties:
         drivers:
@@ -4122,6 +4124,7 @@ components:
         required:
         - enabled
         - name
+        - optionsIta
         type: object
         properties:
           name:
