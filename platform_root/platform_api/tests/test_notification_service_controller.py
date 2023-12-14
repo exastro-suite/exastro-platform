@@ -55,10 +55,10 @@ def test_notification_api(connexion_client):
 
         # Mail+Teams通知の追加
         request_json = [
-            sample_data_mail('mix-mail-01'),
-            sample_data_teams('mix-teams-01'),
-            sample_data_mail('mix-mail-02'),
-            sample_data_teams('mix-teams-02'),
+            sample_data_mail('mix-mail-01', {"name": "mail_name1"}),
+            sample_data_teams('mix-teams-01', {"name": "teams_name1"}),
+            sample_data_mail('mix-mail-02', {"name": "mail_name2"}),
+            sample_data_teams('mix-teams-02', {"name": "teams_name2"}),
         ]
 
         response = connexion_client.post(
@@ -407,14 +407,50 @@ def test_settings_notification_create(connexion_client):
 
         assert response.status_code == 200, "create notifications (kind = mail) response code"
 
+        # Mail通知の追加(json same name exists)
+        response = connexion_client.post(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/settings/notifications",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization["user_id"]),
+            json=[sample_data_mail('mail-02', {"name": "same_name"}), sample_data_mail('mail-03', {"name": "same_name"})])
+
+        assert response.status_code == 400, "create notifications json same name exists"
+        assert response.json["result"] == "400-34002", "create notifications json same name exists"
+
+        # Mail通知の追加(same name db exists)
+        response = connexion_client.post(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/settings/notifications",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization["user_id"]),
+            json=[sample_data_mail('mail-02')])
+
+        assert response.status_code == 400, "create notifications same name db exists"
+        assert response.json["result"] == "400-34003", "create notifications same name db exists"
+
         # Mail通知の追加(alredy exists)
         response = connexion_client.post(
             f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/settings/notifications",
             content_type='application/json',
             headers=request_parameters.request_headers(organization["user_id"]),
-            json=[sample_data_mail('mail-01')])
+            json=[sample_data_mail('mail-01', {"name": "id_exists_error"})])
 
         assert response.status_code == 400, "create notifications already exists"
+        assert response.json["result"] == "400-34001", "create notifications already exists"
+
+    sql_where = " WHERE DESTINATION_NAME = %(destination_name)s"
+
+    with test_common.requsts_mocker_default(), \
+            test_common.pymysql_execute_raise_exception_mocker(queries_notification.SQL_QUERY_NOTIFICATION_DESTINATION + sql_where, Exception("DB Error Test")):
+        #
+        # DB error route
+        #
+        response = connexion_client.post(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/settings/notifications",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization["user_id"]),
+            json=[sample_data_mail('mail-db-error', {"name": "name_db_error"})])
+
+        assert response.status_code == 500, "create notifications response code: db error"
 
     with test_common.requsts_mocker_default(), \
             test_common.pymysql_execute_raise_exception_mocker(queries_notification.SQL_INSERT_NOTIFICATION_DESTINATION, Exception("DB Error Test")):
@@ -425,7 +461,7 @@ def test_settings_notification_create(connexion_client):
             f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/settings/notifications",
             content_type='application/json',
             headers=request_parameters.request_headers(organization["user_id"]),
-            json=[sample_data_mail('mail-db-error')])
+            json=[sample_data_mail('mail-db-error', {"name": "name_db_error"})])
 
         assert response.status_code == 500, "create notifications response code: db error"
 
@@ -1073,6 +1109,15 @@ def test_settings_notification_put(connexion_client):
             json=sample_data_mail(setting_notifications[0]['id']))
 
         assert response.status_code == 200, "update notifications response code OK route"
+
+        response = connexion_client.put(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/settings/notifications/{setting_notifications[0]['id']}",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization["user_id"]),
+            json=sample_data_mail(setting_notifications[0]['id'], {"name": setting_notifications[1]['name']}))
+
+        assert response.status_code == 400, "update notifications response code same name error route"
+        assert response.json["result"] == "400-34004", "update notifications response code same name error route"
 
     with test_common.requsts_mocker_default(), \
             test_common.pymysql_execute_raise_exception_mocker(queries_notification.SQL_UPDATE_NOTIFICATION_DESTINATION, Exception("DB Error Test")):
