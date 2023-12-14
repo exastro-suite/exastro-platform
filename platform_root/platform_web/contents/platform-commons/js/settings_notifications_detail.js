@@ -211,18 +211,43 @@ $(function(){
         ];
 
         show_progress();
-        call_api_promise(
-            {
-                type: "POST",
-                url: api_conf.api.workspaces.notifications.post.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{workspace_id}/g, workspace_id),
-                headers: {
-                    Authorization: "Bearer " + CommonAuth.getToken(),
-                },
-                data: JSON.stringify(reqbody),
-                contentType: "application/json",
-                dataType: "json",
+        new Promise((resolve, reject) => {
+            if(destination_row.kind === DESTINATION_KIND_MAIL) {
+                // メールの場合、メールサーバ設定情報を確認する
+                call_api_promise({
+                    type: "GET",
+                    url: api_conf.api.settings.mailserver.get.replace(/{organization_id}/g, CommonAuth.getRealm()),
+                    headers: {
+                        Authorization: "Bearer " + CommonAuth.getToken(),
+                    },
+                    contentType: "application/json",
+                    dataType: "json",
+                }).then((response_json) => {
+                    if(typeof response_json.data.smtp_host !== "undefined") {
+                        resolve();
+                    } else {
+                        reject();
+                        alertMessage(getText("000-80018", "処理結果"), getText("000-87039", "メール通知を行う前にメール送信サーバー設定を実施してください"));
+                    }
+                }).catch(() => {
+                    reject();
+                });
+            } else {
+                resolve();
             }
-        ).then(() => {
+        }).then(() => {
+            return call_api_promise(
+                {
+                    type: "POST",
+                    url: api_conf.api.workspaces.notifications.post.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{workspace_id}/g, workspace_id),
+                    headers: {
+                        Authorization: "Bearer " + CommonAuth.getToken(),
+                    },
+                    data: JSON.stringify(reqbody),
+                    contentType: "application/json",
+                    dataType: "json",
+                });
+        }).then(() => {
             hide_progress();
             $('#button_test').prop('disabled',false);
             alertMessage(getText("000-80018", "処理結果"), getText("000-87035", "テスト通知を完了しました。結果が通知先に送信されるまでお待ちください。"));
