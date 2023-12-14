@@ -2015,7 +2015,12 @@ def __get_ita_organization(organization_id):
     api_url = "{}://{}:{}".format(os.environ['ITA_API_ADMIN_PROTOCOL'], os.environ['ITA_API_ADMIN_HOST'], os.environ['ITA_API_ADMIN_PORT'])
     response = requests.get(f"{api_url}/api/organizations/{organization_id}/ita/", headers=header_para)
     if response.status_code != 200:
-        raise common.CallException(response.status_code, message_id=response.json.get('result'), message=response.json('message'))
+        try:
+            resp_json = json.loads(response.text)
+        except Exception:
+            resp_json = {}
+
+        raise common.CallException(response.status_code, message_id=resp_json.get('result'), message=resp_json.get('message'))
 
     return json.loads(response.text)
 
