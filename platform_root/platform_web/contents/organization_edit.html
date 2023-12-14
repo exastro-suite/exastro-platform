@@ -143,6 +143,36 @@
                                                         <td class="tBodyTd td" rowspan="1" colspan="1" }=""></td>
                                                     </tr>
                                                 </tbody>
+                                                <tbody class="tbody">
+                                                    <tr class="tBodyTr tr">
+                                                        <td data-id="c1" data-rest="id" class="popup th2" rowspan="1" colspan="3" }="" title="【IT Automation オプション設定】" attr-text-id="title=000-85019" width="250px;"><div class="ci" text-id="000-85019">【IT Automation オプション設定】</div></td>
+                                                    </tr>
+                                                </tbody>
+                                                <thead class="thead">
+                                                    <tr class="tHeadTr tr">
+                                                        <th data-id="c1" data-rest="id" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="項目名" attr-text-id="title=000-80020" width="250px;"><div class="ci" text-id="000-80020">項目名</div></th>
+                                                        <th data-id="c2" data-rest="name" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="設定値" attr-text-id="title=000-80021" style="min-width:400px;"><div class="ci" text-id="000-80021">設定値</div></th>
+                                                        <th data-id="c3" data-rest="name" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="備考" attr-text-id="title=000-80023"><div class="ci" text-id="000-80023">備考</div></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody class="tbody">
+                                                    <tr class="tBodyTr tr">
+                                                        <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: left;" text-id="000-85020">インストールドライバ</div></td>
+                                                        <td class="tBodyTd td ita-option-drivers" rowspan="1" colspan="1" }="">
+                                                            <div class="ci datarow-template" style="display:none">
+                                                                <span style="${readonly_display};">
+                                                                    <span class="icon icon-check" style="margin-left:5px;"></span>${name}
+                                                                </span>
+                                                                <span style="${edit_display};">
+                                                                    <label for="ita-option-driver-${id}" style="cursor: pointer">
+                                                                        <input type="checkbox" class="ita-option-driver" id="ita-option-driver-${id}" value="${id}" ${checked}>${name}
+                                                                    </label>
+                                                                </span>
+                                                            </div>
+                                                        </td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci textOverWrap" text-id="000-85049">インストール済みのドライバの削除はできません</div></td>
+                                                    </tr>
+                                                </tbody>
                                             </table>
                                             <table class="table" width="100%">
                                                 <tbody class="tHeadBlank">
@@ -175,7 +205,7 @@
                                                                     </thead>
                                                                     <tbody class="tbody">
                                                                         <tr class="tBodyTr tr datarow-template ${changed}" style="display:none">
-                                                                            <td class="tBodyLeftSticky tBodyTh tBodyTd td" rowspan="1" colspan="1" }="" ><div class="ci">${plan_id}</div></td>
+                                                                            <td class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1" }="" ><div class="ci">${plan_id}</div></td>
                                                                             <td class="tBodyTd td" rowspan="1" colspan="1" }="" ><div class="ci">${plan_name}</div></td>
                                                                             <td class="tBodyTd td" rowspan="1" colspan="1" }="" ><div class="ci">${plan_start_datetime}</div></td>
                                                                             <td class="tBodyTd td" rowspan="1" colspan="1" }="" ><div class="ci">${plan_create_timestamp}</div></td>

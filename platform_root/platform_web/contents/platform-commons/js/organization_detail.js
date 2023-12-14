@@ -35,7 +35,8 @@ $(function(){
             call_api_promise_get_organization_plans(),
             // get plans
             call_api_promise_get_plans(),
-
+            // get ita all drivers
+            call_api_promise_get_ita_all_drivers(),
         ]).then(function(results) {
             // Display Menu
             displayMenu('menu_organizations');
@@ -45,7 +46,7 @@ $(function(){
                 {"text": getText("000-85027", "オーガナイゼーション詳細"), "href": location_conf.href.organizations.detail.replace(/{organization_id}/g, organization_id) },
             ]);
             plan_master = results[3].data;
-            display_main(results[1].data, results[2].data, plan_master);
+            display_main(results[1].data, results[2].data, plan_master, results[4].data);
             finish_onload_progress();
 
         }).catch((e) => {
@@ -92,7 +93,17 @@ $(function(){
         })
     }
 
-    function display_main(row, org_plans,plans) {
+    function call_api_promise_get_ita_all_drivers() {
+        return call_api_promise({
+            type: "GET",
+            url: api_conf.api["it-automation"].settings.get,
+            headers: {
+                Authorization: "Bearer " + CommonAuth.getToken(),
+            },
+        });
+    }
+
+    function display_main(row, org_plans, plans, ita_all_drivers) {
         console.log("[CALL] display_main");
 
         //
@@ -128,10 +139,14 @@ $(function(){
         display_organization_managers_list(row.organization_managers);
 
         //
+        // display ita driver
+        //
+        display_ita_driver(row.optionsIta, ita_all_drivers);
+
+        //
         // オーガナイゼーションに紐づいているリソースプラン一覧の表示 - plan of the organization list display
         //
         display_organization_plan_list(org_plans);
-
     }
 
     //
@@ -168,6 +183,31 @@ $(function(){
 
         }
         $('#organization_managers_list .datarow').css('display','');
+    }
+
+    //
+    // display ita driver
+    //
+    function display_ita_driver(optionsIta, ita_all_drivers) {
+        if(typeof optionsIta === "undefined" || optionsIta === null) {
+            $(".ita-option-drivers .faild").css('display', '');
+        } else {
+            const row_template = $('.ita-option-drivers .datarow-template').clone(true).removeClass('datarow-template').addClass('datarow').prop('outerHTML');
+            let html='';
+            for(var row of ita_all_drivers.drivers.options) {
+                if(optionsIta.drivers[row.id] === true) {
+                    html += row_template
+                    .replace(/\${id}/g, fn.cv(row.id,'',true))
+                    .replace(/\${name}/g, fn.cv(row.name,'',true))
+                }
+            }
+            if(html !== '') {
+                $(".ita-option-drivers").append(html);
+                $(".ita-option-drivers .datarow").css('display', '');
+            } else {
+                $(".ita-option-drivers .notfound").css('display', '');
+            }
+        }
     }
 
     $('.button_delete_organization').on('click',() => {
