@@ -1,0 +1,32 @@
+# not quate strings
+@sys-user-id = admin
+@sys-user-pw = password
+@org-user-id = admin
+@org-user-pw = password
+@base_sys_url = http://keycloak:8080
+
+# share org_id (同じものを複数記載すると最後の設定値が渡される)
+@org_id = org1
+
+# 1 api to ###
+
+# @name login
+POST {{base_sys_url}}/auth/realms/master/protocol/openid-connect/token
+content-type: application/x-www-form-urlencoded
+
+client_id=admin-cli
+&username={{sys-user-id}}
+&password={{sys-user-pw}}
+&grant_type=password
+
+###
+
+@token = {{login.response.body.$.access_token}}
+
+GET {{base_sys_url}}/auth/admin/realms/{{org_id}}/admin-events
+Authorization: Bearer {{token}}
+
+###
+
+GET {{base_sys_url}}/auth/admin/realms/{{org_id}}/events
+Authorization: Bearer {{token}}
