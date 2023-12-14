@@ -341,7 +341,7 @@ $(function(){
             },
             footer: {
                 button: {
-                    append: { text: '<span class="iconButtonIcon icon icon-plus"></span>'+getText("000-84013", '付与'), action: 'positive', style: 'width:200px;'},
+                    append: { text: '<span class="iconButtonIcon icon icon-plus"></span> '+getText("000-84013", '付与'), action: 'positive', style: 'width:200px;'},
                     close: { text: getText("000-80011", "閉じる"), action: "normal", style: 'width:200px;' }
                 }
             },
