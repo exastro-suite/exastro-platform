@@ -391,6 +391,7 @@ class LanguageList:
     lang_array['000-87036'] = 'Would you like to receive a test notification? <br><br>Title/Body: You will be notified via notification test.'
     lang_array['000-87037'] = 'Up to 36 characters / Available characters: single-byte alphanumeric characters, hyphens, underscores'
     lang_array['000-87038'] = 'Up to 255 characters / Usable characters: full-width/single-byte characters'
+    lang_array['000-87039'] = 'Please configure the email sending server settings before sending email notifications.'
     lang_array['000-88001'] = 'Settings Notification Destination details / Notification Management / Exastro Platform'
     lang_array['000-88002'] = 'Email sending server settings'
     lang_array['000-88003'] = 'Please set up your email sending smtp server.'
