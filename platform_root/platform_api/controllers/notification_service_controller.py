@@ -113,6 +113,27 @@ def settings_notification_put(body, organization_id, workspace_id, destination_i
     db = DBconnector()
     with closing(db.connect_workspacedb(organization_id, workspace_id)) as conn:
         with conn.cursor() as cursor:
+
+            sql_where = " WHERE DESTINATION_ID != %(destination_id)s"
+            sql_where += " AND DESTINATION_NAME = %(destination_name)s"
+            parameter = {
+                "destination_id": destination_id,
+                "destination_name": destination_name,
+            }
+            cursor.execute(queries_notification.SQL_QUERY_NOTIFICATION_DESTINATION + sql_where, parameter)
+            result = cursor.fetchone()
+
+            # 取得した結果が存在した場合は、エラーとする
+            # If the obtained result exists, it will be an error.
+            if result is not None:
+                message_id = f"400-{MSG_FUNCTION_ID}004"
+                message = multi_lang.get_text(
+                    message_id,
+                    "指定された通知先名はすでに存在しているため更新できません({0})",
+                    destination_name,
+                )
+                raise common.BadRequestException(message_id=message_id, message=message)
+
             # Check workspace exists
             cursor.execute(
                 queries_notification.SQL_QUERY_NOTIFICATION_DESTINATION + " WHERE destination_id = %(destination_id)s FOR UPDATE",
@@ -155,6 +176,8 @@ def settings_notification_create(body, organization_id, workspace_id):  # noqa: 
     if not validate.ok:
         return common.response_validation_error(validate)
 
+    name_check = []
+
     for row in body:
         validate = validation.validate_destination_id(row.get('id'))
         if not validate.ok:
@@ -171,6 +194,57 @@ def settings_notification_create(body, organization_id, workspace_id):  # noqa: 
         validate = validation.validate_destination_conditions(row.get('conditions'))
         if not validate.ok:
             return common.response_validation_error(validate)
+
+        # nameの一意制約チェック
+        # name unique constraint check
+        destination_name = row.get('name')
+        if destination_name in name_check:
+            message_id = f"400-{MSG_FUNCTION_ID}002"
+            message = multi_lang.get_text(
+                message_id,
+                "同じ通知先名は指定できません({0})",
+                destination_name,
+            )
+            raise common.BadRequestException(message_id=message_id, message=message)
+
+        name_check.append(destination_name)
+
+        result = None
+        with closing(DBconnector().connect_workspacedb(organization_id, workspace_id)) as conn:
+            with conn.cursor() as cursor:
+                try:
+                    sql_where = " WHERE DESTINATION_NAME = %(destination_name)s"
+                    parameter = {
+                        "destination_name": destination_name,
+                    }
+                    try:
+                        cursor.execute(queries_notification.SQL_QUERY_NOTIFICATION_DESTINATION + sql_where, parameter)
+                        result = cursor.fetchone()
+
+                    except Exception as e:
+                        globals.logger.error(f"exception:{e.args}")
+                        message_id = f"500-{MSG_FUNCTION_ID}001"
+                        message = multi_lang.get_text(
+                            message_id,
+                            "通知先の作成に失敗しました(id:{0})",
+                            parameter['destination_id'],
+                        )
+                        raise common.InternalErrorException(message_id=message_id, message=message)
+
+                except Exception as e:
+                    conn.rollback()
+                    raise e
+
+        # 取得した結果が存在した場合は、エラーとする
+        # If the obtained result exists, it will be an error.
+        if result is not None:
+            message_id = f"400-{MSG_FUNCTION_ID}003"
+            message = multi_lang.get_text(
+                message_id,
+                "指定された通知先名はすでに存在しているため作成できません({0})",
+                destination_name,
+            )
+            raise common.BadRequestException(message_id=message_id, message=message)
 
     user_id = connexion.request.headers.get("User-id")
 

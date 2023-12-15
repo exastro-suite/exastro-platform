@@ -423,6 +423,14 @@ def organization_get(organization_id):  # noqa: E501
             # Get detailed information
             ret_realm = __realms_detail_get(organization_id, keycloak_realms, row, org_informations, token)
 
+            # ITA organization情報取得
+            # ITA organization information acquisition
+            try:
+                ita_org = __get_ita_organization(organization_id)
+                ret_realm['optionsIta'] = ita_org['data']['optionsita']
+            except common.CallException:
+                pass
+
     return common.response_200_ok(ret_realm)
 
 
@@ -445,6 +453,7 @@ def organization_update(organization_id):  # noqa: E501
     body = r.get_json()
     organization_name = body.get("name")
     organization_enabled = body.get("enabled")
+    options_ita = body.get("optionsIta")
 
     # メンテナンスモード(data_update_stop)中は、エラー
     # error during maintenance mode (data_update_stop)
@@ -474,6 +483,7 @@ def organization_update(organization_id):  # noqa: E501
             parameter = {
                 "organization_id": organization_id,
                 "organization_name": organization_name,
+                "options_ita": json.dumps(options_ita),
                 "last_update_user": user_id,
             }
             try:
@@ -489,6 +499,10 @@ def organization_update(organization_id):  # noqa: E501
                                               "オーガナイゼーションの更新に失敗しました(対象ID:{0})",
                                               organization_id)
                 raise common.InternalErrorException(message_id=message_id, message=message)
+
+    # ITA ドライバー インストール
+    # ITA driver installation
+    __ita_update(organization_id, user_id, options_ita)
 
     # オーガナイゼーションの更新
     # update organization
@@ -648,6 +662,14 @@ def organization_list():
             # 詳細情報取得
             # Get detailed information
             ret_realm = __realms_detail_get(organization_id, keycloak_org, row, org_informations, token)
+
+            # ITA organization情報取得（接続エラー以外のエラーが発生しても一覧は返す）
+            # Get ITA organization information (a list will be returned even if an error other than a connection error occurs)
+            try:
+                ita_org = __get_ita_organization(organization_id)
+                ret_realm['optionsIta'] = ita_org['data']['optionsita']
+            except common.CallException:
+                pass
 
             ret_realms.append(ret_realm)
 
@@ -1604,13 +1626,56 @@ def __ita_create(organization_id, user_id, options_ita):
         globals.logger.error(f"response.text:{response.text}")
         return_json = json.loads(response.text)
 
-        raise common.OtherException(status_code=response.status_code, data=return_json.get("data"), message_id=return_json.get("result"), message=return_json.get("message"))
+        raise common.CallException(status_code=response.status_code, data=return_json.get("data"), message_id=return_json.get("result"), message=return_json.get("message"))
 
     globals.logger.debug(response.text)
 
     # ステータス更新
     # update status
     __update_status(const.ORG_STATUS_ITA_CREATE, organization_id, user_id)
+
+    return
+
+
+def __ita_update(organization_id, user_id, options_ita):
+    """Exastro IT Automation update call
+
+    Args:
+        organization_id (str): organization id
+        user_id (str): user id
+        options_ita (dict): ita option
+    """
+
+    globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
+
+    header_para = {
+        "Content-Type": "application/json",
+        "User-Id": request.headers.get("User-Id"),
+        "Roles": request.headers.get("Roles"),
+        "Language": request.headers.get("Language"),
+    }
+
+    if options_ita is None or len(options_ita) == 0:
+        json_para = {}
+    else:
+        json_para = options_ita
+
+    # 呼び出し先設定
+    # Call destination setting
+    api_url = "{}://{}:{}".format(os.environ['ITA_API_ADMIN_PROTOCOL'], os.environ['ITA_API_ADMIN_HOST'], os.environ['ITA_API_ADMIN_PORT'])
+    response = requests.patch(f"{api_url}/api/organizations/{organization_id}/ita/", headers=header_para, json=json_para)
+
+    if response.status_code not in [200, 409]:
+        globals.logger.error(f"response.status_code:{response.status_code}")
+        globals.logger.error(f"response.text:{response.text}")
+        return_json = json.loads(response.text)
+
+        raise common.CallException(status_code=response.status_code, data=return_json.get("data"), message_id=return_json.get("result"), message=return_json.get("message"))
+
+    globals.logger.debug(response.text)
+
+    # organization作成後にステータス更新を行う必要は無いため、ここでステータス更新は実施しない
+    # No status update is performed here because there is no need to update the status after organization is created.
 
     return
 
@@ -1928,6 +1993,36 @@ def __realm_update(organization_id, organization_name, organization_enbaled):
         raise common.InternalErrorException(message_id=message_id, message=message)
 
     return
+
+
+def __get_ita_organization(organization_id):
+    """_summary_
+
+    Args:
+        organization_id (_type_): _description_
+
+    Returns:
+        dict: _description_
+    """
+    header_para = {
+        "User-Id": request.headers.get("User-Id"),
+        "Roles": request.headers.get("Roles"),
+        "Language": request.headers.get("Language"),
+    }
+
+    # 呼び出し先設定
+    # Call destination setting
+    api_url = "{}://{}:{}".format(os.environ['ITA_API_ADMIN_PROTOCOL'], os.environ['ITA_API_ADMIN_HOST'], os.environ['ITA_API_ADMIN_PORT'])
+    response = requests.get(f"{api_url}/api/organizations/{organization_id}/ita/", headers=header_para)
+    if response.status_code != 200:
+        try:
+            resp_json = json.loads(response.text)
+        except Exception:
+            resp_json = {}
+
+        raise common.CallException(response.status_code, message_id=resp_json.get('result'), message=resp_json.get('message'))
+
+    return json.loads(response.text)
 
 
 @common.platform_exception_handler

@@ -120,7 +120,7 @@ $(function(){
             const row_template = $('#organization_list .datarow-template').clone(true).removeClass('datarow-template').addClass('datarow').prop('outerHTML');
             let html='';
             for(var row of organizations) {
-                const plan_name = (plans.find(plan => plan.id == row.active_plan.id)??{name:""}).name
+                const plan_name = (plans.find(plan => plan.id == row.active_plan.id)??{name:"_default plan"}).name
 
                 html += row_template
                     .replace(/\${organization_id}/g, fn.cv(row.id,'',true))

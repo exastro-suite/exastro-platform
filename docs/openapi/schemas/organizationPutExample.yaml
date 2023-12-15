@@ -15,5 +15,13 @@
 value:
   {
     "name": "name of org1",
-    "enabled": true
+    "enabled": true,
+    "optionsIta": {
+      "drivers": {
+        "terraform_cloud_ep": true,
+        "terraform_cli": true,
+        "ci_cd": true,
+        "oase": true
+      }
+    }
   }

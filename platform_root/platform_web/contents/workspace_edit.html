@@ -105,14 +105,14 @@
                                                 </thead>
                                                 <tbody class="tbody">
                                                     <tr class="tBodyTr tr">
-                                                        <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: left;"><span text-id="000-00101">ワークスペースID</span></div></td>
+                                                        <th class="tBodyTh th" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: left;"><span text-id="000-00101">ワークスペースID</span></div></td>
                                                         <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci" id="display_workspace_id"></div>
                                                             <input type="hidden" id="form_workspace_id" value="">
                                                         </td>
                                                         <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci textOverWrap"></div></td>
                                                     </tr>
                                                     <tr class="tBodyTr tr">
-                                                        <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: left;"><span text-id="000-00102">ワークスペース名</span><span class="tHeadRequired" text-id="000-80024">必須</span></div></td>
+                                                        <th class="tBodyTh th" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: left;"><span text-id="000-00102">ワークスペース名</span><span class="tHeadRequired" text-id="000-80024">必須</span></div></td>
                                                         <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci">
                                                             <input type="text" value="" class="tableEditInputText inputText input inputTextWidthAdjustment" id="form_workspace_name" maxlength="255">
                                                             <span class="validate_error" id="message_workspace_name"></span>
@@ -120,7 +120,7 @@
                                                         <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci textOverWrap" text-id="000-82017">最大255文字 / 使用可能文字：全角・半角文字</div></td>
                                                     </tr>
                                                     <tr class="tBodyTr tr">
-                                                        <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: left;" text-id="000-82011">環境一覧</div></td>
+                                                        <th class="tBodyTh th" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: left;" text-id="000-82011">環境一覧</div></td>
                                                         <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci">
                                                             <textarea wrap="soft" rows="4" data-key="environments" data-id="3" data-required="0" data-int-min="0" data-int-max="5000" id="form_workspace_environments" class="tebleEditTextArea textarea input textareaAdjustment" maxlength="5000"></textarea>
                                                             <span class="validate_error" id="message_workspace_environments"></span>
@@ -128,7 +128,7 @@
                                                         <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci textOverWrap" text-id="000-82018">1環境 最大40文字 / 使用可能文字：全角・半角文字 / 改行で1環境</div></td>
                                                     </tr>
                                                     <tr class="tBodyTr tr">
-                                                        <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: left;" text-id="000-00106">説明</div></td>
+                                                        <th class="tBodyTh th" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: left;" text-id="000-00106">説明</div></td>
                                                         <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci">
                                                             <textarea wrap="soft" data-key="remarks" data-id="4" data-required="0" data-int-min="0" data-int-max="4000" id="form_workspace_description" class="tebleEditTextArea textarea input textareaAdjustment" maxlength="4000"></textarea>
                                                         </div></td>
@@ -137,7 +137,10 @@
                                                 </tbody>
                                             </table>
                                         </div>
-                                        <button data-type="tableNew" data-action="positive" style="width:200px;" class="itaButton tableHeaderMainMenuButton button" id="button_register"><span class="inner"><span class="icon icon-edit"></span><span text-id="000-80025">登録</span></span></button>
+                                        <button data-type="tableNew" data-action="positive" style="width:200px;" class="itaButton tableHeaderMainMenuButton button" id="button_register">
+                                            <span class="inner"><span class="icon icon-edit"></span>
+                                            <span text-id="000-80025">登録</span></span>
+                                        </button>
                                     </div>
                                 </div>
                             </section>

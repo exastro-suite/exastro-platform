@@ -47,6 +47,7 @@ WHERE ORGANIZATION_ID = %(organization_id)s
 SQL_UPDATE_ORGANIZATION = """
 UPDATE T_ORGANIZATION
 SET ORGANIZATION_NAME = %(organization_name)s
+, INFORMATIONS = json_replace(INFORMATIONS, "$.ext_options.options_ita", json_compact(%(options_ita)s))
 , LAST_UPDATE_USER = %(last_update_user)s
 WHERE ORGANIZATION_ID = %(organization_id)s
 """

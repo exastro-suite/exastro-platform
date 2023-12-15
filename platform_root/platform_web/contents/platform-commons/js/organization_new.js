@@ -33,6 +33,13 @@ $(function(){
                 },
                 contentType: "application/json",
                 dataType: "json",
+            }),
+            call_api_promise({
+                type: "GET",
+                url: api_conf.api["it-automation"].settings.get,
+                headers: {
+                    Authorization: "Bearer " + CommonAuth.getToken(),
+                },
             })
         ]).then(function(results) {
             // Display Menu
@@ -42,7 +49,7 @@ $(function(){
                 { "text": getText("000-85001", "オーガナイゼーション一覧"), "href": location_conf.href.organizations.list },
                 { "text": getText("000-85011", "新規オーガナイゼーション"), "href": location_conf.href.organizations.new },
             ]);
-            display_main(results[1].data);
+            display_main(results[1].data, results[2].data);
             finish_onload_progress();
 
         }).catch((e) => {
@@ -53,13 +60,17 @@ $(function(){
         });
     }
 
-    function display_main(plans) {
+    function display_main(plans, itaOptions) {
         console.log("[CALL] display_main");
 
         //
         // display plans list
         //
         display_plans_list(plans);
+        //
+        // display ita drivers
+        //
+        display_ita_drivers(itaOptions.drivers.options);
 
         //
         // register button
@@ -132,6 +143,21 @@ $(function(){
     }
 
     //
+    // display ita drivers
+    //
+    function display_ita_drivers(itaDrivers) {
+        const row_template = $('.ita-option-drivers .datarow-template').clone(true).removeClass('datarow-template').addClass('datarow').prop('outerHTML');
+        let html='';
+        for(var row of itaDrivers) {
+            html += row_template
+            .replace(/\${id}/g, fn.cv(row.id,'',true))
+            .replace(/\${name}/g, fn.cv(row.name,'',true))
+        }
+        $(".ita-option-drivers").append(html);
+        $(".ita-option-drivers .datarow").css('display', '');
+    }
+
+    //
     // validate register
     //
     function validate_register() {
@@ -193,11 +219,10 @@ $(function(){
         if($("#form_plan_id").val() != "") {
             plan_id = $("#form_plan_id").val();
         }
-        let no_install_driver = [];
-        $('input[name=form_ita_no_install_driver]:not(:checked)').each(function() {
-            no_install_driver.push( $(this).val() );
-        });
-        console.log("--- no_install_driver: [" + no_install_driver + "] ----");
+        const ita_install_drivers = {}
+        $('.ita-option-drivers .datarow .ita-option-driver').each(function() {
+            ita_install_drivers[$(this).val()] = $(this).prop("checked");
+        })
 
         let reqbody =   {
             "id": $('#form_organization_id').val(),
@@ -223,8 +248,8 @@ $(function(){
         if (plan_id != ""){
             reqbody.plan = { "id": plan_id };
         }
-        if(no_install_driver.length > 0) {
-            reqbody.optionsIta = { "no_install_driver" : no_install_driver };
+        if(Object.keys(ita_install_drivers).length > 0) {
+            reqbody.optionsIta = {"drivers" :  ita_install_drivers};
         }
 
         show_progress();

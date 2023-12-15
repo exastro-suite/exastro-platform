@@ -280,14 +280,44 @@ paths:
                       type: boolean
                       description: organization enabled(true) or disabled(false)
                       example: true
+                    optionsIta:
+                      type: object
+                      description: Organization Add Json Parameter (json of exastro-it-automation)
+                      properties:
+                        drivers:
+                          type: object
+                          description: 'terraform_cloud_ep: Terraform-Cloud/EP driver <br/>terraform_cli: Terraform-CLI driver, <br/>ci_cd: CI/CD for IaC, <br/>oase: OASE, '
+                          properties:
+                            terraform_cloud_ep:
+                              type: boolean
+                            terraform_cli:
+                              type: boolean
+                            ci_cd:
+                              type: boolean
+                            oase:
+                              type: boolean
+                          required:
+                            - terraform_cloud_ep
+                            - terraform_cli
+                            - ci_cd
+                            - oase
+                      required:
+                        - drivers
                   required:
                     - name
                     - enabled
+                    - optionsIta
             examples:
               organization:
                 value:
                   name: name of org1
                   enabled: true
+                  optionsIta:
+                    drivers:
+                      terraform_cloud_ep: true
+                      terraform_cli: true
+                      ci_cd: true
+                      oase: true
         required: true
       responses:
         '200':
@@ -690,6 +720,20 @@ components:
           type: boolean
           description: organization enabled(true) or disabled(false)
           example: true
+        optionsIta:
+          type: object
+          properties:
+            drivers:
+              type: object
+              properties:
+                terraform_cloud_ep:
+                  type: boolean
+                terraform_cli:
+                  type: boolean
+                ci_cd:
+                  type: boolean
+                oase:
+                  type: boolean
         status:
           type: string
           example: Organization Create Complete
@@ -720,15 +764,18 @@ components:
           type: object
           description: Organization Add Json Parameter (json of exastro-it-automation)
           properties:
-            no_install_driver:
-              type: array
-              items:
-                description: 'terraform_cloud_ep: Terraform-Cloud/EPドライバ, <br/>terraform_cli: Terraform-CLIドライバ, <br/>ci_cd: CI/CD for IaC '
-                type: string
-                enum:
-                  - terraform_cloud_ep
-                  - terraform_cli
-                  - ci_cd
+            drivers:
+              type: object
+              description: 'terraform_cloud_ep: Terraform-Cloud/EP driver <br/>terraform_cli: Terraform-CLI driver, <br/>ci_cd: CI/CD for IaC, <br/>oase: OASE, '
+              properties:
+                terraform_cloud_ep:
+                  type: boolean
+                terraform_cli:
+                  type: boolean
+                ci_cd:
+                  type: boolean
+                oase:
+                  type: boolean
       required:
         - id
     organizationUserCreate:
