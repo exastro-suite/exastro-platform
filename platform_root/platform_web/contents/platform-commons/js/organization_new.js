@@ -148,10 +148,12 @@ $(function(){
     function display_ita_drivers(itaDrivers) {
         const row_template = $('.ita-option-drivers .datarow-template').clone(true).removeClass('datarow-template').addClass('datarow').prop('outerHTML');
         let html='';
-        for(var row of itaDrivers) {
+        for(var row of itaDrivers.sort((a,b) => a.name === b.name? 0: a.name > b.name? 1 : -1 )) {
             html += row_template
             .replace(/\${id}/g, fn.cv(row.id,'',true))
             .replace(/\${name}/g, fn.cv(row.name,'',true))
+            .replace(/\${description-text}/g, typeof row.description === "undefined"? "" : fn.cv(row.description,'',true))
+            .replace(/\${description-display}/g, typeof row.description === "undefined"? "display: none;" : "")
         }
         $(".ita-option-drivers").append(html);
         $(".ita-option-drivers .datarow").css('display', '');
