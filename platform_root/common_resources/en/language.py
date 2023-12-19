@@ -309,7 +309,7 @@ class LanguageList:
     lang_array['000-85016'] = 'Resource plan'
     lang_array['000-85017'] = 'If omitted, the default resource plan will be set.'
     lang_array['000-85018'] = '[Organization administrator settings]'
-    lang_array['000-85019'] = '[IT Automation option settings]'
+    lang_array['000-85019'] = '[Exastro IT Automation option settings]'
     lang_array['000-85020'] = 'install driver'
     lang_array['000-85021'] = 'Terraform-Cloud/EP driver'
     lang_array['000-85022'] = 'Terraform-CLI driver'
