@@ -301,13 +301,15 @@ $(function(){
         } else {
             const row_template = $('.ita-option-drivers .datarow-template').clone(true).removeClass('datarow-template').addClass('datarow').prop('outerHTML');
             let html='';
-            for(var row of ita_all_drivers.drivers.options) {
+            for(var row of ita_all_drivers.drivers.options.sort((a,b) => a.name.toLowerCase() === b.name.toLowerCase()? 0: a.name.toLowerCase() > b.name.toLowerCase()? 1 : -1 )) {
                 html += row_template
                 .replace(/\${id}/g, fn.cv(row.id,'',true))
                 .replace(/\${name}/g, fn.cv(row.name,'',true))
                 .replace(/\${checked}/g, optionsIta.drivers[row.id]? "checked": "")
                 .replace(/\${readonly_display}/g, optionsIta.drivers[row.id]? "": "display: none")
                 .replace(/\${edit_display}/g, optionsIta.drivers[row.id]? "display: none": "")
+                .replace(/\${description-text}/g, typeof row.description === "undefined"? "" : fn.cv(row.description,'',true))
+                .replace(/\${description-display}/g, typeof row.description === "undefined"? "display: none;" : "")
             }
             $(".ita-option-drivers").append(html);
             $(".ita-option-drivers .datarow").css('display', '');
