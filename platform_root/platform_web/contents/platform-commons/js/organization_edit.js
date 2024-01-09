@@ -196,7 +196,6 @@ $(function(){
 
         let html = '';
         $(".form_plan_id").children().remove();
-        $('.form_plan_id').append($('<option>').html('').val(''));
         for(var row of planListData) {
             if (row["plan_id"].charAt(0) != '_')
             {
