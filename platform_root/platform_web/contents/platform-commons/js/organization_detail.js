@@ -194,7 +194,7 @@ $(function(){
         } else {
             const row_template = $('.ita-option-drivers .datarow-template').clone(true).removeClass('datarow-template').addClass('datarow').prop('outerHTML');
             let html='';
-            for(var row of ita_all_drivers.drivers.options) {
+            for(var row of ita_all_drivers.drivers.options.sort((a,b) => a.name.toLowerCase() === b.name.toLowerCase()? 0: a.name.toLowerCase() > b.name.toLowerCase()? 1 : -1 )) {
                 if(optionsIta.drivers[row.id] === true) {
                     html += row_template
                     .replace(/\${id}/g, fn.cv(row.id,'',true))
