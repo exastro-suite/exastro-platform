@@ -309,6 +309,7 @@ $(function(){
                 .replace(/\${edit_display}/g, optionsIta.drivers[row.id]? "display: none": "")
                 .replace(/\${description-text}/g, typeof row.description === "undefined"? "" : fn.cv(row.description,'',true))
                 .replace(/\${description-display}/g, typeof row.description === "undefined"? "display: none;" : "")
+                .replace(/\${disabled}/g, fn.cv(row.enable,false,false) ? "": "disabled")
             }
             $(".ita-option-drivers").append(html);
             $(".ita-option-drivers .datarow").css('display', '');
