@@ -154,6 +154,8 @@ $(function(){
             .replace(/\${name}/g, fn.cv(row.name,'',true))
             .replace(/\${description-text}/g, typeof row.description === "undefined"? "" : fn.cv(row.description,'',true))
             .replace(/\${description-display}/g, typeof row.description === "undefined"? "display: none;" : "")
+            .replace(/\${disabled}/g, fn.cv(row.enable,false,false) ? "": "disabled")
+            .replace(/\${checked}/g, fn.cv(row.enable,false,false) ? "checked": "")
         }
         $(".ita-option-drivers").append(html);
         $(".ita-option-drivers .datarow").css('display', '');
