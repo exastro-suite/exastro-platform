@@ -34,6 +34,14 @@ html {
     background-color: silver;
 }
 
+.itaOptionsDriversLabel {
+    cursor: hand;
+}
+
+input[type=checkbox]:disabled+.itaOptionsDriversLabel  {
+    cursor: default;
+    color: var(--black60)!important;
+}
 
 .detail_workspace {
     width: 70%;
