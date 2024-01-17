@@ -164,9 +164,8 @@
                                                                     <span class="icon icon-check" style="margin-left:5px;"></span>${name}
                                                                 </span>
                                                                 <span style="${edit_display};">
-                                                                    <label for="ita-option-driver-${id}" style="cursor: pointer">
-                                                                        <input type="checkbox" class="ita-option-driver" id="ita-option-driver-${id}" value="${id}" ${checked}>${name}
-                                                                    </label>
+                                                                    <input type="checkbox" class="ita-option-driver" id="ita-option-driver-${id}" value="${id}" ${checked} ${disabled}>
+                                                                    <label for="ita-option-driver-${id}" class="itaOptionsDriversLabel">${name}</label>
                                                                 </span>
                                                                 <span class="icon icon-circle_question popup question-icon" title="${description-text}" style="${description-display}"></span>
                                                             </div>
