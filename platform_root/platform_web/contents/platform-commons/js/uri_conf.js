@@ -107,6 +107,10 @@ var api_conf = {
                 "post": "/api/{organization_id}/platform/settings/mailserver",
                 "delete": "/api/{organization_id}/platform/settings/mailserver",
             },
+            "loglevel": {
+                "get": "/api/ita/loglevel-settings/",
+                "patch": "/api/ita/loglevel-settings/"
+            }
         },
 }
 }
@@ -171,7 +175,7 @@ var location_conf = {
             "new": "/platform/plans/_new",
             "list": "/platform/plans",
         },
-        "system_settings": {
+        "loglevel_settings": {
             "top": "/platform/settings",
         },
         "keycloak": {
