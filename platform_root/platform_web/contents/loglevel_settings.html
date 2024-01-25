@@ -19,8 +19,8 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta name="format-detection" content="telephone=no,email=no,address=no">
         <meta name="theme-color" content="#002B62">
-        <title text-id="">
-            ログレベル一覧 / ログレベル設定 / Exastro Platform
+        <title text-id="000-89010">
+            システム状態 / システム状態設定 / Exastro Platform
         </title>
         <link rel="stylesheet" href="/_/platform-commons/css/platform.css?ver=__BUILD_VERSION__">
 
@@ -74,15 +74,15 @@
                 <main id="main" style="visibility:hidden;">
                     <div id="content">
                         <div class="contentHeader">
-                            <h1 class="contentTitle"><span class="contentTitleInner" text-id="000-80039">ログレベル設定</span></h1>
-                            <p class="contentMenuInfo" text-id="000-89001">サービス毎のログレベルをメンテナンス(閲覧/変更)できます。</p>
+                            <h1 class="contentTitle"><span class="contentTitleInner" text-id="000-80039">システム状態設定</span></h1>
+                            <p class="contentMenuInfo" text-id="000-89001">サービス毎のシステム状態をメンテナンス(閲覧/変更)できます。</p>
                         </div>
                         <div class="contentBody">
                             <div class="contentMenu">
                                 <ul class="contentMenuList">
                                     <li class="contentMenuItem">
                                         <a class="contentMenuLink tabOpen" href="#dataList" tabindex="-1">
-                                            <span class="inner" text-id="000-80008">一覧</span>
+                                            <span class="inner" text-id="000-89011">システム状態</span>
                                         </a>
                                     </li>
                                 </ul>
@@ -91,25 +91,72 @@
                                 <div class="sectionBody">
                                     <div id="MT" class="tableContainer viewTable">
                                         <div class="tableBody">
-                                            <table class="table" id="loglevel_list">
+                                            <table class="table" width="100%">
+                                                <thead class="tbody">
+                                                    <tr class="tBodyTr tr">
+                                                        <td data-id="c1" data-rest="id" class="popup th2" rowspan="1" colspan="3" title="【メンテナンスモード切替】" attr-text-id="title=000-89006"><div class="ci" text-id="000-89006">【メンテナンスモード切替】</div></td>
+                                                    </tr>
+                                                </thead>
                                                 <thead class="thead">
                                                     <tr class="tHeadTr tr">
-                                                        <th data-id="c1" data-rest="service" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="サービス名" attr-text-id="title=000-89002" width="400px;"><div class="ci" text-id="000-89002">サービス名</div></th>
-                                                        <th data-id="c2" data-rest="loglevel" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="ログレベル" attr-text-id="title=000-89003" width="250px;"><div class="ci" text-id="000-89003">ログレベル</div></th>
+                                                        <th data-id="c1" data-rest="id" class="tHeadTh popup th" rowspan="1" colspan="1" title="項目名" attr-text-id="title=000-80020" width="250px;"><div class="ci" text-id="000-80020">項目名</div></th>
+                                                        <th data-id="c2" data-rest="name" class="tHeadTh popup th" rowspan="1" colspan="1" title="設定値" attr-text-id="title=000-80021" style="min-width:400px;"><div class="ci" text-id="000-80021">設定値</div></th>
+                                                        <th data-id="c3" data-rest="name" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="備考" attr-text-id="title=000-80023"><div class="ci" text-id="000-80023">備考</div></th>
+                                                    </tr>
+                                                </thead>
+                                                <thead class="tbody">
+                                                    <tr class="tBodyTr tr">
+                                                        <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1" width="300px;"><div class="ci" style="text-align: left;"><span text-id="000-89008">バックヤード</span></div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1"><div class="ci">
+                                                            <div class="switchArea">
+                                                                <input type="checkbox" id="backyard_execute_stop"><label for="backyard_execute_stop"><span></span></label><div id="switchImg"></div>
+                                                            </div>
+                                                            <!-- <span class="validate_error" id="message_edit_plan_id"></span> -->
+                                                        </div>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci textOverWrap" text-id="000-85015">最大255文字 / 使用可能文字：全角・半角文字</div></td>
+                                                        </td>
+                                                    </tr>
+                                                    <tr class="tBodyTr tr">
+                                                        <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1" width="300px;"><div class="ci" style="text-align: left;"><span text-id="000-89009">データ更新</span></div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1"><div class="ci">
+                                                            <div class="switchArea">
+                                                                <input type="checkbox" id="data_update_stop"><label for="data_update_stop"><span></span></label><div id="switchImg"></div>
+                                                            </div>
+                                                            <!-- <span class="validate_error" id="message_edit_plan_id"></span> -->
+                                                        </div>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci textOverWrap" text-id="000-85015">最大255文字 / 使用可能文字：全角・半角文字</div></td>
+                                                        </td>
+                                                    </tr>
+
+                                                </thead>
+                                            </table>
+
+                                            <table class="table" id="loglevel_list">
+                                                <thead class="tbody">
+                                                    <tr class="tBodyTr tr">
+                                                        <td data-id="c1" data-rest="id" class="popup th2" rowspan="1" colspan="3" title="【システム状態】" attr-text-id="title=000-89007"><div class="ci" text-id="000-89007">【システム状態】</div></td>
+                                                    </tr>
+                                                </thead>
+                                                <thead class="thead">
+                                                    <tr class="tHeadTr tr">
+                                                        <th data-id="c1" data-rest="service" class="tHeadTh popup th" rowspan="1" colspan="1" title="サービス名" attr-text-id="title=000-89002" width="400px;"><div class="ci" text-id="000-89002">サービス名</div></th>
+                                                        <th data-id="c2" data-rest="loglevel" class="tHeadTh popup th" rowspan="1" colspan="1" title="ログレベル" attr-text-id="title=000-89003" width="250px;"><div class="ci" text-id="000-89003">ログレベル</div></th>
+                                                        <th data-id="c3" data-rest="status" class="tHeadTh popup th" rowspan="1" colspan="1" title="実行状態" attr-text-id="title=000-89005" width="250px;"><div class="ci" text-id="000-89005">実行状態</div></th>
                                                     </tr>
                                                 </thead>
                                                 <tbody class="tbody">
                                                     <tr class="tBodyTr tr datarow-template" style="cursor:pointer; display:none">
-                                                        <td class="tBodyTh td to_detail" rowspan="1" colspan="1" }="" ><div class="ci" style="text-align: left;">${service}</div></td>
-                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci">
+                                                        <td class="tBodyTh td to_detail" rowspan="1" colspan="1" ><div class="ci" style="text-align: left;">${service}</div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1"><div class="ci">
                                                             <select class="input" id="form_loglevel${i}">
                                                                 <option value="${loglevel}" selected hidden>${loglevel}</option>
                                                                 <option value="INFO">INFO</option>
                                                                 <option value="DEBUG">DEBUG</option>
                                                         </div></td>
+                                                        <td class="tBodyTh td to_detail" rowspan="1" colspan="1" ><div class="ci">${status_name}</div></td>
                                                     </tr>
                                                     <tr class="tBodyTr tr notfound" style="display:none">
-                                                        <td class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="7" }="" height="50px"><div class="ci" style="text-align: center;" text-id="000-89004">
+                                                        <td class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="3" height="50px"><div class="ci" style="text-align: center;" text-id="000-89004">
                                                             サービスは存在しません
                                                         </div></td>
                                                     </tr>
