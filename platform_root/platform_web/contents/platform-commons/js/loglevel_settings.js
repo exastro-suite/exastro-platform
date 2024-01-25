@@ -27,6 +27,10 @@ $(function(){
             loadCommonContents(),
             // Get loglevel
             call_api_promise_get_loglevels(),
+            // Get Backyard Execution
+            call_api_promise_get_backyard_execution(),
+            // /// Get Maintenancemode
+            call_api_promise_get_Maintenancemode(),
 
         ]).then(function(results) {
             // Display Menu
@@ -36,7 +40,7 @@ $(function(){
                 {"text": getText("000-85001", "ログレベル設定"), "href": location_conf.href.loglevel_settings.top }
             ]);
 
-            display_main(results[1].data);
+            display_main(results[1].data, results[2].data, results[3].data);
 
             finish_onload_progress();
 
@@ -53,7 +57,7 @@ $(function(){
     function call_api_promise_get_loglevels() {
         return call_api_promise({
             type: "GET",
-            url: api_conf.api.settings.loglevel.get,
+            url: api_conf.api.settings.ita.loglevel.get,
             headers: {
                 Authorization: "Bearer " + CommonAuth.getToken(),
             },
@@ -62,8 +66,41 @@ $(function(){
         });
     }
 
-    function display_main(loglevels) {
+    function call_api_promise_get_backyard_execution(){
+        // /api/ita/backyard-execute-check/をよぶ
+        return call_api_promise({
+            type: "GET",
+            url: api_conf.api.settings.ita.backyard_execute_check.get,
+            headers: {
+                Authorization: "Bearer " + CommonAuth.getToken(),
+            },
+            contentType: "application/json",
+            dataType: "json",
+        });
+    }
+
+    function call_api_promise_get_Maintenancemode(){
+     // /api/platform/maintenance-mode-settingをよぶ
+        return call_api_promise({
+            type: "GET",
+                url: api_conf.api.settings["maintenance-mode-setting"].get,
+                headers: {
+                    Authorization: "Bearer " + CommonAuth.getToken(),
+                },
+                contentType: "application/json",
+                dataType: "json",
+        });
+    }
+
+
+    function display_main(loglevels,backyard_row,mainte_row) {
         console.log("[CALL] display_main");
+
+        $('#backyard_execute_stop').prop("checked", fn.cv(mainte_row.backyard_execute_stop, false, false));
+        $('#data_update_stop').prop("checked", fn.cv(mainte_row.data_update_stop, false, false));
+        // $('#backyard_execute_stop').prop("checked", fn.cv(mainte_row.backyard_execute_stop, false, "0")=="0"?false:true);
+        // $('#data_update_stop').prop("checked", fn.cv(mainte_row.data_update_stop, false, "0")=="0"?false:true);
+
 
         //
         // display organization list
@@ -97,7 +134,9 @@ $(function(){
             });
 
         }
+
     }
+
 
 
     function loglevel_register(loglevels) {
@@ -113,6 +152,7 @@ $(function(){
 
         console.log(reqbody);
 
+        // org_edit.js 493^517辺り参照
         show_progress();
         call_api_promise(
             {
