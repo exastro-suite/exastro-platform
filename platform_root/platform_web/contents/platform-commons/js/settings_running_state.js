@@ -102,180 +102,180 @@ $(function(){
         // backyard_exec_status list
         backyard_status_list = {};
 
-        // test data
-        backyard_row = {
-            "_execute_count": 0,
-            "org": {
-                "_execute_count": 0
-            },
-            "org1": {
-                "_execute_count": 0,
-                "ws1": {
-                    "_execute_count": 0,
-                    "ita-by-ansible-execute": [
-                        {
-                            "status_id": "5",
-                            "last_update_timestamp": "2024-01-24 01:02:03.000004",
-                            "status_name": "完了",
-                            "id": "(uuid)"
-                          },
-                          {
-                            "status_id": "1",
-                            "last_update_timestamp": "2024-01-23 01:02:03.000004",
-                            "status_name": "未実行",
-                            "id": "(uuid)"
-                          }
-                    ],
-                    "ita-by-conductor-synchronize": [],
-                    "ita-by-excel-export-import": [
-                        {
-                            "status_id": "5",
-                            "last_update_timestamp": "2024-01-24 01:02:03.000004",
-                            "status_name": "完了",
-                            "id": "(uuid)"
-                          },
-                          {
-                            "status_id": "1",
-                            "last_update_timestamp": "2024-01-23 01:02:03.000004",
-                            "status_name": "未実行",
-                            "id": "(uuid)"
-                          },
-                          {
-                            "status_id": "5",
-                            "last_update_timestamp": "2024-01-22 01:02:03.000004",
-                            "status_name": "完了",
-                            "id": "(uuid)"
-                          },
-                          {
-                            "status_id": "1",
-                            "last_update_timestamp": "2024-01-21 01:02:03.000004",
-                            "status_name": "未実行",
-                            "id": "(uuid)"
-                          },
-                          {
-                            "status_id": "5",
-                            "last_update_timestamp": "2024-01-20 01:02:03.000004",
-                            "status_name": "完了",
-                            "id": "(uuid)"
-                          },
-                          {
-                            "status_id": "1",
-                            "last_update_timestamp": "2024-01-19 01:02:03.000004",
-                            "status_name": "未実行",
-                            "id": "(uuid)"
-                          }
+        // // test data
+        // backyard_row = {
+        //     "_execute_count": 0,
+        //     "org": {
+        //         "_execute_count": 0
+        //     },
+        //     "org1": {
+        //         "_execute_count": 0,
+        //         "ws1": {
+        //             "_execute_count": 0,
+        //             "ita-by-ansible-execute": [
+        //                 {
+        //                     "status_id": "5",
+        //                     "last_update_timestamp": "2024-01-24 01:02:03.000004",
+        //                     "status_name": "完了",
+        //                     "id": "(uuid)"
+        //                   },
+        //                   {
+        //                     "status_id": "1",
+        //                     "last_update_timestamp": "2024-01-23 01:02:03.000004",
+        //                     "status_name": "未実行",
+        //                     "id": "(uuid)"
+        //                   }
+        //             ],
+        //             "ita-by-conductor-synchronize": [],
+        //             "ita-by-excel-export-import": [
+        //                 {
+        //                     "status_id": "5",
+        //                     "last_update_timestamp": "2024-01-24 01:02:03.000004",
+        //                     "status_name": "完了",
+        //                     "id": "(uuid)"
+        //                   },
+        //                   {
+        //                     "status_id": "1",
+        //                     "last_update_timestamp": "2024-01-23 01:02:03.000004",
+        //                     "status_name": "未実行",
+        //                     "id": "(uuid)"
+        //                   },
+        //                   {
+        //                     "status_id": "5",
+        //                     "last_update_timestamp": "2024-01-22 01:02:03.000004",
+        //                     "status_name": "完了",
+        //                     "id": "(uuid)"
+        //                   },
+        //                   {
+        //                     "status_id": "1",
+        //                     "last_update_timestamp": "2024-01-21 01:02:03.000004",
+        //                     "status_name": "未実行",
+        //                     "id": "(uuid)"
+        //                   },
+        //                   {
+        //                     "status_id": "5",
+        //                     "last_update_timestamp": "2024-01-20 01:02:03.000004",
+        //                     "status_name": "完了",
+        //                     "id": "(uuid)"
+        //                   },
+        //                   {
+        //                     "status_id": "1",
+        //                     "last_update_timestamp": "2024-01-19 01:02:03.000004",
+        //                     "status_name": "未実行",
+        //                     "id": "(uuid)"
+        //                   }
 
-                    ],
-                    "ita-by-menu-create": [],
-                    "ita-by-menu-export-import": [],
-                    "ita-by-terraform-cli-execute": [],
-                    "ita-by-terraform-cloud-ep-execute": []
-                },
-                "ws2": {
-                    "_execute_count": 0,
-                    "ita-by-ansible-execute": [],
-                    "ita-by-conductor-synchronize": [],
-                    "ita-by-excel-export-import": [],
-                    "ita-by-menu-create": [],
-                    "ita-by-menu-export-import": [],
-                    "ita-by-terraform-cli-execute": [],
-                    "ita-by-terraform-cloud-ep-execute": []
-                },
-                "ws3": {
-                    "_execute_count": 0,
-                    "ita-by-ansible-execute": [],
-                    "ita-by-conductor-synchronize": [],
-                    "ita-by-excel-export-import": [],
-                    "ita-by-menu-create": [],
-                    "ita-by-menu-export-import": [],
-                    "ita-by-terraform-cli-execute": [],
-                    "ita-by-terraform-cloud-ep-execute": []
-                }
-            },
-            "org10": {
-                "_execute_count": 0
-            },
-            "org12": {
-                "_execute_count": 0,
-                "ws1": {
-                    "_execute_count": 0,
-                    "ita-by-ansible-execute": [],
-                    "ita-by-conductor-synchronize": [],
-                    "ita-by-excel-export-import": [],
-                    "ita-by-menu-create": [],
-                    "ita-by-menu-export-import": [],
-                    "ita-by-terraform-cli-execute": [],
-                    "ita-by-terraform-cloud-ep-execute": []
-                },
-                "ws2": {
-                    "_execute_count": 0,
-                    "ita-by-ansible-execute": [],
-                    "ita-by-conductor-synchronize": [],
-                    "ita-by-excel-export-import": [],
-                    "ita-by-menu-create": [],
-                    "ita-by-menu-export-import": [],
-                    "ita-by-terraform-cli-execute": [],
-                    "ita-by-terraform-cloud-ep-execute": []
-                }
-            },
-            "org13": {
-                "_execute_count": 0
-            },
-            "org14": {
-                "WS1-_----1----_----2----_----3----_-": {
-                    "_execute_count": 0,
-                    "ita-by-ansible-execute": [],
-                    "ita-by-conductor-synchronize": [],
-                    "ita-by-excel-export-import": [],
-                    "ita-by-menu-create": [],
-                    "ita-by-menu-export-import": [],
-                    "ita-by-terraform-cli-execute": [],
-                    "ita-by-terraform-cloud-ep-execute": []
-                },
-                "WS2-_----1----_----2----_----3----_-": {
-                    "_execute_count": 0,
-                    "ita-by-ansible-execute": [],
-                    "ita-by-conductor-synchronize": [],
-                    "ita-by-excel-export-import": [],
-                    "ita-by-menu-create": [],
-                    "ita-by-menu-export-import": [],
-                    "ita-by-terraform-cli-execute": [],
-                    "ita-by-terraform-cloud-ep-execute": []
-                },
-                "_execute_count": 0
-            },
-            "org2": {
-                "_execute_count": 0
-            },
-            "org21": {
-                "_execute_count": 0
-            },
-            "org3": {
-                "_execute_count": 0,
-                "ws1": {
-                    "_execute_count": 0,
-                    "ita-by-ansible-execute": [],
-                    "ita-by-conductor-synchronize": [],
-                    "ita-by-excel-export-import": [],
-                    "ita-by-menu-create": [],
-                    "ita-by-menu-export-import": [],
-                    "ita-by-terraform-cli-execute": [],
-                    "ita-by-terraform-cloud-ep-execute": []
-                }
-            },
-            "org4": {
-                "_execute_count": 0
-            },
-            "org5": {
-                "_execute_count": 0
-            },
-            "org6": {
-                "_execute_count": 0
-            },
-            "org7": {
-                "_execute_count": 0
-            }
-        }
+        //             ],
+        //             "ita-by-menu-create": [],
+        //             "ita-by-menu-export-import": [],
+        //             "ita-by-terraform-cli-execute": [],
+        //             "ita-by-terraform-cloud-ep-execute": []
+        //         },
+        //         "ws2": {
+        //             "_execute_count": 0,
+        //             "ita-by-ansible-execute": [],
+        //             "ita-by-conductor-synchronize": [],
+        //             "ita-by-excel-export-import": [],
+        //             "ita-by-menu-create": [],
+        //             "ita-by-menu-export-import": [],
+        //             "ita-by-terraform-cli-execute": [],
+        //             "ita-by-terraform-cloud-ep-execute": []
+        //         },
+        //         "ws3": {
+        //             "_execute_count": 0,
+        //             "ita-by-ansible-execute": [],
+        //             "ita-by-conductor-synchronize": [],
+        //             "ita-by-excel-export-import": [],
+        //             "ita-by-menu-create": [],
+        //             "ita-by-menu-export-import": [],
+        //             "ita-by-terraform-cli-execute": [],
+        //             "ita-by-terraform-cloud-ep-execute": []
+        //         }
+        //     },
+        //     "org10": {
+        //         "_execute_count": 0
+        //     },
+        //     "org12": {
+        //         "_execute_count": 0,
+        //         "ws1": {
+        //             "_execute_count": 0,
+        //             "ita-by-ansible-execute": [],
+        //             "ita-by-conductor-synchronize": [],
+        //             "ita-by-excel-export-import": [],
+        //             "ita-by-menu-create": [],
+        //             "ita-by-menu-export-import": [],
+        //             "ita-by-terraform-cli-execute": [],
+        //             "ita-by-terraform-cloud-ep-execute": []
+        //         },
+        //         "ws2": {
+        //             "_execute_count": 0,
+        //             "ita-by-ansible-execute": [],
+        //             "ita-by-conductor-synchronize": [],
+        //             "ita-by-excel-export-import": [],
+        //             "ita-by-menu-create": [],
+        //             "ita-by-menu-export-import": [],
+        //             "ita-by-terraform-cli-execute": [],
+        //             "ita-by-terraform-cloud-ep-execute": []
+        //         }
+        //     },
+        //     "org13": {
+        //         "_execute_count": 0
+        //     },
+        //     "org14": {
+        //         "WS1-_----1----_----2----_----3----_-": {
+        //             "_execute_count": 0,
+        //             "ita-by-ansible-execute": [],
+        //             "ita-by-conductor-synchronize": [],
+        //             "ita-by-excel-export-import": [],
+        //             "ita-by-menu-create": [],
+        //             "ita-by-menu-export-import": [],
+        //             "ita-by-terraform-cli-execute": [],
+        //             "ita-by-terraform-cloud-ep-execute": []
+        //         },
+        //         "WS2-_----1----_----2----_----3----_-": {
+        //             "_execute_count": 0,
+        //             "ita-by-ansible-execute": [],
+        //             "ita-by-conductor-synchronize": [],
+        //             "ita-by-excel-export-import": [],
+        //             "ita-by-menu-create": [],
+        //             "ita-by-menu-export-import": [],
+        //             "ita-by-terraform-cli-execute": [],
+        //             "ita-by-terraform-cloud-ep-execute": []
+        //         },
+        //         "_execute_count": 0
+        //     },
+        //     "org2": {
+        //         "_execute_count": 0
+        //     },
+        //     "org21": {
+        //         "_execute_count": 0
+        //     },
+        //     "org3": {
+        //         "_execute_count": 0,
+        //         "ws1": {
+        //             "_execute_count": 0,
+        //             "ita-by-ansible-execute": [],
+        //             "ita-by-conductor-synchronize": [],
+        //             "ita-by-excel-export-import": [],
+        //             "ita-by-menu-create": [],
+        //             "ita-by-menu-export-import": [],
+        //             "ita-by-terraform-cli-execute": [],
+        //             "ita-by-terraform-cloud-ep-execute": []
+        //         }
+        //     },
+        //     "org4": {
+        //         "_execute_count": 0
+        //     },
+        //     "org5": {
+        //         "_execute_count": 0
+        //     },
+        //     "org6": {
+        //         "_execute_count": 0
+        //     },
+        //     "org7": {
+        //         "_execute_count": 0
+        //     }
+        // }
 
         //
         // display organization list
