@@ -184,8 +184,8 @@ var location_conf = {
             "new": "/platform/plans/_new",
             "list": "/platform/plans",
         },
-        "loglevel_settings": {
-            "top": "/platform/settings",
+        "settings_running_state": {
+            "top": "/platform/settings/running_state",
         },
         "keycloak": {
             "console": "/auth/admin/master/console",

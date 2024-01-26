@@ -34,10 +34,10 @@ $(function(){
 
         ]).then(function(results) {
             // Display Menu
-            displayMenu('menu_loglevel_settings');
+            displayMenu('menu_settings_running_state');
             // Display Topic Path
             displayTopicPath([
-                {"text": getText("000-85001", "ログレベル設定"), "href": location_conf.href.loglevel_settings.top }
+                {"text": getText("000-85001", "ログレベル設定"), "href": location_conf.href.settings_running_state.top }
             ]);
 
             display_main(results[1].data, results[2].data, results[3].data);
@@ -102,6 +102,7 @@ $(function(){
         // backyard_exec_status list
         backyard_status_list = {};
 
+        // test data
         backyard_row = {
             "_execute_count": 0,
             "org": {
@@ -126,7 +127,45 @@ $(function(){
                           }
                     ],
                     "ita-by-conductor-synchronize": [],
-                    "ita-by-excel-export-import": [],
+                    "ita-by-excel-export-import": [
+                        {
+                            "status_id": "5",
+                            "last_update_timestamp": "2024-01-24 01:02:03.000004",
+                            "status_name": "完了",
+                            "id": "(uuid)"
+                          },
+                          {
+                            "status_id": "1",
+                            "last_update_timestamp": "2024-01-23 01:02:03.000004",
+                            "status_name": "未実行",
+                            "id": "(uuid)"
+                          },
+                          {
+                            "status_id": "5",
+                            "last_update_timestamp": "2024-01-22 01:02:03.000004",
+                            "status_name": "完了",
+                            "id": "(uuid)"
+                          },
+                          {
+                            "status_id": "1",
+                            "last_update_timestamp": "2024-01-21 01:02:03.000004",
+                            "status_name": "未実行",
+                            "id": "(uuid)"
+                          },
+                          {
+                            "status_id": "5",
+                            "last_update_timestamp": "2024-01-20 01:02:03.000004",
+                            "status_name": "完了",
+                            "id": "(uuid)"
+                          },
+                          {
+                            "status_id": "1",
+                            "last_update_timestamp": "2024-01-19 01:02:03.000004",
+                            "status_name": "未実行",
+                            "id": "(uuid)"
+                          }
+
+                    ],
                     "ita-by-menu-create": [],
                     "ita-by-menu-export-import": [],
                     "ita-by-terraform-cli-execute": [],
@@ -343,7 +382,6 @@ $(function(){
 
         console.log(reqbody);
 
-        // org_edit.js 493^517辺り参照
         show_progress();
         call_api_promise(
             {
@@ -360,9 +398,9 @@ $(function(){
             return mainte_register();
         }).then(() => {
             hide_progress();
-            alertMessage(getText("000-80018", "処理結果"), getText("000-89014", "システム状態を変更しました"),
+            alertMessage(getText("000-80018", "処理結果"), getText("000-89014", "メンテナンスモード・ログレベル設定を変更しました"),
                 () => {
-                    window.location = location_conf.href.loglevel_settings.top;
+                    window.location = location_conf.href.settings_running_state.top;
                 });
         }).catch(() => {
             hide_progress();
