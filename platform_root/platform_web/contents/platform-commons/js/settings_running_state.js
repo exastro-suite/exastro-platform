@@ -290,7 +290,6 @@ $(function(){
             org_id = "";
             ws_id = "";
             by_name = "";
-            console.log("backyard_row:" + JSON.stringify(backyard_row));
             Object.keys(backyard_row).forEach(function (org_id) {
                 if (org_id == "_execute_count")  return;
                 Object.keys(backyard_row[org_id]).forEach(function (ws_id) {
@@ -301,8 +300,6 @@ $(function(){
                     });
                 });
             });
-            console.log("backyard_status_list:" + JSON.stringify(backyard_status_list));
-
 
             //
             // display loglevel list
