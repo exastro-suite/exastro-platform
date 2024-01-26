@@ -67,7 +67,7 @@ $(function(){
     }
 
     function call_api_promise_get_backyard_execution(){
-        // /api/ita/backyard-execute-check/をよぶ
+    // /api/ita/backyard-execute-check/をよぶ
         return call_api_promise({
             type: "GET",
             url: api_conf.api.settings.ita.backyard_execute_check.get,
@@ -360,7 +360,7 @@ $(function(){
             return mainte_register();
         }).then(() => {
             hide_progress();
-            alertMessage(getText("000-80018", "処理結果"), getText("", "システム状態を変更しました"),
+            alertMessage(getText("000-80018", "処理結果"), getText("000-89014", "システム状態を変更しました"),
                 () => {
                     window.location = location_conf.href.loglevel_settings.top;
                 });
