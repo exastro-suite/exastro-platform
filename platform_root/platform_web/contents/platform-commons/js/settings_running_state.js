@@ -37,7 +37,7 @@ $(function(){
             displayMenu('menu_settings_running_state');
             // Display Topic Path
             displayTopicPath([
-                {"text": getText("000-85001", "ログレベル設定"), "href": location_conf.href.settings_running_state.top }
+                {"text": getText("000-89011", "システム状態一覧"), "href": location_conf.href.settings_running_state.top }
             ]);
 
             display_main(results[1].data, results[2].data, results[3].data);
