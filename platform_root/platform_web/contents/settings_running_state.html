@@ -20,7 +20,7 @@
         <meta name="format-detection" content="telephone=no,email=no,address=no">
         <meta name="theme-color" content="#002B62">
         <title text-id="000-89010">
-            システム状態 / システム状態設定 / Exastro Platform
+            システム状態一覧 / システム状態設定 / Exastro Platform
         </title>
         <link rel="stylesheet" href="/_/platform-commons/css/platform.css?ver=__BUILD_VERSION__">
 
@@ -40,7 +40,7 @@
 
         <script src="/_/platform-commons/js/platform_common.js?ver=__BUILD_VERSION__"></script>
         <script src="/_/platform-commons/js/uri_conf.js?ver=__BUILD_VERSION__"></script>
-        <script src="/_/platform-commons/js/loglevel_settings.js?ver=__BUILD_VERSION__"></script>
+        <script src="/_/platform-commons/js/settings_running_state.js?ver=__BUILD_VERSION__"></script>
 
     </head>
     <body>
@@ -75,14 +75,14 @@
                     <div id="content">
                         <div class="contentHeader">
                             <h1 class="contentTitle"><span class="contentTitleInner" text-id="000-80039">システム状態設定</span></h1>
-                            <p class="contentMenuInfo" text-id="000-89001">サービス毎のシステム状態をメンテナンス(閲覧/変更)できます。</p>
+                            <p class="contentMenuInfo" text-id="000-89001">メンテナンスモードの切替やサービス毎のログレベルをメンテナンス(閲覧/変更)できます。</p>
                         </div>
                         <div class="contentBody">
                             <div class="contentMenu">
                                 <ul class="contentMenuList">
                                     <li class="contentMenuItem">
                                         <a class="contentMenuLink tabOpen" href="#dataList" tabindex="-1">
-                                            <span class="inner" text-id="000-89011">システム状態</span>
+                                            <span class="inner" text-id="000-89011">システム状態一覧</span>
                                         </a>
                                     </li>
                                 </ul>
@@ -100,8 +100,8 @@
                                                 <thead class="thead">
                                                     <tr class="tHeadTr tr">
                                                         <th data-id="c1" data-rest="id" class="tHeadTh popup th" rowspan="1" colspan="1" title="項目名" attr-text-id="title=000-80020" width="250px;"><div class="ci" text-id="000-80020">項目名</div></th>
-                                                        <th data-id="c2" data-rest="name" class="tHeadTh popup th" rowspan="1" colspan="1" title="設定値" attr-text-id="title=000-80021" style="min-width:400px;"><div class="ci" text-id="000-80021">設定値</div></th>
-                                                        <th data-id="c3" data-rest="name" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="備考" attr-text-id="title=000-80023"><div class="ci" text-id="000-80023">備考</div></th>
+                                                        <th data-id="c2" data-rest="name" class="tHeadTh popup th" rowspan="1" colspan="1" title="設定値" attr-text-id="title=000-80021"><div class="ci" text-id="000-80021">設定値</div></th>
+                                                        <th data-id="c3" data-rest="name" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="備考" attr-text-id="title=000-80023" style="min-width:400px;"><div class="ci" text-id="000-80023">備考</div></th>
                                                     </tr>
                                                 </thead>
                                                 <thead class="tbody">
@@ -131,29 +131,29 @@
                                                 </thead>
                                             </table>
 
-                                            <table class="table" id="loglevel_list">
+                                            <table class="table" id="loglevel_list" width="100%">
                                                 <thead class="tbody">
                                                     <tr class="tBodyTr tr">
-                                                        <td data-id="c1" data-rest="id" class="popup th2" rowspan="1" colspan="3" title="【システム状態】" attr-text-id="title=000-89007"><div class="ci" text-id="000-89007">【システム状態】</div></td>
+                                                        <td data-id="c1" data-rest="id" class="popup th2" rowspan="1" colspan="3" title="【ログレベル設定】" attr-text-id="title=000-89007"><div class="ci" text-id="000-89007">【ログレベル設定】</div></td>
                                                     </tr>
                                                 </thead>
                                                 <thead class="thead">
                                                     <tr class="tHeadTr tr">
                                                         <th data-id="c1" data-rest="service" class="tHeadTh popup th" rowspan="1" colspan="1" title="サービス名" attr-text-id="title=000-89002" width="400px;"><div class="ci" text-id="000-89002">サービス名</div></th>
                                                         <th data-id="c2" data-rest="loglevel" class="tHeadTh popup th" rowspan="1" colspan="1" title="ログレベル" attr-text-id="title=000-89003" width="250px;"><div class="ci" text-id="000-89003">ログレベル</div></th>
-                                                        <th data-id="c3" data-rest="status" class="tHeadTh popup th" rowspan="1" colspan="1" title="実行状態" attr-text-id="title=000-89005" width="250px;"><div class="ci" text-id="000-89005">実行状態</div></th>
+                                                        <th data-id="c3" data-rest="backyard_execute_info" class="tHeadTh popup th" rowspan="1" colspan="1" title="実行状態" attr-text-id="title=000-89005"><div class="ci" text-id="000-89005">実行状態</div></th>
                                                     </tr>
                                                 </thead>
                                                 <tbody class="tbody">
                                                     <tr class="tBodyTr tr datarow-template" style="cursor:pointer; display:none">
-                                                        <td class="tBodyTh td to_detail" rowspan="1" colspan="1" ><div class="ci" style="text-align: left;">${service}</div></td>
+                                                        <td class="tBodyTh td" rowspan="1" colspan="1" ><div class="ci" style="text-align: left;">${service}</div></td>
                                                         <td class="tBodyTd td" rowspan="1" colspan="1"><div class="ci">
                                                             <select class="input" id="form_loglevel${i}">
                                                                 <option value="${loglevel}" selected hidden>${loglevel}</option>
                                                                 <option value="INFO">INFO</option>
                                                                 <option value="DEBUG">DEBUG</option>
                                                         </div></td>
-                                                        <td class="tBodyTh td to_detail" rowspan="1" colspan="1" ><div class="ci">${status_name}</div></td>
+                                                        <td class="tBodyTh td" rowspan="1" colspan="1" ><div class="ci pre_wmax_ht100">${backyard_execute_info}</div></td>
                                                     </tr>
                                                     <tr class="tBodyTr tr notfound" style="display:none">
                                                         <td class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="3" height="50px"><div class="ci" style="text-align: center;" text-id="000-89004">
