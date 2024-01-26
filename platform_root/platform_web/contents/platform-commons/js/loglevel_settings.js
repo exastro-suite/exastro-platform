@@ -96,10 +96,8 @@ $(function(){
     function display_main(loglevels,backyard_row,mainte_row) {
         console.log("[CALL] display_main");
 
-        $('#backyard_execute_stop').prop("checked", fn.cv(mainte_row.backyard_execute_stop, false, false));
-        $('#data_update_stop').prop("checked", fn.cv(mainte_row.data_update_stop, false, false));
-        // $('#backyard_execute_stop').prop("checked", fn.cv(mainte_row.backyard_execute_stop, false, "0")=="0"?false:true);
-        // $('#data_update_stop').prop("checked", fn.cv(mainte_row.data_update_stop, false, "0")=="0"?false:true);
+        $('#backyard_execute_stop').prop("checked", fn.cv(mainte_row.backyard_execute_stop, false, "0")=="0"?false:true);
+        $('#data_update_stop').prop("checked", fn.cv(mainte_row.data_update_stop, false, "0")=="0"?false:true);
 
 
         //
@@ -157,7 +155,7 @@ $(function(){
         call_api_promise(
             {
                 type: "PATCH",
-                url: api_conf.api.settings.loglevel.patch,
+                url: api_conf.api.settings.ita.loglevel.patch,
                 headers: {
                     Authorization: "Bearer " + CommonAuth.getToken(),
                 },
@@ -166,8 +164,10 @@ $(function(){
                 dataType: "json",
             }
         ).then(() => {
+            return mainte_register();
+        }).then(() => {
             hide_progress();
-            alertMessage(getText("000-80018", "処理結果"), getText("", "ログレベルを変更しました"),
+            alertMessage(getText("000-80018", "処理結果"), getText("", "システム状態を変更しました"),
                 () => {
                     window.location = location_conf.href.loglevel_settings.top;
                 });
@@ -175,5 +175,29 @@ $(function(){
             hide_progress();
             $('#button_register').prop('disabled',false);
         })
+    }
+
+    //
+    // register setting maintenance mode
+    //
+
+    function mainte_register() {
+        let reqbody = {
+            "backyard_execute_stop": $('#backyard_execute_stop').prop("checked")?"1":"0",
+            "data_update_stop": $('#data_update_stop').prop("checked")?"1":"0"
+        }
+
+        show_progress();
+        call_api_promise(
+            {
+                type: "PATCH",
+                url: api_conf.api.settings["maintenance-mode-setting"].patch,
+                headers: {
+                    Authorization: "Bearer " + CommonAuth.getToken(),
+                },
+                data: JSON.stringify(reqbody),
+                contentType: "application/json",
+                dataType: "json",
+        });
     }
 });
