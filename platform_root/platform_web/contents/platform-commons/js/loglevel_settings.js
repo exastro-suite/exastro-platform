@@ -93,7 +93,7 @@ $(function(){
     }
 
 
-    function display_main(loglevels,backyard_row,mainte_row) {
+    function display_main(loglevels, backyard_row, mainte_row) {
         console.log("[CALL] display_main");
 
         $('#backyard_execute_stop').prop("checked", fn.cv(mainte_row.backyard_execute_stop, false, false));
@@ -101,6 +101,144 @@ $(function(){
         // $('#backyard_execute_stop').prop("checked", fn.cv(mainte_row.backyard_execute_stop, false, "0")=="0"?false:true);
         // $('#data_update_stop').prop("checked", fn.cv(mainte_row.data_update_stop, false, "0")=="0"?false:true);
 
+        // backyard_exec_status list
+        backyard_status_list = {};
+
+        backyard_row = {
+            "_execute_count": 0,
+            "org": {
+                "_execute_count": 0
+            },
+            "org1": {
+                "_execute_count": 0,
+                "ws1": {
+                    "_execute_count": 0,
+                    "ita-by-ansible-execute": [
+                        {
+                            "status_id": "5",
+                            "last_update_timestamp": "2024-01-24 01:02:03.000004",
+                            "status_name": "完了",
+                            "id": "(uuid)"
+                          },
+                          {
+                            "status_id": "1",
+                            "last_update_timestamp": "2024-01-23 01:02:03.000004",
+                            "status_name": "未実行",
+                            "id": "(uuid)"
+                          }
+                    ],
+                    "ita-by-conductor-synchronize": [],
+                    "ita-by-excel-export-import": [],
+                    "ita-by-menu-create": [],
+                    "ita-by-menu-export-import": [],
+                    "ita-by-terraform-cli-execute": [],
+                    "ita-by-terraform-cloud-ep-execute": []
+                },
+                "ws2": {
+                    "_execute_count": 0,
+                    "ita-by-ansible-execute": [],
+                    "ita-by-conductor-synchronize": [],
+                    "ita-by-excel-export-import": [],
+                    "ita-by-menu-create": [],
+                    "ita-by-menu-export-import": [],
+                    "ita-by-terraform-cli-execute": [],
+                    "ita-by-terraform-cloud-ep-execute": []
+                },
+                "ws3": {
+                    "_execute_count": 0,
+                    "ita-by-ansible-execute": [],
+                    "ita-by-conductor-synchronize": [],
+                    "ita-by-excel-export-import": [],
+                    "ita-by-menu-create": [],
+                    "ita-by-menu-export-import": [],
+                    "ita-by-terraform-cli-execute": [],
+                    "ita-by-terraform-cloud-ep-execute": []
+                }
+            },
+            "org10": {
+                "_execute_count": 0
+            },
+            "org12": {
+                "_execute_count": 0,
+                "ws1": {
+                    "_execute_count": 0,
+                    "ita-by-ansible-execute": [],
+                    "ita-by-conductor-synchronize": [],
+                    "ita-by-excel-export-import": [],
+                    "ita-by-menu-create": [],
+                    "ita-by-menu-export-import": [],
+                    "ita-by-terraform-cli-execute": [],
+                    "ita-by-terraform-cloud-ep-execute": []
+                },
+                "ws2": {
+                    "_execute_count": 0,
+                    "ita-by-ansible-execute": [],
+                    "ita-by-conductor-synchronize": [],
+                    "ita-by-excel-export-import": [],
+                    "ita-by-menu-create": [],
+                    "ita-by-menu-export-import": [],
+                    "ita-by-terraform-cli-execute": [],
+                    "ita-by-terraform-cloud-ep-execute": []
+                }
+            },
+            "org13": {
+                "_execute_count": 0
+            },
+            "org14": {
+                "WS1-_----1----_----2----_----3----_-": {
+                    "_execute_count": 0,
+                    "ita-by-ansible-execute": [],
+                    "ita-by-conductor-synchronize": [],
+                    "ita-by-excel-export-import": [],
+                    "ita-by-menu-create": [],
+                    "ita-by-menu-export-import": [],
+                    "ita-by-terraform-cli-execute": [],
+                    "ita-by-terraform-cloud-ep-execute": []
+                },
+                "WS2-_----1----_----2----_----3----_-": {
+                    "_execute_count": 0,
+                    "ita-by-ansible-execute": [],
+                    "ita-by-conductor-synchronize": [],
+                    "ita-by-excel-export-import": [],
+                    "ita-by-menu-create": [],
+                    "ita-by-menu-export-import": [],
+                    "ita-by-terraform-cli-execute": [],
+                    "ita-by-terraform-cloud-ep-execute": []
+                },
+                "_execute_count": 0
+            },
+            "org2": {
+                "_execute_count": 0
+            },
+            "org21": {
+                "_execute_count": 0
+            },
+            "org3": {
+                "_execute_count": 0,
+                "ws1": {
+                    "_execute_count": 0,
+                    "ita-by-ansible-execute": [],
+                    "ita-by-conductor-synchronize": [],
+                    "ita-by-excel-export-import": [],
+                    "ita-by-menu-create": [],
+                    "ita-by-menu-export-import": [],
+                    "ita-by-terraform-cli-execute": [],
+                    "ita-by-terraform-cloud-ep-execute": []
+                }
+            },
+            "org4": {
+                "_execute_count": 0
+            },
+            "org5": {
+                "_execute_count": 0
+            },
+            "org6": {
+                "_execute_count": 0
+            },
+            "org7": {
+                "_execute_count": 0
+            }
+        }
 
         //
         // display organization list
@@ -112,6 +250,23 @@ $(function(){
             $("#loglevel_list .notfound").css('display', 'none');
             $("#loglevel_list .datarow").remove();
 
+            org_id = "";
+            ws_id = "";
+            by_name = "";
+            console.log("backyard_row:" + JSON.stringify(backyard_row));
+            Object.keys(backyard_row).forEach(function (org_id) {
+                if (org_id == "_execute_count")  return;
+                Object.keys(backyard_row[org_id]).forEach(function (ws_id) {
+                    if (ws_id == "_execute_count")    return;
+                    Object.keys(backyard_row[org_id][ws_id]).forEach(function (by_name) {
+                        if (by_name == "_execute_count")    return;
+                        backyard_status_list[by_name] = set_execute_info(backyard_status_list[by_name], by_name, org_id, ws_id, backyard_row[org_id][ws_id][by_name]);
+                    });
+                });
+            });
+            console.log("backyard_status_list:" + JSON.stringify(backyard_status_list));
+
+
             //
             // display loglevel list
             //
@@ -119,11 +274,29 @@ $(function(){
             let html='';
             const keyList = Object.keys(loglevels)
 
+            const organization_display = getText("000-00103", "オーガナイゼーションID")
+            const workspace_display = getText("000-00101", "ワークスペースID")
+
             for(let i in keyList) {
+                service_name = keyList[i];
+                backyard_execute_info = "";
+                if (backyard_status_list[service_name] != undefined){
+                    for(let j in backyard_status_list[service_name]) {
+                        let org_id = backyard_status_list[service_name][j]["org_id"];
+                        let ws_id = backyard_status_list[service_name][j]["ws_id"];
+                        let status_name = backyard_status_list[service_name][j]["status_name"];
+                        let last_update_timestamp = fn.date(new Date(backyard_status_list[service_name][j]["last_update_timestamp"]),'yyyy/MM/dd HH:mm:ss');
+                        backyard_execute_info += last_update_timestamp + " [" + status_name + "] " + organization_display + ":" + org_id + " " + workspace_display + ":" + ws_id + "<br>";
+                    }
+                }
+                else{
+                    backyard_execute_info = "-";
+                }
                 html += row_template
                     .replace(/\${service}/g, fn.cv(keyList[i],'',true))
                     .replace(/\${i}/g, i)
                     .replace(/\${loglevel}/g, fn.cv(loglevels[keyList[i]],'',true))
+                    .replace(/\${backyard_execute_info}/g, backyard_execute_info)
             }
             $("#loglevel_list tbody").append(html);
             $("#loglevel_list .datarow").css('display', '');
@@ -137,7 +310,27 @@ $(function(){
 
     }
 
+    //
+    // 実行情報取得
+    // Get execution information
+    //
+    function set_execute_info(execute_infos, by_name, org_id, ws_id, execute_list) {
+        if (execute_infos == undefined){
+            execute_infos = [];
+        }
 
+        for(let i in execute_list){
+            execute_info = {
+                "backyard_name": by_name,
+                "org_id": org_id,
+                "ws_id": ws_id,
+                "status_name": execute_list[i]["status_name"],
+                "last_update_timestamp": execute_list[i]["last_update_timestamp"],
+            }
+            execute_infos.push(execute_info);
+        }
+        return execute_infos;
+    }
 
     function loglevel_register(loglevels) {
         console.log("[CALL] loglevel_register");
