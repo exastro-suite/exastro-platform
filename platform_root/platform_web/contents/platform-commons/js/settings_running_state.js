@@ -369,37 +369,22 @@ $(function(){
     function loglevel_register(loglevels) {
         console.log("[CALL] loglevel_register");
 
-        var reqbody = {};
-
-        const keyList = Object.keys(loglevels)
-
-        for(let i in keyList){
-            reqbody[keyList[i]] = $("#form_loglevel" + i).val();
-        }
-
-        console.log(reqbody);
-
-        show_progress();
-        call_api_promise(
-            {
-                type: "PATCH",
-                url: api_conf.api.settings.ita.loglevel.patch,
-                headers: {
-                    Authorization: "Bearer " + CommonAuth.getToken(),
-                },
-                data: JSON.stringify(reqbody),
-                contentType: "application/json",
-                dataType: "json",
-            }
-        ).then(() => {
+        new Promise((resolve) => {
+            show_progress();
+            resolve();
+        }).then(() => {
             return mainte_register();
+        }).then(() => {
+            return register_loglevel(loglevels);
         }).then(() => {
             hide_progress();
             alertMessage(getText("000-80018", "処理結果"), getText("000-89014", "メンテナンスモード・ログレベル設定を変更しました"),
                 () => {
                     window.location = location_conf.href.settings_running_state.top;
                 });
-        }).catch(() => {
+        }).catch((e) => {
+            console.log("catch:on_click_button_register");
+            console.log(e);
             hide_progress();
             $('#button_register').prop('disabled',false);
         })
@@ -414,9 +399,7 @@ $(function(){
             "backyard_execute_stop": $('#backyard_execute_stop').prop("checked")?"1":"0",
             "data_update_stop": $('#data_update_stop').prop("checked")?"1":"0"
         }
-
-        show_progress();
-        call_api_promise(
+        return call_api_promise(
             {
                 type: "PATCH",
                 url: api_conf.api.settings["maintenance-mode-setting"].patch,
@@ -427,5 +410,38 @@ $(function(){
                 contentType: "application/json",
                 dataType: "json",
         });
+    }
+
+    function register_loglevel(loglevels) {
+        if ($('#data_update_stop').prop("checked")) {
+            new Promise((resolve) => {
+                show_progress();
+                resolve();
+            });
+        }
+        else{
+            var reqbody = {};
+
+            const keyList = Object.keys(loglevels)
+
+            for(let i in keyList){
+                reqbody[keyList[i]] = $("#form_loglevel" + i).val();
+            }
+
+            console.log(reqbody);
+
+            return call_api_promise(
+                {
+                    type: "PATCH",
+                    url: api_conf.api.settings.ita.loglevel.patch,
+                    headers: {
+                        Authorization: "Bearer " + CommonAuth.getToken(),
+                    },
+                    data: JSON.stringify(reqbody),
+                    contentType: "application/json",
+                    dataType: "json",
+
+            });
+        }
     }
 });
