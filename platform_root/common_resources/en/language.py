@@ -1,4 +1,4 @@
-# Copyright 2023 NEC Corporation
+# Copyright 2024 NEC Corporation
 #
 # Licensed under the Apache License, Version 2.0 (the ""License"");
 # you may not use this file except in compliance with the License.
@@ -420,7 +420,7 @@ class LanguageList:
     lang_array['000-89010'] = 'System status list / System status settings / Exastro Platform'
     lang_array['000-89011'] = 'System status list'
     lang_array['000-89012'] = 'When turned ON, the backyard will stop.'
-    lang_array['000-89013'] = 'When turned ON, data writing stops.'
+    lang_array['000-89013'] = 'When turned ON, data writing stops. * If it is ON, the log level will not be changed.'
     lang_array['000-89014'] = 'Changed maintenance mode/log level settings'
     lang_array['400-00001'] = 'Request-Header Paramater({}) is Invalid'
     lang_array['400-00002'] = 'Request-Body Paramater({}) is Invalid'
@@ -613,6 +613,10 @@ class LanguageList:
     lang_array['500-34003'] = 'Failed to register process queue (process id:{0})'
     lang_array['500-35001'] = 'Failed to delete notification destination (destination id:{0})'
     lang_array['500-35002'] = 'Failed to get notification destination in use (menu:{0} column:{1})'
+    #
+    lang_array['500-36002'] = 'Failed to deactivate the mail server (destination id:{0})'
+    lang_array['500-36003'] = 'Failed to register/update mail server settings to Keycloak (Target ID:{0})'
+    lang_array['500-36004'] = 'Failed to unlock mail server to Keycloak (Target ID:{0})'
     lang_array['500-37001'] = 'Failed to register or update mailserver settings'
     lang_array['500-90001'] = 'Failed to get client (Target ID: {0} client: {1})'
     lang_array['500-90002'] = 'Failed to get client role (Target ID: {0} client: {1})'
