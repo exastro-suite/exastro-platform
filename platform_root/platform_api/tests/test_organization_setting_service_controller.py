@@ -15,7 +15,11 @@
 import logging
 import time
 from contextlib import closing
+import json
+import re
+import requests_mock
 
+from common_library.common import api_keycloak_tokens, api_keycloak_realms
 from common_library.common import const, encrypt, validation
 from common_library.common.db import DBconnector
 from common_library.common.libs import queries_bl_mailserver
@@ -106,6 +110,56 @@ def test_settings_mailserver_create(connexion_client):
         assert create_data["AUTHENTICATION_PASSWORD"] == tmp_json["authentication_password"], "create mailserver"
         assert create_data["CREATE_USER"] == organization["user_id"], "create mailserver"
         assert create_data["LAST_UPDATE_USER"] == organization["user_id"], "create mailserver"
+
+
+    #
+    #   keycloak メールサーバ設定
+    #
+    with test_common.requsts_mocker_default() as requests_mocker:
+        sample_kc_create_data = __sample_kc_create_data(__sample_create_data())
+
+        token = __get_token()
+        response = api_keycloak_realms.realm_update(organization['organization_id'], sample_kc_create_data, token)
+
+        assert response.status_code == 204
+
+
+    with test_common.requsts_mocker_default() as requests_mocker:
+        requests_mocker.register_uri(
+        requests_mock.ANY,
+        re.compile(rf'^{test_common.keycloak_origin()}/auth/admin/realms/{organization["organization_id"]}'),
+        status_code=500,
+        json={"result": "000-00000", "message": ""})
+
+        response = api_keycloak_realms.realm_update(organization['organization_id'], sample_kc_create_data, token)
+
+        assert response.status_code == 500
+
+
+    #
+    #   keycloak smtp server情報取得
+    #
+    with test_common.requsts_mocker_default() as requests_mocker:
+        response = api_keycloak_realms.realm_get(organization['organization_id'], token)
+
+        assert response.status_code == 200
+
+        # responseのデータと比較
+        kc_create_data = __fetch_settings_mailserver(organization['organization_id'])
+        response_data = response.json()
+        assert response_data["resetPasswordAllowed"] == True
+        assert response_data["smtpServer"]["host"] == kc_create_data["SMTP_HOST"]
+        assert int(response_data["smtpServer"]["port"]) == kc_create_data["SMTP_PORT"]
+        assert response_data["smtpServer"]["from"] == kc_create_data["SEND_FROM"]
+        assert response_data["smtpServer"]["fromDisplayName"] == kc_create_data["SEND_NAME"]
+        assert response_data["smtpServer"]["replyTo"] == kc_create_data["REPLY_TO"]
+        assert response_data["smtpServer"]["replyToDisplayName"] == kc_create_data["REPLY_NAME"]
+        assert response_data["smtpServer"]["envelopeFrom"] == kc_create_data["ENVELOPE_FROM"]
+        assert response_data["smtpServer"]["ssl"].upper() == str(bool(kc_create_data["SSL_ENABLE"])).upper()
+        assert response_data["smtpServer"]["starttls"].upper() == str(bool(kc_create_data["START_TLS_ENABLE"])).upper()
+        assert response_data["smtpServer"]["auth"].upper() == str(bool(kc_create_data["AUTHENTICATION_ENABLE"])).upper()
+        assert response_data["smtpServer"]["user"] == kc_create_data["AUTHENTICATION_USER"]
+
 
     with test_common.requsts_mocker_default(), \
             test_common.pymysql_execute_raise_exception_mocker(queries_bl_mailserver.SQL_UPDATE_MAILSERVER, Exception("DB Error Test")):
@@ -404,6 +458,42 @@ def test_settings_mailserver_create(connexion_client):
         assert response.status == "400 BAD REQUEST", "AUTHENTICATION_PASSWORD numeric"
 
 
+    #
+    #   keycloak メールサーバ更新
+    #
+    with test_common.requsts_mocker_default() as requests_mocker:
+        sample_kc_update_data = __sample_kc_update_data(__sample_update_data())
+
+        token = __get_token()
+        response = api_keycloak_realms.realm_update(organization['organization_id'], sample_kc_update_data, token)
+
+        assert response.status_code == 204
+
+
+    #
+    #   keycloak smtp server情報取得 アップデート内容確認
+    #
+    with test_common.requsts_mocker_default() as requests_mocker:
+        response = api_keycloak_realms.realm_get(organization['organization_id'], token)
+
+        assert response.status_code == 200
+
+        kc_update_data = __fetch_settings_mailserver(organization['organization_id'])
+        response_data = response.json()
+        assert response_data["resetPasswordAllowed"] == True
+        assert response_data["smtpServer"]["host"] == kc_update_data["SMTP_HOST"]
+        assert int(response_data["smtpServer"]["port"]) == kc_update_data["SMTP_PORT"]
+        assert response_data["smtpServer"]["from"] == kc_update_data["SEND_FROM"]
+        assert response_data["smtpServer"]["fromDisplayName"] == kc_update_data["SEND_NAME"]
+        assert response_data["smtpServer"]["replyTo"] == kc_update_data["REPLY_TO"]
+        assert response_data["smtpServer"]["replyToDisplayName"] == kc_update_data["REPLY_NAME"]
+        assert response_data["smtpServer"]["envelopeFrom"] == kc_update_data["ENVELOPE_FROM"]
+        assert response_data["smtpServer"]["ssl"].upper() == str(bool(kc_update_data["SSL_ENABLE"])).upper()
+        assert response_data["smtpServer"]["starttls"].upper() == str(bool(kc_update_data["START_TLS_ENABLE"])).upper()
+        assert response_data["smtpServer"]["auth"].upper() == str(bool(kc_update_data["AUTHENTICATION_ENABLE"])).upper()
+        assert response_data["smtpServer"]["user"] == str(kc_update_data["AUTHENTICATION_USER"])
+
+
 def test_setting_mailserver_delete(connexion_client):
     """test mailserver_delete
 
@@ -420,6 +510,42 @@ def test_setting_mailserver_delete(connexion_client):
             headers=request_parameters.request_headers(organization['user_id']))
 
         assert response.status_code == 200, "normal route"
+
+
+    #
+    #   keycloak メールサーバ削除
+    #
+    with test_common.requsts_mocker_default() as requests_mocker:
+        sample_kc_delete_data = __sample_kc_delete_data()
+
+        token = __get_token()
+        response = api_keycloak_realms.realm_update(organization['organization_id'], sample_kc_delete_data, token)
+
+        assert response.status_code == 204
+
+
+    #
+    #   keycloak smtp server情報取得 削除確認
+    #
+    with test_common.requsts_mocker_default() as requests_mocker:
+        response = api_keycloak_realms.realm_get(organization['organization_id'], token)
+
+        assert response.status_code == 200
+
+        kc_delete_data = __sample_kc_delete_data()
+        response_data = response.json()
+        assert response_data["resetPasswordAllowed"] == False
+        assert response_data["smtpServer"]["host"] == kc_delete_data["smtpServer"]["host"]
+        assert response_data["smtpServer"]["port"] == kc_delete_data["smtpServer"]["port"]
+        assert response_data["smtpServer"]["from"] == kc_delete_data["smtpServer"]["from"]
+        assert response_data["smtpServer"]["fromDisplayName"] == kc_delete_data["smtpServer"]["fromDisplayName"]
+        assert response_data["smtpServer"]["replyTo"] == kc_delete_data["smtpServer"]["replyTo"]
+        assert response_data["smtpServer"]["replyToDisplayName"] == kc_delete_data["smtpServer"]["replyToDisplayName"]
+        assert response_data["smtpServer"]["envelopeFrom"] == kc_delete_data["smtpServer"]["envelopeFrom"]
+        assert response_data["smtpServer"]["ssl"].upper() == str(bool(kc_delete_data["smtpServer"]["ssl"])).upper()
+        assert response_data["smtpServer"]["starttls"].upper() == str(bool(kc_delete_data["smtpServer"]["starttls"])).upper()
+        assert response_data["smtpServer"]["auth"].upper() == str(bool(kc_delete_data["smtpServer"]["auth"])).upper()
+        assert response_data["smtpServer"]["user"] == str(kc_delete_data["smtpServer"]["user"])
 
     with test_common.requsts_mocker_default(), \
             test_common.pymysql_execute_raise_exception_mocker(queries_mailserver.SQL_DELETE_SMTP_SERVER, Exception("DB Error Test")):
@@ -771,6 +897,75 @@ def __sample_update_data(update={}):
     )
 
 
+def __sample_kc_create_data(sample_data, update={}):
+    return dict(
+        {
+            "resetPasswordAllowed": True,
+            "smtpServer":{
+                "host": sample_data["smtp_host"],
+                "port": sample_data["smtp_port"],
+                "from": sample_data["send_from"],
+                "fromDisplayName": sample_data["send_name"],
+                "replyTo": sample_data["reply_to"],
+                "replyToDisplayName": sample_data["reply_name"],
+                "envelopeFrom": sample_data["envelope_from"],
+                "ssl": sample_data["ssl_enable"],
+                "starttls": sample_data["start_tls_enable"],
+                "auth": sample_data["authentication_enable"],
+                "user": sample_data["authentication_user"],
+                "password": sample_data["authentication_password"]
+            }
+        },
+        **update
+    )
+
+
+def __sample_kc_update_data(sample_data, update={}):
+    return dict(
+        {
+            "resetPasswordAllowed": True,
+            "smtpServer":{
+                "host": sample_data["smtp_host"],
+                "port": sample_data["smtp_port"],
+                "from": sample_data["send_from"],
+                "fromDisplayName": sample_data["send_name"],
+                "replyTo": sample_data["reply_to"],
+                "replyToDisplayName": sample_data["reply_name"],
+                "envelopeFrom": sample_data["envelope_from"],
+                "ssl": sample_data["ssl_enable"],
+                "starttls": sample_data["start_tls_enable"],
+                "auth": sample_data["authentication_enable"],
+                "user": sample_data["authentication_user"],
+                "password": sample_data["authentication_password"]
+            }
+        },
+        **update
+    )
+
+
+def __sample_kc_delete_data(update={}):
+    return dict(
+        {
+            "resetPasswordAllowed": False,
+            "smtpServer":{
+                "host": "",
+                "port": "",
+                "from": "",
+                "fromDisplayName": "",
+                "replyTo": "",
+                "replyToDisplayName": "",
+                "envelopeFrom": "",
+                "ssl": False,
+                "starttls": False,
+                "auth": False,
+                "user": "",
+                "password": ""
+            }
+        },
+        **update
+    )
+
+
 def __fetch_settings_mailserver(organization_id):
     with closing(DBconnector().connect_orgdb(organization_id)) as conn:
         with conn.cursor() as cursor:
@@ -780,3 +975,25 @@ def __fetch_settings_mailserver(organization_id):
     row["AUTHENTICATION_PASSWORD"] = encrypt.decrypt_str(row["AUTHENTICATION_PASSWORD"])
 
     return row
+
+
+def __get_token():
+    """get a token
+
+    Raises:
+        common.AuthException: _description_
+
+    Returns:
+        str: token
+    """
+
+    private = DBconnector().get_platform_private()
+
+    # サービスアカウントのTOKEN取得
+    # Get a service account token
+    response = api_keycloak_tokens.service_account_get_token(
+        private.token_check_realm_id, private.token_check_client_clientid, private.token_check_client_secret)
+
+    token = json.loads(response.text).get("access_token")
+
+    return token
