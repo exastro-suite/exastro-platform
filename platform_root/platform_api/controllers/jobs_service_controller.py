@@ -21,8 +21,7 @@ from common_library.common import common, multi_lang, const
 from common_library.common.db import DBconnector
 from common_library.common.libs import queries_bl_jobs, queries_bl_notification
 
-# ####ここのIDはどうやって割り振ってる？
-MSG_FUNCTION_ID = "9999"
+MSG_FUNCTION_ID = "38"
 
 
 @common.platform_exception_handler
