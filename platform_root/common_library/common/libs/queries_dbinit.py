@@ -91,8 +91,8 @@ SQL_ORGANIZATION_CREATE_TABLES = [
         FAILED_REGISTER             	INT,	                                    -- 登録失敗件数
         FAILED_UPDATE	                INT,                                        -- 更新失敗件数
         FAILED_DELETE	                INT,	                                    -- 削除失敗件数
-        MESSAGE_JA	                    TEXT,	                                    -- 処理結果メッセージ（日本語）
-        MESSAGE_EN	                    TEXT,	                                    -- 処理結果メッセージ（英語）
+        MESSAGE 	                    TEXT,	                                    -- 処理結果メッセージ
+        LANGUAGE	                    VARCHAR(36),                                -- 依頼者の言語
         CREATE_TIMESTAMP		        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,    -- 作成日時
         CREATE_USER		                VARCHAR(40),                                -- 作成者
         LAST_UPDATE_TIMESTAMP		    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,    -- 最終更新日時
