@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: Exastro Platform API
   description: Exastro Platform API
-  version: 1.7.0
+  version: 1.8.0
 servers:
   - url: 'https://{host}'
     description: API endpoint
@@ -43,6 +43,8 @@ tags:
     description: ロールに関する操作
   - name: RoleMappingsService
     description: ロール・マッピングに関する操作
+  - name: JobService
+    description: ジョブに関する操作
   - name: MaintenanceModeService
     description: メンテナンスモードに関する操作
   - name: NotificationService
@@ -1159,6 +1161,301 @@ paths:
             schema:
               $ref: '#/components/schemas/roleMappingUser'
         required: true
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        example: null
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+  '/api/{organization_id}/platform/jobs/users/import':
+    post:
+      tags:
+        - JobsService
+      summary: Import user bulk registration
+      x-openapi-router-controller: controllers.jobs_service_controller
+      operationId: jobs_users_import
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                import_file:
+                  type: string
+                  format: binary
+        required: true
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        example: null
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+  '/api/{organization_id}/platform/jobs/users/import/status':
+    get:
+      tags:
+        - JobsService
+      summary: Get all import status
+      x-openapi-router-controller: controllers.jobs_service_controller
+      operationId: jobs_users_import_status
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        example: null
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+  '/api/{organization_id}/platform/jobs/users/import/status/{job_id}':
+    get:
+      tags:
+        - JobsService
+      summary: Get import status
+      x-openapi-router-controller: controllers.jobs_service_controller
+      operationId: jobs_users_import_status_job_id
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: job_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        example: null
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+  '/api/{organization_id}/platform/jobs/users/import/status/{job_id}/download':
+    get:
+      tags:
+        - JobsService
+      summary: Download import status
+      x-openapi-router-controller: controllers.jobs_service_controller
+      operationId: jobs_users_import_status_job_id_download
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: job_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        example: null
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+  '/api/{organization_id}/platform/jobs/users/export':
+    post:
+      tags:
+        - JobsService
+      summary: Export user list
+      x-openapi-router-controller: controllers.jobs_service_controller
+      operationId: jobs_users_export
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                temporary_value:
+                  type: string
+        required: true
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        example: null
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+  '/api/{organization_id}/platform/jobs/users/export/status':
+    get:
+      tags:
+        - JobsService
+      summary: Get all export status
+      x-openapi-router-controller: controllers.jobs_service_controller
+      operationId: jobs_users_export_status
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        example: null
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+  '/api/{organization_id}/platform/jobs/users/export/status/{job_id}':
+    get:
+      tags:
+        - JobsService
+      summary: Get export status
+      x-openapi-router-controller: controllers.jobs_service_controller
+      operationId: jobs_users_export_status_job_id
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: job_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        example: null
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+  '/api/{organization_id}/platform/jobs/users/export/status/{job_id}/download':
+    get:
+      tags:
+        - JobsService
+      summary: Download export status
+      x-openapi-router-controller: controllers.jobs_service_controller
+      operationId: jobs_users_export_status_job_id_download
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: job_id
+          in: path
+          required: true
+          schema:
+            type: string
       responses:
         '200':
           description: A successful response.

@@ -618,6 +618,8 @@ class LanguageList:
     lang_array['500-36003'] = 'Failed to register/update mail server settings to Keycloak (Target ID:{0})'
     lang_array['500-36004'] = 'Failed to unlock mail server to Keycloak (Target ID:{0})'
     lang_array['500-37001'] = 'Failed to register or update mailserver settings'
+    lang_array['500-38001'] = 'Failed to register job (job id:{0})'
+    lang_array['500-38002'] = 'Failed to register processing queue (process id:{0})'
     lang_array['500-90001'] = 'Failed to get client (Target ID: {0} client: {1})'
     lang_array['500-90002'] = 'Failed to get client role (Target ID: {0} client: {1})'
     lang_array['500-90003'] = 'Failed to create client (Target ID: {0} client: {1})'
