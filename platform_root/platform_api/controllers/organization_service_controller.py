@@ -41,7 +41,7 @@ MSG_FUNCTION_ID = "23"
 
 
 @common.platform_exception_handler
-def organization_create(body, retry=None):
+def organization_create(body, retry=None):  # noqa: C901
     """Create creates an organization
 
     Args:
@@ -483,9 +483,14 @@ def organization_update(organization_id):  # noqa: E501
             parameter = {
                 "organization_id": organization_id,
                 "organization_name": organization_name,
-                "options_ita": json.dumps(options_ita),
+                "informations": json.dumps({
+                    "ext_options": {
+                        "options_ita": options_ita
+                    },
+                }, ensure_ascii=False),
                 "last_update_user": user_id,
             }
+            globals.logger.debug(f"update parameter:{parameter}")
             try:
                 cursor.execute(queries_organizations.SQL_UPDATE_ORGANIZATION, parameter)
 
