@@ -132,7 +132,7 @@ def jobs_users_import(import_file, organization_id):  # noqa: E501
             except Exception as e:
                 conn.rollback()
                 globals.logger.error(f"exception:{e.args}")
-                message_id = f"500-{MSG_FUNCTION_ID}002"
+                message_id = f"500-{MSG_FUNCTION_ID}001"
                 message = multi_lang.get_text(
                     message_id,
                     "ジョブの登録に失敗しました(job id:{0})",
