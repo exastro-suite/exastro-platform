@@ -160,6 +160,21 @@ def data_initalize():
         if resp_cache_clear.status_code < 200 and resp_cache_clear.status_code > 299:
             raise Exception('FAILED : clear keycloak realms cache (tests/conftest.py data_initalize)')
 
+        resp_cache_clear = requests.post(
+            f"{keycloak_api_origin}/auth/admin/realms/{realm['realm']}/clear-user-cache",
+            headers={"Content-Type": "application/json", "Authorization": f"Bearer {token}"},
+            json={"realm": realm['realm']})
+
+        if resp_cache_clear.status_code < 200 and resp_cache_clear.status_code > 299:
+            raise Exception('FAILED : clear keycloak user cache (tests/conftest.py data_initalize)')
+
+        resp_cache_clear = requests.post(
+            f"{keycloak_api_origin}/auth/admin/realms/{realm['realm']}/clear-keys-cache",
+            headers={"Content-Type": "application/json", "Authorization": f"Bearer {token}"},
+            json={"realm": realm['realm']})
+
+        if resp_cache_clear.status_code < 200 and resp_cache_clear.status_code > 299:
+            raise Exception('FAILED : clear keycloak key cache (tests/conftest.py data_initalize)')
     #
     # データ初期化(platform_db/keycloak)
     #
