@@ -381,7 +381,8 @@ def test_execute_validation_error():
 
 
 def test_execute_registration_error_limits():
-
+    """userのlimit超過エラー
+    """
     # 上限数エラー
     limit_users = 2
     with test_common.requsts_mocker_default(), \
@@ -417,6 +418,8 @@ def test_execute_registration_error_limits():
         assert ws.cell(user_import_file_common.EXCEL_HEADER_ROWS + 2, ERROR_TEXT_COL_INDEX).value == "{0}の上限数({1})を超えるため、新しい{0}は作成できません。".format("ユーザー", limit_users)
 
 def test_execute_registration_error_duplicate():
+    """重複ユーザーの登録
+    """
     # 重複エラー（ユーザー名）
     with test_common.requsts_mocker_default():
         organization_id = list(testdata.ORGANIZATIONS.keys())[0]
@@ -474,6 +477,8 @@ def test_execute_registration_error_duplicate():
         assert ws.cell(user_import_file_common.EXCEL_HEADER_ROWS + 1, ERROR_TEXT_COL_INDEX).value.startswith("指定されたユーザーはすでに存在しているため作成できません。")
 
 def test_execute_registration_error_user_create():
+    """ユーザー作成失敗
+    """
     # keycloak HTTP-400応答
     with test_common.requsts_mocker_default() as requests_mocker:
         organization_id = list(testdata.ORGANIZATIONS.keys())[0]
@@ -596,6 +601,8 @@ def test_execute_registration_error_user_create():
         assert ws.cell(user_import_file_common.EXCEL_HEADER_ROWS + 1, ERROR_TEXT_COL_INDEX).value.startswith("ユーザー作成に失敗しました")
 
 def test_execute_registration_error_role_mapping():
+    """ロール付与失敗
+    """
     # keycloak role mapping失敗
     with test_common.requsts_mocker_default() as requests_mocker:
         organization_id = list(testdata.ORGANIZATIONS.keys())[0]
@@ -626,6 +633,8 @@ def test_execute_registration_error_role_mapping():
         assert ws.cell(user_import_file_common.EXCEL_HEADER_ROWS + 1, ERROR_TEXT_COL_INDEX).value.startswith("ロール設定に失敗しました")
 
 def test_execute_error_not_found_jobs_table():
+    """TABLEの情報なし
+    """
     with test_common.requsts_mocker_default():
         organization_id = list(testdata.ORGANIZATIONS.keys())[0]
         queue = make_queue_import_user('ja', organization_id, user_import_data=[data_sample_registration])
@@ -663,6 +672,8 @@ def test_execute_error_not_found_jobs_table():
         assert t["MESSAGE"] == "処理対象のレコードの取得に失敗しました(テーブル:{0})".format("T_JOBS_USER_FILE")
 
 def test_execute_error_get_specifiable_roles():
+    """オーガナイゼーションのロール一覧取得失敗
+    """
     with test_common.requsts_mocker_default() as requests_mocker:
         organization_id = list(testdata.ORGANIZATIONS.keys())[0]
         requests_mocker.register_uri(
@@ -686,6 +697,8 @@ def test_execute_error_get_specifiable_roles():
 
 
 def test_execute_timeout():
+    """Timeoutによる中断
+    """
     organization_id = list(testdata.ORGANIZATIONS.keys())[0]
 
     timeout_sec = 5
@@ -716,10 +729,14 @@ def test_execute_timeout():
             queue = make_queue_import_user('ja', organization_id, user_import_data=user_import_data)
 
             # timeout発生まで待つ
-            time.sleep(timeout_sec + 3)
+            time.sleep(timeout_sec)
+            for i in range(30):
+                t = select_t_jobs_user(organization_id, queue["PROCESS_EXEC_ID"])
+                if t["JOB_STATUS"] != const.JOB_USER_EXEC:
+                    break
+                time.sleep(1)
 
             # タイムアウトエラーで終了していること
-            t = select_t_jobs_user(organization_id, queue["PROCESS_EXEC_ID"])
             assert t["JOB_STATUS"] == const.JOB_USER_FAILED
             assert '行目の処理中にタイムアウトしました。' in t["MESSAGE"]
 
@@ -742,6 +759,8 @@ def test_execute_timeout():
 
 
 def test_force_update_status_normally():
+    """強制ステータス更新の確認
+    """
     datas = [
         {
             "organization_id": list(testdata.ORGANIZATIONS.keys())[0],
@@ -812,6 +831,18 @@ def test_force_update_status_normally():
 
 
 def make_queue_import_user(lang, organization_id, user_import_data=None, user_import_data_image=None, insert_queue=True):
+    """テスト用共通:Queue情報生成
+
+    Args:
+        lang (_type_): _description_
+        organization_id (_type_): _description_
+        user_import_data (_type_, optional): _description_. Defaults to None.
+        user_import_data_image (_type_, optional): _description_. Defaults to None.
+        insert_queue (bool, optional): _description_. Defaults to True.
+
+    Returns:
+        _type_: _description_
+    """
     process_id = ulid.new().str
     process_exec_id = ulid.new().str
     file_id = ulid.new().str
@@ -879,6 +910,15 @@ def make_queue_import_user(lang, organization_id, user_import_data=None, user_im
     return queue
 
 def get_result_worksheet(organization_id, job_id):
+    """テスト用共通:結果情報Excel worksheet取得
+
+    Args:
+        organization_id (_type_): _description_
+        job_id (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
     with closing(DBconnector().connect_orgdb(organization_id)) as conn,\
         conn.cursor() as cursor:
 
@@ -889,6 +929,12 @@ def get_result_worksheet(organization_id, job_id):
         return wb.worksheets[0]
 
 def save_result_file(organization_id, job_id):
+    """テスト用共通:結果情報Excelファイル保存
+
+    Args:
+        organization_id (_type_): _description_
+        job_id (_type_): _description_
+    """
     if os.environ.get("USER_EXCEL_FILE_SAVED") == "TRUE":
         with closing(DBconnector().connect_orgdb(organization_id)) as conn,\
             conn.cursor() as cursor:
@@ -901,6 +947,15 @@ def save_result_file(organization_id, job_id):
 
 
 def make_excel_bytes_image(user_import_data, lang):
+    """テスト用共通:Import Excel ファイルイメージ生成
+
+    Args:
+        user_import_data (_type_): _description_
+        lang (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
     imp_wb = user_import_file_common.UserResultWorkbook(lang, error_column=False)
 
     for row in user_import_data:
@@ -910,12 +965,23 @@ def make_excel_bytes_image(user_import_data, lang):
 
 
 def select_t_jobs_user(organization_id, job_id):
+    """テスト用共通:T_JOBS_USER取得
+
+    Args:
+        organization_id (_type_): _description_
+        job_id (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
     with closing(DBconnector().connect_orgdb(organization_id)) as conn,\
         conn.cursor() as cursor:
 
         cursor.execute("SELECT * FROM T_JOBS_USER WHERE JOB_ID = %(job_id)s", {"job_id": job_id})
         return cursor.fetchone()
 
+
+# サンプルデータ（追加用）
 data_sample_registration = {
     "PROC_TYPE": "追加",
     "USERNAME": "testuser-01",

@@ -1,4 +1,4 @@
-#   Copyright 2022 NEC Corporation
+#   Copyright 2024 NEC Corporation
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -53,21 +53,21 @@ class UserImportJobExecutor(BaseJobExecutor):
         self.organization_id = self.queue['ORGANIZATION_ID']
         self.job_id = self.queue['PROCESS_EXEC_ID']
 
-        # organization_private
+        # organization_private情報 / organization_private information
         self.organization_private = None
-        # keycloak token発行用
+        # keycloak token発行用インスタンス / keycloak token issuing instance
         self.organization_sa_token = None
 
-        # 言語
+        # 言語 / Language
         self.language = None
 
-        # Excel制御用class instance
+        # Excel制御用class instance / Excel control class instance
         self.imp_wb = None
         self.err_wb = None
 
-        # 処理結果ファイルID
+        # 処理結果ファイルID / Processing result file ID
         self.result_id = ulid.new().str
-        # 処理件数
+        # 処理件数 / Number of cases processed
         self.count_register = None
         self.count_update = None
         self.count_delete = None
@@ -87,13 +87,13 @@ class UserImportJobExecutor(BaseJobExecutor):
         """
         with closing(DBconnector().connect_orgdb(self.organization_id)) as conn:
             try:
-                # 実行中にステータス更新
+                # 実行中にステータス更新 / Update status during execution
                 self.__update_t_jobs_user(conn, job_status=const.JOB_USER_EXEC, message=None)
                 conn.commit()
 
-                # Oranization private情報の取得
+                # Oranization private情報の取得 / Obtaining Oranization private information
                 self.organization_private = DBconnector().get_organization_private(self.organization_id)
-                # Token発行用classのインスタンス化
+                # Token発行用classのインスタンス化 / Instantiation of Token issuing class
                 self.organization_sa_token = jobs_common.organization_sa_token(self.organization_id, self.organization_private)
 
                 # SELECT T_JOBS_USER
@@ -122,52 +122,56 @@ class UserImportJobExecutor(BaseJobExecutor):
                         )
                         raise common.InternalErrorException(message_id=message_id, message=message)
 
-                # 言語情報
+                # 言語情報 / Language information
                 self.language = t_jobs_user["LANGUAGE"]
 
-                # 指定可能なロールの一覧を取得する
+                # 指定可能なロールの一覧を取得する / Get a list of available roles
                 specifiable_roles = self.__get_specifiable_roles()
                 globals.logger.debug(f'Role lists : {[key for key in specifiable_roles.keys()]}')
 
-                # リソースプランの最大ユーザー数を取得
+                # リソースプランの最大ユーザー数を取得 / Get the maximum number of users for a resource plan
                 limits = bl_plan_service.organization_limits_get(self.organization_id, const.RESOURCE_COUNT_USERS)
 
-                # 結果雛形ファイルのOpen
+                # 結果雛形ファイルのOpen / Open result template file
                 globals.logger.debug('Get excel template')
                 self.err_wb = user_import_file_common.UserResultWorkbook(lang=self.language, error_column=True)
 
-                # import Excelファイルイメージ取り込み
+                # import Excelファイルイメージ取り込み / import Excel file image import
                 globals.logger.debug('Load imports user excel')
                 self.imp_wb = user_import_file_common.UserImportWorkbook(self.language, t_jobs_user_file["FILE_DATA"])
 
-                # 全明細の件数をカウントする
+                # 全明細の件数をカウントする / Count the number of all items
                 globals.logger.debug('Count of records to process')
                 self.count_register, self.count_update, self.count_delete = self.imp_wb.count_proc_type()
                 globals.logger.info(f'Count of records to process [count_register:{self.count_register}] [count_update:{self.count_update}] [count_delete:{self.count_delete}]')
 
-                # 全明細の件数を更新
+                # 全明細の件数を更新 / Update the number of all items
                 self.__update_t_jobs_user(conn, job_status=const.JOB_USER_EXEC, message=None)
                 conn.commit()
 
-                # 全明細を処理する
+                # 全明細を処理する / Process all items
                 while True:
                     cell_values = self.imp_wb.read_row()
                     if cell_values is None:
+                        # 全明細が処理終了したので終了する / Close as all details have been processed.
                         break
 
                     try:
                         if cell_values["PROC_TYPE"] in user_import_file_common.PROC_TYPE_ADD:
-                            # Limitチェック
+                            # ユーザ数がLimit値になっていないかチェックする / Check if the number of users is at the limit value
                             self.__check_users_limit(limits)
 
-                            # validationチェック
+                            # validationチェック / validation check
                             validate = self.__validate_row(cell_values, specifiable_roles)
                             if validate.ok:
+                                # ユーザーの追加 / Add user
                                 user_id = self.__add_user(cell_values)
+                                # ロールの付与 / Grant role
                                 self.__add_roles(cell_values, user_id, specifiable_roles)
                                 self.success_register += 1
                             else:
                                 self.failed_register += 1
+                                # 処理結果ファイルへ情報出力 / Output information to processing result file
                                 cell_values["ERROR_TEXT"] = multi_lang.get_text_spec(self.language, validate.message_id, validate.base_message, *validate.args)
                                 self.err_wb.write_row(cell_values)
                                 globals.logger.debug(f'Failed User Registration(validate error) : [ROW:{self.imp_wb.get_row_idx()}] [USERNAME:{cell_values["USERNAME"]}] [ERROR_TEXT:{cell_values["ERROR_TEXT"]}]')
@@ -175,6 +179,7 @@ class UserImportJobExecutor(BaseJobExecutor):
                     except JobTimeoutException as ex:
                         # Timeout発生時はThrowして処理を中断する
                         self.failed_register += 1
+                        # 処理結果ファイルへ情報出力 / Output information to processing result file
                         cell_values["ERROR_TEXT"] = multi_lang.get_text_spec(self.language, '401-00021', 'タイムアウト発生のため、この行を処理中に中断しました。')
                         self.err_wb.write_row(cell_values)
                         raise ex
@@ -182,6 +187,7 @@ class UserImportJobExecutor(BaseJobExecutor):
                     except (common.BadRequestException, common.InternalErrorException) as ex:
                         # keycloakへの登録失敗
                         self.failed_register += 1
+                        # 処理結果ファイルへ情報出力 / Output information to processing result file
                         cell_values["ERROR_TEXT"] = ex.message
                         self.err_wb.write_row(cell_values)
                         globals.logger.debug(f'Failed User Registration : [ROW:{self.imp_wb.get_row_idx()}] [USERNAME:{cell_values["USERNAME"]}] [ERROR_TEXT:{cell_values["ERROR_TEXT"]}]')
@@ -189,6 +195,7 @@ class UserImportJobExecutor(BaseJobExecutor):
                     except Exception as ex:
                         # その他何らかの失敗
                         self.failed_register += 1
+                        # 処理結果ファイルへ情報出力 / Output information to processing result file
                         cell_values["ERROR_TEXT"] = multi_lang.get_text_spec(self.language, '401-00020', 'エラーのため処理できませんでした。({0})', ex)
                         self.err_wb.write_row(cell_values)
                         globals.logger.debug(f'Failed User Registration : [ROW:{self.imp_wb.get_row_idx()}] [USERNAME:{cell_values["USERNAME"]}] [ERROR_TEXT:{cell_values["ERROR_TEXT"]}]')
@@ -198,17 +205,20 @@ class UserImportJobExecutor(BaseJobExecutor):
                         self.__update_t_jobs_user(conn, job_status=const.JOB_USER_EXEC, message=None)
                         conn.commit()
 
+                    # 1JOBでリソースを占有しないようにsleepする / Sleep so that 1JOB does not occupy resources
                     time.sleep(job_manager_config.JOBS[const.PROCESS_KIND_USER_IMPORT]["extra_config"]["user_import_interval_millisecond"]/1000)
 
+                # 最終的なステータスに更新する / Update to final status
                 self.__update_t_jobs_user(conn, job_status=const.JOB_USER_COMP, message=None)
                 conn.commit()
 
             except FileFormatErrorException as ex:
-                # ファイル形式のエラー
+                # ファイル形式のエラー / File format error
                 self.__update_t_jobs_user(conn, job_status=const.JOB_USER_FAILED, message=ex.message)
                 raise ex
 
             except JobTimeoutException as ex:
+                # タイムアウトエラー / timeout error
                 if self.imp_wb is not None:
                     self.__update_t_jobs_user(conn, job_status=const.JOB_USER_FAILED, message=multi_lang.get_text_spec(self.language, '401-00011', '{0}行目の処理中にタイムアウトしました。', self.imp_wb.get_row_idx()))
                 else:
@@ -246,16 +256,23 @@ class UserImportJobExecutor(BaseJobExecutor):
         return True
 
     def __get_specifiable_roles(self):
+        """指定可能なロールの取得 / Get specifiable roles
+
+        Returns:
+            dict: ロール情報 / Role information
+        """
         first=0
         max=50
         ret_roles = {}
 
         while True:
+            # ロールを取得 / get role
             response = api_keycloak_roles.clients_roles_get(
                 realm_name=self.organization_id, client_id=self.organization_private.user_token_client_id, token=self.organization_sa_token.get(), briefRepresentation=False,
                 first=first, max=max
             )
             if response.status_code != 200:
+                # keycloakから想定外の応答 / Unexpected response from keycloak
                 message_id = f"500-00010"
                 message = multi_lang.get_text(
                     message_id,
@@ -264,19 +281,37 @@ class UserImportJobExecutor(BaseJobExecutor):
                     self.organization_private.user_token_client_clientid
                 )
                 raise common.InternalErrorException(message_id=message_id, message=message)
+
+            # ロールの情報を格納 / Stores role information
             response_json = json.loads(response.text)
             ret_roles = {**ret_roles, **{role["name"]: role for role in response_json}}
+
             if len(response_json) < max:
+                # max件数まで取れなかった時は全て取得し終えたので終了する
+                # If you cannot get the maximum number of items, exit because all have been obtained.
                 break
             else:
+                # max件数取れた時は次の明細を位置づける
+                # When the max number of items is obtained, position the next item.
                 first += max
 
         return ret_roles
 
     def __check_users_limit(self, limits):
+        """ユーザーリミット値のチェック / Check user limit value
+
+        Args:
+            limits (dict): オーガナイゼーションのリミット情報 / Organization limit information
+
+        Raises:
+            common.BadRequestException: リミット値になっている場合 / If the limit value is reached
+        """
         if const.RESOURCE_COUNT_USERS not in limits:
+            # リミット値が無い時は何もしない / Do nothing when there is no limit value
             return
 
+        # 現状のリソース数を取得してリミット値と比較し、リミット値に到達している場合は例外を発行する
+        # Obtain the current number of resources, compare it with the limit value, and issue an exception if the limit value has been reached.
         resources_counter = resources.counter(self.organization_id)
         if resources_counter(const.RESOURCE_COUNT_USERS) >= limits[const.RESOURCE_COUNT_USERS]:
             message_id = "400-00022"
@@ -290,6 +325,15 @@ class UserImportJobExecutor(BaseJobExecutor):
             raise common.BadRequestException(message_id=message_id, message=message)
 
     def __validate_row(self, cell_values, specifiable_roles):
+        """validate row
+
+        Args:
+            cell_values (dict): cellの値 / cell value
+            specifiable_roles (dict): 指定可能なロール / Roles that can be specified
+
+        Returns:
+            validation.result: vaidation result
+        """
         # validation check
         validate = validation.validate_user_name(cell_values["USERNAME"], lang=self.language)
         if not validate.ok:
@@ -304,6 +348,7 @@ class UserImportJobExecutor(BaseJobExecutor):
         if not validate.ok:
             return validate
 
+        # 登録時のみPASSWORDを必須とする / Require PASSWORD only during registration
         if cell_values["PROC_TYPE"] in user_import_file_common.PROC_TYPE_ADD:
             if cell_values["PASSWORD"] is None or cell_values["PASSWORD"] == "":
                 return validation.result(
@@ -321,6 +366,8 @@ class UserImportJobExecutor(BaseJobExecutor):
         if not validate.ok:
             return validate
 
+        # ロールのチェック（カンマ毎に分割して指定可能なロールに含まれているかチェック）
+        # Checking roles (divide by comma and check if it is included in the specifiable roles)
         for role in cell_values["ROLES"].split(','):
             if role != "" and role not in specifiable_roles:
                 return validation.result(
@@ -331,6 +378,15 @@ class UserImportJobExecutor(BaseJobExecutor):
         return validate
 
     def __add_user(self, cell_values):
+        """ユーザの追加 / add user
+
+        Args:
+            cell_values (dict): cellの値 / cell value
+
+        Returns:
+            str: user id
+        """
+        # keycloakに渡すBODYの生成 / Generate BODY to pass to keycloak
         user_json = {
             "username": cell_values["USERNAME"],
             "email": cell_values["EMAIL"],
@@ -351,7 +407,7 @@ class UserImportJobExecutor(BaseJobExecutor):
             "enabled": cell_values["ENABLED"]
         }
 
-
+        # ユーザーの追加 / add user
         u_create = api_keycloak_users.user_create(
             realm_name=self.organization_id, user_json=user_json, token=self.organization_sa_token.get()
         )
@@ -386,6 +442,7 @@ class UserImportJobExecutor(BaseJobExecutor):
 
             raise common.InternalErrorException(message_id=message_id, message=message)
 
+        # 作成したユーザーを取得 / Get created user
         u_get = api_keycloak_users.user_get(realm_name=self.organization_id, user_name=cell_values["USERNAME"], token=self.organization_sa_token.get())
         if u_get.status_code != 200:
             message_id = f"500-25002"
@@ -412,9 +469,18 @@ class UserImportJobExecutor(BaseJobExecutor):
 
 
     def __add_roles(self, cell_values, user_id, specifiable_roles):
+        """ロールの付与 / Grant role
 
+        Args:
+            cell_values (dict): cellの値 / cell value
+            user_id (str): user id
+            specifiable_roles (dict): ロール情報 / Role information
+        """
+
+        # keycloakに渡す付与するロールの一覧を生成 / Generate a list of roles to grant to pass to keycloak
         client_roles = [specifiable_roles[role] for role in cell_values["ROLES"].split(',') if role != ""]
 
+        # ロールの付与 / Grant role
         response = api_keycloak_roles.user_client_role_mapping_create(
             realm_name=self.organization_id, user_id=user_id, client_id=self.organization_private.user_token_client_id,
             client_roles=client_roles, token=self.organization_sa_token.get()
@@ -431,8 +497,14 @@ class UserImportJobExecutor(BaseJobExecutor):
             )
             raise common.InternalErrorException(message_id=message_id, message=message)
 
-
     def __update_t_jobs_user(self, conn, job_status, message):
+        """JOBの状態、件数の更新 / Update of JOB status and number of jobs
+
+        Args:
+            conn (_type_): organization DB connection
+            job_status (str): job_status
+            message (str): message
+        """
         with conn.cursor() as cursor:
             cursor.execute(
                 queries_user_import.SQL_UPDATE_JOBS_USER,
@@ -456,7 +528,7 @@ class UserImportJobExecutor(BaseJobExecutor):
             )
 
     def cancel(self):
-        """job cancel
+        """job cancel (timeout)
         """
         try:
             globals.logger.info(f'Cancel JOB [JOB_ID:{self.job_id}]')
@@ -488,6 +560,7 @@ class UserImportJobExecutor(BaseJobExecutor):
                     # 連続でconnectするとpymysql.err.OperationalError: (1040, 'Too many connections')が発生することがあるので、sleepする
                     # If you connect continuously, pymysql.err.OperationalError: (1040, 'Too many connections') may occur, so sleep
                     time.sleep(0.1)
+                    globals.logger.debug(f"Start force update status : ORGANIZATION_ID:[{organization['ORGANIZATION_ID']}]")
 
                     try:
                         with closing(DBconnector().connect_orgdb(organization['ORGANIZATION_ID'])) as conn, conn.cursor() as cursor:

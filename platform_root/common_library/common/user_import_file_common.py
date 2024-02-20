@@ -1,4 +1,4 @@
-#   Copyright 2022 NEC Corporation
+#   Copyright 2024 NEC Corporation
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -21,14 +21,18 @@ from libs.exceptions import FileFormatErrorException
 
 import job_manager_config
 
+# Excelのヘッダーの行数 / Number of rows in Excel header
 EXCEL_HEADER_ROWS = 2
+# 明細の作成行 / Detail creation line
 EXCEL_FORMAT_SET_ROWS = 100
 
+# 実行処理種別 / Execution processing type
 PROC_TYPE_ADD = ["追加", "Registration"]
 PROC_TYPE_UPD = ["更新", "Update"]
 PROC_TYPE_DEL = ["削除", "Delete"]
 PROC_TYPES = PROC_TYPE_ADD + PROC_TYPE_UPD + PROC_TYPE_DEL
 
+# COLUMN情報 / COLUMN information
 COLUMN_IDS = {
     "PROC_TYPE": {
         "text": "実行処理種別",
@@ -116,19 +120,29 @@ COLUMN_IDS = {
     },
 }
 
+
 class UserResultWorkbook():
+    """結果出力用Excelファイル生成Class / Excel file generation class for result output
+    """
     def __init__(self, lang, error_column=False):
+        """constructor
+
+        Args:
+            lang (str): Language
+            error_column (bool, optional): エラー項目生成有無 / Whether error items are generated or not. Defaults to False.
+        """
         self.lang = lang
         self.wb = openpyxl.Workbook()
         self.ws = self.wb.worksheets[0]
         self.col_indexes = {}
 
+        # 項目をid, 項目位置でdictionary化する / Convert items to dictionary by id and item position
         if error_column:
             column_ids = COLUMN_IDS
         else:
             column_ids = {cid: item for cid, item in COLUMN_IDS.items() if cid != "ERROR_TEXT"}
 
-
+        # ヘッダー行のスタイル生成 / Header row style generation
         header_row1_fill = openpyxl.styles.PatternFill(patternType='solid', fgColor='00459D')
         header_row2_fill = openpyxl.styles.PatternFill(patternType='solid', fgColor='D9D9D9')
         header_side = openpyxl.styles.borders.Side(style='thin', color='FFFFFF')
@@ -138,6 +152,7 @@ class UserResultWorkbook():
         header_row1_font = openpyxl.styles.fonts.Font(color='FFFFFF')
         header_row2_font = openpyxl.styles.fonts.Font(color='000000')
 
+        # cellの入力選択肢生成 / Cell input option generation
         proc_type_lang_idx = 0 if self.lang == "ja" else 1
         proc_type_col_validation = openpyxl.worksheet.datavalidation.DataValidation(
             type="list",
@@ -152,7 +167,7 @@ class UserResultWorkbook():
             formula1=f'"TRUE,FALSE"'
         )
 
-        # ヘッダ行の生成
+        # ヘッダ行の生成 / Generate header row
         for idx, key in enumerate(column_ids):
             self.ws.column_dimensions[chr(ord('A')+idx)].width = column_ids[key]["width"]
             self.ws.cell(row = 1, column=idx+1).value = multi_lang.get_text_spec(lang, column_ids[key]["text-id"], column_ids[key]["text"])
@@ -167,42 +182,63 @@ class UserResultWorkbook():
             self.ws.cell(row = 2, column=idx+1).font = header_row2_font
             self.col_indexes[key] = idx
 
+        # ヘッダ行の高さ設定 / Header row height setting
         self.ws.row_dimensions[1].height = 18
         self.ws.row_dimensions[2].height = 42
-        self.ws.freeze_panes = 'C3'
+        # スクロール固定の設定 / Fixed scroll setting
+        self.ws.freeze_panes = f'{chr(ord("A")+self.col_indexes["USERNAME"]+1)}{EXCEL_HEADER_ROWS+1}'
 
-        # PROC_TYPEの設定
+        # PROC_TYPEのcellの入力選択肢設定 / PROC_TYPE cell input option settings
         proc_type_col = chr(ord('A')+self.col_indexes["PROC_TYPE"])
         proc_type_col_validation.add(f"{proc_type_col}{EXCEL_HEADER_ROWS+1}:{proc_type_col}{EXCEL_FORMAT_SET_ROWS}")
         self.ws.add_data_validation(proc_type_col_validation)
-        # ENABLEDの設定
+        # ENABLEDのcellの入力選択肢設定 / ENABLED cell input option settings
         enabled_col = chr(ord('A')+self.col_indexes["ENABLED"])
         enabled_col_validation.add(f"{enabled_col}{EXCEL_HEADER_ROWS+1}:{enabled_col}{EXCEL_FORMAT_SET_ROWS}")
         self.ws.add_data_validation(enabled_col_validation)
 
+        # 書き込み行の初期設定 / Initial setting of write line
         self.__writed_row_idx = EXCEL_HEADER_ROWS
 
     def write_row(self, cell_values):
+        """行の書き込み / writing a line
+
+        Args:
+            cell_values (dict): cellの値 / cell value
+        """
         self.__writed_row_idx += 1
         for cid, cvalue in cell_values.items():
             self.ws.cell(self.__writed_row_idx, self.col_indexes[cid] + 1).value = cvalue
 
     def get_workbook_bytes_image(self):
+        """Excelファイルイメージ取得 / Excel file image acquisition
+
+        Returns:
+            byte[]: Excel file image
+        """
         return make_workbook_bytes_image(self.wb)
 
 
 class UserImportWorkbook():
+    """User Import用読み込みclass / Reading class for User Import
+    """
     def __init__(self, lang, file_image):
+        """constructor
+
+        Args:
+            lang (str): Language
+            file_image (byte[]): Excel file image
+        """
         self.lang = lang
 
-        # Excelファイルイメージ取り込み
+        # Excelファイルイメージ取り込み / Excel file image import
         try:
             excel_zipfile = ZipFile(io.BytesIO(file_image)).fp
             self.wb = openpyxl.load_workbook(excel_zipfile, read_only=True, data_only=True, keep_links=False, rich_text=False)
         except Exception as ex:
             raise FileFormatErrorException(multi_lang.get_text_spec(self.lang, '401-00015', 'Excelファイルの読み込みに失敗しました。'))
 
-        # 先頭シートを対象とする
+        # 先頭シートを対象とする / Target the first sheet
         try:
             self.ws = self.wb.worksheets[0]
             if self.ws is None:
@@ -210,7 +246,7 @@ class UserImportWorkbook():
         except Exception as ex:
             raise FileFormatErrorException(multi_lang.get_text_spec(self.lang, '401-00017', 'Excelファイルにワークシートが存在しません。'))
 
-        # Excelの行列の最大数のチェック
+        # Excelの行列の最大数のチェック / Checking maximum number of columns in Excel
         if self.ws.max_column > job_manager_config.JOBS[const.PROCESS_KIND_USER_IMPORT]["extra_config"]["max_number_of_cols_allowd"]:
             raise FileFormatErrorException(
                 multi_lang.get_text_spec(
@@ -225,28 +261,36 @@ class UserImportWorkbook():
                     self.ws.max_column,
                     job_manager_config.JOBS[const.PROCESS_KIND_USER_IMPORT]["extra_config"]["max_number_of_rows_allowd"]))
 
-        # 先頭行を取得する
+        # 先頭行を取得する / get first row
         ws_header = [self.ws.cell(row=1, column=col_idx).value for col_idx in range(1, self.ws.max_column + 1)]
 
-        # ヘッダーのテキストよりcolumn位置と特定する
-        self.col_indexes = { cid: columns_index(ws_header, multi_lang.get_text_spec(lang, citem["text-id"], citem["text"]))
+        # ヘッダーのテキストよりidと位置をdictionary化する / Convert id and position into dictionary from header text
+        self.col_indexes = { cid: search_list_value(ws_header, multi_lang.get_text_spec(lang, citem["text-id"], citem["text"]))
                             for cid, citem in COLUMN_IDS.items() }
 
-        # ヘッダーの必須項目チェック
+        # ヘッダーの必須項目チェック / Check required items in header
         not_found_columns = [multi_lang.get_text_spec(lang, COLUMN_IDS[cid]["text-id"], COLUMN_IDS[cid]["text"])
                                 for cid, index in self.col_indexes.items() if index == -1 and cid != "ERROR_TEXT"]
         if len(not_found_columns) > 0:
             raise FileFormatErrorException(multi_lang.get_text_spec(self.lang, '401-00016', 'Excelファイルに必須の項目がありません。({0})', ",".join(not_found_columns)))
 
-        # Read用の項目
+        # Read用の項目: iter_rowsでxl_buffered_rowsずつ読み取りバッファリングして読み込む（性能対策）
+        # Item for Read: Iter_rows reads xl_buffered_rows by buffering and reading (performance measure)
         self.__buff = []
         self.__buffered_row_idx = EXCEL_HEADER_ROWS
         self.__row_idx = EXCEL_HEADER_ROWS
 
     def count_proc_type(self):
+        """処理件数のカウント / Counting the number of processed items
+
+        Returns:
+            int: 登録件数 / Number of registrations
+            int: 変更件数 / Number of changes
+            int: 削除件数 / Number of items deleted
+        """
         count_register = count_update = count_delete = 0
 
-        # 一つ一つ読みだすと遅いのでiter_rowsで一気に読み取る
+        # 一つ一つ読みだすと遅いのでiter_rowsで一気に読み取る / Reading them one by one is slow, so read them all at once with iter_rows
         for row in self.ws.iter_rows(EXCEL_HEADER_ROWS + 1, self.ws.max_row, self.col_indexes["PROC_TYPE"], self.col_indexes["PROC_TYPE"]):
             for cel in row:
                 if cel.value in PROC_TYPE_ADD:
@@ -259,14 +303,26 @@ class UserImportWorkbook():
         return count_register, count_update, count_delete
 
     def read_row(self):
+        """行の読み取り / reading row
+
+        Returns:
+            dict: cellの値 / cell value
+        """
         if len(self.__buff) == 0:
+            # bufferの件数が0件の時は、bufferへの読み込みを行う
+
             if self.__buffered_row_idx == self.ws.max_row:
+                # 最終行までバッファ済みの場合は、もう読み取る行が無いのでNoneを返す
+                # If the last line has been buffered, there are no more lines to read, so return None.
                 return None
 
+            # バッファリングする最終行を決定する / Determine the last line to buffer
             max_row = self.__buffered_row_idx + job_manager_config.JOBS[const.PROCESS_KIND_USER_IMPORT]["extra_config"]["xl_buffered_rows"]
             if max_row > self.ws.max_row:
                 max_row = self.ws.max_row
 
+            # バッファリングの対象行をiter_rowsで指定しバッファにため込む
+            # Specify the rows to be buffered with iter_rows and store them in the buffer
             for xl_row in self.ws.iter_rows(self.__buffered_row_idx + 1, max_row, 1, max(self.col_indexes.values()) + 1):
                 cell_values = [xl_cel.value for xl_cel in xl_row]
                 self.__buff.append(
@@ -276,8 +332,10 @@ class UserImportWorkbook():
                     }
                 )
 
+            # バッファリングが済んだ行を設定 / Set buffered line
             self.__buffered_row_idx = max_row
 
+        # バッファの先頭行を返し、先頭行はバッファから削除する / Returns the first line of the buffer and deletes the first line from the buffer
         row = self.__buff[0].copy()
         del self.__buff[0]
 
@@ -285,10 +343,23 @@ class UserImportWorkbook():
         return row
 
     def get_row_idx(self):
+        """現在の処理行を返す / Returns the current processed row
+
+        Returns:
+            int: 現在の処理行 / current processed row
+        """
         return self.__row_idx
 
 
 def make_workbook_bytes_image(wb):
+    """Excelファイルイメージを生成する / Generate Excel file image
+
+    Args:
+        wb (openpyxl.Workbook): Excel Workbook
+
+    Returns:
+        byte[]: Excel file image
+    """
     mem_stream = io.BytesIO()
     wb.save(mem_stream)
     mem_stream.seek(0)
@@ -298,8 +369,17 @@ def make_workbook_bytes_image(wb):
     return mem_buf
 
 
-def columns_index(header_rows, column_text):
+def search_list_value(list, search_value):
+    """search value
+
+    Args:
+        list (list): list
+        search_value (str): search value
+
+    Returns:
+        int: listの位置(存在しないときは-1を返す) / Position of list (returns -1 if it does not exist)
+    """
     try:
-        return header_rows.index(column_text)
+        return list.index(search_value)
     except ValueError:
         return -1
