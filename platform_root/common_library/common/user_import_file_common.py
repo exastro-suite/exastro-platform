@@ -152,21 +152,6 @@ class UserResultWorkbook():
         header_row1_font = openpyxl.styles.fonts.Font(color='FFFFFF')
         header_row2_font = openpyxl.styles.fonts.Font(color='000000')
 
-        # cellの入力選択肢生成 / Cell input option generation
-        proc_type_lang_idx = 0 if self.lang == "ja" else 1
-        proc_type_col_validation = openpyxl.worksheet.datavalidation.DataValidation(
-            type="list",
-            allow_blank=True,
-            errorStyle="warning",
-            formula1=f'"{PROC_TYPE_ADD[proc_type_lang_idx]},{PROC_TYPE_UPD[proc_type_lang_idx]},{PROC_TYPE_DEL[proc_type_lang_idx]}"'
-        )
-        enabled_col_validation = openpyxl.worksheet.datavalidation.DataValidation(
-            type="list",
-            allow_blank=True,
-            errorStyle="warning",
-            formula1=f'"TRUE,FALSE"'
-        )
-
         # ヘッダ行の生成 / Generate header row
         for idx, key in enumerate(column_ids):
             self.ws.column_dimensions[chr(ord('A')+idx)].width = column_ids[key]["width"]
@@ -188,15 +173,6 @@ class UserResultWorkbook():
         # スクロール固定の設定 / Fixed scroll setting
         self.ws.freeze_panes = f'{chr(ord("A")+self.col_indexes["USERNAME"]+1)}{EXCEL_HEADER_ROWS+1}'
 
-        # PROC_TYPEのcellの入力選択肢設定 / PROC_TYPE cell input option settings
-        proc_type_col = chr(ord('A')+self.col_indexes["PROC_TYPE"])
-        proc_type_col_validation.add(f"{proc_type_col}{EXCEL_HEADER_ROWS+1}:{proc_type_col}{EXCEL_FORMAT_SET_ROWS}")
-        self.ws.add_data_validation(proc_type_col_validation)
-        # ENABLEDのcellの入力選択肢設定 / ENABLED cell input option settings
-        enabled_col = chr(ord('A')+self.col_indexes["ENABLED"])
-        enabled_col_validation.add(f"{enabled_col}{EXCEL_HEADER_ROWS+1}:{enabled_col}{EXCEL_FORMAT_SET_ROWS}")
-        self.ws.add_data_validation(enabled_col_validation)
-
         # 書き込み行の初期設定 / Initial setting of write line
         self.__writed_row_idx = EXCEL_HEADER_ROWS
 
@@ -216,6 +192,32 @@ class UserResultWorkbook():
         Returns:
             byte[]: Excel file image
         """
+        # 入力エリアのcell設定はファイル出力時に設定 / Input area cell settings are set when outputting a file
+
+        # cellの入力選択肢生成 / Cell input option generation
+        proc_type_lang_idx = 0 if self.lang == "ja" else 1
+        proc_type_col_validation = openpyxl.worksheet.datavalidation.DataValidation(
+            type="list",
+            allow_blank=True,
+            errorStyle="warning",
+            formula1=f'"{PROC_TYPE_ADD[proc_type_lang_idx]},{PROC_TYPE_UPD[proc_type_lang_idx]},{PROC_TYPE_DEL[proc_type_lang_idx]}"'
+        )
+        enabled_col_validation = openpyxl.worksheet.datavalidation.DataValidation(
+            type="list",
+            allow_blank=True,
+            errorStyle="warning",
+            formula1=f'"TRUE,FALSE"'
+        )
+
+        # PROC_TYPEのcellの入力選択肢設定 / PROC_TYPE cell input option settings
+        proc_type_col = chr(ord('A')+self.col_indexes["PROC_TYPE"])
+        proc_type_col_validation.add(f"{proc_type_col}{EXCEL_HEADER_ROWS+1}:{proc_type_col}{self.ws.max_row + EXCEL_FORMAT_SET_ROWS}")
+        self.ws.add_data_validation(proc_type_col_validation)
+        # ENABLEDのcellの入力選択肢設定 / ENABLED cell input option settings
+        enabled_col = chr(ord('A')+self.col_indexes["ENABLED"])
+        enabled_col_validation.add(f"{enabled_col}{EXCEL_HEADER_ROWS+1}:{enabled_col}{self.ws.max_row + EXCEL_FORMAT_SET_ROWS}")
+        self.ws.add_data_validation(enabled_col_validation)
+
         return make_workbook_bytes_image(self.wb)
 
 
