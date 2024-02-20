@@ -46,7 +46,8 @@ RUN poetry install --without develop_build
 #
 
 # SUB PROCESSを再起動するインターバル / Interval for restarting SUB PROCESS
-ENV SUB_PROCESS_TERMINATE_REQUEST_SECONDS=1800
+# ※各JOBのタイムアウト時間より大きい数字とするとこ / Set the number to be larger than the timeout time of each JOB
+ENV SUB_PROCESS_TERMINATE_REQUEST_SECONDS=7200
 
 # queueを受付けるSUB PROCESSの総数 / Total number of SUB PROCESS that accept queues
 ENV SUB_PROCESS_ACCEPTABLE=2
@@ -72,6 +73,9 @@ ENV JOB_STATUS_WATCH_INTERVAL_SECONDS=1.0
 # タスクのキャンセルtimeout時間 / Job cancellation timeout seconds
 ENV JOB_CANCEL_TIMEOUT_SECONDS=5.0
 
+# keycloakのtokenを再取得するインターバル / Interval to reacquire keycloak token
+ENV KEYCLOAK_TOKEN_REFRESH_INTERVAL_SECONDS=30
+
 # 通知Jobの設定 / Notification job settings
 #   Jobタイムアウト / Job timeout
 ENV JOB_NOTIFICATION_TIMEOUT_SECONDS=20
@@ -95,7 +99,21 @@ ENV JOB_FORCE_UPDATE_STATUS_INTERVAL_SECONDS=180
 #   ステータスを強制的にエラーにする最終更新日時からの経過時間 / Elapsed time since last update to force status to error
 ENV JOB_FORCE_UPDATE_STATUS_PROGRASS_SECONDS=600
 
-
+# ユーザーインポートJobの設定 / User import job settings
+#   Jobタイムアウト / Job timeout
+ENV JOB_USER_IMPORT_TIMEOUT_SECONDS=3600
+#   プロセス毎に同時実行可能なJob数 / Number of jobs that can be executed simultaneously per process
+ENV JOB_USER_IMPORT_MAX_JOB_PER_PROCESS=2
+#   読み込み可能なExcelファイルの最大行数 / Maximum number of rows in an Excel file that can be read
+ENV JOB_USER_IMPORT_MAX_ROWS_ALLOWD=20000
+#   読み込み可能なExcelファイルの最大列数 / Maximum number of columns in an Excel file that can be read
+ENV JOB_USER_IMPORT_MAX_COLS_ALLOWD=20
+#   1件処理毎にwaitする時間(ミリ秒) / Wait time for each process (milliseconds)
+ENV JOB_USER_IMPORT_WAIT_MILLISECONDS=10
+#   処理中の件数を更新するインターバル / Interval for updating the number of items being processed
+ENV JOB_USER_IMPORT_UPDATE_COUNT_INTERVAL=100
+#   Excelファイルバッファリング行数 / Excel file buffering row count
+ENV JOB_USER_IMPORT_XL_BUFFERED_ROWS=100
 
 #
 # Build for development

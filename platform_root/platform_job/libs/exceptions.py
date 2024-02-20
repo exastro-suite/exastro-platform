@@ -14,3 +14,7 @@
 
 class JobTimeoutException(Exception):
     pass
+
+class FileFormatErrorException(Exception):
+    def __init__(self, message):
+        self.message = message

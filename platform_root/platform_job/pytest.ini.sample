@@ -24,6 +24,8 @@ env =
     ITA_API_ADMIN_HOST=dummy
     ITA_API_ADMIN_PORT=8079
 
+    TEST_OUTPUT_PATH=/workspace/platform_root/platform_job/tests/temp
+
     ; pytest起動時にunit test用のコンテナを起動するかの指定
     ;
     ;   DOCKER_COMPOSE_UP_UNITTEST_NODE=MANUAL (開発時は基本こちらで利用)
@@ -39,6 +41,9 @@ env =
     ;
     DOCKER_COMPOSE_UP_UNITTEST_NODE=MANUAL
     ; DOCKER_COMPOSE_UP_UNITTEST_NODE=AUTO
+
+    ; pytest作成したで試験データのExcelをTEST_OUTPUT_PATHに保存します
+    ; USER_EXCEL_FILE_SAVED=TRUE
 
 ; pytestのデバック（debugger使用）時のみコメントアウトを解除してください
 ; ※コメントアウトを解除中はカバレッジの情報は更新されません
