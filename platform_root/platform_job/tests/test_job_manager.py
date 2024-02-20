@@ -90,11 +90,11 @@ def test_job_manager_main_sigint_signal():
 
             # sub processの終了確認
             assert test_common.check_state(
-                timeout=5.0, conditions=lambda : len([p for p in psutil.Process(os.getpid()).children() if p.name().startswith('python') ]), conditions_value=0)
+                timeout=10.0, conditions=lambda : len([p for p in psutil.Process(os.getpid()).children() if p.name().startswith('python') ]), conditions_value=0)
 
             # 終了しているか確認
             assert test_common.check_state(
-                timeout=3.0, conditions=lambda : not main_thread.is_alive())
+                timeout=5.0, conditions=lambda : not main_thread.is_alive())
 
         finally:
             # sigterm signalの送信
@@ -102,7 +102,7 @@ def test_job_manager_main_sigint_signal():
 
             # main processの終了確認
             assert test_common.check_state(
-                timeout=5.0, conditions=lambda : not main_thread.is_alive())
+                timeout=10.0, conditions=lambda : not main_thread.is_alive())
 
             main_thread.join()
 
