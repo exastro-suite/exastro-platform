@@ -106,7 +106,7 @@ SQL_ORGANIZATION_CREATE_TABLES = [
     (
         FILE_ID		                    VARCHAR(26) NOT NULL,                       -- ファイルID
         JOB_ID		                    VARCHAR(26) NOT NULL,                       -- ジョブID
-        FILE_DATA		                BLOB,                                       -- 一括登録Excelファイルデータ
+        FILE_DATA		                LONGBLOB,                                   -- 一括登録Excelファイルデータ
         CREATE_TIMESTAMP		        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,    -- 作成日時
         CREATE_USER		                VARCHAR(40),                                -- 作成者
         LAST_UPDATE_TIMESTAMP		    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,    -- 最終更新日時
@@ -121,7 +121,7 @@ SQL_ORGANIZATION_CREATE_TABLES = [
     (
         RESULT_ID		                VARCHAR(26) NOT NULL,                       -- 結果ID
         JOB_ID		                    VARCHAR(26) NOT NULL,                       -- ジョブID
-        FILE_DATA		                BLOB,                                       -- 一括登録Excelファイルデータ
+        FILE_DATA		                LONGBLOB,                                   -- 一括登録Excelファイルデータ
         CREATE_TIMESTAMP		        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,    -- 作成日時
         PRIMARY KEY (RESULT_ID),
         INDEX IDX_FUNC_ID (JOB_ID)
