@@ -627,7 +627,7 @@ def validate_datetime(datetime_string, format=const.FORMAT_DATETIME_PLAN_START_D
         return True
 
 
-def validate_user_name(user_name):
+def validate_user_name(user_name, lang=None):
     """Validate user name
 
     Args:
@@ -639,13 +639,13 @@ def validate_user_name(user_name):
     if user_name is None or user_name == "":
         return result(
             False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
-            multi_lang.get_text('000-00128', "ユーザー名")
+            multi_lang.get_text('000-00128', "ユーザー名") if lang is None else multi_lang.get_text_spec(lang, '000-00128', "ユーザー名")
         )
 
     if len(user_name) > const.length_user_name:
         return result(
             False, 400, '400-{}012'.format(MSG_FUNCTION_ID), '指定可能な文字数を超えています。(項目:{0},最大文字数:{1})',
-            multi_lang.get_text('000-00128', "ユーザー名"),
+            multi_lang.get_text('000-00128', "ユーザー名") if lang is None else multi_lang.get_text_spec(lang, '000-00128', "ユーザー名"),
             str(const.length_user_name)
         )
 
@@ -653,20 +653,20 @@ def validate_user_name(user_name):
     if not rlt:
         return result(
             False, 400, '400-{}013'.format(MSG_FUNCTION_ID), '指定できない文字が含まれています。(項目:{0},指定できない文字:{1})',
-            multi_lang.get_text('000-00128', "ユーザー名"),
+            multi_lang.get_text('000-00128', "ユーザー名") if lang is None else multi_lang.get_text_spec(lang, '000-00128', "ユーザー名"),
             chr
         )
 
     if not re.match(RE_ID_USABLE_FIRST_CHARACTER, user_name):
         return result(
             False, 400, '400-{}014'.format(MSG_FUNCTION_ID), '先頭の文字にアルファベット以外が指定されています。({0})',
-            multi_lang.get_text('000-00128', "ユーザー名")
+            multi_lang.get_text('000-00128', "ユーザー名") if lang is None else multi_lang.get_text_spec(lang, '000-00128', "ユーザー名")
         )
 
     return result(True)
 
 
-def validate_user_email(user_email):
+def validate_user_email(user_email, lang=None):
     """Validate user email
 
     Args:
@@ -681,7 +681,7 @@ def validate_user_email(user_email):
     if len(user_email) > const.length_user_email:
         return result(
             False, 400, '400-{}012'.format(MSG_FUNCTION_ID), '指定可能な文字数を超えています。(項目:{0},最大文字数:{1})',
-            multi_lang.get_text('000-00128', "email"),
+            multi_lang.get_text('000-00128', "email") if lang is None else multi_lang.get_text_spec(lang, '000-00128', "email"),
             str(const.length_user_email)
         )
 
@@ -692,13 +692,13 @@ def validate_user_email(user_email):
     except EmailNotValidError:
         return result(
             False, 400, '400-{}023'.format(MSG_FUNCTION_ID), 'メールアドレスの形式に誤りがあります。({0})',
-            multi_lang.get_text('000-00128', "email")
+            multi_lang.get_text('000-00128', "email") if lang is None else multi_lang.get_text_spec(lang, '000-00128', "email")
         )
 
     return result(True)
 
 
-def validate_user_firstName(user_firstName):
+def validate_user_firstName(user_firstName, lang=None):
     """Validate user firstName
 
     Args:
@@ -713,14 +713,14 @@ def validate_user_firstName(user_firstName):
     if len(user_firstName) > const.length_user_firstName:
         return result(
             False, 400, '400-{}012'.format(MSG_FUNCTION_ID), '指定可能な文字数を超えています。(項目:{0},最大文字数:{1})',
-            multi_lang.get_text('000-00130', "名"),
+            multi_lang.get_text('000-00130', "名") if lang is None else multi_lang.get_text_spec(lang, '000-00130', "名"),
             str(const.length_user_firstName)
         )
 
     return result(True)
 
 
-def validate_user_lastName(user_lastName):
+def validate_user_lastName(user_lastName, lang=None):
     """Validate user lastName
 
     Args:
@@ -735,7 +735,7 @@ def validate_user_lastName(user_lastName):
     if len(user_lastName) > const.length_user_lastName:
         return result(
             False, 400, '400-{}012'.format(MSG_FUNCTION_ID), '指定可能な文字数を超えています。(項目:{0},最大文字数:{1})',
-            multi_lang.get_text('000-00131', "姓"),
+            multi_lang.get_text('000-00131', "姓") if lang is None else multi_lang.get_text_spec(lang, '000-00131', "姓"),
             str(const.length_user_lastName)
         )
 
@@ -761,7 +761,7 @@ def validate_password_temporary(password_temporary):
     return result(True)
 
 
-def validate_user_affiliation(user_affiliation):
+def validate_user_affiliation(user_affiliation, lang=None):
     """Validate user affiliation
 
     Args:
@@ -773,14 +773,14 @@ def validate_user_affiliation(user_affiliation):
     if len(user_affiliation) > const.length_user_affiliation:
         return result(
             False, 400, '400-{}012'.format(MSG_FUNCTION_ID), '指定可能な文字数を超えています。(項目:{0},最大文字数:{1})',
-            multi_lang.get_text('000-00143', "所属"),
+            multi_lang.get_text('000-00143', "所属") if lang is None else multi_lang.get_text_spec(lang, '000-00143', "所属"),
             str(const.length_user_affiliation)
         )
 
     return result(True)
 
 
-def validate_user_description(user_description):
+def validate_user_description(user_description, lang=None):
     """Validate user description
 
     Args:
@@ -792,14 +792,14 @@ def validate_user_description(user_description):
     if len(user_description) > const.length_user_description:
         return result(
             False, 400, '400-{}012'.format(MSG_FUNCTION_ID), '指定可能な文字数を超えています。(項目:{0},最大文字数:{1})',
-            multi_lang.get_text('000-00106', "説明"),
+            multi_lang.get_text('000-00106', "説明") if lang is None else multi_lang.get_text_spec(lang, '000-00106', "説明"),
             str(const.length_user_description)
         )
 
     return result(True)
 
 
-def validate_user_enabled(user_enabled):
+def validate_user_enabled(user_enabled, lang=None):
     """Validate user enabled
 
     Args:

@@ -14,6 +14,8 @@ pymysql = ">=0.0.0"
 pycryptodome = ">=0.0.0"
 ulid-py = ">=0.0.0"
 openpyxl = ">=0.0.0"
+lxml = ">=0.0.0"
+email-validator = ">=0.0.0"
 
 
 [tool.poetry.group.first_install.dependencies]

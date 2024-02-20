@@ -15,9 +15,15 @@ import json
 from contextlib import closing
 
 from common_library.common.db import DBconnector
+from common_library.common import common
+from common_library.common import api_keycloak_tokens
+
 from libs import queries_common, queries_process_queue
+from libs.job_manager_classes import IntervalTiming
+
 
 import job_manager_const
+import job_manager_config
 
 
 def get_organizations():
@@ -70,3 +76,47 @@ def exists_queue(conn, process_exec_id: str):
         rlt = cursor.fetchone()
 
         return rlt is not None
+
+
+class organization_sa_token():
+    """organization service account token発行 / organization service account token issued
+    """
+    def __init__(self, organization_id, organization_private):
+        """constructor
+
+        Args:
+            organization_id (str): organization_id
+            organization_private (dict): organization_private
+        """
+        self.__organization_id = organization_id
+        self.__organization_private = organization_private
+        self.__interval_timing = IntervalTiming(job_manager_config.KEYCLOAK_TOKEN_REFRESH_INTERVAL_SECONDS)
+        self.__token = None
+
+    def get(self):
+        """organization service account token取得 / organization service account token acquisition
+
+        Raises:
+            common.AuthException: failed get token
+
+        Returns:
+            str: organization service account token
+        """
+        if self.__token is None or self.__interval_timing.is_passed():
+            # サービスアカウントのTOKEN取得
+            # Get a service account token
+            token_response = api_keycloak_tokens.service_account_get_token(
+                self.__organization_id,
+                self.__organization_private.internal_api_client_clientid,
+                self.__organization_private.internal_api_client_secret,
+            )
+            if token_response.status_code != 200:
+                self.__token = None
+                raise common.AuthException(
+                    "client_user_get_token error status:{}, response:{}".format(token_response.status_code, token_response.text)
+                )
+
+            self.__token = json.loads(token_response.text)["access_token"]
+
+        return self.__token
+

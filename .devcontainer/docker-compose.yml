@@ -189,6 +189,9 @@ services:
       - DB_DATABASE=platform
       - DB_USER=app_user
       - DB_PASSWORD=password
+      - API_KEYCLOAK_HOST=keycloak
+      - API_KEYCLOAK_PROTOCOL=http
+      - API_KEYCLOAK_PORT=8080
       - ENCRYPT_KEY=${ENCRYPT_KEY}
     networks:
       - exastro
