@@ -279,3 +279,10 @@ services:
       - ../test/web/contents:/var/www/html:cached
     networks:
       - exastro
+  platform-init-containers:
+    # 監査ログ用の出力フォルダの権限を設定
+    # Set output folder permissions for audit logs
+    image: busybox:stable
+    volumes:
+      - ../.volumes/exastro/log:/var/log/exastro
+    command: "sh -c 'chmod 777 /var/log/exastro'"
