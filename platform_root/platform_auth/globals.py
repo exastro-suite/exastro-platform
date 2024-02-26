@@ -14,11 +14,14 @@
 
 config = None
 logger = None
+audit = None
 
 
 def init(app):
     global config
     global logger
+    global audit
 
     config = app.config
     logger = app.logger
+    audit = app.logger
