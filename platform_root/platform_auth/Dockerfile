@@ -30,6 +30,9 @@ ENV APACHE_SOCKET_DIR       /var/run_$USERNAME/httpd/socket
 ENV APACHE_TIMEOUT          420
 ENV APACHE_USERNAME         $USERNAME
 ENV APACHE_GROUPNAME        $GROUPNAME
+ENV LOG_LEVEL               INFO
+ENV AUDIT_LOG_ENABLED       True
+ENV AUDIT_LOG_PATH          exastro-audit.log
 
 RUN dnf install -y \
     langpacks-en \
