@@ -74,6 +74,11 @@ JOB_STATUS_WATCH_INTERVAL_SECONDS = float(os.environ.get('JOB_STATUS_WATCH_INTER
 JOB_CANCEL_TIMEOUT_SECONDS = float(os.environ.get('JOB_CANCEL_TIMEOUT_SECONDS'))
 
 #
+# keycloakのtokenを再取得するインターバル 
+#
+KEYCLOAK_TOKEN_REFRESH_INTERVAL_SECONDS = int(os.environ.get('KEYCLOAK_TOKEN_REFRESH_INTERVAL_SECONDS'))
+
+#
 # タスクの種類毎の設定 / Settings for each type of job
 #   timeout_seconds         :   jobのtimeout秒 / job timeout seconds
 #   module                  :   jobを処理するclassのmodule / module of the class that processes the job
@@ -99,6 +104,25 @@ JOBS = {
             "smtp_timeout": float(os.environ.get('JOB_NOTIFICATION_SMTP_TIMEOUT')),
             # smtpsのssl verify(TRUE/FALSE) / smtps ssl verify(TRUE/FALSE)
             "smtps_ssl_verify_enabled": common.val_to_boolean(os.environ.get('JOB_NOTIFICATION_SMTPS_SSL_VERIFY_ENABLED', 'TRUE')),
+        }
+    },
+    const.PROCESS_KIND_USER_IMPORT: {
+        "timeout_seconds": int(os.environ.get('JOB_USER_IMPORT_TIMEOUT_SECONDS')),
+        "module": "jobs.UserImportJobExecutor",
+        "class": "UserImportJobExecutor",
+        "job_trigger": "queue",
+        "max_job_per_process": int(os.environ.get('JOB_USER_IMPORT_MAX_JOB_PER_PROCESS')),
+        "extra_config": {
+            # 読み込み可能なExcelファイルの最大行数 / Maximum number of rows in an Excel file that can be read
+            "max_number_of_rows_allowd": int(os.environ.get('JOB_USER_IMPORT_MAX_ROWS_ALLOWD')),
+            # 読み込み可能なExcelファイルの最大列数 / Maximum number of columns in an Excel file that can be read
+            "max_number_of_cols_allowd": int(os.environ.get('JOB_USER_IMPORT_MAX_COLS_ALLOWD')),
+            # 1件処理毎にwaitする時間(ミリ秒) / Wait time for each process (milliseconds)
+            "user_import_interval_millisecond": float(os.environ.get('JOB_USER_IMPORT_WAIT_MILLISECONDS')),
+            # 処理中の件数を更新するインターバル / Interval for updating the number of items being processed
+            "status_update_interval": int(os.environ.get('JOB_USER_IMPORT_UPDATE_COUNT_INTERVAL')),
+            # Excelファイルバッファリング行数 / Excel file buffering row count
+            "xl_buffered_rows": int(os.environ.get('JOB_USER_IMPORT_XL_BUFFERED_ROWS')),
         }
     },
     job_manager_const.PROCESS_KIND_FORCE_UPDATE_STATUS: {
