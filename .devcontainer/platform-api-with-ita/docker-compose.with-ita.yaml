@@ -30,6 +30,9 @@ services:
   ita-web:
     profiles:
       - exastro-it-automation-dummy
+  ita-mariadb:
+    volumes:
+      - ${ITA_REPO_ROOT}/ita_root/ita_mariadb/conf/custom.cnf:/etc/mysql/conf.d/custom.cnf
   ita-init-containers:
     # busybox:latest を使用してしまうと、backyard系の処理が含まれてしまうため別イメージに変えている。
     # docker-compose.with-ita.by-disable.yaml で使用している busybox:latestを、devcontainerが統合してしまうのだろうとおもう
