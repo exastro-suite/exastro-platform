@@ -51,6 +51,10 @@ services:
       - SSL_CERT_DIR=/etc/ssl/certs
       - NODE_EXTRA_CA_CERTS=/etc/ssl/certs/ca-certificates.crt
       - NODE_TLS_REJECT_UNAUTHORIZED=${NODE_TLS_REJECT_UNAUTHORIZED:-1}
+      - AUDIT_LOG_ENABLED=${AUDIT_LOG_ENABLED:-True}
+      - AUDIT_LOG_PATH=${AUDIT_LOG_PATH:-exastro-audit.log}
+      - AUDIT_LOG_FILE_MAX_BYTE=${AUDIT_LOG_FILE_MAX_BYTE:-100000000}
+      - AUDIT_LOG_BACKUP_COUNT=${AUDIT_LOG_BACKUP_COUNT:-30}
 
   platform-api:
     build:

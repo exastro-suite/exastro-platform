@@ -16,7 +16,7 @@
 WSGI main module
 """
 # from crypt import methods
-from flask import Flask, request, Response, jsonify, make_response
+from flask import Flask, request, jsonify, make_response
 import os
 import requests
 from datetime import datetime
@@ -26,6 +26,7 @@ from logging.config import dictConfig as dictLogConf
 from flask_log_request_id import RequestID
 import inspect
 import traceback
+from pathlib import Path
 
 # User Imports
 import globals
@@ -52,12 +53,18 @@ logging.setLogRecordFactory(ExastroLogRecordFactory(org_factory, request))
 globals.logger = logging.getLogger('root')
 dictLogConf(LOGGING)
 
-globals.logger.setLevel(os.getenv('LOG_LEVEL', 'INFO'))
+globals.logger.setLevel(os.getenv('LOG_LEVEL'))
 
 RequestID(app)
 
+audit_path = Path('/var/log/exastro')
+
 # 監査ログのLogger設定
-globals.audit = audit_getLogger('audit', os.getenv('AUDIT_LOG_PATH'))
+globals.audit = audit_getLogger('audit',
+                                audit_path.joinpath(os.getenv('AUDIT_LOG_PATH')),
+                                os.getenv('AUDIT_LOG_ENABLED').lower() == 'true',
+                                int(os.getenv('AUDIT_LOG_FILE_MAX_BYTE')),
+                                int(os.getenv('AUDIT_LOG_BACKUP_COUNT')))
 
 
 @app.route('/alive', methods=["GET"])

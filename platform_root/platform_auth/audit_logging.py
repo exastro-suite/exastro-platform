@@ -61,12 +61,15 @@ class JsonFormatter(jsonlogger.JsonFormatter):
             log_record['level'] = record.levelname
 
 
-def audit_getLogger(module_name, logfile=""):
+def audit_getLogger(module_name, logfile="", enabled=True, maxBytes=100000000, backupCount=30):
     """ Audit Get Logger
 
     Args:
         module_name (application logger name): logger name
         logfile (str, optional): logfile path Defaults to "".
+        enabled (boolean, optional): true to logger handler enabled. Defaults to True.
+        maxBytes (boolean, optional): logger rotaite max filesize. Defaults to 100000000(100M).
+        backupCount (boolean, optional): logger rotaite max backup count. Defaults to 30.
 
     Returns:
         logger: logger
@@ -77,12 +80,12 @@ def audit_getLogger(module_name, logfile=""):
     logger.propagate = False
     logger.setLevel(999)
 
-    if logfile:
+    if logfile and enabled:
         formatter = JsonFormatter()
         logger.setLevel(logging.INFO)
 
         # create a file handler (100MByte Max filesize)
-        fh = logging.handlers.RotatingFileHandler(filename=logfile, encoding='UTF-8', maxBytes=100000000, backupCount=30)
+        fh = logging.handlers.RotatingFileHandler(filename=logfile, encoding='UTF-8', maxBytes=maxBytes, backupCount=backupCount)
         fh.setLevel(logging.INFO)
         fh.setFormatter(formatter)
         logger.addHandler(fh)
