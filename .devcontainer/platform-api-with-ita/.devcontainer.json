@@ -161,19 +161,19 @@
 					"--aggressive", "--aggressive",
 				],
 
-				"python.testing.cwd": "${workspaceFolder}/platform_root/platform_job",
+				"python.testing.cwd": "${workspaceFolder}/platform_root/platform_api",
 				"python.testing.unittestEnabled": false,
 				"python.testing.pytestEnabled": true,
 				"python.testing.pytestArgs": [
-					"--cov=${workspaceFolder}/platform_root/platform_job/",
+					"--cov=${workspaceFolder}/platform_root/platform_api/",
 					"--cov-report=xml",
 				],
 				"python.testing.autoTestDiscoverOnSaveEnabled": true,
 				"coverage-gutters.showGutterCoverage": false,
 				"coverage-gutters.showLineCoverage": true,
 				"coverage-gutters.showRulerCoverage": false,
-				"coverage-gutters.coverageBaseDir": "platform_root/platform_job",
-				"coverage-gutters.coverageReportFileName": "platform_root/platform_job/coverage.xml",
+				"coverage-gutters.coverageBaseDir": "platform_root/platform_api",
+				"coverage-gutters.coverageReportFileName": "platform_root/platform_api/coverage.xml",
 			},
 			// Add the IDs of extensions you want installed when the container is created.
 			"extensions": [
