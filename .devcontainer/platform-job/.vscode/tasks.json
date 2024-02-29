@@ -20,9 +20,15 @@
       "problemMatcher": []
     },
     {
-      "label": "Unittest Container Up",
+      "label": "Unittest Container Up - mariadb",
       "type": "shell",
-      "command": "${workspaceFolder}/platform_root/platform_job/tests/docker-compose-up.sh",
+      "command": "${workspaceFolder}/platform_root/platform_job/tests/docker-compose-up-mariadb.sh",
+      "problemMatcher": []
+    },
+    {
+      "label": "Unittest Container Up - mysql",
+      "type": "shell",
+      "command": "${workspaceFolder}/platform_root/platform_job/tests/docker-compose-up-mysql.sh",
       "problemMatcher": []
     },
   ]

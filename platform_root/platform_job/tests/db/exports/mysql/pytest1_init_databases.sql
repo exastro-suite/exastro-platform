@@ -1,0 +1,5497 @@
+-- MySQL dump 10.13  Distrib 8.0.36, for Linux (x86_64)
+--
+-- Host: platform-db-mysql    Database: PF_ORG_BEYWKWYCFWAHPNCAM8LA
+-- ------------------------------------------------------
+-- Server version	8.0.36
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Current Database: `PF_ORG_BEYWKWYCFWAHPNCAM8LA`
+--
+
+CREATE DATABASE /*!32312 IF NOT EXISTS*/ `PF_ORG_BEYWKWYCFWAHPNCAM8LA` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+
+USE `PF_ORG_BEYWKWYCFWAHPNCAM8LA`;
+
+--
+-- Table structure for table `M_SMTP_SERVER`
+--
+
+DROP TABLE IF EXISTS `M_SMTP_SERVER`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `M_SMTP_SERVER` (
+  `SMTP_ID` varchar(36) COLLATE utf8mb4_bin NOT NULL,
+  `SMTP_HOST` varchar(1024) COLLATE utf8mb4_bin DEFAULT NULL,
+  `SMTP_PORT` int DEFAULT NULL,
+  `SEND_FROM` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `SEND_NAME` varchar(100) COLLATE utf8mb4_bin DEFAULT NULL,
+  `REPLY_TO` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `REPLY_NAME` varchar(100) COLLATE utf8mb4_bin DEFAULT NULL,
+  `ENVELOPE_FROM` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `SSL_ENABLE` tinyint(1) DEFAULT '0',
+  `START_TLS_ENABLE` tinyint(1) DEFAULT '0',
+  `AUTHENTICATION_ENABLE` tinyint(1) DEFAULT '0',
+  `AUTHENTICATION_USER` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `AUTHENTICATION_PASSWORD` varchar(1024) COLLATE utf8mb4_bin DEFAULT NULL,
+  `CREATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `CREATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  `LAST_UPDATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `LAST_UPDATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  PRIMARY KEY (`SMTP_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `M_SMTP_SERVER`
+--
+
+LOCK TABLES `M_SMTP_SERVER` WRITE;
+/*!40000 ALTER TABLE `M_SMTP_SERVER` DISABLE KEYS */;
+/*!40000 ALTER TABLE `M_SMTP_SERVER` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `T_JOBS_USER`
+--
+
+DROP TABLE IF EXISTS `T_JOBS_USER`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `T_JOBS_USER` (
+  `JOB_ID` varchar(26) COLLATE utf8mb4_bin NOT NULL,
+  `JOB_TYPE` varchar(36) COLLATE utf8mb4_bin DEFAULT NULL,
+  `JOB_STATUS` varchar(36) COLLATE utf8mb4_bin DEFAULT NULL,
+  `COUNT_REGISTER` int DEFAULT NULL,
+  `COUNT_UPDATE` int DEFAULT NULL,
+  `COUNT_DELETE` int DEFAULT NULL,
+  `SUCCESS_REGISTER` int DEFAULT NULL,
+  `SUCCESS_UPDATE` int DEFAULT NULL,
+  `SUCCESS_DELETE` int DEFAULT NULL,
+  `FAILED_REGISTER` int DEFAULT NULL,
+  `FAILED_UPDATE` int DEFAULT NULL,
+  `FAILED_DELETE` int DEFAULT NULL,
+  `MESSAGE` text COLLATE utf8mb4_bin,
+  `LANGUAGE` varchar(36) COLLATE utf8mb4_bin DEFAULT NULL,
+  `CREATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `CREATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  `LAST_UPDATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `LAST_UPDATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  PRIMARY KEY (`JOB_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `T_JOBS_USER`
+--
+
+LOCK TABLES `T_JOBS_USER` WRITE;
+/*!40000 ALTER TABLE `T_JOBS_USER` DISABLE KEYS */;
+/*!40000 ALTER TABLE `T_JOBS_USER` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `T_JOBS_USER_FILE`
+--
+
+DROP TABLE IF EXISTS `T_JOBS_USER_FILE`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `T_JOBS_USER_FILE` (
+  `FILE_ID` varchar(26) COLLATE utf8mb4_bin NOT NULL,
+  `JOB_ID` varchar(26) COLLATE utf8mb4_bin NOT NULL,
+  `FILE_DATA` longblob,
+  `CREATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `CREATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  `LAST_UPDATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `LAST_UPDATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  PRIMARY KEY (`FILE_ID`),
+  KEY `IDX_FUNC_ID` (`JOB_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `T_JOBS_USER_FILE`
+--
+
+LOCK TABLES `T_JOBS_USER_FILE` WRITE;
+/*!40000 ALTER TABLE `T_JOBS_USER_FILE` DISABLE KEYS */;
+/*!40000 ALTER TABLE `T_JOBS_USER_FILE` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `T_JOBS_USER_RESULT`
+--
+
+DROP TABLE IF EXISTS `T_JOBS_USER_RESULT`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `T_JOBS_USER_RESULT` (
+  `RESULT_ID` varchar(26) COLLATE utf8mb4_bin NOT NULL,
+  `JOB_ID` varchar(26) COLLATE utf8mb4_bin NOT NULL,
+  `FILE_DATA` longblob,
+  `CREATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`RESULT_ID`),
+  KEY `IDX_FUNC_ID` (`JOB_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `T_JOBS_USER_RESULT`
+--
+
+LOCK TABLES `T_JOBS_USER_RESULT` WRITE;
+/*!40000 ALTER TABLE `T_JOBS_USER_RESULT` DISABLE KEYS */;
+/*!40000 ALTER TABLE `T_JOBS_USER_RESULT` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `T_ORGANIZATION_PRIVATE`
+--
+
+DROP TABLE IF EXISTS `T_ORGANIZATION_PRIVATE`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `T_ORGANIZATION_PRIVATE` (
+  `ID` int NOT NULL,
+  `INFORMATIONS` json NOT NULL,
+  `CREATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `CREATE_USER` varchar(40) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `LAST_UPDATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `LAST_UPDATE_USER` varchar(40) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  PRIMARY KEY (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `T_ORGANIZATION_PRIVATE`
+--
+
+LOCK TABLES `T_ORGANIZATION_PRIVATE` WRITE;
+/*!40000 ALTER TABLE `T_ORGANIZATION_PRIVATE` DISABLE KEYS */;
+INSERT INTO `T_ORGANIZATION_PRIVATE` VALUES (1,'{\"API_TOKEN_CLIENT_ID\": \"1b5f5d7e-5c2b-4687-8450-d38949728f18\", \"USER_TOKEN_CLIENT_ID\": \"16fe410e-f1df-4ce0-b445-8dd3b5b80750\", \"TOKEN_CHECK_CLIENT_ID\": \"6112a706-0711-40ab-a42e-08ef27723f06\", \"INTERNAL_API_CLIENT_ID\": \"d321d481-bc24-4294-af2c-7907fd6529b0\", \"USER_TOKEN_CLIENT_SECRET\": \"2olEW3tDBV9wS1VsXjHnxCgl5TyTXtKl\", \"API_TOKEN_CLIENT_CLIENTID\": \"_org1-api\", \"TOKEN_CHECK_CLIENT_SECRET\": \"8YCPyhn9zszkdXLh5yvKWL4d6xDyOhrW\", \"INTERNAL_API_CLIENT_SECRET\": \"t4WLAy1hCQhry5HDuHkJa3SeT0MlBub8\", \"USER_TOKEN_CLIENT_CLIENTID\": \"org1\", \"TOKEN_CHECK_CLIENT_CLIENTID\": \"system-org1-auth\", \"INTERNAL_API_CLIENT_CLIENTID\": \"org1-workspaces\"}','2024-02-29 11:52:48','unittest-user01','2024-02-29 11:52:48','unittest-user01');
+/*!40000 ALTER TABLE `T_ORGANIZATION_PRIVATE` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `T_REFRESH_TOKEN`
+--
+
+DROP TABLE IF EXISTS `T_REFRESH_TOKEN`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `T_REFRESH_TOKEN` (
+  `USER_ID` varchar(40) COLLATE utf8mb4_general_ci NOT NULL,
+  `SESSION_ID` varchar(40) COLLATE utf8mb4_general_ci NOT NULL,
+  `EXPIRE_TIMESTAMP` datetime DEFAULT NULL,
+  `CREATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `CREATE_USER` varchar(40) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `LAST_UPDATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `LAST_UPDATE_USER` varchar(40) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  PRIMARY KEY (`USER_ID`,`SESSION_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `T_REFRESH_TOKEN`
+--
+
+LOCK TABLES `T_REFRESH_TOKEN` WRITE;
+/*!40000 ALTER TABLE `T_REFRESH_TOKEN` DISABLE KEYS */;
+/*!40000 ALTER TABLE `T_REFRESH_TOKEN` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `T_WORKSPACE`
+--
+
+DROP TABLE IF EXISTS `T_WORKSPACE`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `T_WORKSPACE` (
+  `WORKSPACE_ID` varchar(36) COLLATE utf8mb4_general_ci NOT NULL,
+  `WORKSPACE_NAME` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `INFORMATIONS` json NOT NULL,
+  `CREATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `CREATE_USER` varchar(40) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `LAST_UPDATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `LAST_UPDATE_USER` varchar(40) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  PRIMARY KEY (`WORKSPACE_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `T_WORKSPACE`
+--
+
+LOCK TABLES `T_WORKSPACE` WRITE;
+/*!40000 ALTER TABLE `T_WORKSPACE` DISABLE KEYS */;
+INSERT INTO `T_WORKSPACE` VALUES ('ws1','name of workspace','{\"description\": \"description of workspace\", \"environments\": [{\"name\": \"staging\"}, {\"name\": \"production\"}]}','2024-02-29 11:52:52','74c8800a-f392-4c3c-9077-cfb96a52c947','2024-02-29 11:52:52','74c8800a-f392-4c3c-9077-cfb96a52c947'),('ws2','name of workspace','{\"description\": \"description of workspace\", \"environments\": [{\"name\": \"staging\"}, {\"name\": \"production\"}]}','2024-02-29 11:53:01','74c8800a-f392-4c3c-9077-cfb96a52c947','2024-02-29 11:53:01','74c8800a-f392-4c3c-9077-cfb96a52c947'),('ws3','name of workspace','{\"description\": \"description of workspace\", \"environments\": [{\"name\": \"staging\"}, {\"name\": \"production\"}]}','2024-02-29 11:53:05','74c8800a-f392-4c3c-9077-cfb96a52c947','2024-02-29 11:53:05','74c8800a-f392-4c3c-9077-cfb96a52c947');
+/*!40000 ALTER TABLE `T_WORKSPACE` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `T_WORKSPACE_DB`
+--
+
+DROP TABLE IF EXISTS `T_WORKSPACE_DB`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `T_WORKSPACE_DB` (
+  `ORGANIZATION_ID` varchar(36) COLLATE utf8mb4_bin NOT NULL,
+  `WORKSPACE_ID` varchar(36) COLLATE utf8mb4_bin NOT NULL,
+  `DB_HOST` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DB_PORT` int DEFAULT NULL,
+  `DB_DATABASE` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DB_USER` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DB_PASSWORD` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `CREATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `CREATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  `LAST_UPDATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `LAST_UPDATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  PRIMARY KEY (`ORGANIZATION_ID`,`WORKSPACE_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `T_WORKSPACE_DB`
+--
+
+LOCK TABLES `T_WORKSPACE_DB` WRITE;
+/*!40000 ALTER TABLE `T_WORKSPACE_DB` DISABLE KEYS */;
+INSERT INTO `T_WORKSPACE_DB` VALUES ('org1','ws1','unittest-platform-db',3306,'PF_WS_QUN48R7KTKVRTHIQMZ3U','PF_WS_QUN48R7KTKVRTHIQMZ3U','GneI16eTGFbDXKa1rGYMi5KpGgNg3t57rV2HA/DsQfLYIiF07sXHwTSdThkhKAeT','2024-02-29 11:52:52','74c8800a-f392-4c3c-9077-cfb96a52c947','2024-02-29 11:54:50','74c8800a-f392-4c3c-9077-cfb96a52c947'),('org1','ws2','unittest-platform-db',3306,'PF_WS_3XE4B764TR2WEPAI80DC','PF_WS_3XE4B764TR2WEPAI80DC','jSSQ6zshLiQdsmkRkDi8vxXfwNi5p29di3Y+xLEosdh96uExsCu7UEVKDDr3fL/H','2024-02-29 11:53:01','74c8800a-f392-4c3c-9077-cfb96a52c947','2024-02-29 11:54:50','74c8800a-f392-4c3c-9077-cfb96a52c947'),('org1','ws3','unittest-platform-db',3306,'PF_WS_S7S097DYE2F989RT75UD','PF_WS_S7S097DYE2F989RT75UD','LcyOJcOHRWREulZrXwn9rrnfyomQbdNS8R6L4WAc0l7hZ+Am2Q4bsdxyG6yyI+Th','2024-02-29 11:53:06','74c8800a-f392-4c3c-9077-cfb96a52c947','2024-02-29 11:54:50','74c8800a-f392-4c3c-9077-cfb96a52c947');
+/*!40000 ALTER TABLE `T_WORKSPACE_DB` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Current Database: `PF_ORG_NQE9W9K838TXFHL5AQHT`
+--
+
+CREATE DATABASE /*!32312 IF NOT EXISTS*/ `PF_ORG_NQE9W9K838TXFHL5AQHT` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+
+USE `PF_ORG_NQE9W9K838TXFHL5AQHT`;
+
+--
+-- Table structure for table `M_SMTP_SERVER`
+--
+
+DROP TABLE IF EXISTS `M_SMTP_SERVER`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `M_SMTP_SERVER` (
+  `SMTP_ID` varchar(36) COLLATE utf8mb4_bin NOT NULL,
+  `SMTP_HOST` varchar(1024) COLLATE utf8mb4_bin DEFAULT NULL,
+  `SMTP_PORT` int DEFAULT NULL,
+  `SEND_FROM` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `SEND_NAME` varchar(100) COLLATE utf8mb4_bin DEFAULT NULL,
+  `REPLY_TO` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `REPLY_NAME` varchar(100) COLLATE utf8mb4_bin DEFAULT NULL,
+  `ENVELOPE_FROM` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `SSL_ENABLE` tinyint(1) DEFAULT '0',
+  `START_TLS_ENABLE` tinyint(1) DEFAULT '0',
+  `AUTHENTICATION_ENABLE` tinyint(1) DEFAULT '0',
+  `AUTHENTICATION_USER` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `AUTHENTICATION_PASSWORD` varchar(1024) COLLATE utf8mb4_bin DEFAULT NULL,
+  `CREATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `CREATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  `LAST_UPDATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `LAST_UPDATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  PRIMARY KEY (`SMTP_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `M_SMTP_SERVER`
+--
+
+LOCK TABLES `M_SMTP_SERVER` WRITE;
+/*!40000 ALTER TABLE `M_SMTP_SERVER` DISABLE KEYS */;
+/*!40000 ALTER TABLE `M_SMTP_SERVER` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `T_JOBS_USER`
+--
+
+DROP TABLE IF EXISTS `T_JOBS_USER`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `T_JOBS_USER` (
+  `JOB_ID` varchar(26) COLLATE utf8mb4_bin NOT NULL,
+  `JOB_TYPE` varchar(36) COLLATE utf8mb4_bin DEFAULT NULL,
+  `JOB_STATUS` varchar(36) COLLATE utf8mb4_bin DEFAULT NULL,
+  `COUNT_REGISTER` int DEFAULT NULL,
+  `COUNT_UPDATE` int DEFAULT NULL,
+  `COUNT_DELETE` int DEFAULT NULL,
+  `SUCCESS_REGISTER` int DEFAULT NULL,
+  `SUCCESS_UPDATE` int DEFAULT NULL,
+  `SUCCESS_DELETE` int DEFAULT NULL,
+  `FAILED_REGISTER` int DEFAULT NULL,
+  `FAILED_UPDATE` int DEFAULT NULL,
+  `FAILED_DELETE` int DEFAULT NULL,
+  `MESSAGE` text COLLATE utf8mb4_bin,
+  `LANGUAGE` varchar(36) COLLATE utf8mb4_bin DEFAULT NULL,
+  `CREATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `CREATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  `LAST_UPDATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `LAST_UPDATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  PRIMARY KEY (`JOB_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `T_JOBS_USER`
+--
+
+LOCK TABLES `T_JOBS_USER` WRITE;
+/*!40000 ALTER TABLE `T_JOBS_USER` DISABLE KEYS */;
+/*!40000 ALTER TABLE `T_JOBS_USER` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `T_JOBS_USER_FILE`
+--
+
+DROP TABLE IF EXISTS `T_JOBS_USER_FILE`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `T_JOBS_USER_FILE` (
+  `FILE_ID` varchar(26) COLLATE utf8mb4_bin NOT NULL,
+  `JOB_ID` varchar(26) COLLATE utf8mb4_bin NOT NULL,
+  `FILE_DATA` longblob,
+  `CREATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `CREATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  `LAST_UPDATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `LAST_UPDATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  PRIMARY KEY (`FILE_ID`),
+  KEY `IDX_FUNC_ID` (`JOB_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `T_JOBS_USER_FILE`
+--
+
+LOCK TABLES `T_JOBS_USER_FILE` WRITE;
+/*!40000 ALTER TABLE `T_JOBS_USER_FILE` DISABLE KEYS */;
+/*!40000 ALTER TABLE `T_JOBS_USER_FILE` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `T_JOBS_USER_RESULT`
+--
+
+DROP TABLE IF EXISTS `T_JOBS_USER_RESULT`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `T_JOBS_USER_RESULT` (
+  `RESULT_ID` varchar(26) COLLATE utf8mb4_bin NOT NULL,
+  `JOB_ID` varchar(26) COLLATE utf8mb4_bin NOT NULL,
+  `FILE_DATA` longblob,
+  `CREATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`RESULT_ID`),
+  KEY `IDX_FUNC_ID` (`JOB_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `T_JOBS_USER_RESULT`
+--
+
+LOCK TABLES `T_JOBS_USER_RESULT` WRITE;
+/*!40000 ALTER TABLE `T_JOBS_USER_RESULT` DISABLE KEYS */;
+/*!40000 ALTER TABLE `T_JOBS_USER_RESULT` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `T_ORGANIZATION_PRIVATE`
+--
+
+DROP TABLE IF EXISTS `T_ORGANIZATION_PRIVATE`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `T_ORGANIZATION_PRIVATE` (
+  `ID` int NOT NULL,
+  `INFORMATIONS` json NOT NULL,
+  `CREATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `CREATE_USER` varchar(40) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `LAST_UPDATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `LAST_UPDATE_USER` varchar(40) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  PRIMARY KEY (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `T_ORGANIZATION_PRIVATE`
+--
+
+LOCK TABLES `T_ORGANIZATION_PRIVATE` WRITE;
+/*!40000 ALTER TABLE `T_ORGANIZATION_PRIVATE` DISABLE KEYS */;
+INSERT INTO `T_ORGANIZATION_PRIVATE` VALUES (1,'{\"API_TOKEN_CLIENT_ID\": \"2d40f5c2-5cc2-42d6-93b7-64af2cedb218\", \"USER_TOKEN_CLIENT_ID\": \"a15e680b-47bb-4b94-a832-5ca99cdbe134\", \"TOKEN_CHECK_CLIENT_ID\": \"d0aaa350-6ca7-4545-a008-583d46596744\", \"INTERNAL_API_CLIENT_ID\": \"a0d96aa1-71ac-4a7e-a769-306baf1c51fc\", \"USER_TOKEN_CLIENT_SECRET\": \"3bRQu4Oa96KFdHne6d40WBQPNuwA3k2q\", \"API_TOKEN_CLIENT_CLIENTID\": \"_org2-api\", \"TOKEN_CHECK_CLIENT_SECRET\": \"d5Y1Va6l12eWstBqt6gvj529VWOvy3sz\", \"INTERNAL_API_CLIENT_SECRET\": \"yVwr7DjWJMfhIypWN8bXrVOVer4XtIOY\", \"USER_TOKEN_CLIENT_CLIENTID\": \"org2\", \"TOKEN_CHECK_CLIENT_CLIENTID\": \"system-org2-auth\", \"INTERNAL_API_CLIENT_CLIENTID\": \"org2-workspaces\"}','2024-02-29 11:53:15','unittest-user01','2024-02-29 11:53:15','unittest-user01');
+/*!40000 ALTER TABLE `T_ORGANIZATION_PRIVATE` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `T_REFRESH_TOKEN`
+--
+
+DROP TABLE IF EXISTS `T_REFRESH_TOKEN`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `T_REFRESH_TOKEN` (
+  `USER_ID` varchar(40) COLLATE utf8mb4_general_ci NOT NULL,
+  `SESSION_ID` varchar(40) COLLATE utf8mb4_general_ci NOT NULL,
+  `EXPIRE_TIMESTAMP` datetime DEFAULT NULL,
+  `CREATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `CREATE_USER` varchar(40) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `LAST_UPDATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `LAST_UPDATE_USER` varchar(40) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  PRIMARY KEY (`USER_ID`,`SESSION_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `T_REFRESH_TOKEN`
+--
+
+LOCK TABLES `T_REFRESH_TOKEN` WRITE;
+/*!40000 ALTER TABLE `T_REFRESH_TOKEN` DISABLE KEYS */;
+/*!40000 ALTER TABLE `T_REFRESH_TOKEN` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `T_WORKSPACE`
+--
+
+DROP TABLE IF EXISTS `T_WORKSPACE`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `T_WORKSPACE` (
+  `WORKSPACE_ID` varchar(36) COLLATE utf8mb4_general_ci NOT NULL,
+  `WORKSPACE_NAME` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `INFORMATIONS` json NOT NULL,
+  `CREATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `CREATE_USER` varchar(40) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `LAST_UPDATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `LAST_UPDATE_USER` varchar(40) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  PRIMARY KEY (`WORKSPACE_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `T_WORKSPACE`
+--
+
+LOCK TABLES `T_WORKSPACE` WRITE;
+/*!40000 ALTER TABLE `T_WORKSPACE` DISABLE KEYS */;
+INSERT INTO `T_WORKSPACE` VALUES ('ws1','name of workspace','{\"description\": \"description of workspace\", \"environments\": [{\"name\": \"staging\"}, {\"name\": \"production\"}]}','2024-02-29 11:53:16','fe934bbc-b716-474a-b1e0-eefc2a29e1b2','2024-02-29 11:53:16','fe934bbc-b716-474a-b1e0-eefc2a29e1b2'),('ws2','name of workspace','{\"description\": \"description of workspace\", \"environments\": [{\"name\": \"staging\"}, {\"name\": \"production\"}]}','2024-02-29 11:53:21','fe934bbc-b716-474a-b1e0-eefc2a29e1b2','2024-02-29 11:53:21','fe934bbc-b716-474a-b1e0-eefc2a29e1b2'),('ws3','name of workspace','{\"description\": \"description of workspace\", \"environments\": [{\"name\": \"staging\"}, {\"name\": \"production\"}]}','2024-02-29 11:53:25','fe934bbc-b716-474a-b1e0-eefc2a29e1b2','2024-02-29 11:53:25','fe934bbc-b716-474a-b1e0-eefc2a29e1b2');
+/*!40000 ALTER TABLE `T_WORKSPACE` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `T_WORKSPACE_DB`
+--
+
+DROP TABLE IF EXISTS `T_WORKSPACE_DB`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `T_WORKSPACE_DB` (
+  `ORGANIZATION_ID` varchar(36) COLLATE utf8mb4_bin NOT NULL,
+  `WORKSPACE_ID` varchar(36) COLLATE utf8mb4_bin NOT NULL,
+  `DB_HOST` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DB_PORT` int DEFAULT NULL,
+  `DB_DATABASE` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DB_USER` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DB_PASSWORD` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `CREATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `CREATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  `LAST_UPDATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `LAST_UPDATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  PRIMARY KEY (`ORGANIZATION_ID`,`WORKSPACE_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `T_WORKSPACE_DB`
+--
+
+LOCK TABLES `T_WORKSPACE_DB` WRITE;
+/*!40000 ALTER TABLE `T_WORKSPACE_DB` DISABLE KEYS */;
+INSERT INTO `T_WORKSPACE_DB` VALUES ('org2','ws1','unittest-platform-db',3306,'PF_WS_SXY64U0L40ODRDB1OFBD','PF_WS_SXY64U0L40ODRDB1OFBD','8Jk3UzL7D4AfEWIDOlC0HS4IftXnnNRAOV/lxdKqBdtAQXfa1S/5YiA3/C5m6jlo','2024-02-29 11:53:16','fe934bbc-b716-474a-b1e0-eefc2a29e1b2','2024-02-29 11:54:50','fe934bbc-b716-474a-b1e0-eefc2a29e1b2'),('org2','ws2','unittest-platform-db',3306,'PF_WS_NSN0OB4MUN31QV8JAYI4','PF_WS_NSN0OB4MUN31QV8JAYI4','CMZdNkB43suIBdQkgSXLDsQobB0XwMSRLWrVSPvxgno7GCcaHUOWNd4AL4KXN058','2024-02-29 11:53:21','fe934bbc-b716-474a-b1e0-eefc2a29e1b2','2024-02-29 11:54:50','fe934bbc-b716-474a-b1e0-eefc2a29e1b2'),('org2','ws3','unittest-platform-db',3306,'PF_WS_HE2O7U3CDACWRS3A4Y0C','PF_WS_HE2O7U3CDACWRS3A4Y0C','wb+RFCB8cj9N4h9l5iDr++f61qP7WM/yyFfRimIdLUUObPm9pKaqRHBUiqw70PcP','2024-02-29 11:53:25','fe934bbc-b716-474a-b1e0-eefc2a29e1b2','2024-02-29 11:54:50','fe934bbc-b716-474a-b1e0-eefc2a29e1b2');
+/*!40000 ALTER TABLE `T_WORKSPACE_DB` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Current Database: `PF_ORG_PA9P5Y7OE76R0LA3BTGM`
+--
+
+CREATE DATABASE /*!32312 IF NOT EXISTS*/ `PF_ORG_PA9P5Y7OE76R0LA3BTGM` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+
+USE `PF_ORG_PA9P5Y7OE76R0LA3BTGM`;
+
+--
+-- Table structure for table `M_SMTP_SERVER`
+--
+
+DROP TABLE IF EXISTS `M_SMTP_SERVER`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `M_SMTP_SERVER` (
+  `SMTP_ID` varchar(36) COLLATE utf8mb4_bin NOT NULL,
+  `SMTP_HOST` varchar(1024) COLLATE utf8mb4_bin DEFAULT NULL,
+  `SMTP_PORT` int DEFAULT NULL,
+  `SEND_FROM` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `SEND_NAME` varchar(100) COLLATE utf8mb4_bin DEFAULT NULL,
+  `REPLY_TO` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `REPLY_NAME` varchar(100) COLLATE utf8mb4_bin DEFAULT NULL,
+  `ENVELOPE_FROM` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `SSL_ENABLE` tinyint(1) DEFAULT '0',
+  `START_TLS_ENABLE` tinyint(1) DEFAULT '0',
+  `AUTHENTICATION_ENABLE` tinyint(1) DEFAULT '0',
+  `AUTHENTICATION_USER` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `AUTHENTICATION_PASSWORD` varchar(1024) COLLATE utf8mb4_bin DEFAULT NULL,
+  `CREATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `CREATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  `LAST_UPDATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `LAST_UPDATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  PRIMARY KEY (`SMTP_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `M_SMTP_SERVER`
+--
+
+LOCK TABLES `M_SMTP_SERVER` WRITE;
+/*!40000 ALTER TABLE `M_SMTP_SERVER` DISABLE KEYS */;
+/*!40000 ALTER TABLE `M_SMTP_SERVER` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `T_JOBS_USER`
+--
+
+DROP TABLE IF EXISTS `T_JOBS_USER`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `T_JOBS_USER` (
+  `JOB_ID` varchar(26) COLLATE utf8mb4_bin NOT NULL,
+  `JOB_TYPE` varchar(36) COLLATE utf8mb4_bin DEFAULT NULL,
+  `JOB_STATUS` varchar(36) COLLATE utf8mb4_bin DEFAULT NULL,
+  `COUNT_REGISTER` int DEFAULT NULL,
+  `COUNT_UPDATE` int DEFAULT NULL,
+  `COUNT_DELETE` int DEFAULT NULL,
+  `SUCCESS_REGISTER` int DEFAULT NULL,
+  `SUCCESS_UPDATE` int DEFAULT NULL,
+  `SUCCESS_DELETE` int DEFAULT NULL,
+  `FAILED_REGISTER` int DEFAULT NULL,
+  `FAILED_UPDATE` int DEFAULT NULL,
+  `FAILED_DELETE` int DEFAULT NULL,
+  `MESSAGE` text COLLATE utf8mb4_bin,
+  `LANGUAGE` varchar(36) COLLATE utf8mb4_bin DEFAULT NULL,
+  `CREATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `CREATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  `LAST_UPDATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `LAST_UPDATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  PRIMARY KEY (`JOB_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `T_JOBS_USER`
+--
+
+LOCK TABLES `T_JOBS_USER` WRITE;
+/*!40000 ALTER TABLE `T_JOBS_USER` DISABLE KEYS */;
+/*!40000 ALTER TABLE `T_JOBS_USER` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `T_JOBS_USER_FILE`
+--
+
+DROP TABLE IF EXISTS `T_JOBS_USER_FILE`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `T_JOBS_USER_FILE` (
+  `FILE_ID` varchar(26) COLLATE utf8mb4_bin NOT NULL,
+  `JOB_ID` varchar(26) COLLATE utf8mb4_bin NOT NULL,
+  `FILE_DATA` longblob,
+  `CREATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `CREATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  `LAST_UPDATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `LAST_UPDATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  PRIMARY KEY (`FILE_ID`),
+  KEY `IDX_FUNC_ID` (`JOB_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `T_JOBS_USER_FILE`
+--
+
+LOCK TABLES `T_JOBS_USER_FILE` WRITE;
+/*!40000 ALTER TABLE `T_JOBS_USER_FILE` DISABLE KEYS */;
+/*!40000 ALTER TABLE `T_JOBS_USER_FILE` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `T_JOBS_USER_RESULT`
+--
+
+DROP TABLE IF EXISTS `T_JOBS_USER_RESULT`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `T_JOBS_USER_RESULT` (
+  `RESULT_ID` varchar(26) COLLATE utf8mb4_bin NOT NULL,
+  `JOB_ID` varchar(26) COLLATE utf8mb4_bin NOT NULL,
+  `FILE_DATA` longblob,
+  `CREATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`RESULT_ID`),
+  KEY `IDX_FUNC_ID` (`JOB_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `T_JOBS_USER_RESULT`
+--
+
+LOCK TABLES `T_JOBS_USER_RESULT` WRITE;
+/*!40000 ALTER TABLE `T_JOBS_USER_RESULT` DISABLE KEYS */;
+/*!40000 ALTER TABLE `T_JOBS_USER_RESULT` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `T_ORGANIZATION_PRIVATE`
+--
+
+DROP TABLE IF EXISTS `T_ORGANIZATION_PRIVATE`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `T_ORGANIZATION_PRIVATE` (
+  `ID` int NOT NULL,
+  `INFORMATIONS` json NOT NULL,
+  `CREATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `CREATE_USER` varchar(40) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `LAST_UPDATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `LAST_UPDATE_USER` varchar(40) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  PRIMARY KEY (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `T_ORGANIZATION_PRIVATE`
+--
+
+LOCK TABLES `T_ORGANIZATION_PRIVATE` WRITE;
+/*!40000 ALTER TABLE `T_ORGANIZATION_PRIVATE` DISABLE KEYS */;
+INSERT INTO `T_ORGANIZATION_PRIVATE` VALUES (1,'{\"API_TOKEN_CLIENT_ID\": \"84e2d9c2-d7af-4ae0-9dfa-41a04f1ab1f4\", \"USER_TOKEN_CLIENT_ID\": \"b0475217-c11a-49f5-833c-33aaee237a25\", \"TOKEN_CHECK_CLIENT_ID\": \"479237b2-a9fc-4828-b80d-ffd84ec6f3bc\", \"INTERNAL_API_CLIENT_ID\": \"c28dd0b0-60ed-40df-91db-0d9b1e14074b\", \"USER_TOKEN_CLIENT_SECRET\": \"DNF8kzoIuJZmFntfIzitqdVaodsPBYqU\", \"API_TOKEN_CLIENT_CLIENTID\": \"_org3-api\", \"TOKEN_CHECK_CLIENT_SECRET\": \"pVkxU7HUrWzoJ1IotWwyXLNxATFpLRda\", \"INTERNAL_API_CLIENT_SECRET\": \"mgs9T2D1k1dAlslK97OJoAhijLZLezyc\", \"USER_TOKEN_CLIENT_CLIENTID\": \"org3\", \"TOKEN_CHECK_CLIENT_CLIENTID\": \"system-org3-auth\", \"INTERNAL_API_CLIENT_CLIENTID\": \"org3-workspaces\"}','2024-02-29 11:53:32','unittest-user01','2024-02-29 11:53:32','unittest-user01');
+/*!40000 ALTER TABLE `T_ORGANIZATION_PRIVATE` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `T_REFRESH_TOKEN`
+--
+
+DROP TABLE IF EXISTS `T_REFRESH_TOKEN`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `T_REFRESH_TOKEN` (
+  `USER_ID` varchar(40) COLLATE utf8mb4_general_ci NOT NULL,
+  `SESSION_ID` varchar(40) COLLATE utf8mb4_general_ci NOT NULL,
+  `EXPIRE_TIMESTAMP` datetime DEFAULT NULL,
+  `CREATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `CREATE_USER` varchar(40) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `LAST_UPDATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `LAST_UPDATE_USER` varchar(40) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  PRIMARY KEY (`USER_ID`,`SESSION_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `T_REFRESH_TOKEN`
+--
+
+LOCK TABLES `T_REFRESH_TOKEN` WRITE;
+/*!40000 ALTER TABLE `T_REFRESH_TOKEN` DISABLE KEYS */;
+/*!40000 ALTER TABLE `T_REFRESH_TOKEN` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `T_WORKSPACE`
+--
+
+DROP TABLE IF EXISTS `T_WORKSPACE`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `T_WORKSPACE` (
+  `WORKSPACE_ID` varchar(36) COLLATE utf8mb4_general_ci NOT NULL,
+  `WORKSPACE_NAME` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `INFORMATIONS` json NOT NULL,
+  `CREATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `CREATE_USER` varchar(40) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `LAST_UPDATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `LAST_UPDATE_USER` varchar(40) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  PRIMARY KEY (`WORKSPACE_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `T_WORKSPACE`
+--
+
+LOCK TABLES `T_WORKSPACE` WRITE;
+/*!40000 ALTER TABLE `T_WORKSPACE` DISABLE KEYS */;
+INSERT INTO `T_WORKSPACE` VALUES ('ws1','name of workspace','{\"description\": \"description of workspace\", \"environments\": [{\"name\": \"staging\"}, {\"name\": \"production\"}]}','2024-02-29 11:53:33','98b18f6f-d105-437a-92f2-fb863b59805c','2024-02-29 11:53:33','98b18f6f-d105-437a-92f2-fb863b59805c'),('ws2','name of workspace','{\"description\": \"description of workspace\", \"environments\": [{\"name\": \"staging\"}, {\"name\": \"production\"}]}','2024-02-29 11:53:37','98b18f6f-d105-437a-92f2-fb863b59805c','2024-02-29 11:53:37','98b18f6f-d105-437a-92f2-fb863b59805c'),('ws3','name of workspace','{\"description\": \"description of workspace\", \"environments\": [{\"name\": \"staging\"}, {\"name\": \"production\"}]}','2024-02-29 11:53:42','98b18f6f-d105-437a-92f2-fb863b59805c','2024-02-29 11:53:42','98b18f6f-d105-437a-92f2-fb863b59805c');
+/*!40000 ALTER TABLE `T_WORKSPACE` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `T_WORKSPACE_DB`
+--
+
+DROP TABLE IF EXISTS `T_WORKSPACE_DB`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `T_WORKSPACE_DB` (
+  `ORGANIZATION_ID` varchar(36) COLLATE utf8mb4_bin NOT NULL,
+  `WORKSPACE_ID` varchar(36) COLLATE utf8mb4_bin NOT NULL,
+  `DB_HOST` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DB_PORT` int DEFAULT NULL,
+  `DB_DATABASE` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DB_USER` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DB_PASSWORD` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `CREATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `CREATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  `LAST_UPDATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `LAST_UPDATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  PRIMARY KEY (`ORGANIZATION_ID`,`WORKSPACE_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `T_WORKSPACE_DB`
+--
+
+LOCK TABLES `T_WORKSPACE_DB` WRITE;
+/*!40000 ALTER TABLE `T_WORKSPACE_DB` DISABLE KEYS */;
+INSERT INTO `T_WORKSPACE_DB` VALUES ('org3','ws1','unittest-platform-db',3306,'PF_WS_BHF6ZN9DJR5L8RIZKD85','PF_WS_BHF6ZN9DJR5L8RIZKD85','T2f1SCjKipAcp1ukGtNGUmtDs7PWeslLsUzOA8ARWSFSbuyU71MghD+LljBS7wBk','2024-02-29 11:53:33','98b18f6f-d105-437a-92f2-fb863b59805c','2024-02-29 11:54:50','98b18f6f-d105-437a-92f2-fb863b59805c'),('org3','ws2','unittest-platform-db',3306,'PF_WS_T8PWJZFUZH4OYRFAAO8Z','PF_WS_T8PWJZFUZH4OYRFAAO8Z','Yr0FLmPWXHVNYj5jL4XtPwhD80Yxd0+5WtrurEikGaIpbxT4X/n+DgnzgIs5lHFr','2024-02-29 11:53:38','98b18f6f-d105-437a-92f2-fb863b59805c','2024-02-29 11:54:50','98b18f6f-d105-437a-92f2-fb863b59805c'),('org3','ws3','unittest-platform-db',3306,'PF_WS_CEWEXSWFHBJQLLPWOIIF','PF_WS_CEWEXSWFHBJQLLPWOIIF','/MQoxidYzro5kPt1ZjJ2GuCdFD+g4lnLsu6oHou1uFPkqrCIr0b8oF3qsQL1Hnfr','2024-02-29 11:53:42','98b18f6f-d105-437a-92f2-fb863b59805c','2024-02-29 11:54:50','98b18f6f-d105-437a-92f2-fb863b59805c');
+/*!40000 ALTER TABLE `T_WORKSPACE_DB` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Current Database: `PF_ORG_QXBO0Y8ME39VH9IEPBWI`
+--
+
+CREATE DATABASE /*!32312 IF NOT EXISTS*/ `PF_ORG_QXBO0Y8ME39VH9IEPBWI` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+
+USE `PF_ORG_QXBO0Y8ME39VH9IEPBWI`;
+
+--
+-- Table structure for table `M_SMTP_SERVER`
+--
+
+DROP TABLE IF EXISTS `M_SMTP_SERVER`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `M_SMTP_SERVER` (
+  `SMTP_ID` varchar(36) COLLATE utf8mb4_bin NOT NULL,
+  `SMTP_HOST` varchar(1024) COLLATE utf8mb4_bin DEFAULT NULL,
+  `SMTP_PORT` int DEFAULT NULL,
+  `SEND_FROM` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `SEND_NAME` varchar(100) COLLATE utf8mb4_bin DEFAULT NULL,
+  `REPLY_TO` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `REPLY_NAME` varchar(100) COLLATE utf8mb4_bin DEFAULT NULL,
+  `ENVELOPE_FROM` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `SSL_ENABLE` tinyint(1) DEFAULT '0',
+  `START_TLS_ENABLE` tinyint(1) DEFAULT '0',
+  `AUTHENTICATION_ENABLE` tinyint(1) DEFAULT '0',
+  `AUTHENTICATION_USER` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `AUTHENTICATION_PASSWORD` varchar(1024) COLLATE utf8mb4_bin DEFAULT NULL,
+  `CREATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `CREATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  `LAST_UPDATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `LAST_UPDATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  PRIMARY KEY (`SMTP_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `M_SMTP_SERVER`
+--
+
+LOCK TABLES `M_SMTP_SERVER` WRITE;
+/*!40000 ALTER TABLE `M_SMTP_SERVER` DISABLE KEYS */;
+/*!40000 ALTER TABLE `M_SMTP_SERVER` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `T_JOBS_USER`
+--
+
+DROP TABLE IF EXISTS `T_JOBS_USER`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `T_JOBS_USER` (
+  `JOB_ID` varchar(26) COLLATE utf8mb4_bin NOT NULL,
+  `JOB_TYPE` varchar(36) COLLATE utf8mb4_bin DEFAULT NULL,
+  `JOB_STATUS` varchar(36) COLLATE utf8mb4_bin DEFAULT NULL,
+  `COUNT_REGISTER` int DEFAULT NULL,
+  `COUNT_UPDATE` int DEFAULT NULL,
+  `COUNT_DELETE` int DEFAULT NULL,
+  `SUCCESS_REGISTER` int DEFAULT NULL,
+  `SUCCESS_UPDATE` int DEFAULT NULL,
+  `SUCCESS_DELETE` int DEFAULT NULL,
+  `FAILED_REGISTER` int DEFAULT NULL,
+  `FAILED_UPDATE` int DEFAULT NULL,
+  `FAILED_DELETE` int DEFAULT NULL,
+  `MESSAGE` text COLLATE utf8mb4_bin,
+  `LANGUAGE` varchar(36) COLLATE utf8mb4_bin DEFAULT NULL,
+  `CREATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `CREATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  `LAST_UPDATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `LAST_UPDATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  PRIMARY KEY (`JOB_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `T_JOBS_USER`
+--
+
+LOCK TABLES `T_JOBS_USER` WRITE;
+/*!40000 ALTER TABLE `T_JOBS_USER` DISABLE KEYS */;
+/*!40000 ALTER TABLE `T_JOBS_USER` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `T_JOBS_USER_FILE`
+--
+
+DROP TABLE IF EXISTS `T_JOBS_USER_FILE`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `T_JOBS_USER_FILE` (
+  `FILE_ID` varchar(26) COLLATE utf8mb4_bin NOT NULL,
+  `JOB_ID` varchar(26) COLLATE utf8mb4_bin NOT NULL,
+  `FILE_DATA` longblob,
+  `CREATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `CREATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  `LAST_UPDATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `LAST_UPDATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  PRIMARY KEY (`FILE_ID`),
+  KEY `IDX_FUNC_ID` (`JOB_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `T_JOBS_USER_FILE`
+--
+
+LOCK TABLES `T_JOBS_USER_FILE` WRITE;
+/*!40000 ALTER TABLE `T_JOBS_USER_FILE` DISABLE KEYS */;
+/*!40000 ALTER TABLE `T_JOBS_USER_FILE` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `T_JOBS_USER_RESULT`
+--
+
+DROP TABLE IF EXISTS `T_JOBS_USER_RESULT`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `T_JOBS_USER_RESULT` (
+  `RESULT_ID` varchar(26) COLLATE utf8mb4_bin NOT NULL,
+  `JOB_ID` varchar(26) COLLATE utf8mb4_bin NOT NULL,
+  `FILE_DATA` longblob,
+  `CREATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`RESULT_ID`),
+  KEY `IDX_FUNC_ID` (`JOB_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `T_JOBS_USER_RESULT`
+--
+
+LOCK TABLES `T_JOBS_USER_RESULT` WRITE;
+/*!40000 ALTER TABLE `T_JOBS_USER_RESULT` DISABLE KEYS */;
+/*!40000 ALTER TABLE `T_JOBS_USER_RESULT` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `T_ORGANIZATION_PRIVATE`
+--
+
+DROP TABLE IF EXISTS `T_ORGANIZATION_PRIVATE`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `T_ORGANIZATION_PRIVATE` (
+  `ID` int NOT NULL,
+  `INFORMATIONS` json NOT NULL,
+  `CREATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `CREATE_USER` varchar(40) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `LAST_UPDATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `LAST_UPDATE_USER` varchar(40) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  PRIMARY KEY (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `T_ORGANIZATION_PRIVATE`
+--
+
+LOCK TABLES `T_ORGANIZATION_PRIVATE` WRITE;
+/*!40000 ALTER TABLE `T_ORGANIZATION_PRIVATE` DISABLE KEYS */;
+INSERT INTO `T_ORGANIZATION_PRIVATE` VALUES (1,'{\"API_TOKEN_CLIENT_ID\": \"690481d3-310d-4227-a8eb-eee2db8d1b25\", \"USER_TOKEN_CLIENT_ID\": \"3d62cf66-73c8-4ec7-ba0f-2b622bc5c747\", \"TOKEN_CHECK_CLIENT_ID\": \"8f492599-c8fb-4bce-af8a-34f41e0f5b74\", \"INTERNAL_API_CLIENT_ID\": \"01f89460-aba4-42ec-8eb3-f3c2d23cfbc2\", \"USER_TOKEN_CLIENT_SECRET\": \"rErCQmyFhbRO89G7aeZhahZnjNvPCfId\", \"API_TOKEN_CLIENT_CLIENTID\": \"_org5-api\", \"TOKEN_CHECK_CLIENT_SECRET\": \"JeaMZtAayEDDMhNE2i5XXGXEh5gwLXCB\", \"INTERNAL_API_CLIENT_SECRET\": \"ayf2weejbx5UiJ3pZsOJKldzQcC1erkR\", \"USER_TOKEN_CLIENT_CLIENTID\": \"org5\", \"TOKEN_CHECK_CLIENT_CLIENTID\": \"system-org5-auth\", \"INTERNAL_API_CLIENT_CLIENTID\": \"org5-workspaces\"}','2024-02-29 11:54:26','unittest-user01','2024-02-29 11:54:26','unittest-user01');
+/*!40000 ALTER TABLE `T_ORGANIZATION_PRIVATE` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `T_REFRESH_TOKEN`
+--
+
+DROP TABLE IF EXISTS `T_REFRESH_TOKEN`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `T_REFRESH_TOKEN` (
+  `USER_ID` varchar(40) COLLATE utf8mb4_general_ci NOT NULL,
+  `SESSION_ID` varchar(40) COLLATE utf8mb4_general_ci NOT NULL,
+  `EXPIRE_TIMESTAMP` datetime DEFAULT NULL,
+  `CREATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `CREATE_USER` varchar(40) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `LAST_UPDATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `LAST_UPDATE_USER` varchar(40) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  PRIMARY KEY (`USER_ID`,`SESSION_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `T_REFRESH_TOKEN`
+--
+
+LOCK TABLES `T_REFRESH_TOKEN` WRITE;
+/*!40000 ALTER TABLE `T_REFRESH_TOKEN` DISABLE KEYS */;
+/*!40000 ALTER TABLE `T_REFRESH_TOKEN` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `T_WORKSPACE`
+--
+
+DROP TABLE IF EXISTS `T_WORKSPACE`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `T_WORKSPACE` (
+  `WORKSPACE_ID` varchar(36) COLLATE utf8mb4_general_ci NOT NULL,
+  `WORKSPACE_NAME` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `INFORMATIONS` json NOT NULL,
+  `CREATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `CREATE_USER` varchar(40) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `LAST_UPDATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `LAST_UPDATE_USER` varchar(40) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  PRIMARY KEY (`WORKSPACE_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `T_WORKSPACE`
+--
+
+LOCK TABLES `T_WORKSPACE` WRITE;
+/*!40000 ALTER TABLE `T_WORKSPACE` DISABLE KEYS */;
+INSERT INTO `T_WORKSPACE` VALUES ('ws1','name of workspace','{\"description\": \"description of workspace\", \"environments\": [{\"name\": \"staging\"}, {\"name\": \"production\"}]}','2024-02-29 11:54:27','85631ddb-cb91-4d18-a335-1646a78ee06a','2024-02-29 11:54:27','85631ddb-cb91-4d18-a335-1646a78ee06a'),('ws2','name of workspace','{\"description\": \"description of workspace\", \"environments\": [{\"name\": \"staging\"}, {\"name\": \"production\"}]}','2024-02-29 11:54:36','85631ddb-cb91-4d18-a335-1646a78ee06a','2024-02-29 11:54:36','85631ddb-cb91-4d18-a335-1646a78ee06a'),('ws3','name of workspace','{\"description\": \"description of workspace\", \"environments\": [{\"name\": \"staging\"}, {\"name\": \"production\"}]}','2024-02-29 11:54:44','85631ddb-cb91-4d18-a335-1646a78ee06a','2024-02-29 11:54:44','85631ddb-cb91-4d18-a335-1646a78ee06a');
+/*!40000 ALTER TABLE `T_WORKSPACE` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `T_WORKSPACE_DB`
+--
+
+DROP TABLE IF EXISTS `T_WORKSPACE_DB`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `T_WORKSPACE_DB` (
+  `ORGANIZATION_ID` varchar(36) COLLATE utf8mb4_bin NOT NULL,
+  `WORKSPACE_ID` varchar(36) COLLATE utf8mb4_bin NOT NULL,
+  `DB_HOST` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DB_PORT` int DEFAULT NULL,
+  `DB_DATABASE` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DB_USER` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DB_PASSWORD` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `CREATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `CREATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  `LAST_UPDATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `LAST_UPDATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  PRIMARY KEY (`ORGANIZATION_ID`,`WORKSPACE_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `T_WORKSPACE_DB`
+--
+
+LOCK TABLES `T_WORKSPACE_DB` WRITE;
+/*!40000 ALTER TABLE `T_WORKSPACE_DB` DISABLE KEYS */;
+INSERT INTO `T_WORKSPACE_DB` VALUES ('org5','ws1','unittest-platform-db',3306,'PF_WS_FEZHRHWI91WNV4NZR3I4','PF_WS_FEZHRHWI91WNV4NZR3I4','fLbB1K2CksHg8AI1rFtYAxqdlLFsPFgoMHEHuz6REkR5t1byX0TdH4Dv+tdqiFkE','2024-02-29 11:54:27','85631ddb-cb91-4d18-a335-1646a78ee06a','2024-02-29 11:54:50','85631ddb-cb91-4d18-a335-1646a78ee06a'),('org5','ws2','unittest-platform-db',3306,'PF_WS_BNXGIYNX1PQJB9ENIE5T','PF_WS_BNXGIYNX1PQJB9ENIE5T','MGV0tYwSnlmp6JH2peUtOrEdrK52M4ej3ms4/CLuB+GK+4vffkesFS99SX0/ciBd','2024-02-29 11:54:36','85631ddb-cb91-4d18-a335-1646a78ee06a','2024-02-29 11:54:50','85631ddb-cb91-4d18-a335-1646a78ee06a'),('org5','ws3','unittest-platform-db',3306,'PF_WS_CO7LWOMXDHL064H4TO3I','PF_WS_CO7LWOMXDHL064H4TO3I','87v3bhIz0S1vvcZSqkRVqFxF1vBKCNwda7gogc/1tpD4zO8e5SO4I41NCcf+bmHT','2024-02-29 11:54:45','85631ddb-cb91-4d18-a335-1646a78ee06a','2024-02-29 11:54:50','85631ddb-cb91-4d18-a335-1646a78ee06a');
+/*!40000 ALTER TABLE `T_WORKSPACE_DB` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Current Database: `PF_ORG_UZ5M3JKTLNP3EP1LC02H`
+--
+
+CREATE DATABASE /*!32312 IF NOT EXISTS*/ `PF_ORG_UZ5M3JKTLNP3EP1LC02H` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+
+USE `PF_ORG_UZ5M3JKTLNP3EP1LC02H`;
+
+--
+-- Table structure for table `M_SMTP_SERVER`
+--
+
+DROP TABLE IF EXISTS `M_SMTP_SERVER`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `M_SMTP_SERVER` (
+  `SMTP_ID` varchar(36) COLLATE utf8mb4_bin NOT NULL,
+  `SMTP_HOST` varchar(1024) COLLATE utf8mb4_bin DEFAULT NULL,
+  `SMTP_PORT` int DEFAULT NULL,
+  `SEND_FROM` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `SEND_NAME` varchar(100) COLLATE utf8mb4_bin DEFAULT NULL,
+  `REPLY_TO` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `REPLY_NAME` varchar(100) COLLATE utf8mb4_bin DEFAULT NULL,
+  `ENVELOPE_FROM` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `SSL_ENABLE` tinyint(1) DEFAULT '0',
+  `START_TLS_ENABLE` tinyint(1) DEFAULT '0',
+  `AUTHENTICATION_ENABLE` tinyint(1) DEFAULT '0',
+  `AUTHENTICATION_USER` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `AUTHENTICATION_PASSWORD` varchar(1024) COLLATE utf8mb4_bin DEFAULT NULL,
+  `CREATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `CREATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  `LAST_UPDATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `LAST_UPDATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  PRIMARY KEY (`SMTP_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `M_SMTP_SERVER`
+--
+
+LOCK TABLES `M_SMTP_SERVER` WRITE;
+/*!40000 ALTER TABLE `M_SMTP_SERVER` DISABLE KEYS */;
+/*!40000 ALTER TABLE `M_SMTP_SERVER` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `T_JOBS_USER`
+--
+
+DROP TABLE IF EXISTS `T_JOBS_USER`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `T_JOBS_USER` (
+  `JOB_ID` varchar(26) COLLATE utf8mb4_bin NOT NULL,
+  `JOB_TYPE` varchar(36) COLLATE utf8mb4_bin DEFAULT NULL,
+  `JOB_STATUS` varchar(36) COLLATE utf8mb4_bin DEFAULT NULL,
+  `COUNT_REGISTER` int DEFAULT NULL,
+  `COUNT_UPDATE` int DEFAULT NULL,
+  `COUNT_DELETE` int DEFAULT NULL,
+  `SUCCESS_REGISTER` int DEFAULT NULL,
+  `SUCCESS_UPDATE` int DEFAULT NULL,
+  `SUCCESS_DELETE` int DEFAULT NULL,
+  `FAILED_REGISTER` int DEFAULT NULL,
+  `FAILED_UPDATE` int DEFAULT NULL,
+  `FAILED_DELETE` int DEFAULT NULL,
+  `MESSAGE` text COLLATE utf8mb4_bin,
+  `LANGUAGE` varchar(36) COLLATE utf8mb4_bin DEFAULT NULL,
+  `CREATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `CREATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  `LAST_UPDATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `LAST_UPDATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  PRIMARY KEY (`JOB_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `T_JOBS_USER`
+--
+
+LOCK TABLES `T_JOBS_USER` WRITE;
+/*!40000 ALTER TABLE `T_JOBS_USER` DISABLE KEYS */;
+/*!40000 ALTER TABLE `T_JOBS_USER` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `T_JOBS_USER_FILE`
+--
+
+DROP TABLE IF EXISTS `T_JOBS_USER_FILE`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `T_JOBS_USER_FILE` (
+  `FILE_ID` varchar(26) COLLATE utf8mb4_bin NOT NULL,
+  `JOB_ID` varchar(26) COLLATE utf8mb4_bin NOT NULL,
+  `FILE_DATA` longblob,
+  `CREATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `CREATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  `LAST_UPDATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `LAST_UPDATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  PRIMARY KEY (`FILE_ID`),
+  KEY `IDX_FUNC_ID` (`JOB_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `T_JOBS_USER_FILE`
+--
+
+LOCK TABLES `T_JOBS_USER_FILE` WRITE;
+/*!40000 ALTER TABLE `T_JOBS_USER_FILE` DISABLE KEYS */;
+/*!40000 ALTER TABLE `T_JOBS_USER_FILE` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `T_JOBS_USER_RESULT`
+--
+
+DROP TABLE IF EXISTS `T_JOBS_USER_RESULT`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `T_JOBS_USER_RESULT` (
+  `RESULT_ID` varchar(26) COLLATE utf8mb4_bin NOT NULL,
+  `JOB_ID` varchar(26) COLLATE utf8mb4_bin NOT NULL,
+  `FILE_DATA` longblob,
+  `CREATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`RESULT_ID`),
+  KEY `IDX_FUNC_ID` (`JOB_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `T_JOBS_USER_RESULT`
+--
+
+LOCK TABLES `T_JOBS_USER_RESULT` WRITE;
+/*!40000 ALTER TABLE `T_JOBS_USER_RESULT` DISABLE KEYS */;
+/*!40000 ALTER TABLE `T_JOBS_USER_RESULT` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `T_ORGANIZATION_PRIVATE`
+--
+
+DROP TABLE IF EXISTS `T_ORGANIZATION_PRIVATE`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `T_ORGANIZATION_PRIVATE` (
+  `ID` int NOT NULL,
+  `INFORMATIONS` json NOT NULL,
+  `CREATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `CREATE_USER` varchar(40) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `LAST_UPDATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `LAST_UPDATE_USER` varchar(40) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  PRIMARY KEY (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `T_ORGANIZATION_PRIVATE`
+--
+
+LOCK TABLES `T_ORGANIZATION_PRIVATE` WRITE;
+/*!40000 ALTER TABLE `T_ORGANIZATION_PRIVATE` DISABLE KEYS */;
+INSERT INTO `T_ORGANIZATION_PRIVATE` VALUES (1,'{\"API_TOKEN_CLIENT_ID\": \"b1088032-b0ab-4e61-9fd4-f58c3c6fe396\", \"USER_TOKEN_CLIENT_ID\": \"5a324cc2-4d44-46de-9c51-9afcc3c1adda\", \"TOKEN_CHECK_CLIENT_ID\": \"684a5673-eac6-49e1-8fad-7b9fe666a06f\", \"INTERNAL_API_CLIENT_ID\": \"311ebcfe-7467-459c-856a-862094332329\", \"USER_TOKEN_CLIENT_SECRET\": \"MWNRQ8QNdqfVBjSftkLHguRs39p63YFi\", \"API_TOKEN_CLIENT_CLIENTID\": \"_org4-api\", \"TOKEN_CHECK_CLIENT_SECRET\": \"fdMC9fipQyXMG1kLcX7q65InNthetdMO\", \"INTERNAL_API_CLIENT_SECRET\": \"hbr4oiMZdmt185KOkUMFePbZ8RdZ2cIr\", \"USER_TOKEN_CLIENT_CLIENTID\": \"org4\", \"TOKEN_CHECK_CLIENT_CLIENTID\": \"system-org4-auth\", \"INTERNAL_API_CLIENT_CLIENTID\": \"org4-workspaces\"}','2024-02-29 11:53:55','unittest-user01','2024-02-29 11:53:55','unittest-user01');
+/*!40000 ALTER TABLE `T_ORGANIZATION_PRIVATE` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `T_REFRESH_TOKEN`
+--
+
+DROP TABLE IF EXISTS `T_REFRESH_TOKEN`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `T_REFRESH_TOKEN` (
+  `USER_ID` varchar(40) COLLATE utf8mb4_general_ci NOT NULL,
+  `SESSION_ID` varchar(40) COLLATE utf8mb4_general_ci NOT NULL,
+  `EXPIRE_TIMESTAMP` datetime DEFAULT NULL,
+  `CREATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `CREATE_USER` varchar(40) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `LAST_UPDATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `LAST_UPDATE_USER` varchar(40) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  PRIMARY KEY (`USER_ID`,`SESSION_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `T_REFRESH_TOKEN`
+--
+
+LOCK TABLES `T_REFRESH_TOKEN` WRITE;
+/*!40000 ALTER TABLE `T_REFRESH_TOKEN` DISABLE KEYS */;
+/*!40000 ALTER TABLE `T_REFRESH_TOKEN` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `T_WORKSPACE`
+--
+
+DROP TABLE IF EXISTS `T_WORKSPACE`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `T_WORKSPACE` (
+  `WORKSPACE_ID` varchar(36) COLLATE utf8mb4_general_ci NOT NULL,
+  `WORKSPACE_NAME` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `INFORMATIONS` json NOT NULL,
+  `CREATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `CREATE_USER` varchar(40) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `LAST_UPDATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `LAST_UPDATE_USER` varchar(40) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  PRIMARY KEY (`WORKSPACE_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `T_WORKSPACE`
+--
+
+LOCK TABLES `T_WORKSPACE` WRITE;
+/*!40000 ALTER TABLE `T_WORKSPACE` DISABLE KEYS */;
+INSERT INTO `T_WORKSPACE` VALUES ('ws1','name of workspace','{\"description\": \"description of workspace\", \"environments\": [{\"name\": \"staging\"}, {\"name\": \"production\"}]}','2024-02-29 11:53:56','56cae199-4b66-451c-a310-9dec3f649490','2024-02-29 11:53:56','56cae199-4b66-451c-a310-9dec3f649490'),('ws2','name of workspace','{\"description\": \"description of workspace\", \"environments\": [{\"name\": \"staging\"}, {\"name\": \"production\"}]}','2024-02-29 11:54:05','56cae199-4b66-451c-a310-9dec3f649490','2024-02-29 11:54:05','56cae199-4b66-451c-a310-9dec3f649490'),('ws3','name of workspace','{\"description\": \"description of workspace\", \"environments\": [{\"name\": \"staging\"}, {\"name\": \"production\"}]}','2024-02-29 11:54:14','56cae199-4b66-451c-a310-9dec3f649490','2024-02-29 11:54:14','56cae199-4b66-451c-a310-9dec3f649490');
+/*!40000 ALTER TABLE `T_WORKSPACE` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `T_WORKSPACE_DB`
+--
+
+DROP TABLE IF EXISTS `T_WORKSPACE_DB`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `T_WORKSPACE_DB` (
+  `ORGANIZATION_ID` varchar(36) COLLATE utf8mb4_bin NOT NULL,
+  `WORKSPACE_ID` varchar(36) COLLATE utf8mb4_bin NOT NULL,
+  `DB_HOST` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DB_PORT` int DEFAULT NULL,
+  `DB_DATABASE` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DB_USER` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DB_PASSWORD` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `CREATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `CREATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  `LAST_UPDATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `LAST_UPDATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  PRIMARY KEY (`ORGANIZATION_ID`,`WORKSPACE_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `T_WORKSPACE_DB`
+--
+
+LOCK TABLES `T_WORKSPACE_DB` WRITE;
+/*!40000 ALTER TABLE `T_WORKSPACE_DB` DISABLE KEYS */;
+INSERT INTO `T_WORKSPACE_DB` VALUES ('org4','ws1','unittest-platform-db',3306,'PF_WS_F7UT8XTA2H286F69WMUQ','PF_WS_F7UT8XTA2H286F69WMUQ','CBOt3Z4ciQvs51ANUMALCfTxwMa0joRMKmrIsYpk8uF38aoAq9oB4zFEtmm+Jqy/','2024-02-29 11:53:56','56cae199-4b66-451c-a310-9dec3f649490','2024-02-29 11:54:50','56cae199-4b66-451c-a310-9dec3f649490'),('org4','ws2','unittest-platform-db',3306,'PF_WS_7R4CZW3VDOOLP0H42D1X','PF_WS_7R4CZW3VDOOLP0H42D1X','2htjIIY0VrDOU/d9zDs8GlZPFo4fowskEXSjx2LSzyPGoSJlLhiLY9lZ9KEfoeWT','2024-02-29 11:54:05','56cae199-4b66-451c-a310-9dec3f649490','2024-02-29 11:54:50','56cae199-4b66-451c-a310-9dec3f649490'),('org4','ws3','unittest-platform-db',3306,'PF_WS_P97LUJHVXKVG6NZYL703','PF_WS_P97LUJHVXKVG6NZYL703','iMUmD1Bc0OoPy2Xxr2eao0EDOqubSeUG6PxGhbSrkiaMEbWx4wjTVxkZWRJuZu8s','2024-02-29 11:54:14','56cae199-4b66-451c-a310-9dec3f649490','2024-02-29 11:54:50','56cae199-4b66-451c-a310-9dec3f649490');
+/*!40000 ALTER TABLE `T_WORKSPACE_DB` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Current Database: `PF_WS_3XE4B764TR2WEPAI80DC`
+--
+
+CREATE DATABASE /*!32312 IF NOT EXISTS*/ `PF_WS_3XE4B764TR2WEPAI80DC` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+
+USE `PF_WS_3XE4B764TR2WEPAI80DC`;
+
+--
+-- Table structure for table `M_NOTIFICATION_DESTINATION`
+--
+
+DROP TABLE IF EXISTS `M_NOTIFICATION_DESTINATION`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `M_NOTIFICATION_DESTINATION` (
+  `DESTINATION_ID` varchar(36) COLLATE utf8mb4_bin NOT NULL,
+  `DESTINATION_NAME` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DESTINATION_KIND` varchar(20) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DESTINATION_INFORMATIONS` longtext COLLATE utf8mb4_bin,
+  `CONDITIONS` longtext COLLATE utf8mb4_bin,
+  `CREATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `CREATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  `LAST_UPDATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `LAST_UPDATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  PRIMARY KEY (`DESTINATION_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `M_NOTIFICATION_DESTINATION`
+--
+
+LOCK TABLES `M_NOTIFICATION_DESTINATION` WRITE;
+/*!40000 ALTER TABLE `M_NOTIFICATION_DESTINATION` DISABLE KEYS */;
+/*!40000 ALTER TABLE `M_NOTIFICATION_DESTINATION` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `T_NOTIFICATION_MESSAGE`
+--
+
+DROP TABLE IF EXISTS `T_NOTIFICATION_MESSAGE`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `T_NOTIFICATION_MESSAGE` (
+  `NOTIFICATION_ID` varchar(26) COLLATE utf8mb4_bin NOT NULL,
+  `DESTINATION_ID` varchar(36) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DESTINATION_NAME` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DESTINATION_KIND` varchar(20) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DESTINATION_INFORMATIONS` longtext COLLATE utf8mb4_bin,
+  `CONDITIONS` longtext COLLATE utf8mb4_bin,
+  `FUNC_ID` varchar(100) COLLATE utf8mb4_bin DEFAULT NULL,
+  `FUNC_INFORMATIONS` longtext COLLATE utf8mb4_bin,
+  `MESSAGE_INFORMATIONS` longtext COLLATE utf8mb4_bin,
+  `NOTIFICATION_STATUS` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  `NOTIFICATION_TIMESTAMP` datetime DEFAULT NULL,
+  `CREATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `CREATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  `LAST_UPDATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `LAST_UPDATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  PRIMARY KEY (`NOTIFICATION_ID`),
+  KEY `IDX_FUNC_ID` (`FUNC_ID`,`CREATE_TIMESTAMP`),
+  KEY `IDX_CREATE_TIMESTAMP` (`CREATE_TIMESTAMP`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `T_NOTIFICATION_MESSAGE`
+--
+
+LOCK TABLES `T_NOTIFICATION_MESSAGE` WRITE;
+/*!40000 ALTER TABLE `T_NOTIFICATION_MESSAGE` DISABLE KEYS */;
+/*!40000 ALTER TABLE `T_NOTIFICATION_MESSAGE` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Current Database: `PF_WS_7R4CZW3VDOOLP0H42D1X`
+--
+
+CREATE DATABASE /*!32312 IF NOT EXISTS*/ `PF_WS_7R4CZW3VDOOLP0H42D1X` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+
+USE `PF_WS_7R4CZW3VDOOLP0H42D1X`;
+
+--
+-- Table structure for table `M_NOTIFICATION_DESTINATION`
+--
+
+DROP TABLE IF EXISTS `M_NOTIFICATION_DESTINATION`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `M_NOTIFICATION_DESTINATION` (
+  `DESTINATION_ID` varchar(36) COLLATE utf8mb4_bin NOT NULL,
+  `DESTINATION_NAME` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DESTINATION_KIND` varchar(20) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DESTINATION_INFORMATIONS` longtext COLLATE utf8mb4_bin,
+  `CONDITIONS` longtext COLLATE utf8mb4_bin,
+  `CREATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `CREATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  `LAST_UPDATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `LAST_UPDATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  PRIMARY KEY (`DESTINATION_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `M_NOTIFICATION_DESTINATION`
+--
+
+LOCK TABLES `M_NOTIFICATION_DESTINATION` WRITE;
+/*!40000 ALTER TABLE `M_NOTIFICATION_DESTINATION` DISABLE KEYS */;
+/*!40000 ALTER TABLE `M_NOTIFICATION_DESTINATION` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `T_NOTIFICATION_MESSAGE`
+--
+
+DROP TABLE IF EXISTS `T_NOTIFICATION_MESSAGE`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `T_NOTIFICATION_MESSAGE` (
+  `NOTIFICATION_ID` varchar(26) COLLATE utf8mb4_bin NOT NULL,
+  `DESTINATION_ID` varchar(36) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DESTINATION_NAME` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DESTINATION_KIND` varchar(20) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DESTINATION_INFORMATIONS` longtext COLLATE utf8mb4_bin,
+  `CONDITIONS` longtext COLLATE utf8mb4_bin,
+  `FUNC_ID` varchar(100) COLLATE utf8mb4_bin DEFAULT NULL,
+  `FUNC_INFORMATIONS` longtext COLLATE utf8mb4_bin,
+  `MESSAGE_INFORMATIONS` longtext COLLATE utf8mb4_bin,
+  `NOTIFICATION_STATUS` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  `NOTIFICATION_TIMESTAMP` datetime DEFAULT NULL,
+  `CREATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `CREATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  `LAST_UPDATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `LAST_UPDATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  PRIMARY KEY (`NOTIFICATION_ID`),
+  KEY `IDX_FUNC_ID` (`FUNC_ID`,`CREATE_TIMESTAMP`),
+  KEY `IDX_CREATE_TIMESTAMP` (`CREATE_TIMESTAMP`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `T_NOTIFICATION_MESSAGE`
+--
+
+LOCK TABLES `T_NOTIFICATION_MESSAGE` WRITE;
+/*!40000 ALTER TABLE `T_NOTIFICATION_MESSAGE` DISABLE KEYS */;
+/*!40000 ALTER TABLE `T_NOTIFICATION_MESSAGE` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Current Database: `PF_WS_BHF6ZN9DJR5L8RIZKD85`
+--
+
+CREATE DATABASE /*!32312 IF NOT EXISTS*/ `PF_WS_BHF6ZN9DJR5L8RIZKD85` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+
+USE `PF_WS_BHF6ZN9DJR5L8RIZKD85`;
+
+--
+-- Table structure for table `M_NOTIFICATION_DESTINATION`
+--
+
+DROP TABLE IF EXISTS `M_NOTIFICATION_DESTINATION`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `M_NOTIFICATION_DESTINATION` (
+  `DESTINATION_ID` varchar(36) COLLATE utf8mb4_bin NOT NULL,
+  `DESTINATION_NAME` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DESTINATION_KIND` varchar(20) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DESTINATION_INFORMATIONS` longtext COLLATE utf8mb4_bin,
+  `CONDITIONS` longtext COLLATE utf8mb4_bin,
+  `CREATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `CREATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  `LAST_UPDATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `LAST_UPDATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  PRIMARY KEY (`DESTINATION_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `M_NOTIFICATION_DESTINATION`
+--
+
+LOCK TABLES `M_NOTIFICATION_DESTINATION` WRITE;
+/*!40000 ALTER TABLE `M_NOTIFICATION_DESTINATION` DISABLE KEYS */;
+/*!40000 ALTER TABLE `M_NOTIFICATION_DESTINATION` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `T_NOTIFICATION_MESSAGE`
+--
+
+DROP TABLE IF EXISTS `T_NOTIFICATION_MESSAGE`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `T_NOTIFICATION_MESSAGE` (
+  `NOTIFICATION_ID` varchar(26) COLLATE utf8mb4_bin NOT NULL,
+  `DESTINATION_ID` varchar(36) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DESTINATION_NAME` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DESTINATION_KIND` varchar(20) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DESTINATION_INFORMATIONS` longtext COLLATE utf8mb4_bin,
+  `CONDITIONS` longtext COLLATE utf8mb4_bin,
+  `FUNC_ID` varchar(100) COLLATE utf8mb4_bin DEFAULT NULL,
+  `FUNC_INFORMATIONS` longtext COLLATE utf8mb4_bin,
+  `MESSAGE_INFORMATIONS` longtext COLLATE utf8mb4_bin,
+  `NOTIFICATION_STATUS` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  `NOTIFICATION_TIMESTAMP` datetime DEFAULT NULL,
+  `CREATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `CREATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  `LAST_UPDATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `LAST_UPDATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  PRIMARY KEY (`NOTIFICATION_ID`),
+  KEY `IDX_FUNC_ID` (`FUNC_ID`,`CREATE_TIMESTAMP`),
+  KEY `IDX_CREATE_TIMESTAMP` (`CREATE_TIMESTAMP`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `T_NOTIFICATION_MESSAGE`
+--
+
+LOCK TABLES `T_NOTIFICATION_MESSAGE` WRITE;
+/*!40000 ALTER TABLE `T_NOTIFICATION_MESSAGE` DISABLE KEYS */;
+/*!40000 ALTER TABLE `T_NOTIFICATION_MESSAGE` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Current Database: `PF_WS_BNXGIYNX1PQJB9ENIE5T`
+--
+
+CREATE DATABASE /*!32312 IF NOT EXISTS*/ `PF_WS_BNXGIYNX1PQJB9ENIE5T` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+
+USE `PF_WS_BNXGIYNX1PQJB9ENIE5T`;
+
+--
+-- Table structure for table `M_NOTIFICATION_DESTINATION`
+--
+
+DROP TABLE IF EXISTS `M_NOTIFICATION_DESTINATION`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `M_NOTIFICATION_DESTINATION` (
+  `DESTINATION_ID` varchar(36) COLLATE utf8mb4_bin NOT NULL,
+  `DESTINATION_NAME` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DESTINATION_KIND` varchar(20) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DESTINATION_INFORMATIONS` longtext COLLATE utf8mb4_bin,
+  `CONDITIONS` longtext COLLATE utf8mb4_bin,
+  `CREATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `CREATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  `LAST_UPDATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `LAST_UPDATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  PRIMARY KEY (`DESTINATION_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `M_NOTIFICATION_DESTINATION`
+--
+
+LOCK TABLES `M_NOTIFICATION_DESTINATION` WRITE;
+/*!40000 ALTER TABLE `M_NOTIFICATION_DESTINATION` DISABLE KEYS */;
+/*!40000 ALTER TABLE `M_NOTIFICATION_DESTINATION` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `T_NOTIFICATION_MESSAGE`
+--
+
+DROP TABLE IF EXISTS `T_NOTIFICATION_MESSAGE`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `T_NOTIFICATION_MESSAGE` (
+  `NOTIFICATION_ID` varchar(26) COLLATE utf8mb4_bin NOT NULL,
+  `DESTINATION_ID` varchar(36) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DESTINATION_NAME` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DESTINATION_KIND` varchar(20) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DESTINATION_INFORMATIONS` longtext COLLATE utf8mb4_bin,
+  `CONDITIONS` longtext COLLATE utf8mb4_bin,
+  `FUNC_ID` varchar(100) COLLATE utf8mb4_bin DEFAULT NULL,
+  `FUNC_INFORMATIONS` longtext COLLATE utf8mb4_bin,
+  `MESSAGE_INFORMATIONS` longtext COLLATE utf8mb4_bin,
+  `NOTIFICATION_STATUS` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  `NOTIFICATION_TIMESTAMP` datetime DEFAULT NULL,
+  `CREATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `CREATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  `LAST_UPDATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `LAST_UPDATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  PRIMARY KEY (`NOTIFICATION_ID`),
+  KEY `IDX_FUNC_ID` (`FUNC_ID`,`CREATE_TIMESTAMP`),
+  KEY `IDX_CREATE_TIMESTAMP` (`CREATE_TIMESTAMP`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `T_NOTIFICATION_MESSAGE`
+--
+
+LOCK TABLES `T_NOTIFICATION_MESSAGE` WRITE;
+/*!40000 ALTER TABLE `T_NOTIFICATION_MESSAGE` DISABLE KEYS */;
+/*!40000 ALTER TABLE `T_NOTIFICATION_MESSAGE` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Current Database: `PF_WS_CEWEXSWFHBJQLLPWOIIF`
+--
+
+CREATE DATABASE /*!32312 IF NOT EXISTS*/ `PF_WS_CEWEXSWFHBJQLLPWOIIF` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+
+USE `PF_WS_CEWEXSWFHBJQLLPWOIIF`;
+
+--
+-- Table structure for table `M_NOTIFICATION_DESTINATION`
+--
+
+DROP TABLE IF EXISTS `M_NOTIFICATION_DESTINATION`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `M_NOTIFICATION_DESTINATION` (
+  `DESTINATION_ID` varchar(36) COLLATE utf8mb4_bin NOT NULL,
+  `DESTINATION_NAME` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DESTINATION_KIND` varchar(20) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DESTINATION_INFORMATIONS` longtext COLLATE utf8mb4_bin,
+  `CONDITIONS` longtext COLLATE utf8mb4_bin,
+  `CREATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `CREATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  `LAST_UPDATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `LAST_UPDATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  PRIMARY KEY (`DESTINATION_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `M_NOTIFICATION_DESTINATION`
+--
+
+LOCK TABLES `M_NOTIFICATION_DESTINATION` WRITE;
+/*!40000 ALTER TABLE `M_NOTIFICATION_DESTINATION` DISABLE KEYS */;
+/*!40000 ALTER TABLE `M_NOTIFICATION_DESTINATION` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `T_NOTIFICATION_MESSAGE`
+--
+
+DROP TABLE IF EXISTS `T_NOTIFICATION_MESSAGE`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `T_NOTIFICATION_MESSAGE` (
+  `NOTIFICATION_ID` varchar(26) COLLATE utf8mb4_bin NOT NULL,
+  `DESTINATION_ID` varchar(36) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DESTINATION_NAME` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DESTINATION_KIND` varchar(20) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DESTINATION_INFORMATIONS` longtext COLLATE utf8mb4_bin,
+  `CONDITIONS` longtext COLLATE utf8mb4_bin,
+  `FUNC_ID` varchar(100) COLLATE utf8mb4_bin DEFAULT NULL,
+  `FUNC_INFORMATIONS` longtext COLLATE utf8mb4_bin,
+  `MESSAGE_INFORMATIONS` longtext COLLATE utf8mb4_bin,
+  `NOTIFICATION_STATUS` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  `NOTIFICATION_TIMESTAMP` datetime DEFAULT NULL,
+  `CREATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `CREATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  `LAST_UPDATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `LAST_UPDATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  PRIMARY KEY (`NOTIFICATION_ID`),
+  KEY `IDX_FUNC_ID` (`FUNC_ID`,`CREATE_TIMESTAMP`),
+  KEY `IDX_CREATE_TIMESTAMP` (`CREATE_TIMESTAMP`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `T_NOTIFICATION_MESSAGE`
+--
+
+LOCK TABLES `T_NOTIFICATION_MESSAGE` WRITE;
+/*!40000 ALTER TABLE `T_NOTIFICATION_MESSAGE` DISABLE KEYS */;
+/*!40000 ALTER TABLE `T_NOTIFICATION_MESSAGE` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Current Database: `PF_WS_CO7LWOMXDHL064H4TO3I`
+--
+
+CREATE DATABASE /*!32312 IF NOT EXISTS*/ `PF_WS_CO7LWOMXDHL064H4TO3I` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+
+USE `PF_WS_CO7LWOMXDHL064H4TO3I`;
+
+--
+-- Table structure for table `M_NOTIFICATION_DESTINATION`
+--
+
+DROP TABLE IF EXISTS `M_NOTIFICATION_DESTINATION`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `M_NOTIFICATION_DESTINATION` (
+  `DESTINATION_ID` varchar(36) COLLATE utf8mb4_bin NOT NULL,
+  `DESTINATION_NAME` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DESTINATION_KIND` varchar(20) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DESTINATION_INFORMATIONS` longtext COLLATE utf8mb4_bin,
+  `CONDITIONS` longtext COLLATE utf8mb4_bin,
+  `CREATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `CREATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  `LAST_UPDATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `LAST_UPDATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  PRIMARY KEY (`DESTINATION_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `M_NOTIFICATION_DESTINATION`
+--
+
+LOCK TABLES `M_NOTIFICATION_DESTINATION` WRITE;
+/*!40000 ALTER TABLE `M_NOTIFICATION_DESTINATION` DISABLE KEYS */;
+/*!40000 ALTER TABLE `M_NOTIFICATION_DESTINATION` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `T_NOTIFICATION_MESSAGE`
+--
+
+DROP TABLE IF EXISTS `T_NOTIFICATION_MESSAGE`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `T_NOTIFICATION_MESSAGE` (
+  `NOTIFICATION_ID` varchar(26) COLLATE utf8mb4_bin NOT NULL,
+  `DESTINATION_ID` varchar(36) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DESTINATION_NAME` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DESTINATION_KIND` varchar(20) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DESTINATION_INFORMATIONS` longtext COLLATE utf8mb4_bin,
+  `CONDITIONS` longtext COLLATE utf8mb4_bin,
+  `FUNC_ID` varchar(100) COLLATE utf8mb4_bin DEFAULT NULL,
+  `FUNC_INFORMATIONS` longtext COLLATE utf8mb4_bin,
+  `MESSAGE_INFORMATIONS` longtext COLLATE utf8mb4_bin,
+  `NOTIFICATION_STATUS` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  `NOTIFICATION_TIMESTAMP` datetime DEFAULT NULL,
+  `CREATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `CREATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  `LAST_UPDATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `LAST_UPDATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  PRIMARY KEY (`NOTIFICATION_ID`),
+  KEY `IDX_FUNC_ID` (`FUNC_ID`,`CREATE_TIMESTAMP`),
+  KEY `IDX_CREATE_TIMESTAMP` (`CREATE_TIMESTAMP`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `T_NOTIFICATION_MESSAGE`
+--
+
+LOCK TABLES `T_NOTIFICATION_MESSAGE` WRITE;
+/*!40000 ALTER TABLE `T_NOTIFICATION_MESSAGE` DISABLE KEYS */;
+/*!40000 ALTER TABLE `T_NOTIFICATION_MESSAGE` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Current Database: `PF_WS_F7UT8XTA2H286F69WMUQ`
+--
+
+CREATE DATABASE /*!32312 IF NOT EXISTS*/ `PF_WS_F7UT8XTA2H286F69WMUQ` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+
+USE `PF_WS_F7UT8XTA2H286F69WMUQ`;
+
+--
+-- Table structure for table `M_NOTIFICATION_DESTINATION`
+--
+
+DROP TABLE IF EXISTS `M_NOTIFICATION_DESTINATION`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `M_NOTIFICATION_DESTINATION` (
+  `DESTINATION_ID` varchar(36) COLLATE utf8mb4_bin NOT NULL,
+  `DESTINATION_NAME` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DESTINATION_KIND` varchar(20) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DESTINATION_INFORMATIONS` longtext COLLATE utf8mb4_bin,
+  `CONDITIONS` longtext COLLATE utf8mb4_bin,
+  `CREATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `CREATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  `LAST_UPDATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `LAST_UPDATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  PRIMARY KEY (`DESTINATION_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `M_NOTIFICATION_DESTINATION`
+--
+
+LOCK TABLES `M_NOTIFICATION_DESTINATION` WRITE;
+/*!40000 ALTER TABLE `M_NOTIFICATION_DESTINATION` DISABLE KEYS */;
+/*!40000 ALTER TABLE `M_NOTIFICATION_DESTINATION` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `T_NOTIFICATION_MESSAGE`
+--
+
+DROP TABLE IF EXISTS `T_NOTIFICATION_MESSAGE`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `T_NOTIFICATION_MESSAGE` (
+  `NOTIFICATION_ID` varchar(26) COLLATE utf8mb4_bin NOT NULL,
+  `DESTINATION_ID` varchar(36) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DESTINATION_NAME` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DESTINATION_KIND` varchar(20) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DESTINATION_INFORMATIONS` longtext COLLATE utf8mb4_bin,
+  `CONDITIONS` longtext COLLATE utf8mb4_bin,
+  `FUNC_ID` varchar(100) COLLATE utf8mb4_bin DEFAULT NULL,
+  `FUNC_INFORMATIONS` longtext COLLATE utf8mb4_bin,
+  `MESSAGE_INFORMATIONS` longtext COLLATE utf8mb4_bin,
+  `NOTIFICATION_STATUS` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  `NOTIFICATION_TIMESTAMP` datetime DEFAULT NULL,
+  `CREATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `CREATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  `LAST_UPDATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `LAST_UPDATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  PRIMARY KEY (`NOTIFICATION_ID`),
+  KEY `IDX_FUNC_ID` (`FUNC_ID`,`CREATE_TIMESTAMP`),
+  KEY `IDX_CREATE_TIMESTAMP` (`CREATE_TIMESTAMP`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `T_NOTIFICATION_MESSAGE`
+--
+
+LOCK TABLES `T_NOTIFICATION_MESSAGE` WRITE;
+/*!40000 ALTER TABLE `T_NOTIFICATION_MESSAGE` DISABLE KEYS */;
+/*!40000 ALTER TABLE `T_NOTIFICATION_MESSAGE` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Current Database: `PF_WS_FEZHRHWI91WNV4NZR3I4`
+--
+
+CREATE DATABASE /*!32312 IF NOT EXISTS*/ `PF_WS_FEZHRHWI91WNV4NZR3I4` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+
+USE `PF_WS_FEZHRHWI91WNV4NZR3I4`;
+
+--
+-- Table structure for table `M_NOTIFICATION_DESTINATION`
+--
+
+DROP TABLE IF EXISTS `M_NOTIFICATION_DESTINATION`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `M_NOTIFICATION_DESTINATION` (
+  `DESTINATION_ID` varchar(36) COLLATE utf8mb4_bin NOT NULL,
+  `DESTINATION_NAME` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DESTINATION_KIND` varchar(20) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DESTINATION_INFORMATIONS` longtext COLLATE utf8mb4_bin,
+  `CONDITIONS` longtext COLLATE utf8mb4_bin,
+  `CREATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `CREATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  `LAST_UPDATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `LAST_UPDATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  PRIMARY KEY (`DESTINATION_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `M_NOTIFICATION_DESTINATION`
+--
+
+LOCK TABLES `M_NOTIFICATION_DESTINATION` WRITE;
+/*!40000 ALTER TABLE `M_NOTIFICATION_DESTINATION` DISABLE KEYS */;
+/*!40000 ALTER TABLE `M_NOTIFICATION_DESTINATION` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `T_NOTIFICATION_MESSAGE`
+--
+
+DROP TABLE IF EXISTS `T_NOTIFICATION_MESSAGE`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `T_NOTIFICATION_MESSAGE` (
+  `NOTIFICATION_ID` varchar(26) COLLATE utf8mb4_bin NOT NULL,
+  `DESTINATION_ID` varchar(36) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DESTINATION_NAME` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DESTINATION_KIND` varchar(20) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DESTINATION_INFORMATIONS` longtext COLLATE utf8mb4_bin,
+  `CONDITIONS` longtext COLLATE utf8mb4_bin,
+  `FUNC_ID` varchar(100) COLLATE utf8mb4_bin DEFAULT NULL,
+  `FUNC_INFORMATIONS` longtext COLLATE utf8mb4_bin,
+  `MESSAGE_INFORMATIONS` longtext COLLATE utf8mb4_bin,
+  `NOTIFICATION_STATUS` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  `NOTIFICATION_TIMESTAMP` datetime DEFAULT NULL,
+  `CREATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `CREATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  `LAST_UPDATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `LAST_UPDATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  PRIMARY KEY (`NOTIFICATION_ID`),
+  KEY `IDX_FUNC_ID` (`FUNC_ID`,`CREATE_TIMESTAMP`),
+  KEY `IDX_CREATE_TIMESTAMP` (`CREATE_TIMESTAMP`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `T_NOTIFICATION_MESSAGE`
+--
+
+LOCK TABLES `T_NOTIFICATION_MESSAGE` WRITE;
+/*!40000 ALTER TABLE `T_NOTIFICATION_MESSAGE` DISABLE KEYS */;
+/*!40000 ALTER TABLE `T_NOTIFICATION_MESSAGE` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Current Database: `PF_WS_HE2O7U3CDACWRS3A4Y0C`
+--
+
+CREATE DATABASE /*!32312 IF NOT EXISTS*/ `PF_WS_HE2O7U3CDACWRS3A4Y0C` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+
+USE `PF_WS_HE2O7U3CDACWRS3A4Y0C`;
+
+--
+-- Table structure for table `M_NOTIFICATION_DESTINATION`
+--
+
+DROP TABLE IF EXISTS `M_NOTIFICATION_DESTINATION`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `M_NOTIFICATION_DESTINATION` (
+  `DESTINATION_ID` varchar(36) COLLATE utf8mb4_bin NOT NULL,
+  `DESTINATION_NAME` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DESTINATION_KIND` varchar(20) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DESTINATION_INFORMATIONS` longtext COLLATE utf8mb4_bin,
+  `CONDITIONS` longtext COLLATE utf8mb4_bin,
+  `CREATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `CREATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  `LAST_UPDATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `LAST_UPDATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  PRIMARY KEY (`DESTINATION_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `M_NOTIFICATION_DESTINATION`
+--
+
+LOCK TABLES `M_NOTIFICATION_DESTINATION` WRITE;
+/*!40000 ALTER TABLE `M_NOTIFICATION_DESTINATION` DISABLE KEYS */;
+/*!40000 ALTER TABLE `M_NOTIFICATION_DESTINATION` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `T_NOTIFICATION_MESSAGE`
+--
+
+DROP TABLE IF EXISTS `T_NOTIFICATION_MESSAGE`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `T_NOTIFICATION_MESSAGE` (
+  `NOTIFICATION_ID` varchar(26) COLLATE utf8mb4_bin NOT NULL,
+  `DESTINATION_ID` varchar(36) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DESTINATION_NAME` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DESTINATION_KIND` varchar(20) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DESTINATION_INFORMATIONS` longtext COLLATE utf8mb4_bin,
+  `CONDITIONS` longtext COLLATE utf8mb4_bin,
+  `FUNC_ID` varchar(100) COLLATE utf8mb4_bin DEFAULT NULL,
+  `FUNC_INFORMATIONS` longtext COLLATE utf8mb4_bin,
+  `MESSAGE_INFORMATIONS` longtext COLLATE utf8mb4_bin,
+  `NOTIFICATION_STATUS` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  `NOTIFICATION_TIMESTAMP` datetime DEFAULT NULL,
+  `CREATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `CREATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  `LAST_UPDATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `LAST_UPDATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  PRIMARY KEY (`NOTIFICATION_ID`),
+  KEY `IDX_FUNC_ID` (`FUNC_ID`,`CREATE_TIMESTAMP`),
+  KEY `IDX_CREATE_TIMESTAMP` (`CREATE_TIMESTAMP`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `T_NOTIFICATION_MESSAGE`
+--
+
+LOCK TABLES `T_NOTIFICATION_MESSAGE` WRITE;
+/*!40000 ALTER TABLE `T_NOTIFICATION_MESSAGE` DISABLE KEYS */;
+/*!40000 ALTER TABLE `T_NOTIFICATION_MESSAGE` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Current Database: `PF_WS_NSN0OB4MUN31QV8JAYI4`
+--
+
+CREATE DATABASE /*!32312 IF NOT EXISTS*/ `PF_WS_NSN0OB4MUN31QV8JAYI4` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+
+USE `PF_WS_NSN0OB4MUN31QV8JAYI4`;
+
+--
+-- Table structure for table `M_NOTIFICATION_DESTINATION`
+--
+
+DROP TABLE IF EXISTS `M_NOTIFICATION_DESTINATION`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `M_NOTIFICATION_DESTINATION` (
+  `DESTINATION_ID` varchar(36) COLLATE utf8mb4_bin NOT NULL,
+  `DESTINATION_NAME` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DESTINATION_KIND` varchar(20) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DESTINATION_INFORMATIONS` longtext COLLATE utf8mb4_bin,
+  `CONDITIONS` longtext COLLATE utf8mb4_bin,
+  `CREATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `CREATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  `LAST_UPDATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `LAST_UPDATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  PRIMARY KEY (`DESTINATION_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `M_NOTIFICATION_DESTINATION`
+--
+
+LOCK TABLES `M_NOTIFICATION_DESTINATION` WRITE;
+/*!40000 ALTER TABLE `M_NOTIFICATION_DESTINATION` DISABLE KEYS */;
+/*!40000 ALTER TABLE `M_NOTIFICATION_DESTINATION` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `T_NOTIFICATION_MESSAGE`
+--
+
+DROP TABLE IF EXISTS `T_NOTIFICATION_MESSAGE`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `T_NOTIFICATION_MESSAGE` (
+  `NOTIFICATION_ID` varchar(26) COLLATE utf8mb4_bin NOT NULL,
+  `DESTINATION_ID` varchar(36) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DESTINATION_NAME` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DESTINATION_KIND` varchar(20) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DESTINATION_INFORMATIONS` longtext COLLATE utf8mb4_bin,
+  `CONDITIONS` longtext COLLATE utf8mb4_bin,
+  `FUNC_ID` varchar(100) COLLATE utf8mb4_bin DEFAULT NULL,
+  `FUNC_INFORMATIONS` longtext COLLATE utf8mb4_bin,
+  `MESSAGE_INFORMATIONS` longtext COLLATE utf8mb4_bin,
+  `NOTIFICATION_STATUS` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  `NOTIFICATION_TIMESTAMP` datetime DEFAULT NULL,
+  `CREATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `CREATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  `LAST_UPDATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `LAST_UPDATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  PRIMARY KEY (`NOTIFICATION_ID`),
+  KEY `IDX_FUNC_ID` (`FUNC_ID`,`CREATE_TIMESTAMP`),
+  KEY `IDX_CREATE_TIMESTAMP` (`CREATE_TIMESTAMP`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `T_NOTIFICATION_MESSAGE`
+--
+
+LOCK TABLES `T_NOTIFICATION_MESSAGE` WRITE;
+/*!40000 ALTER TABLE `T_NOTIFICATION_MESSAGE` DISABLE KEYS */;
+/*!40000 ALTER TABLE `T_NOTIFICATION_MESSAGE` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Current Database: `PF_WS_P97LUJHVXKVG6NZYL703`
+--
+
+CREATE DATABASE /*!32312 IF NOT EXISTS*/ `PF_WS_P97LUJHVXKVG6NZYL703` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+
+USE `PF_WS_P97LUJHVXKVG6NZYL703`;
+
+--
+-- Table structure for table `M_NOTIFICATION_DESTINATION`
+--
+
+DROP TABLE IF EXISTS `M_NOTIFICATION_DESTINATION`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `M_NOTIFICATION_DESTINATION` (
+  `DESTINATION_ID` varchar(36) COLLATE utf8mb4_bin NOT NULL,
+  `DESTINATION_NAME` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DESTINATION_KIND` varchar(20) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DESTINATION_INFORMATIONS` longtext COLLATE utf8mb4_bin,
+  `CONDITIONS` longtext COLLATE utf8mb4_bin,
+  `CREATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `CREATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  `LAST_UPDATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `LAST_UPDATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  PRIMARY KEY (`DESTINATION_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `M_NOTIFICATION_DESTINATION`
+--
+
+LOCK TABLES `M_NOTIFICATION_DESTINATION` WRITE;
+/*!40000 ALTER TABLE `M_NOTIFICATION_DESTINATION` DISABLE KEYS */;
+/*!40000 ALTER TABLE `M_NOTIFICATION_DESTINATION` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `T_NOTIFICATION_MESSAGE`
+--
+
+DROP TABLE IF EXISTS `T_NOTIFICATION_MESSAGE`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `T_NOTIFICATION_MESSAGE` (
+  `NOTIFICATION_ID` varchar(26) COLLATE utf8mb4_bin NOT NULL,
+  `DESTINATION_ID` varchar(36) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DESTINATION_NAME` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DESTINATION_KIND` varchar(20) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DESTINATION_INFORMATIONS` longtext COLLATE utf8mb4_bin,
+  `CONDITIONS` longtext COLLATE utf8mb4_bin,
+  `FUNC_ID` varchar(100) COLLATE utf8mb4_bin DEFAULT NULL,
+  `FUNC_INFORMATIONS` longtext COLLATE utf8mb4_bin,
+  `MESSAGE_INFORMATIONS` longtext COLLATE utf8mb4_bin,
+  `NOTIFICATION_STATUS` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  `NOTIFICATION_TIMESTAMP` datetime DEFAULT NULL,
+  `CREATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `CREATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  `LAST_UPDATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `LAST_UPDATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  PRIMARY KEY (`NOTIFICATION_ID`),
+  KEY `IDX_FUNC_ID` (`FUNC_ID`,`CREATE_TIMESTAMP`),
+  KEY `IDX_CREATE_TIMESTAMP` (`CREATE_TIMESTAMP`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `T_NOTIFICATION_MESSAGE`
+--
+
+LOCK TABLES `T_NOTIFICATION_MESSAGE` WRITE;
+/*!40000 ALTER TABLE `T_NOTIFICATION_MESSAGE` DISABLE KEYS */;
+/*!40000 ALTER TABLE `T_NOTIFICATION_MESSAGE` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Current Database: `PF_WS_QUN48R7KTKVRTHIQMZ3U`
+--
+
+CREATE DATABASE /*!32312 IF NOT EXISTS*/ `PF_WS_QUN48R7KTKVRTHIQMZ3U` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+
+USE `PF_WS_QUN48R7KTKVRTHIQMZ3U`;
+
+--
+-- Table structure for table `M_NOTIFICATION_DESTINATION`
+--
+
+DROP TABLE IF EXISTS `M_NOTIFICATION_DESTINATION`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `M_NOTIFICATION_DESTINATION` (
+  `DESTINATION_ID` varchar(36) COLLATE utf8mb4_bin NOT NULL,
+  `DESTINATION_NAME` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DESTINATION_KIND` varchar(20) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DESTINATION_INFORMATIONS` longtext COLLATE utf8mb4_bin,
+  `CONDITIONS` longtext COLLATE utf8mb4_bin,
+  `CREATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `CREATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  `LAST_UPDATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `LAST_UPDATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  PRIMARY KEY (`DESTINATION_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `M_NOTIFICATION_DESTINATION`
+--
+
+LOCK TABLES `M_NOTIFICATION_DESTINATION` WRITE;
+/*!40000 ALTER TABLE `M_NOTIFICATION_DESTINATION` DISABLE KEYS */;
+/*!40000 ALTER TABLE `M_NOTIFICATION_DESTINATION` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `T_NOTIFICATION_MESSAGE`
+--
+
+DROP TABLE IF EXISTS `T_NOTIFICATION_MESSAGE`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `T_NOTIFICATION_MESSAGE` (
+  `NOTIFICATION_ID` varchar(26) COLLATE utf8mb4_bin NOT NULL,
+  `DESTINATION_ID` varchar(36) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DESTINATION_NAME` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DESTINATION_KIND` varchar(20) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DESTINATION_INFORMATIONS` longtext COLLATE utf8mb4_bin,
+  `CONDITIONS` longtext COLLATE utf8mb4_bin,
+  `FUNC_ID` varchar(100) COLLATE utf8mb4_bin DEFAULT NULL,
+  `FUNC_INFORMATIONS` longtext COLLATE utf8mb4_bin,
+  `MESSAGE_INFORMATIONS` longtext COLLATE utf8mb4_bin,
+  `NOTIFICATION_STATUS` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  `NOTIFICATION_TIMESTAMP` datetime DEFAULT NULL,
+  `CREATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `CREATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  `LAST_UPDATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `LAST_UPDATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  PRIMARY KEY (`NOTIFICATION_ID`),
+  KEY `IDX_FUNC_ID` (`FUNC_ID`,`CREATE_TIMESTAMP`),
+  KEY `IDX_CREATE_TIMESTAMP` (`CREATE_TIMESTAMP`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `T_NOTIFICATION_MESSAGE`
+--
+
+LOCK TABLES `T_NOTIFICATION_MESSAGE` WRITE;
+/*!40000 ALTER TABLE `T_NOTIFICATION_MESSAGE` DISABLE KEYS */;
+/*!40000 ALTER TABLE `T_NOTIFICATION_MESSAGE` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Current Database: `PF_WS_S7S097DYE2F989RT75UD`
+--
+
+CREATE DATABASE /*!32312 IF NOT EXISTS*/ `PF_WS_S7S097DYE2F989RT75UD` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+
+USE `PF_WS_S7S097DYE2F989RT75UD`;
+
+--
+-- Table structure for table `M_NOTIFICATION_DESTINATION`
+--
+
+DROP TABLE IF EXISTS `M_NOTIFICATION_DESTINATION`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `M_NOTIFICATION_DESTINATION` (
+  `DESTINATION_ID` varchar(36) COLLATE utf8mb4_bin NOT NULL,
+  `DESTINATION_NAME` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DESTINATION_KIND` varchar(20) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DESTINATION_INFORMATIONS` longtext COLLATE utf8mb4_bin,
+  `CONDITIONS` longtext COLLATE utf8mb4_bin,
+  `CREATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `CREATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  `LAST_UPDATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `LAST_UPDATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  PRIMARY KEY (`DESTINATION_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `M_NOTIFICATION_DESTINATION`
+--
+
+LOCK TABLES `M_NOTIFICATION_DESTINATION` WRITE;
+/*!40000 ALTER TABLE `M_NOTIFICATION_DESTINATION` DISABLE KEYS */;
+/*!40000 ALTER TABLE `M_NOTIFICATION_DESTINATION` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `T_NOTIFICATION_MESSAGE`
+--
+
+DROP TABLE IF EXISTS `T_NOTIFICATION_MESSAGE`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `T_NOTIFICATION_MESSAGE` (
+  `NOTIFICATION_ID` varchar(26) COLLATE utf8mb4_bin NOT NULL,
+  `DESTINATION_ID` varchar(36) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DESTINATION_NAME` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DESTINATION_KIND` varchar(20) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DESTINATION_INFORMATIONS` longtext COLLATE utf8mb4_bin,
+  `CONDITIONS` longtext COLLATE utf8mb4_bin,
+  `FUNC_ID` varchar(100) COLLATE utf8mb4_bin DEFAULT NULL,
+  `FUNC_INFORMATIONS` longtext COLLATE utf8mb4_bin,
+  `MESSAGE_INFORMATIONS` longtext COLLATE utf8mb4_bin,
+  `NOTIFICATION_STATUS` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  `NOTIFICATION_TIMESTAMP` datetime DEFAULT NULL,
+  `CREATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `CREATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  `LAST_UPDATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `LAST_UPDATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  PRIMARY KEY (`NOTIFICATION_ID`),
+  KEY `IDX_FUNC_ID` (`FUNC_ID`,`CREATE_TIMESTAMP`),
+  KEY `IDX_CREATE_TIMESTAMP` (`CREATE_TIMESTAMP`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `T_NOTIFICATION_MESSAGE`
+--
+
+LOCK TABLES `T_NOTIFICATION_MESSAGE` WRITE;
+/*!40000 ALTER TABLE `T_NOTIFICATION_MESSAGE` DISABLE KEYS */;
+/*!40000 ALTER TABLE `T_NOTIFICATION_MESSAGE` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Current Database: `PF_WS_SXY64U0L40ODRDB1OFBD`
+--
+
+CREATE DATABASE /*!32312 IF NOT EXISTS*/ `PF_WS_SXY64U0L40ODRDB1OFBD` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+
+USE `PF_WS_SXY64U0L40ODRDB1OFBD`;
+
+--
+-- Table structure for table `M_NOTIFICATION_DESTINATION`
+--
+
+DROP TABLE IF EXISTS `M_NOTIFICATION_DESTINATION`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `M_NOTIFICATION_DESTINATION` (
+  `DESTINATION_ID` varchar(36) COLLATE utf8mb4_bin NOT NULL,
+  `DESTINATION_NAME` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DESTINATION_KIND` varchar(20) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DESTINATION_INFORMATIONS` longtext COLLATE utf8mb4_bin,
+  `CONDITIONS` longtext COLLATE utf8mb4_bin,
+  `CREATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `CREATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  `LAST_UPDATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `LAST_UPDATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  PRIMARY KEY (`DESTINATION_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `M_NOTIFICATION_DESTINATION`
+--
+
+LOCK TABLES `M_NOTIFICATION_DESTINATION` WRITE;
+/*!40000 ALTER TABLE `M_NOTIFICATION_DESTINATION` DISABLE KEYS */;
+/*!40000 ALTER TABLE `M_NOTIFICATION_DESTINATION` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `T_NOTIFICATION_MESSAGE`
+--
+
+DROP TABLE IF EXISTS `T_NOTIFICATION_MESSAGE`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `T_NOTIFICATION_MESSAGE` (
+  `NOTIFICATION_ID` varchar(26) COLLATE utf8mb4_bin NOT NULL,
+  `DESTINATION_ID` varchar(36) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DESTINATION_NAME` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DESTINATION_KIND` varchar(20) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DESTINATION_INFORMATIONS` longtext COLLATE utf8mb4_bin,
+  `CONDITIONS` longtext COLLATE utf8mb4_bin,
+  `FUNC_ID` varchar(100) COLLATE utf8mb4_bin DEFAULT NULL,
+  `FUNC_INFORMATIONS` longtext COLLATE utf8mb4_bin,
+  `MESSAGE_INFORMATIONS` longtext COLLATE utf8mb4_bin,
+  `NOTIFICATION_STATUS` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  `NOTIFICATION_TIMESTAMP` datetime DEFAULT NULL,
+  `CREATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `CREATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  `LAST_UPDATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `LAST_UPDATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  PRIMARY KEY (`NOTIFICATION_ID`),
+  KEY `IDX_FUNC_ID` (`FUNC_ID`,`CREATE_TIMESTAMP`),
+  KEY `IDX_CREATE_TIMESTAMP` (`CREATE_TIMESTAMP`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `T_NOTIFICATION_MESSAGE`
+--
+
+LOCK TABLES `T_NOTIFICATION_MESSAGE` WRITE;
+/*!40000 ALTER TABLE `T_NOTIFICATION_MESSAGE` DISABLE KEYS */;
+/*!40000 ALTER TABLE `T_NOTIFICATION_MESSAGE` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Current Database: `PF_WS_T8PWJZFUZH4OYRFAAO8Z`
+--
+
+CREATE DATABASE /*!32312 IF NOT EXISTS*/ `PF_WS_T8PWJZFUZH4OYRFAAO8Z` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+
+USE `PF_WS_T8PWJZFUZH4OYRFAAO8Z`;
+
+--
+-- Table structure for table `M_NOTIFICATION_DESTINATION`
+--
+
+DROP TABLE IF EXISTS `M_NOTIFICATION_DESTINATION`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `M_NOTIFICATION_DESTINATION` (
+  `DESTINATION_ID` varchar(36) COLLATE utf8mb4_bin NOT NULL,
+  `DESTINATION_NAME` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DESTINATION_KIND` varchar(20) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DESTINATION_INFORMATIONS` longtext COLLATE utf8mb4_bin,
+  `CONDITIONS` longtext COLLATE utf8mb4_bin,
+  `CREATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `CREATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  `LAST_UPDATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `LAST_UPDATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  PRIMARY KEY (`DESTINATION_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `M_NOTIFICATION_DESTINATION`
+--
+
+LOCK TABLES `M_NOTIFICATION_DESTINATION` WRITE;
+/*!40000 ALTER TABLE `M_NOTIFICATION_DESTINATION` DISABLE KEYS */;
+/*!40000 ALTER TABLE `M_NOTIFICATION_DESTINATION` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `T_NOTIFICATION_MESSAGE`
+--
+
+DROP TABLE IF EXISTS `T_NOTIFICATION_MESSAGE`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `T_NOTIFICATION_MESSAGE` (
+  `NOTIFICATION_ID` varchar(26) COLLATE utf8mb4_bin NOT NULL,
+  `DESTINATION_ID` varchar(36) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DESTINATION_NAME` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DESTINATION_KIND` varchar(20) COLLATE utf8mb4_bin DEFAULT NULL,
+  `DESTINATION_INFORMATIONS` longtext COLLATE utf8mb4_bin,
+  `CONDITIONS` longtext COLLATE utf8mb4_bin,
+  `FUNC_ID` varchar(100) COLLATE utf8mb4_bin DEFAULT NULL,
+  `FUNC_INFORMATIONS` longtext COLLATE utf8mb4_bin,
+  `MESSAGE_INFORMATIONS` longtext COLLATE utf8mb4_bin,
+  `NOTIFICATION_STATUS` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  `NOTIFICATION_TIMESTAMP` datetime DEFAULT NULL,
+  `CREATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `CREATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  `LAST_UPDATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `LAST_UPDATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  PRIMARY KEY (`NOTIFICATION_ID`),
+  KEY `IDX_FUNC_ID` (`FUNC_ID`,`CREATE_TIMESTAMP`),
+  KEY `IDX_CREATE_TIMESTAMP` (`CREATE_TIMESTAMP`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `T_NOTIFICATION_MESSAGE`
+--
+
+LOCK TABLES `T_NOTIFICATION_MESSAGE` WRITE;
+/*!40000 ALTER TABLE `T_NOTIFICATION_MESSAGE` DISABLE KEYS */;
+/*!40000 ALTER TABLE `T_NOTIFICATION_MESSAGE` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Current Database: `keycloak`
+--
+
+CREATE DATABASE /*!32312 IF NOT EXISTS*/ `keycloak` /*!40100 DEFAULT CHARACTER SET utf8mb3 */ /*!80016 DEFAULT ENCRYPTION='N' */;
+
+USE `keycloak`;
+
+--
+-- Table structure for table `ADMIN_EVENT_ENTITY`
+--
+
+DROP TABLE IF EXISTS `ADMIN_EVENT_ENTITY`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `ADMIN_EVENT_ENTITY` (
+  `ID` varchar(36) NOT NULL,
+  `ADMIN_EVENT_TIME` bigint DEFAULT NULL,
+  `REALM_ID` varchar(255) DEFAULT NULL,
+  `OPERATION_TYPE` varchar(255) DEFAULT NULL,
+  `AUTH_REALM_ID` varchar(255) DEFAULT NULL,
+  `AUTH_CLIENT_ID` varchar(255) DEFAULT NULL,
+  `AUTH_USER_ID` varchar(255) DEFAULT NULL,
+  `IP_ADDRESS` varchar(255) DEFAULT NULL,
+  `RESOURCE_PATH` text,
+  `REPRESENTATION` text,
+  `ERROR` varchar(255) DEFAULT NULL,
+  `RESOURCE_TYPE` varchar(64) DEFAULT NULL,
+  PRIMARY KEY (`ID`),
+  KEY `IDX_ADMIN_EVENT_TIME` (`REALM_ID`,`ADMIN_EVENT_TIME`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ADMIN_EVENT_ENTITY`
+--
+
+LOCK TABLES `ADMIN_EVENT_ENTITY` WRITE;
+/*!40000 ALTER TABLE `ADMIN_EVENT_ENTITY` DISABLE KEYS */;
+INSERT INTO `ADMIN_EVENT_ENTITY` VALUES ('03f6714a-6c4f-4108-80f2-c7479acab856',1709175172541,'org1','CREATE','org1','d321d481-bc24-4294-af2c-7907fd6529b0','2e008a28-22ba-4bec-94c3-f26482afb61b','172.18.0.8','clients/d321d481-bc24-4294-af2c-7907fd6529b0/roles/ws1','{\"id\":\"d36dd5c8-7ece-41a2-b226-5b0a94f449ba\",\"name\":\"ws1\",\"composite\":false,\"attributes\":{\"kind\":[\"workspace\"]}}',NULL,'CLIENT_ROLE'),('04801eb6-f496-4755-a3af-0e713e8f8d6c',1709175232508,'org4','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/311ebcfe-7467-459c-856a-862094332329','{\"id\":\"311ebcfe-7467-459c-856a-862094332329\",\"clientId\":\"org4-workspaces\",\"surrogateAuthRequired\":false,\"enabled\":true,\"alwaysDisplayInConsole\":false,\"clientAuthenticatorType\":\"client-secret\",\"redirectUris\":[],\"webOrigins\":[],\"notBefore\":0,\"bearerOnly\":false,\"consentRequired\":false,\"standardFlowEnabled\":false,\"implicitFlowEnabled\":false,\"directAccessGrantsEnabled\":true,\"serviceAccountsEnabled\":true,\"publicClient\":false,\"frontchannelLogout\":false,\"protocol\":\"openid-connect\",\"attributes\":{\"id.token.as.detached.signature\":\"false\",\"saml.assertion.signature\":\"false\",\"saml.force.post.binding\":\"false\",\"saml.multivalued.roles\":\"false\",\"saml.encrypt\":\"false\",\"oauth2.device.authorization.grant.enabled\":\"false\",\"backchannel.logout.revoke.offline.tokens\":\"false\",\"saml.server.signature\":\"false\",\"saml.server.signature.keyinfo.ext\":\"false\",\"use.refresh.tokens\":\"true\",\"exclude.session.state.from.auth.response\":\"false\",\"oidc.ciba.grant.enabled\":\"false\",\"saml.artifact.binding\":\"false\",\"backchannel.logout.session.required\":\"true\",\"client_credentials.use_refresh_token\":\"false\",\"saml_force_name_id_format\":\"false\",\"require.pushed.authorization.requests\":\"false\",\"saml.client.signature\":\"false\",\"tls.client.certificate.bound.access.tokens\":\"false\",\"saml.authnstatement\":\"false\",\"display.on.consent.screen\":\"false\",\"saml.onetimeuse.condition\":\"false\"},\"authenticationFlowBindingOverrides\":{},\"fullScopeAllowed\":true,\"nodeReRegistrationTimeout\":-1,\"protocolMappers\":[{\"name\":\"Client Host\",\"protocol\":\"openid-connect\",\"protocolMapper\":\"oidc-usersessionmodel-note-mapper\",\"consentRequired\":false,\"config\":{\"user.session.note\":\"clientHost\",\"userinfo.token.claim\":\"true\",\"id.token.claim\":\"true\",\"access.token.claim\":\"true\",\"claim.name\":\"clientHost\",\"jsonType.label\":\"String\"}},{\"name\":\"Client IP Address\",\"protocol\":\"openid-connect\",\"protocolMapper\":\"oidc-usersessionmodel-note-mapper\",\"consentRequired\":false,\"config\":{\"user.session.note\":\"clientAddress\",\"userinfo.token.claim\":\"true\",\"id.token.claim\":\"true\",\"access.token.claim\":\"true\",\"claim.name\":\"clientAddress\",\"jsonType.label\":\"String\"}},{\"name\":\"Client ID\",\"protocol\":\"openid-connect\",\"protocolMapper\":\"oidc-usersessionmodel-note-mapper\",\"consentRequired\":false,\"config\":{\"user.session.note\":\"clientId\",\"userinfo.token.claim\":\"true\",\"id.token.claim\":\"true\",\"access.token.claim\":\"true\",\"claim.name\":\"clientId\",\"jsonType.label\":\"String\"}}],\"defaultClientScopes\":[\"web-origins\",\"profile\",\"roles\",\"email\"],\"optionalClientScopes\":[\"address\",\"phone\",\"offline_access\",\"microprofile-jwt\"],\"access\":{\"view\":true,\"configure\":true,\"manage\":true}}',NULL,'CLIENT'),('0582a5b6-58a6-462e-8474-21e6017c72ae',1709175210909,'org3','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/c28dd0b0-60ed-40df-91db-0d9b1e14074b','{\"id\":\"c28dd0b0-60ed-40df-91db-0d9b1e14074b\",\"clientId\":\"org3-workspaces\",\"surrogateAuthRequired\":false,\"enabled\":true,\"alwaysDisplayInConsole\":false,\"clientAuthenticatorType\":\"client-secret\",\"redirectUris\":[],\"webOrigins\":[],\"notBefore\":0,\"bearerOnly\":false,\"consentRequired\":false,\"standardFlowEnabled\":false,\"implicitFlowEnabled\":false,\"directAccessGrantsEnabled\":true,\"serviceAccountsEnabled\":true,\"publicClient\":false,\"frontchannelLogout\":false,\"protocol\":\"openid-connect\",\"attributes\":{\"id.token.as.detached.signature\":\"false\",\"saml.assertion.signature\":\"false\",\"saml.force.post.binding\":\"false\",\"saml.multivalued.roles\":\"false\",\"saml.encrypt\":\"false\",\"oauth2.device.authorization.grant.enabled\":\"false\",\"backchannel.logout.revoke.offline.tokens\":\"false\",\"saml.server.signature\":\"false\",\"saml.server.signature.keyinfo.ext\":\"false\",\"use.refresh.tokens\":\"true\",\"exclude.session.state.from.auth.response\":\"false\",\"oidc.ciba.grant.enabled\":\"false\",\"saml.artifact.binding\":\"false\",\"backchannel.logout.session.required\":\"true\",\"client_credentials.use_refresh_token\":\"false\",\"saml_force_name_id_format\":\"false\",\"require.pushed.authorization.requests\":\"false\",\"saml.client.signature\":\"false\",\"tls.client.certificate.bound.access.tokens\":\"false\",\"saml.authnstatement\":\"false\",\"display.on.consent.screen\":\"false\",\"saml.onetimeuse.condition\":\"false\"},\"authenticationFlowBindingOverrides\":{},\"fullScopeAllowed\":true,\"nodeReRegistrationTimeout\":-1,\"protocolMappers\":[{\"name\":\"Client Host\",\"protocol\":\"openid-connect\",\"protocolMapper\":\"oidc-usersessionmodel-note-mapper\",\"consentRequired\":false,\"config\":{\"user.session.note\":\"clientHost\",\"userinfo.token.claim\":\"true\",\"id.token.claim\":\"true\",\"access.token.claim\":\"true\",\"claim.name\":\"clientHost\",\"jsonType.label\":\"String\"}},{\"name\":\"Client IP Address\",\"protocol\":\"openid-connect\",\"protocolMapper\":\"oidc-usersessionmodel-note-mapper\",\"consentRequired\":false,\"config\":{\"user.session.note\":\"clientAddress\",\"userinfo.token.claim\":\"true\",\"id.token.claim\":\"true\",\"access.token.claim\":\"true\",\"claim.name\":\"clientAddress\",\"jsonType.label\":\"String\"}},{\"name\":\"Client ID\",\"protocol\":\"openid-connect\",\"protocolMapper\":\"oidc-usersessionmodel-note-mapper\",\"consentRequired\":false,\"config\":{\"user.session.note\":\"clientId\",\"userinfo.token.claim\":\"true\",\"id.token.claim\":\"true\",\"access.token.claim\":\"true\",\"claim.name\":\"clientId\",\"jsonType.label\":\"String\"}}],\"defaultClientScopes\":[\"web-origins\",\"profile\",\"roles\",\"email\"],\"optionalClientScopes\":[\"address\",\"phone\",\"offline_access\",\"microprofile-jwt\"],\"access\":{\"view\":true,\"configure\":true,\"manage\":true}}',NULL,'CLIENT'),('0658a36f-0feb-41a3-a669-527034fadf58',1709175211631,'org3','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/c28dd0b0-60ed-40df-91db-0d9b1e14074b/roles/_og-ws-mt','{\"id\":\"67502093-a88c-4084-b691-4e6096710ac2\",\"name\":\"_og-ws-mt\",\"composite\":false}',NULL,'CLIENT_ROLE'),('08774ca8-916e-4366-a25f-86d07d0445a7',1709175222422,'org3','CREATE','org3','c28dd0b0-60ed-40df-91db-0d9b1e14074b','e74edb4f-b238-4208-8996-dd6ab65ec257','172.18.0.8','clients/b0475217-c11a-49f5-833c-33aaee237a25/roles/_ws3-admin','{\"id\":\"9efaac6f-2cfc-4cfa-b4b1-5e400b184d52\",\"name\":\"_ws3-admin\",\"composite\":false,\"attributes\":{\"kind\":[\"workspace\"]}}',NULL,'CLIENT_ROLE'),('0a3115bd-fc03-4358-8cfd-0d136a40de32',1709175165578,'org1','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/1b5f5d7e-5c2b-4687-8450-d38949728f18','{\"id\":\"1b5f5d7e-5c2b-4687-8450-d38949728f18\",\"clientId\":\"_org1-api\",\"surrogateAuthRequired\":false,\"enabled\":true,\"alwaysDisplayInConsole\":false,\"clientAuthenticatorType\":\"client-secret\",\"redirectUris\":[],\"webOrigins\":[],\"notBefore\":0,\"bearerOnly\":false,\"consentRequired\":false,\"standardFlowEnabled\":false,\"implicitFlowEnabled\":false,\"directAccessGrantsEnabled\":true,\"serviceAccountsEnabled\":false,\"publicClient\":true,\"frontchannelLogout\":false,\"protocol\":\"openid-connect\",\"attributes\":{\"access.token.lifespan\":\"86400\",\"saml.force.post.binding\":\"false\",\"saml.multivalued.roles\":\"false\",\"frontchannel.logout.session.required\":\"false\",\"oauth2.device.authorization.grant.enabled\":\"false\",\"backchannel.logout.revoke.offline.tokens\":\"false\",\"saml.server.signature.keyinfo.ext\":\"false\",\"use.refresh.tokens\":\"true\",\"oidc.ciba.grant.enabled\":\"false\",\"backchannel.logout.session.required\":\"true\",\"client_credentials.use_refresh_token\":\"false\",\"require.pushed.authorization.requests\":\"false\",\"saml.client.signature\":\"false\",\"client.session.max.lifespan\":\"86400\",\"saml.allow.ecp.flow\":\"false\",\"client.session.idle.timeout\":\"86400\",\"id.token.as.detached.signature\":\"false\",\"saml.assertion.signature\":\"false\",\"saml.encrypt\":\"false\",\"saml.server.signature\":\"false\",\"exclude.session.state.from.auth.response\":\"false\",\"saml.artifact.binding\":\"false\",\"saml_force_name_id_format\":\"false\",\"acr.loa.map\":\"{}\",\"tls.client.certificate.bound.access.tokens\":\"false\",\"saml.authnstatement\":\"false\",\"display.on.consent.screen\":\"false\",\"token.response.type.bearer.lower-case\":\"false\",\"saml.onetimeuse.condition\":\"false\"},\"authenticationFlowBindingOverrides\":{},\"fullScopeAllowed\":true,\"nodeReRegistrationTimeout\":-1,\"defaultClientScopes\":[\"web-origins\",\"acr\",\"profile\",\"roles\",\"email\"],\"optionalClientScopes\":[\"address\",\"phone\",\"offline_access\",\"microprofile-jwt\"]}',NULL,'CLIENT'),('0a6fb4dd-2ab1-4c71-8544-e809362eb488',1709175233721,'org4','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/5a324cc2-4d44-46de-9c51-9afcc3c1adda/roles/_organization-user-manager','{\"id\":\"863f3c33-4fa1-47ed-bd69-955f715becad\",\"name\":\"_organization-user-manager\",\"composite\":false,\"attributes\":{\"kind\":[\"organization\"]}}',NULL,'CLIENT_ROLE'),('0af93214-e2ae-4a89-abc1-053d87d8aa28',1709175194936,'org2','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/a15e680b-47bb-4b94-a832-5ca99cdbe134/roles/_organization-user-role-manager','{\"id\":\"ed069635-3623-4e37-a85d-680301a31500\",\"name\":\"_organization-user-role-manager\",\"composite\":false,\"attributes\":{\"kind\":[\"organization\"]}}',NULL,'CLIENT_ROLE'),('0bfbb88e-9e4c-4897-a747-47e043988d19',1709175254489,'org4','CREATE','org4','311ebcfe-7467-459c-856a-862094332329','0eb52a14-0c83-4db6-b40b-19355bfc54ae','172.18.0.8','users/56cae199-4b66-451c-a310-9dec3f649490/role-mappings/clients/5a324cc2-4d44-46de-9c51-9afcc3c1adda','[{\"id\":\"fafdd08b-02fa-45e9-bc40-15befb734572\",\"name\":\"_ws3-admin\",\"composite\":true,\"clientRole\":true,\"containerId\":\"5a324cc2-4d44-46de-9c51-9afcc3c1adda\",\"attributes\":{\"kind\":[\"workspace\"]}}]',NULL,'CLIENT_ROLE_MAPPING'),('0f6ea8c5-a9c3-48ac-836e-3f96c982d229',1709175264086,'org5','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/8f492599-c8fb-4bce-af8a-34f41e0f5b74','{\"id\":\"8f492599-c8fb-4bce-af8a-34f41e0f5b74\",\"clientId\":\"system-org5-auth\",\"surrogateAuthRequired\":false,\"enabled\":true,\"alwaysDisplayInConsole\":false,\"clientAuthenticatorType\":\"client-secret\",\"redirectUris\":[],\"webOrigins\":[],\"notBefore\":0,\"bearerOnly\":true,\"consentRequired\":false,\"standardFlowEnabled\":true,\"implicitFlowEnabled\":false,\"directAccessGrantsEnabled\":true,\"serviceAccountsEnabled\":false,\"publicClient\":false,\"frontchannelLogout\":false,\"protocol\":\"openid-connect\",\"attributes\":{\"id.token.as.detached.signature\":\"false\",\"saml.assertion.signature\":\"false\",\"saml.force.post.binding\":\"false\",\"saml.multivalued.roles\":\"false\",\"saml.encrypt\":\"false\",\"oauth2.device.authorization.grant.enabled\":\"false\",\"backchannel.logout.revoke.offline.tokens\":\"false\",\"saml.server.signature\":\"false\",\"saml.server.signature.keyinfo.ext\":\"false\",\"use.refresh.tokens\":\"true\",\"exclude.session.state.from.auth.response\":\"false\",\"oidc.ciba.grant.enabled\":\"false\",\"saml.artifact.binding\":\"false\",\"backchannel.logout.session.required\":\"true\",\"client_credentials.use_refresh_token\":\"false\",\"saml_force_name_id_format\":\"false\",\"require.pushed.authorization.requests\":\"false\",\"saml.client.signature\":\"false\",\"tls.client.certificate.bound.access.tokens\":\"false\",\"saml.authnstatement\":\"false\",\"display.on.consent.screen\":\"false\",\"saml.onetimeuse.condition\":\"false\"},\"authenticationFlowBindingOverrides\":{},\"fullScopeAllowed\":true,\"nodeReRegistrationTimeout\":-1,\"defaultClientScopes\":[\"web-origins\",\"profile\",\"roles\",\"email\"],\"optionalClientScopes\":[\"address\",\"phone\",\"offline_access\",\"microprofile-jwt\"],\"access\":{\"view\":true,\"configure\":true,\"manage\":true}}',NULL,'CLIENT'),('108e9246-3c23-4038-895d-4feb97f7456b',1709175233772,'org4','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/5a324cc2-4d44-46de-9c51-9afcc3c1adda/roles/_organization-user-manager/composites','[{\"id\":\"e90549ec-b55c-4237-9d4d-d42c50458309\",\"name\":\"_og-usr-mt\",\"composite\":false,\"clientRole\":true,\"containerId\":\"311ebcfe-7467-459c-856a-862094332329\",\"attributes\":{}},{\"id\":\"f8e6ce80-6747-4cbc-9eef-c6b48d8c9d24\",\"name\":\"_og-ws-role-usr\",\"composite\":false,\"clientRole\":true,\"containerId\":\"311ebcfe-7467-459c-856a-862094332329\",\"attributes\":{}}]',NULL,'CLIENT_ROLE'),('10957409-6797-4c26-8930-8a067fdb96e6',1709175264451,'org5','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/690481d3-310d-4227-a8eb-eee2db8d1b25','{\"id\":\"690481d3-310d-4227-a8eb-eee2db8d1b25\",\"clientId\":\"_org5-api\",\"surrogateAuthRequired\":false,\"enabled\":true,\"alwaysDisplayInConsole\":false,\"clientAuthenticatorType\":\"client-secret\",\"redirectUris\":[],\"webOrigins\":[],\"notBefore\":0,\"bearerOnly\":false,\"consentRequired\":false,\"standardFlowEnabled\":false,\"implicitFlowEnabled\":false,\"directAccessGrantsEnabled\":true,\"serviceAccountsEnabled\":false,\"publicClient\":true,\"frontchannelLogout\":false,\"protocol\":\"openid-connect\",\"attributes\":{\"access.token.lifespan\":\"86400\",\"saml.force.post.binding\":\"false\",\"saml.multivalued.roles\":\"false\",\"frontchannel.logout.session.required\":\"false\",\"oauth2.device.authorization.grant.enabled\":\"false\",\"backchannel.logout.revoke.offline.tokens\":\"false\",\"saml.server.signature.keyinfo.ext\":\"false\",\"use.refresh.tokens\":\"true\",\"oidc.ciba.grant.enabled\":\"false\",\"backchannel.logout.session.required\":\"true\",\"client_credentials.use_refresh_token\":\"false\",\"require.pushed.authorization.requests\":\"false\",\"saml.client.signature\":\"false\",\"client.session.max.lifespan\":\"86400\",\"saml.allow.ecp.flow\":\"false\",\"client.session.idle.timeout\":\"86400\",\"id.token.as.detached.signature\":\"false\",\"saml.assertion.signature\":\"false\",\"saml.encrypt\":\"false\",\"saml.server.signature\":\"false\",\"exclude.session.state.from.auth.response\":\"false\",\"saml.artifact.binding\":\"false\",\"saml_force_name_id_format\":\"false\",\"acr.loa.map\":\"{}\",\"tls.client.certificate.bound.access.tokens\":\"false\",\"saml.authnstatement\":\"false\",\"display.on.consent.screen\":\"false\",\"token.response.type.bearer.lower-case\":\"false\",\"saml.onetimeuse.condition\":\"false\"},\"authenticationFlowBindingOverrides\":{},\"fullScopeAllowed\":true,\"nodeReRegistrationTimeout\":-1,\"defaultClientScopes\":[\"web-origins\",\"acr\",\"profile\",\"roles\",\"email\"],\"optionalClientScopes\":[\"address\",\"phone\",\"offline_access\",\"microprofile-jwt\"]}',NULL,'CLIENT'),('10af43ab-f7b5-4e89-9f9c-c8a38ddeb51d',1709175205127,'org2','CREATE','org2','a0d96aa1-71ac-4a7e-a769-306baf1c51fc','8a37f068-a80b-4b4b-82a8-5a4c40c51869','172.18.0.8','clients/a15e680b-47bb-4b94-a832-5ca99cdbe134/roles/_ws3-admin/composites','[{\"id\":\"c2180217-3bf3-45fa-acb3-90dd20ef3772\",\"name\":\"ws3\",\"composite\":false,\"clientRole\":true,\"containerId\":\"a0d96aa1-71ac-4a7e-a769-306baf1c51fc\",\"attributes\":{\"kind\":[\"workspace\"]}},{\"id\":\"e182bbbc-5ce2-4f01-8011-8a858f41d66b\",\"name\":\"_ws3-admin\",\"composite\":false,\"clientRole\":true,\"containerId\":\"a0d96aa1-71ac-4a7e-a769-306baf1c51fc\",\"attributes\":{\"kind\":[\"workspace\"]}}]',NULL,'CLIENT_ROLE'),('11a46186-82c1-4159-bd61-4ae88fa4e023',1709175181080,'org1','CREATE','org1','d321d481-bc24-4294-af2c-7907fd6529b0','2e008a28-22ba-4bec-94c3-f26482afb61b','172.18.0.8','clients/d321d481-bc24-4294-af2c-7907fd6529b0/roles/_ws2-admin','{\"id\":\"43174789-3363-408b-81f6-dda1f17a1e5a\",\"name\":\"_ws2-admin\",\"composite\":false,\"attributes\":{\"kind\":[\"workspace\"]}}',NULL,'CLIENT_ROLE'),('11d3ed05-8fb9-4616-b1b5-8afb53082aa8',1709175233613,'org4','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/5a324cc2-4d44-46de-9c51-9afcc3c1adda/roles/_organization-user-role-manager','{\"id\":\"4f7f75e5-3cf9-4b4a-91b8-d6381d0e7abe\",\"name\":\"_organization-user-role-manager\",\"composite\":false,\"attributes\":{\"kind\":[\"organization\"]}}',NULL,'CLIENT_ROLE'),('12fadc88-8dc5-40e5-a3b7-45d8eb765a9c',1709175236084,'org4','CREATE','org4','311ebcfe-7467-459c-856a-862094332329','0eb52a14-0c83-4db6-b40b-19355bfc54ae','172.18.0.8','clients/311ebcfe-7467-459c-856a-862094332329/roles/_ws1-admin','{\"id\":\"daa0af79-c06f-4116-a234-f5196fe38ad5\",\"name\":\"_ws1-admin\",\"composite\":false,\"attributes\":{\"kind\":[\"workspace\"]}}',NULL,'CLIENT_ROLE'),('13687d7b-873f-466e-97de-4cc9b790a9a5',1709175233148,'org4','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/311ebcfe-7467-459c-856a-862094332329/roles/_og-own-mt','{\"id\":\"f643d9a4-309a-4cb3-8b8d-9cc8b71a342e\",\"name\":\"_og-own-mt\",\"composite\":false}',NULL,'CLIENT_ROLE'),('143f68d9-d132-4116-b94a-acdf4b4821e4',1709175265258,'org5','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/3d62cf66-73c8-4ec7-ba0f-2b622bc5c747/roles/_organization-user-role-manager','{\"id\":\"2b587f58-af59-4e82-8253-0aca06d1138f\",\"name\":\"_organization-user-role-manager\",\"composite\":false,\"attributes\":{\"kind\":[\"organization\"]}}',NULL,'CLIENT_ROLE'),('16fb892f-60bc-4bc0-b754-7da9c7337fdc',1709175172631,'org1','CREATE','org1','d321d481-bc24-4294-af2c-7907fd6529b0','2e008a28-22ba-4bec-94c3-f26482afb61b','172.18.0.8','clients/16fe410e-f1df-4ce0-b445-8dd3b5b80750/roles/_ws1-admin','{\"id\":\"94d463bc-0ba6-4d80-85f4-e63860357f80\",\"name\":\"_ws1-admin\",\"composite\":false,\"attributes\":{\"kind\":[\"workspace\"]}}',NULL,'CLIENT_ROLE'),('172327b2-7dc3-49bf-a9b4-e0c36133b7ca',1709175222510,'org3','CREATE','org3','c28dd0b0-60ed-40df-91db-0d9b1e14074b','e74edb4f-b238-4208-8996-dd6ab65ec257','172.18.0.8','users/98b18f6f-d105-437a-92f2-fb863b59805c/role-mappings/clients/b0475217-c11a-49f5-833c-33aaee237a25','[{\"id\":\"9efaac6f-2cfc-4cfa-b4b1-5e400b184d52\",\"name\":\"_ws3-admin\",\"composite\":true,\"clientRole\":true,\"containerId\":\"b0475217-c11a-49f5-833c-33aaee237a25\",\"attributes\":{\"kind\":[\"workspace\"]}}]',NULL,'CLIENT_ROLE_MAPPING'),('17b8a652-565b-43ec-b011-a4023b7fb9bf',1709175212143,'org3','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','users/e74edb4f-b238-4208-8996-dd6ab65ec257/role-mappings/clients/5bfeb038-8be1-4744-bc58-74432ff827c6','[{\"id\":\"770dbf71-b9d5-4983-b9b8-79d32f64e172\",\"name\":\"realm-admin\",\"description\":\"${role_realm-admin}\",\"composite\":true,\"clientRole\":true,\"containerId\":\"5bfeb038-8be1-4744-bc58-74432ff827c6\",\"attributes\":{}}]',NULL,'CLIENT_ROLE_MAPPING'),('17fdc931-cc2e-43ac-8689-6a88c9b54e27',1709175166050,'org1','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/d321d481-bc24-4294-af2c-7907fd6529b0/roles/_og-upd','{\"id\":\"53507c5e-b647-4eec-af29-43cd2bb96016\",\"name\":\"_og-upd\",\"composite\":false}',NULL,'CLIENT_ROLE'),('18a1fc3a-5561-4305-a00f-4306497d3841',1709175185703,'org1','CREATE','org1','d321d481-bc24-4294-af2c-7907fd6529b0','2e008a28-22ba-4bec-94c3-f26482afb61b','172.18.0.8','clients/d321d481-bc24-4294-af2c-7907fd6529b0/roles/_ws3-admin','{\"id\":\"11b02ef2-cac3-4420-b878-26ab43bc8d69\",\"name\":\"_ws3-admin\",\"composite\":false,\"attributes\":{\"kind\":[\"workspace\"]}}',NULL,'CLIENT_ROLE'),('1c52dca1-e85f-4a8b-a4bd-e2fb0b72264e',1709175166292,'org1','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/d321d481-bc24-4294-af2c-7907fd6529b0/roles/_og-ws-role-mt','{\"id\":\"5d498f7a-28f1-4862-8633-61e026cafff4\",\"name\":\"_og-ws-role-mt\",\"composite\":false}',NULL,'CLIENT_ROLE'),('228dd1b8-55bf-43c4-b84a-c2f9c47304cb',1709175205070,'org2','CREATE','org2','a0d96aa1-71ac-4a7e-a769-306baf1c51fc','8a37f068-a80b-4b4b-82a8-5a4c40c51869','172.18.0.8','clients/a15e680b-47bb-4b94-a832-5ca99cdbe134/roles/_ws3-admin','{\"id\":\"96bd2210-1fcb-4deb-8fbb-563e0ca8f654\",\"name\":\"_ws3-admin\",\"composite\":false,\"attributes\":{\"kind\":[\"workspace\"]}}',NULL,'CLIENT_ROLE'),('22dbe3fb-81c5-49d5-a09a-a4aae3d6a7ea',1709175194672,'org2','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/a0d96aa1-71ac-4a7e-a769-306baf1c51fc/roles/_og-ws-mt','{\"id\":\"60530a2c-05f2-4ac7-b93e-734c1377dc84\",\"name\":\"_og-ws-mt\",\"composite\":false}',NULL,'CLIENT_ROLE'),('2365b7f1-93b0-47ff-9fa6-d5ce55fc2e7f',1709175196250,'org2','UPDATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8',NULL,'{\"enabled\":true}',NULL,'REALM'),('24717a4c-610f-4da1-9d89-77e64aa03f9d',1709175236120,'org4','CREATE','org4','311ebcfe-7467-459c-856a-862094332329','0eb52a14-0c83-4db6-b40b-19355bfc54ae','172.18.0.8','clients/5a324cc2-4d44-46de-9c51-9afcc3c1adda/roles/_ws1-admin','{\"id\":\"7e3a6f58-62a1-4ea9-bb50-5f24d545ec50\",\"name\":\"_ws1-admin\",\"composite\":false,\"attributes\":{\"kind\":[\"workspace\"]}}',NULL,'CLIENT_ROLE'),('24db752c-834c-4c93-a4e9-8ab151310619',1709175196522,'org2','CREATE','org2','a0d96aa1-71ac-4a7e-a769-306baf1c51fc','8a37f068-a80b-4b4b-82a8-5a4c40c51869','172.18.0.8','clients/a0d96aa1-71ac-4a7e-a769-306baf1c51fc/roles/ws1','{\"id\":\"fb06b2e5-a3af-40bb-8a0f-453184845a6b\",\"name\":\"ws1\",\"composite\":false,\"attributes\":{\"kind\":[\"workspace\"]}}',NULL,'CLIENT_ROLE'),('276797dd-22d5-4665-9274-1bc274c84aef',1709175211544,'org3','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/c28dd0b0-60ed-40df-91db-0d9b1e14074b/roles/_og-usage','{\"id\":\"7cbae974-9824-4c76-8f46-9c30af199a16\",\"name\":\"_og-usage\",\"composite\":false}',NULL,'CLIENT_ROLE'),('28e3ad32-c8e0-4259-92ac-c26fa2ffc9f8',1709175222473,'org3','CREATE','org3','c28dd0b0-60ed-40df-91db-0d9b1e14074b','e74edb4f-b238-4208-8996-dd6ab65ec257','172.18.0.8','clients/b0475217-c11a-49f5-833c-33aaee237a25/roles/_ws3-admin/composites','[{\"id\":\"495fa361-8cfe-4d98-98be-d1ec7a00469a\",\"name\":\"ws3\",\"composite\":false,\"clientRole\":true,\"containerId\":\"c28dd0b0-60ed-40df-91db-0d9b1e14074b\",\"attributes\":{\"kind\":[\"workspace\"]}},{\"id\":\"734c9a9f-b357-4f12-afe0-967048b091fb\",\"name\":\"_ws3-admin\",\"composite\":false,\"clientRole\":true,\"containerId\":\"c28dd0b0-60ed-40df-91db-0d9b1e14074b\",\"attributes\":{\"kind\":[\"workspace\"]}}]',NULL,'CLIENT_ROLE'),('291a0c3a-c20f-4523-954b-179f2c3fee78',1709175264749,'org5','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/01f89460-aba4-42ec-8eb3-f3c2d23cfbc2/roles/_og-usage','{\"id\":\"45c2fe61-d5d0-4044-912c-13dcbaa3e873\",\"name\":\"_og-usage\",\"composite\":false}',NULL,'CLIENT_ROLE'),('29673f2e-4a5d-4b0e-b703-61bc1e497bc5',1709175234123,'org4','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','users/56cae199-4b66-451c-a310-9dec3f649490','{\"username\":\"admin\",\"enabled\":true,\"firstName\":\"admin\",\"lastName\":\"admin\",\"email\":\"admin@example.com\",\"credentials\":[{\"type\":\"password\",\"value\":\"password\",\"temporary\":false}],\"requiredActions\":[]}',NULL,'USER'),('29e7ac77-b543-43ee-b315-b8e4c625c104',1709175201145,'org2','CREATE','org2','a0d96aa1-71ac-4a7e-a769-306baf1c51fc','8a37f068-a80b-4b4b-82a8-5a4c40c51869','172.18.0.8','clients/a15e680b-47bb-4b94-a832-5ca99cdbe134/roles/_ws2-admin','{\"id\":\"9201ee66-0e4c-4d92-ab9e-2120a7390dab\",\"name\":\"_ws2-admin\",\"composite\":false,\"attributes\":{\"kind\":[\"workspace\"]}}',NULL,'CLIENT_ROLE'),('2d867566-8d9b-40c2-b81b-880c71fa70b1',1709175233104,'org4','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/311ebcfe-7467-459c-856a-862094332329/roles/_og-upd','{\"id\":\"84ea6a9b-1895-4b25-a70a-078a00c98a9d\",\"name\":\"_og-upd\",\"composite\":false}',NULL,'CLIENT_ROLE'),('2e6b329f-38e6-4795-aef5-63e9dd737f92',1709175201203,'org2','CREATE','org2','a0d96aa1-71ac-4a7e-a769-306baf1c51fc','8a37f068-a80b-4b4b-82a8-5a4c40c51869','172.18.0.8','clients/a15e680b-47bb-4b94-a832-5ca99cdbe134/roles/_ws2-admin/composites','[{\"id\":\"0a925b92-087a-4c5e-aaed-85505bb9eb59\",\"name\":\"ws2\",\"composite\":false,\"clientRole\":true,\"containerId\":\"a0d96aa1-71ac-4a7e-a769-306baf1c51fc\",\"attributes\":{\"kind\":[\"workspace\"]}},{\"id\":\"2e1da019-ad74-4c8e-be8e-d8fcbf47e62c\",\"name\":\"_ws2-admin\",\"composite\":false,\"clientRole\":true,\"containerId\":\"a0d96aa1-71ac-4a7e-a769-306baf1c51fc\",\"attributes\":{\"kind\":[\"workspace\"]}}]',NULL,'CLIENT_ROLE'),('2eba95d7-a85d-4960-a40f-f3837da50e87',1709175265572,'org5','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','users/47ce89fe-bcd3-45ef-9925-2f6cffef721b/role-mappings/clients/8b27a0d1-98ac-4f83-affe-b80ecdd626ef','[{\"id\":\"e349c309-f0a0-4d1a-bce8-7eacb93461ba\",\"name\":\"realm-admin\",\"description\":\"${role_realm-admin}\",\"composite\":true,\"clientRole\":true,\"containerId\":\"8b27a0d1-98ac-4f83-affe-b80ecdd626ef\",\"attributes\":{}}]',NULL,'CLIENT_ROLE_MAPPING'),('2f50db53-957c-4d51-bd63-926362b13087',1709175196544,'org2','CREATE','org2','a0d96aa1-71ac-4a7e-a769-306baf1c51fc','8a37f068-a80b-4b4b-82a8-5a4c40c51869','172.18.0.8','clients/a0d96aa1-71ac-4a7e-a769-306baf1c51fc/roles/_ws1-admin','{\"id\":\"3ad05f10-f903-4cb2-8925-a2be6c8994f1\",\"name\":\"_ws1-admin\",\"composite\":false,\"attributes\":{\"kind\":[\"workspace\"]}}',NULL,'CLIENT_ROLE'),('2fdf131b-69ba-46ec-a53b-140ed2c7c1c7',1709175212014,'org3','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/b0475217-c11a-49f5-833c-33aaee237a25/roles/_organization-user-manager/composites','[{\"id\":\"7edf6052-a64a-4413-8b79-732b90806c24\",\"name\":\"_og-usr-mt\",\"composite\":false,\"clientRole\":true,\"containerId\":\"c28dd0b0-60ed-40df-91db-0d9b1e14074b\",\"attributes\":{}},{\"id\":\"8709f3c7-2db7-4820-8b4c-2e6d4553819a\",\"name\":\"_og-ws-role-usr\",\"composite\":false,\"clientRole\":true,\"containerId\":\"c28dd0b0-60ed-40df-91db-0d9b1e14074b\",\"attributes\":{}}]',NULL,'CLIENT_ROLE'),('32902fa2-2eb6-4408-8870-12ea37c51cd0',1709175201127,'org2','CREATE','org2','a0d96aa1-71ac-4a7e-a769-306baf1c51fc','8a37f068-a80b-4b4b-82a8-5a4c40c51869','172.18.0.8','clients/a0d96aa1-71ac-4a7e-a769-306baf1c51fc/roles/_ws2-admin','{\"id\":\"2e1da019-ad74-4c8e-be8e-d8fcbf47e62c\",\"name\":\"_ws2-admin\",\"composite\":false,\"attributes\":{\"kind\":[\"workspace\"]}}',NULL,'CLIENT_ROLE'),('32973b9d-0290-4849-b24c-ff10d29ce559',1709175236278,'org4','CREATE','org4','311ebcfe-7467-459c-856a-862094332329','0eb52a14-0c83-4db6-b40b-19355bfc54ae','172.18.0.8','users/56cae199-4b66-451c-a310-9dec3f649490/role-mappings/clients/5a324cc2-4d44-46de-9c51-9afcc3c1adda','[{\"id\":\"7e3a6f58-62a1-4ea9-bb50-5f24d545ec50\",\"name\":\"_ws1-admin\",\"composite\":true,\"clientRole\":true,\"containerId\":\"5a324cc2-4d44-46de-9c51-9afcc3c1adda\",\"attributes\":{\"kind\":[\"workspace\"]}}]',NULL,'CLIENT_ROLE_MAPPING'),('34cb7ea1-4629-4dfc-b779-176321ca45f1',1709175211563,'org3','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/c28dd0b0-60ed-40df-91db-0d9b1e14074b/roles/_og-usr-mt','{\"id\":\"7edf6052-a64a-4413-8b79-732b90806c24\",\"name\":\"_og-usr-mt\",\"composite\":false}',NULL,'CLIENT_ROLE'),('355c3f05-0762-4295-a19a-319a2761faa4',1709175166173,'org1','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/d321d481-bc24-4294-af2c-7907fd6529b0/roles/_og-usage','{\"id\":\"c00fb823-0733-4605-8206-760c81ebef93\",\"name\":\"_og-usage\",\"composite\":false}',NULL,'CLIENT_ROLE'),('35e65551-28c9-4721-8aba-dda598bbb0f1',1709175276704,'org5','CREATE','org5','01f89460-aba4-42ec-8eb3-f3c2d23cfbc2','47ce89fe-bcd3-45ef-9925-2f6cffef721b','172.18.0.8','users/85631ddb-cb91-4d18-a335-1646a78ee06a/role-mappings/clients/3d62cf66-73c8-4ec7-ba0f-2b622bc5c747','[{\"id\":\"9ff2af3b-6e78-4684-a859-6278fb8782f2\",\"name\":\"_ws2-admin\",\"composite\":true,\"clientRole\":true,\"containerId\":\"3d62cf66-73c8-4ec7-ba0f-2b622bc5c747\",\"attributes\":{\"kind\":[\"workspace\"]}}]',NULL,'CLIENT_ROLE_MAPPING'),('3618d78d-229f-4d12-9484-90da32eefc40',1709175195480,'org2','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','users/fe934bbc-b716-474a-b1e0-eefc2a29e1b2/role-mappings/clients/a15e680b-47bb-4b94-a832-5ca99cdbe134','[{\"id\":\"97c22ad8-48d8-49db-90e3-b0e205ef50de\",\"name\":\"_organization-manager\",\"composite\":true,\"clientRole\":true,\"containerId\":\"a15e680b-47bb-4b94-a832-5ca99cdbe134\",\"attributes\":{\"kind\":[\"organization\"]}}]',NULL,'CLIENT_ROLE_MAPPING'),('396b2203-7361-4a5e-9665-b7dcc8074507',1709175264525,'org5','ACTION','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/690481d3-310d-4227-a8eb-eee2db8d1b25/client-secret','{\"type\":\"secret\",\"value\":\"3XzOghcBnCJHiwUV7OWUanLqpeMx4KVZ\"}',NULL,'CLIENT'),('3c22f68f-2d2a-4908-92bf-f11abe74bb10',1709175263915,'org5','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/01f89460-aba4-42ec-8eb3-f3c2d23cfbc2','{\"id\":\"01f89460-aba4-42ec-8eb3-f3c2d23cfbc2\",\"clientId\":\"org5-workspaces\",\"surrogateAuthRequired\":false,\"enabled\":true,\"alwaysDisplayInConsole\":false,\"clientAuthenticatorType\":\"client-secret\",\"redirectUris\":[],\"webOrigins\":[],\"notBefore\":0,\"bearerOnly\":false,\"consentRequired\":false,\"standardFlowEnabled\":false,\"implicitFlowEnabled\":false,\"directAccessGrantsEnabled\":true,\"serviceAccountsEnabled\":true,\"publicClient\":false,\"frontchannelLogout\":false,\"protocol\":\"openid-connect\",\"attributes\":{\"id.token.as.detached.signature\":\"false\",\"saml.assertion.signature\":\"false\",\"saml.force.post.binding\":\"false\",\"saml.multivalued.roles\":\"false\",\"saml.encrypt\":\"false\",\"oauth2.device.authorization.grant.enabled\":\"false\",\"backchannel.logout.revoke.offline.tokens\":\"false\",\"saml.server.signature\":\"false\",\"saml.server.signature.keyinfo.ext\":\"false\",\"use.refresh.tokens\":\"true\",\"exclude.session.state.from.auth.response\":\"false\",\"oidc.ciba.grant.enabled\":\"false\",\"saml.artifact.binding\":\"false\",\"backchannel.logout.session.required\":\"true\",\"client_credentials.use_refresh_token\":\"false\",\"saml_force_name_id_format\":\"false\",\"require.pushed.authorization.requests\":\"false\",\"saml.client.signature\":\"false\",\"tls.client.certificate.bound.access.tokens\":\"false\",\"saml.authnstatement\":\"false\",\"display.on.consent.screen\":\"false\",\"saml.onetimeuse.condition\":\"false\"},\"authenticationFlowBindingOverrides\":{},\"fullScopeAllowed\":true,\"nodeReRegistrationTimeout\":-1,\"protocolMappers\":[{\"name\":\"Client Host\",\"protocol\":\"openid-connect\",\"protocolMapper\":\"oidc-usersessionmodel-note-mapper\",\"consentRequired\":false,\"config\":{\"user.session.note\":\"clientHost\",\"userinfo.token.claim\":\"true\",\"id.token.claim\":\"true\",\"access.token.claim\":\"true\",\"claim.name\":\"clientHost\",\"jsonType.label\":\"String\"}},{\"name\":\"Client IP Address\",\"protocol\":\"openid-connect\",\"protocolMapper\":\"oidc-usersessionmodel-note-mapper\",\"consentRequired\":false,\"config\":{\"user.session.note\":\"clientAddress\",\"userinfo.token.claim\":\"true\",\"id.token.claim\":\"true\",\"access.token.claim\":\"true\",\"claim.name\":\"clientAddress\",\"jsonType.label\":\"String\"}},{\"name\":\"Client ID\",\"protocol\":\"openid-connect\",\"protocolMapper\":\"oidc-usersessionmodel-note-mapper\",\"consentRequired\":false,\"config\":{\"user.session.note\":\"clientId\",\"userinfo.token.claim\":\"true\",\"id.token.claim\":\"true\",\"access.token.claim\":\"true\",\"claim.name\":\"clientId\",\"jsonType.label\":\"String\"}}],\"defaultClientScopes\":[\"web-origins\",\"profile\",\"roles\",\"email\"],\"optionalClientScopes\":[\"address\",\"phone\",\"offline_access\",\"microprofile-jwt\"],\"access\":{\"view\":true,\"configure\":true,\"manage\":true}}',NULL,'CLIENT'),('3e832922-9161-4285-9d69-a3db600e7588',1709175217940,'org3','CREATE','org3','c28dd0b0-60ed-40df-91db-0d9b1e14074b','e74edb4f-b238-4208-8996-dd6ab65ec257','172.18.0.8','clients/b0475217-c11a-49f5-833c-33aaee237a25/roles/_ws2-admin','{\"id\":\"534ae492-208a-4329-ac07-fd5bebc8017e\",\"name\":\"_ws2-admin\",\"composite\":false,\"attributes\":{\"kind\":[\"workspace\"]}}',NULL,'CLIENT_ROLE'),('3e95d533-8c83-4e53-a9a9-b43c9794f31f',1709175254368,'org4','CREATE','org4','311ebcfe-7467-459c-856a-862094332329','0eb52a14-0c83-4db6-b40b-19355bfc54ae','172.18.0.8','clients/5a324cc2-4d44-46de-9c51-9afcc3c1adda/roles/_ws3-admin','{\"id\":\"fafdd08b-02fa-45e9-bc40-15befb734572\",\"name\":\"_ws3-admin\",\"composite\":false,\"attributes\":{\"kind\":[\"workspace\"]}}',NULL,'CLIENT_ROLE'),('41ce8af6-3099-4357-bef3-0fae72e4fde5',1709175218016,'org3','CREATE','org3','c28dd0b0-60ed-40df-91db-0d9b1e14074b','e74edb4f-b238-4208-8996-dd6ab65ec257','172.18.0.8','clients/b0475217-c11a-49f5-833c-33aaee237a25/roles/_ws2-admin/composites','[{\"id\":\"b94ada76-bb55-4104-9f46-3a7372882a98\",\"name\":\"ws2\",\"composite\":false,\"clientRole\":true,\"containerId\":\"c28dd0b0-60ed-40df-91db-0d9b1e14074b\",\"attributes\":{\"kind\":[\"workspace\"]}},{\"id\":\"f436c9ed-08de-4a8f-aa80-97e595a7feb5\",\"name\":\"_ws2-admin\",\"composite\":false,\"clientRole\":true,\"containerId\":\"c28dd0b0-60ed-40df-91db-0d9b1e14074b\",\"attributes\":{\"kind\":[\"workspace\"]}}]',NULL,'CLIENT_ROLE'),('42a6c6b6-feb5-4a05-8c8f-6c6a93b3f9d9',1709175213676,'org3','CREATE','org3','c28dd0b0-60ed-40df-91db-0d9b1e14074b','e74edb4f-b238-4208-8996-dd6ab65ec257','172.18.0.8','clients/b0475217-c11a-49f5-833c-33aaee237a25/roles/_ws1-admin/composites','[{\"id\":\"50aabf0d-c27b-46b1-a838-602a59f2c8e5\",\"name\":\"ws1\",\"composite\":false,\"clientRole\":true,\"containerId\":\"c28dd0b0-60ed-40df-91db-0d9b1e14074b\",\"attributes\":{\"kind\":[\"workspace\"]}},{\"id\":\"e478c9c9-a299-4a38-80ce-342198cff104\",\"name\":\"_ws1-admin\",\"composite\":false,\"clientRole\":true,\"containerId\":\"c28dd0b0-60ed-40df-91db-0d9b1e14074b\",\"attributes\":{\"kind\":[\"workspace\"]}}]',NULL,'CLIENT_ROLE'),('43603adf-87ed-4d97-aeee-57c27ed6895a',1709175165173,'org1','ACTION','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/6112a706-0711-40ab-a42e-08ef27723f06/client-secret','{\"type\":\"secret\",\"value\":\"8YCPyhn9zszkdXLh5yvKWL4d6xDyOhrW\"}',NULL,'CLIENT'),('458f8a52-3e49-4d0d-9434-8f5dd5164a46',1709175194597,'org2','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/a0d96aa1-71ac-4a7e-a769-306baf1c51fc/roles/_og-usage','{\"id\":\"6e1fbe58-4de5-4613-a014-4a5123be8baa\",\"name\":\"_og-usage\",\"composite\":false}',NULL,'CLIENT_ROLE'),('465f7bfc-3f63-4dfe-991d-fea965d0a1a6',1709175193859,'org2','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/a0d96aa1-71ac-4a7e-a769-306baf1c51fc','{\"id\":\"a0d96aa1-71ac-4a7e-a769-306baf1c51fc\",\"clientId\":\"org2-workspaces\",\"surrogateAuthRequired\":false,\"enabled\":true,\"alwaysDisplayInConsole\":false,\"clientAuthenticatorType\":\"client-secret\",\"redirectUris\":[],\"webOrigins\":[],\"notBefore\":0,\"bearerOnly\":false,\"consentRequired\":false,\"standardFlowEnabled\":false,\"implicitFlowEnabled\":false,\"directAccessGrantsEnabled\":true,\"serviceAccountsEnabled\":true,\"publicClient\":false,\"frontchannelLogout\":false,\"protocol\":\"openid-connect\",\"attributes\":{\"id.token.as.detached.signature\":\"false\",\"saml.assertion.signature\":\"false\",\"saml.force.post.binding\":\"false\",\"saml.multivalued.roles\":\"false\",\"saml.encrypt\":\"false\",\"oauth2.device.authorization.grant.enabled\":\"false\",\"backchannel.logout.revoke.offline.tokens\":\"false\",\"saml.server.signature\":\"false\",\"saml.server.signature.keyinfo.ext\":\"false\",\"use.refresh.tokens\":\"true\",\"exclude.session.state.from.auth.response\":\"false\",\"oidc.ciba.grant.enabled\":\"false\",\"saml.artifact.binding\":\"false\",\"backchannel.logout.session.required\":\"true\",\"client_credentials.use_refresh_token\":\"false\",\"saml_force_name_id_format\":\"false\",\"require.pushed.authorization.requests\":\"false\",\"saml.client.signature\":\"false\",\"tls.client.certificate.bound.access.tokens\":\"false\",\"saml.authnstatement\":\"false\",\"display.on.consent.screen\":\"false\",\"saml.onetimeuse.condition\":\"false\"},\"authenticationFlowBindingOverrides\":{},\"fullScopeAllowed\":true,\"nodeReRegistrationTimeout\":-1,\"protocolMappers\":[{\"name\":\"Client Host\",\"protocol\":\"openid-connect\",\"protocolMapper\":\"oidc-usersessionmodel-note-mapper\",\"consentRequired\":false,\"config\":{\"user.session.note\":\"clientHost\",\"userinfo.token.claim\":\"true\",\"id.token.claim\":\"true\",\"access.token.claim\":\"true\",\"claim.name\":\"clientHost\",\"jsonType.label\":\"String\"}},{\"name\":\"Client IP Address\",\"protocol\":\"openid-connect\",\"protocolMapper\":\"oidc-usersessionmodel-note-mapper\",\"consentRequired\":false,\"config\":{\"user.session.note\":\"clientAddress\",\"userinfo.token.claim\":\"true\",\"id.token.claim\":\"true\",\"access.token.claim\":\"true\",\"claim.name\":\"clientAddress\",\"jsonType.label\":\"String\"}},{\"name\":\"Client ID\",\"protocol\":\"openid-connect\",\"protocolMapper\":\"oidc-usersessionmodel-note-mapper\",\"consentRequired\":false,\"config\":{\"user.session.note\":\"clientId\",\"userinfo.token.claim\":\"true\",\"id.token.claim\":\"true\",\"access.token.claim\":\"true\",\"claim.name\":\"clientId\",\"jsonType.label\":\"String\"}}],\"defaultClientScopes\":[\"web-origins\",\"profile\",\"roles\",\"email\"],\"optionalClientScopes\":[\"address\",\"phone\",\"offline_access\",\"microprofile-jwt\"],\"access\":{\"view\":true,\"configure\":true,\"manage\":true}}',NULL,'CLIENT'),('473d20ea-baa1-4b77-b2e7-b2ebbc5b34d7',1709175166797,'org1','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/16fe410e-f1df-4ce0-b445-8dd3b5b80750/roles/_organization-manager/composites','[{\"id\":\"53507c5e-b647-4eec-af29-43cd2bb96016\",\"name\":\"_og-upd\",\"composite\":false,\"clientRole\":true,\"containerId\":\"d321d481-bc24-4294-af2c-7907fd6529b0\",\"attributes\":{}},{\"id\":\"be267d19-3305-4185-b833-5ac29b0b665c\",\"name\":\"_og-own-mt\",\"composite\":false,\"clientRole\":true,\"containerId\":\"d321d481-bc24-4294-af2c-7907fd6529b0\",\"attributes\":{}},{\"id\":\"22a556b1-c5ae-43d5-8d25-21698df0b4b6\",\"name\":\"_og-role-usr\",\"composite\":false,\"clientRole\":true,\"containerId\":\"d321d481-bc24-4294-af2c-7907fd6529b0\",\"attributes\":{}},{\"id\":\"c00fb823-0733-4605-8206-760c81ebef93\",\"name\":\"_og-usage\",\"composite\":false,\"clientRole\":true,\"containerId\":\"d321d481-bc24-4294-af2c-7907fd6529b0\",\"attributes\":{}},{\"id\":\"c0c471d5-663f-403f-b33a-0bad8e7328a9\",\"name\":\"_og-usr-mt\",\"composite\":false,\"clientRole\":true,\"containerId\":\"d321d481-bc24-4294-af2c-7907fd6529b0\",\"attributes\":{}},{\"id\":\"5d498f7a-28f1-4862-8633-61e026cafff4\",\"name\":\"_og-ws-role-mt\",\"composite\":false,\"clientRole\":true,\"containerId\":\"d321d481-bc24-4294-af2c-7907fd6529b0\",\"attributes\":{}},{\"id\":\"2482b501-5049-4f8c-98a2-557c96641f6b\",\"name\":\"_og-ws-role-usr\",\"composite\":false,\"clientRole\":true,\"containerId\":\"d321d481-bc24-4294-af2c-7907fd6529b0\",\"attributes\":{}},{\"id\":\"c0c0a50c-70b5-4ba7-ada2-583401aaedd9\",\"name\":\"_og-ws-mt\",\"composite\":false,\"clientRole\":true,\"containerId\":\"d321d481-bc24-4294-af2c-7907fd6529b0\",\"attributes\":{}}]',NULL,'CLIENT_ROLE'),('4823087b-766a-4ebb-a75d-e2d1cc2384b1',1709175167731,'org1','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','users/74c8800a-f392-4c3c-9077-cfb96a52c947/role-mappings/clients/16fe410e-f1df-4ce0-b445-8dd3b5b80750','[{\"id\":\"43de4389-64c9-4a7f-bb70-8cba7986f2d0\",\"name\":\"_organization-manager\",\"composite\":true,\"clientRole\":true,\"containerId\":\"16fe410e-f1df-4ce0-b445-8dd3b5b80750\",\"attributes\":{\"kind\":[\"organization\"]}}]',NULL,'CLIENT_ROLE_MAPPING'),('485acdfe-c1be-4e7a-850c-e25cad43836f',1709175194245,'org2','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/a15e680b-47bb-4b94-a832-5ca99cdbe134','{\"id\":\"a15e680b-47bb-4b94-a832-5ca99cdbe134\",\"clientId\":\"org2\",\"surrogateAuthRequired\":false,\"enabled\":true,\"alwaysDisplayInConsole\":false,\"clientAuthenticatorType\":\"client-secret\",\"redirectUris\":[\"/*\"],\"webOrigins\":[],\"notBefore\":0,\"bearerOnly\":false,\"consentRequired\":false,\"standardFlowEnabled\":true,\"implicitFlowEnabled\":false,\"directAccessGrantsEnabled\":true,\"serviceAccountsEnabled\":false,\"publicClient\":true,\"frontchannelLogout\":false,\"protocol\":\"openid-connect\",\"attributes\":{\"post.logout.redirect.uris\":\"/*\",\"id.token.as.detached.signature\":\"false\",\"saml.assertion.signature\":\"false\",\"saml.force.post.binding\":\"false\",\"saml.multivalued.roles\":\"false\",\"saml.encrypt\":\"false\",\"oauth2.device.authorization.grant.enabled\":\"false\",\"backchannel.logout.revoke.offline.tokens\":\"false\",\"saml.server.signature\":\"false\",\"saml.server.signature.keyinfo.ext\":\"false\",\"use.refresh.tokens\":\"true\",\"exclude.session.state.from.auth.response\":\"false\",\"oidc.ciba.grant.enabled\":\"false\",\"saml.artifact.binding\":\"false\",\"backchannel.logout.session.required\":\"true\",\"client_credentials.use_refresh_token\":\"false\",\"saml_force_name_id_format\":\"false\",\"require.pushed.authorization.requests\":\"false\",\"saml.client.signature\":\"false\",\"tls.client.certificate.bound.access.tokens\":\"false\",\"saml.authnstatement\":\"false\",\"display.on.consent.screen\":\"false\",\"saml.onetimeuse.condition\":\"false\"},\"authenticationFlowBindingOverrides\":{},\"fullScopeAllowed\":true,\"nodeReRegistrationTimeout\":-1,\"defaultClientScopes\":[\"web-origins\",\"profile\",\"roles\",\"email\"],\"optionalClientScopes\":[\"address\",\"phone\",\"offline_access\",\"microprofile-jwt\"],\"access\":{\"view\":true,\"configure\":true,\"manage\":true}}',NULL,'CLIENT'),('4885975d-3133-43a5-b8d3-55145805a36d',1709175213608,'org3','CREATE','org3','c28dd0b0-60ed-40df-91db-0d9b1e14074b','e74edb4f-b238-4208-8996-dd6ab65ec257','172.18.0.8','clients/c28dd0b0-60ed-40df-91db-0d9b1e14074b/roles/_ws1-admin','{\"id\":\"e478c9c9-a299-4a38-80ce-342198cff104\",\"name\":\"_ws1-admin\",\"composite\":false,\"attributes\":{\"kind\":[\"workspace\"]}}',NULL,'CLIENT_ROLE'),('4b117552-54f4-4ae5-9ebc-f1b29ee2c973',1709175194999,'org2','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/a15e680b-47bb-4b94-a832-5ca99cdbe134/roles/_organization-user-role-manager/composites','[{\"id\":\"f8ad0b14-409f-4ae0-ac3d-51d4d6c71c71\",\"name\":\"_og-usr-mt\",\"composite\":false,\"clientRole\":true,\"containerId\":\"a0d96aa1-71ac-4a7e-a769-306baf1c51fc\",\"attributes\":{}},{\"id\":\"4bc71a50-0bca-450d-80f5-0a0fe3f9f1f9\",\"name\":\"_og-ws-role-mt\",\"composite\":false,\"clientRole\":true,\"containerId\":\"a0d96aa1-71ac-4a7e-a769-306baf1c51fc\",\"attributes\":{}},{\"id\":\"793592b1-dbff-4778-b35e-19cdb9681830\",\"name\":\"_og-ws-role-usr\",\"composite\":false,\"clientRole\":true,\"containerId\":\"a0d96aa1-71ac-4a7e-a769-306baf1c51fc\",\"attributes\":{}}]',NULL,'CLIENT_ROLE'),('4f7feb7d-a469-4a7e-a9ba-4051e906b5b4',1709175233330,'org4','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/311ebcfe-7467-459c-856a-862094332329/roles/_og-ws-mt','{\"id\":\"d17ebe14-aacf-465a-bd2b-a42112432780\",\"name\":\"_og-ws-mt\",\"composite\":false}',NULL,'CLIENT_ROLE'),('5160f531-567d-4166-8c21-b10f854c479e',1709175264815,'org5','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/01f89460-aba4-42ec-8eb3-f3c2d23cfbc2/roles/_og-ws-role-mt','{\"id\":\"5a6423d8-f4c7-4bf0-9b4f-42adb669220a\",\"name\":\"_og-ws-role-mt\",\"composite\":false}',NULL,'CLIENT_ROLE'),('51c167ab-607b-453c-be3b-651701c9ae43',1709175264674,'org5','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/01f89460-aba4-42ec-8eb3-f3c2d23cfbc2/roles/_og-own-mt','{\"id\":\"3010abd9-a4c4-49f7-b76e-093ca5360042\",\"name\":\"_og-own-mt\",\"composite\":false}',NULL,'CLIENT_ROLE'),('5247407d-aaf4-4a13-9585-a8ff0bfe8b0c',1709175254344,'org4','CREATE','org4','311ebcfe-7467-459c-856a-862094332329','0eb52a14-0c83-4db6-b40b-19355bfc54ae','172.18.0.8','clients/311ebcfe-7467-459c-856a-862094332329/roles/_ws3-admin','{\"id\":\"ce18d984-dce0-4e3c-82b7-f16678c7e155\",\"name\":\"_ws3-admin\",\"composite\":false,\"attributes\":{\"kind\":[\"workspace\"]}}',NULL,'CLIENT_ROLE'),('55095e80-5aba-4bd9-b9ea-5fa456c2f338',1709175265732,'org5','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','users/85631ddb-cb91-4d18-a335-1646a78ee06a','{\"username\":\"admin\",\"enabled\":true,\"firstName\":\"admin\",\"lastName\":\"admin\",\"email\":\"admin@example.com\",\"credentials\":[{\"type\":\"password\",\"value\":\"password\",\"temporary\":false}],\"requiredActions\":[]}',NULL,'USER'),('57e40293-7512-42ac-baf3-3b4ef5d2ba49',1709175211962,'org3','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/b0475217-c11a-49f5-833c-33aaee237a25/roles/_organization-user-manager','{\"id\":\"81658e71-c64b-4b7e-bb58-0a00f08a397f\",\"name\":\"_organization-user-manager\",\"composite\":false,\"attributes\":{\"kind\":[\"organization\"]}}',NULL,'CLIENT_ROLE'),('58f91d2d-fcde-4679-a75d-19f43aed0d05',1709175264005,'org5','ACTION','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/01f89460-aba4-42ec-8eb3-f3c2d23cfbc2/client-secret','{\"type\":\"secret\",\"value\":\"ayf2weejbx5UiJ3pZsOJKldzQcC1erkR\"}',NULL,'CLIENT'),('5a8bcf51-bae1-4473-8e74-cc43065fed63',1709175185861,'org1','CREATE','org1','d321d481-bc24-4294-af2c-7907fd6529b0','2e008a28-22ba-4bec-94c3-f26482afb61b','172.18.0.8','users/74c8800a-f392-4c3c-9077-cfb96a52c947/role-mappings/clients/16fe410e-f1df-4ce0-b445-8dd3b5b80750','[{\"id\":\"957a70a3-5891-4e14-9765-2560c25916ee\",\"name\":\"_ws3-admin\",\"composite\":true,\"clientRole\":true,\"containerId\":\"16fe410e-f1df-4ce0-b445-8dd3b5b80750\",\"attributes\":{\"kind\":[\"workspace\"]}}]',NULL,'CLIENT_ROLE_MAPPING'),('5a9d5abe-469c-498f-96c0-a916564ba1be',1709175166983,'org1','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/16fe410e-f1df-4ce0-b445-8dd3b5b80750/roles/_organization-user-role-manager/composites','[{\"id\":\"c0c471d5-663f-403f-b33a-0bad8e7328a9\",\"name\":\"_og-usr-mt\",\"composite\":false,\"clientRole\":true,\"containerId\":\"d321d481-bc24-4294-af2c-7907fd6529b0\",\"attributes\":{}},{\"id\":\"5d498f7a-28f1-4862-8633-61e026cafff4\",\"name\":\"_og-ws-role-mt\",\"composite\":false,\"clientRole\":true,\"containerId\":\"d321d481-bc24-4294-af2c-7907fd6529b0\",\"attributes\":{}},{\"id\":\"2482b501-5049-4f8c-98a2-557c96641f6b\",\"name\":\"_og-ws-role-usr\",\"composite\":false,\"clientRole\":true,\"containerId\":\"d321d481-bc24-4294-af2c-7907fd6529b0\",\"attributes\":{}}]',NULL,'CLIENT_ROLE'),('5d6b6646-a860-458d-8dea-83ecc6d37b25',1709175245513,'org4','CREATE','org4','311ebcfe-7467-459c-856a-862094332329','0eb52a14-0c83-4db6-b40b-19355bfc54ae','172.18.0.8','clients/311ebcfe-7467-459c-856a-862094332329/roles/_ws2-admin','{\"id\":\"73f6933d-5e3f-40aa-a211-c73134c76678\",\"name\":\"_ws2-admin\",\"composite\":false,\"attributes\":{\"kind\":[\"workspace\"]}}',NULL,'CLIENT_ROLE'),('5dbf0661-5d27-40e9-ac9f-4b8506539946',1709175195099,'org2','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/a15e680b-47bb-4b94-a832-5ca99cdbe134/roles/_organization-user-manager/composites','[{\"id\":\"f8ad0b14-409f-4ae0-ac3d-51d4d6c71c71\",\"name\":\"_og-usr-mt\",\"composite\":false,\"clientRole\":true,\"containerId\":\"a0d96aa1-71ac-4a7e-a769-306baf1c51fc\",\"attributes\":{}},{\"id\":\"793592b1-dbff-4778-b35e-19cdb9681830\",\"name\":\"_og-ws-role-usr\",\"composite\":false,\"clientRole\":true,\"containerId\":\"a0d96aa1-71ac-4a7e-a769-306baf1c51fc\",\"attributes\":{}}]',NULL,'CLIENT_ROLE'),('5eafe6eb-f1e8-490a-b788-b8a21d4d03f5',1709175195375,'org2','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','users/fe934bbc-b716-474a-b1e0-eefc2a29e1b2','{\"username\":\"admin\",\"enabled\":true,\"firstName\":\"admin\",\"lastName\":\"admin\",\"email\":\"admin@example.com\",\"credentials\":[{\"type\":\"password\",\"value\":\"password\",\"temporary\":false}],\"requiredActions\":[]}',NULL,'USER'),('5eb96c61-ce30-4de4-b08b-4a3aa3db633c',1709175276495,'org5','CREATE','org5','01f89460-aba4-42ec-8eb3-f3c2d23cfbc2','47ce89fe-bcd3-45ef-9925-2f6cffef721b','172.18.0.8','clients/01f89460-aba4-42ec-8eb3-f3c2d23cfbc2/roles/ws2','{\"id\":\"09e063cc-f899-411a-8e8d-0c4d8dac93f3\",\"name\":\"ws2\",\"composite\":false,\"attributes\":{\"kind\":[\"workspace\"]}}',NULL,'CLIENT_ROLE'),('5f4b0115-30d2-4f95-8007-72509491e896',1709175211848,'org3','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/b0475217-c11a-49f5-833c-33aaee237a25/roles/_organization-manager/composites','[{\"id\":\"5ea3cd76-4b85-49ff-8f6b-b25662deb38a\",\"name\":\"_og-upd\",\"composite\":false,\"clientRole\":true,\"containerId\":\"c28dd0b0-60ed-40df-91db-0d9b1e14074b\",\"attributes\":{}},{\"id\":\"95b164a2-6b95-4fe8-b27b-28fab90a372d\",\"name\":\"_og-own-mt\",\"composite\":false,\"clientRole\":true,\"containerId\":\"c28dd0b0-60ed-40df-91db-0d9b1e14074b\",\"attributes\":{}},{\"id\":\"42f46a9a-71a7-4de0-b372-672b561061ce\",\"name\":\"_og-role-usr\",\"composite\":false,\"clientRole\":true,\"containerId\":\"c28dd0b0-60ed-40df-91db-0d9b1e14074b\",\"attributes\":{}},{\"id\":\"7cbae974-9824-4c76-8f46-9c30af199a16\",\"name\":\"_og-usage\",\"composite\":false,\"clientRole\":true,\"containerId\":\"c28dd0b0-60ed-40df-91db-0d9b1e14074b\",\"attributes\":{}},{\"id\":\"7edf6052-a64a-4413-8b79-732b90806c24\",\"name\":\"_og-usr-mt\",\"composite\":false,\"clientRole\":true,\"containerId\":\"c28dd0b0-60ed-40df-91db-0d9b1e14074b\",\"attributes\":{}},{\"id\":\"d066d55a-9192-4ecc-95f8-63d6f89f1ed3\",\"name\":\"_og-ws-role-mt\",\"composite\":false,\"clientRole\":true,\"containerId\":\"c28dd0b0-60ed-40df-91db-0d9b1e14074b\",\"attributes\":{}},{\"id\":\"8709f3c7-2db7-4820-8b4c-2e6d4553819a\",\"name\":\"_og-ws-role-usr\",\"composite\":false,\"clientRole\":true,\"containerId\":\"c28dd0b0-60ed-40df-91db-0d9b1e14074b\",\"attributes\":{}},{\"id\":\"67502093-a88c-4084-b691-4e6096710ac2\",\"name\":\"_og-ws-mt\",\"composite\":false,\"clientRole\":true,\"containerId\":\"c28dd0b0-60ed-40df-91db-0d9b1e14074b\",\"attributes\":{}}]',NULL,'CLIENT_ROLE'),('5fa89ec6-f55f-471c-a4ae-9347c16d2267',1709175211067,'org3','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/479237b2-a9fc-4828-b80d-ffd84ec6f3bc','{\"id\":\"479237b2-a9fc-4828-b80d-ffd84ec6f3bc\",\"clientId\":\"system-org3-auth\",\"surrogateAuthRequired\":false,\"enabled\":true,\"alwaysDisplayInConsole\":false,\"clientAuthenticatorType\":\"client-secret\",\"redirectUris\":[],\"webOrigins\":[],\"notBefore\":0,\"bearerOnly\":true,\"consentRequired\":false,\"standardFlowEnabled\":true,\"implicitFlowEnabled\":false,\"directAccessGrantsEnabled\":true,\"serviceAccountsEnabled\":false,\"publicClient\":false,\"frontchannelLogout\":false,\"protocol\":\"openid-connect\",\"attributes\":{\"id.token.as.detached.signature\":\"false\",\"saml.assertion.signature\":\"false\",\"saml.force.post.binding\":\"false\",\"saml.multivalued.roles\":\"false\",\"saml.encrypt\":\"false\",\"oauth2.device.authorization.grant.enabled\":\"false\",\"backchannel.logout.revoke.offline.tokens\":\"false\",\"saml.server.signature\":\"false\",\"saml.server.signature.keyinfo.ext\":\"false\",\"use.refresh.tokens\":\"true\",\"exclude.session.state.from.auth.response\":\"false\",\"oidc.ciba.grant.enabled\":\"false\",\"saml.artifact.binding\":\"false\",\"backchannel.logout.session.required\":\"true\",\"client_credentials.use_refresh_token\":\"false\",\"saml_force_name_id_format\":\"false\",\"require.pushed.authorization.requests\":\"false\",\"saml.client.signature\":\"false\",\"tls.client.certificate.bound.access.tokens\":\"false\",\"saml.authnstatement\":\"false\",\"display.on.consent.screen\":\"false\",\"saml.onetimeuse.condition\":\"false\"},\"authenticationFlowBindingOverrides\":{},\"fullScopeAllowed\":true,\"nodeReRegistrationTimeout\":-1,\"defaultClientScopes\":[\"web-origins\",\"profile\",\"roles\",\"email\"],\"optionalClientScopes\":[\"address\",\"phone\",\"offline_access\",\"microprofile-jwt\"],\"access\":{\"view\":true,\"configure\":true,\"manage\":true}}',NULL,'CLIENT'),('600e2a6c-a6cf-4a92-a092-bb05d99e9a1d',1709175213712,'org3','CREATE','org3','c28dd0b0-60ed-40df-91db-0d9b1e14074b','e74edb4f-b238-4208-8996-dd6ab65ec257','172.18.0.8','users/98b18f6f-d105-437a-92f2-fb863b59805c/role-mappings/clients/b0475217-c11a-49f5-833c-33aaee237a25','[{\"id\":\"6a0e8485-c569-42a2-8ca9-fb75b7007749\",\"name\":\"_ws1-admin\",\"composite\":true,\"clientRole\":true,\"containerId\":\"b0475217-c11a-49f5-833c-33aaee237a25\",\"attributes\":{\"kind\":[\"workspace\"]}}]',NULL,'CLIENT_ROLE_MAPPING'),('605300c2-1ec0-41d3-9184-82513211b866',1709175232581,'org4','ACTION','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/311ebcfe-7467-459c-856a-862094332329/client-secret','{\"type\":\"secret\",\"value\":\"hbr4oiMZdmt185KOkUMFePbZ8RdZ2cIr\"}',NULL,'CLIENT'),('618d3515-f07e-4fca-b729-7354d414a01d',1709175164846,'org1','ACTION','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/d321d481-bc24-4294-af2c-7907fd6529b0/client-secret','{\"type\":\"secret\",\"value\":\"t4WLAy1hCQhry5HDuHkJa3SeT0MlBub8\"}',NULL,'CLIENT'),('625dc008-8aa8-4ad8-b770-2c7d4437159a',1709175264782,'org5','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/01f89460-aba4-42ec-8eb3-f3c2d23cfbc2/roles/_og-usr-mt','{\"id\":\"f8b4617b-8a4b-454d-9e85-826d34daf267\",\"name\":\"_og-usr-mt\",\"composite\":false}',NULL,'CLIENT_ROLE'),('628684e1-0fa5-45b3-9294-898158886077',1709175213307,'org3','UPDATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8',NULL,'{\"enabled\":true}',NULL,'REALM'),('633752ae-d7c1-4a8e-8177-47dd3b9191f5',1709175254440,'org4','CREATE','org4','311ebcfe-7467-459c-856a-862094332329','0eb52a14-0c83-4db6-b40b-19355bfc54ae','172.18.0.8','clients/5a324cc2-4d44-46de-9c51-9afcc3c1adda/roles/_ws3-admin/composites','[{\"id\":\"24329a10-91c8-4a8f-92b9-803b6d6dd776\",\"name\":\"ws3\",\"composite\":false,\"clientRole\":true,\"containerId\":\"311ebcfe-7467-459c-856a-862094332329\",\"attributes\":{\"kind\":[\"workspace\"]}},{\"id\":\"ce18d984-dce0-4e3c-82b7-f16678c7e155\",\"name\":\"_ws3-admin\",\"composite\":false,\"clientRole\":true,\"containerId\":\"311ebcfe-7467-459c-856a-862094332329\",\"attributes\":{\"kind\":[\"workspace\"]}}]',NULL,'CLIENT_ROLE'),('63840718-b6d9-4423-96b8-83e2cd9e3a67',1709175194725,'org2','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/a15e680b-47bb-4b94-a832-5ca99cdbe134/roles/_organization-manager','{\"id\":\"97c22ad8-48d8-49db-90e3-b0e205ef50de\",\"name\":\"_organization-manager\",\"composite\":false,\"attributes\":{\"kind\":[\"organization\"]}}',NULL,'CLIENT_ROLE'),('63e8b99c-8a38-4c30-9083-3ba3d68d914d',1709175284903,'org5','CREATE','org5','01f89460-aba4-42ec-8eb3-f3c2d23cfbc2','47ce89fe-bcd3-45ef-9925-2f6cffef721b','172.18.0.8','clients/01f89460-aba4-42ec-8eb3-f3c2d23cfbc2/roles/ws3','{\"id\":\"0840bb7d-56e0-479e-b3d5-b510a729d468\",\"name\":\"ws3\",\"composite\":false,\"attributes\":{\"kind\":[\"workspace\"]}}',NULL,'CLIENT_ROLE'),('644cde23-72cc-4bad-9b23-8ecfef6b8c33',1709175267584,'org5','CREATE','org5','01f89460-aba4-42ec-8eb3-f3c2d23cfbc2','47ce89fe-bcd3-45ef-9925-2f6cffef721b','172.18.0.8','clients/01f89460-aba4-42ec-8eb3-f3c2d23cfbc2/roles/ws1','{\"id\":\"fccd3bea-270e-41dc-bd36-5b034e1aacd1\",\"name\":\"ws1\",\"composite\":false,\"attributes\":{\"kind\":[\"workspace\"]}}',NULL,'CLIENT_ROLE'),('64e2c107-3b63-4170-b9fc-3bb5317e3fe2',1709175264846,'org5','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/01f89460-aba4-42ec-8eb3-f3c2d23cfbc2/roles/_og-ws-role-usr','{\"id\":\"67dcf259-6999-47ed-9122-e00dc5222a6c\",\"name\":\"_og-ws-role-usr\",\"composite\":false}',NULL,'CLIENT_ROLE'),('651a1c92-4777-4846-8cac-ab39dad9a25d',1709175254313,'org4','CREATE','org4','311ebcfe-7467-459c-856a-862094332329','0eb52a14-0c83-4db6-b40b-19355bfc54ae','172.18.0.8','clients/311ebcfe-7467-459c-856a-862094332329/roles/ws3','{\"id\":\"24329a10-91c8-4a8f-92b9-803b6d6dd776\",\"name\":\"ws3\",\"composite\":false,\"attributes\":{\"kind\":[\"workspace\"]}}',NULL,'CLIENT_ROLE'),('6566cfb0-e644-48c9-bde3-bd682f722073',1709175232670,'org4','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/684a5673-eac6-49e1-8fad-7b9fe666a06f','{\"id\":\"684a5673-eac6-49e1-8fad-7b9fe666a06f\",\"clientId\":\"system-org4-auth\",\"surrogateAuthRequired\":false,\"enabled\":true,\"alwaysDisplayInConsole\":false,\"clientAuthenticatorType\":\"client-secret\",\"redirectUris\":[],\"webOrigins\":[],\"notBefore\":0,\"bearerOnly\":true,\"consentRequired\":false,\"standardFlowEnabled\":true,\"implicitFlowEnabled\":false,\"directAccessGrantsEnabled\":true,\"serviceAccountsEnabled\":false,\"publicClient\":false,\"frontchannelLogout\":false,\"protocol\":\"openid-connect\",\"attributes\":{\"id.token.as.detached.signature\":\"false\",\"saml.assertion.signature\":\"false\",\"saml.force.post.binding\":\"false\",\"saml.multivalued.roles\":\"false\",\"saml.encrypt\":\"false\",\"oauth2.device.authorization.grant.enabled\":\"false\",\"backchannel.logout.revoke.offline.tokens\":\"false\",\"saml.server.signature\":\"false\",\"saml.server.signature.keyinfo.ext\":\"false\",\"use.refresh.tokens\":\"true\",\"exclude.session.state.from.auth.response\":\"false\",\"oidc.ciba.grant.enabled\":\"false\",\"saml.artifact.binding\":\"false\",\"backchannel.logout.session.required\":\"true\",\"client_credentials.use_refresh_token\":\"false\",\"saml_force_name_id_format\":\"false\",\"require.pushed.authorization.requests\":\"false\",\"saml.client.signature\":\"false\",\"tls.client.certificate.bound.access.tokens\":\"false\",\"saml.authnstatement\":\"false\",\"display.on.consent.screen\":\"false\",\"saml.onetimeuse.condition\":\"false\"},\"authenticationFlowBindingOverrides\":{},\"fullScopeAllowed\":true,\"nodeReRegistrationTimeout\":-1,\"defaultClientScopes\":[\"web-origins\",\"profile\",\"roles\",\"email\"],\"optionalClientScopes\":[\"address\",\"phone\",\"offline_access\",\"microprofile-jwt\"],\"access\":{\"view\":true,\"configure\":true,\"manage\":true}}',NULL,'CLIENT'),('65cef0ac-0a64-4ebd-87e3-e5a3f4e0207e',1709175233685,'org4','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/5a324cc2-4d44-46de-9c51-9afcc3c1adda/roles/_organization-user-role-manager/composites','[{\"id\":\"e90549ec-b55c-4237-9d4d-d42c50458309\",\"name\":\"_og-usr-mt\",\"composite\":false,\"clientRole\":true,\"containerId\":\"311ebcfe-7467-459c-856a-862094332329\",\"attributes\":{}},{\"id\":\"e59b30cd-dcf1-4a54-99e8-3077c935cf9e\",\"name\":\"_og-ws-role-mt\",\"composite\":false,\"clientRole\":true,\"containerId\":\"311ebcfe-7467-459c-856a-862094332329\",\"attributes\":{}},{\"id\":\"f8e6ce80-6747-4cbc-9eef-c6b48d8c9d24\",\"name\":\"_og-ws-role-usr\",\"composite\":false,\"clientRole\":true,\"containerId\":\"311ebcfe-7467-459c-856a-862094332329\",\"attributes\":{}}]',NULL,'CLIENT_ROLE'),('6989ebef-a90f-4541-b500-d52b7205935f',1709175167557,'org1','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','users/74c8800a-f392-4c3c-9077-cfb96a52c947','{\"username\":\"admin\",\"enabled\":true,\"firstName\":\"admin\",\"lastName\":\"admin\",\"email\":\"admin@example.com\",\"credentials\":[{\"type\":\"password\",\"value\":\"password\",\"temporary\":false}],\"requiredActions\":[]}',NULL,'USER'),('6c118831-0c94-4dda-b4b2-146f54dae5e7',1709175233004,'org4','ACTION','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/b1088032-b0ab-4e61-9fd4-f58c3c6fe396/client-secret','{\"type\":\"secret\",\"value\":\"xfJWT6jOm1oXc8imz4dImW7I6jBwuor4\"}',NULL,'CLIENT'),('6d62b8c6-d94a-4c21-a7f4-40f740d095b8',1709175264711,'org5','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/01f89460-aba4-42ec-8eb3-f3c2d23cfbc2/roles/_og-role-usr','{\"id\":\"90d0c148-67ef-4bba-bd2f-8aa2086466f2\",\"name\":\"_og-role-usr\",\"composite\":false}',NULL,'CLIENT_ROLE'),('6eff0ba0-2862-4e47-a742-f10943bc2861',1709175196660,'org2','CREATE','org2','a0d96aa1-71ac-4a7e-a769-306baf1c51fc','8a37f068-a80b-4b4b-82a8-5a4c40c51869','172.18.0.8','clients/a15e680b-47bb-4b94-a832-5ca99cdbe134/roles/_ws1-admin/composites','[{\"id\":\"fb06b2e5-a3af-40bb-8a0f-453184845a6b\",\"name\":\"ws1\",\"composite\":false,\"clientRole\":true,\"containerId\":\"a0d96aa1-71ac-4a7e-a769-306baf1c51fc\",\"attributes\":{\"kind\":[\"workspace\"]}},{\"id\":\"3ad05f10-f903-4cb2-8925-a2be6c8994f1\",\"name\":\"_ws1-admin\",\"composite\":false,\"clientRole\":true,\"containerId\":\"a0d96aa1-71ac-4a7e-a769-306baf1c51fc\",\"attributes\":{\"kind\":[\"workspace\"]}}]',NULL,'CLIENT_ROLE'),('6fbe9e26-1f77-44ce-8705-bb728e8a6eb8',1709175233941,'org4','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','users/0eb52a14-0c83-4db6-b40b-19355bfc54ae/role-mappings/clients/cd83ad65-7b39-444d-8f77-18a2e9ef8179','[{\"id\":\"a0bd219e-58d5-4531-9cc9-085084bf34ef\",\"name\":\"realm-admin\",\"description\":\"${role_realm-admin}\",\"composite\":true,\"clientRole\":true,\"containerId\":\"cd83ad65-7b39-444d-8f77-18a2e9ef8179\",\"attributes\":{}}]',NULL,'CLIENT_ROLE_MAPPING'),('711f9f3d-9521-4993-a6e0-042b4f3730c8',1709175213626,'org3','CREATE','org3','c28dd0b0-60ed-40df-91db-0d9b1e14074b','e74edb4f-b238-4208-8996-dd6ab65ec257','172.18.0.8','clients/b0475217-c11a-49f5-833c-33aaee237a25/roles/_ws1-admin','{\"id\":\"6a0e8485-c569-42a2-8ca9-fb75b7007749\",\"name\":\"_ws1-admin\",\"composite\":false,\"attributes\":{\"kind\":[\"workspace\"]}}',NULL,'CLIENT_ROLE'),('7161dce0-0e84-46c9-a0e7-7f721b547ede',1709175276628,'org5','CREATE','org5','01f89460-aba4-42ec-8eb3-f3c2d23cfbc2','47ce89fe-bcd3-45ef-9925-2f6cffef721b','172.18.0.8','clients/3d62cf66-73c8-4ec7-ba0f-2b622bc5c747/roles/_ws2-admin/composites','[{\"id\":\"09e063cc-f899-411a-8e8d-0c4d8dac93f3\",\"name\":\"ws2\",\"composite\":false,\"clientRole\":true,\"containerId\":\"01f89460-aba4-42ec-8eb3-f3c2d23cfbc2\",\"attributes\":{\"kind\":[\"workspace\"]}},{\"id\":\"048685bc-626c-4b13-a44f-c721b4842248\",\"name\":\"_ws2-admin\",\"composite\":false,\"clientRole\":true,\"containerId\":\"01f89460-aba4-42ec-8eb3-f3c2d23cfbc2\",\"attributes\":{\"kind\":[\"workspace\"]}}]',NULL,'CLIENT_ROLE'),('727b17b9-bf78-4f7d-b6a5-3f0ba128bfc1',1709175196577,'org2','CREATE','org2','a0d96aa1-71ac-4a7e-a769-306baf1c51fc','8a37f068-a80b-4b4b-82a8-5a4c40c51869','172.18.0.8','clients/a15e680b-47bb-4b94-a832-5ca99cdbe134/roles/_ws1-admin','{\"id\":\"6809f7f3-19bd-4e02-b894-e33f3c3879b2\",\"name\":\"_ws1-admin\",\"composite\":false,\"attributes\":{\"kind\":[\"workspace\"]}}',NULL,'CLIENT_ROLE'),('7394ecd2-46c6-4947-ac9c-c8e980eed7c8',1709175233299,'org4','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/311ebcfe-7467-459c-856a-862094332329/roles/_og-ws-role-usr','{\"id\":\"f8e6ce80-6747-4cbc-9eef-c6b48d8c9d24\",\"name\":\"_og-ws-role-usr\",\"composite\":false}',NULL,'CLIENT_ROLE'),('741ffe6d-759e-4685-9121-5780101830e4',1709175211328,'org3','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/84e2d9c2-d7af-4ae0-9dfa-41a04f1ab1f4','{\"id\":\"84e2d9c2-d7af-4ae0-9dfa-41a04f1ab1f4\",\"clientId\":\"_org3-api\",\"surrogateAuthRequired\":false,\"enabled\":true,\"alwaysDisplayInConsole\":false,\"clientAuthenticatorType\":\"client-secret\",\"redirectUris\":[],\"webOrigins\":[],\"notBefore\":0,\"bearerOnly\":false,\"consentRequired\":false,\"standardFlowEnabled\":false,\"implicitFlowEnabled\":false,\"directAccessGrantsEnabled\":true,\"serviceAccountsEnabled\":false,\"publicClient\":true,\"frontchannelLogout\":false,\"protocol\":\"openid-connect\",\"attributes\":{\"access.token.lifespan\":\"86400\",\"saml.force.post.binding\":\"false\",\"saml.multivalued.roles\":\"false\",\"frontchannel.logout.session.required\":\"false\",\"oauth2.device.authorization.grant.enabled\":\"false\",\"backchannel.logout.revoke.offline.tokens\":\"false\",\"saml.server.signature.keyinfo.ext\":\"false\",\"use.refresh.tokens\":\"true\",\"oidc.ciba.grant.enabled\":\"false\",\"backchannel.logout.session.required\":\"true\",\"client_credentials.use_refresh_token\":\"false\",\"require.pushed.authorization.requests\":\"false\",\"saml.client.signature\":\"false\",\"client.session.max.lifespan\":\"86400\",\"saml.allow.ecp.flow\":\"false\",\"client.session.idle.timeout\":\"86400\",\"id.token.as.detached.signature\":\"false\",\"saml.assertion.signature\":\"false\",\"saml.encrypt\":\"false\",\"saml.server.signature\":\"false\",\"exclude.session.state.from.auth.response\":\"false\",\"saml.artifact.binding\":\"false\",\"saml_force_name_id_format\":\"false\",\"acr.loa.map\":\"{}\",\"tls.client.certificate.bound.access.tokens\":\"false\",\"saml.authnstatement\":\"false\",\"display.on.consent.screen\":\"false\",\"token.response.type.bearer.lower-case\":\"false\",\"saml.onetimeuse.condition\":\"false\"},\"authenticationFlowBindingOverrides\":{},\"fullScopeAllowed\":true,\"nodeReRegistrationTimeout\":-1,\"defaultClientScopes\":[\"web-origins\",\"acr\",\"profile\",\"roles\",\"email\"],\"optionalClientScopes\":[\"address\",\"phone\",\"offline_access\",\"microprofile-jwt\"]}',NULL,'CLIENT'),('74345dd7-82fc-4b6d-82d9-f1c37a1d01ef',1709175264925,'org5','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/01f89460-aba4-42ec-8eb3-f3c2d23cfbc2/roles/_og-ws-mt','{\"id\":\"aba52e43-5183-419c-b217-a2f670a69ec0\",\"name\":\"_og-ws-mt\",\"composite\":false}',NULL,'CLIENT_ROLE'),('75a881e6-aa17-4383-9724-9ef31c5bd6c6',1709175233384,'org4','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/5a324cc2-4d44-46de-9c51-9afcc3c1adda/roles/_organization-manager','{\"id\":\"0121d427-696b-4bd0-97fd-ef2e49612705\",\"name\":\"_organization-manager\",\"composite\":false,\"attributes\":{\"kind\":[\"organization\"]}}',NULL,'CLIENT_ROLE'),('762e4e34-ebec-402c-9954-541376c246bc',1709175194380,'org2','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/2d40f5c2-5cc2-42d6-93b7-64af2cedb218','{\"id\":\"2d40f5c2-5cc2-42d6-93b7-64af2cedb218\",\"clientId\":\"_org2-api\",\"surrogateAuthRequired\":false,\"enabled\":true,\"alwaysDisplayInConsole\":false,\"clientAuthenticatorType\":\"client-secret\",\"redirectUris\":[],\"webOrigins\":[],\"notBefore\":0,\"bearerOnly\":false,\"consentRequired\":false,\"standardFlowEnabled\":false,\"implicitFlowEnabled\":false,\"directAccessGrantsEnabled\":true,\"serviceAccountsEnabled\":false,\"publicClient\":true,\"frontchannelLogout\":false,\"protocol\":\"openid-connect\",\"attributes\":{\"access.token.lifespan\":\"86400\",\"saml.force.post.binding\":\"false\",\"saml.multivalued.roles\":\"false\",\"frontchannel.logout.session.required\":\"false\",\"oauth2.device.authorization.grant.enabled\":\"false\",\"backchannel.logout.revoke.offline.tokens\":\"false\",\"saml.server.signature.keyinfo.ext\":\"false\",\"use.refresh.tokens\":\"true\",\"oidc.ciba.grant.enabled\":\"false\",\"backchannel.logout.session.required\":\"true\",\"client_credentials.use_refresh_token\":\"false\",\"require.pushed.authorization.requests\":\"false\",\"saml.client.signature\":\"false\",\"client.session.max.lifespan\":\"86400\",\"saml.allow.ecp.flow\":\"false\",\"client.session.idle.timeout\":\"86400\",\"id.token.as.detached.signature\":\"false\",\"saml.assertion.signature\":\"false\",\"saml.encrypt\":\"false\",\"saml.server.signature\":\"false\",\"exclude.session.state.from.auth.response\":\"false\",\"saml.artifact.binding\":\"false\",\"saml_force_name_id_format\":\"false\",\"acr.loa.map\":\"{}\",\"tls.client.certificate.bound.access.tokens\":\"false\",\"saml.authnstatement\":\"false\",\"display.on.consent.screen\":\"false\",\"token.response.type.bearer.lower-case\":\"false\",\"saml.onetimeuse.condition\":\"false\"},\"authenticationFlowBindingOverrides\":{},\"fullScopeAllowed\":true,\"nodeReRegistrationTimeout\":-1,\"defaultClientScopes\":[\"web-origins\",\"acr\",\"profile\",\"roles\",\"email\"],\"optionalClientScopes\":[\"address\",\"phone\",\"offline_access\",\"microprofile-jwt\"]}',NULL,'CLIENT'),('77c2a462-bee9-4123-92c4-4a601e971743',1709175194526,'org2','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/a0d96aa1-71ac-4a7e-a769-306baf1c51fc/roles/_og-upd','{\"id\":\"c371c4ce-9c38-433c-8650-5774bf65f3f7\",\"name\":\"_og-upd\",\"composite\":false}',NULL,'CLIENT_ROLE'),('77f7f076-7fc7-4283-826e-102e91173be5',1709175210971,'org3','ACTION','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/c28dd0b0-60ed-40df-91db-0d9b1e14074b/client-secret','{\"type\":\"secret\",\"value\":\"mgs9T2D1k1dAlslK97OJoAhijLZLezyc\"}',NULL,'CLIENT'),('78e587d3-d904-4596-88b4-427e6fb3fa0f',1709175265903,'org5','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','users/85631ddb-cb91-4d18-a335-1646a78ee06a/role-mappings/clients/3d62cf66-73c8-4ec7-ba0f-2b622bc5c747','[{\"id\":\"e737d20e-6216-4da9-a281-f43102759f54\",\"name\":\"_organization-manager\",\"composite\":true,\"clientRole\":true,\"containerId\":\"3d62cf66-73c8-4ec7-ba0f-2b622bc5c747\",\"attributes\":{\"kind\":[\"organization\"]}}]',NULL,'CLIENT_ROLE_MAPPING'),('79c37764-ecb9-4531-b1fa-66d56c030771',1709175205165,'org2','CREATE','org2','a0d96aa1-71ac-4a7e-a769-306baf1c51fc','8a37f068-a80b-4b4b-82a8-5a4c40c51869','172.18.0.8','users/fe934bbc-b716-474a-b1e0-eefc2a29e1b2/role-mappings/clients/a15e680b-47bb-4b94-a832-5ca99cdbe134','[{\"id\":\"96bd2210-1fcb-4deb-8fbb-563e0ca8f654\",\"name\":\"_ws3-admin\",\"composite\":true,\"clientRole\":true,\"containerId\":\"a15e680b-47bb-4b94-a832-5ca99cdbe134\",\"attributes\":{\"kind\":[\"workspace\"]}}]',NULL,'CLIENT_ROLE_MAPPING'),('7ac39ee7-3adf-4392-943d-3b34a59acea2',1709175217919,'org3','CREATE','org3','c28dd0b0-60ed-40df-91db-0d9b1e14074b','e74edb4f-b238-4208-8996-dd6ab65ec257','172.18.0.8','clients/c28dd0b0-60ed-40df-91db-0d9b1e14074b/roles/_ws2-admin','{\"id\":\"f436c9ed-08de-4a8f-aa80-97e595a7feb5\",\"name\":\"_ws2-admin\",\"composite\":false,\"attributes\":{\"kind\":[\"workspace\"]}}',NULL,'CLIENT_ROLE'),('7ae73a02-f371-4b91-bddf-3bb115887fa5',1709175211681,'org3','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/b0475217-c11a-49f5-833c-33aaee237a25/roles/_organization-manager','{\"id\":\"2db94f07-d03e-4ad8-b2c3-69cb027d820b\",\"name\":\"_organization-manager\",\"composite\":false,\"attributes\":{\"kind\":[\"organization\"]}}',NULL,'CLIENT_ROLE'),('7d08834f-3015-4d6c-845e-16fb132eb3f4',1709175165377,'org1','ACTION','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/16fe410e-f1df-4ce0-b445-8dd3b5b80750/client-secret','{\"type\":\"secret\",\"value\":\"2olEW3tDBV9wS1VsXjHnxCgl5TyTXtKl\"}',NULL,'CLIENT'),('7e51677d-1ea0-450e-94ed-62035157346c',1709175233583,'org4','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/5a324cc2-4d44-46de-9c51-9afcc3c1adda/roles/_organization-manager/composites','[{\"id\":\"84ea6a9b-1895-4b25-a70a-078a00c98a9d\",\"name\":\"_og-upd\",\"composite\":false,\"clientRole\":true,\"containerId\":\"311ebcfe-7467-459c-856a-862094332329\",\"attributes\":{}},{\"id\":\"f643d9a4-309a-4cb3-8b8d-9cc8b71a342e\",\"name\":\"_og-own-mt\",\"composite\":false,\"clientRole\":true,\"containerId\":\"311ebcfe-7467-459c-856a-862094332329\",\"attributes\":{}},{\"id\":\"97c30574-d3d1-4e01-818f-0867ca808f9a\",\"name\":\"_og-role-usr\",\"composite\":false,\"clientRole\":true,\"containerId\":\"311ebcfe-7467-459c-856a-862094332329\",\"attributes\":{}},{\"id\":\"49d680c3-0166-4ba3-9a23-665e5263f935\",\"name\":\"_og-usage\",\"composite\":false,\"clientRole\":true,\"containerId\":\"311ebcfe-7467-459c-856a-862094332329\",\"attributes\":{}},{\"id\":\"e90549ec-b55c-4237-9d4d-d42c50458309\",\"name\":\"_og-usr-mt\",\"composite\":false,\"clientRole\":true,\"containerId\":\"311ebcfe-7467-459c-856a-862094332329\",\"attributes\":{}},{\"id\":\"e59b30cd-dcf1-4a54-99e8-3077c935cf9e\",\"name\":\"_og-ws-role-mt\",\"composite\":false,\"clientRole\":true,\"containerId\":\"311ebcfe-7467-459c-856a-862094332329\",\"attributes\":{}},{\"id\":\"f8e6ce80-6747-4cbc-9eef-c6b48d8c9d24\",\"name\":\"_og-ws-role-usr\",\"composite\":false,\"clientRole\":true,\"containerId\":\"311ebcfe-7467-459c-856a-862094332329\",\"attributes\":{}},{\"id\":\"d17ebe14-aacf-465a-bd2b-a42112432780\",\"name\":\"_og-ws-mt\",\"composite\":false,\"clientRole\":true,\"containerId\":\"311ebcfe-7467-459c-856a-862094332329\",\"attributes\":{}}]',NULL,'CLIENT_ROLE'),('7f58ca14-7f2e-4893-82c3-a39a2202a029',1709175166136,'org1','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/d321d481-bc24-4294-af2c-7907fd6529b0/roles/_og-role-usr','{\"id\":\"22a556b1-c5ae-43d5-8d25-21698df0b4b6\",\"name\":\"_og-role-usr\",\"composite\":false}',NULL,'CLIENT_ROLE'),('808f3b20-6dea-4a30-be4f-bbae20d8cf4e',1709175267762,'org5','CREATE','org5','01f89460-aba4-42ec-8eb3-f3c2d23cfbc2','47ce89fe-bcd3-45ef-9925-2f6cffef721b','172.18.0.8','users/85631ddb-cb91-4d18-a335-1646a78ee06a/role-mappings/clients/3d62cf66-73c8-4ec7-ba0f-2b622bc5c747','[{\"id\":\"efd5a4cb-e141-4976-86a2-925c48e9a17c\",\"name\":\"_ws1-admin\",\"composite\":true,\"clientRole\":true,\"containerId\":\"3d62cf66-73c8-4ec7-ba0f-2b622bc5c747\",\"attributes\":{\"kind\":[\"workspace\"]}}]',NULL,'CLIENT_ROLE_MAPPING'),('828c2808-58cc-4893-bfab-91aab02d5f01',1709175164651,'org1','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/d321d481-bc24-4294-af2c-7907fd6529b0','{\"id\":\"d321d481-bc24-4294-af2c-7907fd6529b0\",\"clientId\":\"org1-workspaces\",\"surrogateAuthRequired\":false,\"enabled\":true,\"alwaysDisplayInConsole\":false,\"clientAuthenticatorType\":\"client-secret\",\"redirectUris\":[],\"webOrigins\":[],\"notBefore\":0,\"bearerOnly\":false,\"consentRequired\":false,\"standardFlowEnabled\":false,\"implicitFlowEnabled\":false,\"directAccessGrantsEnabled\":true,\"serviceAccountsEnabled\":true,\"publicClient\":false,\"frontchannelLogout\":false,\"protocol\":\"openid-connect\",\"attributes\":{\"id.token.as.detached.signature\":\"false\",\"saml.assertion.signature\":\"false\",\"saml.force.post.binding\":\"false\",\"saml.multivalued.roles\":\"false\",\"saml.encrypt\":\"false\",\"oauth2.device.authorization.grant.enabled\":\"false\",\"backchannel.logout.revoke.offline.tokens\":\"false\",\"saml.server.signature\":\"false\",\"saml.server.signature.keyinfo.ext\":\"false\",\"use.refresh.tokens\":\"true\",\"exclude.session.state.from.auth.response\":\"false\",\"oidc.ciba.grant.enabled\":\"false\",\"saml.artifact.binding\":\"false\",\"backchannel.logout.session.required\":\"true\",\"client_credentials.use_refresh_token\":\"false\",\"saml_force_name_id_format\":\"false\",\"require.pushed.authorization.requests\":\"false\",\"saml.client.signature\":\"false\",\"tls.client.certificate.bound.access.tokens\":\"false\",\"saml.authnstatement\":\"false\",\"display.on.consent.screen\":\"false\",\"saml.onetimeuse.condition\":\"false\"},\"authenticationFlowBindingOverrides\":{},\"fullScopeAllowed\":true,\"nodeReRegistrationTimeout\":-1,\"protocolMappers\":[{\"name\":\"Client Host\",\"protocol\":\"openid-connect\",\"protocolMapper\":\"oidc-usersessionmodel-note-mapper\",\"consentRequired\":false,\"config\":{\"user.session.note\":\"clientHost\",\"userinfo.token.claim\":\"true\",\"id.token.claim\":\"true\",\"access.token.claim\":\"true\",\"claim.name\":\"clientHost\",\"jsonType.label\":\"String\"}},{\"name\":\"Client IP Address\",\"protocol\":\"openid-connect\",\"protocolMapper\":\"oidc-usersessionmodel-note-mapper\",\"consentRequired\":false,\"config\":{\"user.session.note\":\"clientAddress\",\"userinfo.token.claim\":\"true\",\"id.token.claim\":\"true\",\"access.token.claim\":\"true\",\"claim.name\":\"clientAddress\",\"jsonType.label\":\"String\"}},{\"name\":\"Client ID\",\"protocol\":\"openid-connect\",\"protocolMapper\":\"oidc-usersessionmodel-note-mapper\",\"consentRequired\":false,\"config\":{\"user.session.note\":\"clientId\",\"userinfo.token.claim\":\"true\",\"id.token.claim\":\"true\",\"access.token.claim\":\"true\",\"claim.name\":\"clientId\",\"jsonType.label\":\"String\"}}],\"defaultClientScopes\":[\"web-origins\",\"profile\",\"roles\",\"email\"],\"optionalClientScopes\":[\"address\",\"phone\",\"offline_access\",\"microprofile-jwt\"],\"access\":{\"view\":true,\"configure\":true,\"manage\":true}}',NULL,'CLIENT'),('829b123d-a28d-4aec-9f47-a39507a4f42b',1709175195235,'org2','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','users/8a37f068-a80b-4b4b-82a8-5a4c40c51869/role-mappings/clients/5dcb2e50-43d9-4731-af37-8415af71a5fb','[{\"id\":\"c7d88b16-b9b1-4ee9-b88b-089f3cc4736c\",\"name\":\"realm-admin\",\"description\":\"${role_realm-admin}\",\"composite\":true,\"clientRole\":true,\"containerId\":\"5dcb2e50-43d9-4731-af37-8415af71a5fb\",\"attributes\":{}}]',NULL,'CLIENT_ROLE_MAPPING'),('84544d78-70a7-4f45-9ce2-113f2d317c8d',1709175172742,'org1','CREATE','org1','d321d481-bc24-4294-af2c-7907fd6529b0','2e008a28-22ba-4bec-94c3-f26482afb61b','172.18.0.8','clients/16fe410e-f1df-4ce0-b445-8dd3b5b80750/roles/_ws1-admin/composites','[{\"id\":\"d36dd5c8-7ece-41a2-b226-5b0a94f449ba\",\"name\":\"ws1\",\"composite\":false,\"clientRole\":true,\"containerId\":\"d321d481-bc24-4294-af2c-7907fd6529b0\",\"attributes\":{\"kind\":[\"workspace\"]}},{\"id\":\"8078aa9f-4275-4bbf-a881-32f2ff1cfda6\",\"name\":\"_ws1-admin\",\"composite\":false,\"clientRole\":true,\"containerId\":\"d321d481-bc24-4294-af2c-7907fd6529b0\",\"attributes\":{\"kind\":[\"workspace\"]}}]',NULL,'CLIENT_ROLE'),('85a03ec6-a5c5-4b00-b9ac-d3c1f030f946',1709175172809,'org1','CREATE','org1','d321d481-bc24-4294-af2c-7907fd6529b0','2e008a28-22ba-4bec-94c3-f26482afb61b','172.18.0.8','users/74c8800a-f392-4c3c-9077-cfb96a52c947/role-mappings/clients/16fe410e-f1df-4ce0-b445-8dd3b5b80750','[{\"id\":\"94d463bc-0ba6-4d80-85f4-e63860357f80\",\"name\":\"_ws1-admin\",\"composite\":true,\"clientRole\":true,\"containerId\":\"16fe410e-f1df-4ce0-b445-8dd3b5b80750\",\"attributes\":{\"kind\":[\"workspace\"]}}]',NULL,'CLIENT_ROLE_MAPPING'),('8ac9c38b-d45c-458f-9dd8-bf3a12885646',1709175201242,'org2','CREATE','org2','a0d96aa1-71ac-4a7e-a769-306baf1c51fc','8a37f068-a80b-4b4b-82a8-5a4c40c51869','172.18.0.8','users/fe934bbc-b716-474a-b1e0-eefc2a29e1b2/role-mappings/clients/a15e680b-47bb-4b94-a832-5ca99cdbe134','[{\"id\":\"9201ee66-0e4c-4d92-ab9e-2120a7390dab\",\"name\":\"_ws2-admin\",\"composite\":true,\"clientRole\":true,\"containerId\":\"a15e680b-47bb-4b94-a832-5ca99cdbe134\",\"attributes\":{\"kind\":[\"workspace\"]}}]',NULL,'CLIENT_ROLE_MAPPING'),('8c6e4163-4086-4188-a230-8ecc52926e1f',1709175185811,'org1','CREATE','org1','d321d481-bc24-4294-af2c-7907fd6529b0','2e008a28-22ba-4bec-94c3-f26482afb61b','172.18.0.8','clients/16fe410e-f1df-4ce0-b445-8dd3b5b80750/roles/_ws3-admin/composites','[{\"id\":\"eb8ed358-e4aa-4a55-bb8f-98aed6f3e39f\",\"name\":\"ws3\",\"composite\":false,\"clientRole\":true,\"containerId\":\"d321d481-bc24-4294-af2c-7907fd6529b0\",\"attributes\":{\"kind\":[\"workspace\"]}},{\"id\":\"11b02ef2-cac3-4420-b878-26ab43bc8d69\",\"name\":\"_ws3-admin\",\"composite\":false,\"clientRole\":true,\"containerId\":\"d321d481-bc24-4294-af2c-7907fd6529b0\",\"attributes\":{\"kind\":[\"workspace\"]}}]',NULL,'CLIENT_ROLE'),('8d5885fe-7667-4a9e-b96b-dc4ba984f755',1709175264180,'org5','ACTION','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/8f492599-c8fb-4bce-af8a-34f41e0f5b74/client-secret','{\"type\":\"secret\",\"value\":\"JeaMZtAayEDDMhNE2i5XXGXEh5gwLXCB\"}',NULL,'CLIENT'),('8f223538-0501-4971-a142-9f4bcea8e09f',1709175181129,'org1','CREATE','org1','d321d481-bc24-4294-af2c-7907fd6529b0','2e008a28-22ba-4bec-94c3-f26482afb61b','172.18.0.8','clients/16fe410e-f1df-4ce0-b445-8dd3b5b80750/roles/_ws2-admin','{\"id\":\"6bd9c5f4-97b4-457e-8835-a14a932d8d63\",\"name\":\"_ws2-admin\",\"composite\":false,\"attributes\":{\"kind\":[\"workspace\"]}}',NULL,'CLIENT_ROLE'),('924352b7-5653-40e7-bd82-9e4fd61a846e',1709175205033,'org2','CREATE','org2','a0d96aa1-71ac-4a7e-a769-306baf1c51fc','8a37f068-a80b-4b4b-82a8-5a4c40c51869','172.18.0.8','clients/a0d96aa1-71ac-4a7e-a769-306baf1c51fc/roles/ws3','{\"id\":\"c2180217-3bf3-45fa-acb3-90dd20ef3772\",\"name\":\"ws3\",\"composite\":false,\"attributes\":{\"kind\":[\"workspace\"]}}',NULL,'CLIENT_ROLE'),('92932f91-e3f1-450c-b466-6845e320a18f',1709175181051,'org1','CREATE','org1','d321d481-bc24-4294-af2c-7907fd6529b0','2e008a28-22ba-4bec-94c3-f26482afb61b','172.18.0.8','clients/d321d481-bc24-4294-af2c-7907fd6529b0/roles/ws2','{\"id\":\"a062a342-9ccc-4009-8ebd-61e0f92d01a0\",\"name\":\"ws2\",\"composite\":false,\"attributes\":{\"kind\":[\"workspace\"]}}',NULL,'CLIENT_ROLE'),('92f7cee9-07e6-4dbc-bb18-36d6b6711e86',1709175276561,'org5','CREATE','org5','01f89460-aba4-42ec-8eb3-f3c2d23cfbc2','47ce89fe-bcd3-45ef-9925-2f6cffef721b','172.18.0.8','clients/3d62cf66-73c8-4ec7-ba0f-2b622bc5c747/roles/_ws2-admin','{\"id\":\"9ff2af3b-6e78-4684-a859-6278fb8782f2\",\"name\":\"_ws2-admin\",\"composite\":false,\"attributes\":{\"kind\":[\"workspace\"]}}',NULL,'CLIENT_ROLE'),('93cd7535-84b8-406b-ad8f-6a5f4db25ceb',1709175267605,'org5','CREATE','org5','01f89460-aba4-42ec-8eb3-f3c2d23cfbc2','47ce89fe-bcd3-45ef-9925-2f6cffef721b','172.18.0.8','clients/01f89460-aba4-42ec-8eb3-f3c2d23cfbc2/roles/_ws1-admin','{\"id\":\"f8e2a07b-1795-4cb5-b2b2-3ce3fbdb91be\",\"name\":\"_ws1-admin\",\"composite\":false,\"attributes\":{\"kind\":[\"workspace\"]}}',NULL,'CLIENT_ROLE'),('94bb210c-5ba8-4c89-9784-8f47818becc6',1709175212417,'org3','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','users/98b18f6f-d105-437a-92f2-fb863b59805c/role-mappings/clients/b0475217-c11a-49f5-833c-33aaee237a25','[{\"id\":\"2db94f07-d03e-4ad8-b2c3-69cb027d820b\",\"name\":\"_organization-manager\",\"composite\":true,\"clientRole\":true,\"containerId\":\"b0475217-c11a-49f5-833c-33aaee237a25\",\"attributes\":{\"kind\":[\"organization\"]}}]',NULL,'CLIENT_ROLE_MAPPING'),('959cf30c-1a24-40a4-ad7a-38d120ee176b',1709175172195,'org1','UPDATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8',NULL,'{\"enabled\":true}',NULL,'REALM'),('98eb7295-e06c-46bb-ac59-8a69ac0fbb92',1709175166335,'org1','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/d321d481-bc24-4294-af2c-7907fd6529b0/roles/_og-ws-role-usr','{\"id\":\"2482b501-5049-4f8c-98a2-557c96641f6b\",\"name\":\"_og-ws-role-usr\",\"composite\":false}',NULL,'CLIENT_ROLE'),('99d2f891-5f63-48b2-a910-09c2157c6d3c',1709175194635,'org2','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/a0d96aa1-71ac-4a7e-a769-306baf1c51fc/roles/_og-ws-role-mt','{\"id\":\"4bc71a50-0bca-450d-80f5-0a0fe3f9f1f9\",\"name\":\"_og-ws-role-mt\",\"composite\":false}',NULL,'CLIENT_ROLE'),('9c1a1cec-9869-4e29-994b-002fa7eb41f1',1709175217898,'org3','CREATE','org3','c28dd0b0-60ed-40df-91db-0d9b1e14074b','e74edb4f-b238-4208-8996-dd6ab65ec257','172.18.0.8','clients/c28dd0b0-60ed-40df-91db-0d9b1e14074b/roles/ws2','{\"id\":\"b94ada76-bb55-4104-9f46-3a7372882a98\",\"name\":\"ws2\",\"composite\":false,\"attributes\":{\"kind\":[\"workspace\"]}}',NULL,'CLIENT_ROLE'),('9e88d48f-10ec-4d68-9211-8a77682a268b',1709175167131,'org1','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/16fe410e-f1df-4ce0-b445-8dd3b5b80750/roles/_organization-user-manager/composites','[{\"id\":\"c0c471d5-663f-403f-b33a-0bad8e7328a9\",\"name\":\"_og-usr-mt\",\"composite\":false,\"clientRole\":true,\"containerId\":\"d321d481-bc24-4294-af2c-7907fd6529b0\",\"attributes\":{}},{\"id\":\"2482b501-5049-4f8c-98a2-557c96641f6b\",\"name\":\"_og-ws-role-usr\",\"composite\":false,\"clientRole\":true,\"containerId\":\"d321d481-bc24-4294-af2c-7907fd6529b0\",\"attributes\":{}}]',NULL,'CLIENT_ROLE'),('9f3451ca-aa63-40ba-90f2-5ccee583f61d',1709175211476,'org3','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/c28dd0b0-60ed-40df-91db-0d9b1e14074b/roles/_og-upd','{\"id\":\"5ea3cd76-4b85-49ff-8f6b-b25662deb38a\",\"name\":\"_og-upd\",\"composite\":false}',NULL,'CLIENT_ROLE'),('9f571b46-289f-4321-8b30-018d607d7d9e',1709175265353,'org5','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/3d62cf66-73c8-4ec7-ba0f-2b622bc5c747/roles/_organization-user-manager','{\"id\":\"761cbec8-ef0b-418d-b9c6-6351cd4a4039\",\"name\":\"_organization-user-manager\",\"composite\":false,\"attributes\":{\"kind\":[\"organization\"]}}',NULL,'CLIENT_ROLE'),('a3e04ba6-2d45-49e3-b2b0-62809a7c10b8',1709175211388,'org3','ACTION','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/84e2d9c2-d7af-4ae0-9dfa-41a04f1ab1f4/client-secret','{\"type\":\"secret\",\"value\":\"oZPJIc9v8y0QLIqyvPBzYUeDxdIprg7K\"}',NULL,'CLIENT'),('a450139c-861d-4232-910d-25f0ad459298',1709175185681,'org1','CREATE','org1','d321d481-bc24-4294-af2c-7907fd6529b0','2e008a28-22ba-4bec-94c3-f26482afb61b','172.18.0.8','clients/d321d481-bc24-4294-af2c-7907fd6529b0/roles/ws3','{\"id\":\"eb8ed358-e4aa-4a55-bb8f-98aed6f3e39f\",\"name\":\"ws3\",\"composite\":false,\"attributes\":{\"kind\":[\"workspace\"]}}',NULL,'CLIENT_ROLE'),('a7dbc90b-9789-4034-96c4-ee5397c736f2',1709175233245,'org4','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/311ebcfe-7467-459c-856a-862094332329/roles/_og-usr-mt','{\"id\":\"e90549ec-b55c-4237-9d4d-d42c50458309\",\"name\":\"_og-usr-mt\",\"composite\":false}',NULL,'CLIENT_ROLE'),('a7f4c1cf-242c-4a1e-9706-bb1df71211ae',1709175194550,'org2','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/a0d96aa1-71ac-4a7e-a769-306baf1c51fc/roles/_og-own-mt','{\"id\":\"422d8d19-390b-4e48-a9a8-d72074613be0\",\"name\":\"_og-own-mt\",\"composite\":false}',NULL,'CLIENT_ROLE'),('a9e2111a-9c01-48aa-9dc5-c01cb7127854',1709175194151,'org2','ACTION','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/d0aaa350-6ca7-4545-a008-583d46596744/client-secret','{\"type\":\"secret\",\"value\":\"d5Y1Va6l12eWstBqt6gvj529VWOvy3sz\"}',NULL,'CLIENT'),('ab031bf5-8a26-43b2-8561-a943cd48070d',1709175276525,'org5','CREATE','org5','01f89460-aba4-42ec-8eb3-f3c2d23cfbc2','47ce89fe-bcd3-45ef-9925-2f6cffef721b','172.18.0.8','clients/01f89460-aba4-42ec-8eb3-f3c2d23cfbc2/roles/_ws2-admin','{\"id\":\"048685bc-626c-4b13-a44f-c721b4842248\",\"name\":\"_ws2-admin\",\"composite\":false,\"attributes\":{\"kind\":[\"workspace\"]}}',NULL,'CLIENT_ROLE'),('abfd95bd-07b8-4702-85d7-4baee28fc80d',1709175265412,'org5','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/3d62cf66-73c8-4ec7-ba0f-2b622bc5c747/roles/_organization-user-manager/composites','[{\"id\":\"f8b4617b-8a4b-454d-9e85-826d34daf267\",\"name\":\"_og-usr-mt\",\"composite\":false,\"clientRole\":true,\"containerId\":\"01f89460-aba4-42ec-8eb3-f3c2d23cfbc2\",\"attributes\":{}},{\"id\":\"67dcf259-6999-47ed-9122-e00dc5222a6c\",\"name\":\"_og-ws-role-usr\",\"composite\":false,\"clientRole\":true,\"containerId\":\"01f89460-aba4-42ec-8eb3-f3c2d23cfbc2\",\"attributes\":{}}]',NULL,'CLIENT_ROLE'),('ac46abde-66a4-44d0-9567-5a8b2498636b',1709175232719,'org4','ACTION','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/684a5673-eac6-49e1-8fad-7b9fe666a06f/client-secret','{\"type\":\"secret\",\"value\":\"fdMC9fipQyXMG1kLcX7q65InNthetdMO\"}',NULL,'CLIENT'),('ac55d032-dfa2-4053-9d3d-6a3b1b4275c9',1709175267637,'org5','CREATE','org5','01f89460-aba4-42ec-8eb3-f3c2d23cfbc2','47ce89fe-bcd3-45ef-9925-2f6cffef721b','172.18.0.8','clients/3d62cf66-73c8-4ec7-ba0f-2b622bc5c747/roles/_ws1-admin','{\"id\":\"efd5a4cb-e141-4976-86a2-925c48e9a17c\",\"name\":\"_ws1-admin\",\"composite\":false,\"attributes\":{\"kind\":[\"workspace\"]}}',NULL,'CLIENT_ROLE'),('adbbb8fb-6a25-4ca1-8358-521f4fdc8a2e',1709175165750,'org1','ACTION','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/1b5f5d7e-5c2b-4687-8450-d38949728f18/client-secret','{\"type\":\"secret\",\"value\":\"qB8Mr6LW3Anv7XAsACJd2smxbnRx4v6A\"}',NULL,'CLIENT'),('aef2f10a-d5c5-413d-8955-2a98d3f62fa3',1709175211585,'org3','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/c28dd0b0-60ed-40df-91db-0d9b1e14074b/roles/_og-ws-role-mt','{\"id\":\"d066d55a-9192-4ecc-95f8-63d6f89f1ed3\",\"name\":\"_og-ws-role-mt\",\"composite\":false}',NULL,'CLIENT_ROLE'),('afe01b93-591b-4e39-915f-5f52598a541c',1709175245636,'org4','CREATE','org4','311ebcfe-7467-459c-856a-862094332329','0eb52a14-0c83-4db6-b40b-19355bfc54ae','172.18.0.8','clients/5a324cc2-4d44-46de-9c51-9afcc3c1adda/roles/_ws2-admin/composites','[{\"id\":\"4c86b391-91a8-4968-bfdd-816a2ae4efa9\",\"name\":\"ws2\",\"composite\":false,\"clientRole\":true,\"containerId\":\"311ebcfe-7467-459c-856a-862094332329\",\"attributes\":{\"kind\":[\"workspace\"]}},{\"id\":\"73f6933d-5e3f-40aa-a211-c73134c76678\",\"name\":\"_ws2-admin\",\"composite\":false,\"clientRole\":true,\"containerId\":\"311ebcfe-7467-459c-856a-862094332329\",\"attributes\":{\"kind\":[\"workspace\"]}}]',NULL,'CLIENT_ROLE'),('b096f218-0a33-4409-8d3e-5eeb8b052149',1709175245687,'org4','CREATE','org4','311ebcfe-7467-459c-856a-862094332329','0eb52a14-0c83-4db6-b40b-19355bfc54ae','172.18.0.8','users/56cae199-4b66-451c-a310-9dec3f649490/role-mappings/clients/5a324cc2-4d44-46de-9c51-9afcc3c1adda','[{\"id\":\"652f33df-5bff-4e35-9e1e-40b6a6f717f7\",\"name\":\"_ws2-admin\",\"composite\":true,\"clientRole\":true,\"containerId\":\"5a324cc2-4d44-46de-9c51-9afcc3c1adda\",\"attributes\":{\"kind\":[\"workspace\"]}}]',NULL,'CLIENT_ROLE_MAPPING'),('b29c5c00-530d-4b7b-a436-3d7774798845',1709175194577,'org2','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/a0d96aa1-71ac-4a7e-a769-306baf1c51fc/roles/_og-role-usr','{\"id\":\"54089fa4-da59-4bda-a24d-1f502f392a8e\",\"name\":\"_og-role-usr\",\"composite\":false}',NULL,'CLIENT_ROLE'),('b3a6323b-b3f1-4d0c-891c-5ae943c1131d',1709175167046,'org1','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/16fe410e-f1df-4ce0-b445-8dd3b5b80750/roles/_organization-user-manager','{\"id\":\"9b896e40-e851-42db-9546-bf6ef748c438\",\"name\":\"_organization-user-manager\",\"composite\":false,\"attributes\":{\"kind\":[\"organization\"]}}',NULL,'CLIENT_ROLE'),('b4ff964b-0ef4-4385-8c13-3dd9ae31d32b',1709175166092,'org1','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/d321d481-bc24-4294-af2c-7907fd6529b0/roles/_og-own-mt','{\"id\":\"be267d19-3305-4185-b833-5ac29b0b665c\",\"name\":\"_og-own-mt\",\"composite\":false}',NULL,'CLIENT_ROLE'),('b7f6ada3-9ff4-469d-9a02-c1689b985bff',1709175195030,'org2','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/a15e680b-47bb-4b94-a832-5ca99cdbe134/roles/_organization-user-manager','{\"id\":\"4317a957-dd6e-41c6-b3fb-2118c48a8f6a\",\"name\":\"_organization-user-manager\",\"composite\":false,\"attributes\":{\"kind\":[\"organization\"]}}',NULL,'CLIENT_ROLE'),('b81da23d-53fe-432a-828b-31ea1705391d',1709175264627,'org5','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/01f89460-aba4-42ec-8eb3-f3c2d23cfbc2/roles/_og-upd','{\"id\":\"6c0f37d2-2c65-427f-8e55-fa3677ec482a\",\"name\":\"_og-upd\",\"composite\":false}',NULL,'CLIENT_ROLE'),('ba6e3244-0e0c-4614-85cc-baf73ca2e21e',1709175211499,'org3','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/c28dd0b0-60ed-40df-91db-0d9b1e14074b/roles/_og-own-mt','{\"id\":\"95b164a2-6b95-4fe8-b27b-28fab90a372d\",\"name\":\"_og-own-mt\",\"composite\":false}',NULL,'CLIENT_ROLE'),('bb1cdf4c-e6eb-4dff-8a54-02d08e08f959',1709175194912,'org2','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/a15e680b-47bb-4b94-a832-5ca99cdbe134/roles/_organization-manager/composites','[{\"id\":\"c371c4ce-9c38-433c-8650-5774bf65f3f7\",\"name\":\"_og-upd\",\"composite\":false,\"clientRole\":true,\"containerId\":\"a0d96aa1-71ac-4a7e-a769-306baf1c51fc\",\"attributes\":{}},{\"id\":\"422d8d19-390b-4e48-a9a8-d72074613be0\",\"name\":\"_og-own-mt\",\"composite\":false,\"clientRole\":true,\"containerId\":\"a0d96aa1-71ac-4a7e-a769-306baf1c51fc\",\"attributes\":{}},{\"id\":\"54089fa4-da59-4bda-a24d-1f502f392a8e\",\"name\":\"_og-role-usr\",\"composite\":false,\"clientRole\":true,\"containerId\":\"a0d96aa1-71ac-4a7e-a769-306baf1c51fc\",\"attributes\":{}},{\"id\":\"6e1fbe58-4de5-4613-a014-4a5123be8baa\",\"name\":\"_og-usage\",\"composite\":false,\"clientRole\":true,\"containerId\":\"a0d96aa1-71ac-4a7e-a769-306baf1c51fc\",\"attributes\":{}},{\"id\":\"f8ad0b14-409f-4ae0-ac3d-51d4d6c71c71\",\"name\":\"_og-usr-mt\",\"composite\":false,\"clientRole\":true,\"containerId\":\"a0d96aa1-71ac-4a7e-a769-306baf1c51fc\",\"attributes\":{}},{\"id\":\"4bc71a50-0bca-450d-80f5-0a0fe3f9f1f9\",\"name\":\"_og-ws-role-mt\",\"composite\":false,\"clientRole\":true,\"containerId\":\"a0d96aa1-71ac-4a7e-a769-306baf1c51fc\",\"attributes\":{}},{\"id\":\"793592b1-dbff-4778-b35e-19cdb9681830\",\"name\":\"_og-ws-role-usr\",\"composite\":false,\"clientRole\":true,\"containerId\":\"a0d96aa1-71ac-4a7e-a769-306baf1c51fc\",\"attributes\":{}},{\"id\":\"60530a2c-05f2-4ac7-b93e-734c1377dc84\",\"name\":\"_og-ws-mt\",\"composite\":false,\"clientRole\":true,\"containerId\":\"a0d96aa1-71ac-4a7e-a769-306baf1c51fc\",\"attributes\":{}}]',NULL,'CLIENT_ROLE'),('bbfb69b8-064c-4671-a5b4-d2107dcab854',1709175166385,'org1','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/d321d481-bc24-4294-af2c-7907fd6529b0/roles/_og-ws-mt','{\"id\":\"c0c0a50c-70b5-4ba7-ada2-583401aaedd9\",\"name\":\"_og-ws-mt\",\"composite\":false}',NULL,'CLIENT_ROLE'),('bd0b051c-c252-42bd-a427-ccdf329c5639',1709175166223,'org1','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/d321d481-bc24-4294-af2c-7907fd6529b0/roles/_og-usr-mt','{\"id\":\"c0c471d5-663f-403f-b33a-0bad8e7328a9\",\"name\":\"_og-usr-mt\",\"composite\":false}',NULL,'CLIENT_ROLE'),('bd3d3e49-92f9-492a-997e-a3197cbb61cf',1709175211879,'org3','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/b0475217-c11a-49f5-833c-33aaee237a25/roles/_organization-user-role-manager','{\"id\":\"fd2e0de6-8e32-4a51-8f7c-ad0ee28b4804\",\"name\":\"_organization-user-role-manager\",\"composite\":false,\"attributes\":{\"kind\":[\"organization\"]}}',NULL,'CLIENT_ROLE'),('bdacb32f-30b7-4750-8a54-edbdc065d6a8',1709175267272,'org5','UPDATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8',NULL,'{\"enabled\":true}',NULL,'REALM'),('c26e83c9-0f16-4ef7-b36c-31a7f2a0517d',1709175211523,'org3','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/c28dd0b0-60ed-40df-91db-0d9b1e14074b/roles/_og-role-usr','{\"id\":\"42f46a9a-71a7-4de0-b372-672b561061ce\",\"name\":\"_og-role-usr\",\"composite\":false}',NULL,'CLIENT_ROLE'),('c3023765-88b7-484c-a665-6c6237bd6a9b',1709175233208,'org4','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/311ebcfe-7467-459c-856a-862094332329/roles/_og-usage','{\"id\":\"49d680c3-0166-4ba3-9a23-665e5263f935\",\"name\":\"_og-usage\",\"composite\":false}',NULL,'CLIENT_ROLE'),('c360164d-3a86-405a-b5b5-c9afe4d4c082',1709175235718,'org4','UPDATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8',NULL,'{\"enabled\":true}',NULL,'REALM'),('c3e76648-6218-4c27-9071-659b92a34a9c',1709175181270,'org1','CREATE','org1','d321d481-bc24-4294-af2c-7907fd6529b0','2e008a28-22ba-4bec-94c3-f26482afb61b','172.18.0.8','users/74c8800a-f392-4c3c-9077-cfb96a52c947/role-mappings/clients/16fe410e-f1df-4ce0-b445-8dd3b5b80750','[{\"id\":\"6bd9c5f4-97b4-457e-8835-a14a932d8d63\",\"name\":\"_ws2-admin\",\"composite\":true,\"clientRole\":true,\"containerId\":\"16fe410e-f1df-4ce0-b445-8dd3b5b80750\",\"attributes\":{\"kind\":[\"workspace\"]}}]',NULL,'CLIENT_ROLE_MAPPING'),('c415c1e7-5877-43a3-9e47-13d2a3e6c3a6',1709175166845,'org1','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/16fe410e-f1df-4ce0-b445-8dd3b5b80750/roles/_organization-user-role-manager','{\"id\":\"ca326db1-1def-40b5-b442-186c8372dc54\",\"name\":\"_organization-user-role-manager\",\"composite\":false,\"attributes\":{\"kind\":[\"organization\"]}}',NULL,'CLIENT_ROLE'),('c42b2933-e883-4496-a6b2-2d74a812a364',1709175264340,'org5','ACTION','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/3d62cf66-73c8-4ec7-ba0f-2b622bc5c747/client-secret','{\"type\":\"secret\",\"value\":\"rErCQmyFhbRO89G7aeZhahZnjNvPCfId\"}',NULL,'CLIENT'),('c4b08865-56af-4e91-a9a4-1a9831ed3221',1709175265324,'org5','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/3d62cf66-73c8-4ec7-ba0f-2b622bc5c747/roles/_organization-user-role-manager/composites','[{\"id\":\"f8b4617b-8a4b-454d-9e85-826d34daf267\",\"name\":\"_og-usr-mt\",\"composite\":false,\"clientRole\":true,\"containerId\":\"01f89460-aba4-42ec-8eb3-f3c2d23cfbc2\",\"attributes\":{}},{\"id\":\"5a6423d8-f4c7-4bf0-9b4f-42adb669220a\",\"name\":\"_og-ws-role-mt\",\"composite\":false,\"clientRole\":true,\"containerId\":\"01f89460-aba4-42ec-8eb3-f3c2d23cfbc2\",\"attributes\":{}},{\"id\":\"67dcf259-6999-47ed-9122-e00dc5222a6c\",\"name\":\"_og-ws-role-usr\",\"composite\":false,\"clientRole\":true,\"containerId\":\"01f89460-aba4-42ec-8eb3-f3c2d23cfbc2\",\"attributes\":{}}]',NULL,'CLIENT_ROLE'),('c6bfd4ad-8986-4684-8040-fadce624e32b',1709175193956,'org2','ACTION','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/a0d96aa1-71ac-4a7e-a769-306baf1c51fc/client-secret','{\"type\":\"secret\",\"value\":\"yVwr7DjWJMfhIypWN8bXrVOVer4XtIOY\"}',NULL,'CLIENT'),('c6cfa60d-93cd-4768-9ff8-34d57fe3e8ec',1709175181215,'org1','CREATE','org1','d321d481-bc24-4294-af2c-7907fd6529b0','2e008a28-22ba-4bec-94c3-f26482afb61b','172.18.0.8','clients/16fe410e-f1df-4ce0-b445-8dd3b5b80750/roles/_ws2-admin/composites','[{\"id\":\"a062a342-9ccc-4009-8ebd-61e0f92d01a0\",\"name\":\"ws2\",\"composite\":false,\"clientRole\":true,\"containerId\":\"d321d481-bc24-4294-af2c-7907fd6529b0\",\"attributes\":{\"kind\":[\"workspace\"]}},{\"id\":\"43174789-3363-408b-81f6-dda1f17a1e5a\",\"name\":\"_ws2-admin\",\"composite\":false,\"clientRole\":true,\"containerId\":\"d321d481-bc24-4294-af2c-7907fd6529b0\",\"attributes\":{\"kind\":[\"workspace\"]}}]',NULL,'CLIENT_ROLE'),('c737c72c-a418-424a-876d-00dadb02be67',1709175196708,'org2','CREATE','org2','a0d96aa1-71ac-4a7e-a769-306baf1c51fc','8a37f068-a80b-4b4b-82a8-5a4c40c51869','172.18.0.8','users/fe934bbc-b716-474a-b1e0-eefc2a29e1b2/role-mappings/clients/a15e680b-47bb-4b94-a832-5ca99cdbe134','[{\"id\":\"6809f7f3-19bd-4e02-b894-e33f3c3879b2\",\"name\":\"_ws1-admin\",\"composite\":true,\"clientRole\":true,\"containerId\":\"a15e680b-47bb-4b94-a832-5ca99cdbe134\",\"attributes\":{\"kind\":[\"workspace\"]}}]',NULL,'CLIENT_ROLE_MAPPING'),('c80ade47-fe6d-486d-a738-608231dd1dd6',1709175285082,'org5','CREATE','org5','01f89460-aba4-42ec-8eb3-f3c2d23cfbc2','47ce89fe-bcd3-45ef-9925-2f6cffef721b','172.18.0.8','clients/3d62cf66-73c8-4ec7-ba0f-2b622bc5c747/roles/_ws3-admin/composites','[{\"id\":\"0840bb7d-56e0-479e-b3d5-b510a729d468\",\"name\":\"ws3\",\"composite\":false,\"clientRole\":true,\"containerId\":\"01f89460-aba4-42ec-8eb3-f3c2d23cfbc2\",\"attributes\":{\"kind\":[\"workspace\"]}},{\"id\":\"673b825d-10ba-4658-b90a-0854ca6dacd4\",\"name\":\"_ws3-admin\",\"composite\":false,\"clientRole\":true,\"containerId\":\"01f89460-aba4-42ec-8eb3-f3c2d23cfbc2\",\"attributes\":{\"kind\":[\"workspace\"]}}]',NULL,'CLIENT_ROLE'),('c865e2ae-d273-4991-a866-43f900331ca7',1709175234245,'org4','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','users/56cae199-4b66-451c-a310-9dec3f649490/role-mappings/clients/5a324cc2-4d44-46de-9c51-9afcc3c1adda','[{\"id\":\"0121d427-696b-4bd0-97fd-ef2e49612705\",\"name\":\"_organization-manager\",\"composite\":true,\"clientRole\":true,\"containerId\":\"5a324cc2-4d44-46de-9c51-9afcc3c1adda\",\"attributes\":{\"kind\":[\"organization\"]}}]',NULL,'CLIENT_ROLE_MAPPING'),('c9493f63-414a-4a37-a463-1d1c1c66dfb2',1709175185731,'org1','CREATE','org1','d321d481-bc24-4294-af2c-7907fd6529b0','2e008a28-22ba-4bec-94c3-f26482afb61b','172.18.0.8','clients/16fe410e-f1df-4ce0-b445-8dd3b5b80750/roles/_ws3-admin','{\"id\":\"957a70a3-5891-4e14-9765-2560c25916ee\",\"name\":\"_ws3-admin\",\"composite\":false,\"attributes\":{\"kind\":[\"workspace\"]}}',NULL,'CLIENT_ROLE'),('ca897f94-1947-406c-87b3-8770f7ad6fb0',1709175211128,'org3','ACTION','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/479237b2-a9fc-4828-b80d-ffd84ec6f3bc/client-secret','{\"type\":\"secret\",\"value\":\"pVkxU7HUrWzoJ1IotWwyXLNxATFpLRda\"}',NULL,'CLIENT'),('caeadf4f-518f-4337-ac2f-00e2f6156ce2',1709175265220,'org5','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/3d62cf66-73c8-4ec7-ba0f-2b622bc5c747/roles/_organization-manager/composites','[{\"id\":\"6c0f37d2-2c65-427f-8e55-fa3677ec482a\",\"name\":\"_og-upd\",\"composite\":false,\"clientRole\":true,\"containerId\":\"01f89460-aba4-42ec-8eb3-f3c2d23cfbc2\",\"attributes\":{}},{\"id\":\"3010abd9-a4c4-49f7-b76e-093ca5360042\",\"name\":\"_og-own-mt\",\"composite\":false,\"clientRole\":true,\"containerId\":\"01f89460-aba4-42ec-8eb3-f3c2d23cfbc2\",\"attributes\":{}},{\"id\":\"90d0c148-67ef-4bba-bd2f-8aa2086466f2\",\"name\":\"_og-role-usr\",\"composite\":false,\"clientRole\":true,\"containerId\":\"01f89460-aba4-42ec-8eb3-f3c2d23cfbc2\",\"attributes\":{}},{\"id\":\"45c2fe61-d5d0-4044-912c-13dcbaa3e873\",\"name\":\"_og-usage\",\"composite\":false,\"clientRole\":true,\"containerId\":\"01f89460-aba4-42ec-8eb3-f3c2d23cfbc2\",\"attributes\":{}},{\"id\":\"f8b4617b-8a4b-454d-9e85-826d34daf267\",\"name\":\"_og-usr-mt\",\"composite\":false,\"clientRole\":true,\"containerId\":\"01f89460-aba4-42ec-8eb3-f3c2d23cfbc2\",\"attributes\":{}},{\"id\":\"5a6423d8-f4c7-4bf0-9b4f-42adb669220a\",\"name\":\"_og-ws-role-mt\",\"composite\":false,\"clientRole\":true,\"containerId\":\"01f89460-aba4-42ec-8eb3-f3c2d23cfbc2\",\"attributes\":{}},{\"id\":\"67dcf259-6999-47ed-9122-e00dc5222a6c\",\"name\":\"_og-ws-role-usr\",\"composite\":false,\"clientRole\":true,\"containerId\":\"01f89460-aba4-42ec-8eb3-f3c2d23cfbc2\",\"attributes\":{}},{\"id\":\"aba52e43-5183-419c-b217-a2f670a69ec0\",\"name\":\"_og-ws-mt\",\"composite\":false,\"clientRole\":true,\"containerId\":\"01f89460-aba4-42ec-8eb3-f3c2d23cfbc2\",\"attributes\":{}}]',NULL,'CLIENT_ROLE'),('cbf742cb-564c-44b4-9e14-25f2767eb1e1',1709175172570,'org1','CREATE','org1','d321d481-bc24-4294-af2c-7907fd6529b0','2e008a28-22ba-4bec-94c3-f26482afb61b','172.18.0.8','clients/d321d481-bc24-4294-af2c-7907fd6529b0/roles/_ws1-admin','{\"id\":\"8078aa9f-4275-4bbf-a881-32f2ff1cfda6\",\"name\":\"_ws1-admin\",\"composite\":false,\"attributes\":{\"kind\":[\"workspace\"]}}',NULL,'CLIENT_ROLE'),('cc7fe452-4143-477c-88f4-8839b63dd4de',1709175211202,'org3','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/b0475217-c11a-49f5-833c-33aaee237a25','{\"id\":\"b0475217-c11a-49f5-833c-33aaee237a25\",\"clientId\":\"org3\",\"surrogateAuthRequired\":false,\"enabled\":true,\"alwaysDisplayInConsole\":false,\"clientAuthenticatorType\":\"client-secret\",\"redirectUris\":[\"/*\"],\"webOrigins\":[],\"notBefore\":0,\"bearerOnly\":false,\"consentRequired\":false,\"standardFlowEnabled\":true,\"implicitFlowEnabled\":false,\"directAccessGrantsEnabled\":true,\"serviceAccountsEnabled\":false,\"publicClient\":true,\"frontchannelLogout\":false,\"protocol\":\"openid-connect\",\"attributes\":{\"post.logout.redirect.uris\":\"/*\",\"id.token.as.detached.signature\":\"false\",\"saml.assertion.signature\":\"false\",\"saml.force.post.binding\":\"false\",\"saml.multivalued.roles\":\"false\",\"saml.encrypt\":\"false\",\"oauth2.device.authorization.grant.enabled\":\"false\",\"backchannel.logout.revoke.offline.tokens\":\"false\",\"saml.server.signature\":\"false\",\"saml.server.signature.keyinfo.ext\":\"false\",\"use.refresh.tokens\":\"true\",\"exclude.session.state.from.auth.response\":\"false\",\"oidc.ciba.grant.enabled\":\"false\",\"saml.artifact.binding\":\"false\",\"backchannel.logout.session.required\":\"true\",\"client_credentials.use_refresh_token\":\"false\",\"saml_force_name_id_format\":\"false\",\"require.pushed.authorization.requests\":\"false\",\"saml.client.signature\":\"false\",\"tls.client.certificate.bound.access.tokens\":\"false\",\"saml.authnstatement\":\"false\",\"display.on.consent.screen\":\"false\",\"saml.onetimeuse.condition\":\"false\"},\"authenticationFlowBindingOverrides\":{},\"fullScopeAllowed\":true,\"nodeReRegistrationTimeout\":-1,\"defaultClientScopes\":[\"web-origins\",\"profile\",\"roles\",\"email\"],\"optionalClientScopes\":[\"address\",\"phone\",\"offline_access\",\"microprofile-jwt\"],\"access\":{\"view\":true,\"configure\":true,\"manage\":true}}',NULL,'CLIENT'),('ce06bf73-9a28-417d-bb47-d039184e6191',1709175232948,'org4','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/b1088032-b0ab-4e61-9fd4-f58c3c6fe396','{\"id\":\"b1088032-b0ab-4e61-9fd4-f58c3c6fe396\",\"clientId\":\"_org4-api\",\"surrogateAuthRequired\":false,\"enabled\":true,\"alwaysDisplayInConsole\":false,\"clientAuthenticatorType\":\"client-secret\",\"redirectUris\":[],\"webOrigins\":[],\"notBefore\":0,\"bearerOnly\":false,\"consentRequired\":false,\"standardFlowEnabled\":false,\"implicitFlowEnabled\":false,\"directAccessGrantsEnabled\":true,\"serviceAccountsEnabled\":false,\"publicClient\":true,\"frontchannelLogout\":false,\"protocol\":\"openid-connect\",\"attributes\":{\"access.token.lifespan\":\"86400\",\"saml.force.post.binding\":\"false\",\"saml.multivalued.roles\":\"false\",\"frontchannel.logout.session.required\":\"false\",\"oauth2.device.authorization.grant.enabled\":\"false\",\"backchannel.logout.revoke.offline.tokens\":\"false\",\"saml.server.signature.keyinfo.ext\":\"false\",\"use.refresh.tokens\":\"true\",\"oidc.ciba.grant.enabled\":\"false\",\"backchannel.logout.session.required\":\"true\",\"client_credentials.use_refresh_token\":\"false\",\"require.pushed.authorization.requests\":\"false\",\"saml.client.signature\":\"false\",\"client.session.max.lifespan\":\"86400\",\"saml.allow.ecp.flow\":\"false\",\"client.session.idle.timeout\":\"86400\",\"id.token.as.detached.signature\":\"false\",\"saml.assertion.signature\":\"false\",\"saml.encrypt\":\"false\",\"saml.server.signature\":\"false\",\"exclude.session.state.from.auth.response\":\"false\",\"saml.artifact.binding\":\"false\",\"saml_force_name_id_format\":\"false\",\"acr.loa.map\":\"{}\",\"tls.client.certificate.bound.access.tokens\":\"false\",\"saml.authnstatement\":\"false\",\"display.on.consent.screen\":\"false\",\"token.response.type.bearer.lower-case\":\"false\",\"saml.onetimeuse.condition\":\"false\"},\"authenticationFlowBindingOverrides\":{},\"fullScopeAllowed\":true,\"nodeReRegistrationTimeout\":-1,\"defaultClientScopes\":[\"web-origins\",\"acr\",\"profile\",\"roles\",\"email\"],\"optionalClientScopes\":[\"address\",\"phone\",\"offline_access\",\"microprofile-jwt\"]}',NULL,'CLIENT'),('d2295703-cc4c-43ef-9804-5495954eb0c0',1709175285143,'org5','CREATE','org5','01f89460-aba4-42ec-8eb3-f3c2d23cfbc2','47ce89fe-bcd3-45ef-9925-2f6cffef721b','172.18.0.8','users/85631ddb-cb91-4d18-a335-1646a78ee06a/role-mappings/clients/3d62cf66-73c8-4ec7-ba0f-2b622bc5c747','[{\"id\":\"6a5eaac8-03fe-4cbe-aaf4-267e8d5614d3\",\"name\":\"_ws3-admin\",\"composite\":true,\"clientRole\":true,\"containerId\":\"3d62cf66-73c8-4ec7-ba0f-2b622bc5c747\",\"attributes\":{\"kind\":[\"workspace\"]}}]',NULL,'CLIENT_ROLE_MAPPING'),('d535d578-7963-4fc4-b590-58854a8ed5e4',1709175205051,'org2','CREATE','org2','a0d96aa1-71ac-4a7e-a769-306baf1c51fc','8a37f068-a80b-4b4b-82a8-5a4c40c51869','172.18.0.8','clients/a0d96aa1-71ac-4a7e-a769-306baf1c51fc/roles/_ws3-admin','{\"id\":\"e182bbbc-5ce2-4f01-8011-8a858f41d66b\",\"name\":\"_ws3-admin\",\"composite\":false,\"attributes\":{\"kind\":[\"workspace\"]}}',NULL,'CLIENT_ROLE'),('d6a69564-32ee-4e9a-800b-23e8400949c6',1709175165258,'org1','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/16fe410e-f1df-4ce0-b445-8dd3b5b80750','{\"id\":\"16fe410e-f1df-4ce0-b445-8dd3b5b80750\",\"clientId\":\"org1\",\"surrogateAuthRequired\":false,\"enabled\":true,\"alwaysDisplayInConsole\":false,\"clientAuthenticatorType\":\"client-secret\",\"redirectUris\":[\"/*\"],\"webOrigins\":[],\"notBefore\":0,\"bearerOnly\":false,\"consentRequired\":false,\"standardFlowEnabled\":true,\"implicitFlowEnabled\":false,\"directAccessGrantsEnabled\":true,\"serviceAccountsEnabled\":false,\"publicClient\":true,\"frontchannelLogout\":false,\"protocol\":\"openid-connect\",\"attributes\":{\"post.logout.redirect.uris\":\"/*\",\"id.token.as.detached.signature\":\"false\",\"saml.assertion.signature\":\"false\",\"saml.force.post.binding\":\"false\",\"saml.multivalued.roles\":\"false\",\"saml.encrypt\":\"false\",\"oauth2.device.authorization.grant.enabled\":\"false\",\"backchannel.logout.revoke.offline.tokens\":\"false\",\"saml.server.signature\":\"false\",\"saml.server.signature.keyinfo.ext\":\"false\",\"use.refresh.tokens\":\"true\",\"exclude.session.state.from.auth.response\":\"false\",\"oidc.ciba.grant.enabled\":\"false\",\"saml.artifact.binding\":\"false\",\"backchannel.logout.session.required\":\"true\",\"client_credentials.use_refresh_token\":\"false\",\"saml_force_name_id_format\":\"false\",\"require.pushed.authorization.requests\":\"false\",\"saml.client.signature\":\"false\",\"tls.client.certificate.bound.access.tokens\":\"false\",\"saml.authnstatement\":\"false\",\"display.on.consent.screen\":\"false\",\"saml.onetimeuse.condition\":\"false\"},\"authenticationFlowBindingOverrides\":{},\"fullScopeAllowed\":true,\"nodeReRegistrationTimeout\":-1,\"defaultClientScopes\":[\"web-origins\",\"profile\",\"roles\",\"email\"],\"optionalClientScopes\":[\"address\",\"phone\",\"offline_access\",\"microprofile-jwt\"],\"access\":{\"view\":true,\"configure\":true,\"manage\":true}}',NULL,'CLIENT'),('d6de3bc9-249f-4def-ada3-c8ce23598ff3',1709175194617,'org2','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/a0d96aa1-71ac-4a7e-a769-306baf1c51fc/roles/_og-usr-mt','{\"id\":\"f8ad0b14-409f-4ae0-ac3d-51d4d6c71c71\",\"name\":\"_og-usr-mt\",\"composite\":false}',NULL,'CLIENT_ROLE'),('d77adc12-8d3d-4f48-a2a0-713d5f0c0c50',1709175232856,'org4','ACTION','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/5a324cc2-4d44-46de-9c51-9afcc3c1adda/client-secret','{\"type\":\"secret\",\"value\":\"MWNRQ8QNdqfVBjSftkLHguRs39p63YFi\"}',NULL,'CLIENT'),('da8c9c17-d19e-4323-9d6a-43ba5db7b9a2',1709175194654,'org2','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/a0d96aa1-71ac-4a7e-a769-306baf1c51fc/roles/_og-ws-role-usr','{\"id\":\"793592b1-dbff-4778-b35e-19cdb9681830\",\"name\":\"_og-ws-role-usr\",\"composite\":false}',NULL,'CLIENT_ROLE'),('da90c357-b36d-44a0-9c91-34ac0c3fe21d',1709175211604,'org3','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/c28dd0b0-60ed-40df-91db-0d9b1e14074b/roles/_og-ws-role-usr','{\"id\":\"8709f3c7-2db7-4820-8b4c-2e6d4553819a\",\"name\":\"_og-ws-role-usr\",\"composite\":false}',NULL,'CLIENT_ROLE'),('db3c32e9-1545-4562-86e9-14db60ee6b75',1709175265002,'org5','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/3d62cf66-73c8-4ec7-ba0f-2b622bc5c747/roles/_organization-manager','{\"id\":\"e737d20e-6216-4da9-a281-f43102759f54\",\"name\":\"_organization-manager\",\"composite\":false,\"attributes\":{\"kind\":[\"organization\"]}}',NULL,'CLIENT_ROLE'),('db8c8ac9-c36f-4e0f-8983-50bb3bc799ca',1709175218068,'org3','CREATE','org3','c28dd0b0-60ed-40df-91db-0d9b1e14074b','e74edb4f-b238-4208-8996-dd6ab65ec257','172.18.0.8','users/98b18f6f-d105-437a-92f2-fb863b59805c/role-mappings/clients/b0475217-c11a-49f5-833c-33aaee237a25','[{\"id\":\"534ae492-208a-4329-ac07-fd5bebc8017e\",\"name\":\"_ws2-admin\",\"composite\":true,\"clientRole\":true,\"containerId\":\"b0475217-c11a-49f5-833c-33aaee237a25\",\"attributes\":{\"kind\":[\"workspace\"]}}]',NULL,'CLIENT_ROLE_MAPPING'),('dc14e1b3-c617-40bb-b7c5-8aaa48c8112e',1709175201109,'org2','CREATE','org2','a0d96aa1-71ac-4a7e-a769-306baf1c51fc','8a37f068-a80b-4b4b-82a8-5a4c40c51869','172.18.0.8','clients/a0d96aa1-71ac-4a7e-a769-306baf1c51fc/roles/ws2','{\"id\":\"0a925b92-087a-4c5e-aaed-85505bb9eb59\",\"name\":\"ws2\",\"composite\":false,\"attributes\":{\"kind\":[\"workspace\"]}}',NULL,'CLIENT_ROLE'),('dce83346-de2a-4dec-8beb-bc533fc77079',1709175264277,'org5','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/3d62cf66-73c8-4ec7-ba0f-2b622bc5c747','{\"id\":\"3d62cf66-73c8-4ec7-ba0f-2b622bc5c747\",\"clientId\":\"org5\",\"surrogateAuthRequired\":false,\"enabled\":true,\"alwaysDisplayInConsole\":false,\"clientAuthenticatorType\":\"client-secret\",\"redirectUris\":[\"/*\"],\"webOrigins\":[],\"notBefore\":0,\"bearerOnly\":false,\"consentRequired\":false,\"standardFlowEnabled\":true,\"implicitFlowEnabled\":false,\"directAccessGrantsEnabled\":true,\"serviceAccountsEnabled\":false,\"publicClient\":true,\"frontchannelLogout\":false,\"protocol\":\"openid-connect\",\"attributes\":{\"post.logout.redirect.uris\":\"/*\",\"id.token.as.detached.signature\":\"false\",\"saml.assertion.signature\":\"false\",\"saml.force.post.binding\":\"false\",\"saml.multivalued.roles\":\"false\",\"saml.encrypt\":\"false\",\"oauth2.device.authorization.grant.enabled\":\"false\",\"backchannel.logout.revoke.offline.tokens\":\"false\",\"saml.server.signature\":\"false\",\"saml.server.signature.keyinfo.ext\":\"false\",\"use.refresh.tokens\":\"true\",\"exclude.session.state.from.auth.response\":\"false\",\"oidc.ciba.grant.enabled\":\"false\",\"saml.artifact.binding\":\"false\",\"backchannel.logout.session.required\":\"true\",\"client_credentials.use_refresh_token\":\"false\",\"saml_force_name_id_format\":\"false\",\"require.pushed.authorization.requests\":\"false\",\"saml.client.signature\":\"false\",\"tls.client.certificate.bound.access.tokens\":\"false\",\"saml.authnstatement\":\"false\",\"display.on.consent.screen\":\"false\",\"saml.onetimeuse.condition\":\"false\"},\"authenticationFlowBindingOverrides\":{},\"fullScopeAllowed\":true,\"nodeReRegistrationTimeout\":-1,\"defaultClientScopes\":[\"web-origins\",\"profile\",\"roles\",\"email\"],\"optionalClientScopes\":[\"address\",\"phone\",\"offline_access\",\"microprofile-jwt\"],\"access\":{\"view\":true,\"configure\":true,\"manage\":true}}',NULL,'CLIENT'),('df12a9cc-b265-4ac3-9984-fe9e7adcaf76',1709175194304,'org2','ACTION','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/a15e680b-47bb-4b94-a832-5ca99cdbe134/client-secret','{\"type\":\"secret\",\"value\":\"3bRQu4Oa96KFdHne6d40WBQPNuwA3k2q\"}',NULL,'CLIENT'),('df147a8d-ec71-47c4-8ff8-3bad5a0039e1',1709175284951,'org5','CREATE','org5','01f89460-aba4-42ec-8eb3-f3c2d23cfbc2','47ce89fe-bcd3-45ef-9925-2f6cffef721b','172.18.0.8','clients/01f89460-aba4-42ec-8eb3-f3c2d23cfbc2/roles/_ws3-admin','{\"id\":\"673b825d-10ba-4658-b90a-0854ca6dacd4\",\"name\":\"_ws3-admin\",\"composite\":false,\"attributes\":{\"kind\":[\"workspace\"]}}',NULL,'CLIENT_ROLE'),('df5c3533-cb86-42a0-bf21-d98ef93bd648',1709175167354,'org1','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','users/2e008a28-22ba-4bec-94c3-f26482afb61b/role-mappings/clients/d0763c7a-1183-4390-aa83-1804c4bf13dd','[{\"id\":\"1b849fbb-23b2-41b3-8590-c4cf2e292e54\",\"name\":\"realm-admin\",\"description\":\"${role_realm-admin}\",\"composite\":true,\"clientRole\":true,\"containerId\":\"d0763c7a-1183-4390-aa83-1804c4bf13dd\",\"attributes\":{}}]',NULL,'CLIENT_ROLE_MAPPING'),('e0931d8e-2992-4cb3-b01b-b01eb1e47625',1709175222403,'org3','CREATE','org3','c28dd0b0-60ed-40df-91db-0d9b1e14074b','e74edb4f-b238-4208-8996-dd6ab65ec257','172.18.0.8','clients/c28dd0b0-60ed-40df-91db-0d9b1e14074b/roles/_ws3-admin','{\"id\":\"734c9a9f-b357-4f12-afe0-967048b091fb\",\"name\":\"_ws3-admin\",\"composite\":false,\"attributes\":{\"kind\":[\"workspace\"]}}',NULL,'CLIENT_ROLE'),('e29e0e8d-d8ee-4f16-a6e2-d363d0e4e15d',1709175165083,'org1','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/6112a706-0711-40ab-a42e-08ef27723f06','{\"id\":\"6112a706-0711-40ab-a42e-08ef27723f06\",\"clientId\":\"system-org1-auth\",\"surrogateAuthRequired\":false,\"enabled\":true,\"alwaysDisplayInConsole\":false,\"clientAuthenticatorType\":\"client-secret\",\"redirectUris\":[],\"webOrigins\":[],\"notBefore\":0,\"bearerOnly\":true,\"consentRequired\":false,\"standardFlowEnabled\":true,\"implicitFlowEnabled\":false,\"directAccessGrantsEnabled\":true,\"serviceAccountsEnabled\":false,\"publicClient\":false,\"frontchannelLogout\":false,\"protocol\":\"openid-connect\",\"attributes\":{\"id.token.as.detached.signature\":\"false\",\"saml.assertion.signature\":\"false\",\"saml.force.post.binding\":\"false\",\"saml.multivalued.roles\":\"false\",\"saml.encrypt\":\"false\",\"oauth2.device.authorization.grant.enabled\":\"false\",\"backchannel.logout.revoke.offline.tokens\":\"false\",\"saml.server.signature\":\"false\",\"saml.server.signature.keyinfo.ext\":\"false\",\"use.refresh.tokens\":\"true\",\"exclude.session.state.from.auth.response\":\"false\",\"oidc.ciba.grant.enabled\":\"false\",\"saml.artifact.binding\":\"false\",\"backchannel.logout.session.required\":\"true\",\"client_credentials.use_refresh_token\":\"false\",\"saml_force_name_id_format\":\"false\",\"require.pushed.authorization.requests\":\"false\",\"saml.client.signature\":\"false\",\"tls.client.certificate.bound.access.tokens\":\"false\",\"saml.authnstatement\":\"false\",\"display.on.consent.screen\":\"false\",\"saml.onetimeuse.condition\":\"false\"},\"authenticationFlowBindingOverrides\":{},\"fullScopeAllowed\":true,\"nodeReRegistrationTimeout\":-1,\"defaultClientScopes\":[\"web-origins\",\"profile\",\"roles\",\"email\"],\"optionalClientScopes\":[\"address\",\"phone\",\"offline_access\",\"microprofile-jwt\"],\"access\":{\"view\":true,\"configure\":true,\"manage\":true}}',NULL,'CLIENT'),('e37cca98-9118-4169-b8bf-441b067324d4',1709175194451,'org2','ACTION','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/2d40f5c2-5cc2-42d6-93b7-64af2cedb218/client-secret','{\"type\":\"secret\",\"value\":\"RmTe97vMWtmndXNUbADp61DWhL0uIQyq\"}',NULL,'CLIENT'),('e4b10672-4a6f-4101-96d8-e51747e6a04b',1709175245481,'org4','CREATE','org4','311ebcfe-7467-459c-856a-862094332329','0eb52a14-0c83-4db6-b40b-19355bfc54ae','172.18.0.8','clients/311ebcfe-7467-459c-856a-862094332329/roles/ws2','{\"id\":\"4c86b391-91a8-4968-bfdd-816a2ae4efa9\",\"name\":\"ws2\",\"composite\":false,\"attributes\":{\"kind\":[\"workspace\"]}}',NULL,'CLIENT_ROLE'),('e5f81f79-7098-4ebf-8ccb-2058a39f2b0d',1709175233272,'org4','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/311ebcfe-7467-459c-856a-862094332329/roles/_og-ws-role-mt','{\"id\":\"e59b30cd-dcf1-4a54-99e8-3077c935cf9e\",\"name\":\"_og-ws-role-mt\",\"composite\":false}',NULL,'CLIENT_ROLE'),('e65e9d0d-0fa5-4324-ba01-89798f283f88',1709175211249,'org3','ACTION','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/b0475217-c11a-49f5-833c-33aaee237a25/client-secret','{\"type\":\"secret\",\"value\":\"DNF8kzoIuJZmFntfIzitqdVaodsPBYqU\"}',NULL,'CLIENT'),('e7a0c216-aa5b-4be3-9ac7-b330953ad35a',1709175233186,'org4','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/311ebcfe-7467-459c-856a-862094332329/roles/_og-role-usr','{\"id\":\"97c30574-d3d1-4e01-818f-0867ca808f9a\",\"name\":\"_og-role-usr\",\"composite\":false}',NULL,'CLIENT_ROLE'),('e7d187c8-5ba2-45cd-b54a-3fe0573f1011',1709175284997,'org5','CREATE','org5','01f89460-aba4-42ec-8eb3-f3c2d23cfbc2','47ce89fe-bcd3-45ef-9925-2f6cffef721b','172.18.0.8','clients/3d62cf66-73c8-4ec7-ba0f-2b622bc5c747/roles/_ws3-admin','{\"id\":\"6a5eaac8-03fe-4cbe-aaf4-267e8d5614d3\",\"name\":\"_ws3-admin\",\"composite\":false,\"attributes\":{\"kind\":[\"workspace\"]}}',NULL,'CLIENT_ROLE'),('e8d7e0a1-e48f-4ef5-b748-7691be6b25b8',1709175213587,'org3','CREATE','org3','c28dd0b0-60ed-40df-91db-0d9b1e14074b','e74edb4f-b238-4208-8996-dd6ab65ec257','172.18.0.8','clients/c28dd0b0-60ed-40df-91db-0d9b1e14074b/roles/ws1','{\"id\":\"50aabf0d-c27b-46b1-a838-602a59f2c8e5\",\"name\":\"ws1\",\"composite\":false,\"attributes\":{\"kind\":[\"workspace\"]}}',NULL,'CLIENT_ROLE'),('eb862d9f-6f74-4bb4-9bdd-356bc2124854',1709175211938,'org3','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/b0475217-c11a-49f5-833c-33aaee237a25/roles/_organization-user-role-manager/composites','[{\"id\":\"7edf6052-a64a-4413-8b79-732b90806c24\",\"name\":\"_og-usr-mt\",\"composite\":false,\"clientRole\":true,\"containerId\":\"c28dd0b0-60ed-40df-91db-0d9b1e14074b\",\"attributes\":{}},{\"id\":\"d066d55a-9192-4ecc-95f8-63d6f89f1ed3\",\"name\":\"_og-ws-role-mt\",\"composite\":false,\"clientRole\":true,\"containerId\":\"c28dd0b0-60ed-40df-91db-0d9b1e14074b\",\"attributes\":{}},{\"id\":\"8709f3c7-2db7-4820-8b4c-2e6d4553819a\",\"name\":\"_og-ws-role-usr\",\"composite\":false,\"clientRole\":true,\"containerId\":\"c28dd0b0-60ed-40df-91db-0d9b1e14074b\",\"attributes\":{}}]',NULL,'CLIENT_ROLE'),('edf9bb1e-dca6-438b-a576-bb86e93a53d8',1709175236208,'org4','CREATE','org4','311ebcfe-7467-459c-856a-862094332329','0eb52a14-0c83-4db6-b40b-19355bfc54ae','172.18.0.8','clients/5a324cc2-4d44-46de-9c51-9afcc3c1adda/roles/_ws1-admin/composites','[{\"id\":\"75f487db-0f18-42b1-9efa-f660dda152cd\",\"name\":\"ws1\",\"composite\":false,\"clientRole\":true,\"containerId\":\"311ebcfe-7467-459c-856a-862094332329\",\"attributes\":{\"kind\":[\"workspace\"]}},{\"id\":\"daa0af79-c06f-4116-a234-f5196fe38ad5\",\"name\":\"_ws1-admin\",\"composite\":false,\"clientRole\":true,\"containerId\":\"311ebcfe-7467-459c-856a-862094332329\",\"attributes\":{\"kind\":[\"workspace\"]}}]',NULL,'CLIENT_ROLE'),('ee2354d8-5ad1-4d40-b07b-7b8dd1e4f000',1709175222381,'org3','CREATE','org3','c28dd0b0-60ed-40df-91db-0d9b1e14074b','e74edb4f-b238-4208-8996-dd6ab65ec257','172.18.0.8','clients/c28dd0b0-60ed-40df-91db-0d9b1e14074b/roles/ws3','{\"id\":\"495fa361-8cfe-4d98-98be-d1ec7a00469a\",\"name\":\"ws3\",\"composite\":false,\"attributes\":{\"kind\":[\"workspace\"]}}',NULL,'CLIENT_ROLE'),('ef02a49b-0f4e-4e5f-bd07-b835d4ddff0a',1709175166485,'org1','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/16fe410e-f1df-4ce0-b445-8dd3b5b80750/roles/_organization-manager','{\"id\":\"43de4389-64c9-4a7f-bb70-8cba7986f2d0\",\"name\":\"_organization-manager\",\"composite\":false,\"attributes\":{\"kind\":[\"organization\"]}}',NULL,'CLIENT_ROLE'),('f0903d03-5d6d-453d-9c48-02c52453d903',1709175245560,'org4','CREATE','org4','311ebcfe-7467-459c-856a-862094332329','0eb52a14-0c83-4db6-b40b-19355bfc54ae','172.18.0.8','clients/5a324cc2-4d44-46de-9c51-9afcc3c1adda/roles/_ws2-admin','{\"id\":\"652f33df-5bff-4e35-9e1e-40b6a6f717f7\",\"name\":\"_ws2-admin\",\"composite\":false,\"attributes\":{\"kind\":[\"workspace\"]}}',NULL,'CLIENT_ROLE'),('f6510646-4d0b-402e-8cc0-613e155a4fc6',1709175212310,'org3','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','users/98b18f6f-d105-437a-92f2-fb863b59805c','{\"username\":\"admin\",\"enabled\":true,\"firstName\":\"admin\",\"lastName\":\"admin\",\"email\":\"admin@example.com\",\"credentials\":[{\"type\":\"password\",\"value\":\"password\",\"temporary\":false}],\"requiredActions\":[]}',NULL,'USER'),('fb804de2-f443-40f0-ac0a-c94e3c00d765',1709175267700,'org5','CREATE','org5','01f89460-aba4-42ec-8eb3-f3c2d23cfbc2','47ce89fe-bcd3-45ef-9925-2f6cffef721b','172.18.0.8','clients/3d62cf66-73c8-4ec7-ba0f-2b622bc5c747/roles/_ws1-admin/composites','[{\"id\":\"fccd3bea-270e-41dc-bd36-5b034e1aacd1\",\"name\":\"ws1\",\"composite\":false,\"clientRole\":true,\"containerId\":\"01f89460-aba4-42ec-8eb3-f3c2d23cfbc2\",\"attributes\":{\"kind\":[\"workspace\"]}},{\"id\":\"f8e2a07b-1795-4cb5-b2b2-3ce3fbdb91be\",\"name\":\"_ws1-admin\",\"composite\":false,\"clientRole\":true,\"containerId\":\"01f89460-aba4-42ec-8eb3-f3c2d23cfbc2\",\"attributes\":{\"kind\":[\"workspace\"]}}]',NULL,'CLIENT_ROLE'),('fe6fd01a-6d5c-4928-9475-1199bae6182c',1709175194074,'org2','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/d0aaa350-6ca7-4545-a008-583d46596744','{\"id\":\"d0aaa350-6ca7-4545-a008-583d46596744\",\"clientId\":\"system-org2-auth\",\"surrogateAuthRequired\":false,\"enabled\":true,\"alwaysDisplayInConsole\":false,\"clientAuthenticatorType\":\"client-secret\",\"redirectUris\":[],\"webOrigins\":[],\"notBefore\":0,\"bearerOnly\":true,\"consentRequired\":false,\"standardFlowEnabled\":true,\"implicitFlowEnabled\":false,\"directAccessGrantsEnabled\":true,\"serviceAccountsEnabled\":false,\"publicClient\":false,\"frontchannelLogout\":false,\"protocol\":\"openid-connect\",\"attributes\":{\"id.token.as.detached.signature\":\"false\",\"saml.assertion.signature\":\"false\",\"saml.force.post.binding\":\"false\",\"saml.multivalued.roles\":\"false\",\"saml.encrypt\":\"false\",\"oauth2.device.authorization.grant.enabled\":\"false\",\"backchannel.logout.revoke.offline.tokens\":\"false\",\"saml.server.signature\":\"false\",\"saml.server.signature.keyinfo.ext\":\"false\",\"use.refresh.tokens\":\"true\",\"exclude.session.state.from.auth.response\":\"false\",\"oidc.ciba.grant.enabled\":\"false\",\"saml.artifact.binding\":\"false\",\"backchannel.logout.session.required\":\"true\",\"client_credentials.use_refresh_token\":\"false\",\"saml_force_name_id_format\":\"false\",\"require.pushed.authorization.requests\":\"false\",\"saml.client.signature\":\"false\",\"tls.client.certificate.bound.access.tokens\":\"false\",\"saml.authnstatement\":\"false\",\"display.on.consent.screen\":\"false\",\"saml.onetimeuse.condition\":\"false\"},\"authenticationFlowBindingOverrides\":{},\"fullScopeAllowed\":true,\"nodeReRegistrationTimeout\":-1,\"defaultClientScopes\":[\"web-origins\",\"profile\",\"roles\",\"email\"],\"optionalClientScopes\":[\"address\",\"phone\",\"offline_access\",\"microprofile-jwt\"],\"access\":{\"view\":true,\"configure\":true,\"manage\":true}}',NULL,'CLIENT'),('ff036dbd-659d-45d0-8aad-6d48763c0c8f',1709175232790,'org4','CREATE','dabc51bf-58ea-42ed-9918-4114e6b08338','58e5ed05-5651-4e99-ac86-e93c28adc1f0','99050347-6740-4d25-891b-ae451c2c1f62','172.18.0.8','clients/5a324cc2-4d44-46de-9c51-9afcc3c1adda','{\"id\":\"5a324cc2-4d44-46de-9c51-9afcc3c1adda\",\"clientId\":\"org4\",\"surrogateAuthRequired\":false,\"enabled\":true,\"alwaysDisplayInConsole\":false,\"clientAuthenticatorType\":\"client-secret\",\"redirectUris\":[\"/*\"],\"webOrigins\":[],\"notBefore\":0,\"bearerOnly\":false,\"consentRequired\":false,\"standardFlowEnabled\":true,\"implicitFlowEnabled\":false,\"directAccessGrantsEnabled\":true,\"serviceAccountsEnabled\":false,\"publicClient\":true,\"frontchannelLogout\":false,\"protocol\":\"openid-connect\",\"attributes\":{\"post.logout.redirect.uris\":\"/*\",\"id.token.as.detached.signature\":\"false\",\"saml.assertion.signature\":\"false\",\"saml.force.post.binding\":\"false\",\"saml.multivalued.roles\":\"false\",\"saml.encrypt\":\"false\",\"oauth2.device.authorization.grant.enabled\":\"false\",\"backchannel.logout.revoke.offline.tokens\":\"false\",\"saml.server.signature\":\"false\",\"saml.server.signature.keyinfo.ext\":\"false\",\"use.refresh.tokens\":\"true\",\"exclude.session.state.from.auth.response\":\"false\",\"oidc.ciba.grant.enabled\":\"false\",\"saml.artifact.binding\":\"false\",\"backchannel.logout.session.required\":\"true\",\"client_credentials.use_refresh_token\":\"false\",\"saml_force_name_id_format\":\"false\",\"require.pushed.authorization.requests\":\"false\",\"saml.client.signature\":\"false\",\"tls.client.certificate.bound.access.tokens\":\"false\",\"saml.authnstatement\":\"false\",\"display.on.consent.screen\":\"false\",\"saml.onetimeuse.condition\":\"false\"},\"authenticationFlowBindingOverrides\":{},\"fullScopeAllowed\":true,\"nodeReRegistrationTimeout\":-1,\"defaultClientScopes\":[\"web-origins\",\"profile\",\"roles\",\"email\"],\"optionalClientScopes\":[\"address\",\"phone\",\"offline_access\",\"microprofile-jwt\"],\"access\":{\"view\":true,\"configure\":true,\"manage\":true}}',NULL,'CLIENT'),('ffda7466-c4ac-44f1-94e8-67b64a6d5693',1709175236051,'org4','CREATE','org4','311ebcfe-7467-459c-856a-862094332329','0eb52a14-0c83-4db6-b40b-19355bfc54ae','172.18.0.8','clients/311ebcfe-7467-459c-856a-862094332329/roles/ws1','{\"id\":\"75f487db-0f18-42b1-9efa-f660dda152cd\",\"name\":\"ws1\",\"composite\":false,\"attributes\":{\"kind\":[\"workspace\"]}}',NULL,'CLIENT_ROLE');
+/*!40000 ALTER TABLE `ADMIN_EVENT_ENTITY` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ASSOCIATED_POLICY`
+--
+
+DROP TABLE IF EXISTS `ASSOCIATED_POLICY`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `ASSOCIATED_POLICY` (
+  `POLICY_ID` varchar(36) NOT NULL,
+  `ASSOCIATED_POLICY_ID` varchar(36) NOT NULL,
+  PRIMARY KEY (`POLICY_ID`,`ASSOCIATED_POLICY_ID`),
+  KEY `IDX_ASSOC_POL_ASSOC_POL_ID` (`ASSOCIATED_POLICY_ID`),
+  CONSTRAINT `FK_FRSR5S213XCX4WNKOG82SSRFY` FOREIGN KEY (`ASSOCIATED_POLICY_ID`) REFERENCES `RESOURCE_SERVER_POLICY` (`ID`),
+  CONSTRAINT `FK_FRSRPAS14XCX4WNKOG82SSRFY` FOREIGN KEY (`POLICY_ID`) REFERENCES `RESOURCE_SERVER_POLICY` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ASSOCIATED_POLICY`
+--
+
+LOCK TABLES `ASSOCIATED_POLICY` WRITE;
+/*!40000 ALTER TABLE `ASSOCIATED_POLICY` DISABLE KEYS */;
+/*!40000 ALTER TABLE `ASSOCIATED_POLICY` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `AUTHENTICATION_EXECUTION`
+--
+
+DROP TABLE IF EXISTS `AUTHENTICATION_EXECUTION`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `AUTHENTICATION_EXECUTION` (
+  `ID` varchar(36) NOT NULL,
+  `ALIAS` varchar(255) DEFAULT NULL,
+  `AUTHENTICATOR` varchar(36) DEFAULT NULL,
+  `REALM_ID` varchar(36) DEFAULT NULL,
+  `FLOW_ID` varchar(36) DEFAULT NULL,
+  `REQUIREMENT` int DEFAULT NULL,
+  `PRIORITY` int DEFAULT NULL,
+  `AUTHENTICATOR_FLOW` bit(1) NOT NULL DEFAULT b'0',
+  `AUTH_FLOW_ID` varchar(36) DEFAULT NULL,
+  `AUTH_CONFIG` varchar(36) DEFAULT NULL,
+  PRIMARY KEY (`ID`),
+  KEY `IDX_AUTH_EXEC_REALM_FLOW` (`REALM_ID`,`FLOW_ID`),
+  KEY `IDX_AUTH_EXEC_FLOW` (`FLOW_ID`),
+  CONSTRAINT `FK_AUTH_EXEC_FLOW` FOREIGN KEY (`FLOW_ID`) REFERENCES `AUTHENTICATION_FLOW` (`ID`),
+  CONSTRAINT `FK_AUTH_EXEC_REALM` FOREIGN KEY (`REALM_ID`) REFERENCES `REALM` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `AUTHENTICATION_EXECUTION`
+--
+
+LOCK TABLES `AUTHENTICATION_EXECUTION` WRITE;
+/*!40000 ALTER TABLE `AUTHENTICATION_EXECUTION` DISABLE KEYS */;
+INSERT INTO `AUTHENTICATION_EXECUTION` VALUES ('007ad891-682c-4c1a-b610-0b53a0b4c6d6',NULL,'idp-create-user-if-unique','org4','fefb0528-c330-4955-bfb0-3a05c7c1ca29',2,10,_binary '\0',NULL,'673cb3b8-3250-48d9-8678-e677e5904138'),('00f1252e-d6ce-439b-b9ab-213fed895d67',NULL,'reset-password','org1','6111d7d7-524e-41ea-85c5-76d8e515d243',0,30,_binary '\0',NULL,NULL),('01cd28c7-fd44-4962-944c-ed03a8dec4e4',NULL,'reset-credential-email','org3','ad2e0b48-8a09-4454-9ad5-a0d0f102ad48',0,20,_binary '\0',NULL,NULL),('01eca477-53dc-48ff-9e5c-2616b2be2154',NULL,'direct-grant-validate-otp','dabc51bf-58ea-42ed-9918-4114e6b08338','52a70b51-a747-4f42-a7d2-9e10844e4cf8',0,20,_binary '\0',NULL,NULL),('04224ded-5ac2-4e24-b4df-89b3ae9c428e',NULL,'registration-recaptcha-action','org2','25bc59b3-bf84-4b49-b8bc-cb1944b2be1f',3,60,_binary '\0',NULL,NULL),('05456737-d003-49e4-89c7-bb16303484d6',NULL,'client-secret','org1','fe921562-834e-4b69-b052-148ee5251a05',2,10,_binary '\0',NULL,NULL),('0563f5cb-e5cb-465d-ac96-927e03b7e2a4',NULL,'reset-otp','dabc51bf-58ea-42ed-9918-4114e6b08338','6e907f97-deb3-44dc-b374-162362e602d1',0,20,_binary '\0',NULL,NULL),('05943b6b-d56c-4fa0-b091-15cdba0fa02d',NULL,'idp-email-verification','org3','489926bf-32b6-41ef-ae64-0c013053b00e',2,10,_binary '\0',NULL,NULL),('083876ef-7c13-4bbf-ac54-36ce6d5de74b',NULL,'idp-create-user-if-unique','org1','e375cfc3-c4c7-4cd0-81f8-10bb36da7410',2,10,_binary '\0',NULL,'37909750-ce1e-4e51-93f0-8dfe57b366e0'),('088e5f60-a896-4e6d-b29c-9f25438ae3af',NULL,'auth-username-password-form','org4','d79fd308-4f33-4283-b743-d96edb66dd34',0,10,_binary '\0',NULL,NULL),('0924b628-08f5-49f5-b21d-3d5df8dd06eb',NULL,'client-secret','org2','3bbdf73f-08ef-4660-9d2e-a8f220010d3f',2,10,_binary '\0',NULL,NULL),('0957a408-4dce-4263-80a5-350290abded3',NULL,'docker-http-basic-authenticator','org3','2b4bb0ca-0c8f-4b9b-b962-ce55320e342c',0,10,_binary '\0',NULL,NULL),('09dd15e9-9609-44a4-9ebd-bd77136b71b8',NULL,'client-secret','org5','975ef3b1-b6f5-4db1-a3c6-fea5fa1376b8',2,10,_binary '\0',NULL,NULL),('0a18da63-08a4-4b66-bc74-d9baf53dfdc8',NULL,'conditional-user-configured','org3','a307a202-7ef4-4b79-a60c-63e445a16755',0,10,_binary '\0',NULL,NULL),('0a3bca13-fe53-4731-aa74-392fbf6acbb6',NULL,'idp-create-user-if-unique','dabc51bf-58ea-42ed-9918-4114e6b08338','30c423f4-220d-4fdd-afd3-5685251ac988',2,10,_binary '\0',NULL,'39439e30-597c-4da1-b467-3f20f10e76a1'),('0af1b5a2-6b22-43bd-8f5e-78820602918c',NULL,'conditional-user-configured','org3','f6e8c40b-0f44-482b-848f-15b45408d0f9',0,10,_binary '\0',NULL,NULL),('0b3df980-419f-48f6-89cd-33d0797c3e8e',NULL,'auth-cookie','dabc51bf-58ea-42ed-9918-4114e6b08338','78fd3ef3-8171-4a55-b550-6f44cf6db2d8',2,10,_binary '\0',NULL,NULL),('0c086198-8bf4-4d2e-b7dd-d0012ad09d37',NULL,'registration-profile-action','org3','20fe5c6c-8f26-47aa-97ef-60f7b7227164',0,40,_binary '\0',NULL,NULL),('0c2f32a0-379e-4dfe-8847-c049183452e3',NULL,'idp-review-profile','dabc51bf-58ea-42ed-9918-4114e6b08338','1ad19c5e-0a39-4aed-bd7b-551079d4345a',0,10,_binary '\0',NULL,'01909e1d-c9ed-490f-89ef-556de77f44cb'),('0c76c5aa-e505-41b0-ad63-d81ea4be0e5b',NULL,NULL,'org2','36140312-1555-4074-b820-ce9677ca3316',2,30,_binary '','c1ba830e-d351-4226-82aa-820189289db4',NULL),('0e83094e-f3f0-4ac1-bfb2-b180ad2cd5ed',NULL,NULL,'org1','48598438-66c2-4ea4-aa92-fba11475c609',1,30,_binary '','6c4a3f93-f29d-4959-98fd-944255a5da86',NULL),('0ed7f1f0-4770-46a6-80cb-f07119fd0cd1',NULL,'conditional-user-configured','dabc51bf-58ea-42ed-9918-4114e6b08338','52a70b51-a747-4f42-a7d2-9e10844e4cf8',0,10,_binary '\0',NULL,NULL),('0f238512-5a5d-46c3-81bd-cfc3c45a0967',NULL,'idp-email-verification','org5','2bb6a57d-234d-4286-977f-f453ede17e24',2,10,_binary '\0',NULL,NULL),('0f40ff3c-9f63-425b-857e-097476a22cf2',NULL,'registration-page-form','dabc51bf-58ea-42ed-9918-4114e6b08338','daa518b7-df95-4ec7-bebf-002dad9ec5f4',0,10,_binary '','2c0bc69a-cd26-403b-b03f-4c01517b4ae1',NULL),('0f7a5957-ba15-4b3e-a455-eb1760c454b5',NULL,'idp-email-verification','org1','7e7cc0ac-0722-46f1-b8f9-5836184b9424',2,10,_binary '\0',NULL,NULL),('1000aa3f-1dd1-47b3-a708-d834131c678d',NULL,'registration-recaptcha-action','org3','20fe5c6c-8f26-47aa-97ef-60f7b7227164',3,60,_binary '\0',NULL,NULL),('10021d26-4c15-4e73-bc74-c3b35f0fb837',NULL,'registration-page-form','org2','41ab6d77-5d8b-422b-89ce-888262d83ff8',0,10,_binary '','25bc59b3-bf84-4b49-b8bc-cb1944b2be1f',NULL),('13d88704-5249-4f6e-bc71-c63f93a76ccc',NULL,'client-secret','org4','915c5551-b590-403f-9798-c55b24e5c0c6',2,10,_binary '\0',NULL,NULL),('14058439-546f-4a4c-b04f-ee3b900f82a9',NULL,'conditional-user-configured','org1','29b8a59d-e1c7-459e-bf4f-954c1ba43b9d',0,10,_binary '\0',NULL,NULL),('15609589-7b7d-4be0-a690-eef394557d48',NULL,NULL,'org1','e375cfc3-c4c7-4cd0-81f8-10bb36da7410',2,20,_binary '','459747f0-6740-4959-96a6-cdbd3705b8b9',NULL),('165624fe-d488-4488-aa61-def9f4b6ebc4',NULL,'basic-auth','org2','8f12129d-08c8-4c85-a777-0ae263ae9bcf',0,10,_binary '\0',NULL,NULL),('17a1dcce-e583-4978-ad4e-0ba3336776fb',NULL,NULL,'org1','6c38c05b-0367-44f9-819b-0844cfa1eddc',1,20,_binary '','29b8a59d-e1c7-459e-bf4f-954c1ba43b9d',NULL),('17b5a8f6-5d19-42fe-a445-6170f2830576',NULL,'auth-username-password-form','org1','29e5625b-924e-4a5a-a550-f9738af01203',0,10,_binary '\0',NULL,NULL),('18744fd7-1e66-44c0-8b3d-b393759b34ab',NULL,NULL,'org2','81a74ca2-2b1d-4d9a-bae5-3e8d085d4578',1,40,_binary '','73cd0ec7-e9a9-404c-99a6-6dd3d718b721',NULL),('18b0a09e-7edd-4ab4-a867-78f87040d59a',NULL,NULL,'org4','395c712e-5588-4d5e-a70f-63fbfa8b3abc',0,20,_binary '','fefb0528-c330-4955-bfb0-3a05c7c1ca29',NULL),('19ddb754-13e8-4dfb-bf59-516439a61e11',NULL,'auth-spnego','org5','9c373c92-ccfd-4e12-a1cf-df011b73b627',3,30,_binary '\0',NULL,NULL),('19e3e15e-7c03-4fba-84cd-5fb2cb6fa8b1',NULL,'registration-password-action','org2','25bc59b3-bf84-4b49-b8bc-cb1944b2be1f',0,50,_binary '\0',NULL,NULL),('19ea019d-9c1e-483c-a155-9c1f102b3826',NULL,NULL,'dabc51bf-58ea-42ed-9918-4114e6b08338','30c423f4-220d-4fdd-afd3-5685251ac988',2,20,_binary '','c93997cc-1126-4809-abf4-4c4dbc5e910f',NULL),('1b9f5c9a-eade-4149-895e-ad7683d313e6',NULL,'reset-credentials-choose-user','org5','ef4879c9-f5ef-43fe-9bf5-5e87961404ed',0,10,_binary '\0',NULL,NULL),('1baba84e-d688-46ac-8c60-73419f8fd63d',NULL,'http-basic-authenticator','org3','2b816106-ce34-4fac-b0fd-9312ee752909',0,10,_binary '\0',NULL,NULL),('1c4d6752-6896-4761-900f-84a1584ce222',NULL,'idp-review-profile','org5','d1d03d9a-2333-4825-8cd0-cf7219edbca5',0,10,_binary '\0',NULL,'49a48360-6570-46f7-8753-3565e5122de6'),('1c4e9153-dea7-41d9-b6ab-97f8f7002d16',NULL,'direct-grant-validate-username','org5','1680c8f5-dd45-435b-b73c-03de482c49e1',0,10,_binary '\0',NULL,NULL),('1d492c9f-0757-4458-8944-57ce3b9a88ca',NULL,'conditional-user-configured','org2','2efd0c04-05a8-4336-ae5e-10c93a811359',0,10,_binary '\0',NULL,NULL),('1df53c4c-94d1-4780-b51c-8e8369281149',NULL,NULL,'org3','489926bf-32b6-41ef-ae64-0c013053b00e',2,20,_binary '','2f681f2d-c382-4e7a-b8ed-02dd298cf7f1',NULL),('1ebb48e9-4a87-468b-b4d9-ea822d196303',NULL,'auth-cookie','org5','bd77106d-ca23-4bb4-9151-11bc8afb1f4b',2,10,_binary '\0',NULL,NULL),('1f5f8663-7488-49f9-871c-9d72466f90da',NULL,'idp-email-verification','org2','9d0c2734-d123-4bf5-aeee-7eb2209f2a7c',2,10,_binary '\0',NULL,NULL),('1f84247b-486b-41a1-bccd-08435e638f7d',NULL,'registration-password-action','org5','1d0505ed-b997-4c6a-910e-6a6e87bd77df',0,50,_binary '\0',NULL,NULL),('21efc0ee-7077-498b-bef1-1a1895d17a14',NULL,NULL,'org3','9d7b9956-c309-4add-b774-de883e61a3fc',1,20,_binary '','e0d4d7d8-5b18-4fbc-943a-18940a9139a2',NULL),('22c48a11-1609-43f8-8f41-ba29a83851e2',NULL,'identity-provider-redirector','org4','77f45827-9c32-40cc-88af-f10c237535e3',2,25,_binary '\0',NULL,NULL),('242569e2-8ce7-45e9-a019-ac9d7e5e2216',NULL,'idp-create-user-if-unique','org2','7698a82b-7729-4545-9c91-995bd46224cf',2,10,_binary '\0',NULL,'5223696c-6eaf-4686-85c9-bcb6c5c6d5b4'),('248b18ec-bc49-4c4a-b133-fe628cc3ed36',NULL,'registration-page-form','org4','61a9ce97-518b-4b3f-a9b5-220d79a6353e',0,10,_binary '','2342034e-a33f-4553-8243-611612b77ff8',NULL),('258d4e97-c6c3-43cf-a707-f7cb75b37421',NULL,NULL,'dabc51bf-58ea-42ed-9918-4114e6b08338','fc25ac1b-911a-42ac-a364-8e985575220a',1,40,_binary '','6e907f97-deb3-44dc-b374-162362e602d1',NULL),('27a61bc1-58f6-4f72-9413-c3bcdff1b1f5',NULL,'client-secret-jwt','org4','915c5551-b590-403f-9798-c55b24e5c0c6',2,30,_binary '\0',NULL,NULL),('289dfecf-6f21-458f-b745-28b28d389906',NULL,'auth-otp-form','org1','29b8a59d-e1c7-459e-bf4f-954c1ba43b9d',0,20,_binary '\0',NULL,NULL),('29a309dd-5bfb-4a1d-9585-aaebad5e2814',NULL,'docker-http-basic-authenticator','org2','bfa6c3a2-eae7-47ae-b6bb-1c217b7b3b47',0,10,_binary '\0',NULL,NULL),('29eaa5b7-3b25-402b-ac8b-a4ea3ae281ef',NULL,'conditional-user-configured','org4','6b317b6f-e248-459f-a441-876dd81e364c',0,10,_binary '\0',NULL,NULL),('2a92f112-8ece-4c84-8b4a-c46bd1c9f80d',NULL,'identity-provider-redirector','org5','bd77106d-ca23-4bb4-9151-11bc8afb1f4b',2,25,_binary '\0',NULL,NULL),('2bbbcc0d-1cdc-4a49-8654-f33b4146f349',NULL,'auth-cookie','org4','77f45827-9c32-40cc-88af-f10c237535e3',2,10,_binary '\0',NULL,NULL),('30118c5d-90c5-4497-b1c0-e67b5768c541',NULL,'idp-review-profile','org3','d190e905-69ef-43b0-8810-ad082b7093c1',0,10,_binary '\0',NULL,'48d707a5-c58b-406c-bab1-a719c7e820c2'),('348c3cdf-90c0-4d4e-aa26-3d61af5cdd9d',NULL,'client-secret','dabc51bf-58ea-42ed-9918-4114e6b08338','9b61a41b-7902-4235-af5b-5c04aac15529',2,10,_binary '\0',NULL,NULL),('35828c3c-f9f1-49ea-b217-5cccd64c274f',NULL,'client-secret-jwt','org1','fe921562-834e-4b69-b052-148ee5251a05',2,30,_binary '\0',NULL,NULL),('36406304-0380-4de0-b178-2a558051b73b',NULL,'client-x509','org4','915c5551-b590-403f-9798-c55b24e5c0c6',2,40,_binary '\0',NULL,NULL),('39593093-368b-4c18-a694-ebee38c8ab17',NULL,'auth-otp-form','org3','f6e8c40b-0f44-482b-848f-15b45408d0f9',0,20,_binary '\0',NULL,NULL),('3999c0e8-15d5-4759-8efc-5771b89e7189',NULL,'conditional-user-configured','org4','12e155a1-c69a-46fc-8a51-344c695613fe',0,10,_binary '\0',NULL,NULL),('3a1088cb-89aa-4b2c-84df-cb73624d48d7',NULL,'reset-otp','org4','057c9796-c5a3-469c-b557-3bdf03d5e65e',0,20,_binary '\0',NULL,NULL),('3c59ce89-c75d-467c-a00c-5e0ecab863d1',NULL,NULL,'org1','29e5625b-924e-4a5a-a550-f9738af01203',1,20,_binary '','fe86bfe5-af4a-4a3d-87bf-1211c3fe7d7f',NULL),('3d24ffbd-ae3e-4ecc-83be-4b3694aac6e6',NULL,'reset-otp','org2','73cd0ec7-e9a9-404c-99a6-6dd3d718b721',0,20,_binary '\0',NULL,NULL),('3dfb7d85-0c6e-4d95-a039-a050a8d65d2f',NULL,'http-basic-authenticator','org5','4b71fbe1-00f4-414d-937f-bfa3c57f5b0c',0,10,_binary '\0',NULL,NULL),('3ff497ad-6ff6-46cb-ad78-de59d5ce8aa1',NULL,NULL,'org4','d79fd308-4f33-4283-b743-d96edb66dd34',1,20,_binary '','4fb24731-98a1-4940-8260-6831b956ac37',NULL),('40b15a89-ef69-4093-8359-5b6e625e930d',NULL,'direct-grant-validate-password','org3','1437c314-ae6f-48bd-b27b-544ba44af41f',0,20,_binary '\0',NULL,NULL),('42974838-2bd0-4d58-be6e-fc3f8cb0d3ee',NULL,NULL,'org2','5773f0ff-1d55-4370-8644-7ab9042ed98d',1,20,_binary '','1e220f8a-7de9-4176-8713-19deb5b580ad',NULL),('449696ce-b717-4d31-9646-7ca96f04ae79',NULL,NULL,'org1','df7d87da-d586-4532-a693-f60a82707840',2,30,_binary '','29e5625b-924e-4a5a-a550-f9738af01203',NULL),('4560e7ee-320e-4b5e-8121-de197e420f2e',NULL,'idp-review-profile','org4','395c712e-5588-4d5e-a70f-63fbfa8b3abc',0,10,_binary '\0',NULL,'622f6228-59e4-4f46-9c8e-e955ff8d83ca'),('4562b537-bb90-4198-9bd5-6e5680f31e62',NULL,'registration-profile-action','org2','25bc59b3-bf84-4b49-b8bc-cb1944b2be1f',0,40,_binary '\0',NULL,NULL),('456fbbeb-4f3c-4c6d-b07d-70361686f95c',NULL,'client-secret-jwt','org5','975ef3b1-b6f5-4db1-a3c6-fea5fa1376b8',2,30,_binary '\0',NULL,NULL),('46ea0127-3c1c-4fb0-b309-584188c422bc',NULL,NULL,'org4','77f45827-9c32-40cc-88af-f10c237535e3',2,30,_binary '','d79fd308-4f33-4283-b743-d96edb66dd34',NULL),('47a03fd6-3cb6-4405-bad6-b18aba60a46d',NULL,'client-secret-jwt','dabc51bf-58ea-42ed-9918-4114e6b08338','9b61a41b-7902-4235-af5b-5c04aac15529',2,30,_binary '\0',NULL,NULL),('4802db2c-2406-401d-b8bc-d2f4e6a4f7f3',NULL,'conditional-user-configured','org2','4172f787-b54b-4a06-b2a4-4a4b2e44ab2a',0,10,_binary '\0',NULL,NULL),('48370e20-4198-4026-ae5d-ab223bb0dd16',NULL,'auth-username-password-form','org3','9d7b9956-c309-4add-b774-de883e61a3fc',0,10,_binary '\0',NULL,NULL),('4890af72-d311-4799-824c-1d493543a084',NULL,'client-jwt','org1','fe921562-834e-4b69-b052-148ee5251a05',2,20,_binary '\0',NULL,NULL),('4897f7ff-400c-4f24-8564-33a7dfb42b63',NULL,'reset-password','org4','a8b74522-d279-460c-9856-ae76be89898a',0,30,_binary '\0',NULL,NULL),('4c88899d-3c85-4232-8d77-19caeee8561c',NULL,'client-x509','org5','975ef3b1-b6f5-4db1-a3c6-fea5fa1376b8',2,40,_binary '\0',NULL,NULL),('4cde03fc-45e7-4df7-967d-0c64478204d0',NULL,'basic-auth-otp','org3','0d375797-6ad5-4761-8990-6f8402bbd8e4',3,20,_binary '\0',NULL,NULL),('4d27a4a1-7c39-426a-bcc1-a21931a505e3',NULL,NULL,'org5','ef4879c9-f5ef-43fe-9bf5-5e87961404ed',1,40,_binary '','815598b3-20ce-4c27-94a8-744c973a925a',NULL),('4da2d0c8-bc8d-47af-822f-a24dab48a7da',NULL,'direct-grant-validate-password','org2','8b66555b-c54b-40e5-ac47-2220b747d26a',0,20,_binary '\0',NULL,NULL),('4e3beb8c-5924-4847-a43f-071adf513670',NULL,'no-cookie-redirect','org2','1d217df0-adee-4952-9403-b43994febef6',0,10,_binary '\0',NULL,NULL),('50c8f666-c903-442c-9196-344c64c263c1',NULL,'registration-recaptcha-action','org4','2342034e-a33f-4553-8243-611612b77ff8',3,60,_binary '\0',NULL,NULL),('50fb2796-2120-45ca-ade6-48fc998ca968',NULL,NULL,'org1','c0db97f5-aa55-4120-a6fa-ce9d2e40ac13',0,20,_binary '','e375cfc3-c4c7-4cd0-81f8-10bb36da7410',NULL),('5155c3ee-a111-4331-9b8e-3bfcd366b469',NULL,'registration-recaptcha-action','dabc51bf-58ea-42ed-9918-4114e6b08338','2c0bc69a-cd26-403b-b03f-4c01517b4ae1',3,60,_binary '\0',NULL,NULL),('5192615d-aa9e-4e69-bcc4-8a3013b38efc',NULL,'no-cookie-redirect','org3','cbb5d656-b3a5-4081-ac09-2be048d2e0ee',0,10,_binary '\0',NULL,NULL),('533349b4-613d-4e1c-a7fb-e14da90821ad',NULL,'registration-user-creation','org5','1d0505ed-b997-4c6a-910e-6a6e87bd77df',0,20,_binary '\0',NULL,NULL),('5353f90f-93c8-4808-8df4-640fbb2e6360',NULL,'conditional-user-configured','org4','4fb24731-98a1-4940-8260-6831b956ac37',0,10,_binary '\0',NULL,NULL),('53822e08-02e0-4673-936a-0d3f7759d014',NULL,'idp-review-profile','org1','c0db97f5-aa55-4120-a6fa-ce9d2e40ac13',0,10,_binary '\0',NULL,'0ef1bef4-64c2-4d5c-9f14-1de3ee4a6ca8'),('564bc47c-8d20-402d-b54c-4846be45d39c',NULL,NULL,'dabc51bf-58ea-42ed-9918-4114e6b08338','1ad19c5e-0a39-4aed-bd7b-551079d4345a',0,20,_binary '','30c423f4-220d-4fdd-afd3-5685251ac988',NULL),('56b9a5f6-c3b3-4d11-9c9b-e9ca2ca4a6d3',NULL,'registration-profile-action','org5','1d0505ed-b997-4c6a-910e-6a6e87bd77df',0,40,_binary '\0',NULL,NULL),('571801dd-5cbb-4687-a6fb-cccad60bdda3',NULL,'auth-cookie','org3','a9b11600-a61a-4715-9e73-0408e4cbd455',2,10,_binary '\0',NULL,NULL),('5801bebc-07a3-407f-8445-8d5cccf72856',NULL,'identity-provider-redirector','dabc51bf-58ea-42ed-9918-4114e6b08338','78fd3ef3-8171-4a55-b550-6f44cf6db2d8',2,25,_binary '\0',NULL,NULL),('58195ebf-05c7-4e32-b107-f7e53289b28e',NULL,'auth-cookie','org1','df7d87da-d586-4532-a693-f60a82707840',2,10,_binary '\0',NULL,NULL),('584a2104-b155-477e-a349-0a5207b4e0c1',NULL,'reset-password','org2','81a74ca2-2b1d-4d9a-bae5-3e8d085d4578',0,30,_binary '\0',NULL,NULL),('5993b9bd-276b-4ae9-be3b-7cfb0ba8297a',NULL,'auth-otp-form','org2','1e220f8a-7de9-4176-8713-19deb5b580ad',0,20,_binary '\0',NULL,NULL),('5a0f1df3-e4e2-44da-9e5b-d00c87024d12',NULL,'reset-credentials-choose-user','org3','ad2e0b48-8a09-4454-9ad5-a0d0f102ad48',0,10,_binary '\0',NULL,NULL),('5a502b31-c0b4-4149-884a-153abfcce512',NULL,'client-x509','org2','3bbdf73f-08ef-4660-9d2e-a8f220010d3f',2,40,_binary '\0',NULL,NULL),('5c2bc57c-6cfd-4799-a395-392f71ef65c7',NULL,'registration-user-creation','org4','2342034e-a33f-4553-8243-611612b77ff8',0,20,_binary '\0',NULL,NULL),('5c2d3a87-4b0e-4105-a5ea-02122b00e74f',NULL,'basic-auth-otp','org2','8f12129d-08c8-4c85-a777-0ae263ae9bcf',3,20,_binary '\0',NULL,NULL),('5c4a6849-9a62-40dd-af48-b2e865557976',NULL,'registration-profile-action','dabc51bf-58ea-42ed-9918-4114e6b08338','2c0bc69a-cd26-403b-b03f-4c01517b4ae1',0,40,_binary '\0',NULL,NULL),('5d04ed39-a33b-41de-be00-7cb17e91b742',NULL,'conditional-user-configured','org1','6c4a3f93-f29d-4959-98fd-944255a5da86',0,10,_binary '\0',NULL,NULL),('5d200907-a4e3-4e81-a7d9-c99587ca87fc',NULL,'basic-auth','dabc51bf-58ea-42ed-9918-4114e6b08338','87de0f55-4154-4a91-bde8-23a20385a0c4',0,10,_binary '\0',NULL,NULL),('5d77ee9b-4ee5-46e4-91b2-a43045976df0',NULL,NULL,'org2','7698a82b-7729-4545-9c91-995bd46224cf',2,20,_binary '','f457a001-e8e4-41ba-bbe3-cc8c5095be58',NULL),('5dfe9319-585d-4502-b369-3cb0fb56cfa4',NULL,NULL,'org5','1680c8f5-dd45-435b-b73c-03de482c49e1',1,30,_binary '','e0f5ffe0-1303-4e4d-9b26-84b10ebe36a8',NULL),('5e0c1d23-bfa3-4456-9f7c-cb2b2714d2b3',NULL,NULL,'org3','cbb5d656-b3a5-4081-ac09-2be048d2e0ee',0,20,_binary '','0d375797-6ad5-4761-8990-6f8402bbd8e4',NULL),('5e6ae0d5-fe4f-4037-b25c-4695459086af',NULL,'reset-credential-email','org5','ef4879c9-f5ef-43fe-9bf5-5e87961404ed',0,20,_binary '\0',NULL,NULL),('5f18911a-d792-454d-9891-5be47619ada6',NULL,NULL,'org5','95e4c7a4-3160-4fea-9937-60f38e4c91ff',0,20,_binary '','9c373c92-ccfd-4e12-a1cf-df011b73b627',NULL),('5fb00008-ae25-4b1f-be01-15463095640d',NULL,'auth-otp-form','org3','e0d4d7d8-5b18-4fbc-943a-18940a9139a2',0,20,_binary '\0',NULL,NULL),('607f80d9-d645-4aa8-9f0c-20f023424eb3',NULL,'registration-password-action','org1','606e3ec0-563c-4c53-ab1c-b5777e7e91fb',0,50,_binary '\0',NULL,NULL),('60cc6692-2708-4996-ac48-0a8afbde1e52',NULL,'client-x509','dabc51bf-58ea-42ed-9918-4114e6b08338','9b61a41b-7902-4235-af5b-5c04aac15529',2,40,_binary '\0',NULL,NULL),('628ff91d-fe32-4456-9761-3dcc3e01edf0',NULL,NULL,'org4','0b495974-5c43-471b-9918-78cbd9d654ec',2,20,_binary '','76dc3797-8845-4103-af58-4934fbbdb723',NULL),('639d1516-4903-4df2-9263-87ac80d9732a',NULL,'idp-email-verification','org4','0b495974-5c43-471b-9918-78cbd9d654ec',2,10,_binary '\0',NULL,NULL),('641ffd7f-5203-47a5-ae12-c396e2e821bc',NULL,'idp-confirm-link','org3','0c005855-b2ed-4e00-9c23-707df482b650',0,10,_binary '\0',NULL,NULL),('64e834c9-bac4-4d38-9774-c206be151d81',NULL,'idp-username-password-form','org1','6c38c05b-0367-44f9-819b-0844cfa1eddc',0,10,_binary '\0',NULL,NULL),('667b0e30-e80e-4a6e-a64e-31a236789729',NULL,NULL,'org4','76dc3797-8845-4103-af58-4934fbbdb723',1,20,_binary '','12e155a1-c69a-46fc-8a51-344c695613fe',NULL),('66fe1c54-963a-46c7-a04c-e3f0bbf7ce8c',NULL,'auth-spnego','org4','ba40ab9b-8c65-45ea-8ce5-7dc341a20aa3',3,30,_binary '\0',NULL,NULL),('673e5cc9-d339-4062-a413-62066fbbd062',NULL,'basic-auth','org3','0d375797-6ad5-4761-8990-6f8402bbd8e4',0,10,_binary '\0',NULL,NULL),('674f913b-b017-427d-8b84-25ef6b53a86c',NULL,'conditional-user-configured','org5','e0f5ffe0-1303-4e4d-9b26-84b10ebe36a8',0,10,_binary '\0',NULL,NULL),('67c6ff5d-31e6-440e-a7b1-a362aa895b7e',NULL,NULL,'org3','d190e905-69ef-43b0-8810-ad082b7093c1',0,20,_binary '','bdb8bfeb-da00-4c89-8351-8201792f4ec0',NULL),('681657f5-1ef0-4aec-84fb-ca1f6d516eb1',NULL,NULL,'org5','0f3c99b2-c423-47cd-8e2f-bec2aec4c422',1,20,_binary '','6ab00bfb-0c8c-407e-8b4b-fb658ff94ff5',NULL),('681fec42-0a58-4851-9791-baadd634aa32',NULL,NULL,'org3','a9b11600-a61a-4715-9e73-0408e4cbd455',2,30,_binary '','9d7b9956-c309-4add-b774-de883e61a3fc',NULL),('6928bab5-0b06-480b-ae44-ba9153146e11',NULL,'docker-http-basic-authenticator','dabc51bf-58ea-42ed-9918-4114e6b08338','54bcf4e0-40f3-4849-a2c4-b8cae6181a08',0,10,_binary '\0',NULL,NULL),('69a9b419-64a9-42d8-9699-5249fdf8b864',NULL,'reset-credentials-choose-user','org1','6111d7d7-524e-41ea-85c5-76d8e515d243',0,10,_binary '\0',NULL,NULL),('6a16ea22-536c-4e78-9400-edbd5c691df3',NULL,'reset-credential-email','dabc51bf-58ea-42ed-9918-4114e6b08338','fc25ac1b-911a-42ac-a364-8e985575220a',0,20,_binary '\0',NULL,NULL),('6bfe70fc-1516-4ca3-bfe1-119633c4dd9b',NULL,'auth-spnego','org1','997e61f1-54b2-4e64-ad5b-0e22b25d9f6f',3,30,_binary '\0',NULL,NULL),('6c589f1c-9fc2-4e3c-bdfd-10a0ff60dbd1',NULL,NULL,'dabc51bf-58ea-42ed-9918-4114e6b08338','c93997cc-1126-4809-abf4-4c4dbc5e910f',0,20,_binary '','3ac8ef1d-5edd-4a4c-ba45-7ebc34908780',NULL),('6c9a72d5-4264-4c33-9028-efeaa72a5086',NULL,'registration-user-creation','org1','606e3ec0-563c-4c53-ab1c-b5777e7e91fb',0,20,_binary '\0',NULL,NULL),('6cac25ec-fc83-43c4-9493-99766f41b9e6',NULL,'http-basic-authenticator','dabc51bf-58ea-42ed-9918-4114e6b08338','c4be8d0c-dbe4-4bc7-83cb-002012bbe848',0,10,_binary '\0',NULL,NULL),('715bd685-2981-49d1-8c2e-659ff2b65162',NULL,'conditional-user-configured','org5','6ab00bfb-0c8c-407e-8b4b-fb658ff94ff5',0,10,_binary '\0',NULL,NULL),('745e6805-5709-4a33-a6a7-0f13b647adf0',NULL,'direct-grant-validate-otp','org2','4172f787-b54b-4a06-b2a4-4a4b2e44ab2a',0,20,_binary '\0',NULL,NULL),('746e4c5c-1e00-4a70-b89e-904c5bc5e027',NULL,'idp-review-profile','org2','1e90e813-45c5-4317-af13-e41a5ce2ee31',0,10,_binary '\0',NULL,'56690cff-d08d-4353-b001-5863bebdc275'),('748f4980-9309-4676-a8b1-f7ce89bb815c',NULL,NULL,'org1','f8f2e867-cea7-416f-8a05-46e78bb62829',0,20,_binary '','997e61f1-54b2-4e64-ad5b-0e22b25d9f6f',NULL),('74aaaf26-3e0c-4ade-bae7-bf682800216c',NULL,'idp-create-user-if-unique','org5','90e5397a-94da-45aa-aa27-34aa28896fe2',2,10,_binary '\0',NULL,'157e54ab-5f70-4ef0-bcdc-a05884b301d1'),('751e0061-4db4-4f64-9a4d-19f787e65bfe',NULL,NULL,'org2','9d0c2734-d123-4bf5-aeee-7eb2209f2a7c',2,20,_binary '','5773f0ff-1d55-4370-8644-7ab9042ed98d',NULL),('76996461-e1ae-4091-b1a1-09280e783c98',NULL,'idp-username-password-form','org3','2f681f2d-c382-4e7a-b8ed-02dd298cf7f1',0,10,_binary '\0',NULL,NULL),('78d7f414-600d-4f3c-bbd6-596cde7f56c0',NULL,'client-jwt','org2','3bbdf73f-08ef-4660-9d2e-a8f220010d3f',2,20,_binary '\0',NULL,NULL),('7acc2874-415e-47ce-856f-b3efc934bffa',NULL,'registration-recaptcha-action','org1','606e3ec0-563c-4c53-ab1c-b5777e7e91fb',3,60,_binary '\0',NULL,NULL),('7b7c940e-04bb-4dae-9150-5e5aa04d6e6b',NULL,NULL,'org2','c1ba830e-d351-4226-82aa-820189289db4',1,20,_binary '','2efd0c04-05a8-4336-ae5e-10c93a811359',NULL),('7bf90b07-8f29-444f-b490-a40c41fb243c',NULL,'reset-credentials-choose-user','org4','a8b74522-d279-460c-9856-ae76be89898a',0,10,_binary '\0',NULL,NULL),('7c79294d-133f-424f-b6d5-8dc9d8b67886',NULL,'reset-credential-email','org2','81a74ca2-2b1d-4d9a-bae5-3e8d085d4578',0,20,_binary '\0',NULL,NULL),('7d341462-2bde-45df-abe1-9978271a460e',NULL,'client-secret-jwt','org2','3bbdf73f-08ef-4660-9d2e-a8f220010d3f',2,30,_binary '\0',NULL,NULL),('7fa8396b-f33a-4c4a-a682-149f4d704d8f',NULL,'reset-password','org3','ad2e0b48-8a09-4454-9ad5-a0d0f102ad48',0,30,_binary '\0',NULL,NULL),('8250d64e-646f-4ed3-8049-1bf8b3269fcf',NULL,'http-basic-authenticator','org1','a742e961-d48a-4175-91e4-dc873f4466fe',0,10,_binary '\0',NULL,NULL),('8493a5e4-a3ee-435f-b246-03759e2f5c39',NULL,'conditional-user-configured','dabc51bf-58ea-42ed-9918-4114e6b08338','03e64cd1-2b08-48a2-87dc-30a8dfbbfa40',0,10,_binary '\0',NULL,NULL),('84a3f8c9-1bdf-45e8-88f9-2768f89f7f7a',NULL,'idp-confirm-link','org4','ed4e9e92-1ea7-410e-93e0-791d6b3c5291',0,10,_binary '\0',NULL,NULL),('84dda25e-072b-481a-a2a6-e28641958aa0',NULL,'idp-confirm-link','org5','ab6aa3a7-d948-4bf4-8edb-bcf134fa6fcb',0,10,_binary '\0',NULL,NULL),('85bc5f73-f24d-4aff-9d67-d0e8f2f37075',NULL,'direct-grant-validate-username','org2','8b66555b-c54b-40e5-ac47-2220b747d26a',0,10,_binary '\0',NULL,NULL),('866a81f8-17ce-4a74-9bd2-3e9b1ef94a30',NULL,NULL,'dabc51bf-58ea-42ed-9918-4114e6b08338','78fd3ef3-8171-4a55-b550-6f44cf6db2d8',2,30,_binary '','985bd86b-5875-4c6f-a262-92635c097b5d',NULL),('8956b06f-1d0c-4a54-91c6-9d310c490331',NULL,'direct-grant-validate-password','org5','1680c8f5-dd45-435b-b73c-03de482c49e1',0,20,_binary '\0',NULL,NULL),('8a73697a-b0a8-4d13-8845-54cbab68e053',NULL,'idp-email-verification','dabc51bf-58ea-42ed-9918-4114e6b08338','3ac8ef1d-5edd-4a4c-ba45-7ebc34908780',2,10,_binary '\0',NULL,NULL),('8a80ca3e-2990-4ccb-99b8-035a666a5ce4',NULL,'registration-user-creation','org2','25bc59b3-bf84-4b49-b8bc-cb1944b2be1f',0,20,_binary '\0',NULL,NULL),('8b25c60b-39dd-42f9-8b29-4b6fea3a738c',NULL,'auth-username-password-form','org5','32b8ef42-1b9b-4e38-a3d1-e8857258de9e',0,10,_binary '\0',NULL,NULL),('8bb4457c-9fe4-4e48-a41b-104b907e1953',NULL,'direct-grant-validate-username','org1','48598438-66c2-4ea4-aa92-fba11475c609',0,10,_binary '\0',NULL,NULL),('8caa2440-5c33-4b29-86c0-d0234f9068b9',NULL,'no-cookie-redirect','org1','f8f2e867-cea7-416f-8a05-46e78bb62829',0,10,_binary '\0',NULL,NULL),('8cd7d928-e57b-4d1f-876f-cf23f8f266b3',NULL,'direct-grant-validate-otp','org3','a307a202-7ef4-4b79-a60c-63e445a16755',0,20,_binary '\0',NULL,NULL),('8f560a9d-8e12-4028-bcf0-588717f48733',NULL,'reset-otp','org3','758ba5ba-e3d5-4ffe-b22c-44670587eefb',0,20,_binary '\0',NULL,NULL),('9151d20d-ecd6-43b8-a08b-6c50d0c48abb',NULL,'reset-credential-email','org4','a8b74522-d279-460c-9856-ae76be89898a',0,20,_binary '\0',NULL,NULL),('917d887e-fafa-4576-9c5e-23b1508e5fb4',NULL,'direct-grant-validate-password','dabc51bf-58ea-42ed-9918-4114e6b08338','df42398f-1333-45f5-9b00-f179b3231906',0,20,_binary '\0',NULL,NULL),('9325085c-e3f0-4a60-b076-c189bc549af7',NULL,'registration-recaptcha-action','org5','1d0505ed-b997-4c6a-910e-6a6e87bd77df',3,60,_binary '\0',NULL,NULL),('93499cfd-9cd4-4fde-93ec-b7b55496f12c',NULL,'conditional-user-configured','org2','73cd0ec7-e9a9-404c-99a6-6dd3d718b721',0,10,_binary '\0',NULL,NULL),('97cca051-be2e-4a0d-917b-e066ea720a00',NULL,'idp-confirm-link','org1','459747f0-6740-4959-96a6-cdbd3705b8b9',0,10,_binary '\0',NULL,NULL),('988542f1-7e18-4ab9-ad4e-8b3267a35201',NULL,'auth-username-password-form','dabc51bf-58ea-42ed-9918-4114e6b08338','985bd86b-5875-4c6f-a262-92635c097b5d',0,10,_binary '\0',NULL,NULL),('999ee171-992f-4051-83b4-2dbf25940ff0',NULL,NULL,'org4','51f3ada7-488f-430b-a9ed-17471ca87b4f',0,20,_binary '','ba40ab9b-8c65-45ea-8ce5-7dc341a20aa3',NULL),('9a76a76b-b9e3-4b34-8666-d7567c789641',NULL,NULL,'org5','32b8ef42-1b9b-4e38-a3d1-e8857258de9e',1,20,_binary '','1ac0c336-5cff-4aae-b942-d681ea540291',NULL),('9aa32b5e-7658-42eb-82e4-129d204178c5',NULL,'auth-username-password-form','org2','c1ba830e-d351-4226-82aa-820189289db4',0,10,_binary '\0',NULL,NULL),('9b871d4f-cd84-4a83-9008-052446b83668',NULL,'auth-otp-form','org1','fe86bfe5-af4a-4a3d-87bf-1211c3fe7d7f',0,20,_binary '\0',NULL,NULL),('9c5643a8-70ce-44ab-b12f-87a03a164dc5',NULL,'client-secret-jwt','org3','cb06f7b0-679e-431b-90d4-a564d37c9d44',2,30,_binary '\0',NULL,NULL),('9f2fc0cb-5cf9-4e0b-a8a2-c12cf366b5df',NULL,'conditional-user-configured','org5','1ac0c336-5cff-4aae-b942-d681ea540291',0,10,_binary '\0',NULL,NULL),('9f4878df-de38-4b14-a814-eb6e7d5f1161',NULL,'auth-spnego','org5','bd77106d-ca23-4bb4-9151-11bc8afb1f4b',3,20,_binary '\0',NULL,NULL),('9fe9e379-7917-4f0e-bb7f-fc66ded1ef91',NULL,'direct-grant-validate-username','org3','1437c314-ae6f-48bd-b27b-544ba44af41f',0,10,_binary '\0',NULL,NULL),('a196c759-e7ef-4d8f-b113-97fe7ebe7843',NULL,'auth-spnego','dabc51bf-58ea-42ed-9918-4114e6b08338','87de0f55-4154-4a91-bde8-23a20385a0c4',3,30,_binary '\0',NULL,NULL),('a22af855-0ec2-43b9-9571-68f1de84c907',NULL,'auth-otp-form','dabc51bf-58ea-42ed-9918-4114e6b08338','03e64cd1-2b08-48a2-87dc-30a8dfbbfa40',0,20,_binary '\0',NULL,NULL),('a264ffc6-1ec8-4924-a388-36dc612032a5',NULL,NULL,'org1','459747f0-6740-4959-96a6-cdbd3705b8b9',0,20,_binary '','7e7cc0ac-0722-46f1-b8f9-5836184b9424',NULL),('a2b3a58a-7b16-4fa3-9725-81683276d587',NULL,'reset-credentials-choose-user','org2','81a74ca2-2b1d-4d9a-bae5-3e8d085d4578',0,10,_binary '\0',NULL,NULL),('a3d92d7b-30c5-4269-9fca-4aa134c810ca',NULL,'registration-page-form','org5','e61e12a5-8571-4a32-8209-068c7595b6bd',0,10,_binary '','1d0505ed-b997-4c6a-910e-6a6e87bd77df',NULL),('a4c22f68-18b6-478d-89a3-a0a4b2e0210c',NULL,'auth-otp-form','org2','2efd0c04-05a8-4336-ae5e-10c93a811359',0,20,_binary '\0',NULL,NULL),('a6a50e84-70ac-47a0-bdba-11f03b7f1f54',NULL,'auth-spnego','org2','8f12129d-08c8-4c85-a777-0ae263ae9bcf',3,30,_binary '\0',NULL,NULL),('a7d47056-3ea9-47ba-8a5b-ebd05c7ede71',NULL,'no-cookie-redirect','org5','95e4c7a4-3160-4fea-9937-60f38e4c91ff',0,10,_binary '\0',NULL,NULL),('a7ee6b67-40bc-42bf-8aeb-7078c81908dc',NULL,'basic-auth','org5','9c373c92-ccfd-4e12-a1cf-df011b73b627',0,10,_binary '\0',NULL,NULL),('a82678f8-6f9d-4eaa-b5e3-d1c7e2028364',NULL,'client-jwt','dabc51bf-58ea-42ed-9918-4114e6b08338','9b61a41b-7902-4235-af5b-5c04aac15529',2,20,_binary '\0',NULL,NULL),('a8b9dce9-fcc2-49b9-a33c-7dbb77fabd5f',NULL,'reset-otp','org1','81f10f69-61b6-4c5a-973c-11c9fae12edb',0,20,_binary '\0',NULL,NULL),('a92f280c-d18f-4f2d-acf2-71d8f36b1004',NULL,'direct-grant-validate-username','org4','f0198c42-6838-4333-a2e3-5902ecc9bef8',0,10,_binary '\0',NULL,NULL),('a933cb42-17ba-4bec-ad14-ccabd5d2779a',NULL,NULL,'org4','fefb0528-c330-4955-bfb0-3a05c7c1ca29',2,20,_binary '','ed4e9e92-1ea7-410e-93e0-791d6b3c5291',NULL),('af451100-4a20-4972-87a8-6631e61b0210',NULL,'identity-provider-redirector','org1','df7d87da-d586-4532-a693-f60a82707840',2,25,_binary '\0',NULL,NULL),('b0d555a4-0088-4373-be4b-771e7b8574bb',NULL,'direct-grant-validate-username','dabc51bf-58ea-42ed-9918-4114e6b08338','df42398f-1333-45f5-9b00-f179b3231906',0,10,_binary '\0',NULL,NULL),('b115712a-3648-419d-87e0-8aea583d5950',NULL,'auth-otp-form','org5','6ab00bfb-0c8c-407e-8b4b-fb658ff94ff5',0,20,_binary '\0',NULL,NULL),('b15f5ea3-e999-4154-82aa-7f4fb39a2dff',NULL,'docker-http-basic-authenticator','org5','f3eb6f5d-79a6-4e3c-b79c-9e9738068ddb',0,10,_binary '\0',NULL,NULL),('b16ce419-9e5a-459a-bbd1-2c6735ef813e',NULL,'conditional-user-configured','org5','815598b3-20ce-4c27-94a8-744c973a925a',0,10,_binary '\0',NULL,NULL),('b2956fc4-ed26-4396-9656-9c6f2518e6d2',NULL,'conditional-user-configured','dabc51bf-58ea-42ed-9918-4114e6b08338','215b594f-9fc3-484c-b267-41c2cb986390',0,10,_binary '\0',NULL,NULL),('b36794df-cc68-4bbc-b4e4-32ac7ed52571',NULL,'auth-spnego','org2','36140312-1555-4074-b820-ce9677ca3316',3,20,_binary '\0',NULL,NULL),('b4e41d02-ec33-46ec-9aee-3eca5195deb2',NULL,'client-jwt','org3','cb06f7b0-679e-431b-90d4-a564d37c9d44',2,20,_binary '\0',NULL,NULL),('b637fb7d-1dc0-4eee-9017-92248acccd6f',NULL,'auth-spnego','org1','df7d87da-d586-4532-a693-f60a82707840',3,20,_binary '\0',NULL,NULL),('b6588cba-25b7-4e0f-a9d6-ff4a6fb48568',NULL,'client-x509','org3','cb06f7b0-679e-431b-90d4-a564d37c9d44',2,40,_binary '\0',NULL,NULL),('b7441a99-ede2-4455-a8d7-c652989ec381',NULL,NULL,'org3','ad2e0b48-8a09-4454-9ad5-a0d0f102ad48',1,40,_binary '','758ba5ba-e3d5-4ffe-b22c-44670587eefb',NULL),('b8d4818e-081a-476c-ba73-b94f0726b571',NULL,'auth-otp-form','org4','4fb24731-98a1-4940-8260-6831b956ac37',0,20,_binary '\0',NULL,NULL),('b9301a2a-673f-4c61-93f8-25717839ae23',NULL,'registration-password-action','dabc51bf-58ea-42ed-9918-4114e6b08338','2c0bc69a-cd26-403b-b03f-4c01517b4ae1',0,50,_binary '\0',NULL,NULL),('b996c4e4-53f9-4cdf-87f4-74eea9f81b89',NULL,'idp-confirm-link','org2','f457a001-e8e4-41ba-bbe3-cc8c5095be58',0,10,_binary '\0',NULL,NULL),('b9cffc62-387c-4510-ab10-ae782a6b7a75',NULL,'conditional-user-configured','org1','81f10f69-61b6-4c5a-973c-11c9fae12edb',0,10,_binary '\0',NULL,NULL),('bb6796df-b019-45c4-8556-78afec7d2c2c',NULL,NULL,'org3','1437c314-ae6f-48bd-b27b-544ba44af41f',1,30,_binary '','a307a202-7ef4-4b79-a60c-63e445a16755',NULL),('bb77d28e-1714-4390-bd15-6a7d90934e85',NULL,NULL,'org5','2bb6a57d-234d-4286-977f-f453ede17e24',2,20,_binary '','0f3c99b2-c423-47cd-8e2f-bec2aec4c422',NULL),('bc77c7e4-8e87-421d-8c72-faecf9755d05',NULL,NULL,'org2','1d217df0-adee-4952-9403-b43994febef6',0,20,_binary '','8f12129d-08c8-4c85-a777-0ae263ae9bcf',NULL),('bd6a687a-ed71-49cf-a06d-db8c5591585b',NULL,'reset-otp','org5','815598b3-20ce-4c27-94a8-744c973a925a',0,20,_binary '\0',NULL,NULL),('be460095-5cd9-4590-84b1-82f702c88700',NULL,NULL,'org2','1e90e813-45c5-4317-af13-e41a5ce2ee31',0,20,_binary '','7698a82b-7729-4545-9c91-995bd46224cf',NULL),('bf152dc9-4210-4f0a-b08e-482a725a18b6',NULL,'idp-username-password-form','org2','5773f0ff-1d55-4370-8644-7ab9042ed98d',0,10,_binary '\0',NULL,NULL),('bf7a1869-3889-498f-9be1-4be0fcdee66e',NULL,'direct-grant-validate-password','org4','f0198c42-6838-4333-a2e3-5902ecc9bef8',0,20,_binary '\0',NULL,NULL),('c06081f5-ba99-4afd-b915-61525e247af6',NULL,'registration-user-creation','dabc51bf-58ea-42ed-9918-4114e6b08338','2c0bc69a-cd26-403b-b03f-4c01517b4ae1',0,20,_binary '\0',NULL,NULL),('c0e98e9f-fe6e-41de-bde1-8e7b4ee0d8ac',NULL,'docker-http-basic-authenticator','org4','01b74f0e-be68-4a43-8154-a04e50bba9b3',0,10,_binary '\0',NULL,NULL),('c2319218-d3d6-43da-ad4f-1fda7b79d2e8',NULL,'registration-profile-action','org4','2342034e-a33f-4553-8243-611612b77ff8',0,40,_binary '\0',NULL,NULL),('c2e75130-7c10-47e6-b374-93d06e80b8fe',NULL,'auth-cookie','org2','36140312-1555-4074-b820-ce9677ca3316',2,10,_binary '\0',NULL,NULL),('c2e76fce-dbe1-4c28-b905-8671c35d8fa4',NULL,'conditional-user-configured','org4','057c9796-c5a3-469c-b557-3bdf03d5e65e',0,10,_binary '\0',NULL,NULL),('c450c48f-c315-4104-a46c-1b305fd7cd90',NULL,NULL,'dabc51bf-58ea-42ed-9918-4114e6b08338','985bd86b-5875-4c6f-a262-92635c097b5d',1,20,_binary '','215b594f-9fc3-484c-b267-41c2cb986390',NULL),('c461595f-f29e-4397-8064-e504dba723ef',NULL,NULL,'org4','f0198c42-6838-4333-a2e3-5902ecc9bef8',1,30,_binary '','6b317b6f-e248-459f-a441-876dd81e364c',NULL),('c4ea8be7-4942-462a-ab83-2511d18068e8',NULL,NULL,'dabc51bf-58ea-42ed-9918-4114e6b08338','23e242a2-a8f7-4b03-9ef2-c84df9d42df4',1,20,_binary '','03e64cd1-2b08-48a2-87dc-30a8dfbbfa40',NULL),('c5c389f1-cb9e-4a84-8002-d5b4fe1d5b0b',NULL,'auth-spnego','dabc51bf-58ea-42ed-9918-4114e6b08338','78fd3ef3-8171-4a55-b550-6f44cf6db2d8',3,20,_binary '\0',NULL,NULL),('c70baa0c-6bb5-413c-b68b-2628a575d5a1',NULL,'registration-page-form','org1','b5aece4d-8a04-4f29-91ca-9bbe0e1cda49',0,10,_binary '','606e3ec0-563c-4c53-ab1c-b5777e7e91fb',NULL),('c73ce001-a360-422a-b56d-5875daf2168b',NULL,'docker-http-basic-authenticator','org1','5952f91a-4b9b-44b5-bab7-0022487183cf',0,10,_binary '\0',NULL,NULL),('c7a0907f-2ce6-4686-8c0a-9338e6a91766',NULL,NULL,'org5','d1d03d9a-2333-4825-8cd0-cf7219edbca5',0,20,_binary '','90e5397a-94da-45aa-aa27-34aa28896fe2',NULL),('c8490972-1cb2-4935-914a-ffb5b2277aa3',NULL,'no-cookie-redirect','dabc51bf-58ea-42ed-9918-4114e6b08338','86d5f9ac-4818-47ad-b095-c5ae77540e6c',0,10,_binary '\0',NULL,NULL),('c8965f71-72f2-4222-8553-30b926756b1e',NULL,'idp-username-password-form','org5','0f3c99b2-c423-47cd-8e2f-bec2aec4c422',0,10,_binary '\0',NULL,NULL),('c8b53f5c-ac7a-4cdb-92ca-38826b20a661',NULL,'client-secret','org3','cb06f7b0-679e-431b-90d4-a564d37c9d44',2,10,_binary '\0',NULL,NULL),('ca15d0c3-ce7c-400b-bcbf-aefa470f7c9e',NULL,'auth-spnego','org4','77f45827-9c32-40cc-88af-f10c237535e3',3,20,_binary '\0',NULL,NULL),('ca81f047-59d6-42f6-977d-9a1117a7444e',NULL,NULL,'org3','0c005855-b2ed-4e00-9c23-707df482b650',0,20,_binary '','489926bf-32b6-41ef-ae64-0c013053b00e',NULL),('cad9c360-2a50-47af-a4fc-4381396dc662',NULL,'direct-grant-validate-password','org1','48598438-66c2-4ea4-aa92-fba11475c609',0,20,_binary '\0',NULL,NULL),('cbbc539f-18e5-4a75-b0c5-f435a0ee1a68',NULL,'identity-provider-redirector','org2','36140312-1555-4074-b820-ce9677ca3316',2,25,_binary '\0',NULL,NULL),('cdc57568-27ce-468a-b39e-ec4d1f8cefe0',NULL,'reset-password','org5','ef4879c9-f5ef-43fe-9bf5-5e87961404ed',0,30,_binary '\0',NULL,NULL),('ce74947e-67fe-4f3e-92ac-3aa33eaa4e15',NULL,'client-x509','org1','fe921562-834e-4b69-b052-148ee5251a05',2,40,_binary '\0',NULL,NULL),('ceace84d-fb30-44cf-a8c9-43311a1ae9e3',NULL,NULL,'dabc51bf-58ea-42ed-9918-4114e6b08338','3ac8ef1d-5edd-4a4c-ba45-7ebc34908780',2,20,_binary '','23e242a2-a8f7-4b03-9ef2-c84df9d42df4',NULL),('d0a7afd3-792e-4674-9340-222c72ccb509',NULL,'registration-password-action','org3','20fe5c6c-8f26-47aa-97ef-60f7b7227164',0,50,_binary '\0',NULL,NULL),('d289b9d1-03e5-4b93-9423-b1d6fc5a7511',NULL,NULL,'org4','a8b74522-d279-460c-9856-ae76be89898a',1,40,_binary '','057c9796-c5a3-469c-b557-3bdf03d5e65e',NULL),('d2a0404b-29c9-4e25-837b-858a543742c8',NULL,'conditional-user-configured','org3','758ba5ba-e3d5-4ffe-b22c-44670587eefb',0,10,_binary '\0',NULL,NULL),('d42cac97-0fb6-4d0c-aeb3-dae3c16d224c',NULL,NULL,'org2','8b66555b-c54b-40e5-ac47-2220b747d26a',1,30,_binary '','4172f787-b54b-4a06-b2a4-4a4b2e44ab2a',NULL),('d59fa111-1dac-42d1-ab58-f73127f89be9',NULL,'registration-user-creation','org3','20fe5c6c-8f26-47aa-97ef-60f7b7227164',0,20,_binary '\0',NULL,NULL),('d7385999-830b-4642-9445-1dac717ca322',NULL,NULL,'org3','bdb8bfeb-da00-4c89-8351-8201792f4ec0',2,20,_binary '','0c005855-b2ed-4e00-9c23-707df482b650',NULL),('d8209d62-822e-40f1-af06-5b7b12da68dc',NULL,'direct-grant-validate-otp','org4','6b317b6f-e248-459f-a441-876dd81e364c',0,20,_binary '\0',NULL,NULL),('d9a73a5b-d9d2-4cf5-8845-f65f82b88ae3',NULL,'client-jwt','org4','915c5551-b590-403f-9798-c55b24e5c0c6',2,20,_binary '\0',NULL,NULL),('d9a9a896-100c-4396-8dcf-4bb34ea1a5cc',NULL,'reset-password','dabc51bf-58ea-42ed-9918-4114e6b08338','fc25ac1b-911a-42ac-a364-8e985575220a',0,30,_binary '\0',NULL,NULL),('d9fea11e-d86e-4bcd-b2eb-d002c03e962a',NULL,NULL,'org5','90e5397a-94da-45aa-aa27-34aa28896fe2',2,20,_binary '','ab6aa3a7-d948-4bf4-8edb-bcf134fa6fcb',NULL),('daa782df-32fc-4f86-89fd-3415bedc4b20',NULL,'conditional-user-configured','org1','fe86bfe5-af4a-4a3d-87bf-1211c3fe7d7f',0,10,_binary '\0',NULL,NULL),('db9d6f30-65e8-4535-bafd-1edc09cb3c42',NULL,'direct-grant-validate-otp','org1','6c4a3f93-f29d-4959-98fd-944255a5da86',0,20,_binary '\0',NULL,NULL),('dcbe1241-5999-4d07-a09e-e564976ea943',NULL,'idp-username-password-form','dabc51bf-58ea-42ed-9918-4114e6b08338','23e242a2-a8f7-4b03-9ef2-c84df9d42df4',0,10,_binary '\0',NULL,NULL),('dd39a6b8-5521-458c-a9fc-f79beeedc4c8',NULL,NULL,'org5','bd77106d-ca23-4bb4-9151-11bc8afb1f4b',2,30,_binary '','32b8ef42-1b9b-4e38-a3d1-e8857258de9e',NULL),('de5945e8-78b1-4308-ba6f-8ba58ff28d53',NULL,NULL,'org5','ab6aa3a7-d948-4bf4-8edb-bcf134fa6fcb',0,20,_binary '','2bb6a57d-234d-4286-977f-f453ede17e24',NULL),('df8e5999-2b48-495d-b6b9-3e6516b2de86',NULL,'identity-provider-redirector','org3','a9b11600-a61a-4715-9e73-0408e4cbd455',2,25,_binary '\0',NULL,NULL),('e1056f17-d7bc-4f41-8740-4e756c575505',NULL,'idp-create-user-if-unique','org3','bdb8bfeb-da00-4c89-8351-8201792f4ec0',2,10,_binary '\0',NULL,'2a1d5c07-b55e-408b-b180-cc15d6362e42'),('e236f371-3184-4434-ae4b-1aa223cab3f4',NULL,'auth-otp-form','org5','1ac0c336-5cff-4aae-b942-d681ea540291',0,20,_binary '\0',NULL,NULL),('e3735aa0-7f1a-4105-a081-8a6d241e9e67',NULL,'auth-spnego','org3','a9b11600-a61a-4715-9e73-0408e4cbd455',3,20,_binary '\0',NULL,NULL),('e46c26e0-8964-4f98-a7d1-c4a082d72930',NULL,'idp-username-password-form','org4','76dc3797-8845-4103-af58-4934fbbdb723',0,10,_binary '\0',NULL,NULL),('e51f77b1-0dea-4364-920c-22347f10ede1',NULL,NULL,'org1','6111d7d7-524e-41ea-85c5-76d8e515d243',1,40,_binary '','81f10f69-61b6-4c5a-973c-11c9fae12edb',NULL),('e8716adc-dd71-4c88-a984-a8604890f3f1',NULL,'direct-grant-validate-otp','org5','e0f5ffe0-1303-4e4d-9b26-84b10ebe36a8',0,20,_binary '\0',NULL,NULL),('e8a691f1-3aa4-43ca-8138-24f4af4e1c76',NULL,'idp-confirm-link','dabc51bf-58ea-42ed-9918-4114e6b08338','c93997cc-1126-4809-abf4-4c4dbc5e910f',0,10,_binary '\0',NULL,NULL),('eaf91c14-242f-4f9e-b239-33a700efa7d8',NULL,'registration-password-action','org4','2342034e-a33f-4553-8243-611612b77ff8',0,50,_binary '\0',NULL,NULL),('ebcc52ca-d0ea-47d1-b1f1-914aa274d84e',NULL,'basic-auth','org1','997e61f1-54b2-4e64-ad5b-0e22b25d9f6f',0,10,_binary '\0',NULL,NULL),('ec42f170-301b-464b-93ae-5988f8650cdb',NULL,'conditional-user-configured','org2','1e220f8a-7de9-4176-8713-19deb5b580ad',0,10,_binary '\0',NULL,NULL),('ed5204d4-4b72-488e-b1e4-5745469624ac',NULL,'basic-auth-otp','org5','9c373c92-ccfd-4e12-a1cf-df011b73b627',3,20,_binary '\0',NULL,NULL),('edc5e96b-039a-4ea9-921f-63454ff117b1',NULL,'conditional-user-configured','org3','e0d4d7d8-5b18-4fbc-943a-18940a9139a2',0,10,_binary '\0',NULL,NULL),('ee60190f-6ebb-45ae-a951-2c2d7e37acec',NULL,'http-basic-authenticator','org4','eef18541-f4bd-49ef-8463-f9f997321e94',0,10,_binary '\0',NULL,NULL),('f15efd98-fcda-440b-bfef-5e1bf103d58d',NULL,'http-basic-authenticator','org2','34a9fc1b-56cf-4c1a-9c3c-49679b911f9e',0,10,_binary '\0',NULL,NULL),('f172eb4a-37ab-4014-93e7-1147219bb35f',NULL,'registration-profile-action','org1','606e3ec0-563c-4c53-ab1c-b5777e7e91fb',0,40,_binary '\0',NULL,NULL),('f1c624c1-c60a-4f17-bda4-2e570182c885',NULL,'basic-auth-otp','dabc51bf-58ea-42ed-9918-4114e6b08338','87de0f55-4154-4a91-bde8-23a20385a0c4',3,20,_binary '\0',NULL,NULL),('f2120e7e-81e0-4c5a-bbd6-d95d2dffa9a1',NULL,'reset-credential-email','org1','6111d7d7-524e-41ea-85c5-76d8e515d243',0,20,_binary '\0',NULL,NULL),('f2fd682c-6646-4bc3-b19f-2b5e2be10c86',NULL,'client-jwt','org5','975ef3b1-b6f5-4db1-a3c6-fea5fa1376b8',2,20,_binary '\0',NULL,NULL),('f33aebc6-62ac-4846-9f9d-72fb3736d294',NULL,'auth-otp-form','org4','12e155a1-c69a-46fc-8a51-344c695613fe',0,20,_binary '\0',NULL,NULL),('f3a37e25-2d27-4542-9ce3-1335da1dda40',NULL,'basic-auth','org4','ba40ab9b-8c65-45ea-8ce5-7dc341a20aa3',0,10,_binary '\0',NULL,NULL),('f3e15136-1123-43c0-8020-8b480a79c28f',NULL,'basic-auth-otp','org4','ba40ab9b-8c65-45ea-8ce5-7dc341a20aa3',3,20,_binary '\0',NULL,NULL),('f3fe6ebc-9146-4930-9e08-98c57b9135c2',NULL,'no-cookie-redirect','org4','51f3ada7-488f-430b-a9ed-17471ca87b4f',0,10,_binary '\0',NULL,NULL),('f45ca83a-b7ad-4933-9deb-2444ba77f408',NULL,NULL,'org4','ed4e9e92-1ea7-410e-93e0-791d6b3c5291',0,20,_binary '','0b495974-5c43-471b-9918-78cbd9d654ec',NULL),('f5908ffb-8884-4c17-a57b-f98c0dfabc9c',NULL,NULL,'org3','2f681f2d-c382-4e7a-b8ed-02dd298cf7f1',1,20,_binary '','f6e8c40b-0f44-482b-848f-15b45408d0f9',NULL),('f5dc2bfa-bf60-4b19-9b34-53a59417a253',NULL,'reset-credentials-choose-user','dabc51bf-58ea-42ed-9918-4114e6b08338','fc25ac1b-911a-42ac-a364-8e985575220a',0,10,_binary '\0',NULL,NULL),('f61585eb-f7a8-4838-be80-03cbd769749a',NULL,NULL,'org2','f457a001-e8e4-41ba-bbe3-cc8c5095be58',0,20,_binary '','9d0c2734-d123-4bf5-aeee-7eb2209f2a7c',NULL),('f71a0cb6-535f-4f43-bf93-116250fee869',NULL,NULL,'org1','7e7cc0ac-0722-46f1-b8f9-5836184b9424',2,20,_binary '','6c38c05b-0367-44f9-819b-0844cfa1eddc',NULL),('f7e8e343-fe27-4639-976b-be2c186cecc5',NULL,NULL,'dabc51bf-58ea-42ed-9918-4114e6b08338','df42398f-1333-45f5-9b00-f179b3231906',1,30,_binary '','52a70b51-a747-4f42-a7d2-9e10844e4cf8',NULL),('fbc8b462-2aca-470f-b341-62b108d5da60',NULL,'auth-spnego','org3','0d375797-6ad5-4761-8990-6f8402bbd8e4',3,30,_binary '\0',NULL,NULL),('fd6c4bb2-6b46-46a5-a096-fbaa8ee16ad2',NULL,'registration-page-form','org3','c88e8469-b79a-4bc3-880d-26f3753f1c76',0,10,_binary '','20fe5c6c-8f26-47aa-97ef-60f7b7227164',NULL),('fecaf79b-eeda-414b-bfd7-ec6bcedd5ce8',NULL,'auth-otp-form','dabc51bf-58ea-42ed-9918-4114e6b08338','215b594f-9fc3-484c-b267-41c2cb986390',0,20,_binary '\0',NULL,NULL),('fecb2fcd-b31e-4fb2-9549-c152a4a2af14',NULL,NULL,'dabc51bf-58ea-42ed-9918-4114e6b08338','86d5f9ac-4818-47ad-b095-c5ae77540e6c',0,20,_binary '','87de0f55-4154-4a91-bde8-23a20385a0c4',NULL),('fef64be4-8472-4c9d-88f0-cfabf33096a7',NULL,'conditional-user-configured','dabc51bf-58ea-42ed-9918-4114e6b08338','6e907f97-deb3-44dc-b374-162362e602d1',0,10,_binary '\0',NULL,NULL),('ff868dc4-478c-4419-897d-17ae9c94a086',NULL,'basic-auth-otp','org1','997e61f1-54b2-4e64-ad5b-0e22b25d9f6f',3,20,_binary '\0',NULL,NULL);
+/*!40000 ALTER TABLE `AUTHENTICATION_EXECUTION` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `AUTHENTICATION_FLOW`
+--
+
+DROP TABLE IF EXISTS `AUTHENTICATION_FLOW`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `AUTHENTICATION_FLOW` (
+  `ID` varchar(36) NOT NULL,
+  `ALIAS` varchar(255) DEFAULT NULL,
+  `DESCRIPTION` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
+  `REALM_ID` varchar(36) DEFAULT NULL,
+  `PROVIDER_ID` varchar(36) NOT NULL DEFAULT 'basic-flow',
+  `TOP_LEVEL` bit(1) NOT NULL DEFAULT b'0',
+  `BUILT_IN` bit(1) NOT NULL DEFAULT b'0',
+  PRIMARY KEY (`ID`),
+  KEY `IDX_AUTH_FLOW_REALM` (`REALM_ID`),
+  CONSTRAINT `FK_AUTH_FLOW_REALM` FOREIGN KEY (`REALM_ID`) REFERENCES `REALM` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `AUTHENTICATION_FLOW`
+--
+
+LOCK TABLES `AUTHENTICATION_FLOW` WRITE;
+/*!40000 ALTER TABLE `AUTHENTICATION_FLOW` DISABLE KEYS */;
+INSERT INTO `AUTHENTICATION_FLOW` VALUES ('01b74f0e-be68-4a43-8154-a04e50bba9b3','docker auth','Used by Docker clients to authenticate against the IDP','org4','basic-flow',_binary '',_binary ''),('03e64cd1-2b08-48a2-87dc-30a8dfbbfa40','First broker login - Conditional OTP','Flow to determine if the OTP is required for the authentication','dabc51bf-58ea-42ed-9918-4114e6b08338','basic-flow',_binary '\0',_binary ''),('057c9796-c5a3-469c-b557-3bdf03d5e65e','Reset - Conditional OTP','Flow to determine if the OTP should be reset or not. Set to REQUIRED to force.','org4','basic-flow',_binary '\0',_binary ''),('0b495974-5c43-471b-9918-78cbd9d654ec','Account verification options','Method with which to verity the existing account','org4','basic-flow',_binary '\0',_binary ''),('0c005855-b2ed-4e00-9c23-707df482b650','Handle Existing Account','Handle what to do if there is existing account with same email/username like authenticated identity provider','org3','basic-flow',_binary '\0',_binary ''),('0d375797-6ad5-4761-8990-6f8402bbd8e4','Authentication Options','Authentication options.','org3','basic-flow',_binary '\0',_binary ''),('0f3c99b2-c423-47cd-8e2f-bec2aec4c422','Verify Existing Account by Re-authentication','Reauthentication of existing account','org5','basic-flow',_binary '\0',_binary ''),('12e155a1-c69a-46fc-8a51-344c695613fe','First broker login - Conditional OTP','Flow to determine if the OTP is required for the authentication','org4','basic-flow',_binary '\0',_binary ''),('1437c314-ae6f-48bd-b27b-544ba44af41f','direct grant','OpenID Connect Resource Owner Grant','org3','basic-flow',_binary '',_binary ''),('1680c8f5-dd45-435b-b73c-03de482c49e1','direct grant','OpenID Connect Resource Owner Grant','org5','basic-flow',_binary '',_binary ''),('1ac0c336-5cff-4aae-b942-d681ea540291','Browser - Conditional OTP','Flow to determine if the OTP is required for the authentication','org5','basic-flow',_binary '\0',_binary ''),('1ad19c5e-0a39-4aed-bd7b-551079d4345a','first broker login','Actions taken after first broker login with identity provider account, which is not yet linked to any Keycloak account','dabc51bf-58ea-42ed-9918-4114e6b08338','basic-flow',_binary '',_binary ''),('1d0505ed-b997-4c6a-910e-6a6e87bd77df','registration form','registration form','org5','form-flow',_binary '\0',_binary ''),('1d217df0-adee-4952-9403-b43994febef6','http challenge','An authentication flow based on challenge-response HTTP Authentication Schemes','org2','basic-flow',_binary '',_binary ''),('1e220f8a-7de9-4176-8713-19deb5b580ad','First broker login - Conditional OTP','Flow to determine if the OTP is required for the authentication','org2','basic-flow',_binary '\0',_binary ''),('1e90e813-45c5-4317-af13-e41a5ce2ee31','first broker login','Actions taken after first broker login with identity provider account, which is not yet linked to any Keycloak account','org2','basic-flow',_binary '',_binary ''),('20fe5c6c-8f26-47aa-97ef-60f7b7227164','registration form','registration form','org3','form-flow',_binary '\0',_binary ''),('215b594f-9fc3-484c-b267-41c2cb986390','Browser - Conditional OTP','Flow to determine if the OTP is required for the authentication','dabc51bf-58ea-42ed-9918-4114e6b08338','basic-flow',_binary '\0',_binary ''),('2342034e-a33f-4553-8243-611612b77ff8','registration form','registration form','org4','form-flow',_binary '\0',_binary ''),('23e242a2-a8f7-4b03-9ef2-c84df9d42df4','Verify Existing Account by Re-authentication','Reauthentication of existing account','dabc51bf-58ea-42ed-9918-4114e6b08338','basic-flow',_binary '\0',_binary ''),('25bc59b3-bf84-4b49-b8bc-cb1944b2be1f','registration form','registration form','org2','form-flow',_binary '\0',_binary ''),('29b8a59d-e1c7-459e-bf4f-954c1ba43b9d','First broker login - Conditional OTP','Flow to determine if the OTP is required for the authentication','org1','basic-flow',_binary '\0',_binary ''),('29e5625b-924e-4a5a-a550-f9738af01203','forms','Username, password, otp and other auth forms.','org1','basic-flow',_binary '\0',_binary ''),('2b4bb0ca-0c8f-4b9b-b962-ce55320e342c','docker auth','Used by Docker clients to authenticate against the IDP','org3','basic-flow',_binary '',_binary ''),('2b816106-ce34-4fac-b0fd-9312ee752909','saml ecp','SAML ECP Profile Authentication Flow','org3','basic-flow',_binary '',_binary ''),('2bb6a57d-234d-4286-977f-f453ede17e24','Account verification options','Method with which to verity the existing account','org5','basic-flow',_binary '\0',_binary ''),('2c0bc69a-cd26-403b-b03f-4c01517b4ae1','registration form','registration form','dabc51bf-58ea-42ed-9918-4114e6b08338','form-flow',_binary '\0',_binary ''),('2efd0c04-05a8-4336-ae5e-10c93a811359','Browser - Conditional OTP','Flow to determine if the OTP is required for the authentication','org2','basic-flow',_binary '\0',_binary ''),('2f681f2d-c382-4e7a-b8ed-02dd298cf7f1','Verify Existing Account by Re-authentication','Reauthentication of existing account','org3','basic-flow',_binary '\0',_binary ''),('30c423f4-220d-4fdd-afd3-5685251ac988','User creation or linking','Flow for the existing/non-existing user alternatives','dabc51bf-58ea-42ed-9918-4114e6b08338','basic-flow',_binary '\0',_binary ''),('32b8ef42-1b9b-4e38-a3d1-e8857258de9e','forms','Username, password, otp and other auth forms.','org5','basic-flow',_binary '\0',_binary ''),('34a9fc1b-56cf-4c1a-9c3c-49679b911f9e','saml ecp','SAML ECP Profile Authentication Flow','org2','basic-flow',_binary '',_binary ''),('36140312-1555-4074-b820-ce9677ca3316','browser','browser based authentication','org2','basic-flow',_binary '',_binary ''),('395c712e-5588-4d5e-a70f-63fbfa8b3abc','first broker login','Actions taken after first broker login with identity provider account, which is not yet linked to any Keycloak account','org4','basic-flow',_binary '',_binary ''),('3ac8ef1d-5edd-4a4c-ba45-7ebc34908780','Account verification options','Method with which to verity the existing account','dabc51bf-58ea-42ed-9918-4114e6b08338','basic-flow',_binary '\0',_binary ''),('3bbdf73f-08ef-4660-9d2e-a8f220010d3f','clients','Base authentication for clients','org2','client-flow',_binary '',_binary ''),('4172f787-b54b-4a06-b2a4-4a4b2e44ab2a','Direct Grant - Conditional OTP','Flow to determine if the OTP is required for the authentication','org2','basic-flow',_binary '\0',_binary ''),('41ab6d77-5d8b-422b-89ce-888262d83ff8','registration','registration flow','org2','basic-flow',_binary '',_binary ''),('459747f0-6740-4959-96a6-cdbd3705b8b9','Handle Existing Account','Handle what to do if there is existing account with same email/username like authenticated identity provider','org1','basic-flow',_binary '\0',_binary ''),('48598438-66c2-4ea4-aa92-fba11475c609','direct grant','OpenID Connect Resource Owner Grant','org1','basic-flow',_binary '',_binary ''),('489926bf-32b6-41ef-ae64-0c013053b00e','Account verification options','Method with which to verity the existing account','org3','basic-flow',_binary '\0',_binary ''),('4b71fbe1-00f4-414d-937f-bfa3c57f5b0c','saml ecp','SAML ECP Profile Authentication Flow','org5','basic-flow',_binary '',_binary ''),('4fb24731-98a1-4940-8260-6831b956ac37','Browser - Conditional OTP','Flow to determine if the OTP is required for the authentication','org4','basic-flow',_binary '\0',_binary ''),('51f3ada7-488f-430b-a9ed-17471ca87b4f','http challenge','An authentication flow based on challenge-response HTTP Authentication Schemes','org4','basic-flow',_binary '',_binary ''),('52a70b51-a747-4f42-a7d2-9e10844e4cf8','Direct Grant - Conditional OTP','Flow to determine if the OTP is required for the authentication','dabc51bf-58ea-42ed-9918-4114e6b08338','basic-flow',_binary '\0',_binary ''),('54bcf4e0-40f3-4849-a2c4-b8cae6181a08','docker auth','Used by Docker clients to authenticate against the IDP','dabc51bf-58ea-42ed-9918-4114e6b08338','basic-flow',_binary '',_binary ''),('5773f0ff-1d55-4370-8644-7ab9042ed98d','Verify Existing Account by Re-authentication','Reauthentication of existing account','org2','basic-flow',_binary '\0',_binary ''),('5952f91a-4b9b-44b5-bab7-0022487183cf','docker auth','Used by Docker clients to authenticate against the IDP','org1','basic-flow',_binary '',_binary ''),('606e3ec0-563c-4c53-ab1c-b5777e7e91fb','registration form','registration form','org1','form-flow',_binary '\0',_binary ''),('6111d7d7-524e-41ea-85c5-76d8e515d243','reset credentials','Reset credentials for a user if they forgot their password or something','org1','basic-flow',_binary '',_binary ''),('61a9ce97-518b-4b3f-a9b5-220d79a6353e','registration','registration flow','org4','basic-flow',_binary '',_binary ''),('6ab00bfb-0c8c-407e-8b4b-fb658ff94ff5','First broker login - Conditional OTP','Flow to determine if the OTP is required for the authentication','org5','basic-flow',_binary '\0',_binary ''),('6b317b6f-e248-459f-a441-876dd81e364c','Direct Grant - Conditional OTP','Flow to determine if the OTP is required for the authentication','org4','basic-flow',_binary '\0',_binary ''),('6c38c05b-0367-44f9-819b-0844cfa1eddc','Verify Existing Account by Re-authentication','Reauthentication of existing account','org1','basic-flow',_binary '\0',_binary ''),('6c4a3f93-f29d-4959-98fd-944255a5da86','Direct Grant - Conditional OTP','Flow to determine if the OTP is required for the authentication','org1','basic-flow',_binary '\0',_binary ''),('6e907f97-deb3-44dc-b374-162362e602d1','Reset - Conditional OTP','Flow to determine if the OTP should be reset or not. Set to REQUIRED to force.','dabc51bf-58ea-42ed-9918-4114e6b08338','basic-flow',_binary '\0',_binary ''),('73cd0ec7-e9a9-404c-99a6-6dd3d718b721','Reset - Conditional OTP','Flow to determine if the OTP should be reset or not. Set to REQUIRED to force.','org2','basic-flow',_binary '\0',_binary ''),('758ba5ba-e3d5-4ffe-b22c-44670587eefb','Reset - Conditional OTP','Flow to determine if the OTP should be reset or not. Set to REQUIRED to force.','org3','basic-flow',_binary '\0',_binary ''),('7698a82b-7729-4545-9c91-995bd46224cf','User creation or linking','Flow for the existing/non-existing user alternatives','org2','basic-flow',_binary '\0',_binary ''),('76dc3797-8845-4103-af58-4934fbbdb723','Verify Existing Account by Re-authentication','Reauthentication of existing account','org4','basic-flow',_binary '\0',_binary ''),('77f45827-9c32-40cc-88af-f10c237535e3','browser','browser based authentication','org4','basic-flow',_binary '',_binary ''),('78fd3ef3-8171-4a55-b550-6f44cf6db2d8','browser','browser based authentication','dabc51bf-58ea-42ed-9918-4114e6b08338','basic-flow',_binary '',_binary ''),('7e7cc0ac-0722-46f1-b8f9-5836184b9424','Account verification options','Method with which to verity the existing account','org1','basic-flow',_binary '\0',_binary ''),('815598b3-20ce-4c27-94a8-744c973a925a','Reset - Conditional OTP','Flow to determine if the OTP should be reset or not. Set to REQUIRED to force.','org5','basic-flow',_binary '\0',_binary ''),('81a74ca2-2b1d-4d9a-bae5-3e8d085d4578','reset credentials','Reset credentials for a user if they forgot their password or something','org2','basic-flow',_binary '',_binary ''),('81f10f69-61b6-4c5a-973c-11c9fae12edb','Reset - Conditional OTP','Flow to determine if the OTP should be reset or not. Set to REQUIRED to force.','org1','basic-flow',_binary '\0',_binary ''),('86d5f9ac-4818-47ad-b095-c5ae77540e6c','http challenge','An authentication flow based on challenge-response HTTP Authentication Schemes','dabc51bf-58ea-42ed-9918-4114e6b08338','basic-flow',_binary '',_binary ''),('87de0f55-4154-4a91-bde8-23a20385a0c4','Authentication Options','Authentication options.','dabc51bf-58ea-42ed-9918-4114e6b08338','basic-flow',_binary '\0',_binary ''),('8b66555b-c54b-40e5-ac47-2220b747d26a','direct grant','OpenID Connect Resource Owner Grant','org2','basic-flow',_binary '',_binary ''),('8f12129d-08c8-4c85-a777-0ae263ae9bcf','Authentication Options','Authentication options.','org2','basic-flow',_binary '\0',_binary ''),('90e5397a-94da-45aa-aa27-34aa28896fe2','User creation or linking','Flow for the existing/non-existing user alternatives','org5','basic-flow',_binary '\0',_binary ''),('915c5551-b590-403f-9798-c55b24e5c0c6','clients','Base authentication for clients','org4','client-flow',_binary '',_binary ''),('95e4c7a4-3160-4fea-9937-60f38e4c91ff','http challenge','An authentication flow based on challenge-response HTTP Authentication Schemes','org5','basic-flow',_binary '',_binary ''),('975ef3b1-b6f5-4db1-a3c6-fea5fa1376b8','clients','Base authentication for clients','org5','client-flow',_binary '',_binary ''),('985bd86b-5875-4c6f-a262-92635c097b5d','forms','Username, password, otp and other auth forms.','dabc51bf-58ea-42ed-9918-4114e6b08338','basic-flow',_binary '\0',_binary ''),('997e61f1-54b2-4e64-ad5b-0e22b25d9f6f','Authentication Options','Authentication options.','org1','basic-flow',_binary '\0',_binary ''),('9b61a41b-7902-4235-af5b-5c04aac15529','clients','Base authentication for clients','dabc51bf-58ea-42ed-9918-4114e6b08338','client-flow',_binary '',_binary ''),('9c373c92-ccfd-4e12-a1cf-df011b73b627','Authentication Options','Authentication options.','org5','basic-flow',_binary '\0',_binary ''),('9d0c2734-d123-4bf5-aeee-7eb2209f2a7c','Account verification options','Method with which to verity the existing account','org2','basic-flow',_binary '\0',_binary ''),('9d7b9956-c309-4add-b774-de883e61a3fc','forms','Username, password, otp and other auth forms.','org3','basic-flow',_binary '\0',_binary ''),('a307a202-7ef4-4b79-a60c-63e445a16755','Direct Grant - Conditional OTP','Flow to determine if the OTP is required for the authentication','org3','basic-flow',_binary '\0',_binary ''),('a742e961-d48a-4175-91e4-dc873f4466fe','saml ecp','SAML ECP Profile Authentication Flow','org1','basic-flow',_binary '',_binary ''),('a8b74522-d279-460c-9856-ae76be89898a','reset credentials','Reset credentials for a user if they forgot their password or something','org4','basic-flow',_binary '',_binary ''),('a9b11600-a61a-4715-9e73-0408e4cbd455','browser','browser based authentication','org3','basic-flow',_binary '',_binary ''),('ab6aa3a7-d948-4bf4-8edb-bcf134fa6fcb','Handle Existing Account','Handle what to do if there is existing account with same email/username like authenticated identity provider','org5','basic-flow',_binary '\0',_binary ''),('ad2e0b48-8a09-4454-9ad5-a0d0f102ad48','reset credentials','Reset credentials for a user if they forgot their password or something','org3','basic-flow',_binary '',_binary ''),('b5aece4d-8a04-4f29-91ca-9bbe0e1cda49','registration','registration flow','org1','basic-flow',_binary '',_binary ''),('ba40ab9b-8c65-45ea-8ce5-7dc341a20aa3','Authentication Options','Authentication options.','org4','basic-flow',_binary '\0',_binary ''),('bd77106d-ca23-4bb4-9151-11bc8afb1f4b','browser','browser based authentication','org5','basic-flow',_binary '',_binary ''),('bdb8bfeb-da00-4c89-8351-8201792f4ec0','User creation or linking','Flow for the existing/non-existing user alternatives','org3','basic-flow',_binary '\0',_binary ''),('bfa6c3a2-eae7-47ae-b6bb-1c217b7b3b47','docker auth','Used by Docker clients to authenticate against the IDP','org2','basic-flow',_binary '',_binary ''),('c0db97f5-aa55-4120-a6fa-ce9d2e40ac13','first broker login','Actions taken after first broker login with identity provider account, which is not yet linked to any Keycloak account','org1','basic-flow',_binary '',_binary ''),('c1ba830e-d351-4226-82aa-820189289db4','forms','Username, password, otp and other auth forms.','org2','basic-flow',_binary '\0',_binary ''),('c4be8d0c-dbe4-4bc7-83cb-002012bbe848','saml ecp','SAML ECP Profile Authentication Flow','dabc51bf-58ea-42ed-9918-4114e6b08338','basic-flow',_binary '',_binary ''),('c88e8469-b79a-4bc3-880d-26f3753f1c76','registration','registration flow','org3','basic-flow',_binary '',_binary ''),('c93997cc-1126-4809-abf4-4c4dbc5e910f','Handle Existing Account','Handle what to do if there is existing account with same email/username like authenticated identity provider','dabc51bf-58ea-42ed-9918-4114e6b08338','basic-flow',_binary '\0',_binary ''),('cb06f7b0-679e-431b-90d4-a564d37c9d44','clients','Base authentication for clients','org3','client-flow',_binary '',_binary ''),('cbb5d656-b3a5-4081-ac09-2be048d2e0ee','http challenge','An authentication flow based on challenge-response HTTP Authentication Schemes','org3','basic-flow',_binary '',_binary ''),('d190e905-69ef-43b0-8810-ad082b7093c1','first broker login','Actions taken after first broker login with identity provider account, which is not yet linked to any Keycloak account','org3','basic-flow',_binary '',_binary ''),('d1d03d9a-2333-4825-8cd0-cf7219edbca5','first broker login','Actions taken after first broker login with identity provider account, which is not yet linked to any Keycloak account','org5','basic-flow',_binary '',_binary ''),('d79fd308-4f33-4283-b743-d96edb66dd34','forms','Username, password, otp and other auth forms.','org4','basic-flow',_binary '\0',_binary ''),('daa518b7-df95-4ec7-bebf-002dad9ec5f4','registration','registration flow','dabc51bf-58ea-42ed-9918-4114e6b08338','basic-flow',_binary '',_binary ''),('df42398f-1333-45f5-9b00-f179b3231906','direct grant','OpenID Connect Resource Owner Grant','dabc51bf-58ea-42ed-9918-4114e6b08338','basic-flow',_binary '',_binary ''),('df7d87da-d586-4532-a693-f60a82707840','browser','browser based authentication','org1','basic-flow',_binary '',_binary ''),('e0d4d7d8-5b18-4fbc-943a-18940a9139a2','Browser - Conditional OTP','Flow to determine if the OTP is required for the authentication','org3','basic-flow',_binary '\0',_binary ''),('e0f5ffe0-1303-4e4d-9b26-84b10ebe36a8','Direct Grant - Conditional OTP','Flow to determine if the OTP is required for the authentication','org5','basic-flow',_binary '\0',_binary ''),('e375cfc3-c4c7-4cd0-81f8-10bb36da7410','User creation or linking','Flow for the existing/non-existing user alternatives','org1','basic-flow',_binary '\0',_binary ''),('e61e12a5-8571-4a32-8209-068c7595b6bd','registration','registration flow','org5','basic-flow',_binary '',_binary ''),('ed4e9e92-1ea7-410e-93e0-791d6b3c5291','Handle Existing Account','Handle what to do if there is existing account with same email/username like authenticated identity provider','org4','basic-flow',_binary '\0',_binary ''),('eef18541-f4bd-49ef-8463-f9f997321e94','saml ecp','SAML ECP Profile Authentication Flow','org4','basic-flow',_binary '',_binary ''),('ef4879c9-f5ef-43fe-9bf5-5e87961404ed','reset credentials','Reset credentials for a user if they forgot their password or something','org5','basic-flow',_binary '',_binary ''),('f0198c42-6838-4333-a2e3-5902ecc9bef8','direct grant','OpenID Connect Resource Owner Grant','org4','basic-flow',_binary '',_binary ''),('f3eb6f5d-79a6-4e3c-b79c-9e9738068ddb','docker auth','Used by Docker clients to authenticate against the IDP','org5','basic-flow',_binary '',_binary ''),('f457a001-e8e4-41ba-bbe3-cc8c5095be58','Handle Existing Account','Handle what to do if there is existing account with same email/username like authenticated identity provider','org2','basic-flow',_binary '\0',_binary ''),('f6e8c40b-0f44-482b-848f-15b45408d0f9','First broker login - Conditional OTP','Flow to determine if the OTP is required for the authentication','org3','basic-flow',_binary '\0',_binary ''),('f8f2e867-cea7-416f-8a05-46e78bb62829','http challenge','An authentication flow based on challenge-response HTTP Authentication Schemes','org1','basic-flow',_binary '',_binary ''),('fc25ac1b-911a-42ac-a364-8e985575220a','reset credentials','Reset credentials for a user if they forgot their password or something','dabc51bf-58ea-42ed-9918-4114e6b08338','basic-flow',_binary '',_binary ''),('fe86bfe5-af4a-4a3d-87bf-1211c3fe7d7f','Browser - Conditional OTP','Flow to determine if the OTP is required for the authentication','org1','basic-flow',_binary '\0',_binary ''),('fe921562-834e-4b69-b052-148ee5251a05','clients','Base authentication for clients','org1','client-flow',_binary '',_binary ''),('fefb0528-c330-4955-bfb0-3a05c7c1ca29','User creation or linking','Flow for the existing/non-existing user alternatives','org4','basic-flow',_binary '\0',_binary '');
+/*!40000 ALTER TABLE `AUTHENTICATION_FLOW` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `AUTHENTICATOR_CONFIG`
+--
+
+DROP TABLE IF EXISTS `AUTHENTICATOR_CONFIG`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `AUTHENTICATOR_CONFIG` (
+  `ID` varchar(36) NOT NULL,
+  `ALIAS` varchar(255) DEFAULT NULL,
+  `REALM_ID` varchar(36) DEFAULT NULL,
+  PRIMARY KEY (`ID`),
+  KEY `IDX_AUTH_CONFIG_REALM` (`REALM_ID`),
+  CONSTRAINT `FK_AUTH_REALM` FOREIGN KEY (`REALM_ID`) REFERENCES `REALM` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `AUTHENTICATOR_CONFIG`
+--
+
+LOCK TABLES `AUTHENTICATOR_CONFIG` WRITE;
+/*!40000 ALTER TABLE `AUTHENTICATOR_CONFIG` DISABLE KEYS */;
+INSERT INTO `AUTHENTICATOR_CONFIG` VALUES ('01909e1d-c9ed-490f-89ef-556de77f44cb','review profile config','dabc51bf-58ea-42ed-9918-4114e6b08338'),('0ef1bef4-64c2-4d5c-9f14-1de3ee4a6ca8','review profile config','org1'),('157e54ab-5f70-4ef0-bcdc-a05884b301d1','create unique user config','org5'),('2a1d5c07-b55e-408b-b180-cc15d6362e42','create unique user config','org3'),('37909750-ce1e-4e51-93f0-8dfe57b366e0','create unique user config','org1'),('39439e30-597c-4da1-b467-3f20f10e76a1','create unique user config','dabc51bf-58ea-42ed-9918-4114e6b08338'),('48d707a5-c58b-406c-bab1-a719c7e820c2','review profile config','org3'),('49a48360-6570-46f7-8753-3565e5122de6','review profile config','org5'),('5223696c-6eaf-4686-85c9-bcb6c5c6d5b4','create unique user config','org2'),('56690cff-d08d-4353-b001-5863bebdc275','review profile config','org2'),('622f6228-59e4-4f46-9c8e-e955ff8d83ca','review profile config','org4'),('673cb3b8-3250-48d9-8678-e677e5904138','create unique user config','org4');
+/*!40000 ALTER TABLE `AUTHENTICATOR_CONFIG` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `AUTHENTICATOR_CONFIG_ENTRY`
+--
+
+DROP TABLE IF EXISTS `AUTHENTICATOR_CONFIG_ENTRY`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `AUTHENTICATOR_CONFIG_ENTRY` (
+  `AUTHENTICATOR_ID` varchar(36) NOT NULL,
+  `VALUE` longtext,
+  `NAME` varchar(255) NOT NULL,
+  PRIMARY KEY (`AUTHENTICATOR_ID`,`NAME`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `AUTHENTICATOR_CONFIG_ENTRY`
+--
+
+LOCK TABLES `AUTHENTICATOR_CONFIG_ENTRY` WRITE;
+/*!40000 ALTER TABLE `AUTHENTICATOR_CONFIG_ENTRY` DISABLE KEYS */;
+INSERT INTO `AUTHENTICATOR_CONFIG_ENTRY` VALUES ('01909e1d-c9ed-490f-89ef-556de77f44cb','missing','update.profile.on.first.login'),('0ef1bef4-64c2-4d5c-9f14-1de3ee4a6ca8','missing','update.profile.on.first.login'),('157e54ab-5f70-4ef0-bcdc-a05884b301d1','false','require.password.update.after.registration'),('2a1d5c07-b55e-408b-b180-cc15d6362e42','false','require.password.update.after.registration'),('37909750-ce1e-4e51-93f0-8dfe57b366e0','false','require.password.update.after.registration'),('39439e30-597c-4da1-b467-3f20f10e76a1','false','require.password.update.after.registration'),('48d707a5-c58b-406c-bab1-a719c7e820c2','missing','update.profile.on.first.login'),('49a48360-6570-46f7-8753-3565e5122de6','missing','update.profile.on.first.login'),('5223696c-6eaf-4686-85c9-bcb6c5c6d5b4','false','require.password.update.after.registration'),('56690cff-d08d-4353-b001-5863bebdc275','missing','update.profile.on.first.login'),('622f6228-59e4-4f46-9c8e-e955ff8d83ca','missing','update.profile.on.first.login'),('673cb3b8-3250-48d9-8678-e677e5904138','false','require.password.update.after.registration');
+/*!40000 ALTER TABLE `AUTHENTICATOR_CONFIG_ENTRY` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `BROKER_LINK`
+--
+
+DROP TABLE IF EXISTS `BROKER_LINK`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `BROKER_LINK` (
+  `IDENTITY_PROVIDER` varchar(255) NOT NULL,
+  `STORAGE_PROVIDER_ID` varchar(255) DEFAULT NULL,
+  `REALM_ID` varchar(36) NOT NULL,
+  `BROKER_USER_ID` varchar(255) DEFAULT NULL,
+  `BROKER_USERNAME` varchar(255) DEFAULT NULL,
+  `TOKEN` text,
+  `USER_ID` varchar(255) NOT NULL,
+  PRIMARY KEY (`IDENTITY_PROVIDER`,`USER_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `BROKER_LINK`
+--
+
+LOCK TABLES `BROKER_LINK` WRITE;
+/*!40000 ALTER TABLE `BROKER_LINK` DISABLE KEYS */;
+/*!40000 ALTER TABLE `BROKER_LINK` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `CLIENT`
+--
+
+DROP TABLE IF EXISTS `CLIENT`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `CLIENT` (
+  `ID` varchar(36) NOT NULL,
+  `ENABLED` bit(1) NOT NULL DEFAULT b'0',
+  `FULL_SCOPE_ALLOWED` bit(1) NOT NULL DEFAULT b'0',
+  `CLIENT_ID` varchar(255) DEFAULT NULL,
+  `NOT_BEFORE` int DEFAULT NULL,
+  `PUBLIC_CLIENT` bit(1) NOT NULL DEFAULT b'0',
+  `SECRET` varchar(255) DEFAULT NULL,
+  `BASE_URL` varchar(255) DEFAULT NULL,
+  `BEARER_ONLY` bit(1) NOT NULL DEFAULT b'0',
+  `MANAGEMENT_URL` varchar(255) DEFAULT NULL,
+  `SURROGATE_AUTH_REQUIRED` bit(1) NOT NULL DEFAULT b'0',
+  `REALM_ID` varchar(36) DEFAULT NULL,
+  `PROTOCOL` varchar(255) DEFAULT NULL,
+  `NODE_REREG_TIMEOUT` int DEFAULT '0',
+  `FRONTCHANNEL_LOGOUT` bit(1) NOT NULL DEFAULT b'0',
+  `CONSENT_REQUIRED` bit(1) NOT NULL DEFAULT b'0',
+  `NAME` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
+  `SERVICE_ACCOUNTS_ENABLED` bit(1) NOT NULL DEFAULT b'0',
+  `CLIENT_AUTHENTICATOR_TYPE` varchar(255) DEFAULT NULL,
+  `ROOT_URL` varchar(255) DEFAULT NULL,
+  `DESCRIPTION` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
+  `REGISTRATION_TOKEN` varchar(255) DEFAULT NULL,
+  `STANDARD_FLOW_ENABLED` bit(1) NOT NULL DEFAULT b'1',
+  `IMPLICIT_FLOW_ENABLED` bit(1) NOT NULL DEFAULT b'0',
+  `DIRECT_ACCESS_GRANTS_ENABLED` bit(1) NOT NULL DEFAULT b'0',
+  `ALWAYS_DISPLAY_IN_CONSOLE` bit(1) NOT NULL DEFAULT b'0',
+  PRIMARY KEY (`ID`),
+  UNIQUE KEY `UK_B71CJLBENV945RB6GCON438AT` (`REALM_ID`,`CLIENT_ID`),
+  KEY `IDX_CLIENT_ID` (`CLIENT_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `CLIENT`
+--
+
+LOCK TABLES `CLIENT` WRITE;
+/*!40000 ALTER TABLE `CLIENT` DISABLE KEYS */;
+INSERT INTO `CLIENT` VALUES ('01f89460-aba4-42ec-8eb3-f3c2d23cfbc2',_binary '',_binary '','org5-workspaces',0,_binary '\0','ayf2weejbx5UiJ3pZsOJKldzQcC1erkR',NULL,_binary '\0',NULL,_binary '\0','org5','openid-connect',-1,_binary '\0',_binary '\0',NULL,_binary '','client-secret',NULL,NULL,NULL,_binary '\0',_binary '\0',_binary '',_binary '\0'),('0d3bec04-1354-4db0-b7b6-96ee59ad7c4a',_binary '',_binary '\0','account',0,_binary '',NULL,'/realms/org5/account/',_binary '\0',NULL,_binary '\0','org5','openid-connect',0,_binary '\0',_binary '\0','${client_account}',_binary '\0','client-secret','${authBaseUrl}',NULL,NULL,_binary '',_binary '\0',_binary '\0',_binary '\0'),('10447023-de56-4fa6-8669-07b054551ad1',_binary '',_binary '\0','security-admin-console',0,_binary '',NULL,'/admin/org5/console/',_binary '\0',NULL,_binary '\0','org5','openid-connect',0,_binary '\0',_binary '\0','${client_security-admin-console}',_binary '\0','client-secret','${authAdminUrl}',NULL,NULL,_binary '',_binary '\0',_binary '\0',_binary '\0'),('166138a8-bf2f-4caa-97eb-8cabbe18a8f6',_binary '',_binary '\0','security-admin-console',0,_binary '',NULL,'/admin/org3/console/',_binary '\0',NULL,_binary '\0','org3','openid-connect',0,_binary '\0',_binary '\0','${client_security-admin-console}',_binary '\0','client-secret','${authAdminUrl}',NULL,NULL,_binary '',_binary '\0',_binary '\0',_binary '\0'),('16fe410e-f1df-4ce0-b445-8dd3b5b80750',_binary '',_binary '','org1',0,_binary '','2olEW3tDBV9wS1VsXjHnxCgl5TyTXtKl',NULL,_binary '\0',NULL,_binary '\0','org1','openid-connect',-1,_binary '\0',_binary '\0',NULL,_binary '\0','client-secret',NULL,NULL,NULL,_binary '',_binary '\0',_binary '',_binary '\0'),('1b5f5d7e-5c2b-4687-8450-d38949728f18',_binary '',_binary '','_org1-api',0,_binary '','qB8Mr6LW3Anv7XAsACJd2smxbnRx4v6A',NULL,_binary '\0',NULL,_binary '\0','org1','openid-connect',-1,_binary '\0',_binary '\0',NULL,_binary '\0','client-secret',NULL,NULL,NULL,_binary '\0',_binary '\0',_binary '',_binary '\0'),('21f3aced-8905-4cbe-b76e-e4efc5f5b5d9',_binary '',_binary '\0','account-console',0,_binary '',NULL,'/realms/org3/account/',_binary '\0',NULL,_binary '\0','org3','openid-connect',0,_binary '\0',_binary '\0','${client_account-console}',_binary '\0','client-secret','${authBaseUrl}',NULL,NULL,_binary '',_binary '\0',_binary '\0',_binary '\0'),('2379042f-9ee4-4597-80c6-45add2d7a487',_binary '',_binary '\0','broker',0,_binary '\0',NULL,NULL,_binary '',NULL,_binary '\0','org1','openid-connect',0,_binary '\0',_binary '\0','${client_broker}',_binary '\0','client-secret',NULL,NULL,NULL,_binary '',_binary '\0',_binary '\0',_binary '\0'),('2d40f5c2-5cc2-42d6-93b7-64af2cedb218',_binary '',_binary '','_org2-api',0,_binary '','RmTe97vMWtmndXNUbADp61DWhL0uIQyq',NULL,_binary '\0',NULL,_binary '\0','org2','openid-connect',-1,_binary '\0',_binary '\0',NULL,_binary '\0','client-secret',NULL,NULL,NULL,_binary '\0',_binary '\0',_binary '',_binary '\0'),('2ec8a5c0-e0c9-4602-902f-11927b599527',_binary '',_binary '\0','admin-cli',0,_binary '',NULL,NULL,_binary '\0',NULL,_binary '\0','org5','openid-connect',0,_binary '\0',_binary '\0','${client_admin-cli}',_binary '\0','client-secret',NULL,NULL,NULL,_binary '\0',_binary '\0',_binary '',_binary '\0'),('2edff0cf-8f6c-44b6-917d-f00a3bb58261',_binary '',_binary '\0','account-console',0,_binary '',NULL,'/realms/org2/account/',_binary '\0',NULL,_binary '\0','org2','openid-connect',0,_binary '\0',_binary '\0','${client_account-console}',_binary '\0','client-secret','${authBaseUrl}',NULL,NULL,_binary '',_binary '\0',_binary '\0',_binary '\0'),('311ebcfe-7467-459c-856a-862094332329',_binary '',_binary '','org4-workspaces',0,_binary '\0','hbr4oiMZdmt185KOkUMFePbZ8RdZ2cIr',NULL,_binary '\0',NULL,_binary '\0','org4','openid-connect',-1,_binary '\0',_binary '\0',NULL,_binary '','client-secret',NULL,NULL,NULL,_binary '\0',_binary '\0',_binary '',_binary '\0'),('37140475-df0f-4d9e-9d4d-9c9afbdda5f6',_binary '',_binary '\0','account',0,_binary '',NULL,'/realms/org1/account/',_binary '\0',NULL,_binary '\0','org1','openid-connect',0,_binary '\0',_binary '\0','${client_account}',_binary '\0','client-secret','${authBaseUrl}',NULL,NULL,_binary '',_binary '\0',_binary '\0',_binary '\0'),('3d62cf66-73c8-4ec7-ba0f-2b622bc5c747',_binary '',_binary '','org5',0,_binary '','rErCQmyFhbRO89G7aeZhahZnjNvPCfId',NULL,_binary '\0',NULL,_binary '\0','org5','openid-connect',-1,_binary '\0',_binary '\0',NULL,_binary '\0','client-secret',NULL,NULL,NULL,_binary '',_binary '\0',_binary '',_binary '\0'),('479237b2-a9fc-4828-b80d-ffd84ec6f3bc',_binary '',_binary '','system-org3-auth',0,_binary '\0','pVkxU7HUrWzoJ1IotWwyXLNxATFpLRda',NULL,_binary '',NULL,_binary '\0','org3','openid-connect',-1,_binary '\0',_binary '\0',NULL,_binary '\0','client-secret',NULL,NULL,NULL,_binary '',_binary '\0',_binary '',_binary '\0'),('47a07858-733a-4de8-a079-837b25a07547',_binary '',_binary '\0','account',0,_binary '',NULL,'/realms/org3/account/',_binary '\0',NULL,_binary '\0','org3','openid-connect',0,_binary '\0',_binary '\0','${client_account}',_binary '\0','client-secret','${authBaseUrl}',NULL,NULL,_binary '',_binary '\0',_binary '\0',_binary '\0'),('57f46d8e-a3aa-4587-abe4-ef652ebef40c',_binary '',_binary '\0','account-console',0,_binary '',NULL,'/realms/org4/account/',_binary '\0',NULL,_binary '\0','org4','openid-connect',0,_binary '\0',_binary '\0','${client_account-console}',_binary '\0','client-secret','${authBaseUrl}',NULL,NULL,_binary '',_binary '\0',_binary '\0',_binary '\0'),('58e5ed05-5651-4e99-ac86-e93c28adc1f0',_binary '',_binary '','_platform',0,_binary '\0','sspQc20tWySZgUWfngyq3zt64Igd6n7N',NULL,_binary '\0',NULL,_binary '\0','dabc51bf-58ea-42ed-9918-4114e6b08338','openid-connect',-1,_binary '\0',_binary '\0',NULL,_binary '','client-secret',NULL,NULL,NULL,_binary '\0',_binary '\0',_binary '',_binary '\0'),('5a324cc2-4d44-46de-9c51-9afcc3c1adda',_binary '',_binary '','org4',0,_binary '','MWNRQ8QNdqfVBjSftkLHguRs39p63YFi',NULL,_binary '\0',NULL,_binary '\0','org4','openid-connect',-1,_binary '\0',_binary '\0',NULL,_binary '\0','client-secret',NULL,NULL,NULL,_binary '',_binary '\0',_binary '',_binary '\0'),('5bfeb038-8be1-4744-bc58-74432ff827c6',_binary '',_binary '\0','realm-management',0,_binary '\0',NULL,NULL,_binary '',NULL,_binary '\0','org3','openid-connect',0,_binary '\0',_binary '\0','${client_realm-management}',_binary '\0','client-secret',NULL,NULL,NULL,_binary '',_binary '\0',_binary '\0',_binary '\0'),('5dcb2e50-43d9-4731-af37-8415af71a5fb',_binary '',_binary '\0','realm-management',0,_binary '\0',NULL,NULL,_binary '',NULL,_binary '\0','org2','openid-connect',0,_binary '\0',_binary '\0','${client_realm-management}',_binary '\0','client-secret',NULL,NULL,NULL,_binary '',_binary '\0',_binary '\0',_binary '\0'),('6112a706-0711-40ab-a42e-08ef27723f06',_binary '',_binary '','system-org1-auth',0,_binary '\0','8YCPyhn9zszkdXLh5yvKWL4d6xDyOhrW',NULL,_binary '',NULL,_binary '\0','org1','openid-connect',-1,_binary '\0',_binary '\0',NULL,_binary '\0','client-secret',NULL,NULL,NULL,_binary '',_binary '\0',_binary '',_binary '\0'),('6552251b-4819-4c12-9e6a-7602a75edc4d',_binary '',_binary '\0','broker',0,_binary '\0',NULL,NULL,_binary '',NULL,_binary '\0','org4','openid-connect',0,_binary '\0',_binary '\0','${client_broker}',_binary '\0','client-secret',NULL,NULL,NULL,_binary '',_binary '\0',_binary '\0',_binary '\0'),('684a5673-eac6-49e1-8fad-7b9fe666a06f',_binary '',_binary '','system-org4-auth',0,_binary '\0','fdMC9fipQyXMG1kLcX7q65InNthetdMO',NULL,_binary '',NULL,_binary '\0','org4','openid-connect',-1,_binary '\0',_binary '\0',NULL,_binary '\0','client-secret',NULL,NULL,NULL,_binary '',_binary '\0',_binary '',_binary '\0'),('690481d3-310d-4227-a8eb-eee2db8d1b25',_binary '',_binary '','_org5-api',0,_binary '','3XzOghcBnCJHiwUV7OWUanLqpeMx4KVZ',NULL,_binary '\0',NULL,_binary '\0','org5','openid-connect',-1,_binary '\0',_binary '\0',NULL,_binary '\0','client-secret',NULL,NULL,NULL,_binary '\0',_binary '\0',_binary '',_binary '\0'),('6c811e00-186f-4bbb-aa0d-7e3e27eb9605',_binary '',_binary '\0','org4-realm',0,_binary '\0',NULL,NULL,_binary '',NULL,_binary '\0','dabc51bf-58ea-42ed-9918-4114e6b08338',NULL,0,_binary '\0',_binary '\0','org4 Realm',_binary '\0','client-secret',NULL,NULL,NULL,_binary '',_binary '\0',_binary '\0',_binary '\0'),('6e5e1844-3f44-46b9-a6b7-4297aed21fcf',_binary '',_binary '\0','account',0,_binary '',NULL,'/realms/org2/account/',_binary '\0',NULL,_binary '\0','org2','openid-connect',0,_binary '\0',_binary '\0','${client_account}',_binary '\0','client-secret','${authBaseUrl}',NULL,NULL,_binary '',_binary '\0',_binary '\0',_binary '\0'),('719f23fc-fbd3-4efc-a757-5fa1f94ec2ca',_binary '',_binary '\0','admin-cli',0,_binary '',NULL,NULL,_binary '\0',NULL,_binary '\0','org1','openid-connect',0,_binary '\0',_binary '\0','${client_admin-cli}',_binary '\0','client-secret',NULL,NULL,NULL,_binary '\0',_binary '\0',_binary '',_binary '\0'),('8137d95e-0cab-4e9f-b666-92c7bd7ca71a',_binary '',_binary '\0','account-console',0,_binary '',NULL,'/realms/master/account/',_binary '\0',NULL,_binary '\0','dabc51bf-58ea-42ed-9918-4114e6b08338','openid-connect',0,_binary '\0',_binary '\0','${client_account-console}',_binary '\0','client-secret','${authBaseUrl}',NULL,NULL,_binary '',_binary '\0',_binary '\0',_binary '\0'),('81806f02-c6ca-42a2-b286-e6c2c0953955',_binary '',_binary '\0','org1-realm',0,_binary '\0',NULL,NULL,_binary '',NULL,_binary '\0','dabc51bf-58ea-42ed-9918-4114e6b08338',NULL,0,_binary '\0',_binary '\0','org1 Realm',_binary '\0','client-secret',NULL,NULL,NULL,_binary '',_binary '\0',_binary '\0',_binary '\0'),('84e2d9c2-d7af-4ae0-9dfa-41a04f1ab1f4',_binary '',_binary '','_org3-api',0,_binary '','oZPJIc9v8y0QLIqyvPBzYUeDxdIprg7K',NULL,_binary '\0',NULL,_binary '\0','org3','openid-connect',-1,_binary '\0',_binary '\0',NULL,_binary '\0','client-secret',NULL,NULL,NULL,_binary '\0',_binary '\0',_binary '',_binary '\0'),('8b27a0d1-98ac-4f83-affe-b80ecdd626ef',_binary '',_binary '\0','realm-management',0,_binary '\0',NULL,NULL,_binary '',NULL,_binary '\0','org5','openid-connect',0,_binary '\0',_binary '\0','${client_realm-management}',_binary '\0','client-secret',NULL,NULL,NULL,_binary '',_binary '\0',_binary '\0',_binary '\0'),('8ecdd6f7-f568-4a2a-acaa-cbe6cf8854b2',_binary '',_binary '\0','org3-realm',0,_binary '\0',NULL,NULL,_binary '',NULL,_binary '\0','dabc51bf-58ea-42ed-9918-4114e6b08338',NULL,0,_binary '\0',_binary '\0','org3 Realm',_binary '\0','client-secret',NULL,NULL,NULL,_binary '',_binary '\0',_binary '\0',_binary '\0'),('8f492599-c8fb-4bce-af8a-34f41e0f5b74',_binary '',_binary '','system-org5-auth',0,_binary '\0','JeaMZtAayEDDMhNE2i5XXGXEh5gwLXCB',NULL,_binary '',NULL,_binary '\0','org5','openid-connect',-1,_binary '\0',_binary '\0',NULL,_binary '\0','client-secret',NULL,NULL,NULL,_binary '',_binary '\0',_binary '',_binary '\0'),('908e528c-5deb-476b-9612-751d1944f79a',_binary '',_binary '\0','_platform-console',0,_binary '','BrlohBz0kizxAttCqOG7FUe0hJSqyvNr',NULL,_binary '\0',NULL,_binary '\0','dabc51bf-58ea-42ed-9918-4114e6b08338','openid-connect',-1,_binary '\0',_binary '\0',NULL,_binary '\0','client-secret',NULL,NULL,NULL,_binary '',_binary '\0',_binary '',_binary '\0'),('918724dc-e6f6-424e-a42f-875f0da655ae',_binary '',_binary '\0','account',0,_binary '',NULL,'/realms/org4/account/',_binary '\0',NULL,_binary '\0','org4','openid-connect',0,_binary '\0',_binary '\0','${client_account}',_binary '\0','client-secret','${authBaseUrl}',NULL,NULL,_binary '',_binary '\0',_binary '\0',_binary '\0'),('93f6c7ec-5361-4216-9f3f-bda1f99ccd7d',_binary '',_binary '','_platform-api',0,_binary '',NULL,NULL,_binary '\0',NULL,_binary '\0','dabc51bf-58ea-42ed-9918-4114e6b08338','openid-connect',-1,_binary '\0',_binary '\0',NULL,_binary '\0','client-secret',NULL,NULL,NULL,_binary '\0',_binary '\0',_binary '',_binary '\0'),('9ae68c10-8b44-4c90-8c3c-0c89e441c036',_binary '',_binary '\0','admin-cli',0,_binary '',NULL,NULL,_binary '\0',NULL,_binary '\0','org4','openid-connect',0,_binary '\0',_binary '\0','${client_admin-cli}',_binary '\0','client-secret',NULL,NULL,NULL,_binary '\0',_binary '\0',_binary '',_binary '\0'),('9f5cccd3-039b-4e2d-a53d-5c71869e0289',_binary '',_binary '\0','broker',0,_binary '\0',NULL,NULL,_binary '',NULL,_binary '\0','dabc51bf-58ea-42ed-9918-4114e6b08338','openid-connect',0,_binary '\0',_binary '\0','${client_broker}',_binary '\0','client-secret',NULL,NULL,NULL,_binary '',_binary '\0',_binary '\0',_binary '\0'),('9f98a940-4d88-413d-af70-540c4673615f',_binary '',_binary '\0','broker',0,_binary '\0',NULL,NULL,_binary '',NULL,_binary '\0','org2','openid-connect',0,_binary '\0',_binary '\0','${client_broker}',_binary '\0','client-secret',NULL,NULL,NULL,_binary '',_binary '\0',_binary '\0',_binary '\0'),('a0d96aa1-71ac-4a7e-a769-306baf1c51fc',_binary '',_binary '','org2-workspaces',0,_binary '\0','yVwr7DjWJMfhIypWN8bXrVOVer4XtIOY',NULL,_binary '\0',NULL,_binary '\0','org2','openid-connect',-1,_binary '\0',_binary '\0',NULL,_binary '','client-secret',NULL,NULL,NULL,_binary '\0',_binary '\0',_binary '',_binary '\0'),('a15e680b-47bb-4b94-a832-5ca99cdbe134',_binary '',_binary '','org2',0,_binary '','3bRQu4Oa96KFdHne6d40WBQPNuwA3k2q',NULL,_binary '\0',NULL,_binary '\0','org2','openid-connect',-1,_binary '\0',_binary '\0',NULL,_binary '\0','client-secret',NULL,NULL,NULL,_binary '',_binary '\0',_binary '',_binary '\0'),('a45ffddc-de71-4c69-b026-cb2cf7f30d16',_binary '',_binary '\0','account-console',0,_binary '',NULL,'/realms/org1/account/',_binary '\0',NULL,_binary '\0','org1','openid-connect',0,_binary '\0',_binary '\0','${client_account-console}',_binary '\0','client-secret','${authBaseUrl}',NULL,NULL,_binary '',_binary '\0',_binary '\0',_binary '\0'),('a9936092-1b5e-4c07-a983-ec18f6ce9136',_binary '',_binary '\0','admin-cli',0,_binary '',NULL,NULL,_binary '\0',NULL,_binary '\0','org2','openid-connect',0,_binary '\0',_binary '\0','${client_admin-cli}',_binary '\0','client-secret',NULL,NULL,NULL,_binary '\0',_binary '\0',_binary '',_binary '\0'),('aa4ae80c-bbad-4217-a6a7-8ff0a871577f',_binary '',_binary '\0','security-admin-console',0,_binary '',NULL,'/admin/master/console/',_binary '\0',NULL,_binary '\0','dabc51bf-58ea-42ed-9918-4114e6b08338','openid-connect',0,_binary '\0',_binary '\0','${client_security-admin-console}',_binary '\0','client-secret','${authAdminUrl}',NULL,NULL,_binary '',_binary '\0',_binary '\0',_binary '\0'),('ad5aa4ab-fe72-4d1d-8bab-e0a39529dca7',_binary '',_binary '\0','account-console',0,_binary '',NULL,'/realms/org5/account/',_binary '\0',NULL,_binary '\0','org5','openid-connect',0,_binary '\0',_binary '\0','${client_account-console}',_binary '\0','client-secret','${authBaseUrl}',NULL,NULL,_binary '',_binary '\0',_binary '\0',_binary '\0'),('b0475217-c11a-49f5-833c-33aaee237a25',_binary '',_binary '','org3',0,_binary '','DNF8kzoIuJZmFntfIzitqdVaodsPBYqU',NULL,_binary '\0',NULL,_binary '\0','org3','openid-connect',-1,_binary '\0',_binary '\0',NULL,_binary '\0','client-secret',NULL,NULL,NULL,_binary '',_binary '\0',_binary '',_binary '\0'),('b1088032-b0ab-4e61-9fd4-f58c3c6fe396',_binary '',_binary '','_org4-api',0,_binary '','xfJWT6jOm1oXc8imz4dImW7I6jBwuor4',NULL,_binary '\0',NULL,_binary '\0','org4','openid-connect',-1,_binary '\0',_binary '\0',NULL,_binary '\0','client-secret',NULL,NULL,NULL,_binary '\0',_binary '\0',_binary '',_binary '\0'),('b3af9339-dbdc-4ec6-b142-91237381d1de',_binary '',_binary '\0','broker',0,_binary '\0',NULL,NULL,_binary '',NULL,_binary '\0','org5','openid-connect',0,_binary '\0',_binary '\0','${client_broker}',_binary '\0','client-secret',NULL,NULL,NULL,_binary '',_binary '\0',_binary '\0',_binary '\0'),('bf0a8c22-455e-4840-9240-f2a7d5b415f7',_binary '',_binary '\0','security-admin-console',0,_binary '',NULL,'/admin/org2/console/',_binary '\0',NULL,_binary '\0','org2','openid-connect',0,_binary '\0',_binary '\0','${client_security-admin-console}',_binary '\0','client-secret','${authAdminUrl}',NULL,NULL,_binary '',_binary '\0',_binary '\0',_binary '\0'),('c28dd0b0-60ed-40df-91db-0d9b1e14074b',_binary '',_binary '','org3-workspaces',0,_binary '\0','mgs9T2D1k1dAlslK97OJoAhijLZLezyc',NULL,_binary '\0',NULL,_binary '\0','org3','openid-connect',-1,_binary '\0',_binary '\0',NULL,_binary '','client-secret',NULL,NULL,NULL,_binary '\0',_binary '\0',_binary '',_binary '\0'),('c2a9a8ae-6fb5-4265-b8e5-012c8fb17857',_binary '',_binary '\0','org2-realm',0,_binary '\0',NULL,NULL,_binary '',NULL,_binary '\0','dabc51bf-58ea-42ed-9918-4114e6b08338',NULL,0,_binary '\0',_binary '\0','org2 Realm',_binary '\0','client-secret',NULL,NULL,NULL,_binary '',_binary '\0',_binary '\0',_binary '\0'),('c56d777e-7f90-4a13-9719-316e592b62fa',_binary '',_binary '\0','org5-realm',0,_binary '\0',NULL,NULL,_binary '',NULL,_binary '\0','dabc51bf-58ea-42ed-9918-4114e6b08338',NULL,0,_binary '\0',_binary '\0','org5 Realm',_binary '\0','client-secret',NULL,NULL,NULL,_binary '',_binary '\0',_binary '\0',_binary '\0'),('c948de3b-8380-4528-a5b7-de403c58d40f',_binary '',_binary '\0','account',0,_binary '',NULL,'/realms/master/account/',_binary '\0',NULL,_binary '\0','dabc51bf-58ea-42ed-9918-4114e6b08338','openid-connect',0,_binary '\0',_binary '\0','${client_account}',_binary '\0','client-secret','${authBaseUrl}',NULL,NULL,_binary '',_binary '\0',_binary '\0',_binary '\0'),('cc93c9ab-5a18-4913-845f-577116c22be9',_binary '',_binary '\0','admin-cli',0,_binary '',NULL,NULL,_binary '\0',NULL,_binary '\0','org3','openid-connect',0,_binary '\0',_binary '\0','${client_admin-cli}',_binary '\0','client-secret',NULL,NULL,NULL,_binary '\0',_binary '\0',_binary '',_binary '\0'),('cd83ad65-7b39-444d-8f77-18a2e9ef8179',_binary '',_binary '\0','realm-management',0,_binary '\0',NULL,NULL,_binary '',NULL,_binary '\0','org4','openid-connect',0,_binary '\0',_binary '\0','${client_realm-management}',_binary '\0','client-secret',NULL,NULL,NULL,_binary '',_binary '\0',_binary '\0',_binary '\0'),('d0763c7a-1183-4390-aa83-1804c4bf13dd',_binary '',_binary '\0','realm-management',0,_binary '\0',NULL,NULL,_binary '',NULL,_binary '\0','org1','openid-connect',0,_binary '\0',_binary '\0','${client_realm-management}',_binary '\0','client-secret',NULL,NULL,NULL,_binary '',_binary '\0',_binary '\0',_binary '\0'),('d0aaa350-6ca7-4545-a008-583d46596744',_binary '',_binary '','system-org2-auth',0,_binary '\0','d5Y1Va6l12eWstBqt6gvj529VWOvy3sz',NULL,_binary '',NULL,_binary '\0','org2','openid-connect',-1,_binary '\0',_binary '\0',NULL,_binary '\0','client-secret',NULL,NULL,NULL,_binary '',_binary '\0',_binary '',_binary '\0'),('d321d481-bc24-4294-af2c-7907fd6529b0',_binary '',_binary '','org1-workspaces',0,_binary '\0','t4WLAy1hCQhry5HDuHkJa3SeT0MlBub8',NULL,_binary '\0',NULL,_binary '\0','org1','openid-connect',-1,_binary '\0',_binary '\0',NULL,_binary '','client-secret',NULL,NULL,NULL,_binary '\0',_binary '\0',_binary '',_binary '\0'),('da68d9d1-cd82-4d04-90ad-6a5aa63e301a',_binary '',_binary '\0','master-realm',0,_binary '\0',NULL,NULL,_binary '',NULL,_binary '\0','dabc51bf-58ea-42ed-9918-4114e6b08338',NULL,0,_binary '\0',_binary '\0','master Realm',_binary '\0','client-secret',NULL,NULL,NULL,_binary '',_binary '\0',_binary '\0',_binary '\0'),('e7ce9cbf-460c-4fb6-9da2-484548018706',_binary '',_binary '\0','security-admin-console',0,_binary '',NULL,'/admin/org4/console/',_binary '\0',NULL,_binary '\0','org4','openid-connect',0,_binary '\0',_binary '\0','${client_security-admin-console}',_binary '\0','client-secret','${authAdminUrl}',NULL,NULL,_binary '',_binary '\0',_binary '\0',_binary '\0'),('f5768d73-d038-46a2-94b6-7370cb299152',_binary '',_binary '\0','broker',0,_binary '\0',NULL,NULL,_binary '',NULL,_binary '\0','org3','openid-connect',0,_binary '\0',_binary '\0','${client_broker}',_binary '\0','client-secret',NULL,NULL,NULL,_binary '',_binary '\0',_binary '\0',_binary '\0'),('fc2a72df-deaf-4360-830b-8b81948da740',_binary '',_binary '\0','admin-cli',0,_binary '',NULL,NULL,_binary '\0',NULL,_binary '\0','dabc51bf-58ea-42ed-9918-4114e6b08338','openid-connect',0,_binary '\0',_binary '\0','${client_admin-cli}',_binary '\0','client-secret',NULL,NULL,NULL,_binary '\0',_binary '\0',_binary '',_binary '\0'),('fc9017e3-d5da-44aa-8c39-f16017ad8608',_binary '',_binary '\0','security-admin-console',0,_binary '',NULL,'/admin/org1/console/',_binary '\0',NULL,_binary '\0','org1','openid-connect',0,_binary '\0',_binary '\0','${client_security-admin-console}',_binary '\0','client-secret','${authAdminUrl}',NULL,NULL,_binary '',_binary '\0',_binary '\0',_binary '\0');
+/*!40000 ALTER TABLE `CLIENT` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `CLIENT_ATTRIBUTES`
+--
+
+DROP TABLE IF EXISTS `CLIENT_ATTRIBUTES`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `CLIENT_ATTRIBUTES` (
+  `CLIENT_ID` varchar(36) NOT NULL,
+  `NAME` varchar(255) NOT NULL,
+  `VALUE` longtext CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci,
+  PRIMARY KEY (`CLIENT_ID`,`NAME`),
+  KEY `IDX_CLIENT_ATT_BY_NAME_VALUE` (`NAME`),
+  CONSTRAINT `FK3C47C64BEACCA966` FOREIGN KEY (`CLIENT_ID`) REFERENCES `CLIENT` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `CLIENT_ATTRIBUTES`
+--
+
+LOCK TABLES `CLIENT_ATTRIBUTES` WRITE;
+/*!40000 ALTER TABLE `CLIENT_ATTRIBUTES` DISABLE KEYS */;
+INSERT INTO `CLIENT_ATTRIBUTES` VALUES ('01f89460-aba4-42ec-8eb3-f3c2d23cfbc2','backchannel.logout.revoke.offline.tokens','false'),('01f89460-aba4-42ec-8eb3-f3c2d23cfbc2','backchannel.logout.session.required','true'),('01f89460-aba4-42ec-8eb3-f3c2d23cfbc2','client.secret.creation.time','1709175264'),('01f89460-aba4-42ec-8eb3-f3c2d23cfbc2','client_credentials.use_refresh_token','false'),('01f89460-aba4-42ec-8eb3-f3c2d23cfbc2','display.on.consent.screen','false'),('01f89460-aba4-42ec-8eb3-f3c2d23cfbc2','exclude.session.state.from.auth.response','false'),('01f89460-aba4-42ec-8eb3-f3c2d23cfbc2','id.token.as.detached.signature','false'),('01f89460-aba4-42ec-8eb3-f3c2d23cfbc2','oauth2.device.authorization.grant.enabled','false'),('01f89460-aba4-42ec-8eb3-f3c2d23cfbc2','oidc.ciba.grant.enabled','false'),('01f89460-aba4-42ec-8eb3-f3c2d23cfbc2','require.pushed.authorization.requests','false'),('01f89460-aba4-42ec-8eb3-f3c2d23cfbc2','saml.artifact.binding','false'),('01f89460-aba4-42ec-8eb3-f3c2d23cfbc2','saml.assertion.signature','false'),('01f89460-aba4-42ec-8eb3-f3c2d23cfbc2','saml.authnstatement','false'),('01f89460-aba4-42ec-8eb3-f3c2d23cfbc2','saml.client.signature','false'),('01f89460-aba4-42ec-8eb3-f3c2d23cfbc2','saml.encrypt','false'),('01f89460-aba4-42ec-8eb3-f3c2d23cfbc2','saml.force.post.binding','false'),('01f89460-aba4-42ec-8eb3-f3c2d23cfbc2','saml.multivalued.roles','false'),('01f89460-aba4-42ec-8eb3-f3c2d23cfbc2','saml.onetimeuse.condition','false'),('01f89460-aba4-42ec-8eb3-f3c2d23cfbc2','saml.server.signature','false'),('01f89460-aba4-42ec-8eb3-f3c2d23cfbc2','saml.server.signature.keyinfo.ext','false'),('01f89460-aba4-42ec-8eb3-f3c2d23cfbc2','saml_force_name_id_format','false'),('01f89460-aba4-42ec-8eb3-f3c2d23cfbc2','tls.client.certificate.bound.access.tokens','false'),('01f89460-aba4-42ec-8eb3-f3c2d23cfbc2','use.refresh.tokens','true'),('0d3bec04-1354-4db0-b7b6-96ee59ad7c4a','post.logout.redirect.uris','+'),('10447023-de56-4fa6-8669-07b054551ad1','pkce.code.challenge.method','S256'),('10447023-de56-4fa6-8669-07b054551ad1','post.logout.redirect.uris','+'),('166138a8-bf2f-4caa-97eb-8cabbe18a8f6','pkce.code.challenge.method','S256'),('166138a8-bf2f-4caa-97eb-8cabbe18a8f6','post.logout.redirect.uris','+'),('16fe410e-f1df-4ce0-b445-8dd3b5b80750','backchannel.logout.revoke.offline.tokens','false'),('16fe410e-f1df-4ce0-b445-8dd3b5b80750','backchannel.logout.session.required','true'),('16fe410e-f1df-4ce0-b445-8dd3b5b80750','client.secret.creation.time','1709175165'),('16fe410e-f1df-4ce0-b445-8dd3b5b80750','client_credentials.use_refresh_token','false'),('16fe410e-f1df-4ce0-b445-8dd3b5b80750','display.on.consent.screen','false'),('16fe410e-f1df-4ce0-b445-8dd3b5b80750','exclude.session.state.from.auth.response','false'),('16fe410e-f1df-4ce0-b445-8dd3b5b80750','id.token.as.detached.signature','false'),('16fe410e-f1df-4ce0-b445-8dd3b5b80750','oauth2.device.authorization.grant.enabled','false'),('16fe410e-f1df-4ce0-b445-8dd3b5b80750','oidc.ciba.grant.enabled','false'),('16fe410e-f1df-4ce0-b445-8dd3b5b80750','post.logout.redirect.uris','/*'),('16fe410e-f1df-4ce0-b445-8dd3b5b80750','require.pushed.authorization.requests','false'),('16fe410e-f1df-4ce0-b445-8dd3b5b80750','saml.artifact.binding','false'),('16fe410e-f1df-4ce0-b445-8dd3b5b80750','saml.assertion.signature','false'),('16fe410e-f1df-4ce0-b445-8dd3b5b80750','saml.authnstatement','false'),('16fe410e-f1df-4ce0-b445-8dd3b5b80750','saml.client.signature','false'),('16fe410e-f1df-4ce0-b445-8dd3b5b80750','saml.encrypt','false'),('16fe410e-f1df-4ce0-b445-8dd3b5b80750','saml.force.post.binding','false'),('16fe410e-f1df-4ce0-b445-8dd3b5b80750','saml.multivalued.roles','false'),('16fe410e-f1df-4ce0-b445-8dd3b5b80750','saml.onetimeuse.condition','false'),('16fe410e-f1df-4ce0-b445-8dd3b5b80750','saml.server.signature','false'),('16fe410e-f1df-4ce0-b445-8dd3b5b80750','saml.server.signature.keyinfo.ext','false'),('16fe410e-f1df-4ce0-b445-8dd3b5b80750','saml_force_name_id_format','false'),('16fe410e-f1df-4ce0-b445-8dd3b5b80750','tls.client.certificate.bound.access.tokens','false'),('16fe410e-f1df-4ce0-b445-8dd3b5b80750','use.refresh.tokens','true'),('1b5f5d7e-5c2b-4687-8450-d38949728f18','access.token.lifespan','86400'),('1b5f5d7e-5c2b-4687-8450-d38949728f18','acr.loa.map','{}'),('1b5f5d7e-5c2b-4687-8450-d38949728f18','backchannel.logout.revoke.offline.tokens','false'),('1b5f5d7e-5c2b-4687-8450-d38949728f18','backchannel.logout.session.required','true'),('1b5f5d7e-5c2b-4687-8450-d38949728f18','client.secret.creation.time','1709175165'),('1b5f5d7e-5c2b-4687-8450-d38949728f18','client.session.idle.timeout','86400'),('1b5f5d7e-5c2b-4687-8450-d38949728f18','client.session.max.lifespan','86400'),('1b5f5d7e-5c2b-4687-8450-d38949728f18','client_credentials.use_refresh_token','false'),('1b5f5d7e-5c2b-4687-8450-d38949728f18','display.on.consent.screen','false'),('1b5f5d7e-5c2b-4687-8450-d38949728f18','exclude.session.state.from.auth.response','false'),('1b5f5d7e-5c2b-4687-8450-d38949728f18','frontchannel.logout.session.required','false'),('1b5f5d7e-5c2b-4687-8450-d38949728f18','id.token.as.detached.signature','false'),('1b5f5d7e-5c2b-4687-8450-d38949728f18','oauth2.device.authorization.grant.enabled','false'),('1b5f5d7e-5c2b-4687-8450-d38949728f18','oidc.ciba.grant.enabled','false'),('1b5f5d7e-5c2b-4687-8450-d38949728f18','require.pushed.authorization.requests','false'),('1b5f5d7e-5c2b-4687-8450-d38949728f18','saml.allow.ecp.flow','false'),('1b5f5d7e-5c2b-4687-8450-d38949728f18','saml.artifact.binding','false'),('1b5f5d7e-5c2b-4687-8450-d38949728f18','saml.assertion.signature','false'),('1b5f5d7e-5c2b-4687-8450-d38949728f18','saml.authnstatement','false'),('1b5f5d7e-5c2b-4687-8450-d38949728f18','saml.client.signature','false'),('1b5f5d7e-5c2b-4687-8450-d38949728f18','saml.encrypt','false'),('1b5f5d7e-5c2b-4687-8450-d38949728f18','saml.force.post.binding','false'),('1b5f5d7e-5c2b-4687-8450-d38949728f18','saml.multivalued.roles','false'),('1b5f5d7e-5c2b-4687-8450-d38949728f18','saml.onetimeuse.condition','false'),('1b5f5d7e-5c2b-4687-8450-d38949728f18','saml.server.signature','false'),('1b5f5d7e-5c2b-4687-8450-d38949728f18','saml.server.signature.keyinfo.ext','false'),('1b5f5d7e-5c2b-4687-8450-d38949728f18','saml_force_name_id_format','false'),('1b5f5d7e-5c2b-4687-8450-d38949728f18','tls.client.certificate.bound.access.tokens','false'),('1b5f5d7e-5c2b-4687-8450-d38949728f18','token.response.type.bearer.lower-case','false'),('1b5f5d7e-5c2b-4687-8450-d38949728f18','use.refresh.tokens','true'),('21f3aced-8905-4cbe-b76e-e4efc5f5b5d9','pkce.code.challenge.method','S256'),('21f3aced-8905-4cbe-b76e-e4efc5f5b5d9','post.logout.redirect.uris','+'),('2d40f5c2-5cc2-42d6-93b7-64af2cedb218','access.token.lifespan','86400'),('2d40f5c2-5cc2-42d6-93b7-64af2cedb218','acr.loa.map','{}'),('2d40f5c2-5cc2-42d6-93b7-64af2cedb218','backchannel.logout.revoke.offline.tokens','false'),('2d40f5c2-5cc2-42d6-93b7-64af2cedb218','backchannel.logout.session.required','true'),('2d40f5c2-5cc2-42d6-93b7-64af2cedb218','client.secret.creation.time','1709175194'),('2d40f5c2-5cc2-42d6-93b7-64af2cedb218','client.session.idle.timeout','86400'),('2d40f5c2-5cc2-42d6-93b7-64af2cedb218','client.session.max.lifespan','86400'),('2d40f5c2-5cc2-42d6-93b7-64af2cedb218','client_credentials.use_refresh_token','false'),('2d40f5c2-5cc2-42d6-93b7-64af2cedb218','display.on.consent.screen','false'),('2d40f5c2-5cc2-42d6-93b7-64af2cedb218','exclude.session.state.from.auth.response','false'),('2d40f5c2-5cc2-42d6-93b7-64af2cedb218','frontchannel.logout.session.required','false'),('2d40f5c2-5cc2-42d6-93b7-64af2cedb218','id.token.as.detached.signature','false'),('2d40f5c2-5cc2-42d6-93b7-64af2cedb218','oauth2.device.authorization.grant.enabled','false'),('2d40f5c2-5cc2-42d6-93b7-64af2cedb218','oidc.ciba.grant.enabled','false'),('2d40f5c2-5cc2-42d6-93b7-64af2cedb218','require.pushed.authorization.requests','false'),('2d40f5c2-5cc2-42d6-93b7-64af2cedb218','saml.allow.ecp.flow','false'),('2d40f5c2-5cc2-42d6-93b7-64af2cedb218','saml.artifact.binding','false'),('2d40f5c2-5cc2-42d6-93b7-64af2cedb218','saml.assertion.signature','false'),('2d40f5c2-5cc2-42d6-93b7-64af2cedb218','saml.authnstatement','false'),('2d40f5c2-5cc2-42d6-93b7-64af2cedb218','saml.client.signature','false'),('2d40f5c2-5cc2-42d6-93b7-64af2cedb218','saml.encrypt','false'),('2d40f5c2-5cc2-42d6-93b7-64af2cedb218','saml.force.post.binding','false'),('2d40f5c2-5cc2-42d6-93b7-64af2cedb218','saml.multivalued.roles','false'),('2d40f5c2-5cc2-42d6-93b7-64af2cedb218','saml.onetimeuse.condition','false'),('2d40f5c2-5cc2-42d6-93b7-64af2cedb218','saml.server.signature','false'),('2d40f5c2-5cc2-42d6-93b7-64af2cedb218','saml.server.signature.keyinfo.ext','false'),('2d40f5c2-5cc2-42d6-93b7-64af2cedb218','saml_force_name_id_format','false'),('2d40f5c2-5cc2-42d6-93b7-64af2cedb218','tls.client.certificate.bound.access.tokens','false'),('2d40f5c2-5cc2-42d6-93b7-64af2cedb218','token.response.type.bearer.lower-case','false'),('2d40f5c2-5cc2-42d6-93b7-64af2cedb218','use.refresh.tokens','true'),('2edff0cf-8f6c-44b6-917d-f00a3bb58261','pkce.code.challenge.method','S256'),('2edff0cf-8f6c-44b6-917d-f00a3bb58261','post.logout.redirect.uris','+'),('311ebcfe-7467-459c-856a-862094332329','backchannel.logout.revoke.offline.tokens','false'),('311ebcfe-7467-459c-856a-862094332329','backchannel.logout.session.required','true'),('311ebcfe-7467-459c-856a-862094332329','client.secret.creation.time','1709175232'),('311ebcfe-7467-459c-856a-862094332329','client_credentials.use_refresh_token','false'),('311ebcfe-7467-459c-856a-862094332329','display.on.consent.screen','false'),('311ebcfe-7467-459c-856a-862094332329','exclude.session.state.from.auth.response','false'),('311ebcfe-7467-459c-856a-862094332329','id.token.as.detached.signature','false'),('311ebcfe-7467-459c-856a-862094332329','oauth2.device.authorization.grant.enabled','false'),('311ebcfe-7467-459c-856a-862094332329','oidc.ciba.grant.enabled','false'),('311ebcfe-7467-459c-856a-862094332329','require.pushed.authorization.requests','false'),('311ebcfe-7467-459c-856a-862094332329','saml.artifact.binding','false'),('311ebcfe-7467-459c-856a-862094332329','saml.assertion.signature','false'),('311ebcfe-7467-459c-856a-862094332329','saml.authnstatement','false'),('311ebcfe-7467-459c-856a-862094332329','saml.client.signature','false'),('311ebcfe-7467-459c-856a-862094332329','saml.encrypt','false'),('311ebcfe-7467-459c-856a-862094332329','saml.force.post.binding','false'),('311ebcfe-7467-459c-856a-862094332329','saml.multivalued.roles','false'),('311ebcfe-7467-459c-856a-862094332329','saml.onetimeuse.condition','false'),('311ebcfe-7467-459c-856a-862094332329','saml.server.signature','false'),('311ebcfe-7467-459c-856a-862094332329','saml.server.signature.keyinfo.ext','false'),('311ebcfe-7467-459c-856a-862094332329','saml_force_name_id_format','false'),('311ebcfe-7467-459c-856a-862094332329','tls.client.certificate.bound.access.tokens','false'),('311ebcfe-7467-459c-856a-862094332329','use.refresh.tokens','true'),('37140475-df0f-4d9e-9d4d-9c9afbdda5f6','post.logout.redirect.uris','+'),('3d62cf66-73c8-4ec7-ba0f-2b622bc5c747','backchannel.logout.revoke.offline.tokens','false'),('3d62cf66-73c8-4ec7-ba0f-2b622bc5c747','backchannel.logout.session.required','true'),('3d62cf66-73c8-4ec7-ba0f-2b622bc5c747','client.secret.creation.time','1709175264'),('3d62cf66-73c8-4ec7-ba0f-2b622bc5c747','client_credentials.use_refresh_token','false'),('3d62cf66-73c8-4ec7-ba0f-2b622bc5c747','display.on.consent.screen','false'),('3d62cf66-73c8-4ec7-ba0f-2b622bc5c747','exclude.session.state.from.auth.response','false'),('3d62cf66-73c8-4ec7-ba0f-2b622bc5c747','id.token.as.detached.signature','false'),('3d62cf66-73c8-4ec7-ba0f-2b622bc5c747','oauth2.device.authorization.grant.enabled','false'),('3d62cf66-73c8-4ec7-ba0f-2b622bc5c747','oidc.ciba.grant.enabled','false'),('3d62cf66-73c8-4ec7-ba0f-2b622bc5c747','post.logout.redirect.uris','/*'),('3d62cf66-73c8-4ec7-ba0f-2b622bc5c747','require.pushed.authorization.requests','false'),('3d62cf66-73c8-4ec7-ba0f-2b622bc5c747','saml.artifact.binding','false'),('3d62cf66-73c8-4ec7-ba0f-2b622bc5c747','saml.assertion.signature','false'),('3d62cf66-73c8-4ec7-ba0f-2b622bc5c747','saml.authnstatement','false'),('3d62cf66-73c8-4ec7-ba0f-2b622bc5c747','saml.client.signature','false'),('3d62cf66-73c8-4ec7-ba0f-2b622bc5c747','saml.encrypt','false'),('3d62cf66-73c8-4ec7-ba0f-2b622bc5c747','saml.force.post.binding','false'),('3d62cf66-73c8-4ec7-ba0f-2b622bc5c747','saml.multivalued.roles','false'),('3d62cf66-73c8-4ec7-ba0f-2b622bc5c747','saml.onetimeuse.condition','false'),('3d62cf66-73c8-4ec7-ba0f-2b622bc5c747','saml.server.signature','false'),('3d62cf66-73c8-4ec7-ba0f-2b622bc5c747','saml.server.signature.keyinfo.ext','false'),('3d62cf66-73c8-4ec7-ba0f-2b622bc5c747','saml_force_name_id_format','false'),('3d62cf66-73c8-4ec7-ba0f-2b622bc5c747','tls.client.certificate.bound.access.tokens','false'),('3d62cf66-73c8-4ec7-ba0f-2b622bc5c747','use.refresh.tokens','true'),('479237b2-a9fc-4828-b80d-ffd84ec6f3bc','backchannel.logout.revoke.offline.tokens','false'),('479237b2-a9fc-4828-b80d-ffd84ec6f3bc','backchannel.logout.session.required','true'),('479237b2-a9fc-4828-b80d-ffd84ec6f3bc','client.secret.creation.time','1709175211'),('479237b2-a9fc-4828-b80d-ffd84ec6f3bc','client_credentials.use_refresh_token','false'),('479237b2-a9fc-4828-b80d-ffd84ec6f3bc','display.on.consent.screen','false'),('479237b2-a9fc-4828-b80d-ffd84ec6f3bc','exclude.session.state.from.auth.response','false'),('479237b2-a9fc-4828-b80d-ffd84ec6f3bc','id.token.as.detached.signature','false'),('479237b2-a9fc-4828-b80d-ffd84ec6f3bc','oauth2.device.authorization.grant.enabled','false'),('479237b2-a9fc-4828-b80d-ffd84ec6f3bc','oidc.ciba.grant.enabled','false'),('479237b2-a9fc-4828-b80d-ffd84ec6f3bc','require.pushed.authorization.requests','false'),('479237b2-a9fc-4828-b80d-ffd84ec6f3bc','saml.artifact.binding','false'),('479237b2-a9fc-4828-b80d-ffd84ec6f3bc','saml.assertion.signature','false'),('479237b2-a9fc-4828-b80d-ffd84ec6f3bc','saml.authnstatement','false'),('479237b2-a9fc-4828-b80d-ffd84ec6f3bc','saml.client.signature','false'),('479237b2-a9fc-4828-b80d-ffd84ec6f3bc','saml.encrypt','false'),('479237b2-a9fc-4828-b80d-ffd84ec6f3bc','saml.force.post.binding','false'),('479237b2-a9fc-4828-b80d-ffd84ec6f3bc','saml.multivalued.roles','false'),('479237b2-a9fc-4828-b80d-ffd84ec6f3bc','saml.onetimeuse.condition','false'),('479237b2-a9fc-4828-b80d-ffd84ec6f3bc','saml.server.signature','false'),('479237b2-a9fc-4828-b80d-ffd84ec6f3bc','saml.server.signature.keyinfo.ext','false'),('479237b2-a9fc-4828-b80d-ffd84ec6f3bc','saml_force_name_id_format','false'),('479237b2-a9fc-4828-b80d-ffd84ec6f3bc','tls.client.certificate.bound.access.tokens','false'),('479237b2-a9fc-4828-b80d-ffd84ec6f3bc','use.refresh.tokens','true'),('47a07858-733a-4de8-a079-837b25a07547','post.logout.redirect.uris','+'),('57f46d8e-a3aa-4587-abe4-ef652ebef40c','pkce.code.challenge.method','S256'),('57f46d8e-a3aa-4587-abe4-ef652ebef40c','post.logout.redirect.uris','+'),('58e5ed05-5651-4e99-ac86-e93c28adc1f0','backchannel.logout.revoke.offline.tokens','false'),('58e5ed05-5651-4e99-ac86-e93c28adc1f0','backchannel.logout.session.required','true'),('58e5ed05-5651-4e99-ac86-e93c28adc1f0','client.secret.creation.time','1709175123'),('58e5ed05-5651-4e99-ac86-e93c28adc1f0','client_credentials.use_refresh_token','false'),('58e5ed05-5651-4e99-ac86-e93c28adc1f0','display.on.consent.screen','false'),('58e5ed05-5651-4e99-ac86-e93c28adc1f0','exclude.session.state.from.auth.response','false'),('58e5ed05-5651-4e99-ac86-e93c28adc1f0','id.token.as.detached.signature','false'),('58e5ed05-5651-4e99-ac86-e93c28adc1f0','oauth2.device.authorization.grant.enabled','false'),('58e5ed05-5651-4e99-ac86-e93c28adc1f0','oidc.ciba.grant.enabled','false'),('58e5ed05-5651-4e99-ac86-e93c28adc1f0','require.pushed.authorization.requests','false'),('58e5ed05-5651-4e99-ac86-e93c28adc1f0','saml.artifact.binding','false'),('58e5ed05-5651-4e99-ac86-e93c28adc1f0','saml.assertion.signature','false'),('58e5ed05-5651-4e99-ac86-e93c28adc1f0','saml.authnstatement','false'),('58e5ed05-5651-4e99-ac86-e93c28adc1f0','saml.client.signature','false'),('58e5ed05-5651-4e99-ac86-e93c28adc1f0','saml.encrypt','false'),('58e5ed05-5651-4e99-ac86-e93c28adc1f0','saml.force.post.binding','false'),('58e5ed05-5651-4e99-ac86-e93c28adc1f0','saml.multivalued.roles','false'),('58e5ed05-5651-4e99-ac86-e93c28adc1f0','saml.onetimeuse.condition','false'),('58e5ed05-5651-4e99-ac86-e93c28adc1f0','saml.server.signature','false'),('58e5ed05-5651-4e99-ac86-e93c28adc1f0','saml.server.signature.keyinfo.ext','false'),('58e5ed05-5651-4e99-ac86-e93c28adc1f0','saml_force_name_id_format','false'),('58e5ed05-5651-4e99-ac86-e93c28adc1f0','tls.client.certificate.bound.access.tokens','false'),('58e5ed05-5651-4e99-ac86-e93c28adc1f0','use.refresh.tokens','true'),('5a324cc2-4d44-46de-9c51-9afcc3c1adda','backchannel.logout.revoke.offline.tokens','false'),('5a324cc2-4d44-46de-9c51-9afcc3c1adda','backchannel.logout.session.required','true'),('5a324cc2-4d44-46de-9c51-9afcc3c1adda','client.secret.creation.time','1709175232'),('5a324cc2-4d44-46de-9c51-9afcc3c1adda','client_credentials.use_refresh_token','false'),('5a324cc2-4d44-46de-9c51-9afcc3c1adda','display.on.consent.screen','false'),('5a324cc2-4d44-46de-9c51-9afcc3c1adda','exclude.session.state.from.auth.response','false'),('5a324cc2-4d44-46de-9c51-9afcc3c1adda','id.token.as.detached.signature','false'),('5a324cc2-4d44-46de-9c51-9afcc3c1adda','oauth2.device.authorization.grant.enabled','false'),('5a324cc2-4d44-46de-9c51-9afcc3c1adda','oidc.ciba.grant.enabled','false'),('5a324cc2-4d44-46de-9c51-9afcc3c1adda','post.logout.redirect.uris','/*'),('5a324cc2-4d44-46de-9c51-9afcc3c1adda','require.pushed.authorization.requests','false'),('5a324cc2-4d44-46de-9c51-9afcc3c1adda','saml.artifact.binding','false'),('5a324cc2-4d44-46de-9c51-9afcc3c1adda','saml.assertion.signature','false'),('5a324cc2-4d44-46de-9c51-9afcc3c1adda','saml.authnstatement','false'),('5a324cc2-4d44-46de-9c51-9afcc3c1adda','saml.client.signature','false'),('5a324cc2-4d44-46de-9c51-9afcc3c1adda','saml.encrypt','false'),('5a324cc2-4d44-46de-9c51-9afcc3c1adda','saml.force.post.binding','false'),('5a324cc2-4d44-46de-9c51-9afcc3c1adda','saml.multivalued.roles','false'),('5a324cc2-4d44-46de-9c51-9afcc3c1adda','saml.onetimeuse.condition','false'),('5a324cc2-4d44-46de-9c51-9afcc3c1adda','saml.server.signature','false'),('5a324cc2-4d44-46de-9c51-9afcc3c1adda','saml.server.signature.keyinfo.ext','false'),('5a324cc2-4d44-46de-9c51-9afcc3c1adda','saml_force_name_id_format','false'),('5a324cc2-4d44-46de-9c51-9afcc3c1adda','tls.client.certificate.bound.access.tokens','false'),('5a324cc2-4d44-46de-9c51-9afcc3c1adda','use.refresh.tokens','true'),('6112a706-0711-40ab-a42e-08ef27723f06','backchannel.logout.revoke.offline.tokens','false'),('6112a706-0711-40ab-a42e-08ef27723f06','backchannel.logout.session.required','true'),('6112a706-0711-40ab-a42e-08ef27723f06','client.secret.creation.time','1709175165'),('6112a706-0711-40ab-a42e-08ef27723f06','client_credentials.use_refresh_token','false'),('6112a706-0711-40ab-a42e-08ef27723f06','display.on.consent.screen','false'),('6112a706-0711-40ab-a42e-08ef27723f06','exclude.session.state.from.auth.response','false'),('6112a706-0711-40ab-a42e-08ef27723f06','id.token.as.detached.signature','false'),('6112a706-0711-40ab-a42e-08ef27723f06','oauth2.device.authorization.grant.enabled','false'),('6112a706-0711-40ab-a42e-08ef27723f06','oidc.ciba.grant.enabled','false'),('6112a706-0711-40ab-a42e-08ef27723f06','require.pushed.authorization.requests','false'),('6112a706-0711-40ab-a42e-08ef27723f06','saml.artifact.binding','false'),('6112a706-0711-40ab-a42e-08ef27723f06','saml.assertion.signature','false'),('6112a706-0711-40ab-a42e-08ef27723f06','saml.authnstatement','false'),('6112a706-0711-40ab-a42e-08ef27723f06','saml.client.signature','false'),('6112a706-0711-40ab-a42e-08ef27723f06','saml.encrypt','false'),('6112a706-0711-40ab-a42e-08ef27723f06','saml.force.post.binding','false'),('6112a706-0711-40ab-a42e-08ef27723f06','saml.multivalued.roles','false'),('6112a706-0711-40ab-a42e-08ef27723f06','saml.onetimeuse.condition','false'),('6112a706-0711-40ab-a42e-08ef27723f06','saml.server.signature','false'),('6112a706-0711-40ab-a42e-08ef27723f06','saml.server.signature.keyinfo.ext','false'),('6112a706-0711-40ab-a42e-08ef27723f06','saml_force_name_id_format','false'),('6112a706-0711-40ab-a42e-08ef27723f06','tls.client.certificate.bound.access.tokens','false'),('6112a706-0711-40ab-a42e-08ef27723f06','use.refresh.tokens','true'),('684a5673-eac6-49e1-8fad-7b9fe666a06f','backchannel.logout.revoke.offline.tokens','false'),('684a5673-eac6-49e1-8fad-7b9fe666a06f','backchannel.logout.session.required','true'),('684a5673-eac6-49e1-8fad-7b9fe666a06f','client.secret.creation.time','1709175232'),('684a5673-eac6-49e1-8fad-7b9fe666a06f','client_credentials.use_refresh_token','false'),('684a5673-eac6-49e1-8fad-7b9fe666a06f','display.on.consent.screen','false'),('684a5673-eac6-49e1-8fad-7b9fe666a06f','exclude.session.state.from.auth.response','false'),('684a5673-eac6-49e1-8fad-7b9fe666a06f','id.token.as.detached.signature','false'),('684a5673-eac6-49e1-8fad-7b9fe666a06f','oauth2.device.authorization.grant.enabled','false'),('684a5673-eac6-49e1-8fad-7b9fe666a06f','oidc.ciba.grant.enabled','false'),('684a5673-eac6-49e1-8fad-7b9fe666a06f','require.pushed.authorization.requests','false'),('684a5673-eac6-49e1-8fad-7b9fe666a06f','saml.artifact.binding','false'),('684a5673-eac6-49e1-8fad-7b9fe666a06f','saml.assertion.signature','false'),('684a5673-eac6-49e1-8fad-7b9fe666a06f','saml.authnstatement','false'),('684a5673-eac6-49e1-8fad-7b9fe666a06f','saml.client.signature','false'),('684a5673-eac6-49e1-8fad-7b9fe666a06f','saml.encrypt','false'),('684a5673-eac6-49e1-8fad-7b9fe666a06f','saml.force.post.binding','false'),('684a5673-eac6-49e1-8fad-7b9fe666a06f','saml.multivalued.roles','false'),('684a5673-eac6-49e1-8fad-7b9fe666a06f','saml.onetimeuse.condition','false'),('684a5673-eac6-49e1-8fad-7b9fe666a06f','saml.server.signature','false'),('684a5673-eac6-49e1-8fad-7b9fe666a06f','saml.server.signature.keyinfo.ext','false'),('684a5673-eac6-49e1-8fad-7b9fe666a06f','saml_force_name_id_format','false'),('684a5673-eac6-49e1-8fad-7b9fe666a06f','tls.client.certificate.bound.access.tokens','false'),('684a5673-eac6-49e1-8fad-7b9fe666a06f','use.refresh.tokens','true'),('690481d3-310d-4227-a8eb-eee2db8d1b25','access.token.lifespan','86400'),('690481d3-310d-4227-a8eb-eee2db8d1b25','acr.loa.map','{}'),('690481d3-310d-4227-a8eb-eee2db8d1b25','backchannel.logout.revoke.offline.tokens','false'),('690481d3-310d-4227-a8eb-eee2db8d1b25','backchannel.logout.session.required','true'),('690481d3-310d-4227-a8eb-eee2db8d1b25','client.secret.creation.time','1709175264'),('690481d3-310d-4227-a8eb-eee2db8d1b25','client.session.idle.timeout','86400'),('690481d3-310d-4227-a8eb-eee2db8d1b25','client.session.max.lifespan','86400'),('690481d3-310d-4227-a8eb-eee2db8d1b25','client_credentials.use_refresh_token','false'),('690481d3-310d-4227-a8eb-eee2db8d1b25','display.on.consent.screen','false'),('690481d3-310d-4227-a8eb-eee2db8d1b25','exclude.session.state.from.auth.response','false'),('690481d3-310d-4227-a8eb-eee2db8d1b25','frontchannel.logout.session.required','false'),('690481d3-310d-4227-a8eb-eee2db8d1b25','id.token.as.detached.signature','false'),('690481d3-310d-4227-a8eb-eee2db8d1b25','oauth2.device.authorization.grant.enabled','false'),('690481d3-310d-4227-a8eb-eee2db8d1b25','oidc.ciba.grant.enabled','false'),('690481d3-310d-4227-a8eb-eee2db8d1b25','require.pushed.authorization.requests','false'),('690481d3-310d-4227-a8eb-eee2db8d1b25','saml.allow.ecp.flow','false'),('690481d3-310d-4227-a8eb-eee2db8d1b25','saml.artifact.binding','false'),('690481d3-310d-4227-a8eb-eee2db8d1b25','saml.assertion.signature','false'),('690481d3-310d-4227-a8eb-eee2db8d1b25','saml.authnstatement','false'),('690481d3-310d-4227-a8eb-eee2db8d1b25','saml.client.signature','false'),('690481d3-310d-4227-a8eb-eee2db8d1b25','saml.encrypt','false'),('690481d3-310d-4227-a8eb-eee2db8d1b25','saml.force.post.binding','false'),('690481d3-310d-4227-a8eb-eee2db8d1b25','saml.multivalued.roles','false'),('690481d3-310d-4227-a8eb-eee2db8d1b25','saml.onetimeuse.condition','false'),('690481d3-310d-4227-a8eb-eee2db8d1b25','saml.server.signature','false'),('690481d3-310d-4227-a8eb-eee2db8d1b25','saml.server.signature.keyinfo.ext','false'),('690481d3-310d-4227-a8eb-eee2db8d1b25','saml_force_name_id_format','false'),('690481d3-310d-4227-a8eb-eee2db8d1b25','tls.client.certificate.bound.access.tokens','false'),('690481d3-310d-4227-a8eb-eee2db8d1b25','token.response.type.bearer.lower-case','false'),('690481d3-310d-4227-a8eb-eee2db8d1b25','use.refresh.tokens','true'),('6e5e1844-3f44-46b9-a6b7-4297aed21fcf','post.logout.redirect.uris','+'),('8137d95e-0cab-4e9f-b666-92c7bd7ca71a','pkce.code.challenge.method','S256'),('8137d95e-0cab-4e9f-b666-92c7bd7ca71a','post.logout.redirect.uris','+'),('84e2d9c2-d7af-4ae0-9dfa-41a04f1ab1f4','access.token.lifespan','86400'),('84e2d9c2-d7af-4ae0-9dfa-41a04f1ab1f4','acr.loa.map','{}'),('84e2d9c2-d7af-4ae0-9dfa-41a04f1ab1f4','backchannel.logout.revoke.offline.tokens','false'),('84e2d9c2-d7af-4ae0-9dfa-41a04f1ab1f4','backchannel.logout.session.required','true'),('84e2d9c2-d7af-4ae0-9dfa-41a04f1ab1f4','client.secret.creation.time','1709175211'),('84e2d9c2-d7af-4ae0-9dfa-41a04f1ab1f4','client.session.idle.timeout','86400'),('84e2d9c2-d7af-4ae0-9dfa-41a04f1ab1f4','client.session.max.lifespan','86400'),('84e2d9c2-d7af-4ae0-9dfa-41a04f1ab1f4','client_credentials.use_refresh_token','false'),('84e2d9c2-d7af-4ae0-9dfa-41a04f1ab1f4','display.on.consent.screen','false'),('84e2d9c2-d7af-4ae0-9dfa-41a04f1ab1f4','exclude.session.state.from.auth.response','false'),('84e2d9c2-d7af-4ae0-9dfa-41a04f1ab1f4','frontchannel.logout.session.required','false'),('84e2d9c2-d7af-4ae0-9dfa-41a04f1ab1f4','id.token.as.detached.signature','false'),('84e2d9c2-d7af-4ae0-9dfa-41a04f1ab1f4','oauth2.device.authorization.grant.enabled','false'),('84e2d9c2-d7af-4ae0-9dfa-41a04f1ab1f4','oidc.ciba.grant.enabled','false'),('84e2d9c2-d7af-4ae0-9dfa-41a04f1ab1f4','require.pushed.authorization.requests','false'),('84e2d9c2-d7af-4ae0-9dfa-41a04f1ab1f4','saml.allow.ecp.flow','false'),('84e2d9c2-d7af-4ae0-9dfa-41a04f1ab1f4','saml.artifact.binding','false'),('84e2d9c2-d7af-4ae0-9dfa-41a04f1ab1f4','saml.assertion.signature','false'),('84e2d9c2-d7af-4ae0-9dfa-41a04f1ab1f4','saml.authnstatement','false'),('84e2d9c2-d7af-4ae0-9dfa-41a04f1ab1f4','saml.client.signature','false'),('84e2d9c2-d7af-4ae0-9dfa-41a04f1ab1f4','saml.encrypt','false'),('84e2d9c2-d7af-4ae0-9dfa-41a04f1ab1f4','saml.force.post.binding','false'),('84e2d9c2-d7af-4ae0-9dfa-41a04f1ab1f4','saml.multivalued.roles','false'),('84e2d9c2-d7af-4ae0-9dfa-41a04f1ab1f4','saml.onetimeuse.condition','false'),('84e2d9c2-d7af-4ae0-9dfa-41a04f1ab1f4','saml.server.signature','false'),('84e2d9c2-d7af-4ae0-9dfa-41a04f1ab1f4','saml.server.signature.keyinfo.ext','false'),('84e2d9c2-d7af-4ae0-9dfa-41a04f1ab1f4','saml_force_name_id_format','false'),('84e2d9c2-d7af-4ae0-9dfa-41a04f1ab1f4','tls.client.certificate.bound.access.tokens','false'),('84e2d9c2-d7af-4ae0-9dfa-41a04f1ab1f4','token.response.type.bearer.lower-case','false'),('84e2d9c2-d7af-4ae0-9dfa-41a04f1ab1f4','use.refresh.tokens','true'),('8f492599-c8fb-4bce-af8a-34f41e0f5b74','backchannel.logout.revoke.offline.tokens','false'),('8f492599-c8fb-4bce-af8a-34f41e0f5b74','backchannel.logout.session.required','true'),('8f492599-c8fb-4bce-af8a-34f41e0f5b74','client.secret.creation.time','1709175264'),('8f492599-c8fb-4bce-af8a-34f41e0f5b74','client_credentials.use_refresh_token','false'),('8f492599-c8fb-4bce-af8a-34f41e0f5b74','display.on.consent.screen','false'),('8f492599-c8fb-4bce-af8a-34f41e0f5b74','exclude.session.state.from.auth.response','false'),('8f492599-c8fb-4bce-af8a-34f41e0f5b74','id.token.as.detached.signature','false'),('8f492599-c8fb-4bce-af8a-34f41e0f5b74','oauth2.device.authorization.grant.enabled','false'),('8f492599-c8fb-4bce-af8a-34f41e0f5b74','oidc.ciba.grant.enabled','false'),('8f492599-c8fb-4bce-af8a-34f41e0f5b74','require.pushed.authorization.requests','false'),('8f492599-c8fb-4bce-af8a-34f41e0f5b74','saml.artifact.binding','false'),('8f492599-c8fb-4bce-af8a-34f41e0f5b74','saml.assertion.signature','false'),('8f492599-c8fb-4bce-af8a-34f41e0f5b74','saml.authnstatement','false'),('8f492599-c8fb-4bce-af8a-34f41e0f5b74','saml.client.signature','false'),('8f492599-c8fb-4bce-af8a-34f41e0f5b74','saml.encrypt','false'),('8f492599-c8fb-4bce-af8a-34f41e0f5b74','saml.force.post.binding','false'),('8f492599-c8fb-4bce-af8a-34f41e0f5b74','saml.multivalued.roles','false'),('8f492599-c8fb-4bce-af8a-34f41e0f5b74','saml.onetimeuse.condition','false'),('8f492599-c8fb-4bce-af8a-34f41e0f5b74','saml.server.signature','false'),('8f492599-c8fb-4bce-af8a-34f41e0f5b74','saml.server.signature.keyinfo.ext','false'),('8f492599-c8fb-4bce-af8a-34f41e0f5b74','saml_force_name_id_format','false'),('8f492599-c8fb-4bce-af8a-34f41e0f5b74','tls.client.certificate.bound.access.tokens','false'),('8f492599-c8fb-4bce-af8a-34f41e0f5b74','use.refresh.tokens','true'),('908e528c-5deb-476b-9612-751d1944f79a','backchannel.logout.revoke.offline.tokens','false'),('908e528c-5deb-476b-9612-751d1944f79a','backchannel.logout.session.required','true'),('908e528c-5deb-476b-9612-751d1944f79a','client.secret.creation.time','1709175124'),('908e528c-5deb-476b-9612-751d1944f79a','client_credentials.use_refresh_token','false'),('908e528c-5deb-476b-9612-751d1944f79a','display.on.consent.screen','false'),('908e528c-5deb-476b-9612-751d1944f79a','exclude.session.state.from.auth.response','false'),('908e528c-5deb-476b-9612-751d1944f79a','id.token.as.detached.signature','false'),('908e528c-5deb-476b-9612-751d1944f79a','oauth2.device.authorization.grant.enabled','false'),('908e528c-5deb-476b-9612-751d1944f79a','oidc.ciba.grant.enabled','false'),('908e528c-5deb-476b-9612-751d1944f79a','post.logout.redirect.uris','/*'),('908e528c-5deb-476b-9612-751d1944f79a','require.pushed.authorization.requests','false'),('908e528c-5deb-476b-9612-751d1944f79a','saml.artifact.binding','false'),('908e528c-5deb-476b-9612-751d1944f79a','saml.assertion.signature','false'),('908e528c-5deb-476b-9612-751d1944f79a','saml.authnstatement','false'),('908e528c-5deb-476b-9612-751d1944f79a','saml.client.signature','false'),('908e528c-5deb-476b-9612-751d1944f79a','saml.encrypt','false'),('908e528c-5deb-476b-9612-751d1944f79a','saml.force.post.binding','false'),('908e528c-5deb-476b-9612-751d1944f79a','saml.multivalued.roles','false'),('908e528c-5deb-476b-9612-751d1944f79a','saml.onetimeuse.condition','false'),('908e528c-5deb-476b-9612-751d1944f79a','saml.server.signature','false'),('908e528c-5deb-476b-9612-751d1944f79a','saml.server.signature.keyinfo.ext','false'),('908e528c-5deb-476b-9612-751d1944f79a','saml_force_name_id_format','false'),('908e528c-5deb-476b-9612-751d1944f79a','tls.client.certificate.bound.access.tokens','false'),('908e528c-5deb-476b-9612-751d1944f79a','use.refresh.tokens','true'),('918724dc-e6f6-424e-a42f-875f0da655ae','post.logout.redirect.uris','+'),('93f6c7ec-5361-4216-9f3f-bda1f99ccd7d','access.token.lifespan','86400'),('93f6c7ec-5361-4216-9f3f-bda1f99ccd7d','acr.loa.map','{}'),('93f6c7ec-5361-4216-9f3f-bda1f99ccd7d','backchannel.logout.revoke.offline.tokens','false'),('93f6c7ec-5361-4216-9f3f-bda1f99ccd7d','backchannel.logout.session.required','true'),('93f6c7ec-5361-4216-9f3f-bda1f99ccd7d','client.session.idle.timeout','86400'),('93f6c7ec-5361-4216-9f3f-bda1f99ccd7d','client.session.max.lifespan','86400'),('93f6c7ec-5361-4216-9f3f-bda1f99ccd7d','client_credentials.use_refresh_token','false'),('93f6c7ec-5361-4216-9f3f-bda1f99ccd7d','display.on.consent.screen','false'),('93f6c7ec-5361-4216-9f3f-bda1f99ccd7d','exclude.session.state.from.auth.response','false'),('93f6c7ec-5361-4216-9f3f-bda1f99ccd7d','frontchannel.logout.session.required','false'),('93f6c7ec-5361-4216-9f3f-bda1f99ccd7d','id.token.as.detached.signature','false'),('93f6c7ec-5361-4216-9f3f-bda1f99ccd7d','oauth2.device.authorization.grant.enabled','false'),('93f6c7ec-5361-4216-9f3f-bda1f99ccd7d','oidc.ciba.grant.enabled','false'),('93f6c7ec-5361-4216-9f3f-bda1f99ccd7d','require.pushed.authorization.requests','false'),('93f6c7ec-5361-4216-9f3f-bda1f99ccd7d','saml.allow.ecp.flow','false'),('93f6c7ec-5361-4216-9f3f-bda1f99ccd7d','saml.artifact.binding','false'),('93f6c7ec-5361-4216-9f3f-bda1f99ccd7d','saml.assertion.signature','false'),('93f6c7ec-5361-4216-9f3f-bda1f99ccd7d','saml.authnstatement','false'),('93f6c7ec-5361-4216-9f3f-bda1f99ccd7d','saml.client.signature','false'),('93f6c7ec-5361-4216-9f3f-bda1f99ccd7d','saml.encrypt','false'),('93f6c7ec-5361-4216-9f3f-bda1f99ccd7d','saml.force.post.binding','false'),('93f6c7ec-5361-4216-9f3f-bda1f99ccd7d','saml.multivalued.roles','false'),('93f6c7ec-5361-4216-9f3f-bda1f99ccd7d','saml.onetimeuse.condition','false'),('93f6c7ec-5361-4216-9f3f-bda1f99ccd7d','saml.server.signature','false'),('93f6c7ec-5361-4216-9f3f-bda1f99ccd7d','saml.server.signature.keyinfo.ext','false'),('93f6c7ec-5361-4216-9f3f-bda1f99ccd7d','saml_force_name_id_format','false'),('93f6c7ec-5361-4216-9f3f-bda1f99ccd7d','tls.client.certificate.bound.access.tokens','false'),('93f6c7ec-5361-4216-9f3f-bda1f99ccd7d','token.response.type.bearer.lower-case','false'),('93f6c7ec-5361-4216-9f3f-bda1f99ccd7d','use.refresh.tokens','true'),('a0d96aa1-71ac-4a7e-a769-306baf1c51fc','backchannel.logout.revoke.offline.tokens','false'),('a0d96aa1-71ac-4a7e-a769-306baf1c51fc','backchannel.logout.session.required','true'),('a0d96aa1-71ac-4a7e-a769-306baf1c51fc','client.secret.creation.time','1709175193'),('a0d96aa1-71ac-4a7e-a769-306baf1c51fc','client_credentials.use_refresh_token','false'),('a0d96aa1-71ac-4a7e-a769-306baf1c51fc','display.on.consent.screen','false'),('a0d96aa1-71ac-4a7e-a769-306baf1c51fc','exclude.session.state.from.auth.response','false'),('a0d96aa1-71ac-4a7e-a769-306baf1c51fc','id.token.as.detached.signature','false'),('a0d96aa1-71ac-4a7e-a769-306baf1c51fc','oauth2.device.authorization.grant.enabled','false'),('a0d96aa1-71ac-4a7e-a769-306baf1c51fc','oidc.ciba.grant.enabled','false'),('a0d96aa1-71ac-4a7e-a769-306baf1c51fc','require.pushed.authorization.requests','false'),('a0d96aa1-71ac-4a7e-a769-306baf1c51fc','saml.artifact.binding','false'),('a0d96aa1-71ac-4a7e-a769-306baf1c51fc','saml.assertion.signature','false'),('a0d96aa1-71ac-4a7e-a769-306baf1c51fc','saml.authnstatement','false'),('a0d96aa1-71ac-4a7e-a769-306baf1c51fc','saml.client.signature','false'),('a0d96aa1-71ac-4a7e-a769-306baf1c51fc','saml.encrypt','false'),('a0d96aa1-71ac-4a7e-a769-306baf1c51fc','saml.force.post.binding','false'),('a0d96aa1-71ac-4a7e-a769-306baf1c51fc','saml.multivalued.roles','false'),('a0d96aa1-71ac-4a7e-a769-306baf1c51fc','saml.onetimeuse.condition','false'),('a0d96aa1-71ac-4a7e-a769-306baf1c51fc','saml.server.signature','false'),('a0d96aa1-71ac-4a7e-a769-306baf1c51fc','saml.server.signature.keyinfo.ext','false'),('a0d96aa1-71ac-4a7e-a769-306baf1c51fc','saml_force_name_id_format','false'),('a0d96aa1-71ac-4a7e-a769-306baf1c51fc','tls.client.certificate.bound.access.tokens','false'),('a0d96aa1-71ac-4a7e-a769-306baf1c51fc','use.refresh.tokens','true'),('a15e680b-47bb-4b94-a832-5ca99cdbe134','backchannel.logout.revoke.offline.tokens','false'),('a15e680b-47bb-4b94-a832-5ca99cdbe134','backchannel.logout.session.required','true'),('a15e680b-47bb-4b94-a832-5ca99cdbe134','client.secret.creation.time','1709175194'),('a15e680b-47bb-4b94-a832-5ca99cdbe134','client_credentials.use_refresh_token','false'),('a15e680b-47bb-4b94-a832-5ca99cdbe134','display.on.consent.screen','false'),('a15e680b-47bb-4b94-a832-5ca99cdbe134','exclude.session.state.from.auth.response','false'),('a15e680b-47bb-4b94-a832-5ca99cdbe134','id.token.as.detached.signature','false'),('a15e680b-47bb-4b94-a832-5ca99cdbe134','oauth2.device.authorization.grant.enabled','false'),('a15e680b-47bb-4b94-a832-5ca99cdbe134','oidc.ciba.grant.enabled','false'),('a15e680b-47bb-4b94-a832-5ca99cdbe134','post.logout.redirect.uris','/*'),('a15e680b-47bb-4b94-a832-5ca99cdbe134','require.pushed.authorization.requests','false'),('a15e680b-47bb-4b94-a832-5ca99cdbe134','saml.artifact.binding','false'),('a15e680b-47bb-4b94-a832-5ca99cdbe134','saml.assertion.signature','false'),('a15e680b-47bb-4b94-a832-5ca99cdbe134','saml.authnstatement','false'),('a15e680b-47bb-4b94-a832-5ca99cdbe134','saml.client.signature','false'),('a15e680b-47bb-4b94-a832-5ca99cdbe134','saml.encrypt','false'),('a15e680b-47bb-4b94-a832-5ca99cdbe134','saml.force.post.binding','false'),('a15e680b-47bb-4b94-a832-5ca99cdbe134','saml.multivalued.roles','false'),('a15e680b-47bb-4b94-a832-5ca99cdbe134','saml.onetimeuse.condition','false'),('a15e680b-47bb-4b94-a832-5ca99cdbe134','saml.server.signature','false'),('a15e680b-47bb-4b94-a832-5ca99cdbe134','saml.server.signature.keyinfo.ext','false'),('a15e680b-47bb-4b94-a832-5ca99cdbe134','saml_force_name_id_format','false'),('a15e680b-47bb-4b94-a832-5ca99cdbe134','tls.client.certificate.bound.access.tokens','false'),('a15e680b-47bb-4b94-a832-5ca99cdbe134','use.refresh.tokens','true'),('a45ffddc-de71-4c69-b026-cb2cf7f30d16','pkce.code.challenge.method','S256'),('a45ffddc-de71-4c69-b026-cb2cf7f30d16','post.logout.redirect.uris','+'),('aa4ae80c-bbad-4217-a6a7-8ff0a871577f','pkce.code.challenge.method','S256'),('aa4ae80c-bbad-4217-a6a7-8ff0a871577f','post.logout.redirect.uris','+'),('ad5aa4ab-fe72-4d1d-8bab-e0a39529dca7','pkce.code.challenge.method','S256'),('ad5aa4ab-fe72-4d1d-8bab-e0a39529dca7','post.logout.redirect.uris','+'),('b0475217-c11a-49f5-833c-33aaee237a25','backchannel.logout.revoke.offline.tokens','false'),('b0475217-c11a-49f5-833c-33aaee237a25','backchannel.logout.session.required','true'),('b0475217-c11a-49f5-833c-33aaee237a25','client.secret.creation.time','1709175211'),('b0475217-c11a-49f5-833c-33aaee237a25','client_credentials.use_refresh_token','false'),('b0475217-c11a-49f5-833c-33aaee237a25','display.on.consent.screen','false'),('b0475217-c11a-49f5-833c-33aaee237a25','exclude.session.state.from.auth.response','false'),('b0475217-c11a-49f5-833c-33aaee237a25','id.token.as.detached.signature','false'),('b0475217-c11a-49f5-833c-33aaee237a25','oauth2.device.authorization.grant.enabled','false'),('b0475217-c11a-49f5-833c-33aaee237a25','oidc.ciba.grant.enabled','false'),('b0475217-c11a-49f5-833c-33aaee237a25','post.logout.redirect.uris','/*'),('b0475217-c11a-49f5-833c-33aaee237a25','require.pushed.authorization.requests','false'),('b0475217-c11a-49f5-833c-33aaee237a25','saml.artifact.binding','false'),('b0475217-c11a-49f5-833c-33aaee237a25','saml.assertion.signature','false'),('b0475217-c11a-49f5-833c-33aaee237a25','saml.authnstatement','false'),('b0475217-c11a-49f5-833c-33aaee237a25','saml.client.signature','false'),('b0475217-c11a-49f5-833c-33aaee237a25','saml.encrypt','false'),('b0475217-c11a-49f5-833c-33aaee237a25','saml.force.post.binding','false'),('b0475217-c11a-49f5-833c-33aaee237a25','saml.multivalued.roles','false'),('b0475217-c11a-49f5-833c-33aaee237a25','saml.onetimeuse.condition','false'),('b0475217-c11a-49f5-833c-33aaee237a25','saml.server.signature','false'),('b0475217-c11a-49f5-833c-33aaee237a25','saml.server.signature.keyinfo.ext','false'),('b0475217-c11a-49f5-833c-33aaee237a25','saml_force_name_id_format','false'),('b0475217-c11a-49f5-833c-33aaee237a25','tls.client.certificate.bound.access.tokens','false'),('b0475217-c11a-49f5-833c-33aaee237a25','use.refresh.tokens','true'),('b1088032-b0ab-4e61-9fd4-f58c3c6fe396','access.token.lifespan','86400'),('b1088032-b0ab-4e61-9fd4-f58c3c6fe396','acr.loa.map','{}'),('b1088032-b0ab-4e61-9fd4-f58c3c6fe396','backchannel.logout.revoke.offline.tokens','false'),('b1088032-b0ab-4e61-9fd4-f58c3c6fe396','backchannel.logout.session.required','true'),('b1088032-b0ab-4e61-9fd4-f58c3c6fe396','client.secret.creation.time','1709175233'),('b1088032-b0ab-4e61-9fd4-f58c3c6fe396','client.session.idle.timeout','86400'),('b1088032-b0ab-4e61-9fd4-f58c3c6fe396','client.session.max.lifespan','86400'),('b1088032-b0ab-4e61-9fd4-f58c3c6fe396','client_credentials.use_refresh_token','false'),('b1088032-b0ab-4e61-9fd4-f58c3c6fe396','display.on.consent.screen','false'),('b1088032-b0ab-4e61-9fd4-f58c3c6fe396','exclude.session.state.from.auth.response','false'),('b1088032-b0ab-4e61-9fd4-f58c3c6fe396','frontchannel.logout.session.required','false'),('b1088032-b0ab-4e61-9fd4-f58c3c6fe396','id.token.as.detached.signature','false'),('b1088032-b0ab-4e61-9fd4-f58c3c6fe396','oauth2.device.authorization.grant.enabled','false'),('b1088032-b0ab-4e61-9fd4-f58c3c6fe396','oidc.ciba.grant.enabled','false'),('b1088032-b0ab-4e61-9fd4-f58c3c6fe396','require.pushed.authorization.requests','false'),('b1088032-b0ab-4e61-9fd4-f58c3c6fe396','saml.allow.ecp.flow','false'),('b1088032-b0ab-4e61-9fd4-f58c3c6fe396','saml.artifact.binding','false'),('b1088032-b0ab-4e61-9fd4-f58c3c6fe396','saml.assertion.signature','false'),('b1088032-b0ab-4e61-9fd4-f58c3c6fe396','saml.authnstatement','false'),('b1088032-b0ab-4e61-9fd4-f58c3c6fe396','saml.client.signature','false'),('b1088032-b0ab-4e61-9fd4-f58c3c6fe396','saml.encrypt','false'),('b1088032-b0ab-4e61-9fd4-f58c3c6fe396','saml.force.post.binding','false'),('b1088032-b0ab-4e61-9fd4-f58c3c6fe396','saml.multivalued.roles','false'),('b1088032-b0ab-4e61-9fd4-f58c3c6fe396','saml.onetimeuse.condition','false'),('b1088032-b0ab-4e61-9fd4-f58c3c6fe396','saml.server.signature','false'),('b1088032-b0ab-4e61-9fd4-f58c3c6fe396','saml.server.signature.keyinfo.ext','false'),('b1088032-b0ab-4e61-9fd4-f58c3c6fe396','saml_force_name_id_format','false'),('b1088032-b0ab-4e61-9fd4-f58c3c6fe396','tls.client.certificate.bound.access.tokens','false'),('b1088032-b0ab-4e61-9fd4-f58c3c6fe396','token.response.type.bearer.lower-case','false'),('b1088032-b0ab-4e61-9fd4-f58c3c6fe396','use.refresh.tokens','true'),('bf0a8c22-455e-4840-9240-f2a7d5b415f7','pkce.code.challenge.method','S256'),('bf0a8c22-455e-4840-9240-f2a7d5b415f7','post.logout.redirect.uris','+'),('c28dd0b0-60ed-40df-91db-0d9b1e14074b','backchannel.logout.revoke.offline.tokens','false'),('c28dd0b0-60ed-40df-91db-0d9b1e14074b','backchannel.logout.session.required','true'),('c28dd0b0-60ed-40df-91db-0d9b1e14074b','client.secret.creation.time','1709175210'),('c28dd0b0-60ed-40df-91db-0d9b1e14074b','client_credentials.use_refresh_token','false'),('c28dd0b0-60ed-40df-91db-0d9b1e14074b','display.on.consent.screen','false'),('c28dd0b0-60ed-40df-91db-0d9b1e14074b','exclude.session.state.from.auth.response','false'),('c28dd0b0-60ed-40df-91db-0d9b1e14074b','id.token.as.detached.signature','false'),('c28dd0b0-60ed-40df-91db-0d9b1e14074b','oauth2.device.authorization.grant.enabled','false'),('c28dd0b0-60ed-40df-91db-0d9b1e14074b','oidc.ciba.grant.enabled','false'),('c28dd0b0-60ed-40df-91db-0d9b1e14074b','require.pushed.authorization.requests','false'),('c28dd0b0-60ed-40df-91db-0d9b1e14074b','saml.artifact.binding','false'),('c28dd0b0-60ed-40df-91db-0d9b1e14074b','saml.assertion.signature','false'),('c28dd0b0-60ed-40df-91db-0d9b1e14074b','saml.authnstatement','false'),('c28dd0b0-60ed-40df-91db-0d9b1e14074b','saml.client.signature','false'),('c28dd0b0-60ed-40df-91db-0d9b1e14074b','saml.encrypt','false'),('c28dd0b0-60ed-40df-91db-0d9b1e14074b','saml.force.post.binding','false'),('c28dd0b0-60ed-40df-91db-0d9b1e14074b','saml.multivalued.roles','false'),('c28dd0b0-60ed-40df-91db-0d9b1e14074b','saml.onetimeuse.condition','false'),('c28dd0b0-60ed-40df-91db-0d9b1e14074b','saml.server.signature','false'),('c28dd0b0-60ed-40df-91db-0d9b1e14074b','saml.server.signature.keyinfo.ext','false'),('c28dd0b0-60ed-40df-91db-0d9b1e14074b','saml_force_name_id_format','false'),('c28dd0b0-60ed-40df-91db-0d9b1e14074b','tls.client.certificate.bound.access.tokens','false'),('c28dd0b0-60ed-40df-91db-0d9b1e14074b','use.refresh.tokens','true'),('c948de3b-8380-4528-a5b7-de403c58d40f','post.logout.redirect.uris','+'),('d0aaa350-6ca7-4545-a008-583d46596744','backchannel.logout.revoke.offline.tokens','false'),('d0aaa350-6ca7-4545-a008-583d46596744','backchannel.logout.session.required','true'),('d0aaa350-6ca7-4545-a008-583d46596744','client.secret.creation.time','1709175194'),('d0aaa350-6ca7-4545-a008-583d46596744','client_credentials.use_refresh_token','false'),('d0aaa350-6ca7-4545-a008-583d46596744','display.on.consent.screen','false'),('d0aaa350-6ca7-4545-a008-583d46596744','exclude.session.state.from.auth.response','false'),('d0aaa350-6ca7-4545-a008-583d46596744','id.token.as.detached.signature','false'),('d0aaa350-6ca7-4545-a008-583d46596744','oauth2.device.authorization.grant.enabled','false'),('d0aaa350-6ca7-4545-a008-583d46596744','oidc.ciba.grant.enabled','false'),('d0aaa350-6ca7-4545-a008-583d46596744','require.pushed.authorization.requests','false'),('d0aaa350-6ca7-4545-a008-583d46596744','saml.artifact.binding','false'),('d0aaa350-6ca7-4545-a008-583d46596744','saml.assertion.signature','false'),('d0aaa350-6ca7-4545-a008-583d46596744','saml.authnstatement','false'),('d0aaa350-6ca7-4545-a008-583d46596744','saml.client.signature','false'),('d0aaa350-6ca7-4545-a008-583d46596744','saml.encrypt','false'),('d0aaa350-6ca7-4545-a008-583d46596744','saml.force.post.binding','false'),('d0aaa350-6ca7-4545-a008-583d46596744','saml.multivalued.roles','false'),('d0aaa350-6ca7-4545-a008-583d46596744','saml.onetimeuse.condition','false'),('d0aaa350-6ca7-4545-a008-583d46596744','saml.server.signature','false'),('d0aaa350-6ca7-4545-a008-583d46596744','saml.server.signature.keyinfo.ext','false'),('d0aaa350-6ca7-4545-a008-583d46596744','saml_force_name_id_format','false'),('d0aaa350-6ca7-4545-a008-583d46596744','tls.client.certificate.bound.access.tokens','false'),('d0aaa350-6ca7-4545-a008-583d46596744','use.refresh.tokens','true'),('d321d481-bc24-4294-af2c-7907fd6529b0','backchannel.logout.revoke.offline.tokens','false'),('d321d481-bc24-4294-af2c-7907fd6529b0','backchannel.logout.session.required','true'),('d321d481-bc24-4294-af2c-7907fd6529b0','client.secret.creation.time','1709175164'),('d321d481-bc24-4294-af2c-7907fd6529b0','client_credentials.use_refresh_token','false'),('d321d481-bc24-4294-af2c-7907fd6529b0','display.on.consent.screen','false'),('d321d481-bc24-4294-af2c-7907fd6529b0','exclude.session.state.from.auth.response','false'),('d321d481-bc24-4294-af2c-7907fd6529b0','id.token.as.detached.signature','false'),('d321d481-bc24-4294-af2c-7907fd6529b0','oauth2.device.authorization.grant.enabled','false'),('d321d481-bc24-4294-af2c-7907fd6529b0','oidc.ciba.grant.enabled','false'),('d321d481-bc24-4294-af2c-7907fd6529b0','require.pushed.authorization.requests','false'),('d321d481-bc24-4294-af2c-7907fd6529b0','saml.artifact.binding','false'),('d321d481-bc24-4294-af2c-7907fd6529b0','saml.assertion.signature','false'),('d321d481-bc24-4294-af2c-7907fd6529b0','saml.authnstatement','false'),('d321d481-bc24-4294-af2c-7907fd6529b0','saml.client.signature','false'),('d321d481-bc24-4294-af2c-7907fd6529b0','saml.encrypt','false'),('d321d481-bc24-4294-af2c-7907fd6529b0','saml.force.post.binding','false'),('d321d481-bc24-4294-af2c-7907fd6529b0','saml.multivalued.roles','false'),('d321d481-bc24-4294-af2c-7907fd6529b0','saml.onetimeuse.condition','false'),('d321d481-bc24-4294-af2c-7907fd6529b0','saml.server.signature','false'),('d321d481-bc24-4294-af2c-7907fd6529b0','saml.server.signature.keyinfo.ext','false'),('d321d481-bc24-4294-af2c-7907fd6529b0','saml_force_name_id_format','false'),('d321d481-bc24-4294-af2c-7907fd6529b0','tls.client.certificate.bound.access.tokens','false'),('d321d481-bc24-4294-af2c-7907fd6529b0','use.refresh.tokens','true'),('e7ce9cbf-460c-4fb6-9da2-484548018706','pkce.code.challenge.method','S256'),('e7ce9cbf-460c-4fb6-9da2-484548018706','post.logout.redirect.uris','+'),('fc9017e3-d5da-44aa-8c39-f16017ad8608','pkce.code.challenge.method','S256'),('fc9017e3-d5da-44aa-8c39-f16017ad8608','post.logout.redirect.uris','+');
+/*!40000 ALTER TABLE `CLIENT_ATTRIBUTES` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `CLIENT_AUTH_FLOW_BINDINGS`
+--
+
+DROP TABLE IF EXISTS `CLIENT_AUTH_FLOW_BINDINGS`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `CLIENT_AUTH_FLOW_BINDINGS` (
+  `CLIENT_ID` varchar(36) NOT NULL,
+  `FLOW_ID` varchar(36) DEFAULT NULL,
+  `BINDING_NAME` varchar(255) NOT NULL,
+  PRIMARY KEY (`CLIENT_ID`,`BINDING_NAME`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `CLIENT_AUTH_FLOW_BINDINGS`
+--
+
+LOCK TABLES `CLIENT_AUTH_FLOW_BINDINGS` WRITE;
+/*!40000 ALTER TABLE `CLIENT_AUTH_FLOW_BINDINGS` DISABLE KEYS */;
+/*!40000 ALTER TABLE `CLIENT_AUTH_FLOW_BINDINGS` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `CLIENT_INITIAL_ACCESS`
+--
+
+DROP TABLE IF EXISTS `CLIENT_INITIAL_ACCESS`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `CLIENT_INITIAL_ACCESS` (
+  `ID` varchar(36) NOT NULL,
+  `REALM_ID` varchar(36) NOT NULL,
+  `TIMESTAMP` int DEFAULT NULL,
+  `EXPIRATION` int DEFAULT NULL,
+  `COUNT` int DEFAULT NULL,
+  `REMAINING_COUNT` int DEFAULT NULL,
+  PRIMARY KEY (`ID`),
+  KEY `IDX_CLIENT_INIT_ACC_REALM` (`REALM_ID`),
+  CONSTRAINT `FK_CLIENT_INIT_ACC_REALM` FOREIGN KEY (`REALM_ID`) REFERENCES `REALM` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `CLIENT_INITIAL_ACCESS`
+--
+
+LOCK TABLES `CLIENT_INITIAL_ACCESS` WRITE;
+/*!40000 ALTER TABLE `CLIENT_INITIAL_ACCESS` DISABLE KEYS */;
+/*!40000 ALTER TABLE `CLIENT_INITIAL_ACCESS` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `CLIENT_NODE_REGISTRATIONS`
+--
+
+DROP TABLE IF EXISTS `CLIENT_NODE_REGISTRATIONS`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `CLIENT_NODE_REGISTRATIONS` (
+  `CLIENT_ID` varchar(36) NOT NULL,
+  `VALUE` int DEFAULT NULL,
+  `NAME` varchar(255) NOT NULL,
+  PRIMARY KEY (`CLIENT_ID`,`NAME`),
+  CONSTRAINT `FK4129723BA992F594` FOREIGN KEY (`CLIENT_ID`) REFERENCES `CLIENT` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `CLIENT_NODE_REGISTRATIONS`
+--
+
+LOCK TABLES `CLIENT_NODE_REGISTRATIONS` WRITE;
+/*!40000 ALTER TABLE `CLIENT_NODE_REGISTRATIONS` DISABLE KEYS */;
+/*!40000 ALTER TABLE `CLIENT_NODE_REGISTRATIONS` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `CLIENT_SCOPE`
+--
+
+DROP TABLE IF EXISTS `CLIENT_SCOPE`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `CLIENT_SCOPE` (
+  `ID` varchar(36) NOT NULL,
+  `NAME` varchar(255) DEFAULT NULL,
+  `REALM_ID` varchar(36) DEFAULT NULL,
+  `DESCRIPTION` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
+  `PROTOCOL` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`ID`),
+  UNIQUE KEY `UK_CLI_SCOPE` (`REALM_ID`,`NAME`),
+  KEY `IDX_REALM_CLSCOPE` (`REALM_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `CLIENT_SCOPE`
+--
+
+LOCK TABLES `CLIENT_SCOPE` WRITE;
+/*!40000 ALTER TABLE `CLIENT_SCOPE` DISABLE KEYS */;
+INSERT INTO `CLIENT_SCOPE` VALUES ('09814274-c074-43d4-90e9-b955a86ac5ab','web-origins','org4','OpenID Connect scope for add allowed web origins to the access token','openid-connect'),('1bca493a-f048-4583-8a05-06e5b2bbceeb','microprofile-jwt','dabc51bf-58ea-42ed-9918-4114e6b08338','Microprofile - JWT built-in scope','openid-connect'),('2b1287b6-579c-4ca8-8c67-3ae43797f83f','acr','org4','OpenID Connect scope for add acr (authentication context class reference) to the token','openid-connect'),('2c6483d7-a7af-450e-bef4-ffe5af5b1261','role_list','org4','SAML role list','saml'),('32a6adf1-5209-4cc8-9f4f-97daf67777e4','roles','org1','OpenID Connect scope for add user roles to the access token','openid-connect'),('36122d22-c5bc-471c-8694-ed913ee1de6f','acr','dabc51bf-58ea-42ed-9918-4114e6b08338','OpenID Connect scope for add acr (authentication context class reference) to the token','openid-connect'),('3f20050b-2690-4eae-932e-55d4033bcb9c','profile','dabc51bf-58ea-42ed-9918-4114e6b08338','OpenID Connect built-in scope: profile','openid-connect'),('444fc554-8739-4d2d-a0d7-8f71b8a1d129','offline_access','org2','OpenID Connect built-in scope: offline_access','openid-connect'),('46883c24-c9d6-40a4-a7ec-86086d6c9892','roles','org4','OpenID Connect scope for add user roles to the access token','openid-connect'),('4b9a4275-ee4b-4dc9-a8a2-0428fb232c38','phone','org3','OpenID Connect built-in scope: phone','openid-connect'),('4da313aa-06ea-4fda-b4b5-80d2cd5a2a16','profile','org5','OpenID Connect built-in scope: profile','openid-connect'),('522294da-4699-4dbc-ab7a-fcf6f50af4e1','role_list','org1','SAML role list','saml'),('55ae0da8-23c0-4796-b3bb-a002ea377870','microprofile-jwt','org5','Microprofile - JWT built-in scope','openid-connect'),('5ef9bc49-df97-44f6-bdaa-a40377368a1a','email','org5','OpenID Connect built-in scope: email','openid-connect'),('6209cbb9-9404-457c-9e29-68444a8347b8','microprofile-jwt','org3','Microprofile - JWT built-in scope','openid-connect'),('625f2210-714e-4d31-9f58-9a6d9d4aa95b','web-origins','org2','OpenID Connect scope for add allowed web origins to the access token','openid-connect'),('628834b0-f4ce-431e-ad1a-7b1aa02bb389','address','dabc51bf-58ea-42ed-9918-4114e6b08338','OpenID Connect built-in scope: address','openid-connect'),('63882871-ca1f-485c-8c37-7a4bb0ec13b4','phone','org1','OpenID Connect built-in scope: phone','openid-connect'),('66dbbe7a-d6b9-4d1d-b437-f8f7a8da44da','address','org2','OpenID Connect built-in scope: address','openid-connect'),('6fb6e60c-85bc-4695-8127-a571e81a2fd7','microprofile-jwt','org2','Microprofile - JWT built-in scope','openid-connect'),('7011312f-7085-4e66-af22-d73fd8d54724','acr','org2','OpenID Connect scope for add acr (authentication context class reference) to the token','openid-connect'),('70815eec-a377-4975-8ff7-4ddd86da41d0','role_list','org2','SAML role list','saml'),('7414b4b7-8306-4c6c-86b0-cc0a4a1f3752','acr','org1','OpenID Connect scope for add acr (authentication context class reference) to the token','openid-connect'),('7685469d-bb7f-48d5-abf1-01c16ca11f2f','offline_access','org3','OpenID Connect built-in scope: offline_access','openid-connect'),('77983d6e-5896-40fc-8486-923344dba90c','offline_access','org5','OpenID Connect built-in scope: offline_access','openid-connect'),('786caaa4-7b36-474b-acff-b4cab4358208','email','org1','OpenID Connect built-in scope: email','openid-connect'),('79c357f1-a15a-404a-80fb-b3aacc5a3097','address','org3','OpenID Connect built-in scope: address','openid-connect'),('7d63cd15-fc63-4eb0-a2b6-c894ed8cda92','phone','org5','OpenID Connect built-in scope: phone','openid-connect'),('816096c9-b105-455b-805d-d887b0cdf314','web-origins','org5','OpenID Connect scope for add allowed web origins to the access token','openid-connect'),('816bef08-a6f0-4074-8879-01a7d67d4918','phone','org2','OpenID Connect built-in scope: phone','openid-connect'),('882ca1f6-cc4e-45fb-8c37-b28c9b367e20','profile','org4','OpenID Connect built-in scope: profile','openid-connect'),('88704bf7-69f8-4c11-9fce-96cf17f0fd85','microprofile-jwt','org4','Microprofile - JWT built-in scope','openid-connect'),('8c9e794f-e41a-44d1-91b0-dcf521d7a60f','offline_access','org4','OpenID Connect built-in scope: offline_access','openid-connect'),('8ca87019-4bfe-43c7-b100-5adf8fd6fbbb','roles','org3','OpenID Connect scope for add user roles to the access token','openid-connect'),('95893421-3e01-41ad-8d75-255e7e81e4d0','email','org3','OpenID Connect built-in scope: email','openid-connect'),('9d2ff12d-6798-416a-a938-998b1ea40a7c','roles','dabc51bf-58ea-42ed-9918-4114e6b08338','OpenID Connect scope for add user roles to the access token','openid-connect'),('9d97a7e6-f4e0-42f8-b906-a8f674d5336d','address','org4','OpenID Connect built-in scope: address','openid-connect'),('a27b05ba-3058-4404-8d07-becd0a92634a','email','org2','OpenID Connect built-in scope: email','openid-connect'),('a6d9ee28-55ef-4da3-b5da-03dab12522ce','web-origins','org1','OpenID Connect scope for add allowed web origins to the access token','openid-connect'),('a7cc0573-78dd-492f-a8d7-a66a9cd285de','email','org4','OpenID Connect built-in scope: email','openid-connect'),('aa710d34-15aa-41e8-bea7-78d5269af573','roles','org2','OpenID Connect scope for add user roles to the access token','openid-connect'),('aaed6bc3-06fe-41bc-a2ce-17e0d69e9408','role_list','org5','SAML role list','saml'),('bc3d6466-832d-4c2a-8e64-b25af286304e','email','dabc51bf-58ea-42ed-9918-4114e6b08338','OpenID Connect built-in scope: email','openid-connect'),('c1960172-937d-4322-bc36-60cb8d62e029','offline_access','dabc51bf-58ea-42ed-9918-4114e6b08338','OpenID Connect built-in scope: offline_access','openid-connect'),('c5171254-a8d1-4564-ac47-ef6890f0338f','offline_access','org1','OpenID Connect built-in scope: offline_access','openid-connect'),('c63b2066-2601-46ba-be46-4865a2af9fb1','web-origins','org3','OpenID Connect scope for add allowed web origins to the access token','openid-connect'),('c7c12f84-00fc-4191-91f4-d9d53cfb760d','phone','dabc51bf-58ea-42ed-9918-4114e6b08338','OpenID Connect built-in scope: phone','openid-connect'),('ca8d577e-fc8e-4fab-bbd4-332b169fe26d','address','org1','OpenID Connect built-in scope: address','openid-connect'),('d347d989-0abc-4a13-8c14-c1ddb3264c27','acr','org3','OpenID Connect scope for add acr (authentication context class reference) to the token','openid-connect'),('d4a4f8f3-865c-47a2-b5ef-21b4ef2bc4bb','profile','org1','OpenID Connect built-in scope: profile','openid-connect'),('d906096a-7031-4608-ab7a-e1046aa24ebc','acr','org5','OpenID Connect scope for add acr (authentication context class reference) to the token','openid-connect'),('dc07de30-6518-4c49-b74c-7948f482a583','roles','org5','OpenID Connect scope for add user roles to the access token','openid-connect'),('dd7e350c-b03e-4743-b081-d6c9e860662e','address','org5','OpenID Connect built-in scope: address','openid-connect'),('dedb10ee-98c5-4f06-a7e7-ca5a600e5077','microprofile-jwt','org1','Microprofile - JWT built-in scope','openid-connect'),('e013d9cc-5fca-4f57-9ff2-c5e6ad5cc825','role_list','org3','SAML role list','saml'),('e5edd8d0-323b-4ba8-b943-aeb19c7a514e','web-origins','dabc51bf-58ea-42ed-9918-4114e6b08338','OpenID Connect scope for add allowed web origins to the access token','openid-connect'),('e85ee535-40c7-463f-8a90-38f83987975c','role_list','dabc51bf-58ea-42ed-9918-4114e6b08338','SAML role list','saml'),('eea99c04-72d0-4364-a9f9-22afc631ee33','profile','org2','OpenID Connect built-in scope: profile','openid-connect'),('f14553d0-1ded-4935-a6ee-f84bf8265ec5','profile','org3','OpenID Connect built-in scope: profile','openid-connect'),('f74057ad-184b-4f01-8947-fdd12da4a0fd','phone','org4','OpenID Connect built-in scope: phone','openid-connect');
+/*!40000 ALTER TABLE `CLIENT_SCOPE` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `CLIENT_SCOPE_ATTRIBUTES`
+--
+
+DROP TABLE IF EXISTS `CLIENT_SCOPE_ATTRIBUTES`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `CLIENT_SCOPE_ATTRIBUTES` (
+  `SCOPE_ID` varchar(36) NOT NULL,
+  `VALUE` text,
+  `NAME` varchar(255) NOT NULL,
+  PRIMARY KEY (`SCOPE_ID`,`NAME`),
+  KEY `IDX_CLSCOPE_ATTRS` (`SCOPE_ID`),
+  CONSTRAINT `FK_CL_SCOPE_ATTR_SCOPE` FOREIGN KEY (`SCOPE_ID`) REFERENCES `CLIENT_SCOPE` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `CLIENT_SCOPE_ATTRIBUTES`
+--
+
+LOCK TABLES `CLIENT_SCOPE_ATTRIBUTES` WRITE;
+/*!40000 ALTER TABLE `CLIENT_SCOPE_ATTRIBUTES` DISABLE KEYS */;
+INSERT INTO `CLIENT_SCOPE_ATTRIBUTES` VALUES ('09814274-c074-43d4-90e9-b955a86ac5ab','','consent.screen.text'),('09814274-c074-43d4-90e9-b955a86ac5ab','false','display.on.consent.screen'),('09814274-c074-43d4-90e9-b955a86ac5ab','false','include.in.token.scope'),('1bca493a-f048-4583-8a05-06e5b2bbceeb','false','display.on.consent.screen'),('1bca493a-f048-4583-8a05-06e5b2bbceeb','true','include.in.token.scope'),('2b1287b6-579c-4ca8-8c67-3ae43797f83f','false','display.on.consent.screen'),('2b1287b6-579c-4ca8-8c67-3ae43797f83f','false','include.in.token.scope'),('2c6483d7-a7af-450e-bef4-ffe5af5b1261','${samlRoleListScopeConsentText}','consent.screen.text'),('2c6483d7-a7af-450e-bef4-ffe5af5b1261','true','display.on.consent.screen'),('32a6adf1-5209-4cc8-9f4f-97daf67777e4','${rolesScopeConsentText}','consent.screen.text'),('32a6adf1-5209-4cc8-9f4f-97daf67777e4','true','display.on.consent.screen'),('32a6adf1-5209-4cc8-9f4f-97daf67777e4','false','include.in.token.scope'),('36122d22-c5bc-471c-8694-ed913ee1de6f','false','display.on.consent.screen'),('36122d22-c5bc-471c-8694-ed913ee1de6f','false','include.in.token.scope'),('3f20050b-2690-4eae-932e-55d4033bcb9c','${profileScopeConsentText}','consent.screen.text'),('3f20050b-2690-4eae-932e-55d4033bcb9c','true','display.on.consent.screen'),('3f20050b-2690-4eae-932e-55d4033bcb9c','true','include.in.token.scope'),('444fc554-8739-4d2d-a0d7-8f71b8a1d129','${offlineAccessScopeConsentText}','consent.screen.text'),('444fc554-8739-4d2d-a0d7-8f71b8a1d129','true','display.on.consent.screen'),('46883c24-c9d6-40a4-a7ec-86086d6c9892','${rolesScopeConsentText}','consent.screen.text'),('46883c24-c9d6-40a4-a7ec-86086d6c9892','true','display.on.consent.screen'),('46883c24-c9d6-40a4-a7ec-86086d6c9892','false','include.in.token.scope'),('4b9a4275-ee4b-4dc9-a8a2-0428fb232c38','${phoneScopeConsentText}','consent.screen.text'),('4b9a4275-ee4b-4dc9-a8a2-0428fb232c38','true','display.on.consent.screen'),('4b9a4275-ee4b-4dc9-a8a2-0428fb232c38','true','include.in.token.scope'),('4da313aa-06ea-4fda-b4b5-80d2cd5a2a16','${profileScopeConsentText}','consent.screen.text'),('4da313aa-06ea-4fda-b4b5-80d2cd5a2a16','true','display.on.consent.screen'),('4da313aa-06ea-4fda-b4b5-80d2cd5a2a16','true','include.in.token.scope'),('522294da-4699-4dbc-ab7a-fcf6f50af4e1','${samlRoleListScopeConsentText}','consent.screen.text'),('522294da-4699-4dbc-ab7a-fcf6f50af4e1','true','display.on.consent.screen'),('55ae0da8-23c0-4796-b3bb-a002ea377870','false','display.on.consent.screen'),('55ae0da8-23c0-4796-b3bb-a002ea377870','true','include.in.token.scope'),('5ef9bc49-df97-44f6-bdaa-a40377368a1a','${emailScopeConsentText}','consent.screen.text'),('5ef9bc49-df97-44f6-bdaa-a40377368a1a','true','display.on.consent.screen'),('5ef9bc49-df97-44f6-bdaa-a40377368a1a','true','include.in.token.scope'),('6209cbb9-9404-457c-9e29-68444a8347b8','false','display.on.consent.screen'),('6209cbb9-9404-457c-9e29-68444a8347b8','true','include.in.token.scope'),('625f2210-714e-4d31-9f58-9a6d9d4aa95b','','consent.screen.text'),('625f2210-714e-4d31-9f58-9a6d9d4aa95b','false','display.on.consent.screen'),('625f2210-714e-4d31-9f58-9a6d9d4aa95b','false','include.in.token.scope'),('628834b0-f4ce-431e-ad1a-7b1aa02bb389','${addressScopeConsentText}','consent.screen.text'),('628834b0-f4ce-431e-ad1a-7b1aa02bb389','true','display.on.consent.screen'),('628834b0-f4ce-431e-ad1a-7b1aa02bb389','true','include.in.token.scope'),('63882871-ca1f-485c-8c37-7a4bb0ec13b4','${phoneScopeConsentText}','consent.screen.text'),('63882871-ca1f-485c-8c37-7a4bb0ec13b4','true','display.on.consent.screen'),('63882871-ca1f-485c-8c37-7a4bb0ec13b4','true','include.in.token.scope'),('66dbbe7a-d6b9-4d1d-b437-f8f7a8da44da','${addressScopeConsentText}','consent.screen.text'),('66dbbe7a-d6b9-4d1d-b437-f8f7a8da44da','true','display.on.consent.screen'),('66dbbe7a-d6b9-4d1d-b437-f8f7a8da44da','true','include.in.token.scope'),('6fb6e60c-85bc-4695-8127-a571e81a2fd7','false','display.on.consent.screen'),('6fb6e60c-85bc-4695-8127-a571e81a2fd7','true','include.in.token.scope'),('7011312f-7085-4e66-af22-d73fd8d54724','false','display.on.consent.screen'),('7011312f-7085-4e66-af22-d73fd8d54724','false','include.in.token.scope'),('70815eec-a377-4975-8ff7-4ddd86da41d0','${samlRoleListScopeConsentText}','consent.screen.text'),('70815eec-a377-4975-8ff7-4ddd86da41d0','true','display.on.consent.screen'),('7414b4b7-8306-4c6c-86b0-cc0a4a1f3752','false','display.on.consent.screen'),('7414b4b7-8306-4c6c-86b0-cc0a4a1f3752','false','include.in.token.scope'),('7685469d-bb7f-48d5-abf1-01c16ca11f2f','${offlineAccessScopeConsentText}','consent.screen.text'),('7685469d-bb7f-48d5-abf1-01c16ca11f2f','true','display.on.consent.screen'),('77983d6e-5896-40fc-8486-923344dba90c','${offlineAccessScopeConsentText}','consent.screen.text'),('77983d6e-5896-40fc-8486-923344dba90c','true','display.on.consent.screen'),('786caaa4-7b36-474b-acff-b4cab4358208','${emailScopeConsentText}','consent.screen.text'),('786caaa4-7b36-474b-acff-b4cab4358208','true','display.on.consent.screen'),('786caaa4-7b36-474b-acff-b4cab4358208','true','include.in.token.scope'),('79c357f1-a15a-404a-80fb-b3aacc5a3097','${addressScopeConsentText}','consent.screen.text'),('79c357f1-a15a-404a-80fb-b3aacc5a3097','true','display.on.consent.screen'),('79c357f1-a15a-404a-80fb-b3aacc5a3097','true','include.in.token.scope'),('7d63cd15-fc63-4eb0-a2b6-c894ed8cda92','${phoneScopeConsentText}','consent.screen.text'),('7d63cd15-fc63-4eb0-a2b6-c894ed8cda92','true','display.on.consent.screen'),('7d63cd15-fc63-4eb0-a2b6-c894ed8cda92','true','include.in.token.scope'),('816096c9-b105-455b-805d-d887b0cdf314','','consent.screen.text'),('816096c9-b105-455b-805d-d887b0cdf314','false','display.on.consent.screen'),('816096c9-b105-455b-805d-d887b0cdf314','false','include.in.token.scope'),('816bef08-a6f0-4074-8879-01a7d67d4918','${phoneScopeConsentText}','consent.screen.text'),('816bef08-a6f0-4074-8879-01a7d67d4918','true','display.on.consent.screen'),('816bef08-a6f0-4074-8879-01a7d67d4918','true','include.in.token.scope'),('882ca1f6-cc4e-45fb-8c37-b28c9b367e20','${profileScopeConsentText}','consent.screen.text'),('882ca1f6-cc4e-45fb-8c37-b28c9b367e20','true','display.on.consent.screen'),('882ca1f6-cc4e-45fb-8c37-b28c9b367e20','true','include.in.token.scope'),('88704bf7-69f8-4c11-9fce-96cf17f0fd85','false','display.on.consent.screen'),('88704bf7-69f8-4c11-9fce-96cf17f0fd85','true','include.in.token.scope'),('8c9e794f-e41a-44d1-91b0-dcf521d7a60f','${offlineAccessScopeConsentText}','consent.screen.text'),('8c9e794f-e41a-44d1-91b0-dcf521d7a60f','true','display.on.consent.screen'),('8ca87019-4bfe-43c7-b100-5adf8fd6fbbb','${rolesScopeConsentText}','consent.screen.text'),('8ca87019-4bfe-43c7-b100-5adf8fd6fbbb','true','display.on.consent.screen'),('8ca87019-4bfe-43c7-b100-5adf8fd6fbbb','false','include.in.token.scope'),('95893421-3e01-41ad-8d75-255e7e81e4d0','${emailScopeConsentText}','consent.screen.text'),('95893421-3e01-41ad-8d75-255e7e81e4d0','true','display.on.consent.screen'),('95893421-3e01-41ad-8d75-255e7e81e4d0','true','include.in.token.scope'),('9d2ff12d-6798-416a-a938-998b1ea40a7c','${rolesScopeConsentText}','consent.screen.text'),('9d2ff12d-6798-416a-a938-998b1ea40a7c','true','display.on.consent.screen'),('9d2ff12d-6798-416a-a938-998b1ea40a7c','false','include.in.token.scope'),('9d97a7e6-f4e0-42f8-b906-a8f674d5336d','${addressScopeConsentText}','consent.screen.text'),('9d97a7e6-f4e0-42f8-b906-a8f674d5336d','true','display.on.consent.screen'),('9d97a7e6-f4e0-42f8-b906-a8f674d5336d','true','include.in.token.scope'),('a27b05ba-3058-4404-8d07-becd0a92634a','${emailScopeConsentText}','consent.screen.text'),('a27b05ba-3058-4404-8d07-becd0a92634a','true','display.on.consent.screen'),('a27b05ba-3058-4404-8d07-becd0a92634a','true','include.in.token.scope'),('a6d9ee28-55ef-4da3-b5da-03dab12522ce','','consent.screen.text'),('a6d9ee28-55ef-4da3-b5da-03dab12522ce','false','display.on.consent.screen'),('a6d9ee28-55ef-4da3-b5da-03dab12522ce','false','include.in.token.scope'),('a7cc0573-78dd-492f-a8d7-a66a9cd285de','${emailScopeConsentText}','consent.screen.text'),('a7cc0573-78dd-492f-a8d7-a66a9cd285de','true','display.on.consent.screen'),('a7cc0573-78dd-492f-a8d7-a66a9cd285de','true','include.in.token.scope'),('aa710d34-15aa-41e8-bea7-78d5269af573','${rolesScopeConsentText}','consent.screen.text'),('aa710d34-15aa-41e8-bea7-78d5269af573','true','display.on.consent.screen'),('aa710d34-15aa-41e8-bea7-78d5269af573','false','include.in.token.scope'),('aaed6bc3-06fe-41bc-a2ce-17e0d69e9408','${samlRoleListScopeConsentText}','consent.screen.text'),('aaed6bc3-06fe-41bc-a2ce-17e0d69e9408','true','display.on.consent.screen'),('bc3d6466-832d-4c2a-8e64-b25af286304e','${emailScopeConsentText}','consent.screen.text'),('bc3d6466-832d-4c2a-8e64-b25af286304e','true','display.on.consent.screen'),('bc3d6466-832d-4c2a-8e64-b25af286304e','true','include.in.token.scope'),('c1960172-937d-4322-bc36-60cb8d62e029','${offlineAccessScopeConsentText}','consent.screen.text'),('c1960172-937d-4322-bc36-60cb8d62e029','true','display.on.consent.screen'),('c5171254-a8d1-4564-ac47-ef6890f0338f','${offlineAccessScopeConsentText}','consent.screen.text'),('c5171254-a8d1-4564-ac47-ef6890f0338f','true','display.on.consent.screen'),('c63b2066-2601-46ba-be46-4865a2af9fb1','','consent.screen.text'),('c63b2066-2601-46ba-be46-4865a2af9fb1','false','display.on.consent.screen'),('c63b2066-2601-46ba-be46-4865a2af9fb1','false','include.in.token.scope'),('c7c12f84-00fc-4191-91f4-d9d53cfb760d','${phoneScopeConsentText}','consent.screen.text'),('c7c12f84-00fc-4191-91f4-d9d53cfb760d','true','display.on.consent.screen'),('c7c12f84-00fc-4191-91f4-d9d53cfb760d','true','include.in.token.scope'),('ca8d577e-fc8e-4fab-bbd4-332b169fe26d','${addressScopeConsentText}','consent.screen.text'),('ca8d577e-fc8e-4fab-bbd4-332b169fe26d','true','display.on.consent.screen'),('ca8d577e-fc8e-4fab-bbd4-332b169fe26d','true','include.in.token.scope'),('d347d989-0abc-4a13-8c14-c1ddb3264c27','false','display.on.consent.screen'),('d347d989-0abc-4a13-8c14-c1ddb3264c27','false','include.in.token.scope'),('d4a4f8f3-865c-47a2-b5ef-21b4ef2bc4bb','${profileScopeConsentText}','consent.screen.text'),('d4a4f8f3-865c-47a2-b5ef-21b4ef2bc4bb','true','display.on.consent.screen'),('d4a4f8f3-865c-47a2-b5ef-21b4ef2bc4bb','true','include.in.token.scope'),('d906096a-7031-4608-ab7a-e1046aa24ebc','false','display.on.consent.screen'),('d906096a-7031-4608-ab7a-e1046aa24ebc','false','include.in.token.scope'),('dc07de30-6518-4c49-b74c-7948f482a583','${rolesScopeConsentText}','consent.screen.text'),('dc07de30-6518-4c49-b74c-7948f482a583','true','display.on.consent.screen'),('dc07de30-6518-4c49-b74c-7948f482a583','false','include.in.token.scope'),('dd7e350c-b03e-4743-b081-d6c9e860662e','${addressScopeConsentText}','consent.screen.text'),('dd7e350c-b03e-4743-b081-d6c9e860662e','true','display.on.consent.screen'),('dd7e350c-b03e-4743-b081-d6c9e860662e','true','include.in.token.scope'),('dedb10ee-98c5-4f06-a7e7-ca5a600e5077','false','display.on.consent.screen'),('dedb10ee-98c5-4f06-a7e7-ca5a600e5077','true','include.in.token.scope'),('e013d9cc-5fca-4f57-9ff2-c5e6ad5cc825','${samlRoleListScopeConsentText}','consent.screen.text'),('e013d9cc-5fca-4f57-9ff2-c5e6ad5cc825','true','display.on.consent.screen'),('e5edd8d0-323b-4ba8-b943-aeb19c7a514e','','consent.screen.text'),('e5edd8d0-323b-4ba8-b943-aeb19c7a514e','false','display.on.consent.screen'),('e5edd8d0-323b-4ba8-b943-aeb19c7a514e','false','include.in.token.scope'),('e85ee535-40c7-463f-8a90-38f83987975c','${samlRoleListScopeConsentText}','consent.screen.text'),('e85ee535-40c7-463f-8a90-38f83987975c','true','display.on.consent.screen'),('eea99c04-72d0-4364-a9f9-22afc631ee33','${profileScopeConsentText}','consent.screen.text'),('eea99c04-72d0-4364-a9f9-22afc631ee33','true','display.on.consent.screen'),('eea99c04-72d0-4364-a9f9-22afc631ee33','true','include.in.token.scope'),('f14553d0-1ded-4935-a6ee-f84bf8265ec5','${profileScopeConsentText}','consent.screen.text'),('f14553d0-1ded-4935-a6ee-f84bf8265ec5','true','display.on.consent.screen'),('f14553d0-1ded-4935-a6ee-f84bf8265ec5','true','include.in.token.scope'),('f74057ad-184b-4f01-8947-fdd12da4a0fd','${phoneScopeConsentText}','consent.screen.text'),('f74057ad-184b-4f01-8947-fdd12da4a0fd','true','display.on.consent.screen'),('f74057ad-184b-4f01-8947-fdd12da4a0fd','true','include.in.token.scope');
+/*!40000 ALTER TABLE `CLIENT_SCOPE_ATTRIBUTES` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `CLIENT_SCOPE_CLIENT`
+--
+
+DROP TABLE IF EXISTS `CLIENT_SCOPE_CLIENT`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `CLIENT_SCOPE_CLIENT` (
+  `CLIENT_ID` varchar(255) NOT NULL,
+  `SCOPE_ID` varchar(255) NOT NULL,
+  `DEFAULT_SCOPE` bit(1) NOT NULL DEFAULT b'0',
+  PRIMARY KEY (`CLIENT_ID`,`SCOPE_ID`),
+  KEY `IDX_CLSCOPE_CL` (`CLIENT_ID`),
+  KEY `IDX_CL_CLSCOPE` (`SCOPE_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `CLIENT_SCOPE_CLIENT`
+--
+
+LOCK TABLES `CLIENT_SCOPE_CLIENT` WRITE;
+/*!40000 ALTER TABLE `CLIENT_SCOPE_CLIENT` DISABLE KEYS */;
+INSERT INTO `CLIENT_SCOPE_CLIENT` VALUES ('01f89460-aba4-42ec-8eb3-f3c2d23cfbc2','4da313aa-06ea-4fda-b4b5-80d2cd5a2a16',_binary ''),('01f89460-aba4-42ec-8eb3-f3c2d23cfbc2','55ae0da8-23c0-4796-b3bb-a002ea377870',_binary '\0'),('01f89460-aba4-42ec-8eb3-f3c2d23cfbc2','5ef9bc49-df97-44f6-bdaa-a40377368a1a',_binary ''),('01f89460-aba4-42ec-8eb3-f3c2d23cfbc2','77983d6e-5896-40fc-8486-923344dba90c',_binary '\0'),('01f89460-aba4-42ec-8eb3-f3c2d23cfbc2','7d63cd15-fc63-4eb0-a2b6-c894ed8cda92',_binary '\0'),('01f89460-aba4-42ec-8eb3-f3c2d23cfbc2','816096c9-b105-455b-805d-d887b0cdf314',_binary ''),('01f89460-aba4-42ec-8eb3-f3c2d23cfbc2','dc07de30-6518-4c49-b74c-7948f482a583',_binary ''),('01f89460-aba4-42ec-8eb3-f3c2d23cfbc2','dd7e350c-b03e-4743-b081-d6c9e860662e',_binary '\0'),('0d3bec04-1354-4db0-b7b6-96ee59ad7c4a','4da313aa-06ea-4fda-b4b5-80d2cd5a2a16',_binary ''),('0d3bec04-1354-4db0-b7b6-96ee59ad7c4a','55ae0da8-23c0-4796-b3bb-a002ea377870',_binary '\0'),('0d3bec04-1354-4db0-b7b6-96ee59ad7c4a','5ef9bc49-df97-44f6-bdaa-a40377368a1a',_binary ''),('0d3bec04-1354-4db0-b7b6-96ee59ad7c4a','77983d6e-5896-40fc-8486-923344dba90c',_binary '\0'),('0d3bec04-1354-4db0-b7b6-96ee59ad7c4a','7d63cd15-fc63-4eb0-a2b6-c894ed8cda92',_binary '\0'),('0d3bec04-1354-4db0-b7b6-96ee59ad7c4a','816096c9-b105-455b-805d-d887b0cdf314',_binary ''),('0d3bec04-1354-4db0-b7b6-96ee59ad7c4a','d906096a-7031-4608-ab7a-e1046aa24ebc',_binary ''),('0d3bec04-1354-4db0-b7b6-96ee59ad7c4a','dc07de30-6518-4c49-b74c-7948f482a583',_binary ''),('0d3bec04-1354-4db0-b7b6-96ee59ad7c4a','dd7e350c-b03e-4743-b081-d6c9e860662e',_binary '\0'),('10447023-de56-4fa6-8669-07b054551ad1','4da313aa-06ea-4fda-b4b5-80d2cd5a2a16',_binary ''),('10447023-de56-4fa6-8669-07b054551ad1','55ae0da8-23c0-4796-b3bb-a002ea377870',_binary '\0'),('10447023-de56-4fa6-8669-07b054551ad1','5ef9bc49-df97-44f6-bdaa-a40377368a1a',_binary ''),('10447023-de56-4fa6-8669-07b054551ad1','77983d6e-5896-40fc-8486-923344dba90c',_binary '\0'),('10447023-de56-4fa6-8669-07b054551ad1','7d63cd15-fc63-4eb0-a2b6-c894ed8cda92',_binary '\0'),('10447023-de56-4fa6-8669-07b054551ad1','816096c9-b105-455b-805d-d887b0cdf314',_binary ''),('10447023-de56-4fa6-8669-07b054551ad1','d906096a-7031-4608-ab7a-e1046aa24ebc',_binary ''),('10447023-de56-4fa6-8669-07b054551ad1','dc07de30-6518-4c49-b74c-7948f482a583',_binary ''),('10447023-de56-4fa6-8669-07b054551ad1','dd7e350c-b03e-4743-b081-d6c9e860662e',_binary '\0'),('166138a8-bf2f-4caa-97eb-8cabbe18a8f6','4b9a4275-ee4b-4dc9-a8a2-0428fb232c38',_binary '\0'),('166138a8-bf2f-4caa-97eb-8cabbe18a8f6','6209cbb9-9404-457c-9e29-68444a8347b8',_binary '\0'),('166138a8-bf2f-4caa-97eb-8cabbe18a8f6','7685469d-bb7f-48d5-abf1-01c16ca11f2f',_binary '\0'),('166138a8-bf2f-4caa-97eb-8cabbe18a8f6','79c357f1-a15a-404a-80fb-b3aacc5a3097',_binary '\0'),('166138a8-bf2f-4caa-97eb-8cabbe18a8f6','8ca87019-4bfe-43c7-b100-5adf8fd6fbbb',_binary ''),('166138a8-bf2f-4caa-97eb-8cabbe18a8f6','95893421-3e01-41ad-8d75-255e7e81e4d0',_binary ''),('166138a8-bf2f-4caa-97eb-8cabbe18a8f6','c63b2066-2601-46ba-be46-4865a2af9fb1',_binary ''),('166138a8-bf2f-4caa-97eb-8cabbe18a8f6','d347d989-0abc-4a13-8c14-c1ddb3264c27',_binary ''),('166138a8-bf2f-4caa-97eb-8cabbe18a8f6','f14553d0-1ded-4935-a6ee-f84bf8265ec5',_binary ''),('16fe410e-f1df-4ce0-b445-8dd3b5b80750','32a6adf1-5209-4cc8-9f4f-97daf67777e4',_binary ''),('16fe410e-f1df-4ce0-b445-8dd3b5b80750','63882871-ca1f-485c-8c37-7a4bb0ec13b4',_binary '\0'),('16fe410e-f1df-4ce0-b445-8dd3b5b80750','786caaa4-7b36-474b-acff-b4cab4358208',_binary ''),('16fe410e-f1df-4ce0-b445-8dd3b5b80750','a6d9ee28-55ef-4da3-b5da-03dab12522ce',_binary ''),('16fe410e-f1df-4ce0-b445-8dd3b5b80750','c5171254-a8d1-4564-ac47-ef6890f0338f',_binary '\0'),('16fe410e-f1df-4ce0-b445-8dd3b5b80750','ca8d577e-fc8e-4fab-bbd4-332b169fe26d',_binary '\0'),('16fe410e-f1df-4ce0-b445-8dd3b5b80750','d4a4f8f3-865c-47a2-b5ef-21b4ef2bc4bb',_binary ''),('16fe410e-f1df-4ce0-b445-8dd3b5b80750','dedb10ee-98c5-4f06-a7e7-ca5a600e5077',_binary '\0'),('1b5f5d7e-5c2b-4687-8450-d38949728f18','32a6adf1-5209-4cc8-9f4f-97daf67777e4',_binary ''),('1b5f5d7e-5c2b-4687-8450-d38949728f18','63882871-ca1f-485c-8c37-7a4bb0ec13b4',_binary '\0'),('1b5f5d7e-5c2b-4687-8450-d38949728f18','7414b4b7-8306-4c6c-86b0-cc0a4a1f3752',_binary ''),('1b5f5d7e-5c2b-4687-8450-d38949728f18','786caaa4-7b36-474b-acff-b4cab4358208',_binary ''),('1b5f5d7e-5c2b-4687-8450-d38949728f18','a6d9ee28-55ef-4da3-b5da-03dab12522ce',_binary ''),('1b5f5d7e-5c2b-4687-8450-d38949728f18','c5171254-a8d1-4564-ac47-ef6890f0338f',_binary '\0'),('1b5f5d7e-5c2b-4687-8450-d38949728f18','ca8d577e-fc8e-4fab-bbd4-332b169fe26d',_binary '\0'),('1b5f5d7e-5c2b-4687-8450-d38949728f18','d4a4f8f3-865c-47a2-b5ef-21b4ef2bc4bb',_binary ''),('1b5f5d7e-5c2b-4687-8450-d38949728f18','dedb10ee-98c5-4f06-a7e7-ca5a600e5077',_binary '\0'),('21f3aced-8905-4cbe-b76e-e4efc5f5b5d9','4b9a4275-ee4b-4dc9-a8a2-0428fb232c38',_binary '\0'),('21f3aced-8905-4cbe-b76e-e4efc5f5b5d9','6209cbb9-9404-457c-9e29-68444a8347b8',_binary '\0'),('21f3aced-8905-4cbe-b76e-e4efc5f5b5d9','7685469d-bb7f-48d5-abf1-01c16ca11f2f',_binary '\0'),('21f3aced-8905-4cbe-b76e-e4efc5f5b5d9','79c357f1-a15a-404a-80fb-b3aacc5a3097',_binary '\0'),('21f3aced-8905-4cbe-b76e-e4efc5f5b5d9','8ca87019-4bfe-43c7-b100-5adf8fd6fbbb',_binary ''),('21f3aced-8905-4cbe-b76e-e4efc5f5b5d9','95893421-3e01-41ad-8d75-255e7e81e4d0',_binary ''),('21f3aced-8905-4cbe-b76e-e4efc5f5b5d9','c63b2066-2601-46ba-be46-4865a2af9fb1',_binary ''),('21f3aced-8905-4cbe-b76e-e4efc5f5b5d9','d347d989-0abc-4a13-8c14-c1ddb3264c27',_binary ''),('21f3aced-8905-4cbe-b76e-e4efc5f5b5d9','f14553d0-1ded-4935-a6ee-f84bf8265ec5',_binary ''),('2379042f-9ee4-4597-80c6-45add2d7a487','32a6adf1-5209-4cc8-9f4f-97daf67777e4',_binary ''),('2379042f-9ee4-4597-80c6-45add2d7a487','63882871-ca1f-485c-8c37-7a4bb0ec13b4',_binary '\0'),('2379042f-9ee4-4597-80c6-45add2d7a487','7414b4b7-8306-4c6c-86b0-cc0a4a1f3752',_binary ''),('2379042f-9ee4-4597-80c6-45add2d7a487','786caaa4-7b36-474b-acff-b4cab4358208',_binary ''),('2379042f-9ee4-4597-80c6-45add2d7a487','a6d9ee28-55ef-4da3-b5da-03dab12522ce',_binary ''),('2379042f-9ee4-4597-80c6-45add2d7a487','c5171254-a8d1-4564-ac47-ef6890f0338f',_binary '\0'),('2379042f-9ee4-4597-80c6-45add2d7a487','ca8d577e-fc8e-4fab-bbd4-332b169fe26d',_binary '\0'),('2379042f-9ee4-4597-80c6-45add2d7a487','d4a4f8f3-865c-47a2-b5ef-21b4ef2bc4bb',_binary ''),('2379042f-9ee4-4597-80c6-45add2d7a487','dedb10ee-98c5-4f06-a7e7-ca5a600e5077',_binary '\0'),('2d40f5c2-5cc2-42d6-93b7-64af2cedb218','444fc554-8739-4d2d-a0d7-8f71b8a1d129',_binary '\0'),('2d40f5c2-5cc2-42d6-93b7-64af2cedb218','625f2210-714e-4d31-9f58-9a6d9d4aa95b',_binary ''),('2d40f5c2-5cc2-42d6-93b7-64af2cedb218','66dbbe7a-d6b9-4d1d-b437-f8f7a8da44da',_binary '\0'),('2d40f5c2-5cc2-42d6-93b7-64af2cedb218','6fb6e60c-85bc-4695-8127-a571e81a2fd7',_binary '\0'),('2d40f5c2-5cc2-42d6-93b7-64af2cedb218','7011312f-7085-4e66-af22-d73fd8d54724',_binary ''),('2d40f5c2-5cc2-42d6-93b7-64af2cedb218','816bef08-a6f0-4074-8879-01a7d67d4918',_binary '\0'),('2d40f5c2-5cc2-42d6-93b7-64af2cedb218','a27b05ba-3058-4404-8d07-becd0a92634a',_binary ''),('2d40f5c2-5cc2-42d6-93b7-64af2cedb218','aa710d34-15aa-41e8-bea7-78d5269af573',_binary ''),('2d40f5c2-5cc2-42d6-93b7-64af2cedb218','eea99c04-72d0-4364-a9f9-22afc631ee33',_binary ''),('2ec8a5c0-e0c9-4602-902f-11927b599527','4da313aa-06ea-4fda-b4b5-80d2cd5a2a16',_binary ''),('2ec8a5c0-e0c9-4602-902f-11927b599527','55ae0da8-23c0-4796-b3bb-a002ea377870',_binary '\0'),('2ec8a5c0-e0c9-4602-902f-11927b599527','5ef9bc49-df97-44f6-bdaa-a40377368a1a',_binary ''),('2ec8a5c0-e0c9-4602-902f-11927b599527','77983d6e-5896-40fc-8486-923344dba90c',_binary '\0'),('2ec8a5c0-e0c9-4602-902f-11927b599527','7d63cd15-fc63-4eb0-a2b6-c894ed8cda92',_binary '\0'),('2ec8a5c0-e0c9-4602-902f-11927b599527','816096c9-b105-455b-805d-d887b0cdf314',_binary ''),('2ec8a5c0-e0c9-4602-902f-11927b599527','d906096a-7031-4608-ab7a-e1046aa24ebc',_binary ''),('2ec8a5c0-e0c9-4602-902f-11927b599527','dc07de30-6518-4c49-b74c-7948f482a583',_binary ''),('2ec8a5c0-e0c9-4602-902f-11927b599527','dd7e350c-b03e-4743-b081-d6c9e860662e',_binary '\0'),('2edff0cf-8f6c-44b6-917d-f00a3bb58261','444fc554-8739-4d2d-a0d7-8f71b8a1d129',_binary '\0'),('2edff0cf-8f6c-44b6-917d-f00a3bb58261','625f2210-714e-4d31-9f58-9a6d9d4aa95b',_binary ''),('2edff0cf-8f6c-44b6-917d-f00a3bb58261','66dbbe7a-d6b9-4d1d-b437-f8f7a8da44da',_binary '\0'),('2edff0cf-8f6c-44b6-917d-f00a3bb58261','6fb6e60c-85bc-4695-8127-a571e81a2fd7',_binary '\0'),('2edff0cf-8f6c-44b6-917d-f00a3bb58261','7011312f-7085-4e66-af22-d73fd8d54724',_binary ''),('2edff0cf-8f6c-44b6-917d-f00a3bb58261','816bef08-a6f0-4074-8879-01a7d67d4918',_binary '\0'),('2edff0cf-8f6c-44b6-917d-f00a3bb58261','a27b05ba-3058-4404-8d07-becd0a92634a',_binary ''),('2edff0cf-8f6c-44b6-917d-f00a3bb58261','aa710d34-15aa-41e8-bea7-78d5269af573',_binary ''),('2edff0cf-8f6c-44b6-917d-f00a3bb58261','eea99c04-72d0-4364-a9f9-22afc631ee33',_binary ''),('311ebcfe-7467-459c-856a-862094332329','09814274-c074-43d4-90e9-b955a86ac5ab',_binary ''),('311ebcfe-7467-459c-856a-862094332329','46883c24-c9d6-40a4-a7ec-86086d6c9892',_binary ''),('311ebcfe-7467-459c-856a-862094332329','882ca1f6-cc4e-45fb-8c37-b28c9b367e20',_binary ''),('311ebcfe-7467-459c-856a-862094332329','88704bf7-69f8-4c11-9fce-96cf17f0fd85',_binary '\0'),('311ebcfe-7467-459c-856a-862094332329','8c9e794f-e41a-44d1-91b0-dcf521d7a60f',_binary '\0'),('311ebcfe-7467-459c-856a-862094332329','9d97a7e6-f4e0-42f8-b906-a8f674d5336d',_binary '\0'),('311ebcfe-7467-459c-856a-862094332329','a7cc0573-78dd-492f-a8d7-a66a9cd285de',_binary ''),('311ebcfe-7467-459c-856a-862094332329','f74057ad-184b-4f01-8947-fdd12da4a0fd',_binary '\0'),('37140475-df0f-4d9e-9d4d-9c9afbdda5f6','32a6adf1-5209-4cc8-9f4f-97daf67777e4',_binary ''),('37140475-df0f-4d9e-9d4d-9c9afbdda5f6','63882871-ca1f-485c-8c37-7a4bb0ec13b4',_binary '\0'),('37140475-df0f-4d9e-9d4d-9c9afbdda5f6','7414b4b7-8306-4c6c-86b0-cc0a4a1f3752',_binary ''),('37140475-df0f-4d9e-9d4d-9c9afbdda5f6','786caaa4-7b36-474b-acff-b4cab4358208',_binary ''),('37140475-df0f-4d9e-9d4d-9c9afbdda5f6','a6d9ee28-55ef-4da3-b5da-03dab12522ce',_binary ''),('37140475-df0f-4d9e-9d4d-9c9afbdda5f6','c5171254-a8d1-4564-ac47-ef6890f0338f',_binary '\0'),('37140475-df0f-4d9e-9d4d-9c9afbdda5f6','ca8d577e-fc8e-4fab-bbd4-332b169fe26d',_binary '\0'),('37140475-df0f-4d9e-9d4d-9c9afbdda5f6','d4a4f8f3-865c-47a2-b5ef-21b4ef2bc4bb',_binary ''),('37140475-df0f-4d9e-9d4d-9c9afbdda5f6','dedb10ee-98c5-4f06-a7e7-ca5a600e5077',_binary '\0'),('3d62cf66-73c8-4ec7-ba0f-2b622bc5c747','4da313aa-06ea-4fda-b4b5-80d2cd5a2a16',_binary ''),('3d62cf66-73c8-4ec7-ba0f-2b622bc5c747','55ae0da8-23c0-4796-b3bb-a002ea377870',_binary '\0'),('3d62cf66-73c8-4ec7-ba0f-2b622bc5c747','5ef9bc49-df97-44f6-bdaa-a40377368a1a',_binary ''),('3d62cf66-73c8-4ec7-ba0f-2b622bc5c747','77983d6e-5896-40fc-8486-923344dba90c',_binary '\0'),('3d62cf66-73c8-4ec7-ba0f-2b622bc5c747','7d63cd15-fc63-4eb0-a2b6-c894ed8cda92',_binary '\0'),('3d62cf66-73c8-4ec7-ba0f-2b622bc5c747','816096c9-b105-455b-805d-d887b0cdf314',_binary ''),('3d62cf66-73c8-4ec7-ba0f-2b622bc5c747','dc07de30-6518-4c49-b74c-7948f482a583',_binary ''),('3d62cf66-73c8-4ec7-ba0f-2b622bc5c747','dd7e350c-b03e-4743-b081-d6c9e860662e',_binary '\0'),('479237b2-a9fc-4828-b80d-ffd84ec6f3bc','4b9a4275-ee4b-4dc9-a8a2-0428fb232c38',_binary '\0'),('479237b2-a9fc-4828-b80d-ffd84ec6f3bc','6209cbb9-9404-457c-9e29-68444a8347b8',_binary '\0'),('479237b2-a9fc-4828-b80d-ffd84ec6f3bc','7685469d-bb7f-48d5-abf1-01c16ca11f2f',_binary '\0'),('479237b2-a9fc-4828-b80d-ffd84ec6f3bc','79c357f1-a15a-404a-80fb-b3aacc5a3097',_binary '\0'),('479237b2-a9fc-4828-b80d-ffd84ec6f3bc','8ca87019-4bfe-43c7-b100-5adf8fd6fbbb',_binary ''),('479237b2-a9fc-4828-b80d-ffd84ec6f3bc','95893421-3e01-41ad-8d75-255e7e81e4d0',_binary ''),('479237b2-a9fc-4828-b80d-ffd84ec6f3bc','c63b2066-2601-46ba-be46-4865a2af9fb1',_binary ''),('479237b2-a9fc-4828-b80d-ffd84ec6f3bc','f14553d0-1ded-4935-a6ee-f84bf8265ec5',_binary ''),('47a07858-733a-4de8-a079-837b25a07547','4b9a4275-ee4b-4dc9-a8a2-0428fb232c38',_binary '\0'),('47a07858-733a-4de8-a079-837b25a07547','6209cbb9-9404-457c-9e29-68444a8347b8',_binary '\0'),('47a07858-733a-4de8-a079-837b25a07547','7685469d-bb7f-48d5-abf1-01c16ca11f2f',_binary '\0'),('47a07858-733a-4de8-a079-837b25a07547','79c357f1-a15a-404a-80fb-b3aacc5a3097',_binary '\0'),('47a07858-733a-4de8-a079-837b25a07547','8ca87019-4bfe-43c7-b100-5adf8fd6fbbb',_binary ''),('47a07858-733a-4de8-a079-837b25a07547','95893421-3e01-41ad-8d75-255e7e81e4d0',_binary ''),('47a07858-733a-4de8-a079-837b25a07547','c63b2066-2601-46ba-be46-4865a2af9fb1',_binary ''),('47a07858-733a-4de8-a079-837b25a07547','d347d989-0abc-4a13-8c14-c1ddb3264c27',_binary ''),('47a07858-733a-4de8-a079-837b25a07547','f14553d0-1ded-4935-a6ee-f84bf8265ec5',_binary ''),('57f46d8e-a3aa-4587-abe4-ef652ebef40c','09814274-c074-43d4-90e9-b955a86ac5ab',_binary ''),('57f46d8e-a3aa-4587-abe4-ef652ebef40c','2b1287b6-579c-4ca8-8c67-3ae43797f83f',_binary ''),('57f46d8e-a3aa-4587-abe4-ef652ebef40c','46883c24-c9d6-40a4-a7ec-86086d6c9892',_binary ''),('57f46d8e-a3aa-4587-abe4-ef652ebef40c','882ca1f6-cc4e-45fb-8c37-b28c9b367e20',_binary ''),('57f46d8e-a3aa-4587-abe4-ef652ebef40c','88704bf7-69f8-4c11-9fce-96cf17f0fd85',_binary '\0'),('57f46d8e-a3aa-4587-abe4-ef652ebef40c','8c9e794f-e41a-44d1-91b0-dcf521d7a60f',_binary '\0'),('57f46d8e-a3aa-4587-abe4-ef652ebef40c','9d97a7e6-f4e0-42f8-b906-a8f674d5336d',_binary '\0'),('57f46d8e-a3aa-4587-abe4-ef652ebef40c','a7cc0573-78dd-492f-a8d7-a66a9cd285de',_binary ''),('57f46d8e-a3aa-4587-abe4-ef652ebef40c','f74057ad-184b-4f01-8947-fdd12da4a0fd',_binary '\0'),('58e5ed05-5651-4e99-ac86-e93c28adc1f0','1bca493a-f048-4583-8a05-06e5b2bbceeb',_binary '\0'),('58e5ed05-5651-4e99-ac86-e93c28adc1f0','3f20050b-2690-4eae-932e-55d4033bcb9c',_binary ''),('58e5ed05-5651-4e99-ac86-e93c28adc1f0','628834b0-f4ce-431e-ad1a-7b1aa02bb389',_binary '\0'),('58e5ed05-5651-4e99-ac86-e93c28adc1f0','9d2ff12d-6798-416a-a938-998b1ea40a7c',_binary ''),('58e5ed05-5651-4e99-ac86-e93c28adc1f0','bc3d6466-832d-4c2a-8e64-b25af286304e',_binary ''),('58e5ed05-5651-4e99-ac86-e93c28adc1f0','c1960172-937d-4322-bc36-60cb8d62e029',_binary '\0'),('58e5ed05-5651-4e99-ac86-e93c28adc1f0','c7c12f84-00fc-4191-91f4-d9d53cfb760d',_binary '\0'),('58e5ed05-5651-4e99-ac86-e93c28adc1f0','e5edd8d0-323b-4ba8-b943-aeb19c7a514e',_binary ''),('5a324cc2-4d44-46de-9c51-9afcc3c1adda','09814274-c074-43d4-90e9-b955a86ac5ab',_binary ''),('5a324cc2-4d44-46de-9c51-9afcc3c1adda','46883c24-c9d6-40a4-a7ec-86086d6c9892',_binary ''),('5a324cc2-4d44-46de-9c51-9afcc3c1adda','882ca1f6-cc4e-45fb-8c37-b28c9b367e20',_binary ''),('5a324cc2-4d44-46de-9c51-9afcc3c1adda','88704bf7-69f8-4c11-9fce-96cf17f0fd85',_binary '\0'),('5a324cc2-4d44-46de-9c51-9afcc3c1adda','8c9e794f-e41a-44d1-91b0-dcf521d7a60f',_binary '\0'),('5a324cc2-4d44-46de-9c51-9afcc3c1adda','9d97a7e6-f4e0-42f8-b906-a8f674d5336d',_binary '\0'),('5a324cc2-4d44-46de-9c51-9afcc3c1adda','a7cc0573-78dd-492f-a8d7-a66a9cd285de',_binary ''),('5a324cc2-4d44-46de-9c51-9afcc3c1adda','f74057ad-184b-4f01-8947-fdd12da4a0fd',_binary '\0'),('5bfeb038-8be1-4744-bc58-74432ff827c6','4b9a4275-ee4b-4dc9-a8a2-0428fb232c38',_binary '\0'),('5bfeb038-8be1-4744-bc58-74432ff827c6','6209cbb9-9404-457c-9e29-68444a8347b8',_binary '\0'),('5bfeb038-8be1-4744-bc58-74432ff827c6','7685469d-bb7f-48d5-abf1-01c16ca11f2f',_binary '\0'),('5bfeb038-8be1-4744-bc58-74432ff827c6','79c357f1-a15a-404a-80fb-b3aacc5a3097',_binary '\0'),('5bfeb038-8be1-4744-bc58-74432ff827c6','8ca87019-4bfe-43c7-b100-5adf8fd6fbbb',_binary ''),('5bfeb038-8be1-4744-bc58-74432ff827c6','95893421-3e01-41ad-8d75-255e7e81e4d0',_binary ''),('5bfeb038-8be1-4744-bc58-74432ff827c6','c63b2066-2601-46ba-be46-4865a2af9fb1',_binary ''),('5bfeb038-8be1-4744-bc58-74432ff827c6','d347d989-0abc-4a13-8c14-c1ddb3264c27',_binary ''),('5bfeb038-8be1-4744-bc58-74432ff827c6','f14553d0-1ded-4935-a6ee-f84bf8265ec5',_binary ''),('5dcb2e50-43d9-4731-af37-8415af71a5fb','444fc554-8739-4d2d-a0d7-8f71b8a1d129',_binary '\0'),('5dcb2e50-43d9-4731-af37-8415af71a5fb','625f2210-714e-4d31-9f58-9a6d9d4aa95b',_binary ''),('5dcb2e50-43d9-4731-af37-8415af71a5fb','66dbbe7a-d6b9-4d1d-b437-f8f7a8da44da',_binary '\0'),('5dcb2e50-43d9-4731-af37-8415af71a5fb','6fb6e60c-85bc-4695-8127-a571e81a2fd7',_binary '\0'),('5dcb2e50-43d9-4731-af37-8415af71a5fb','7011312f-7085-4e66-af22-d73fd8d54724',_binary ''),('5dcb2e50-43d9-4731-af37-8415af71a5fb','816bef08-a6f0-4074-8879-01a7d67d4918',_binary '\0'),('5dcb2e50-43d9-4731-af37-8415af71a5fb','a27b05ba-3058-4404-8d07-becd0a92634a',_binary ''),('5dcb2e50-43d9-4731-af37-8415af71a5fb','aa710d34-15aa-41e8-bea7-78d5269af573',_binary ''),('5dcb2e50-43d9-4731-af37-8415af71a5fb','eea99c04-72d0-4364-a9f9-22afc631ee33',_binary ''),('6112a706-0711-40ab-a42e-08ef27723f06','32a6adf1-5209-4cc8-9f4f-97daf67777e4',_binary ''),('6112a706-0711-40ab-a42e-08ef27723f06','63882871-ca1f-485c-8c37-7a4bb0ec13b4',_binary '\0'),('6112a706-0711-40ab-a42e-08ef27723f06','786caaa4-7b36-474b-acff-b4cab4358208',_binary ''),('6112a706-0711-40ab-a42e-08ef27723f06','a6d9ee28-55ef-4da3-b5da-03dab12522ce',_binary ''),('6112a706-0711-40ab-a42e-08ef27723f06','c5171254-a8d1-4564-ac47-ef6890f0338f',_binary '\0'),('6112a706-0711-40ab-a42e-08ef27723f06','ca8d577e-fc8e-4fab-bbd4-332b169fe26d',_binary '\0'),('6112a706-0711-40ab-a42e-08ef27723f06','d4a4f8f3-865c-47a2-b5ef-21b4ef2bc4bb',_binary ''),('6112a706-0711-40ab-a42e-08ef27723f06','dedb10ee-98c5-4f06-a7e7-ca5a600e5077',_binary '\0'),('6552251b-4819-4c12-9e6a-7602a75edc4d','09814274-c074-43d4-90e9-b955a86ac5ab',_binary ''),('6552251b-4819-4c12-9e6a-7602a75edc4d','2b1287b6-579c-4ca8-8c67-3ae43797f83f',_binary ''),('6552251b-4819-4c12-9e6a-7602a75edc4d','46883c24-c9d6-40a4-a7ec-86086d6c9892',_binary ''),('6552251b-4819-4c12-9e6a-7602a75edc4d','882ca1f6-cc4e-45fb-8c37-b28c9b367e20',_binary ''),('6552251b-4819-4c12-9e6a-7602a75edc4d','88704bf7-69f8-4c11-9fce-96cf17f0fd85',_binary '\0'),('6552251b-4819-4c12-9e6a-7602a75edc4d','8c9e794f-e41a-44d1-91b0-dcf521d7a60f',_binary '\0'),('6552251b-4819-4c12-9e6a-7602a75edc4d','9d97a7e6-f4e0-42f8-b906-a8f674d5336d',_binary '\0'),('6552251b-4819-4c12-9e6a-7602a75edc4d','a7cc0573-78dd-492f-a8d7-a66a9cd285de',_binary ''),('6552251b-4819-4c12-9e6a-7602a75edc4d','f74057ad-184b-4f01-8947-fdd12da4a0fd',_binary '\0'),('684a5673-eac6-49e1-8fad-7b9fe666a06f','09814274-c074-43d4-90e9-b955a86ac5ab',_binary ''),('684a5673-eac6-49e1-8fad-7b9fe666a06f','46883c24-c9d6-40a4-a7ec-86086d6c9892',_binary ''),('684a5673-eac6-49e1-8fad-7b9fe666a06f','882ca1f6-cc4e-45fb-8c37-b28c9b367e20',_binary ''),('684a5673-eac6-49e1-8fad-7b9fe666a06f','88704bf7-69f8-4c11-9fce-96cf17f0fd85',_binary '\0'),('684a5673-eac6-49e1-8fad-7b9fe666a06f','8c9e794f-e41a-44d1-91b0-dcf521d7a60f',_binary '\0'),('684a5673-eac6-49e1-8fad-7b9fe666a06f','9d97a7e6-f4e0-42f8-b906-a8f674d5336d',_binary '\0'),('684a5673-eac6-49e1-8fad-7b9fe666a06f','a7cc0573-78dd-492f-a8d7-a66a9cd285de',_binary ''),('684a5673-eac6-49e1-8fad-7b9fe666a06f','f74057ad-184b-4f01-8947-fdd12da4a0fd',_binary '\0'),('690481d3-310d-4227-a8eb-eee2db8d1b25','4da313aa-06ea-4fda-b4b5-80d2cd5a2a16',_binary ''),('690481d3-310d-4227-a8eb-eee2db8d1b25','55ae0da8-23c0-4796-b3bb-a002ea377870',_binary '\0'),('690481d3-310d-4227-a8eb-eee2db8d1b25','5ef9bc49-df97-44f6-bdaa-a40377368a1a',_binary ''),('690481d3-310d-4227-a8eb-eee2db8d1b25','77983d6e-5896-40fc-8486-923344dba90c',_binary '\0'),('690481d3-310d-4227-a8eb-eee2db8d1b25','7d63cd15-fc63-4eb0-a2b6-c894ed8cda92',_binary '\0'),('690481d3-310d-4227-a8eb-eee2db8d1b25','816096c9-b105-455b-805d-d887b0cdf314',_binary ''),('690481d3-310d-4227-a8eb-eee2db8d1b25','d906096a-7031-4608-ab7a-e1046aa24ebc',_binary ''),('690481d3-310d-4227-a8eb-eee2db8d1b25','dc07de30-6518-4c49-b74c-7948f482a583',_binary ''),('690481d3-310d-4227-a8eb-eee2db8d1b25','dd7e350c-b03e-4743-b081-d6c9e860662e',_binary '\0'),('6e5e1844-3f44-46b9-a6b7-4297aed21fcf','444fc554-8739-4d2d-a0d7-8f71b8a1d129',_binary '\0'),('6e5e1844-3f44-46b9-a6b7-4297aed21fcf','625f2210-714e-4d31-9f58-9a6d9d4aa95b',_binary ''),('6e5e1844-3f44-46b9-a6b7-4297aed21fcf','66dbbe7a-d6b9-4d1d-b437-f8f7a8da44da',_binary '\0'),('6e5e1844-3f44-46b9-a6b7-4297aed21fcf','6fb6e60c-85bc-4695-8127-a571e81a2fd7',_binary '\0'),('6e5e1844-3f44-46b9-a6b7-4297aed21fcf','7011312f-7085-4e66-af22-d73fd8d54724',_binary ''),('6e5e1844-3f44-46b9-a6b7-4297aed21fcf','816bef08-a6f0-4074-8879-01a7d67d4918',_binary '\0'),('6e5e1844-3f44-46b9-a6b7-4297aed21fcf','a27b05ba-3058-4404-8d07-becd0a92634a',_binary ''),('6e5e1844-3f44-46b9-a6b7-4297aed21fcf','aa710d34-15aa-41e8-bea7-78d5269af573',_binary ''),('6e5e1844-3f44-46b9-a6b7-4297aed21fcf','eea99c04-72d0-4364-a9f9-22afc631ee33',_binary ''),('719f23fc-fbd3-4efc-a757-5fa1f94ec2ca','32a6adf1-5209-4cc8-9f4f-97daf67777e4',_binary ''),('719f23fc-fbd3-4efc-a757-5fa1f94ec2ca','63882871-ca1f-485c-8c37-7a4bb0ec13b4',_binary '\0'),('719f23fc-fbd3-4efc-a757-5fa1f94ec2ca','7414b4b7-8306-4c6c-86b0-cc0a4a1f3752',_binary ''),('719f23fc-fbd3-4efc-a757-5fa1f94ec2ca','786caaa4-7b36-474b-acff-b4cab4358208',_binary ''),('719f23fc-fbd3-4efc-a757-5fa1f94ec2ca','a6d9ee28-55ef-4da3-b5da-03dab12522ce',_binary ''),('719f23fc-fbd3-4efc-a757-5fa1f94ec2ca','c5171254-a8d1-4564-ac47-ef6890f0338f',_binary '\0'),('719f23fc-fbd3-4efc-a757-5fa1f94ec2ca','ca8d577e-fc8e-4fab-bbd4-332b169fe26d',_binary '\0'),('719f23fc-fbd3-4efc-a757-5fa1f94ec2ca','d4a4f8f3-865c-47a2-b5ef-21b4ef2bc4bb',_binary ''),('719f23fc-fbd3-4efc-a757-5fa1f94ec2ca','dedb10ee-98c5-4f06-a7e7-ca5a600e5077',_binary '\0'),('8137d95e-0cab-4e9f-b666-92c7bd7ca71a','1bca493a-f048-4583-8a05-06e5b2bbceeb',_binary '\0'),('8137d95e-0cab-4e9f-b666-92c7bd7ca71a','36122d22-c5bc-471c-8694-ed913ee1de6f',_binary ''),('8137d95e-0cab-4e9f-b666-92c7bd7ca71a','3f20050b-2690-4eae-932e-55d4033bcb9c',_binary ''),('8137d95e-0cab-4e9f-b666-92c7bd7ca71a','628834b0-f4ce-431e-ad1a-7b1aa02bb389',_binary '\0'),('8137d95e-0cab-4e9f-b666-92c7bd7ca71a','9d2ff12d-6798-416a-a938-998b1ea40a7c',_binary ''),('8137d95e-0cab-4e9f-b666-92c7bd7ca71a','bc3d6466-832d-4c2a-8e64-b25af286304e',_binary ''),('8137d95e-0cab-4e9f-b666-92c7bd7ca71a','c1960172-937d-4322-bc36-60cb8d62e029',_binary '\0'),('8137d95e-0cab-4e9f-b666-92c7bd7ca71a','c7c12f84-00fc-4191-91f4-d9d53cfb760d',_binary '\0'),('8137d95e-0cab-4e9f-b666-92c7bd7ca71a','e5edd8d0-323b-4ba8-b943-aeb19c7a514e',_binary ''),('84e2d9c2-d7af-4ae0-9dfa-41a04f1ab1f4','4b9a4275-ee4b-4dc9-a8a2-0428fb232c38',_binary '\0'),('84e2d9c2-d7af-4ae0-9dfa-41a04f1ab1f4','6209cbb9-9404-457c-9e29-68444a8347b8',_binary '\0'),('84e2d9c2-d7af-4ae0-9dfa-41a04f1ab1f4','7685469d-bb7f-48d5-abf1-01c16ca11f2f',_binary '\0'),('84e2d9c2-d7af-4ae0-9dfa-41a04f1ab1f4','79c357f1-a15a-404a-80fb-b3aacc5a3097',_binary '\0'),('84e2d9c2-d7af-4ae0-9dfa-41a04f1ab1f4','8ca87019-4bfe-43c7-b100-5adf8fd6fbbb',_binary ''),('84e2d9c2-d7af-4ae0-9dfa-41a04f1ab1f4','95893421-3e01-41ad-8d75-255e7e81e4d0',_binary ''),('84e2d9c2-d7af-4ae0-9dfa-41a04f1ab1f4','c63b2066-2601-46ba-be46-4865a2af9fb1',_binary ''),('84e2d9c2-d7af-4ae0-9dfa-41a04f1ab1f4','d347d989-0abc-4a13-8c14-c1ddb3264c27',_binary ''),('84e2d9c2-d7af-4ae0-9dfa-41a04f1ab1f4','f14553d0-1ded-4935-a6ee-f84bf8265ec5',_binary ''),('8b27a0d1-98ac-4f83-affe-b80ecdd626ef','4da313aa-06ea-4fda-b4b5-80d2cd5a2a16',_binary ''),('8b27a0d1-98ac-4f83-affe-b80ecdd626ef','55ae0da8-23c0-4796-b3bb-a002ea377870',_binary '\0'),('8b27a0d1-98ac-4f83-affe-b80ecdd626ef','5ef9bc49-df97-44f6-bdaa-a40377368a1a',_binary ''),('8b27a0d1-98ac-4f83-affe-b80ecdd626ef','77983d6e-5896-40fc-8486-923344dba90c',_binary '\0'),('8b27a0d1-98ac-4f83-affe-b80ecdd626ef','7d63cd15-fc63-4eb0-a2b6-c894ed8cda92',_binary '\0'),('8b27a0d1-98ac-4f83-affe-b80ecdd626ef','816096c9-b105-455b-805d-d887b0cdf314',_binary ''),('8b27a0d1-98ac-4f83-affe-b80ecdd626ef','d906096a-7031-4608-ab7a-e1046aa24ebc',_binary ''),('8b27a0d1-98ac-4f83-affe-b80ecdd626ef','dc07de30-6518-4c49-b74c-7948f482a583',_binary ''),('8b27a0d1-98ac-4f83-affe-b80ecdd626ef','dd7e350c-b03e-4743-b081-d6c9e860662e',_binary '\0'),('8f492599-c8fb-4bce-af8a-34f41e0f5b74','4da313aa-06ea-4fda-b4b5-80d2cd5a2a16',_binary ''),('8f492599-c8fb-4bce-af8a-34f41e0f5b74','55ae0da8-23c0-4796-b3bb-a002ea377870',_binary '\0'),('8f492599-c8fb-4bce-af8a-34f41e0f5b74','5ef9bc49-df97-44f6-bdaa-a40377368a1a',_binary ''),('8f492599-c8fb-4bce-af8a-34f41e0f5b74','77983d6e-5896-40fc-8486-923344dba90c',_binary '\0'),('8f492599-c8fb-4bce-af8a-34f41e0f5b74','7d63cd15-fc63-4eb0-a2b6-c894ed8cda92',_binary '\0'),('8f492599-c8fb-4bce-af8a-34f41e0f5b74','816096c9-b105-455b-805d-d887b0cdf314',_binary ''),('8f492599-c8fb-4bce-af8a-34f41e0f5b74','dc07de30-6518-4c49-b74c-7948f482a583',_binary ''),('8f492599-c8fb-4bce-af8a-34f41e0f5b74','dd7e350c-b03e-4743-b081-d6c9e860662e',_binary '\0'),('908e528c-5deb-476b-9612-751d1944f79a','1bca493a-f048-4583-8a05-06e5b2bbceeb',_binary '\0'),('908e528c-5deb-476b-9612-751d1944f79a','3f20050b-2690-4eae-932e-55d4033bcb9c',_binary ''),('908e528c-5deb-476b-9612-751d1944f79a','628834b0-f4ce-431e-ad1a-7b1aa02bb389',_binary '\0'),('908e528c-5deb-476b-9612-751d1944f79a','9d2ff12d-6798-416a-a938-998b1ea40a7c',_binary ''),('908e528c-5deb-476b-9612-751d1944f79a','bc3d6466-832d-4c2a-8e64-b25af286304e',_binary ''),('908e528c-5deb-476b-9612-751d1944f79a','c1960172-937d-4322-bc36-60cb8d62e029',_binary '\0'),('908e528c-5deb-476b-9612-751d1944f79a','c7c12f84-00fc-4191-91f4-d9d53cfb760d',_binary '\0'),('908e528c-5deb-476b-9612-751d1944f79a','e5edd8d0-323b-4ba8-b943-aeb19c7a514e',_binary ''),('918724dc-e6f6-424e-a42f-875f0da655ae','09814274-c074-43d4-90e9-b955a86ac5ab',_binary ''),('918724dc-e6f6-424e-a42f-875f0da655ae','2b1287b6-579c-4ca8-8c67-3ae43797f83f',_binary ''),('918724dc-e6f6-424e-a42f-875f0da655ae','46883c24-c9d6-40a4-a7ec-86086d6c9892',_binary ''),('918724dc-e6f6-424e-a42f-875f0da655ae','882ca1f6-cc4e-45fb-8c37-b28c9b367e20',_binary ''),('918724dc-e6f6-424e-a42f-875f0da655ae','88704bf7-69f8-4c11-9fce-96cf17f0fd85',_binary '\0'),('918724dc-e6f6-424e-a42f-875f0da655ae','8c9e794f-e41a-44d1-91b0-dcf521d7a60f',_binary '\0'),('918724dc-e6f6-424e-a42f-875f0da655ae','9d97a7e6-f4e0-42f8-b906-a8f674d5336d',_binary '\0'),('918724dc-e6f6-424e-a42f-875f0da655ae','a7cc0573-78dd-492f-a8d7-a66a9cd285de',_binary ''),('918724dc-e6f6-424e-a42f-875f0da655ae','f74057ad-184b-4f01-8947-fdd12da4a0fd',_binary '\0'),('93f6c7ec-5361-4216-9f3f-bda1f99ccd7d','1bca493a-f048-4583-8a05-06e5b2bbceeb',_binary '\0'),('93f6c7ec-5361-4216-9f3f-bda1f99ccd7d','36122d22-c5bc-471c-8694-ed913ee1de6f',_binary ''),('93f6c7ec-5361-4216-9f3f-bda1f99ccd7d','3f20050b-2690-4eae-932e-55d4033bcb9c',_binary ''),('93f6c7ec-5361-4216-9f3f-bda1f99ccd7d','628834b0-f4ce-431e-ad1a-7b1aa02bb389',_binary '\0'),('93f6c7ec-5361-4216-9f3f-bda1f99ccd7d','9d2ff12d-6798-416a-a938-998b1ea40a7c',_binary ''),('93f6c7ec-5361-4216-9f3f-bda1f99ccd7d','bc3d6466-832d-4c2a-8e64-b25af286304e',_binary ''),('93f6c7ec-5361-4216-9f3f-bda1f99ccd7d','c1960172-937d-4322-bc36-60cb8d62e029',_binary '\0'),('93f6c7ec-5361-4216-9f3f-bda1f99ccd7d','c7c12f84-00fc-4191-91f4-d9d53cfb760d',_binary '\0'),('93f6c7ec-5361-4216-9f3f-bda1f99ccd7d','e5edd8d0-323b-4ba8-b943-aeb19c7a514e',_binary ''),('9ae68c10-8b44-4c90-8c3c-0c89e441c036','09814274-c074-43d4-90e9-b955a86ac5ab',_binary ''),('9ae68c10-8b44-4c90-8c3c-0c89e441c036','2b1287b6-579c-4ca8-8c67-3ae43797f83f',_binary ''),('9ae68c10-8b44-4c90-8c3c-0c89e441c036','46883c24-c9d6-40a4-a7ec-86086d6c9892',_binary ''),('9ae68c10-8b44-4c90-8c3c-0c89e441c036','882ca1f6-cc4e-45fb-8c37-b28c9b367e20',_binary ''),('9ae68c10-8b44-4c90-8c3c-0c89e441c036','88704bf7-69f8-4c11-9fce-96cf17f0fd85',_binary '\0'),('9ae68c10-8b44-4c90-8c3c-0c89e441c036','8c9e794f-e41a-44d1-91b0-dcf521d7a60f',_binary '\0'),('9ae68c10-8b44-4c90-8c3c-0c89e441c036','9d97a7e6-f4e0-42f8-b906-a8f674d5336d',_binary '\0'),('9ae68c10-8b44-4c90-8c3c-0c89e441c036','a7cc0573-78dd-492f-a8d7-a66a9cd285de',_binary ''),('9ae68c10-8b44-4c90-8c3c-0c89e441c036','f74057ad-184b-4f01-8947-fdd12da4a0fd',_binary '\0'),('9f5cccd3-039b-4e2d-a53d-5c71869e0289','1bca493a-f048-4583-8a05-06e5b2bbceeb',_binary '\0'),('9f5cccd3-039b-4e2d-a53d-5c71869e0289','36122d22-c5bc-471c-8694-ed913ee1de6f',_binary ''),('9f5cccd3-039b-4e2d-a53d-5c71869e0289','3f20050b-2690-4eae-932e-55d4033bcb9c',_binary ''),('9f5cccd3-039b-4e2d-a53d-5c71869e0289','628834b0-f4ce-431e-ad1a-7b1aa02bb389',_binary '\0'),('9f5cccd3-039b-4e2d-a53d-5c71869e0289','9d2ff12d-6798-416a-a938-998b1ea40a7c',_binary ''),('9f5cccd3-039b-4e2d-a53d-5c71869e0289','bc3d6466-832d-4c2a-8e64-b25af286304e',_binary ''),('9f5cccd3-039b-4e2d-a53d-5c71869e0289','c1960172-937d-4322-bc36-60cb8d62e029',_binary '\0'),('9f5cccd3-039b-4e2d-a53d-5c71869e0289','c7c12f84-00fc-4191-91f4-d9d53cfb760d',_binary '\0'),('9f5cccd3-039b-4e2d-a53d-5c71869e0289','e5edd8d0-323b-4ba8-b943-aeb19c7a514e',_binary ''),('9f98a940-4d88-413d-af70-540c4673615f','444fc554-8739-4d2d-a0d7-8f71b8a1d129',_binary '\0'),('9f98a940-4d88-413d-af70-540c4673615f','625f2210-714e-4d31-9f58-9a6d9d4aa95b',_binary ''),('9f98a940-4d88-413d-af70-540c4673615f','66dbbe7a-d6b9-4d1d-b437-f8f7a8da44da',_binary '\0'),('9f98a940-4d88-413d-af70-540c4673615f','6fb6e60c-85bc-4695-8127-a571e81a2fd7',_binary '\0'),('9f98a940-4d88-413d-af70-540c4673615f','7011312f-7085-4e66-af22-d73fd8d54724',_binary ''),('9f98a940-4d88-413d-af70-540c4673615f','816bef08-a6f0-4074-8879-01a7d67d4918',_binary '\0'),('9f98a940-4d88-413d-af70-540c4673615f','a27b05ba-3058-4404-8d07-becd0a92634a',_binary ''),('9f98a940-4d88-413d-af70-540c4673615f','aa710d34-15aa-41e8-bea7-78d5269af573',_binary ''),('9f98a940-4d88-413d-af70-540c4673615f','eea99c04-72d0-4364-a9f9-22afc631ee33',_binary ''),('a0d96aa1-71ac-4a7e-a769-306baf1c51fc','444fc554-8739-4d2d-a0d7-8f71b8a1d129',_binary '\0'),('a0d96aa1-71ac-4a7e-a769-306baf1c51fc','625f2210-714e-4d31-9f58-9a6d9d4aa95b',_binary ''),('a0d96aa1-71ac-4a7e-a769-306baf1c51fc','66dbbe7a-d6b9-4d1d-b437-f8f7a8da44da',_binary '\0'),('a0d96aa1-71ac-4a7e-a769-306baf1c51fc','6fb6e60c-85bc-4695-8127-a571e81a2fd7',_binary '\0'),('a0d96aa1-71ac-4a7e-a769-306baf1c51fc','816bef08-a6f0-4074-8879-01a7d67d4918',_binary '\0'),('a0d96aa1-71ac-4a7e-a769-306baf1c51fc','a27b05ba-3058-4404-8d07-becd0a92634a',_binary ''),('a0d96aa1-71ac-4a7e-a769-306baf1c51fc','aa710d34-15aa-41e8-bea7-78d5269af573',_binary ''),('a0d96aa1-71ac-4a7e-a769-306baf1c51fc','eea99c04-72d0-4364-a9f9-22afc631ee33',_binary ''),('a15e680b-47bb-4b94-a832-5ca99cdbe134','444fc554-8739-4d2d-a0d7-8f71b8a1d129',_binary '\0'),('a15e680b-47bb-4b94-a832-5ca99cdbe134','625f2210-714e-4d31-9f58-9a6d9d4aa95b',_binary ''),('a15e680b-47bb-4b94-a832-5ca99cdbe134','66dbbe7a-d6b9-4d1d-b437-f8f7a8da44da',_binary '\0'),('a15e680b-47bb-4b94-a832-5ca99cdbe134','6fb6e60c-85bc-4695-8127-a571e81a2fd7',_binary '\0'),('a15e680b-47bb-4b94-a832-5ca99cdbe134','816bef08-a6f0-4074-8879-01a7d67d4918',_binary '\0'),('a15e680b-47bb-4b94-a832-5ca99cdbe134','a27b05ba-3058-4404-8d07-becd0a92634a',_binary ''),('a15e680b-47bb-4b94-a832-5ca99cdbe134','aa710d34-15aa-41e8-bea7-78d5269af573',_binary ''),('a15e680b-47bb-4b94-a832-5ca99cdbe134','eea99c04-72d0-4364-a9f9-22afc631ee33',_binary ''),('a45ffddc-de71-4c69-b026-cb2cf7f30d16','32a6adf1-5209-4cc8-9f4f-97daf67777e4',_binary ''),('a45ffddc-de71-4c69-b026-cb2cf7f30d16','63882871-ca1f-485c-8c37-7a4bb0ec13b4',_binary '\0'),('a45ffddc-de71-4c69-b026-cb2cf7f30d16','7414b4b7-8306-4c6c-86b0-cc0a4a1f3752',_binary ''),('a45ffddc-de71-4c69-b026-cb2cf7f30d16','786caaa4-7b36-474b-acff-b4cab4358208',_binary ''),('a45ffddc-de71-4c69-b026-cb2cf7f30d16','a6d9ee28-55ef-4da3-b5da-03dab12522ce',_binary ''),('a45ffddc-de71-4c69-b026-cb2cf7f30d16','c5171254-a8d1-4564-ac47-ef6890f0338f',_binary '\0'),('a45ffddc-de71-4c69-b026-cb2cf7f30d16','ca8d577e-fc8e-4fab-bbd4-332b169fe26d',_binary '\0'),('a45ffddc-de71-4c69-b026-cb2cf7f30d16','d4a4f8f3-865c-47a2-b5ef-21b4ef2bc4bb',_binary ''),('a45ffddc-de71-4c69-b026-cb2cf7f30d16','dedb10ee-98c5-4f06-a7e7-ca5a600e5077',_binary '\0'),('a9936092-1b5e-4c07-a983-ec18f6ce9136','444fc554-8739-4d2d-a0d7-8f71b8a1d129',_binary '\0'),('a9936092-1b5e-4c07-a983-ec18f6ce9136','625f2210-714e-4d31-9f58-9a6d9d4aa95b',_binary ''),('a9936092-1b5e-4c07-a983-ec18f6ce9136','66dbbe7a-d6b9-4d1d-b437-f8f7a8da44da',_binary '\0'),('a9936092-1b5e-4c07-a983-ec18f6ce9136','6fb6e60c-85bc-4695-8127-a571e81a2fd7',_binary '\0'),('a9936092-1b5e-4c07-a983-ec18f6ce9136','7011312f-7085-4e66-af22-d73fd8d54724',_binary ''),('a9936092-1b5e-4c07-a983-ec18f6ce9136','816bef08-a6f0-4074-8879-01a7d67d4918',_binary '\0'),('a9936092-1b5e-4c07-a983-ec18f6ce9136','a27b05ba-3058-4404-8d07-becd0a92634a',_binary ''),('a9936092-1b5e-4c07-a983-ec18f6ce9136','aa710d34-15aa-41e8-bea7-78d5269af573',_binary ''),('a9936092-1b5e-4c07-a983-ec18f6ce9136','eea99c04-72d0-4364-a9f9-22afc631ee33',_binary ''),('aa4ae80c-bbad-4217-a6a7-8ff0a871577f','1bca493a-f048-4583-8a05-06e5b2bbceeb',_binary '\0'),('aa4ae80c-bbad-4217-a6a7-8ff0a871577f','36122d22-c5bc-471c-8694-ed913ee1de6f',_binary ''),('aa4ae80c-bbad-4217-a6a7-8ff0a871577f','3f20050b-2690-4eae-932e-55d4033bcb9c',_binary ''),('aa4ae80c-bbad-4217-a6a7-8ff0a871577f','628834b0-f4ce-431e-ad1a-7b1aa02bb389',_binary '\0'),('aa4ae80c-bbad-4217-a6a7-8ff0a871577f','9d2ff12d-6798-416a-a938-998b1ea40a7c',_binary ''),('aa4ae80c-bbad-4217-a6a7-8ff0a871577f','bc3d6466-832d-4c2a-8e64-b25af286304e',_binary ''),('aa4ae80c-bbad-4217-a6a7-8ff0a871577f','c1960172-937d-4322-bc36-60cb8d62e029',_binary '\0'),('aa4ae80c-bbad-4217-a6a7-8ff0a871577f','c7c12f84-00fc-4191-91f4-d9d53cfb760d',_binary '\0'),('aa4ae80c-bbad-4217-a6a7-8ff0a871577f','e5edd8d0-323b-4ba8-b943-aeb19c7a514e',_binary ''),('ad5aa4ab-fe72-4d1d-8bab-e0a39529dca7','4da313aa-06ea-4fda-b4b5-80d2cd5a2a16',_binary ''),('ad5aa4ab-fe72-4d1d-8bab-e0a39529dca7','55ae0da8-23c0-4796-b3bb-a002ea377870',_binary '\0'),('ad5aa4ab-fe72-4d1d-8bab-e0a39529dca7','5ef9bc49-df97-44f6-bdaa-a40377368a1a',_binary ''),('ad5aa4ab-fe72-4d1d-8bab-e0a39529dca7','77983d6e-5896-40fc-8486-923344dba90c',_binary '\0'),('ad5aa4ab-fe72-4d1d-8bab-e0a39529dca7','7d63cd15-fc63-4eb0-a2b6-c894ed8cda92',_binary '\0'),('ad5aa4ab-fe72-4d1d-8bab-e0a39529dca7','816096c9-b105-455b-805d-d887b0cdf314',_binary ''),('ad5aa4ab-fe72-4d1d-8bab-e0a39529dca7','d906096a-7031-4608-ab7a-e1046aa24ebc',_binary ''),('ad5aa4ab-fe72-4d1d-8bab-e0a39529dca7','dc07de30-6518-4c49-b74c-7948f482a583',_binary ''),('ad5aa4ab-fe72-4d1d-8bab-e0a39529dca7','dd7e350c-b03e-4743-b081-d6c9e860662e',_binary '\0'),('b0475217-c11a-49f5-833c-33aaee237a25','4b9a4275-ee4b-4dc9-a8a2-0428fb232c38',_binary '\0'),('b0475217-c11a-49f5-833c-33aaee237a25','6209cbb9-9404-457c-9e29-68444a8347b8',_binary '\0'),('b0475217-c11a-49f5-833c-33aaee237a25','7685469d-bb7f-48d5-abf1-01c16ca11f2f',_binary '\0'),('b0475217-c11a-49f5-833c-33aaee237a25','79c357f1-a15a-404a-80fb-b3aacc5a3097',_binary '\0'),('b0475217-c11a-49f5-833c-33aaee237a25','8ca87019-4bfe-43c7-b100-5adf8fd6fbbb',_binary ''),('b0475217-c11a-49f5-833c-33aaee237a25','95893421-3e01-41ad-8d75-255e7e81e4d0',_binary ''),('b0475217-c11a-49f5-833c-33aaee237a25','c63b2066-2601-46ba-be46-4865a2af9fb1',_binary ''),('b0475217-c11a-49f5-833c-33aaee237a25','f14553d0-1ded-4935-a6ee-f84bf8265ec5',_binary ''),('b1088032-b0ab-4e61-9fd4-f58c3c6fe396','09814274-c074-43d4-90e9-b955a86ac5ab',_binary ''),('b1088032-b0ab-4e61-9fd4-f58c3c6fe396','2b1287b6-579c-4ca8-8c67-3ae43797f83f',_binary ''),('b1088032-b0ab-4e61-9fd4-f58c3c6fe396','46883c24-c9d6-40a4-a7ec-86086d6c9892',_binary ''),('b1088032-b0ab-4e61-9fd4-f58c3c6fe396','882ca1f6-cc4e-45fb-8c37-b28c9b367e20',_binary ''),('b1088032-b0ab-4e61-9fd4-f58c3c6fe396','88704bf7-69f8-4c11-9fce-96cf17f0fd85',_binary '\0'),('b1088032-b0ab-4e61-9fd4-f58c3c6fe396','8c9e794f-e41a-44d1-91b0-dcf521d7a60f',_binary '\0'),('b1088032-b0ab-4e61-9fd4-f58c3c6fe396','9d97a7e6-f4e0-42f8-b906-a8f674d5336d',_binary '\0'),('b1088032-b0ab-4e61-9fd4-f58c3c6fe396','a7cc0573-78dd-492f-a8d7-a66a9cd285de',_binary ''),('b1088032-b0ab-4e61-9fd4-f58c3c6fe396','f74057ad-184b-4f01-8947-fdd12da4a0fd',_binary '\0'),('b3af9339-dbdc-4ec6-b142-91237381d1de','4da313aa-06ea-4fda-b4b5-80d2cd5a2a16',_binary ''),('b3af9339-dbdc-4ec6-b142-91237381d1de','55ae0da8-23c0-4796-b3bb-a002ea377870',_binary '\0'),('b3af9339-dbdc-4ec6-b142-91237381d1de','5ef9bc49-df97-44f6-bdaa-a40377368a1a',_binary ''),('b3af9339-dbdc-4ec6-b142-91237381d1de','77983d6e-5896-40fc-8486-923344dba90c',_binary '\0'),('b3af9339-dbdc-4ec6-b142-91237381d1de','7d63cd15-fc63-4eb0-a2b6-c894ed8cda92',_binary '\0'),('b3af9339-dbdc-4ec6-b142-91237381d1de','816096c9-b105-455b-805d-d887b0cdf314',_binary ''),('b3af9339-dbdc-4ec6-b142-91237381d1de','d906096a-7031-4608-ab7a-e1046aa24ebc',_binary ''),('b3af9339-dbdc-4ec6-b142-91237381d1de','dc07de30-6518-4c49-b74c-7948f482a583',_binary ''),('b3af9339-dbdc-4ec6-b142-91237381d1de','dd7e350c-b03e-4743-b081-d6c9e860662e',_binary '\0'),('bf0a8c22-455e-4840-9240-f2a7d5b415f7','444fc554-8739-4d2d-a0d7-8f71b8a1d129',_binary '\0'),('bf0a8c22-455e-4840-9240-f2a7d5b415f7','625f2210-714e-4d31-9f58-9a6d9d4aa95b',_binary ''),('bf0a8c22-455e-4840-9240-f2a7d5b415f7','66dbbe7a-d6b9-4d1d-b437-f8f7a8da44da',_binary '\0'),('bf0a8c22-455e-4840-9240-f2a7d5b415f7','6fb6e60c-85bc-4695-8127-a571e81a2fd7',_binary '\0'),('bf0a8c22-455e-4840-9240-f2a7d5b415f7','7011312f-7085-4e66-af22-d73fd8d54724',_binary ''),('bf0a8c22-455e-4840-9240-f2a7d5b415f7','816bef08-a6f0-4074-8879-01a7d67d4918',_binary '\0'),('bf0a8c22-455e-4840-9240-f2a7d5b415f7','a27b05ba-3058-4404-8d07-becd0a92634a',_binary ''),('bf0a8c22-455e-4840-9240-f2a7d5b415f7','aa710d34-15aa-41e8-bea7-78d5269af573',_binary ''),('bf0a8c22-455e-4840-9240-f2a7d5b415f7','eea99c04-72d0-4364-a9f9-22afc631ee33',_binary ''),('c28dd0b0-60ed-40df-91db-0d9b1e14074b','4b9a4275-ee4b-4dc9-a8a2-0428fb232c38',_binary '\0'),('c28dd0b0-60ed-40df-91db-0d9b1e14074b','6209cbb9-9404-457c-9e29-68444a8347b8',_binary '\0'),('c28dd0b0-60ed-40df-91db-0d9b1e14074b','7685469d-bb7f-48d5-abf1-01c16ca11f2f',_binary '\0'),('c28dd0b0-60ed-40df-91db-0d9b1e14074b','79c357f1-a15a-404a-80fb-b3aacc5a3097',_binary '\0'),('c28dd0b0-60ed-40df-91db-0d9b1e14074b','8ca87019-4bfe-43c7-b100-5adf8fd6fbbb',_binary ''),('c28dd0b0-60ed-40df-91db-0d9b1e14074b','95893421-3e01-41ad-8d75-255e7e81e4d0',_binary ''),('c28dd0b0-60ed-40df-91db-0d9b1e14074b','c63b2066-2601-46ba-be46-4865a2af9fb1',_binary ''),('c28dd0b0-60ed-40df-91db-0d9b1e14074b','f14553d0-1ded-4935-a6ee-f84bf8265ec5',_binary ''),('c948de3b-8380-4528-a5b7-de403c58d40f','1bca493a-f048-4583-8a05-06e5b2bbceeb',_binary '\0'),('c948de3b-8380-4528-a5b7-de403c58d40f','36122d22-c5bc-471c-8694-ed913ee1de6f',_binary ''),('c948de3b-8380-4528-a5b7-de403c58d40f','3f20050b-2690-4eae-932e-55d4033bcb9c',_binary ''),('c948de3b-8380-4528-a5b7-de403c58d40f','628834b0-f4ce-431e-ad1a-7b1aa02bb389',_binary '\0'),('c948de3b-8380-4528-a5b7-de403c58d40f','9d2ff12d-6798-416a-a938-998b1ea40a7c',_binary ''),('c948de3b-8380-4528-a5b7-de403c58d40f','bc3d6466-832d-4c2a-8e64-b25af286304e',_binary ''),('c948de3b-8380-4528-a5b7-de403c58d40f','c1960172-937d-4322-bc36-60cb8d62e029',_binary '\0'),('c948de3b-8380-4528-a5b7-de403c58d40f','c7c12f84-00fc-4191-91f4-d9d53cfb760d',_binary '\0'),('c948de3b-8380-4528-a5b7-de403c58d40f','e5edd8d0-323b-4ba8-b943-aeb19c7a514e',_binary ''),('cc93c9ab-5a18-4913-845f-577116c22be9','4b9a4275-ee4b-4dc9-a8a2-0428fb232c38',_binary '\0'),('cc93c9ab-5a18-4913-845f-577116c22be9','6209cbb9-9404-457c-9e29-68444a8347b8',_binary '\0'),('cc93c9ab-5a18-4913-845f-577116c22be9','7685469d-bb7f-48d5-abf1-01c16ca11f2f',_binary '\0'),('cc93c9ab-5a18-4913-845f-577116c22be9','79c357f1-a15a-404a-80fb-b3aacc5a3097',_binary '\0'),('cc93c9ab-5a18-4913-845f-577116c22be9','8ca87019-4bfe-43c7-b100-5adf8fd6fbbb',_binary ''),('cc93c9ab-5a18-4913-845f-577116c22be9','95893421-3e01-41ad-8d75-255e7e81e4d0',_binary ''),('cc93c9ab-5a18-4913-845f-577116c22be9','c63b2066-2601-46ba-be46-4865a2af9fb1',_binary ''),('cc93c9ab-5a18-4913-845f-577116c22be9','d347d989-0abc-4a13-8c14-c1ddb3264c27',_binary ''),('cc93c9ab-5a18-4913-845f-577116c22be9','f14553d0-1ded-4935-a6ee-f84bf8265ec5',_binary ''),('cd83ad65-7b39-444d-8f77-18a2e9ef8179','09814274-c074-43d4-90e9-b955a86ac5ab',_binary ''),('cd83ad65-7b39-444d-8f77-18a2e9ef8179','2b1287b6-579c-4ca8-8c67-3ae43797f83f',_binary ''),('cd83ad65-7b39-444d-8f77-18a2e9ef8179','46883c24-c9d6-40a4-a7ec-86086d6c9892',_binary ''),('cd83ad65-7b39-444d-8f77-18a2e9ef8179','882ca1f6-cc4e-45fb-8c37-b28c9b367e20',_binary ''),('cd83ad65-7b39-444d-8f77-18a2e9ef8179','88704bf7-69f8-4c11-9fce-96cf17f0fd85',_binary '\0'),('cd83ad65-7b39-444d-8f77-18a2e9ef8179','8c9e794f-e41a-44d1-91b0-dcf521d7a60f',_binary '\0'),('cd83ad65-7b39-444d-8f77-18a2e9ef8179','9d97a7e6-f4e0-42f8-b906-a8f674d5336d',_binary '\0'),('cd83ad65-7b39-444d-8f77-18a2e9ef8179','a7cc0573-78dd-492f-a8d7-a66a9cd285de',_binary ''),('cd83ad65-7b39-444d-8f77-18a2e9ef8179','f74057ad-184b-4f01-8947-fdd12da4a0fd',_binary '\0'),('d0763c7a-1183-4390-aa83-1804c4bf13dd','32a6adf1-5209-4cc8-9f4f-97daf67777e4',_binary ''),('d0763c7a-1183-4390-aa83-1804c4bf13dd','63882871-ca1f-485c-8c37-7a4bb0ec13b4',_binary '\0'),('d0763c7a-1183-4390-aa83-1804c4bf13dd','7414b4b7-8306-4c6c-86b0-cc0a4a1f3752',_binary ''),('d0763c7a-1183-4390-aa83-1804c4bf13dd','786caaa4-7b36-474b-acff-b4cab4358208',_binary ''),('d0763c7a-1183-4390-aa83-1804c4bf13dd','a6d9ee28-55ef-4da3-b5da-03dab12522ce',_binary ''),('d0763c7a-1183-4390-aa83-1804c4bf13dd','c5171254-a8d1-4564-ac47-ef6890f0338f',_binary '\0'),('d0763c7a-1183-4390-aa83-1804c4bf13dd','ca8d577e-fc8e-4fab-bbd4-332b169fe26d',_binary '\0'),('d0763c7a-1183-4390-aa83-1804c4bf13dd','d4a4f8f3-865c-47a2-b5ef-21b4ef2bc4bb',_binary ''),('d0763c7a-1183-4390-aa83-1804c4bf13dd','dedb10ee-98c5-4f06-a7e7-ca5a600e5077',_binary '\0'),('d0aaa350-6ca7-4545-a008-583d46596744','444fc554-8739-4d2d-a0d7-8f71b8a1d129',_binary '\0'),('d0aaa350-6ca7-4545-a008-583d46596744','625f2210-714e-4d31-9f58-9a6d9d4aa95b',_binary ''),('d0aaa350-6ca7-4545-a008-583d46596744','66dbbe7a-d6b9-4d1d-b437-f8f7a8da44da',_binary '\0'),('d0aaa350-6ca7-4545-a008-583d46596744','6fb6e60c-85bc-4695-8127-a571e81a2fd7',_binary '\0'),('d0aaa350-6ca7-4545-a008-583d46596744','816bef08-a6f0-4074-8879-01a7d67d4918',_binary '\0'),('d0aaa350-6ca7-4545-a008-583d46596744','a27b05ba-3058-4404-8d07-becd0a92634a',_binary ''),('d0aaa350-6ca7-4545-a008-583d46596744','aa710d34-15aa-41e8-bea7-78d5269af573',_binary ''),('d0aaa350-6ca7-4545-a008-583d46596744','eea99c04-72d0-4364-a9f9-22afc631ee33',_binary ''),('d321d481-bc24-4294-af2c-7907fd6529b0','32a6adf1-5209-4cc8-9f4f-97daf67777e4',_binary ''),('d321d481-bc24-4294-af2c-7907fd6529b0','63882871-ca1f-485c-8c37-7a4bb0ec13b4',_binary '\0'),('d321d481-bc24-4294-af2c-7907fd6529b0','786caaa4-7b36-474b-acff-b4cab4358208',_binary ''),('d321d481-bc24-4294-af2c-7907fd6529b0','a6d9ee28-55ef-4da3-b5da-03dab12522ce',_binary ''),('d321d481-bc24-4294-af2c-7907fd6529b0','c5171254-a8d1-4564-ac47-ef6890f0338f',_binary '\0'),('d321d481-bc24-4294-af2c-7907fd6529b0','ca8d577e-fc8e-4fab-bbd4-332b169fe26d',_binary '\0'),('d321d481-bc24-4294-af2c-7907fd6529b0','d4a4f8f3-865c-47a2-b5ef-21b4ef2bc4bb',_binary ''),('d321d481-bc24-4294-af2c-7907fd6529b0','dedb10ee-98c5-4f06-a7e7-ca5a600e5077',_binary '\0'),('da68d9d1-cd82-4d04-90ad-6a5aa63e301a','1bca493a-f048-4583-8a05-06e5b2bbceeb',_binary '\0'),('da68d9d1-cd82-4d04-90ad-6a5aa63e301a','36122d22-c5bc-471c-8694-ed913ee1de6f',_binary ''),('da68d9d1-cd82-4d04-90ad-6a5aa63e301a','3f20050b-2690-4eae-932e-55d4033bcb9c',_binary ''),('da68d9d1-cd82-4d04-90ad-6a5aa63e301a','628834b0-f4ce-431e-ad1a-7b1aa02bb389',_binary '\0'),('da68d9d1-cd82-4d04-90ad-6a5aa63e301a','9d2ff12d-6798-416a-a938-998b1ea40a7c',_binary ''),('da68d9d1-cd82-4d04-90ad-6a5aa63e301a','bc3d6466-832d-4c2a-8e64-b25af286304e',_binary ''),('da68d9d1-cd82-4d04-90ad-6a5aa63e301a','c1960172-937d-4322-bc36-60cb8d62e029',_binary '\0'),('da68d9d1-cd82-4d04-90ad-6a5aa63e301a','c7c12f84-00fc-4191-91f4-d9d53cfb760d',_binary '\0'),('da68d9d1-cd82-4d04-90ad-6a5aa63e301a','e5edd8d0-323b-4ba8-b943-aeb19c7a514e',_binary ''),('e7ce9cbf-460c-4fb6-9da2-484548018706','09814274-c074-43d4-90e9-b955a86ac5ab',_binary ''),('e7ce9cbf-460c-4fb6-9da2-484548018706','2b1287b6-579c-4ca8-8c67-3ae43797f83f',_binary ''),('e7ce9cbf-460c-4fb6-9da2-484548018706','46883c24-c9d6-40a4-a7ec-86086d6c9892',_binary ''),('e7ce9cbf-460c-4fb6-9da2-484548018706','882ca1f6-cc4e-45fb-8c37-b28c9b367e20',_binary ''),('e7ce9cbf-460c-4fb6-9da2-484548018706','88704bf7-69f8-4c11-9fce-96cf17f0fd85',_binary '\0'),('e7ce9cbf-460c-4fb6-9da2-484548018706','8c9e794f-e41a-44d1-91b0-dcf521d7a60f',_binary '\0'),('e7ce9cbf-460c-4fb6-9da2-484548018706','9d97a7e6-f4e0-42f8-b906-a8f674d5336d',_binary '\0'),('e7ce9cbf-460c-4fb6-9da2-484548018706','a7cc0573-78dd-492f-a8d7-a66a9cd285de',_binary ''),('e7ce9cbf-460c-4fb6-9da2-484548018706','f74057ad-184b-4f01-8947-fdd12da4a0fd',_binary '\0'),('f5768d73-d038-46a2-94b6-7370cb299152','4b9a4275-ee4b-4dc9-a8a2-0428fb232c38',_binary '\0'),('f5768d73-d038-46a2-94b6-7370cb299152','6209cbb9-9404-457c-9e29-68444a8347b8',_binary '\0'),('f5768d73-d038-46a2-94b6-7370cb299152','7685469d-bb7f-48d5-abf1-01c16ca11f2f',_binary '\0'),('f5768d73-d038-46a2-94b6-7370cb299152','79c357f1-a15a-404a-80fb-b3aacc5a3097',_binary '\0'),('f5768d73-d038-46a2-94b6-7370cb299152','8ca87019-4bfe-43c7-b100-5adf8fd6fbbb',_binary ''),('f5768d73-d038-46a2-94b6-7370cb299152','95893421-3e01-41ad-8d75-255e7e81e4d0',_binary ''),('f5768d73-d038-46a2-94b6-7370cb299152','c63b2066-2601-46ba-be46-4865a2af9fb1',_binary ''),('f5768d73-d038-46a2-94b6-7370cb299152','d347d989-0abc-4a13-8c14-c1ddb3264c27',_binary ''),('f5768d73-d038-46a2-94b6-7370cb299152','f14553d0-1ded-4935-a6ee-f84bf8265ec5',_binary ''),('fc2a72df-deaf-4360-830b-8b81948da740','1bca493a-f048-4583-8a05-06e5b2bbceeb',_binary '\0'),('fc2a72df-deaf-4360-830b-8b81948da740','36122d22-c5bc-471c-8694-ed913ee1de6f',_binary ''),('fc2a72df-deaf-4360-830b-8b81948da740','3f20050b-2690-4eae-932e-55d4033bcb9c',_binary ''),('fc2a72df-deaf-4360-830b-8b81948da740','628834b0-f4ce-431e-ad1a-7b1aa02bb389',_binary '\0'),('fc2a72df-deaf-4360-830b-8b81948da740','9d2ff12d-6798-416a-a938-998b1ea40a7c',_binary ''),('fc2a72df-deaf-4360-830b-8b81948da740','bc3d6466-832d-4c2a-8e64-b25af286304e',_binary ''),('fc2a72df-deaf-4360-830b-8b81948da740','c1960172-937d-4322-bc36-60cb8d62e029',_binary '\0'),('fc2a72df-deaf-4360-830b-8b81948da740','c7c12f84-00fc-4191-91f4-d9d53cfb760d',_binary '\0'),('fc2a72df-deaf-4360-830b-8b81948da740','e5edd8d0-323b-4ba8-b943-aeb19c7a514e',_binary ''),('fc9017e3-d5da-44aa-8c39-f16017ad8608','32a6adf1-5209-4cc8-9f4f-97daf67777e4',_binary ''),('fc9017e3-d5da-44aa-8c39-f16017ad8608','63882871-ca1f-485c-8c37-7a4bb0ec13b4',_binary '\0'),('fc9017e3-d5da-44aa-8c39-f16017ad8608','7414b4b7-8306-4c6c-86b0-cc0a4a1f3752',_binary ''),('fc9017e3-d5da-44aa-8c39-f16017ad8608','786caaa4-7b36-474b-acff-b4cab4358208',_binary ''),('fc9017e3-d5da-44aa-8c39-f16017ad8608','a6d9ee28-55ef-4da3-b5da-03dab12522ce',_binary ''),('fc9017e3-d5da-44aa-8c39-f16017ad8608','c5171254-a8d1-4564-ac47-ef6890f0338f',_binary '\0'),('fc9017e3-d5da-44aa-8c39-f16017ad8608','ca8d577e-fc8e-4fab-bbd4-332b169fe26d',_binary '\0'),('fc9017e3-d5da-44aa-8c39-f16017ad8608','d4a4f8f3-865c-47a2-b5ef-21b4ef2bc4bb',_binary ''),('fc9017e3-d5da-44aa-8c39-f16017ad8608','dedb10ee-98c5-4f06-a7e7-ca5a600e5077',_binary '\0');
+/*!40000 ALTER TABLE `CLIENT_SCOPE_CLIENT` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `CLIENT_SCOPE_ROLE_MAPPING`
+--
+
+DROP TABLE IF EXISTS `CLIENT_SCOPE_ROLE_MAPPING`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `CLIENT_SCOPE_ROLE_MAPPING` (
+  `SCOPE_ID` varchar(36) NOT NULL,
+  `ROLE_ID` varchar(36) NOT NULL,
+  PRIMARY KEY (`SCOPE_ID`,`ROLE_ID`),
+  KEY `IDX_CLSCOPE_ROLE` (`SCOPE_ID`),
+  KEY `IDX_ROLE_CLSCOPE` (`ROLE_ID`),
+  CONSTRAINT `FK_CL_SCOPE_RM_SCOPE` FOREIGN KEY (`SCOPE_ID`) REFERENCES `CLIENT_SCOPE` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `CLIENT_SCOPE_ROLE_MAPPING`
+--
+
+LOCK TABLES `CLIENT_SCOPE_ROLE_MAPPING` WRITE;
+/*!40000 ALTER TABLE `CLIENT_SCOPE_ROLE_MAPPING` DISABLE KEYS */;
+INSERT INTO `CLIENT_SCOPE_ROLE_MAPPING` VALUES ('444fc554-8739-4d2d-a0d7-8f71b8a1d129','c3c88538-83c6-43fa-8172-0d071b88aee4'),('7685469d-bb7f-48d5-abf1-01c16ca11f2f','8f37a057-52cd-4775-8de6-8566dca090e5'),('77983d6e-5896-40fc-8486-923344dba90c','65c4d68a-414a-4a92-b41b-13a57f79de65'),('8c9e794f-e41a-44d1-91b0-dcf521d7a60f','535888f1-55f1-41ec-9957-67d782232af0'),('c1960172-937d-4322-bc36-60cb8d62e029','f9232b84-1ebd-45f1-beb5-21bf4eff1fdc'),('c5171254-a8d1-4564-ac47-ef6890f0338f','c7cdedbe-5434-49e5-9548-9d5d6dc1c51b');
+/*!40000 ALTER TABLE `CLIENT_SCOPE_ROLE_MAPPING` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `CLIENT_SESSION`
+--
+
+DROP TABLE IF EXISTS `CLIENT_SESSION`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `CLIENT_SESSION` (
+  `ID` varchar(36) NOT NULL,
+  `CLIENT_ID` varchar(36) DEFAULT NULL,
+  `REDIRECT_URI` varchar(255) DEFAULT NULL,
+  `STATE` varchar(255) DEFAULT NULL,
+  `TIMESTAMP` int DEFAULT NULL,
+  `SESSION_ID` varchar(36) DEFAULT NULL,
+  `AUTH_METHOD` varchar(255) DEFAULT NULL,
+  `REALM_ID` varchar(255) DEFAULT NULL,
+  `AUTH_USER_ID` varchar(36) DEFAULT NULL,
+  `CURRENT_ACTION` varchar(36) DEFAULT NULL,
+  PRIMARY KEY (`ID`),
+  KEY `IDX_CLIENT_SESSION_SESSION` (`SESSION_ID`),
+  CONSTRAINT `FK_B4AO2VCVAT6UKAU74WBWTFQO1` FOREIGN KEY (`SESSION_ID`) REFERENCES `USER_SESSION` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `CLIENT_SESSION`
+--
+
+LOCK TABLES `CLIENT_SESSION` WRITE;
+/*!40000 ALTER TABLE `CLIENT_SESSION` DISABLE KEYS */;
+/*!40000 ALTER TABLE `CLIENT_SESSION` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `CLIENT_SESSION_AUTH_STATUS`
+--
+
+DROP TABLE IF EXISTS `CLIENT_SESSION_AUTH_STATUS`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `CLIENT_SESSION_AUTH_STATUS` (
+  `AUTHENTICATOR` varchar(36) NOT NULL,
+  `STATUS` int DEFAULT NULL,
+  `CLIENT_SESSION` varchar(36) NOT NULL,
+  PRIMARY KEY (`CLIENT_SESSION`,`AUTHENTICATOR`),
+  CONSTRAINT `AUTH_STATUS_CONSTRAINT` FOREIGN KEY (`CLIENT_SESSION`) REFERENCES `CLIENT_SESSION` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `CLIENT_SESSION_AUTH_STATUS`
+--
+
+LOCK TABLES `CLIENT_SESSION_AUTH_STATUS` WRITE;
+/*!40000 ALTER TABLE `CLIENT_SESSION_AUTH_STATUS` DISABLE KEYS */;
+/*!40000 ALTER TABLE `CLIENT_SESSION_AUTH_STATUS` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `CLIENT_SESSION_NOTE`
+--
+
+DROP TABLE IF EXISTS `CLIENT_SESSION_NOTE`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `CLIENT_SESSION_NOTE` (
+  `NAME` varchar(255) NOT NULL,
+  `VALUE` varchar(255) DEFAULT NULL,
+  `CLIENT_SESSION` varchar(36) NOT NULL,
+  PRIMARY KEY (`CLIENT_SESSION`,`NAME`),
+  CONSTRAINT `FK5EDFB00FF51C2736` FOREIGN KEY (`CLIENT_SESSION`) REFERENCES `CLIENT_SESSION` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `CLIENT_SESSION_NOTE`
+--
+
+LOCK TABLES `CLIENT_SESSION_NOTE` WRITE;
+/*!40000 ALTER TABLE `CLIENT_SESSION_NOTE` DISABLE KEYS */;
+/*!40000 ALTER TABLE `CLIENT_SESSION_NOTE` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `CLIENT_SESSION_PROT_MAPPER`
+--
+
+DROP TABLE IF EXISTS `CLIENT_SESSION_PROT_MAPPER`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `CLIENT_SESSION_PROT_MAPPER` (
+  `PROTOCOL_MAPPER_ID` varchar(36) NOT NULL,
+  `CLIENT_SESSION` varchar(36) NOT NULL,
+  PRIMARY KEY (`CLIENT_SESSION`,`PROTOCOL_MAPPER_ID`),
+  CONSTRAINT `FK_33A8SGQW18I532811V7O2DK89` FOREIGN KEY (`CLIENT_SESSION`) REFERENCES `CLIENT_SESSION` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `CLIENT_SESSION_PROT_MAPPER`
+--
+
+LOCK TABLES `CLIENT_SESSION_PROT_MAPPER` WRITE;
+/*!40000 ALTER TABLE `CLIENT_SESSION_PROT_MAPPER` DISABLE KEYS */;
+/*!40000 ALTER TABLE `CLIENT_SESSION_PROT_MAPPER` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `CLIENT_SESSION_ROLE`
+--
+
+DROP TABLE IF EXISTS `CLIENT_SESSION_ROLE`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `CLIENT_SESSION_ROLE` (
+  `ROLE_ID` varchar(255) NOT NULL,
+  `CLIENT_SESSION` varchar(36) NOT NULL,
+  PRIMARY KEY (`CLIENT_SESSION`,`ROLE_ID`),
+  CONSTRAINT `FK_11B7SGQW18I532811V7O2DV76` FOREIGN KEY (`CLIENT_SESSION`) REFERENCES `CLIENT_SESSION` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `CLIENT_SESSION_ROLE`
+--
+
+LOCK TABLES `CLIENT_SESSION_ROLE` WRITE;
+/*!40000 ALTER TABLE `CLIENT_SESSION_ROLE` DISABLE KEYS */;
+/*!40000 ALTER TABLE `CLIENT_SESSION_ROLE` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `CLIENT_USER_SESSION_NOTE`
+--
+
+DROP TABLE IF EXISTS `CLIENT_USER_SESSION_NOTE`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `CLIENT_USER_SESSION_NOTE` (
+  `NAME` varchar(255) NOT NULL,
+  `VALUE` text,
+  `CLIENT_SESSION` varchar(36) NOT NULL,
+  PRIMARY KEY (`CLIENT_SESSION`,`NAME`),
+  CONSTRAINT `FK_CL_USR_SES_NOTE` FOREIGN KEY (`CLIENT_SESSION`) REFERENCES `CLIENT_SESSION` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `CLIENT_USER_SESSION_NOTE`
+--
+
+LOCK TABLES `CLIENT_USER_SESSION_NOTE` WRITE;
+/*!40000 ALTER TABLE `CLIENT_USER_SESSION_NOTE` DISABLE KEYS */;
+/*!40000 ALTER TABLE `CLIENT_USER_SESSION_NOTE` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `COMPONENT`
+--
+
+DROP TABLE IF EXISTS `COMPONENT`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `COMPONENT` (
+  `ID` varchar(36) NOT NULL,
+  `NAME` varchar(255) DEFAULT NULL,
+  `PARENT_ID` varchar(36) DEFAULT NULL,
+  `PROVIDER_ID` varchar(36) DEFAULT NULL,
+  `PROVIDER_TYPE` varchar(255) DEFAULT NULL,
+  `REALM_ID` varchar(36) DEFAULT NULL,
+  `SUB_TYPE` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`ID`),
+  KEY `IDX_COMPONENT_REALM` (`REALM_ID`),
+  KEY `IDX_COMPONENT_PROVIDER_TYPE` (`PROVIDER_TYPE`),
+  CONSTRAINT `FK_COMPONENT_REALM` FOREIGN KEY (`REALM_ID`) REFERENCES `REALM` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `COMPONENT`
+--
+
+LOCK TABLES `COMPONENT` WRITE;
+/*!40000 ALTER TABLE `COMPONENT` DISABLE KEYS */;
+INSERT INTO `COMPONENT` VALUES ('01786429-596b-489f-8a90-ccb57264e86e','rsa-generated','org1','rsa-generated','org.keycloak.keys.KeyProvider','org1',NULL),('0b05ebc5-cfd3-402c-9220-5da53071b446','Full Scope Disabled','dabc51bf-58ea-42ed-9918-4114e6b08338','scope','org.keycloak.services.clientregistration.policy.ClientRegistrationPolicy','dabc51bf-58ea-42ed-9918-4114e6b08338','anonymous'),('0ceab05b-e563-4c1a-9f14-4fc4cd69a95b','Allowed Protocol Mapper Types','org1','allowed-protocol-mappers','org.keycloak.services.clientregistration.policy.ClientRegistrationPolicy','org1','anonymous'),('110813c7-e2ff-4dee-b26d-8726ed9b47d4','Trusted Hosts','org3','trusted-hosts','org.keycloak.services.clientregistration.policy.ClientRegistrationPolicy','org3','anonymous'),('116efd4e-d678-43f2-af62-1bdfbcd23b73','Consent Required','dabc51bf-58ea-42ed-9918-4114e6b08338','consent-required','org.keycloak.services.clientregistration.policy.ClientRegistrationPolicy','dabc51bf-58ea-42ed-9918-4114e6b08338','anonymous'),('129d18ef-d574-4951-a810-9b0409114af1','Full Scope Disabled','org5','scope','org.keycloak.services.clientregistration.policy.ClientRegistrationPolicy','org5','anonymous'),('12fe9341-4670-436d-8ded-efd663bc0134','rsa-enc-generated','dabc51bf-58ea-42ed-9918-4114e6b08338','rsa-enc-generated','org.keycloak.keys.KeyProvider','dabc51bf-58ea-42ed-9918-4114e6b08338',NULL),('14f2826f-3905-49be-a851-f599a4954315','Allowed Client Scopes','org2','allowed-client-templates','org.keycloak.services.clientregistration.policy.ClientRegistrationPolicy','org2','authenticated'),('15f30367-da6a-473d-a937-8cee56a97ab7','Trusted Hosts','org2','trusted-hosts','org.keycloak.services.clientregistration.policy.ClientRegistrationPolicy','org2','anonymous'),('183c2b16-24f1-495b-bab5-d10777a3b701','Trusted Hosts','org5','trusted-hosts','org.keycloak.services.clientregistration.policy.ClientRegistrationPolicy','org5','anonymous'),('18aada12-6c75-4729-96a4-f836dfef6141','Allowed Protocol Mapper Types','org5','allowed-protocol-mappers','org.keycloak.services.clientregistration.policy.ClientRegistrationPolicy','org5','authenticated'),('1af77db7-5cb1-4f74-bac7-1e91f15171b2','Allowed Client Scopes','org3','allowed-client-templates','org.keycloak.services.clientregistration.policy.ClientRegistrationPolicy','org3','anonymous'),('1c96144e-e9e6-4ef9-a042-98d2317b37d5','Allowed Client Scopes','org1','allowed-client-templates','org.keycloak.services.clientregistration.policy.ClientRegistrationPolicy','org1','authenticated'),('1dce4b98-2422-4f99-9948-8bb81f8b4a1e','rsa-generated','org2','rsa-generated','org.keycloak.keys.KeyProvider','org2',NULL),('22c2335b-2609-4844-a9aa-350931d513df','rsa-enc-generated','org5','rsa-enc-generated','org.keycloak.keys.KeyProvider','org5',NULL),('2340793c-9c1e-423c-8d01-abbb6c19b77e',NULL,'org2','declarative-user-profile','org.keycloak.userprofile.UserProfileProvider','org2',NULL),('271c9aa5-0424-4f1f-8d22-78d0490cea99',NULL,'org5','declarative-user-profile','org.keycloak.userprofile.UserProfileProvider','org5',NULL),('2d4def39-3a6c-4594-8fc3-e3b270868f9f','Allowed Protocol Mapper Types','org4','allowed-protocol-mappers','org.keycloak.services.clientregistration.policy.ClientRegistrationPolicy','org4','authenticated'),('3a41aeb3-e596-4909-b5d1-f4fe46b4220e','Consent Required','org3','consent-required','org.keycloak.services.clientregistration.policy.ClientRegistrationPolicy','org3','anonymous'),('3bef268b-ab75-49f6-8900-577d779eb884','Full Scope Disabled','org1','scope','org.keycloak.services.clientregistration.policy.ClientRegistrationPolicy','org1','anonymous'),('3e2600ce-a8ff-490c-ac6c-7ecdea59898f','rsa-generated','org5','rsa-generated','org.keycloak.keys.KeyProvider','org5',NULL),('3e49a95d-55e9-4caf-b448-5fe445b636b5','hmac-generated','org4','hmac-generated','org.keycloak.keys.KeyProvider','org4',NULL),('47c04626-f12e-4017-a060-ea2446c5dadd','Full Scope Disabled','org4','scope','org.keycloak.services.clientregistration.policy.ClientRegistrationPolicy','org4','anonymous'),('47dcd19d-4464-4b44-8e9a-11f191093e02',NULL,'org3','declarative-user-profile','org.keycloak.userprofile.UserProfileProvider','org3',NULL),('4bccb431-74b9-4d2a-87b4-325d577b2571','Allowed Client Scopes','org1','allowed-client-templates','org.keycloak.services.clientregistration.policy.ClientRegistrationPolicy','org1','anonymous'),('4f70a015-ef75-4a8d-ad5c-96d64fcc2e55','hmac-generated','org2','hmac-generated','org.keycloak.keys.KeyProvider','org2',NULL),('50538daf-6b1e-4572-ad04-0ac40bd5087e','Allowed Protocol Mapper Types','org1','allowed-protocol-mappers','org.keycloak.services.clientregistration.policy.ClientRegistrationPolicy','org1','authenticated'),('536759d0-4311-4295-af48-7f0f07a74b09','Full Scope Disabled','org2','scope','org.keycloak.services.clientregistration.policy.ClientRegistrationPolicy','org2','anonymous'),('56d80c01-881a-413e-84f4-7fe1ed9f18e4','Trusted Hosts','org1','trusted-hosts','org.keycloak.services.clientregistration.policy.ClientRegistrationPolicy','org1','anonymous'),('5b191c64-4d7c-4fe8-914d-c1b22aaf5cef','rsa-generated','org4','rsa-generated','org.keycloak.keys.KeyProvider','org4',NULL),('624f83c4-3bee-47bf-b141-17fcb31bab54','Allowed Protocol Mapper Types','org2','allowed-protocol-mappers','org.keycloak.services.clientregistration.policy.ClientRegistrationPolicy','org2','authenticated'),('69b0faa2-87db-4ef5-8d1c-6f52fe7f940f','Consent Required','org1','consent-required','org.keycloak.services.clientregistration.policy.ClientRegistrationPolicy','org1','anonymous'),('70e3da01-d47b-49cc-bf95-eebfeba681fe','hmac-generated','dabc51bf-58ea-42ed-9918-4114e6b08338','hmac-generated','org.keycloak.keys.KeyProvider','dabc51bf-58ea-42ed-9918-4114e6b08338',NULL),('75e4d35c-e1f5-4b25-9a9f-cfe25f85140d','Allowed Client Scopes','dabc51bf-58ea-42ed-9918-4114e6b08338','allowed-client-templates','org.keycloak.services.clientregistration.policy.ClientRegistrationPolicy','dabc51bf-58ea-42ed-9918-4114e6b08338','authenticated'),('79db3c52-cc04-44fb-a7c6-7ac15f09a63f','Max Clients Limit','org1','max-clients','org.keycloak.services.clientregistration.policy.ClientRegistrationPolicy','org1','anonymous'),('7a62be0e-52d5-4f86-a628-7592b43769a1','hmac-generated','org3','hmac-generated','org.keycloak.keys.KeyProvider','org3',NULL),('7bdd7835-f7da-4981-8bc2-68119f56ab28','Allowed Client Scopes','dabc51bf-58ea-42ed-9918-4114e6b08338','allowed-client-templates','org.keycloak.services.clientregistration.policy.ClientRegistrationPolicy','dabc51bf-58ea-42ed-9918-4114e6b08338','anonymous'),('810247d5-b40f-4175-bb44-c499b7025b86','Max Clients Limit','org3','max-clients','org.keycloak.services.clientregistration.policy.ClientRegistrationPolicy','org3','anonymous'),('82130434-a3c8-44b6-93a6-e2918e5ccc88','Allowed Protocol Mapper Types','org5','allowed-protocol-mappers','org.keycloak.services.clientregistration.policy.ClientRegistrationPolicy','org5','anonymous'),('83c41551-1caf-4461-8978-399813474238','rsa-enc-generated','org4','rsa-enc-generated','org.keycloak.keys.KeyProvider','org4',NULL),('87c57f18-e064-4826-89d5-ff8915be0664','Allowed Client Scopes','org5','allowed-client-templates','org.keycloak.services.clientregistration.policy.ClientRegistrationPolicy','org5','authenticated'),('8924aaa2-2c3c-4ed8-a418-3360fb02cc46','Allowed Client Scopes','org4','allowed-client-templates','org.keycloak.services.clientregistration.policy.ClientRegistrationPolicy','org4','authenticated'),('8dcab68e-ffc9-4d12-8062-3ecc1dc0a1c6','rsa-generated','dabc51bf-58ea-42ed-9918-4114e6b08338','rsa-generated','org.keycloak.keys.KeyProvider','dabc51bf-58ea-42ed-9918-4114e6b08338',NULL),('8e80099d-b595-42d5-9287-372c2c31c118',NULL,'org4','declarative-user-profile','org.keycloak.userprofile.UserProfileProvider','org4',NULL),('9b93d78e-e5bb-43bb-86b7-871b14db62ca','rsa-enc-generated','org1','rsa-enc-generated','org.keycloak.keys.KeyProvider','org1',NULL),('9e95ae01-2b6e-4b38-a2cb-6f3be06e9905','Allowed Protocol Mapper Types','org2','allowed-protocol-mappers','org.keycloak.services.clientregistration.policy.ClientRegistrationPolicy','org2','anonymous'),('a42f68cc-9a64-4b32-b1a0-d8d9c79f327f','Allowed Protocol Mapper Types','org3','allowed-protocol-mappers','org.keycloak.services.clientregistration.policy.ClientRegistrationPolicy','org3','authenticated'),('a57ef1bf-6e18-406b-ab76-efda5184ac1b','aes-generated','org5','aes-generated','org.keycloak.keys.KeyProvider','org5',NULL),('ab350360-86af-4c99-9a0a-84ca2cef7cff','hmac-generated','org1','hmac-generated','org.keycloak.keys.KeyProvider','org1',NULL),('acacf2f3-4b77-4c49-9ead-5d6f9ef7cb5e','rsa-generated','org3','rsa-generated','org.keycloak.keys.KeyProvider','org3',NULL),('af402381-baf1-4b78-821c-ee2610dccff4','Max Clients Limit','dabc51bf-58ea-42ed-9918-4114e6b08338','max-clients','org.keycloak.services.clientregistration.policy.ClientRegistrationPolicy','dabc51bf-58ea-42ed-9918-4114e6b08338','anonymous'),('b107d4a6-fc2b-4170-ad29-b13b959cec4c','Allowed Protocol Mapper Types','dabc51bf-58ea-42ed-9918-4114e6b08338','allowed-protocol-mappers','org.keycloak.services.clientregistration.policy.ClientRegistrationPolicy','dabc51bf-58ea-42ed-9918-4114e6b08338','anonymous'),('b1600350-8929-45aa-8fc2-f040ee914b20','Full Scope Disabled','org3','scope','org.keycloak.services.clientregistration.policy.ClientRegistrationPolicy','org3','anonymous'),('b3570c62-6275-4701-badc-a9499dbe77ea','aes-generated','org2','aes-generated','org.keycloak.keys.KeyProvider','org2',NULL),('b3db4109-f00d-4052-909b-d7ea51247f6c','Consent Required','org5','consent-required','org.keycloak.services.clientregistration.policy.ClientRegistrationPolicy','org5','anonymous'),('b41e7d1f-2ab5-4311-aa1c-5ddb518f677a','Trusted Hosts','dabc51bf-58ea-42ed-9918-4114e6b08338','trusted-hosts','org.keycloak.services.clientregistration.policy.ClientRegistrationPolicy','dabc51bf-58ea-42ed-9918-4114e6b08338','anonymous'),('b78af578-efd2-4ae8-986d-2d9baa06628e','rsa-enc-generated','org3','rsa-enc-generated','org.keycloak.keys.KeyProvider','org3',NULL),('bdba424c-5f08-412f-81c5-09871c23adb8','rsa-enc-generated','org2','rsa-enc-generated','org.keycloak.keys.KeyProvider','org2',NULL),('c5600706-69ee-4740-bc29-4be2282be572','Allowed Client Scopes','org3','allowed-client-templates','org.keycloak.services.clientregistration.policy.ClientRegistrationPolicy','org3','authenticated'),('c679c0c2-f74e-4831-ab8c-87ceb6b5d528','aes-generated','dabc51bf-58ea-42ed-9918-4114e6b08338','aes-generated','org.keycloak.keys.KeyProvider','dabc51bf-58ea-42ed-9918-4114e6b08338',NULL),('c9938567-6270-4508-b018-cb23e7d39a80','Allowed Protocol Mapper Types','dabc51bf-58ea-42ed-9918-4114e6b08338','allowed-protocol-mappers','org.keycloak.services.clientregistration.policy.ClientRegistrationPolicy','dabc51bf-58ea-42ed-9918-4114e6b08338','authenticated'),('d0d68f57-45ce-429f-ab98-d4231a234336','aes-generated','org4','aes-generated','org.keycloak.keys.KeyProvider','org4',NULL),('d5d180d5-20d8-4d7f-b0a7-7bafb7bcac0f','Allowed Client Scopes','org2','allowed-client-templates','org.keycloak.services.clientregistration.policy.ClientRegistrationPolicy','org2','anonymous'),('d98bd3f1-5f39-4f54-b47f-e8b502cded6e','Allowed Client Scopes','org5','allowed-client-templates','org.keycloak.services.clientregistration.policy.ClientRegistrationPolicy','org5','anonymous'),('dbf03864-c7cf-42dd-a399-6136995d716a','Allowed Client Scopes','org4','allowed-client-templates','org.keycloak.services.clientregistration.policy.ClientRegistrationPolicy','org4','anonymous'),('dfa2b049-f654-44d6-b514-bb9394f473d8','Max Clients Limit','org4','max-clients','org.keycloak.services.clientregistration.policy.ClientRegistrationPolicy','org4','anonymous'),('e0303cd1-46d2-46a8-967c-de27eed24a38',NULL,'org1','declarative-user-profile','org.keycloak.userprofile.UserProfileProvider','org1',NULL),('e14d1c34-470e-48cf-8994-3a7255c001b3','Max Clients Limit','org2','max-clients','org.keycloak.services.clientregistration.policy.ClientRegistrationPolicy','org2','anonymous'),('e1d9bfc2-a0bb-4ca8-a851-29c01f548cc7','Consent Required','org2','consent-required','org.keycloak.services.clientregistration.policy.ClientRegistrationPolicy','org2','anonymous'),('e2b54a93-5e11-4806-bc9b-95ce899c1532','aes-generated','org1','aes-generated','org.keycloak.keys.KeyProvider','org1',NULL),('e6d16d5b-014f-4c4f-89b6-f9250da365dc','Allowed Protocol Mapper Types','org4','allowed-protocol-mappers','org.keycloak.services.clientregistration.policy.ClientRegistrationPolicy','org4','anonymous'),('ea80dac8-88e6-4ffe-b4f9-57731f0edbfa','hmac-generated','org5','hmac-generated','org.keycloak.keys.KeyProvider','org5',NULL),('ec72c9c8-e9db-489a-8183-776fb6b2f41a','Max Clients Limit','org5','max-clients','org.keycloak.services.clientregistration.policy.ClientRegistrationPolicy','org5','anonymous'),('efe1688b-7668-4832-8b80-addbf37595d3','Allowed Protocol Mapper Types','org3','allowed-protocol-mappers','org.keycloak.services.clientregistration.policy.ClientRegistrationPolicy','org3','anonymous'),('f3d63105-67d6-4ba8-8bd1-732e87de63f0','Consent Required','org4','consent-required','org.keycloak.services.clientregistration.policy.ClientRegistrationPolicy','org4','anonymous'),('f6cc436d-8a78-40f3-bc06-d6e30131fde4','aes-generated','org3','aes-generated','org.keycloak.keys.KeyProvider','org3',NULL),('fd7968e9-0c10-4e77-9b8e-a638c785d67e','Trusted Hosts','org4','trusted-hosts','org.keycloak.services.clientregistration.policy.ClientRegistrationPolicy','org4','anonymous');
+/*!40000 ALTER TABLE `COMPONENT` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `COMPONENT_CONFIG`
+--
+
+DROP TABLE IF EXISTS `COMPONENT_CONFIG`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `COMPONENT_CONFIG` (
+  `ID` varchar(36) NOT NULL,
+  `COMPONENT_ID` varchar(36) NOT NULL,
+  `NAME` varchar(255) NOT NULL,
+  `VALUE` varchar(4000) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
+  PRIMARY KEY (`ID`),
+  KEY `IDX_COMPO_CONFIG_COMPO` (`COMPONENT_ID`),
+  CONSTRAINT `FK_COMPONENT_CONFIG` FOREIGN KEY (`COMPONENT_ID`) REFERENCES `COMPONENT` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `COMPONENT_CONFIG`
+--
+
+LOCK TABLES `COMPONENT_CONFIG` WRITE;
+/*!40000 ALTER TABLE `COMPONENT_CONFIG` DISABLE KEYS */;
+INSERT INTO `COMPONENT_CONFIG` VALUES ('0040ca93-a947-43c9-bcd8-fb171d71edee','b3570c62-6275-4701-badc-a9499dbe77ea','kid','ee00c533-cb65-4bbe-9d4e-bb115bc918ec'),('013c661e-69ff-468e-a223-2a0035838676','ab350360-86af-4c99-9a0a-84ca2cef7cff','priority','100'),('02179ba4-b57d-40ed-8e1c-2f79328dd0ce','b107d4a6-fc2b-4170-ad29-b13b959cec4c','allowed-protocol-mapper-types','saml-role-list-mapper'),('049da3b7-6c8d-4775-b705-7aed0d825adf','a42f68cc-9a64-4b32-b1a0-d8d9c79f327f','allowed-protocol-mapper-types','saml-user-property-mapper'),('06652671-b64d-474f-8dc5-1a1e31704eba','624f83c4-3bee-47bf-b141-17fcb31bab54','allowed-protocol-mapper-types','oidc-address-mapper'),('07c5f938-f867-4b7e-855a-d477599a0b06','87c57f18-e064-4826-89d5-ff8915be0664','allow-default-scopes','true'),('0885eae5-9e52-4efb-8a20-77d8ba7f30b5','2d4def39-3a6c-4594-8fc3-e3b270868f9f','allowed-protocol-mapper-types','saml-user-attribute-mapper'),('0908dcc8-5c89-475d-8dd2-b47aa56b79c7','acacf2f3-4b77-4c49-9ead-5d6f9ef7cb5e','priority','100'),('0962da5a-dd88-42b5-a74c-65876f78317e','9e95ae01-2b6e-4b38-a2cb-6f3be06e9905','allowed-protocol-mapper-types','saml-user-property-mapper'),('09bdbcaa-04e7-42ab-bb66-b1ccdadcfbbe','110813c7-e2ff-4dee-b26d-8726ed9b47d4','client-uris-must-match','true'),('0bc618d9-c61c-4cd3-9c14-cc34c010851e','7bdd7835-f7da-4981-8bc2-68119f56ab28','allow-default-scopes','true'),('0bf51428-9bb0-4f97-b85a-fcec5e5d83e6','e6d16d5b-014f-4c4f-89b6-f9250da365dc','allowed-protocol-mapper-types','oidc-full-name-mapper'),('0db7254f-9cfe-4a24-b3df-0712e3a0a18e','c5600706-69ee-4740-bc29-4be2282be572','allow-default-scopes','true'),('107fae17-fcca-4a08-8d82-938d6a9f05e8','e6d16d5b-014f-4c4f-89b6-f9250da365dc','allowed-protocol-mapper-types','saml-user-attribute-mapper'),('125f9620-481f-4711-883b-e18ce099faa4','83c41551-1caf-4461-8978-399813474238','certificate','MIIClzCCAX8CBgGN8shWjTANBgkqhkiG9w0BAQsFADAPMQ0wCwYDVQQDDARvcmc0MB4XDTI0MDIyOTAyNTIxMloXDTM0MDIyODAyNTM1MlowDzENMAsGA1UEAwwEb3JnNDCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAIw3V/xrk4o+zEzxY5jzdOc9sE6b4s7hyRXalZZThZ+JbYPEhwqmZwv+03x/jB4wT9Kb3xXiGNngzuOvHHWSn8oL3VpeYUqgN7nX1Ku3jTEe9lMNSl4++EX5XMdTgbgPGKduUDnJecIyY/eRydWLXjOvQl9oQUGkolS+AbM9dtbcendPZuxo1WeOEH5KVM3vAuuwbf9xFJMJnTYxgcrQCu/rEgycboeyWkwo2g5ZpNxrCMItqZSvip2PV4TnAzjjJaQgWBUPY5+plLQ3MGS6mzXbXG7uTTczbeqkpZ3LOxzNYHmhOOSYi6sp3b5+WDwzAWiMQGhc3L+NoXnLs5eM3CcCAwEAATANBgkqhkiG9w0BAQsFAAOCAQEAPJ4DisIlrmfuBShFlxRPB2EyKUSI/2mxHseiBXa8PPjcW/Kji7QN6Jh28vvfP1U3sHFESEaZAj7XefElr88pRKpQ58ohSDvMsuTSv/DBweA3HlI3K4/Ucup8VVWYDYFFYjwLTbGLlSXFcjKVDcXA/T+A8K2zr0AUJ83zPUSc8PA0yEQBzHilHar8vCGoISVo7evAwlwo1JHmk90pfSMC0NiXK+eeQwkzE/k9EE1gbQlld1RsYGmSQSfZnL9PzOM256n+tR2of7veRuxxt0nuj80OsbEy7WYPIY8fPdu+/7IIn5U8ddaBmyqBWC7D7AHmQZSPe5ZVYr82wEdx70FAzA=='),('1298906a-2fde-4053-aeb1-b9cf87f664dd','83c41551-1caf-4461-8978-399813474238','priority','100'),('131fca25-4215-40ce-abc2-bc91a14f8038','e6d16d5b-014f-4c4f-89b6-f9250da365dc','allowed-protocol-mapper-types','oidc-address-mapper'),('1344a214-371b-4da3-906e-3eaf8200afef','8924aaa2-2c3c-4ed8-a418-3360fb02cc46','allow-default-scopes','true'),('1380441d-27e2-4828-be73-d201e9feeb34','fd7968e9-0c10-4e77-9b8e-a638c785d67e','host-sending-registration-request-must-match','true'),('147c805a-28b1-4402-8379-b485d0a48629','01786429-596b-489f-8a90-ccb57264e86e','keyUse','SIG'),('152eb3b4-b57c-4284-95aa-daa0491f4533','18aada12-6c75-4729-96a4-f836dfef6141','allowed-protocol-mapper-types','oidc-usermodel-attribute-mapper'),('169b9df8-6b82-4265-9bd7-2cb019ab4918','b107d4a6-fc2b-4170-ad29-b13b959cec4c','allowed-protocol-mapper-types','oidc-usermodel-property-mapper'),('170a5197-ffe6-429d-b6e1-46982fc12df7','1dce4b98-2422-4f99-9948-8bb81f8b4a1e','priority','100'),('1855083b-ef08-4036-a35e-66b3f9fddf1b','1c96144e-e9e6-4ef9-a042-98d2317b37d5','allow-default-scopes','true'),('18895763-fc6a-407c-8283-4af4737605a9','624f83c4-3bee-47bf-b141-17fcb31bab54','allowed-protocol-mapper-types','saml-role-list-mapper'),('194eecc7-a724-45f2-ba10-ca87c810d32f','b78af578-efd2-4ae8-986d-2d9baa06628e','algorithm','RSA-OAEP'),('19e6cf0c-3854-47e5-8731-8e41f94ee3b2','a57ef1bf-6e18-406b-ab76-efda5184ac1b','kid','78bdb06a-f0b1-4918-be73-da9e286f802b'),('19eaa36a-cea2-451a-bbdf-d8f0f55b380d','5b191c64-4d7c-4fe8-914d-c1b22aaf5cef','privateKey','MIIEpAIBAAKCAQEApdvJyI/KuSdeHiBA8O727nYspQWtWvEWBplcySrX//DdJEN8fQ+vVJGzWcBE/QpRpMHjFtn0XgIb3IZuA78LtBtyaf0iILdcrCiqbD8I/+LZsj1kBqxz1kOj43j5rUqtYvsCDyi0zdOhqB0L17hedNj3Uip0rMOrmyplpIDvGzhEU8T2ZoKRaMvZwilKFdX3MqqQ4hZBhIgNU2aN/Asf5ynp1hp1dD7mSPswYX73om9V7yEwEHeOtDnwLAnm559k+ynhQb3JWA3hoDYzIci0C1i7cK8ilpG82IsLQ50I9cs3JnZvf0IT8ADDCx9Al8U+57OEiHlSMPa+lzEKM8nk3QIDAQABAoIBABzwIKA8KmAstLin4vzGjNHlT3vJZkowNyoWlwBIV+CBe2wI1E8TrgEg3LyDleXaZ41KAN+rTn4aexb6Y3aG3jlh8o/4iPxRUbt96uIxC1ZuE5KMMIgTjbBsI8ub/2ATX/YdmmnfrdAdpR5qVvcf5WcYteohmzLLfwT3HD3b+xvx6KwtT9WzfbdRkrB1nCjQED3BNI8Uh5qoq8eOgZ0GtIEJR3bkwC2j53kg3SQ09obFl8fkIqteLyLmTAS+yWO/4w9KjOMlQsTMwfPPqm/Tlw5NVs61pN5yN20D/KfAlBeKDDY3v8zW2/ULTjubVe8OJdAo6M+i2ppQmVgeJ4/K17ECgYEA3du/WF/XtJvf2aAoQHxWisGgRgjMtgGEgo9nSdHoU49lCo25PbF2gMwW02m/rVd6aJAp2nxbseRaQuO9ZpymCYSEmrDguMuREBnfNJtdi8maNYxB2uRn0pXyYZ2EqHKJxHei90aZ8Rkd6JdmhvtywScQVuK3Tq3sgOe9p+rKt4UCgYEAv2HkMPA3PVIxhwiH0vlCUxGCmb0y9k+0ZoZgvdKF5lSShUzJE3Aq9XHHpN3Rsw3SlQ9xyUU84qRuOb8HX71FklVaA1n/WrhbZey1RCRVn0xb0kTpJF10km++lbTjgqQkHRMxrfZwhyQ7bUEwgILxc6Miv3wC0p+Al/Yv1Yqvu3kCgYBZD+9HheotCeoaDi46fO+s8j/p/XxYkFFmrDTVsJtoeAci7nPvrT8aQ1PiePBGoPh143G50PRqfHYzpgMRn08UQQuOofUEmkvYv9oX30r1Y/AxEOYa/lgjdKiBwV9Q0/I0WaalR8ViwSd9iNHS3DxcB9eKWacmwbFQqjc7oojQlQKBgQCzcoxOPs7s1obOAHeqoEFKNl7o3HhOcAnNIC7RjfYzNBV2m7rmWQROw/LYaYzYgRt03NhqSlt+f4NC7hVx9byoKxONlPNUEwzQExUb4Z3PEf/+ttKMYHyPWeuv3757noCmKnsojKySaqy2Eqvxs9XGAa7xMMxMxXYEBrhvV+zSsQKBgQChb5QBAf0q7JygoG0iglpUM5HKn4Kov9iX8Z8fMeZTcGnprYQVFVT6+xBbKVKzZUggngjqD1/y7DZu3+CPUdqBY0h9OgKXRrBQ0bbqpvwseQPH7H4dHWeqykH7Mc+BpYMO+6ifByF5By8+tzk7k16XaOG/cJyL05F8oMmrsDwQHA=='),('1a64933f-6845-4b72-9bde-87810033e885','12fe9341-4670-436d-8ded-efd663bc0134','certificate','MIICmzCCAYMCBgGN8saSWjANBgkqhkiG9w0BAQsFADARMQ8wDQYDVQQDDAZtYXN0ZXIwHhcNMjQwMjI5MDI1MDE2WhcNMzQwMjI4MDI1MTU2WjARMQ8wDQYDVQQDDAZtYXN0ZXIwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQC+RU4NVAi0WuxDaNBD5GzyfvuK+PDwLPcdESodtDS+3WhwMf55nNrnQO89MIO3F1tarBepxFyWOJzDO28QgkUyKw6tqs3uXSRzLKm97BcxxbDGi5JUVRYSwL7dl4SytKW6v6yOH6QM3WJ5OVpXS9yAEsR2JCkxfpINDGbuvn9Oj9MvYMSVKyLmpn0kuzcrA2XT7XRScgFx1M9xcTOxoCpB0Q/HQGJ50F4NC+fo/Y+in6pAVP6Q9rdq2f/N+FTjZMqMyYOE3+GF2249cuXh+N/xB6IRM4jsiU6n2NIcnLJxPoGGUwB0V4G+hQ3DIuo9ALKPH9KmxOBN6LEdwW4cv+clAgMBAAEwDQYJKoZIhvcNAQELBQADggEBAK2nD5o09PjThCnzszKJlpFhtvf0DStOjrbKYfOhJs14QhyLsbNEczd1nvJSOCB2+/sbCFs0LGyz2ji68ZPlMDCyIXLZspQFWPcBna5EIvxCxlgIniplC+ecQNNsaWyHnJ0jVejymxjzGecyfCmnx71+zFFw12VoywNvjkDviLOl1Tql3t+hQNCPhmgIF9zMFKGxcNIoxnq2+O4Qig6aMFmpVvjpLoV81B+twck/67EGEqu6g9kEwclgr7ch/ebA/3Nco16iqzLDWXkGq/dOMRYJsngK/KqqluwJny9YppE6oK6pEbjiR4K4Dy2y4cwk92Nn4D0g0xga7hiXkaArJEo='),('1c23fb78-7c98-4d1e-8688-d709cb55f10c','82130434-a3c8-44b6-93a6-e2918e5ccc88','allowed-protocol-mapper-types','saml-user-property-mapper'),('1ca45967-bdb9-423d-b2e4-821d78eaeafa','a42f68cc-9a64-4b32-b1a0-d8d9c79f327f','allowed-protocol-mapper-types','saml-role-list-mapper'),('1ce08afb-29e4-412b-ac4e-301da3e47f16','9e95ae01-2b6e-4b38-a2cb-6f3be06e9905','allowed-protocol-mapper-types','saml-user-attribute-mapper'),('1dd9c135-7f4f-43b9-a19d-b853b536c637','af402381-baf1-4b78-821c-ee2610dccff4','max-clients','200'),('1ddc365f-d35f-42e5-93fc-a8378158426d','0ceab05b-e563-4c1a-9f14-4fc4cd69a95b','allowed-protocol-mapper-types','oidc-sha256-pairwise-sub-mapper'),('1f9fc2a0-92bb-4006-a87c-6f6aa2cd0093','d0d68f57-45ce-429f-ab98-d4231a234336','kid','1eb6a0aa-e3f7-4f2b-baf9-6c909b2bdbf6'),('21ab466e-a5f3-4665-9df4-6894c38b4d17','12fe9341-4670-436d-8ded-efd663bc0134','priority','100'),('22552faa-4c13-401d-97cc-0594ee3ca897','624f83c4-3bee-47bf-b141-17fcb31bab54','allowed-protocol-mapper-types','oidc-sha256-pairwise-sub-mapper'),('23035a93-5d06-4f70-a065-2f43fd7bd5db','efe1688b-7668-4832-8b80-addbf37595d3','allowed-protocol-mapper-types','oidc-address-mapper'),('23a308cb-17de-4f5c-8644-d9eca9118efe','a42f68cc-9a64-4b32-b1a0-d8d9c79f327f','allowed-protocol-mapper-types','saml-user-attribute-mapper'),('23f5f5d5-2b0a-46a6-a9d2-46d596b07115','624f83c4-3bee-47bf-b141-17fcb31bab54','allowed-protocol-mapper-types','oidc-usermodel-attribute-mapper'),('24fc86e8-23ff-4f70-a9b1-c62b7f17625d','ea80dac8-88e6-4ffe-b4f9-57731f0edbfa','algorithm','HS256'),('255a2310-f51d-4594-9fd9-f392ee68d778','c9938567-6270-4508-b018-cb23e7d39a80','allowed-protocol-mapper-types','oidc-sha256-pairwise-sub-mapper'),('2ae73f5a-a352-482a-a2f0-4636060ffa98','4f70a015-ef75-4a8d-ad5c-96d64fcc2e55','algorithm','HS256'),('2b41cf3d-4aff-4c50-8f6e-b8998332dfec','22c2335b-2609-4844-a9aa-350931d513df','algorithm','RSA-OAEP'),('2b670cb7-45c7-45ed-9403-41d6de435d40','50538daf-6b1e-4572-ad04-0ac40bd5087e','allowed-protocol-mapper-types','oidc-address-mapper'),('2b8f6da3-8e4f-4b16-ae24-b7bc21f53b25','70e3da01-d47b-49cc-bf95-eebfeba681fe','priority','100'),('2bb33654-fef0-4bb7-9ed8-1c273d876081','d0d68f57-45ce-429f-ab98-d4231a234336','priority','100'),('2e1565cf-c8f9-4e78-9884-8d50861430c8','b107d4a6-fc2b-4170-ad29-b13b959cec4c','allowed-protocol-mapper-types','saml-user-attribute-mapper'),('2e7ccb0a-a298-4885-9c25-5fc40319df96','d5d180d5-20d8-4d7f-b0a7-7bafb7bcac0f','allow-default-scopes','true'),('2f48fe64-7ce7-442b-810a-68b8b5e3e31f','ea80dac8-88e6-4ffe-b4f9-57731f0edbfa','secret','nx4iKDYsA3fXo-8tYKe7V1XBIspEoFec3RtPdM3MI4aSCElA4dg76t4KbTqGMqcjZVVpFdkaDOAncD0oAZXscw'),('316d7685-ed25-43a1-8e20-dd245686967e','ec72c9c8-e9db-489a-8183-776fb6b2f41a','max-clients','200'),('318fedda-965f-45d6-bb5f-025a33a586a2','624f83c4-3bee-47bf-b141-17fcb31bab54','allowed-protocol-mapper-types','saml-user-attribute-mapper'),('325fc9ad-b295-4fe3-bfb9-5f2502a71e45','9b93d78e-e5bb-43bb-86b7-871b14db62ca','algorithm','RSA-OAEP'),('32929a70-9afb-4a9c-8153-4a414cc9e268','624f83c4-3bee-47bf-b141-17fcb31bab54','allowed-protocol-mapper-types','saml-user-property-mapper'),('34dc5982-8df0-4304-be9f-ac9babd20a5e','82130434-a3c8-44b6-93a6-e2918e5ccc88','allowed-protocol-mapper-types','oidc-usermodel-attribute-mapper'),('360d7096-17be-45ff-a138-c4f90d7bacd7','ea80dac8-88e6-4ffe-b4f9-57731f0edbfa','priority','100'),('368d85f9-3412-4fa3-8091-ed47e5184069','acacf2f3-4b77-4c49-9ead-5d6f9ef7cb5e','certificate','MIIClzCCAX8CBgGN8sf/+TANBgkqhkiG9w0BAQsFADAPMQ0wCwYDVQQDDARvcmczMB4XDTI0MDIyOTAyNTE0OVoXDTM0MDIyODAyNTMyOVowDzENMAsGA1UEAwwEb3JnMzCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAO0vvamiie5Q2bSRIdLwh/tmjpK2Laz4rrBJ+OaWQ65FIbIwZisoriwqEY8MP4noUFk/KjQz1FKVZUdmjt5s7DDqtGaebfcNP1HLsKwVKC6Z69zyycQCT8TIh1RMZHUvdpD+GyI1WxjL8l6sG7dd5Zu2R/i9VYXpKsjrr9e1s0l2BjutVLYSlRtLcTIoFAK/v7Fqt/BXxvaPVW1XF9xrLcz8i5j6qlSKF7MSYqexWbp6yUdoRvZjPKbDoXny1t7/BIIWAWB3rf8FfZ0P785s5tLpmwKSLZ58TKmCc1+cFuc1aFuiyV5kHhsyXvsU8djADwv9+K2jlkJcxcChbylvEs8CAwEAATANBgkqhkiG9w0BAQsFAAOCAQEACatpzJjuUn0OElI9BEUqdehtoBsWeMxKbfsgIVazQRyiujAXEnDNTJEt0vfDRhwXYsnXnmPJSxogYOrMjz2cDnLdBKomPV/4u3n1RCfVTdIO41iq0anP5tCPdvO4hDvs8HAg2TbCiT6Yk4/Xvo+dWvvjkSvYiTxfLEtYwa2/1MT2+xNtjCA4ZmSPx31Sr/F2f8qND+wJvBTUVeHYkr57JZQB0Dkp3wUoY1p1I5FhxbqrwOCcWcCDWQSP0cEXGojb0RDcAloniRVDWBiaI/vMBvhZGydrHYeH8RjL6vaiQCxPdCy3b8JHISq2wCyyyD5U/YkA9VQNRNixJRhzrA7QuA=='),('39680b54-a1b3-426c-83e6-c6e8c6dc62e5','b107d4a6-fc2b-4170-ad29-b13b959cec4c','allowed-protocol-mapper-types','saml-user-property-mapper'),('3a159c68-e0c4-4ced-85c4-42ccb9ed39d9','c9938567-6270-4508-b018-cb23e7d39a80','allowed-protocol-mapper-types','oidc-usermodel-attribute-mapper'),('3a98053e-d828-4779-b9da-4eda64e7fada','f6cc436d-8a78-40f3-bc06-d6e30131fde4','kid','2d72e867-937e-46c6-8821-7c5a68f95a8c'),('3b2565fa-de19-4e57-a2ff-7bf2c0f6173e','18aada12-6c75-4729-96a4-f836dfef6141','allowed-protocol-mapper-types','saml-user-property-mapper'),('3c2a1d2a-b388-46f6-96ce-a6e394209037','82130434-a3c8-44b6-93a6-e2918e5ccc88','allowed-protocol-mapper-types','saml-user-attribute-mapper'),('3cac4a0a-b43a-4f61-9f92-8340478bc28e','a42f68cc-9a64-4b32-b1a0-d8d9c79f327f','allowed-protocol-mapper-types','oidc-usermodel-attribute-mapper'),('3d01c0a2-b322-4fea-8aef-2bc7b8cc1781','c9938567-6270-4508-b018-cb23e7d39a80','allowed-protocol-mapper-types','oidc-address-mapper'),('3ee1d678-77af-4e23-bb6c-748d5f7dc455','79db3c52-cc04-44fb-a7c6-7ac15f09a63f','max-clients','200'),('3effe276-d84f-4937-850b-dd91e619c369','22c2335b-2609-4844-a9aa-350931d513df','keyUse','ENC'),('3fa32168-6b45-42aa-9a1c-676a5e69071a','0ceab05b-e563-4c1a-9f14-4fc4cd69a95b','allowed-protocol-mapper-types','saml-user-property-mapper'),('43191005-be53-4445-970b-3a9a2fe292cf','3e49a95d-55e9-4caf-b448-5fe445b636b5','algorithm','HS256'),('441cda48-85ad-4563-bbc0-a6b2edb497ec','acacf2f3-4b77-4c49-9ead-5d6f9ef7cb5e','keyUse','SIG'),('4447c3eb-c551-422f-ae32-23b1fa9aa45b','f6cc436d-8a78-40f3-bc06-d6e30131fde4','secret','CeV2BSNrwF3ypDMJ4cz-HQ'),('44ac620b-69eb-483d-8620-48ebbb3eaa9e','15f30367-da6a-473d-a937-8cee56a97ab7','client-uris-must-match','true'),('45bfad04-0442-4cf8-8dde-2d02b253e251','18aada12-6c75-4729-96a4-f836dfef6141','allowed-protocol-mapper-types','saml-role-list-mapper'),('490c99c9-7c07-4790-8c78-acbac1791475','50538daf-6b1e-4572-ad04-0ac40bd5087e','allowed-protocol-mapper-types','oidc-usermodel-property-mapper'),('492e93cd-1ce7-4c55-a0ce-db0ec43b67b1','b3570c62-6275-4701-badc-a9499dbe77ea','priority','100'),('4b41e353-4406-499a-aba6-b20219d68d62','bdba424c-5f08-412f-81c5-09871c23adb8','certificate','MIIClzCCAX8CBgGN8se/AzANBgkqhkiG9w0BAQsFADAPMQ0wCwYDVQQDDARvcmcyMB4XDTI0MDIyOTAyNTEzM1oXDTM0MDIyODAyNTMxM1owDzENMAsGA1UEAwwEb3JnMjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAJKTfSiINJ41L0rIh1jAmOI5l+PAsNENJ6aFL5s76XNGks4vhvoS3ysfbK6ZuRmTnhEzRxRkCB+Klp47pNw0cjYZ0glCwkBhcnNPBBcTvpfngOa1NFB0f6BZCHkrtQQ6ji6usEjx4fL8oDHAXs79BJGkbEZlro+FSzBDkC3C6uZARp3oxFWzWUn+omdlK7YTcg5+kx3gP7hqZFnDkkXxS8ZNvgZNUVaPfy9X6BPDBeg+yVD2QOjYCTFm9NpLYxTlmcKad3SD2GXRSQVLkVts5WG5hy+7YrPZclGCEa6hRtXMrPOIVC/5Yv+KrnsIlYcS2twXDmSi2h/azFwZMd6xwv0CAwEAATANBgkqhkiG9w0BAQsFAAOCAQEARthj60ye89abgHbAqlbC6+AY2gAFiYR7OSXZ7Y7qtDTGhGSgQ8PbjWoMkcutDwYmAeo1G1laPqo8vTWScDSXGkVQsHvdcM9Y0WbYhhKckre/3xTcwgS4TNCqEockl7eNxe/c1sMCOQg4DXK3IWuTsCEr9DaIfZ1vloAfEBiwmIwnN4Ntn9u0t/VhS1FJ8zYaZKXAEwJ6tSwTB0sLD6kKOyv88KmcF3OvA/Vo0HIoP+TAATYhABA5ickQMcGfh4wV5A5SrSreqddmdPmxMZGjy+THr1er4Kj9X79qZWCo6tnvoLF5L1Y3+mP05JNZmtzCMJYvCBudC1hGXES/hxFj1g=='),('4ceeab17-849e-454b-acec-6156d3b205b4','7a62be0e-52d5-4f86-a628-7592b43769a1','algorithm','HS256'),('4ebaabad-5bac-46f4-a2d2-c74b22241720','a57ef1bf-6e18-406b-ab76-efda5184ac1b','secret','2qaseePh6wL1L4T3hz3MpA'),('50989146-c31b-4788-9332-e0232e8a9c3c','5b191c64-4d7c-4fe8-914d-c1b22aaf5cef','certificate','MIIClzCCAX8CBgGN8shVMzANBgkqhkiG9w0BAQsFADAPMQ0wCwYDVQQDDARvcmc0MB4XDTI0MDIyOTAyNTIxMVoXDTM0MDIyODAyNTM1MVowDzENMAsGA1UEAwwEb3JnNDCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAKXbyciPyrknXh4gQPDu9u52LKUFrVrxFgaZXMkq1//w3SRDfH0Pr1SRs1nARP0KUaTB4xbZ9F4CG9yGbgO/C7Qbcmn9IiC3XKwoqmw/CP/i2bI9ZAasc9ZDo+N4+a1KrWL7Ag8otM3ToagdC9e4XnTY91IqdKzDq5sqZaSA7xs4RFPE9maCkWjL2cIpShXV9zKqkOIWQYSIDVNmjfwLH+cp6dYadXQ+5kj7MGF+96JvVe8hMBB3jrQ58CwJ5uefZPsp4UG9yVgN4aA2MyHItAtYu3CvIpaRvNiLC0OdCPXLNyZ2b39CE/AAwwsfQJfFPuezhIh5UjD2vpcxCjPJ5N0CAwEAATANBgkqhkiG9w0BAQsFAAOCAQEAa5JObaY/RMoj8t10DLUuwbgWEpox5Yve/olm/Ez9NYwFbmIh709Qoh4KHWnSIhNXfA+IyqSPmiHK3Jivcc9IwlvV75ASJOGUVu36o93ui5UOke1i/2U1C+SidkkacGOaAZtcseV2+sShVM5WqKGudbLNgR1Di34+8/GL6HMGR7367O1e6ypgMpvh8rWppQv/G0t8ZYdJbDITXn2cVTqbe+MzziUwWP8Wi+8sxGdr40/L6lP6deuV+tgtoWnKzr5hgSMzkTpmuLdoy3mCRtqXteuJylHBKDamKm/KhosSUYckz+P4wsI89LdQfdXN5YY66C24+MJEYhs0SIv8iJHhLQ=='),('5166cf75-1bdb-4eb5-a7d3-cb78ddf0ecca','bdba424c-5f08-412f-81c5-09871c23adb8','algorithm','RSA-OAEP'),('518c8d79-5a35-4abe-a79b-d10c6ec64a52','18aada12-6c75-4729-96a4-f836dfef6141','allowed-protocol-mapper-types','oidc-usermodel-property-mapper'),('52aee6f7-35cd-4e3a-b6d5-38c84b5e51b1','0ceab05b-e563-4c1a-9f14-4fc4cd69a95b','allowed-protocol-mapper-types','oidc-usermodel-attribute-mapper'),('52b3fae1-ac5f-4a57-983d-6747b8a4722b','9e95ae01-2b6e-4b38-a2cb-6f3be06e9905','allowed-protocol-mapper-types','saml-role-list-mapper'),('52ed806b-8b60-4889-8da3-f0e1cb4c8c3f','b107d4a6-fc2b-4170-ad29-b13b959cec4c','allowed-protocol-mapper-types','oidc-address-mapper'),('545c5535-200b-4644-87d4-ed35d0e5a84a','0ceab05b-e563-4c1a-9f14-4fc4cd69a95b','allowed-protocol-mapper-types','oidc-usermodel-property-mapper'),('555cc87e-a86b-463e-ba0e-ba8e375885fb','dfa2b049-f654-44d6-b514-bb9394f473d8','max-clients','200'),('56bb5be8-6714-4aa3-bdbe-e9aec0effa0d','b107d4a6-fc2b-4170-ad29-b13b959cec4c','allowed-protocol-mapper-types','oidc-sha256-pairwise-sub-mapper'),('58592253-37d9-4642-b007-560ac7d6fa5c','22c2335b-2609-4844-a9aa-350931d513df','priority','100'),('587014db-4077-499f-8718-7ff504d9f313','ab350360-86af-4c99-9a0a-84ca2cef7cff','secret','5h_n5q_hGLZsROTTrfZuw5eGy3Z24AngfYeDQwcN-27WqX9FuaniPFvRI1PdCs2psdyujTVZOJbyuLw3Q6oBkA'),('5889ceaa-b9e9-403b-8891-5088fbeb25a8','ab350360-86af-4c99-9a0a-84ca2cef7cff','algorithm','HS256'),('5894a116-8e49-486b-8782-76f36d5ce8e6','e2b54a93-5e11-4806-bc9b-95ce899c1532','priority','100'),('58cecb1d-2dc7-43a1-b4a4-c47241bd321e','d0d68f57-45ce-429f-ab98-d4231a234336','secret','3mFdp110wjhQZt23cYxU9g'),('58e94a77-c1ad-4c02-920f-fefdc936c002','50538daf-6b1e-4572-ad04-0ac40bd5087e','allowed-protocol-mapper-types','saml-user-property-mapper'),('599edd00-393a-4a8b-a662-16a28a842a44','50538daf-6b1e-4572-ad04-0ac40bd5087e','allowed-protocol-mapper-types','oidc-sha256-pairwise-sub-mapper'),('5a02412c-7687-4c15-be15-7cff5df61450','2d4def39-3a6c-4594-8fc3-e3b270868f9f','allowed-protocol-mapper-types','oidc-sha256-pairwise-sub-mapper'),('5bb7eec6-872e-4319-bb88-1c8503808047','3e2600ce-a8ff-490c-ac6c-7ecdea59898f','certificate','MIIClzCCAX8CBgGN8sjQljANBgkqhkiG9w0BAQsFADAPMQ0wCwYDVQQDDARvcmc1MB4XDTI0MDIyOTAyNTI0M1oXDTM0MDIyODAyNTQyM1owDzENMAsGA1UEAwwEb3JnNTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAK5XN1K5DtLu/ef1WvQl4Pnk6574+KaHrdhUAMw3HVdHRpwoD7yHA2UD06rxiY84VQMh9IM6bEho97FqanjzxAddhMe8Ug01sN2YbB4qyLeAcZa8gMFPzQWhdBnmiFi1WcRBnS4ZDQyTQOnd8joWXj4VpX3BVQ+hf5BgwDNCfbtvz7+vwDaioK3+WI4Uj0rOgbKbOSXO+1XxYYZzM4xCJSltv7VbxtEbTlADeip4JVugh/ze8GWoOrVonNg0y2mauF4DlTkEf5K1qfH8JXc6cVvxEfWTnEEGNuFaqVNJejIHuUiR7ZoIIzP9mujpV+9DjMvBDDYGMftLciCchpImNJkCAwEAATANBgkqhkiG9w0BAQsFAAOCAQEAcO6wXL1rUNgGV6ajHgWBrga0KSuv+ZMuJiXRHfjvD7IRem1vRcXntqCgWf+gMwZFtkR3vZEIYwOB0Pu79mKRg8d76RV5NRFO/RMLMDvWtgjboA+tEpTZggLFoD6ST3egcaqufjbKaTvZ9xJWBtEFEuwUG4E6KWWups2DIDE5s1g9AD+mQDOiUjWFJaS8ZNU/YbZ/7Uik0dre5Z+lhSptnjG5uoTbrod3Qxdz0MjWJf67Y38hsIKZeLjPauM4PGUOmBx+7jZWsQpt9SnN91PkyOp2zH1g166O86dXr+qMC1DbDj1cvgDwuZ6j8Q6iQ0FgyFUznEo08gx3h9RHX/Ua2Q=='),('5c7f99b0-2543-4b2f-bc3d-56489970de67','9e95ae01-2b6e-4b38-a2cb-6f3be06e9905','allowed-protocol-mapper-types','oidc-usermodel-attribute-mapper'),('5fe28acf-bdec-4c0c-8e32-51c1b45aa9e7','22c2335b-2609-4844-a9aa-350931d513df','certificate','MIIClzCCAX8CBgGN8sjQ5jANBgkqhkiG9w0BAQsFADAPMQ0wCwYDVQQDDARvcmc1MB4XDTI0MDIyOTAyNTI0M1oXDTM0MDIyODAyNTQyM1owDzENMAsGA1UEAwwEb3JnNTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMx7aDXOypZRxMcfIT1BDJ/BJEk9E4Km/2ZFAdomPsVlRSqLCoc8XsRMwlKocvLjiattaSXaGOlsNDf0j9UE41XLzU0FXD3ue68sB1QkElg7npF+VS5nxhp8xIbWa0pg6tA5BwcjgMifRc1ssM2tGlo3G32yHx8lO79yHnYzLqldk+AMCRy3WmXFmCtdxrA+sxVNgqqd52FIv3Wg1taSawu9R2hv5UIIxP4dG9nXHrQoqjASLwX/1sgqfigYnVVFE7wH9m04hAxtnDjCtixyNbIU6a9cPjDn0hKnrU4wQ7PlTv/fYGtZJjOlU7LSKip31xZ5+a+/R0NpGKaCT+hey7UCAwEAATANBgkqhkiG9w0BAQsFAAOCAQEAt4pv/tlcMdpg8LG17WKI6WESv2CVgWOI4HG4HR//05dP7/7iJ60qIz5oS3mz4iq5kwIUltEekJrFn4meWwZLTMPrkv9fR8RF3q7X/t/g+nFzj3R6Tqp3bkl4llWypYWUVEe3mQWiLUwNJuj/pkJc8pv/not5K06MUbrHDXISYyfF/SbXRXyeeMAa2xbJqOxAgJvYREu5PL5EtBu6gJufzjaI+h0RosUdyGZ4e2DeSRxXpksaNCH0XiX25FjLYipBssfr9cecJX6NF6sAuSV/wL8SXfWjyQP/q2zu0t2M97iwdur9JhcEQd2M51tEQpNE2+CZdJxDcyPkRuUD+c2C4Q=='),('62036d64-7e2a-4e12-9c9f-558afe3b932f','8dcab68e-ffc9-4d12-8062-3ecc1dc0a1c6','privateKey','MIIEpAIBAAKCAQEAn0jFUqjHWTpwIJviSQjY+BI8BxJ83yOBweKtN8koUZaU6+Fxpm6gGGxLAuhktvBYLSCQQYBwGll2JUs9IpXF7TFiaQqGt6LCBo87OqCN7XZLDH/gUFkqQAXYcQ+fr+BZ7nBcGrbTB9qHwsWePOOdVyuQ/mdqY7xqCF+CzHeyfzV/rPwTtecGlkTIENsSY37MWfHRWdHUqz8eZpD4RfX/hAbmyHouBmvGDPJDlmIl62Ae0RnKTa4mmXzkQBiny1FVNJ9SCMbVRBo/drpdXUE/oqVo/s8E7c5N3jzghbXG/qFSaPVbC88tMxQwB4ohERlumChvJRGZCmW9IfCuV+YyPwIDAQABAoIBABVqd9lexvrIwCWqP9j4/w8PiJGc2zw3Lm2OmCKNgcXCfMBgPeMWMaFHAijgbRYpp3ldzPd5mNj6GUf3Xz9kqsly39vmpelP0U2HeXuu9ZYtVvbVxKeY7XTRNGIzKxG/FOhZpBCVbzc5mxJFdrqSEegT+/kwl13Uid8ZVGFAYLf4l2e0w4abMmmNeoOlyyvJrE8jrgTTLN1SUmjSpzwmMyYXt7/3rix4EfArv+FWIKPhD3wxP5CLWhGiXo5d3syBMGbZqMSesGaOVbF5bVp3gK2ETTfVTXBn7ktPcul/yIJhugxkXLTkv8O44/lqzloOJHoSdApd/fgq88MeV/G8BmECgYEA3g7mdO39L0tyfGimDMczLq7SqVtBVCpNRr1cv3IKB3X3HD3i4/cBhCNDnl/BZebFTqQfvE1eEnWnt2EW2AvM+aZ6iAKc51y0QRx2YBKnOoEi1ihsld/sIVUj1N9skw14indL4q2ERdBgaUINy33F+6q70E6iCrFWDe7kIq5j858CgYEAt6GJbtyi4O47oAI0RZUukxz3Sn6fyvdqzDIDMYbYoCWRw5tbRr5sQ8tUuZsmoG/vXHcKXEaflCmDrR5UgYMdxkBD+VuUp5pqcinF0Ud/Rcmj2M66fECzbAYTl3QtsIQpC2bG6ZhBJukgLoojC/lRBacw2vQRnjw2xvK5BDrGPWECgYEAr+cnwdrApFVk1I5lc1vc/I76S7QBNTXpTy80KGei8DQPUyzm7eS+K7lvmCaMYjeDdv9mMFktOvw+pnJfkTcP4XdyOwmu10vFcoqkbwh3tk2TlgghtDvUprb2EmwGaxrRsQY9c8w2KsOdi+QKX3c7fVfLPYD8tfGylIj36U0x2ksCgYA65CmJTmVGMeEZbduJvVBUieOdFoL0uuibWCbCCXcL1UCsNPTO+V8LVvhzFhkLNxrS0rKV6WhgQfgi2ylK59vyqsWiAQbpwZIFzvPMLFva69IKRDJ2iuF/8WrzFaVZiOkI6Qs9+0BZ1EYn5tFak7iyUW5PqhrEXpdKsqk3fAn7wQKBgQCCD9DzH7iB2CpmDQHgl38lGFYFTKRaStvyoTQnnQsDbPDXXeLGbpk9OYrPbpPxk21Wd0O3tCBoB9sDwDw2hXLD7gpMayYLf5OcSbaHS6aXVEqcKLhqxNC2SvBs9Bb3qjUhkAlcOBnd8c6gCdPYE+sGEtNFRlCApyRqXhMl+sS97g=='),('620cb12d-bbd2-447f-9aba-fba068223a68','ea80dac8-88e6-4ffe-b4f9-57731f0edbfa','kid','562ac7d3-c40e-418d-88a8-fb70e77ae704'),('626803e3-2661-4d95-9a77-b250ef38ece6','18aada12-6c75-4729-96a4-f836dfef6141','allowed-protocol-mapper-types','saml-user-attribute-mapper'),('633035a5-2da2-4cc8-82d6-c7c0923e09e7','7a62be0e-52d5-4f86-a628-7592b43769a1','priority','100'),('67425ca9-1652-4edd-a1b7-c358ea5d86bd','0ceab05b-e563-4c1a-9f14-4fc4cd69a95b','allowed-protocol-mapper-types','saml-role-list-mapper'),('67575c4c-13ae-46a5-baad-40e15a9ac2f6','dbf03864-c7cf-42dd-a399-6136995d716a','allow-default-scopes','true'),('69622cfc-ee04-4042-997b-8a8208e4044a','a42f68cc-9a64-4b32-b1a0-d8d9c79f327f','allowed-protocol-mapper-types','oidc-usermodel-property-mapper'),('6dfb6ce1-32fd-4e90-a985-37f6d64d001e','82130434-a3c8-44b6-93a6-e2918e5ccc88','allowed-protocol-mapper-types','oidc-full-name-mapper'),('6fa2f49f-f3ab-441b-b553-7a978d18fd00','8dcab68e-ffc9-4d12-8062-3ecc1dc0a1c6','priority','100'),('6fae9aa6-4eeb-457e-be27-8cb4e9a49cf1','0ceab05b-e563-4c1a-9f14-4fc4cd69a95b','allowed-protocol-mapper-types','oidc-full-name-mapper'),('6feccb2c-d0fc-4060-b766-f212f8079f7b','b78af578-efd2-4ae8-986d-2d9baa06628e','privateKey','MIIEpAIBAAKCAQEAuFtUinZ6BsAM7d04t7iPmRuotDZMmM9xbjKFI9E1mvWAk7A7rpqpCPuydjGeaamEKSXpVriL+qhyDm5fDys+nPJK1PMuSmFdRXifh87Axn0jm5Eeg9HR3H93oQWlQAhPUCEaWKCSvD9FSNtTbgGlzkQ1Iyqo2UVjvcoFfObAet7Ur71BHmrx1WHeFMTPZHzBLy13sHim477dvaYcSX7rmpWf973iRGIAHMYKlBh649EN5jNwK7ozFSEgp1EJzsBzjkam2M7QwYqe8CES75yivmRsuVxtq+i9XTjPpMtql/+ainYRtqImxUzzhmcoKG/AeCFKOtjeTynuNQV7eoAzpwIDAQABAoIBACUqwIIDvbkzqcegtGkRq92dvmbKlamvFLq3M7FTYb/CY/AidP3QD2kQuVtryHib5NmY25CQtyPLJudy5/Y6bS6eCGkjN79mHrQ9S8hI7gN2QiIAYUsJF4qhJiCP709X/Yl1iwa4JK0QAmtcUFcavO83QBE9bfoTq7adDnsuWDrM7zDoqjQNfNe6/f8AIuuJnvJIRbNA2+04a0IJEPX5F6jFDmp9PZ08/Idc+sS+PSqaMbvHCBUYYvtpF82wfeb+eCQH/YchMXcZexKt8s1h8QJUAiLKO9+qWJrZGymb3QSYw6MrrdyKDYlcEY1+HmQvaXwIcZgGmXESGHsGRiP5o7kCgYEA29pcHzps353GSFz/rTM0eyWolxIfMfRw0dW5hGszy3t56OZeoBjpF+S76SmYTW//Jwu4hAYX7I+zYSWweo+Mn82huCiLfZEBfX65PSpMknmY5mxdWn/g39tOYBevVWwqH+AWB4RhlvbMBRday7jDix45qGZmYKVviTjRkU4dnkkCgYEA1qruJ8vCdFmxT2dquoUhICF2ijF3l46zf12xQ+dIXx+5XuX6OPKLe64Ec3AybNBNZTFJkNtAaGm9UcleiRN27BaXg32hWlVhIFrXoe9ED/4EAVH/cJphUS+JTkKA5DW6t4kDkbbylU0j9ZUKXh2yyHsWP1MwXNPodX2n500MAm8CgYEAuQ1MOzDXUUWhD2nP/345L2qcRESJo2enyseFttLxLtZI3+OARGuTT3xFOtW7D3s0ni38aowieQjfqOarbA4GBMB13eequc9jHLmcu8It36CgNVuDHFjE9EfI6ZMmDtXTgy7/++XOqt4jDioBT7a+SQvw5jEC/Vhi0HLV2uOQhJkCgYAhGjajWF5iBrq63d2taX4UMFTRNpOUgWLYjyAYsn+Me53gLmKJiY1MwybYjkKYWP62TgVkGwsxjqytAfpb9O5vtYQjuKm6/lN948RAql66gJcphPV47bV4CXaI5ORvTIHAb5ZnT+jUcRLMefEhVj8Nfz2NAk0A44SDKZ9MoarqbQKBgQCf7WlQrJhcfnXx2D6giWT5aHRBXhht44e/Znf4Qm8IbqLVkvK8setQh/9bkXF7cC+owmzFxBWvI3DTHZYsItgtnZqa2G3VRAekuRgyikj01MuV4nr34iQ1c+I6MgBMUuQDy5wcEfAFDuRn6ppGD7O7CjA2MwSfARBW2IVxoW12Ew=='),('704ffd5a-ec15-4ccd-b84d-f11040a053eb','bdba424c-5f08-412f-81c5-09871c23adb8','priority','100'),('70ce8f71-2952-40a9-a1f3-b59dad39037f','b3570c62-6275-4701-badc-a9499dbe77ea','secret','4aPVUKS_gLQSFXsJlltkpQ'),('76ddc378-1016-439d-ab7a-c414e648f441','9b93d78e-e5bb-43bb-86b7-871b14db62ca','keyUse','ENC'),('78d7a727-a779-4ae3-8817-d6f057e3697f','4bccb431-74b9-4d2a-87b4-325d577b2571','allow-default-scopes','true'),('7b30c661-0efe-4553-8b8b-5f6d0298b729','1dce4b98-2422-4f99-9948-8bb81f8b4a1e','privateKey','MIIEogIBAAKCAQEArgpU7FX3hO5VPrI6SwRoLdZGnY6SmvEMLWBnrI7I05aOo7hNyiIyY8s+lXxExXPllZCVhawiV0Itxzk4G8FtznNJE3VomeC4Zk4j3Q9lSQ3mvxgaDicdWIkTN9gi+2s5V1+w5lGVY1jTJ8sovg7szbGS1UR8d2yvFaYdZcUgH6K6YSk39/8pi1juVUnhifDjcqxyJ2d7PKK1PLr3vRtPZMz6HPnKwYyIW4+1QGV4Rp5acvSPBXj0H3gyb8y8lvNrL+deXm9fM9ZmNNm4uunXdbh+hDufBBOhkjMA7SvjN+CTQS3as3dwUcMWIm0AvfzGMJisaCPfeodFsxBKhL6PyQIDAQABAoIBAAu1DTZiqAZMo/ZWNd6i+sEOl2x00T7T9S4+PGsapb6583lm5fCxcTNOUjTrCZNAsxJnCe/Wfu7guESdAD25usG29pT1AmbLe4wCOJ5fsUADS+DR5brK/cndWqoYg23nLhHHEZbEqShoKrgUDfcO+PXzOn3XIApGiNaLeJHGe101T/VhZthx6Ud20E1k19TbC3NC8EOWiaZmWAeg8ciXg6aaxfxB7HPU0Yx6ff7jO9Z0ASn02eOW1agtsDft8QexGoduFhh7kPu+OKV1ZZUviUyiST6OHDTeMjPqsovTKBzPn2mLfbB+6ML6e2RW4hovYJrzejUvM+DHPH4SG/RukAkCgYEA730rEW+Z28WMRAAzZesnSM0grIR4SRH5+fexgioM0iSESKYO/3C9koHQ4kNZGlzDWSWhnEti7U2MC+yxy4IFZ4OKGJqTWP3k4SFBAONNWXgiBWsHAuU97E5sgNcfNTDthZd9m1wK9gQzJdBzvdAXmm/caZTuRFPQqEWayIWSsN0CgYEAugoJWEdBdjmzegkQ9AQgUDZvqjJvmme/rFF+j9He4xktr4Rz4mmeEptY4mm2WkX2jWW2X1ISAWs0zTG2GyysJorLHBiaSplJ6IKm+MnQFoAnA/PCUEhjp7pcALWGqKDoTCpCoJvh0lBkvhJBW7iWpNaJJoklk0E+mSuwcm6E1d0CgYBVzylxU+VzA3NgohnIeNtYkHcWmVhoBhLlZ8SoeNyjJwZm6WkSSZkDN5Ranfr9ISO1e3BOigxmLpTxaNvDqVC6aD1A15HYHxC1Qa8C3G7IkezOuCyI8w6e7vKdr3a1HlTcuwz8b5xVzedtsyTla/wpD8+P3RcKUGXBBT+SfZmz2QKBgCUc73RO8r41EJrdyCYF1LRrx6b6XM0+uTwVHdxvD7naQgTrtXqLe19W4kp4sEod/uuCSPmHE9R4oJX2vs94//bIZXB7b/xFzDq4Jbsn930ln6LoM/F0H31MbiIuFGj7gJwBKj2EG26rXw2T8rnrfxHvQnkPjxFrSKOh1ZdeeN15AoGADjwKYGkI1zlLPVp35RDKI/XafWU1m9Af67+YL1ityg2c05Ma+FWMlrdO1NpGuMEj5ZBsQBigkKnEkiMtBf31dnb3S/MfEtEasw2eGEDRMczDcV9tEc1cgXGJLWKj/AwA0uUChXOd9eXrBnEEvod0oFXfhm3N3Q3ZyS4hdN6TEYo='),('7c17e2c3-d902-4d6e-ad4e-5ed48d5778ba','82130434-a3c8-44b6-93a6-e2918e5ccc88','allowed-protocol-mapper-types','oidc-address-mapper'),('7dd858f1-3c2c-444f-b0e4-625f672ea0d7','50538daf-6b1e-4572-ad04-0ac40bd5087e','allowed-protocol-mapper-types','saml-role-list-mapper'),('7f835f3f-bd57-40f1-9f0f-54645499fe1d','c9938567-6270-4508-b018-cb23e7d39a80','allowed-protocol-mapper-types','oidc-usermodel-property-mapper'),('8028f2ba-d07e-4830-a581-56812257848a','2d4def39-3a6c-4594-8fc3-e3b270868f9f','allowed-protocol-mapper-types','oidc-full-name-mapper'),('8064bce7-03c4-48e1-a81d-c3b18a68bbea','70e3da01-d47b-49cc-bf95-eebfeba681fe','kid','4942bcc9-e172-41d0-8c32-d0006c4521dc'),('81e2520f-581c-4e43-809c-bb93ec630a1b','f6cc436d-8a78-40f3-bc06-d6e30131fde4','priority','100'),('830045a6-b13d-4d8e-9c98-20252cdce635','0ceab05b-e563-4c1a-9f14-4fc4cd69a95b','allowed-protocol-mapper-types','saml-user-attribute-mapper'),('83b41dde-7d0e-4a18-bd9a-e518c1863743','624f83c4-3bee-47bf-b141-17fcb31bab54','allowed-protocol-mapper-types','oidc-full-name-mapper'),('83b6ce42-daf0-4099-87a4-6ea04c6e0aa2','50538daf-6b1e-4572-ad04-0ac40bd5087e','allowed-protocol-mapper-types','saml-user-attribute-mapper'),('85797496-bd40-43d4-b04d-f03d940f891d','3e2600ce-a8ff-490c-ac6c-7ecdea59898f','keyUse','SIG'),('88b1bcb4-1b92-4b2e-9cd0-1350c2bf8660','4f70a015-ef75-4a8d-ad5c-96d64fcc2e55','priority','100'),('88d8b893-6c56-44f4-b4af-4639bc3631bb','b41e7d1f-2ab5-4311-aa1c-5ddb518f677a','host-sending-registration-request-must-match','true'),('89811a17-a272-48f4-9edf-d8a375a1c52e','ab350360-86af-4c99-9a0a-84ca2cef7cff','kid','c21111bd-5af4-4ae2-943f-d4835de71c8d'),('8a119a0d-3dea-4348-8b89-3e573cf3b1f9','12fe9341-4670-436d-8ded-efd663bc0134','keyUse','ENC'),('8ae141cd-63f8-430f-b9d1-c1a252863ac3','efe1688b-7668-4832-8b80-addbf37595d3','allowed-protocol-mapper-types','oidc-usermodel-property-mapper'),('8afed093-5560-4070-81f5-39b7b4be9fe4','b78af578-efd2-4ae8-986d-2d9baa06628e','keyUse','ENC'),('8b27b5c3-8a1f-4c7b-b9e1-d631d342f4a4','c679c0c2-f74e-4831-ab8c-87ceb6b5d528','secret','UiopXorSkxvwHz_Aj1IVqw'),('8fb05090-af3d-443d-a83a-416c1d8c58d6','efe1688b-7668-4832-8b80-addbf37595d3','allowed-protocol-mapper-types','oidc-full-name-mapper'),('8fbb19da-41b5-4afb-8b3a-fda86deca167','c9938567-6270-4508-b018-cb23e7d39a80','allowed-protocol-mapper-types','saml-user-attribute-mapper'),('90c8a0c5-3d39-430e-a693-7e99ac13fd9b','efe1688b-7668-4832-8b80-addbf37595d3','allowed-protocol-mapper-types','saml-role-list-mapper'),('910685d4-3b54-47f6-8208-229aa9cfc84a','12fe9341-4670-436d-8ded-efd663bc0134','privateKey','MIIEowIBAAKCAQEAvkVODVQItFrsQ2jQQ+Rs8n77ivjw8Cz3HREqHbQ0vt1ocDH+eZza50DvPTCDtxdbWqwXqcRcljicwztvEIJFMisOrarN7l0kcyypvewXMcWwxouSVFUWEsC+3ZeEsrSlur+sjh+kDN1ieTlaV0vcgBLEdiQpMX6SDQxm7r5/To/TL2DElSsi5qZ9JLs3KwNl0+10UnIBcdTPcXEzsaAqQdEPx0BiedBeDQvn6P2Pop+qQFT+kPa3atn/zfhU42TKjMmDhN/hhdtuPXLl4fjf8QeiETOI7IlOp9jSHJyycT6BhlMAdFeBvoUNwyLqPQCyjx/SpsTgTeixHcFuHL/nJQIDAQABAoIBAEjfKkGYiazplctLfVhDSCan05cqOL0Du7D6PfMabYkcKz+tJhVVqdEf4YDB7/BTlb1oY7e1aPBvxjpPrP3Zpr7MFtcUr8I3Ehq6ZFhE7600Vbv1AJoj7ExKXc9olH4NCdw4RNI59A6pS2m6OYttlonGpk/JEa3PGAi/Uzzk4MUpTmEvfMDCKL6X460/DcEgrc/l2bx9fIq4qkQdhoAV11R6TWz7UAU4QRgIZbSRpWb8Mm4zVPSQ9JuClwDaYN0iPJUtuueNWTWeohSr6IpdVIarwDLpQIqNKsoO2nyJDdKXf8V8bHNRs0BYLlzQTNmlyTqx0eWCLOg92johp0ae1xECgYEA9egIdW8crHSQVwYdWx+2rtyi9aDa4WoGe2IkNrLFNMCv+1yrrnbEuFcWL5MPzJmr5/GXdckcqNCMuL58awBcyNrUFHvKWI/bO0bIABMzBdN40lgBl5xuFMIIxdA3dKTba5zhQAFlD5lOhusWiS253/np8Bk3wQYSNsyDIIi5vFcCgYEAxhSoAaHYWcxx6ygYLbeuo0vI3eO8z5O6CtJPxs0J9oAsmxgKmIJpDGS32revPbRdNE9qewh+yFiLq8siofePreeKyj58DLRRy7bCbNJs7SBznIl9IwFkUgQ6+I8aWu5RB4AlUc+IrKCMLCR5c+3Bba/7nwARMpf5s3lOm39RiuMCgYBehG8r5CdbSfpo2JrT+Z6YG4ova0J2PfB74D8XHyOZoS6DKR18E36NdDu80YPTGoXuwvd6eHChmndcUyszXZJMSYAW13XxEGotoIkjLj4AUUYxY05JXgEZzXLdxahrFyqXdFdH6MFVe5GpXhbtZzv4kPCQLsE1WgYKNhV4ndT2RQKBgGC3tVEWtY0jRnyMF0I7bgpN9sZhbM/uUej2x/1KIJM8Aou4MXRGOQTUKPGivu5iIyBnppZsj3tDwO8hQMfVGVLQu/QEjo2lfkr58fUwyf7+2XSVrYRqKZHifuje9v9vXiFLcO2BaDriKY9kP+lbLhdg1nvMjJknm8UGdlt2z1oBAoGBAPHMqx4KwOTyRTTsMKTEfu16gvjGuhBNNhE+zrHc73sR6nwgf1ipDUxtjNH9htJbrMhlNvtOsn+pTOtqyVms/3OK3G/UNFZAiNt3t1R+/0ze/ZME+7/hhrFToAzvmDv4/PX/B03rvRWhWAkcIQGMORzH49ari48ArT4GdQ4AiKFa'),('9124da82-7ffc-4b12-9660-4a1ced2a1b4f','70e3da01-d47b-49cc-bf95-eebfeba681fe','secret','p8adv24SRBcT-PrMWwyx-RnrXu6R6vf5o81wNtY7xWx16H-ZeVZjha_9KSkMu6zAxAcudmUcGf01wvcMjP5FTA'),('9190bb2a-60d3-4611-8dba-47ac47b99249','9e95ae01-2b6e-4b38-a2cb-6f3be06e9905','allowed-protocol-mapper-types','oidc-full-name-mapper'),('92ab562b-a5c2-44a0-91ce-c4f3a18399e3','e2b54a93-5e11-4806-bc9b-95ce899c1532','kid','a2adddc7-912e-4d04-8b8c-d125b4f36875'),('9345f26b-4b87-427d-bb94-6456f8df840a','efe1688b-7668-4832-8b80-addbf37595d3','allowed-protocol-mapper-types','saml-user-property-mapper'),('9bb61286-7632-4860-8c5b-2f5f389d4c4d','183c2b16-24f1-495b-bab5-d10777a3b701','host-sending-registration-request-must-match','true'),('9bfc944a-4956-412a-ba67-2294b29b9c38','b107d4a6-fc2b-4170-ad29-b13b959cec4c','allowed-protocol-mapper-types','oidc-full-name-mapper'),('a36c70de-0719-406e-8dc4-43e525a08ca3','5b191c64-4d7c-4fe8-914d-c1b22aaf5cef','priority','100'),('a42ee392-21a0-4ba1-a901-2356d65fc41a','3e49a95d-55e9-4caf-b448-5fe445b636b5','priority','100'),('a484ddf0-0c55-48fa-a7d6-b960f5c1e6c9','1af77db7-5cb1-4f74-bac7-1e91f15171b2','allow-default-scopes','true'),('a4af7204-beb4-4a4b-b1fc-c2b68876aec6','18aada12-6c75-4729-96a4-f836dfef6141','allowed-protocol-mapper-types','oidc-sha256-pairwise-sub-mapper'),('a563a6f2-813a-47e7-bee0-9dbe70aba0a1','1dce4b98-2422-4f99-9948-8bb81f8b4a1e','keyUse','SIG'),('a5e91045-2133-44ca-9a29-6bf92db0815e','fd7968e9-0c10-4e77-9b8e-a638c785d67e','client-uris-must-match','true'),('a66be72c-8e68-491a-a4c5-ed68e9524b45','7a62be0e-52d5-4f86-a628-7592b43769a1','kid','03429785-2ba9-4142-8246-05de1eaa343d'),('a731ef7b-a957-4041-b3f1-85ad6d1711d5','01786429-596b-489f-8a90-ccb57264e86e','certificate','MIIClzCCAX8CBgGN8sdLJjANBgkqhkiG9w0BAQsFADAPMQ0wCwYDVQQDDARvcmcxMB4XDTI0MDIyOTAyNTEwM1oXDTM0MDIyODAyNTI0M1owDzENMAsGA1UEAwwEb3JnMTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAN35AVPGmotCGkdpJK8dGuxFYXKNacAtr8mmeEmSo1jMX+dkRSSJJKU0M1RWDs8zWMx4zCbMnHxgGJSxmo48HzEv1n5Db2fO7cEQTaZlKgFO1Ji57ArqbY/kT0ODLNRDqk8adlej7vTLSV2s67Wc9WVnjWHcJEpw9DFvNJI65GCzn9oQsk17ezD7c7VOxg7zepHVlxaXkMreXWpSlj+VFZJq7MCED8SkwoVigUoiOs33uIQvPYk5f9M4mqQLiKB1MucP6I/fQyliATzsEJGGc7IqPNCrD5LbqMS3EtJDArTng/gQor6bKGZCdWqLzo1Wo+azXfzAPjK9E3k82x2h0IsCAwEAATANBgkqhkiG9w0BAQsFAAOCAQEAFitcvdzEu5s05/5iHD747Okoaa1lk9/YLa7n5h9Aewc5rANSE2okW8oui7YuDXiTNrNEeZTMF6MdDkOTtBcr8P58wSisZD/4PiJZWxzMXrpDFR/wDs3XdNVT8iXbYlC+r+Dee/rcQHZWUfbKhmNzFgDMZBBklL2At0f8PNIZ6xI+gUtvz+zW/uhSoWlC+kh0KPiDXekALmAesXIlCvWeHyVXNf2WOMfZrg6iou35L6SKxPDYiFOXvlJclO2IYGGMXIBpJUxMju4XaRi8lMb+JsXN+tdUdifkjJNLjLB7aucSWZupxz443QwZoyAbA/x0uaZzsF0E6KZGUkEVHKeoxQ=='),('a7897972-335a-4f1f-8455-9701cd4bacbb','b78af578-efd2-4ae8-986d-2d9baa06628e','certificate','MIIClzCCAX8CBgGN8sgCPTANBgkqhkiG9w0BAQsFADAPMQ0wCwYDVQQDDARvcmczMB4XDTI0MDIyOTAyNTE1MFoXDTM0MDIyODAyNTMzMFowDzENMAsGA1UEAwwEb3JnMzCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBALhbVIp2egbADO3dOLe4j5kbqLQ2TJjPcW4yhSPRNZr1gJOwO66aqQj7snYxnmmphCkl6Va4i/qocg5uXw8rPpzyStTzLkphXUV4n4fOwMZ9I5uRHoPR0dx/d6EFpUAIT1AhGligkrw/RUjbU24Bpc5ENSMqqNlFY73KBXzmwHre1K+9QR5q8dVh3hTEz2R8wS8td7B4puO+3b2mHEl+65qVn/e94kRiABzGCpQYeuPRDeYzcCu6MxUhIKdRCc7Ac45GptjO0MGKnvAhEu+cor5kbLlcbavovV04z6TLapf/mop2EbaiJsVM84ZnKChvwHghSjrY3k8p7jUFe3qAM6cCAwEAATANBgkqhkiG9w0BAQsFAAOCAQEAUW3DoahR9Y0oO+GeW0Uvj1ibv2rQ+fOJMOt3aDCnurPFxKNkP+wpIKGKv/4BQ4SKJ1rW7zDcscdVSHZWE5wBGX+X7ZQBbAeBLOQKEC0Fu53RkzG10GKinZEfIXO0OiXFYpmIklF9ONEkHaRKdcSu9HxAUmF4TjzZcnsF01Ei8z6ZwJgy09MpWffAnKA0N9RHoBRq3DfxM6xR9K5DNfPeIOgnUgYEzrNJ5cnBLTR3gzB4kLzGyxpVUcncColUAIWgNxqXEJ/+RW0musOAWGfNypwICoA5XEbF0n8JNUMR/66LlFW5SZDjfRVOc0kVEefQ+OzrFjMqt2Z8w6qm2BWhVQ=='),('a8203d5a-2b67-4597-88e1-50df37603cfe','efe1688b-7668-4832-8b80-addbf37595d3','allowed-protocol-mapper-types','saml-user-attribute-mapper'),('a85f4933-266e-4428-bfbf-a9a65b26c5fe','110813c7-e2ff-4dee-b26d-8726ed9b47d4','host-sending-registration-request-must-match','true'),('a9e4fd51-bdaf-4082-9708-655e54e132bc','e14d1c34-470e-48cf-8994-3a7255c001b3','max-clients','200'),('aa10a8d9-2572-4f0f-9b8c-e7502d94a46f','a42f68cc-9a64-4b32-b1a0-d8d9c79f327f','allowed-protocol-mapper-types','oidc-full-name-mapper'),('aa320d7a-6fb9-49ca-977d-3a5c80f0bfaa','0ceab05b-e563-4c1a-9f14-4fc4cd69a95b','allowed-protocol-mapper-types','oidc-address-mapper'),('aa4a5a3c-cdd6-4bc1-af5f-33320aa392b8','82130434-a3c8-44b6-93a6-e2918e5ccc88','allowed-protocol-mapper-types','saml-role-list-mapper'),('ab3002cf-7b63-4546-938f-628b3edde915','82130434-a3c8-44b6-93a6-e2918e5ccc88','allowed-protocol-mapper-types','oidc-sha256-pairwise-sub-mapper'),('af4a2626-aa67-4e9a-9363-95050a688bdf','e6d16d5b-014f-4c4f-89b6-f9250da365dc','allowed-protocol-mapper-types','oidc-usermodel-property-mapper'),('afa17fd0-b30e-4f8a-a807-7f7c023b8d7f','50538daf-6b1e-4572-ad04-0ac40bd5087e','allowed-protocol-mapper-types','oidc-full-name-mapper'),('afaaf4d0-e657-4da0-849d-2ac39abaeae6','01786429-596b-489f-8a90-ccb57264e86e','privateKey','MIIEpAIBAAKCAQEA3fkBU8aai0IaR2kkrx0a7EVhco1pwC2vyaZ4SZKjWMxf52RFJIkkpTQzVFYOzzNYzHjMJsycfGAYlLGajjwfMS/WfkNvZ87twRBNpmUqAU7UmLnsCuptj+RPQ4Ms1EOqTxp2V6Pu9MtJXazrtZz1ZWeNYdwkSnD0MW80kjrkYLOf2hCyTXt7MPtztU7GDvN6kdWXFpeQyt5dalKWP5UVkmrswIQPxKTChWKBSiI6zfe4hC89iTl/0ziapAuIoHUy5w/oj99DKWIBPOwQkYZzsio80KsPktuoxLcS0kMCtOeD+BCivpsoZkJ1aovOjVaj5rNd/MA+Mr0TeTzbHaHQiwIDAQABAoIBAA9ETpKQANYeJEeQFD1VD6J7fSHPVxwoKESCxhgtVT3IxLnZ/CVwp0wThIpC5v7aRbu+fTAX95VYWKh1dK9etDiCVUrW4YUuxsx2DhkpMRPo85dThkgT6pgweEEo9v7cbozFQalydX9xseiW+ZlCo+AnGKLH7NkP3sO9pcx+73E1GK8ZAAN8KBdW2VA0HDy2SOg/ALnF21Ylon2DwMumxl6sqxZuCTJjLK2WGki5y23TYuHx5ARKmB3US/3y6FGqgwBSSkKoy69am2uTq0lFlgW7yXP/vAswZ7gepLE3AssqamusFmDWCdoUUZcWqlCBM63XJTs4L68SnEWNO8xqoVECgYEA+ocYS/IS4zmczPsTPfjH55h8iOnbiuy4poI7IFSJVEC4NArOZxFbcP99gfY3dG6qTt2zdPLvpqnAgBG6mfpDEAWz+3JAczW19Jh/SwMUDWXmKP0MdwNikBZF5+kGQZzVz6tG1y5Xdr1r2B01AtI9GVejTWLhFsdQF05imQ9SJvECgYEA4tI8WQonnd+FAdKLeQvVGR7Hxv70ISD3pYTi/lfjWEf0rFK10noS0hchPCoG4RZNzGWNXRCzvxHDMifVKZGsocSiD/2AAqHX6EiVYyntp58cc+9EhJK92d2WzfJtK75ZzLdrQiA20cUct6Gp+froO8EjB7EpeYeFq8QVRpdGRzsCgYEAgIbKSjwYwIYQEYFFr+dv9zrduQfw3+buHE53svBru9OwLNLWbT4UYXZRl1kPviYALZHDvV3c4O35mjp+NvyTZybl3TwSIIkPnjqWI4+iu/TpDWI1AOG1sSIcHwwHb6Xcczv1jfNyX7JyH19skNP3EIdLeioePCdoyWwnXUrk5KECgYEAtvQZFUDpn5/xavzm3yY6Jt77CXoQdMBgwLOlXL6LdGPl6TF102X/1FIvzpWfouMYsaugENcuBQpQxh33BGaqNnmitv8kx/q/am9RgAEL3s6qZqEyRTUPybHAuDG4+TW6vTOdYmMVlLJHbZ8KucY2mCw7EzNFXu9/VIL/Hkdauo0CgYACHLuqdsJcR+wp3ZsGi8xDLRCCrWKjCVYmCGfZNXomPr31tuzJJEH08MG+ZOMRGNjGQEGwsdEUdVHUNsvVtgJse0DqgtNIQcG6e6+OLBtLJDLXH/4FBlVAcBsD7ac8+fPpAIWnEWkMpREaGPTo2GZ1aEQdHMU9uRrqAqSJEXyQoA=='),('b28c2a86-67d0-4894-8483-0b2b581d2f05','5b191c64-4d7c-4fe8-914d-c1b22aaf5cef','keyUse','SIG'),('b2af1610-8e96-4754-8e6a-181df39d53e0','1dce4b98-2422-4f99-9948-8bb81f8b4a1e','certificate','MIIClzCCAX8CBgGN8se8UDANBgkqhkiG9w0BAQsFADAPMQ0wCwYDVQQDDARvcmcyMB4XDTI0MDIyOTAyNTEzMloXDTM0MDIyODAyNTMxMlowDzENMAsGA1UEAwwEb3JnMjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAK4KVOxV94TuVT6yOksEaC3WRp2OkprxDC1gZ6yOyNOWjqO4TcoiMmPLPpV8RMVz5ZWQlYWsIldCLcc5OBvBbc5zSRN1aJnguGZOI90PZUkN5r8YGg4nHViJEzfYIvtrOVdfsOZRlWNY0yfLKL4O7M2xktVEfHdsrxWmHWXFIB+iumEpN/f/KYtY7lVJ4Ynw43KscidnezyitTy6970bT2TM+hz5ysGMiFuPtUBleEaeWnL0jwV49B94Mm/MvJbzay/nXl5vXzPWZjTZuLrp13W4foQ7nwQToZIzAO0r4zfgk0Et2rN3cFHDFiJtAL38xjCYrGgj33qHRbMQSoS+j8kCAwEAATANBgkqhkiG9w0BAQsFAAOCAQEAH0BqbK3oM7Xq0NI30u/1gLQWeD7wh/AXN2fpgsp83JFX/dnHaQI7+ck6doSNHo6CPOEiMCrXCiUKNQrJrDgnar+UUO0QfcJRTcgBAp7fYvXHWXi4yCyUl1gtoYho7cG71aLlZvegND01wjFZQjtTuH9Nxc/foeQNr+MxaPFYecoPjHhyfsC/y/Vrg4xPBTauUXFxAuRFnV0c2zKKxSapx+qK5zly+vxTm6VWYfAZMyfo2JH4AoYN1d5y1GXMwYl/S/q/9yA/8gDsRFxCFjbXeFRESnslWsvqQApTC2g3vXjrilE0HoIvhWHm2rn0pXvM5HrM9LvvtYNIESqXIM1C/A=='),('b5a80e19-e8d4-4c7b-9718-eca73092ce92','e2b54a93-5e11-4806-bc9b-95ce899c1532','secret','55zEJahFmBJGFSq7hCzUoQ'),('b6e5d36f-c781-4e08-8f80-51c417070960','18aada12-6c75-4729-96a4-f836dfef6141','allowed-protocol-mapper-types','oidc-address-mapper'),('b7ba1c4c-1c8d-41de-8326-b3f498874397','acacf2f3-4b77-4c49-9ead-5d6f9ef7cb5e','privateKey','MIIEowIBAAKCAQEA7S+9qaKJ7lDZtJEh0vCH+2aOkrYtrPiusEn45pZDrkUhsjBmKyiuLCoRjww/iehQWT8qNDPUUpVlR2aO3mzsMOq0Zp5t9w0/UcuwrBUoLpnr3PLJxAJPxMiHVExkdS92kP4bIjVbGMvyXqwbt13lm7ZH+L1VhekqyOuv17WzSXYGO61UthKVG0txMigUAr+/sWq38FfG9o9VbVcX3GstzPyLmPqqVIoXsxJip7FZunrJR2hG9mM8psOhefLW3v8EghYBYHet/wV9nQ/vzmzm0umbApItnnxMqYJzX5wW5zVoW6LJXmQeGzJe+xTx2MAPC/34raOWQlzFwKFvKW8SzwIDAQABAoIBABUjqSLCUsrDt/OI79vOBkCYzmIzDHUbIO6jWSSsBdI1ZSBtgd2c3ZEgGrqGG++dnfOmVouahvTpTcKEWH1oddCSSovO2Pwo2RjgL5nWtOMaYtQpa2Ql1Jg0SyNvP5DWLxoTG7X7zWezXaGkcz/vhXRQVa/MqB+sPVz07JIsJpOIXm9LDXrRd18Y3oun1Nh5B3i3AYyXBsanP3OeqKkQw2GNqSBxXKhvNdrxuP0Egft/zudOphj57PehXwxNriVKhCWV5UoBxGChRZFd0taBjNyjWVKLQKvtW1k3PJ6Fs9vsyrxROO7SEuZb9GIyAgK9AX1zgFUtfp+Uh3LDiqbsm+kCgYEA9pJXXyV5tExEesN13TryGz/FhRegH4wB6TO2hEfAg/tLhPq1Tysc0viO+sMGE/0elt7iwyPhfvyT73ioMSO2LbvvVoBB63besTn/cTfE+28BL01tALfI+U5O8VltBVR9U8lNv9Hdje4Q9eWp3RRqUMPpFMV/fZZotbcS/ZlzrZUCgYEA9kGHie27+eXDcG1G8dNV6AnAcrjJCaYoWbxGJZWRh8Azx3UYS9/uz8nT68iNsD3fk3BMehCnb36xqOcuk+URSiAKZ2KCLeSwJaMJTDcuaW6BS3+mU9AKRLyEjaYvql/OXCNceiQ25Vvx/+72wJWR0lW2aATP6UpMMyF8rMwwvdMCgYAYO6+8mSlJ8Aj268jksktjJDRcbUL+drslWUDB5W9lSUhVzHIPUtRlY6phuNMbGdBs0YEF3rvlyBsd+QTGt5TLD+Jo5PgVlTwzvNh/HxUMBQ/fv0NMQ8PLxMd7bueJE5Gxr2IlzRFyRoiCMk0sfjoor+hzcymhhSvLWC/UnsVAtQKBgQDsnjKaObCxgjC0yousuaCGATjGAwBJITsMXngYjQr1IZ2fPchGv7k8N3ZFzMM4YXt+tB0H/RCldVtILDr5KNXgH8FfbawgZOlMgMfiT/Nsox3haZpsVi5Htcy4PsL2NnCW3/Nv+XQ2Fo8FmJvImO8w5+MJN/Z+90EYsEiX0OvUuQKBgCQtR+ks5GWuvCGY/Ww5shUCJUoEx4qtl24by05mgxuaKOcaom2PDAWaBHvezty06jG0vF+fhKFS10tenSho3Tx2ORaVaJ22HVBay5mJeCLJ3Qwy/RHNC2dN76LDOG1g/Srq6/es7UHoiyKTNc/Xz14C3SyrGG3K5pbN6XjkVsAU'),('bd60223a-265b-4cbb-82c4-bd9af64f668b','14f2826f-3905-49be-a851-f599a4954315','allow-default-scopes','true'),('beabdc2b-5873-4bbd-a769-e31a7b70b3b6','15f30367-da6a-473d-a937-8cee56a97ab7','host-sending-registration-request-must-match','true'),('bed57e97-0cfa-48e1-900f-d8a6596aa2c1','c9938567-6270-4508-b018-cb23e7d39a80','allowed-protocol-mapper-types','saml-user-property-mapper'),('bf547b11-3c5c-4707-b785-8eac3a261e92','3e49a95d-55e9-4caf-b448-5fe445b636b5','kid','fc686ae6-bd5c-45b3-9f71-ffb8aeb31107'),('c0a92d53-2df0-4069-8bd5-a611944e54b6','8dcab68e-ffc9-4d12-8062-3ecc1dc0a1c6','keyUse','SIG'),('c14141f7-8cba-42bb-9db6-3f65044ce83d','bdba424c-5f08-412f-81c5-09871c23adb8','privateKey','MIIEowIBAAKCAQEAkpN9KIg0njUvSsiHWMCY4jmX48Cw0Q0npoUvmzvpc0aSzi+G+hLfKx9srpm5GZOeETNHFGQIH4qWnjuk3DRyNhnSCULCQGFyc08EFxO+l+eA5rU0UHR/oFkIeSu1BDqOLq6wSPHh8vygMcBezv0EkaRsRmWuj4VLMEOQLcLq5kBGnejEVbNZSf6iZ2UrthNyDn6THeA/uGpkWcOSRfFLxk2+Bk1RVo9/L1foE8MF6D7JUPZA6NgJMWb02ktjFOWZwpp3dIPYZdFJBUuRW2zlYbmHL7tis9lyUYIRrqFG1cys84hUL/li/4quewiVhxLa3BcOZKLaH9rMXBkx3rHC/QIDAQABAoIBAAkyDo6N6Psp7AMdjHwxbQX4RgKoUo9y61NjlKaA/jbYrRoZWjbzGyQZ7xgPFdE4dRiwJlvtoKLV73gS1tdnxOiG+ynQkd43HtaEFQYbm3/tKqWOpa8Md/tHyqPLbapLwCLGm9GftySm26fzYR9MOU6nyZErDOX9H0fyXSe5zEHQmy3kthfqWcity8jV87k2cvy9IxDVzhW773QSmR27/YqPPwn0c7f8kyzd5NQnp231fw1xgQw+wDUnJgS/0beNf3n0XywJYvFYfXaa3xAxDG9RVa+6myvKHFGzYaCeFmakU+RpHyqkMEUtH38/I3RNbjhmRaaRRCTxKggNqeOGs5ECgYEAxfkhvCFR5eFjBEtpKg790W+XKw41/b7GO1n07hOIK592BpMwFCvfHtzZiBZewz31uwFaNU82UgLL6SGOivKPOcDMlooKb59KwRXOJE0/IU7PCt7ZkA6v90g92plWtFSPCqJxjZ2KrnaK0HxXU7srYxTX8tvoQiTmOhNlCNZGcaUCgYEAvYnK7KUNMdemw+VFOcYU1jAA2ok2k1I2CK78HR/xT8/fXnYafQ3HrycPWGvxcIwHjZVHpYCNO8exC6ptTbp3j2Soiw8c+qV/mbTA+O2reEZ8NxLxJWaphUJhrUrLTYBqxgqqxfbPx+hlKRgGi/UBfjO+H69GlPqIC9d2vXWYHHkCgYBLPFSPtHH1VORWW3pJ24ymLSxb1ni6R+f54kPsvkt/mIg4E3OwFsQibHfW+fllZYSfXvIzVDkmjZ2EqZYMRAYeQqD9jNROe1DjdC/1J84YEGUqkmpIDuzcov2ut5t1yLTbq8RPt1Fe3/n9JWPilDz22JMA3oWzrWY5J+m7pAL9aQKBgQCf9gDKw2llXUkjHwXTgnbnZU/zH8Ztgv6TSYsA0YqI/zjWsfoc/FpAWki7KS50+9kMBqaW6O1JPHkRDV5+MRbib+NGqRSd/Lq58DDEZWFHesUufdAC7qe3DZT9+Zem6vAx/6KsvGYTovBtRBeSWs5NwkF84CJDbUUQKWHO98XOkQKBgBcpfsC6V1BTb6ijaKLqqpggiaMI4kZSGKN60GQFHN2f/NkfTchT5i2FBIGAmSz28LVXc57TPKcrZFobyp44X3cVUq7xQabTYRJYNM6SJaXk8CmMWsr95lcs43AnnJJCnfCLLl0kzH9xGXMKBNumMzcdCWAfqLuBh1DfNZkz8fZe'),('c1c8c1bf-126c-400d-9987-1451a113c2c7','83c41551-1caf-4461-8978-399813474238','keyUse','ENC'),('c25ee5d7-5c37-4b01-b81b-1d342ca8b175','e6d16d5b-014f-4c4f-89b6-f9250da365dc','allowed-protocol-mapper-types','oidc-sha256-pairwise-sub-mapper'),('c35cc4e2-f588-4806-8499-7f40a11613f7','18aada12-6c75-4729-96a4-f836dfef6141','allowed-protocol-mapper-types','oidc-full-name-mapper'),('c4f57ce8-84fd-4157-8b44-47440d269f75','2d4def39-3a6c-4594-8fc3-e3b270868f9f','allowed-protocol-mapper-types','saml-role-list-mapper'),('c554e07d-45df-4460-8cb3-a79dc7fa5c65','c679c0c2-f74e-4831-ab8c-87ceb6b5d528','kid','290325c1-c6ad-43bc-8d6e-e723d6a7298f'),('c5628f26-0a09-4643-b697-53ea98671e45','75e4d35c-e1f5-4b25-9a9f-cfe25f85140d','allow-default-scopes','true'),('cb6568ab-3565-4911-b769-29b5784965fc','d98bd3f1-5f39-4f54-b47f-e8b502cded6e','allow-default-scopes','true'),('cba038b7-250f-4036-bed1-98b2dfd43c08','7a62be0e-52d5-4f86-a628-7592b43769a1','secret','1WOn6V1EQS24SWzW_s0OXRu3VGd5H9H-C6J6SSoorXBU6aFr5dcQ8jFK6P0BXzy6QgIYSPyc6tlz44QIxkjllw'),('cc699711-1eb8-4507-be4f-3af0564422e5','9b93d78e-e5bb-43bb-86b7-871b14db62ca','certificate','MIIClzCCAX8CBgGN8sdLszANBgkqhkiG9w0BAQsFADAPMQ0wCwYDVQQDDARvcmcxMB4XDTI0MDIyOTAyNTEwM1oXDTM0MDIyODAyNTI0M1owDzENMAsGA1UEAwwEb3JnMTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBANRTa9JzFmEaAtnp/xlJU0PoPitQJqDzSjYUQ8vGEPkrc+R+SdB63ZkVaVHk0VjVoFdLlMLFHxKZNZHHxfduIZgcGiPf0Kc+DNxcPh568JkMNEuIQ7t2cUvvaIy3UjiXnOcWOJFq2NQ3mCAWFb7yOoigXEWBcLyDM4lFfH81HrToSX83p7+2XILjyUmTYFxtLPxh8OOPrS94w1I5mjCXkquXn0T4ZKZ2QJp25fXoA+5zYl2uC+uGHinTlqDsyv3ZvTzF/XGI71AORArgQDICqj+xtLogQLIyhA/ssa+oXGRUGICm2qMdJzYT79pj2/DD9uBmLmfdB+h9ggFPfTl2ctECAwEAATANBgkqhkiG9w0BAQsFAAOCAQEAEPbIBo32yVOgrypSp/kJ49LZpCWEedbBaP63ADY4y9zZXzao8opPRcGW9k01yTuHedm3OvatRvQAO1JubCoReE6+D83i7dhnlxaeshpvOegigstxG4QJFoMZASxN2Ibfk1VswLu2c16fugG56vwwQtVXEVqC3QsrJlgnKOLkKssiodHqY8VTLvcnaQbp+eb5yDc3Mq4Fc1ua07xNMvGuCtheOADUkcJajVO6uggjS2Wj0ogwvzCS9naeOVP6Yq4lgUfHp1YflBRQ/blQl+13o24GqpTEf5DhI8ILHLY9LiXDZzBexKF+H6B6/f/O0bj3k95QnLTyyEEnNBTqQJGLFQ=='),('cf5a946b-2f97-4eb0-8e55-2c85f5da8364','3e49a95d-55e9-4caf-b448-5fe445b636b5','secret','FiXCZ4XOy4dA8JnWHRI01uGR-WzMZ-Evq9mQZfpLdlrKaoafKs20xgYpeqoxFbsoHbZcwY-yM5Atv1omPWAUAw'),('d0b1ef5f-44c0-451f-b902-904124618fa2','a42f68cc-9a64-4b32-b1a0-d8d9c79f327f','allowed-protocol-mapper-types','oidc-sha256-pairwise-sub-mapper'),('d1d8d41b-7810-4878-ac8a-c2a7d798868e','22c2335b-2609-4844-a9aa-350931d513df','privateKey','MIIEpQIBAAKCAQEAzHtoNc7KllHExx8hPUEMn8EkST0Tgqb/ZkUB2iY+xWVFKosKhzxexEzCUqhy8uOJq21pJdoY6Ww0N/SP1QTjVcvNTQVcPe57rywHVCQSWDuekX5VLmfGGnzEhtZrSmDq0DkHByOAyJ9FzWywza0aWjcbfbIfHyU7v3IedjMuqV2T4AwJHLdaZcWYK13GsD6zFU2Cqp3nYUi/daDW1pJrC71HaG/lQgjE/h0b2dcetCiqMBIvBf/WyCp+KBidVUUTvAf2bTiEDG2cOMK2LHI1shTpr1w+MOfSEqetTjBDs+VO/99ga1kmM6VTstIqKnfXFnn5r79HQ2kYpoJP6F7LtQIDAQABAoIBAFAN0l8affq6uYDBYbiC8ofKzEN2C2Dfs2adBpwa1AFg4+LDe5Q1YN6WNI+6zgHkbf30wDEnARDFoW30q6jYmI36033fZt0CNF8ArD/XPW1YrfxFCuE3lHnDNgeaA3gjmFp7sRIs5prkrCW/8zoalpISOAuORBvj7k/FxEI/SHnaauwhcYXybb4Ae+oH9t9UmQUxdJ0egeVn8rJX52x/3LfAKNdJRib1vawA4EzURz9UzNc9K1ujxr+abHaK6Am/KRhXB5zVckjzLon8ie7rgKCf/PRICvvuc0/oKiQfCIH5U97TBKjdGd+Y494XSowp1HtWIJ1KcJuwaF3y6bjaEcMCgYEA87yNqdR6J5z5Pmgf1Ckqd12ATJE0su9zCCZrRFMCsmEC8E0RtpLw5CgFYBm67lpVBxPbW+pW9CebhRmTJq1/G4+zdlPINTHxA1Oyj3V1q5Kyrv8W+mUxgssScW7o6jnheFNqyovddoXfzBA4v03ZP2ygf0CNhxEBEaW9AMApzcsCgYEA1sU8l+k86Do/BNffMjd2kaMX5ob5QZN3QdcgwuqJib8Ev0nXpSkXH6cbljKd/I+lNa+DYbg6CQ1VG3CY7In/iqySH1kZoasiJoesDUb/qDVwIdoFlc/RjllxbIAGojK94dtlZlNx8NXg/lVvnrNohb333tg6VmXzTxevvGdunH8CgYEAiM1b9eZ8aZ+BhbWLp9kzLKweRtt5aLVdK0XlDwRIjzZEH/wh5Qe0jVqpKbdHZGDvOHm8tWpiQ8e3Uo14Ok1G+oE9iTydMr5FOEjSABM9aH9+KxqiGwiRMYgpYeGOeWjjVFX9qpG2S7/4TOEN+NIJDcA6lTH2PckdgHo2CyXQUOECgYEAoymzEAHdCNx/VfGemmryhFAwby1pnf0nY/jI5ewC04gwVhcGYm5mJ+Dvn1sTFXYX4EJYANxSEuBzIOaY91MbtcHHPVOWmnEF/9mgx3GB9suqRb158sewf4HKHtDguUbtZPImBegtLvd9+Br2Ms5AASNCdaU2JL9NanAnTW4S5YcCgYEAynab+6gErd8F7psV/C6+9xWDZApffhP17MfaHT6YW5jKgqWRvFz35990WvBGRC5mbwfq2jP9t6G2kgtxW06rxyO/dS584VMXUQGcb2397LMH+BoyY88cj37nmc0AmvkppXnQloTXpRmHafDtqcrXKlb06y2zFHWBGN9H0W5Gwqc='),('d55fdcc1-0116-46d9-892b-8c39211cc78c','9e95ae01-2b6e-4b38-a2cb-6f3be06e9905','allowed-protocol-mapper-types','oidc-address-mapper'),('d5868aea-fd48-4b76-b435-967be35bc408','56d80c01-881a-413e-84f4-7fe1ed9f18e4','client-uris-must-match','true'),('d9050c2a-f9ee-432a-ba15-eccce3c013d8','c679c0c2-f74e-4831-ab8c-87ceb6b5d528','priority','100'),('dd57accc-81db-4e1c-b8d7-b32cb8b8542d','3e2600ce-a8ff-490c-ac6c-7ecdea59898f','privateKey','MIIEpQIBAAKCAQEArlc3UrkO0u795/Va9CXg+eTrnvj4poet2FQAzDcdV0dGnCgPvIcDZQPTqvGJjzhVAyH0gzpsSGj3sWpqePPEB12Ex7xSDTWw3ZhsHirIt4BxlryAwU/NBaF0GeaIWLVZxEGdLhkNDJNA6d3yOhZePhWlfcFVD6F/kGDAM0J9u2/Pv6/ANqKgrf5YjhSPSs6Bsps5Jc77VfFhhnMzjEIlKW2/tVvG0RtOUAN6KnglW6CH/N7wZag6tWic2DTLaZq4XgOVOQR/krWp8fwldzpxW/ER9ZOcQQY24VqpU0l6Mge5SJHtmggjM/2a6OlX70OMy8EMNgYx+0tyIJyGkiY0mQIDAQABAoIBABKAaPubbgpOmJ2EOUnNt0lt1N+DFog9v+JET+1cL/3yL3kk+z6LqX2P4WezyGBtnv/9G4DNs24fzaGDZJc/b19EunGj96U1PHbX1SmCatimhed0S8m4GU7uqm6RO4kGfedI+1BIEk1yVyI6jplBhHDcRTrKSKenAO2mht8pwEQi1TZFV3ywe+a2VeFW2SbFGted/EPiipBLFpWlxVL+mbM0rqitW3+VCdPkGpx0vnrE5SQ0wlK938Is6MZyMQfu/9rP588v3yiweuppklXFZilPFMMyqOYJkHOQxwljJ5pf4yBIbqImEfzblu9h79K35Unu1KuJnMcqB7+HmtFqdPECgYEA9WNQ89X/n88TlMSYgL2mQgc/hoMNtkbrPNLWlIUH7ty2ZWqjqrQRZryg08lqTBPQOO2sy0IRm6qT/lmX99KdA2RyXINuyVZUH4pP9z8c1ByHaua/qU9KxLPDiPgFJUdDx6QOqCGKenh++zh8gDzg/i19wkSOe2ta9V5oO8T0Yp0CgYEAteFWYNK+JWCL2hFhdp8vCSFMK0wdraLuevPdlqUGuphOTriNxis6Ej0lh7KIt2XyGha+xOeCpyNkzE65/2xwl7grDmnYeAvhnELF4cGagacEuOZJZmKt2IlYKZbaJA2kMmslMWz7GI7TQMyNHZul4PbRkQr3GBygeEjC8oj6qy0CgYEA0c1tbF0eZqNlCYAhJ4l+udt6m+Y29g6il+loH6myA67fn8xSTOQSMLW8B/egk5UpJVNItqwxY9evGvu9K9z98+WQxbp2IVxXJnRaNHnYix4tReAuJHMv6QgNeXEc7SeGMw34nhW3UUjuwJomEHp8n7WDXXLCI5HBPiLOmbOmgx0CgYEAn6ArHUMYWtmHJFZIwcEnmM2+eemNyozK3OIWwlYHt9BgObrDwv7BMqyzuYq5bqxsdPUtbMb65hGsL5uQplnX33BlaXr/3yweT/RSk7ZFEjExdc228cL9bKPt2mJpBWdrikx7EgvhvEXtpltgJnIqfWxhtPh4sJK/S5Igdpg91+kCgYEAx+7qSKObw4AgOMRAYXqK4r0ZYYiD3DEc0Zw9/0CLf46MPG7oyCcG0Unat3kWzJF1u4xLu0rM+YYxoeqTrXZCHqxaJgNezbBFjPnd30liTJMaUOtRk5r9JNyFQYHtqfg3bxT4vvdogQxmm2X6fnAcjbKZ5Iatjq+1Hfx4qS46SHg='),('ddab0ca2-fda5-4330-bd8d-ad04b2844a2f','efe1688b-7668-4832-8b80-addbf37595d3','allowed-protocol-mapper-types','oidc-usermodel-attribute-mapper'),('dddf7a4d-8bff-4658-903d-3948f7be5c93','e6d16d5b-014f-4c4f-89b6-f9250da365dc','allowed-protocol-mapper-types','oidc-usermodel-attribute-mapper'),('df637c23-2edb-4aad-af20-cbc762df45a1','50538daf-6b1e-4572-ad04-0ac40bd5087e','allowed-protocol-mapper-types','oidc-usermodel-attribute-mapper'),('e1a21224-8ca6-42be-86d6-4bb8f3b15088','01786429-596b-489f-8a90-ccb57264e86e','priority','100'),('e2cfc76a-769b-4e0b-9b90-8381fcedbfdd','624f83c4-3bee-47bf-b141-17fcb31bab54','allowed-protocol-mapper-types','oidc-usermodel-property-mapper'),('e664fcfb-18bf-4e8c-8769-c9c224e1ae7e','3e2600ce-a8ff-490c-ac6c-7ecdea59898f','priority','100'),('e6dfe44f-a4b9-4a66-ae26-0a6ac125b9d6','83c41551-1caf-4461-8978-399813474238','algorithm','RSA-OAEP'),('e75a5e4f-e835-4d53-a52a-4048b6ffcdbf','4f70a015-ef75-4a8d-ad5c-96d64fcc2e55','kid','2bcf61cc-5b5c-4d1a-9f28-52d76465e0b6'),('e7bfa03b-27fa-4cdc-993f-7d345107d61b','4f70a015-ef75-4a8d-ad5c-96d64fcc2e55','secret','RYIOCVyh9spEjdiMcj13qC5O3vZrCBiC3xWENxWSIQhg32RhRRo9mNQ7c6NGE8I3D5Xv10cNddvdEuQRvizFOg'),('e833fe58-95f1-41d5-aa0d-e173c6d757f6','82130434-a3c8-44b6-93a6-e2918e5ccc88','allowed-protocol-mapper-types','oidc-usermodel-property-mapper'),('ea74315f-e698-4302-bda2-a632b62e1601','12fe9341-4670-436d-8ded-efd663bc0134','algorithm','RSA-OAEP'),('eb47341a-a7bf-4265-9867-d3b3c4e43b74','2d4def39-3a6c-4594-8fc3-e3b270868f9f','allowed-protocol-mapper-types','oidc-usermodel-attribute-mapper'),('ebe0f9df-98c8-481c-8f58-16ee084e775d','c9938567-6270-4508-b018-cb23e7d39a80','allowed-protocol-mapper-types','oidc-full-name-mapper'),('ecd41d16-0709-4419-8aa6-ea05ab17557b','e6d16d5b-014f-4c4f-89b6-f9250da365dc','allowed-protocol-mapper-types','saml-user-property-mapper'),('ed177834-f7a4-4abd-b993-48dffbe61b8f','efe1688b-7668-4832-8b80-addbf37595d3','allowed-protocol-mapper-types','oidc-sha256-pairwise-sub-mapper'),('ed63870f-6428-4af0-9b3f-6369b2724c29','9e95ae01-2b6e-4b38-a2cb-6f3be06e9905','allowed-protocol-mapper-types','oidc-sha256-pairwise-sub-mapper'),('eef3ac50-f57c-470c-a2ce-1a4e1fbdc9f0','2d4def39-3a6c-4594-8fc3-e3b270868f9f','allowed-protocol-mapper-types','saml-user-property-mapper'),('f00aa33f-ada6-49f6-b10f-349f63de7df4','8dcab68e-ffc9-4d12-8062-3ecc1dc0a1c6','certificate','MIICmzCCAYMCBgGN8saQUjANBgkqhkiG9w0BAQsFADARMQ8wDQYDVQQDDAZtYXN0ZXIwHhcNMjQwMjI5MDI1MDE1WhcNMzQwMjI4MDI1MTU1WjARMQ8wDQYDVQQDDAZtYXN0ZXIwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCfSMVSqMdZOnAgm+JJCNj4EjwHEnzfI4HB4q03yShRlpTr4XGmbqAYbEsC6GS28FgtIJBBgHAaWXYlSz0ilcXtMWJpCoa3osIGjzs6oI3tdksMf+BQWSpABdhxD5+v4FnucFwattMH2ofCxZ48451XK5D+Z2pjvGoIX4LMd7J/NX+s/BO15waWRMgQ2xJjfsxZ8dFZ0dSrPx5mkPhF9f+EBubIei4Ga8YM8kOWYiXrYB7RGcpNriaZfORAGKfLUVU0n1IIxtVEGj92ul1dQT+ipWj+zwTtzk3ePOCFtcb+oVJo9VsLzy0zFDAHiiERGW6YKG8lEZkKZb0h8K5X5jI/AgMBAAEwDQYJKoZIhvcNAQELBQADggEBAAGumX+vks9i7pEPRA+VB8LBmrCvYa0onAjsAOw1Vts26e/tC6Smw2Q6+oGG1ieI6OcKSf3sCOWBHcCY8GJraciWD7Cqon2NGVrBBifMWlkafcBAubSq4z+sKdqlLMuzGPRf4+n4RD9HptkF88U+S6EScg1Rbme0BcgApfnh7VbXAIR5hA3HxTvrJBp4rGsLhZ7AM0InrC54wKum5K06DJeOgVOjSI5ucQd1EOrHuUI5D/cnTjdeByvetweuW/tvy/dGS+R/LdP/+AganbsVdQ9HUE6ueHST4bP0dqrCXtZlV3c1TFWxeg/Vcp27zl/IE6UW7AC+YKaDPNc5SKb+BBU='),('f029f36b-803b-4e12-a002-bb032b1b8d4d','a57ef1bf-6e18-406b-ab76-efda5184ac1b','priority','100'),('f0e31742-0a47-49ba-bc5f-a805a916ffb9','b78af578-efd2-4ae8-986d-2d9baa06628e','priority','100'),('f128d860-f85a-4563-a47c-f16d08fa4401','83c41551-1caf-4461-8978-399813474238','privateKey','MIIEogIBAAKCAQEAjDdX/GuTij7MTPFjmPN05z2wTpvizuHJFdqVllOFn4ltg8SHCqZnC/7TfH+MHjBP0pvfFeIY2eDO468cdZKfygvdWl5hSqA3udfUq7eNMR72Uw1KXj74Rflcx1OBuA8Yp25QOcl5wjJj95HJ1YteM69CX2hBQaSiVL4Bsz121tx6d09m7GjVZ44QfkpUze8C67Bt/3EUkwmdNjGBytAK7+sSDJxuh7JaTCjaDlmk3GsIwi2plK+KnY9XhOcDOOMlpCBYFQ9jn6mUtDcwZLqbNdtcbu5NNzNt6qSlncs7HM1geaE45JiLqyndvn5YPDMBaIxAaFzcv42hecuzl4zcJwIDAQABAoIBAAsOY3S28teoI1SUhXr5BNMlt8eVs9OxAA8mFjzX8dBmS2lkJMB/5d458L5/Zt1hMoTJNP+1EqqTdxzYS6aFskMsnlP9idm9j8dVWnf+guFIWg9Vxp3EhK/X0tYGIqi7IAGLyZhU57HwEUE4kLFdn5xJtIfGC7yRA8UqL64iKZhq2ksJNrIhbHL7v9MfzDpkDV818FUAb8SNT+aeVnqgZQ3fowy/Kdh02udMLFrbRwmzHqOBG0FoyKVzuDBinI867cBD+0mFLXbhKIf7wohJZHvlMwVEyo/lsaxWustDWhVUjNZBtIfBw5vjZd0w7RxsFhtityeTnjUak5vQdpVmjKECgYEAxkgJXT0SDGEIYdptzoCE0buRP+xAatxAaO/N66LqORXJYHSpXxhOegXldfNDcULkDdzCP7dkadSS47Wfx4jVE+Mma1kqdu+Lf71mPTXRct/43pxGwPuoufKjktcJ1UX5AxsbrXT+KuIL0Gnza5hGPHn/bUmvE+/GO2G1L6SJ/jECgYEAtQhHKFDc0zXWo1n8GK4iOVlOYU0QGCcvfvMrI/h+z7Vn2C6JbkVt2Tt+NfeaJSbrccqZQ+zYwbmYL+c/lyToyLlYEhPvR2g9J8gnGvojn+yloQWSu708+zypWZ4CxZjPAZmT/M6vuklSzoCcDMHaYXN4s6G4YUGc/cdvavjRMdcCgYBN86Ii0tCWp0spVTtYNPSCk/ANpm7I1CBKYQSev+S/Xo5V6mdv6Flp5YmJboK0M2z++iwv6oSCirzY4t2XD3ddoy7Ggz6Lla9NIAPiypa2R9FKizvRwN5bhEXEg9/sxd6Y1v5xmg4Wg9nLLOwy/6GVQw0lRROcjeZsEASwX0qU8QKBgB9zkrlEYzkmr2Wt6oh3KGcCRwXMl7E6jZvmr2YOdCmuAJ6kZygLU+xb06+YluVBf8JDSqFscrQlhHU+HeQqe270FIL/h6DGUWmp8nFTaAEO4i+5giav1/pmLZ3uP9kIlV5XykgvuIQK3SIXYgUtYL1xjFTZEemDtry4e3kARYf9AoGAdR0X8qBwHXKUWtDX2+pAcF6CEk8stkm/cD5xHpq/F9aoZHtHUEPG7pt/fxOYtr7hSQskjBOzQpy+xEC1row/PBaqbCi+ZNHU5r3hhFyyBLAA5Aib1Milr/KrlxhkI9IJ9wNO83054LenxCHrYSxLW14MGBaSjoRO/5INx8xqkx0='),('f2760e9d-7f2a-4272-9b3b-b3ee06f9e2d4','56d80c01-881a-413e-84f4-7fe1ed9f18e4','host-sending-registration-request-must-match','true'),('f3147d94-2409-4377-8a7c-05d57cca527a','183c2b16-24f1-495b-bab5-d10777a3b701','client-uris-must-match','true'),('f529527c-f14c-421d-9226-4c4c16e4103e','9e95ae01-2b6e-4b38-a2cb-6f3be06e9905','allowed-protocol-mapper-types','oidc-usermodel-property-mapper'),('f58da6b1-c8af-4e1a-b0a7-0d9359e47f3c','810247d5-b40f-4175-bb44-c499b7025b86','max-clients','200'),('f59eba87-775f-487c-b19f-05509a11390d','bdba424c-5f08-412f-81c5-09871c23adb8','keyUse','ENC'),('f650407b-76d0-4573-96ce-734b0379af6f','a42f68cc-9a64-4b32-b1a0-d8d9c79f327f','allowed-protocol-mapper-types','oidc-address-mapper'),('f884ad73-40d0-49b5-add0-c99edbfdca6a','9b93d78e-e5bb-43bb-86b7-871b14db62ca','priority','100'),('fa2a3f17-034b-4996-9480-ab14d5bc66f5','2d4def39-3a6c-4594-8fc3-e3b270868f9f','allowed-protocol-mapper-types','oidc-usermodel-property-mapper'),('fa2f223c-44af-436d-9a1b-3a39214e9de9','e6d16d5b-014f-4c4f-89b6-f9250da365dc','allowed-protocol-mapper-types','saml-role-list-mapper'),('fa4c6a76-20a7-406a-a558-4428b05fc090','c9938567-6270-4508-b018-cb23e7d39a80','allowed-protocol-mapper-types','saml-role-list-mapper'),('fba6d73b-6249-4605-92cd-1a7469735653','b41e7d1f-2ab5-4311-aa1c-5ddb518f677a','client-uris-must-match','true'),('fd310203-f294-4153-a76e-67d6d92435cf','b107d4a6-fc2b-4170-ad29-b13b959cec4c','allowed-protocol-mapper-types','oidc-usermodel-attribute-mapper'),('fe53e464-adfb-4533-aed1-bec9006b7655','9b93d78e-e5bb-43bb-86b7-871b14db62ca','privateKey','MIIEowIBAAKCAQEA1FNr0nMWYRoC2en/GUlTQ+g+K1AmoPNKNhRDy8YQ+Stz5H5J0HrdmRVpUeTRWNWgV0uUwsUfEpk1kcfF924hmBwaI9/Qpz4M3Fw+HnrwmQw0S4hDu3ZxS+9ojLdSOJec5xY4kWrY1DeYIBYVvvI6iKBcRYFwvIMziUV8fzUetOhJfzenv7ZcguPJSZNgXG0s/GHw44+tL3jDUjmaMJeSq5efRPhkpnZAmnbl9egD7nNiXa4L64YeKdOWoOzK/dm9PMX9cYjvUA5ECuBAMgKqP7G0uiBAsjKED+yxr6hcZFQYgKbaox0nNhPv2mPb8MP24GYuZ90H6H2CAU99OXZy0QIDAQABAoIBABYU/HdZRowv/DitYj1fH8Cl3lRbHD9cOh08d44Rcfm2DBIpE7Rx2MrXXBobJ+4bHpdBmi20+k2w/y4jhppcevQyxQGy4OSJ2qTO15uMKepi52vtFq1ADNmqwxbyaGPQGc57REQUZotQolrA7T9L+iw0MFB+vSqv4vvdbQyeScyi1N24UGAuq0YrDKKgkHF7Gpo4RwUdP9eJ4zDQuSolm8Q6/B6bJ+zHdwjzTWKHp2aGYqhVeSd+pSJdKaun8VvPzeAZD1MgGiBVvLeWtIsk1lZhGDcjnO5le6qzAZKev5Sem9iiA5Y4HsxO2X+3TnCcwrsAKjvFOA90E+/iI2Loy5kCgYEA8gOi02G+P8KfjLwwWb8SaBpKu4g6r5+M28EjiayKSyP3KDewGQQJdvcz1cO+SN0XsFn6mrne/DfoNiymCj0khsQ9tF68f45wxMCqMr2HueK7z92HGMejSG0LuzkzFClWUw4DHxfoSb9drTvX3Ap0Oco4eE48a6H+8q+XmIikNvkCgYEA4JiTPAC+wY7sw3Ct5KLFTsxlLpwKl3lxZ8qhYK+98ECnVHhqNKjzSQ08tmg813hV0xYuEIgK0dlraSMhOdNCwfS4XUX+qHbE6yS61FGbK5YMcxS1grc24HkJK1KjTbp78tawXPJI/de0F/8RVFwSROtwnoeCVaXbbMCAZz7MWJkCgYADn2RPj7X+VFZ5D9QVc9O9tS8LMZXXTScZnwF+LRQA3e/0LSk4pqPRoQ+okn6FrrGNFTu4FzIsSlXygaaWnqWuUr+ttIFT03kCqPOjQM0ITkmLagB8sXhTPDahvdBy6897/Mi1LXFvsSqgzjWD+LAWsV05B8rFva4ISfKV+O2kWQKBgGG1HsCI1nPgWNJBj/UadtnsA8y+J8F0HMj5lzE341rE1cbix9l28rgCITp9qJJYkIXPbWTVuldGzfqkRM0iQjWc4CP70mi5mrttdDXv9qCEm4/pH3npeN846KtHPTIQgeHIUlttMCH2mCukVIats2j2QD1HWIUoLYhnSrUf1chpAoGBAOXJb6lOTMttxD4yCZd7GJ8wcIMWvCANjZog4CAzuq4w2OT4LkC1dYA666KLTOXacY3+6zylZLVlRoMKFAbQTReAyxQahBUe26cSTWYEiOTlxVVLkFusSaWvbgH+Nie5XLwf0d1HM8zgQRFSvha3Lwev9bkL1tnkmXkYMvKYhfp1'),('fe839781-00c9-44da-9f36-4b0a6983a9f8','2d4def39-3a6c-4594-8fc3-e3b270868f9f','allowed-protocol-mapper-types','oidc-address-mapper'),('ff4cf47e-4d7d-4543-b7ac-17f5910bcc8c','70e3da01-d47b-49cc-bf95-eebfeba681fe','algorithm','HS256');
+/*!40000 ALTER TABLE `COMPONENT_CONFIG` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `COMPOSITE_ROLE`
+--
+
+DROP TABLE IF EXISTS `COMPOSITE_ROLE`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `COMPOSITE_ROLE` (
+  `COMPOSITE` varchar(36) NOT NULL,
+  `CHILD_ROLE` varchar(36) NOT NULL,
+  PRIMARY KEY (`COMPOSITE`,`CHILD_ROLE`),
+  KEY `IDX_COMPOSITE` (`COMPOSITE`),
+  KEY `IDX_COMPOSITE_CHILD` (`CHILD_ROLE`),
+  CONSTRAINT `FK_A63WVEKFTU8JO1PNJ81E7MCE2` FOREIGN KEY (`COMPOSITE`) REFERENCES `KEYCLOAK_ROLE` (`ID`),
+  CONSTRAINT `FK_GR7THLLB9LU8Q4VQA4524JJY8` FOREIGN KEY (`CHILD_ROLE`) REFERENCES `KEYCLOAK_ROLE` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `COMPOSITE_ROLE`
+--
+
+LOCK TABLES `COMPOSITE_ROLE` WRITE;
+/*!40000 ALTER TABLE `COMPOSITE_ROLE` DISABLE KEYS */;
+INSERT INTO `COMPOSITE_ROLE` VALUES ('0121d427-696b-4bd0-97fd-ef2e49612705','49d680c3-0166-4ba3-9a23-665e5263f935'),('0121d427-696b-4bd0-97fd-ef2e49612705','84ea6a9b-1895-4b25-a70a-078a00c98a9d'),('0121d427-696b-4bd0-97fd-ef2e49612705','97c30574-d3d1-4e01-818f-0867ca808f9a'),('0121d427-696b-4bd0-97fd-ef2e49612705','d17ebe14-aacf-465a-bd2b-a42112432780'),('0121d427-696b-4bd0-97fd-ef2e49612705','e59b30cd-dcf1-4a54-99e8-3077c935cf9e'),('0121d427-696b-4bd0-97fd-ef2e49612705','e90549ec-b55c-4237-9d4d-d42c50458309'),('0121d427-696b-4bd0-97fd-ef2e49612705','f643d9a4-309a-4cb3-8b8d-9cc8b71a342e'),('0121d427-696b-4bd0-97fd-ef2e49612705','f8e6ce80-6747-4cbc-9eef-c6b48d8c9d24'),('1a84f37b-2b75-4762-83fc-72bab727c14f','f7fcdeae-257a-4138-99aa-588ac3be2cc4'),('1b849fbb-23b2-41b3-8590-c4cf2e292e54','056adae4-b910-4417-aa7b-2e37ee43f0da'),('1b849fbb-23b2-41b3-8590-c4cf2e292e54','0e894d70-def4-462e-aee7-d25f80c20b27'),('1b849fbb-23b2-41b3-8590-c4cf2e292e54','300c5b39-2fa9-4fcf-a1c1-82fc9110abc6'),('1b849fbb-23b2-41b3-8590-c4cf2e292e54','36558109-a205-44b3-bc0e-0d51e254b94b'),('1b849fbb-23b2-41b3-8590-c4cf2e292e54','647a97b1-a528-4909-a23f-7e5013c052bc'),('1b849fbb-23b2-41b3-8590-c4cf2e292e54','70fd34a5-b70a-44c8-82fe-b1577bc97f29'),('1b849fbb-23b2-41b3-8590-c4cf2e292e54','724eea70-abd8-482b-a0ff-46a90b0a1954'),('1b849fbb-23b2-41b3-8590-c4cf2e292e54','7305b9cb-09ed-46cf-9779-0bc6182c7b25'),('1b849fbb-23b2-41b3-8590-c4cf2e292e54','9081d025-ef46-4876-9eab-5e516b75016a'),('1b849fbb-23b2-41b3-8590-c4cf2e292e54','92a8a0bb-0644-4a46-a02b-b1a6118bc629'),('1b849fbb-23b2-41b3-8590-c4cf2e292e54','958941e6-9c2c-48c6-8458-181a5f7da4cb'),('1b849fbb-23b2-41b3-8590-c4cf2e292e54','a16b13ef-3fc5-479d-8066-0fcefa1d76ac'),('1b849fbb-23b2-41b3-8590-c4cf2e292e54','b18d5cd6-78f1-4b31-b254-6dececbc3f4f'),('1b849fbb-23b2-41b3-8590-c4cf2e292e54','b2769d0a-1434-4b96-840a-64405cc9cb87'),('1b849fbb-23b2-41b3-8590-c4cf2e292e54','c5d3c276-eec7-4b8c-a069-27ba3589abc2'),('1b849fbb-23b2-41b3-8590-c4cf2e292e54','eaf1d0ce-2944-4d39-bd99-377fea5b3132'),('1b849fbb-23b2-41b3-8590-c4cf2e292e54','efdaf8ca-0ee6-4782-b9bc-594353a407b1'),('1b849fbb-23b2-41b3-8590-c4cf2e292e54','fe84de5a-dc51-4fb6-bb63-7b5703c24bdc'),('1f13355c-00fa-478d-af4d-5f4c2740912a','058bcf15-2e8c-48c1-8fda-bb79e359649c'),('1f13355c-00fa-478d-af4d-5f4c2740912a','05f13cff-8e49-4b33-8ef3-81c497e26e46'),('1f13355c-00fa-478d-af4d-5f4c2740912a','08312139-81fb-4c52-bb9e-a09738aaa765'),('1f13355c-00fa-478d-af4d-5f4c2740912a','0bc9d2b0-2988-4689-8073-cba6c6afada0'),('1f13355c-00fa-478d-af4d-5f4c2740912a','0c840511-4078-4458-972e-80b78d016023'),('1f13355c-00fa-478d-af4d-5f4c2740912a','0cd9a547-26da-45c0-9c54-aee678b75a27'),('1f13355c-00fa-478d-af4d-5f4c2740912a','0ea53d0b-6bfa-45fd-8052-bf0692e3076b'),('1f13355c-00fa-478d-af4d-5f4c2740912a','0eefaf76-bc1b-4952-bbea-39359688aed5'),('1f13355c-00fa-478d-af4d-5f4c2740912a','0ff40488-4296-4983-915b-c79ef5c22baa'),('1f13355c-00fa-478d-af4d-5f4c2740912a','10cdfe9d-de00-42a0-b1e8-cc341b34d57c'),('1f13355c-00fa-478d-af4d-5f4c2740912a','1186de7f-4407-4e17-9d83-b8c0bae4893f'),('1f13355c-00fa-478d-af4d-5f4c2740912a','1a84f37b-2b75-4762-83fc-72bab727c14f'),('1f13355c-00fa-478d-af4d-5f4c2740912a','1b7fe556-7551-49b2-82c1-052a25c06506'),('1f13355c-00fa-478d-af4d-5f4c2740912a','1eb6d3af-c8e8-408a-9b36-dba68b7d5a5c'),('1f13355c-00fa-478d-af4d-5f4c2740912a','1ef11c4d-7be0-4e55-8a52-d62bd61aa1b9'),('1f13355c-00fa-478d-af4d-5f4c2740912a','1f7e3aa9-dd7a-44c5-9f78-9bbfbc7daa00'),('1f13355c-00fa-478d-af4d-5f4c2740912a','20fc34bc-79e1-44fc-9023-f7d64c30f099'),('1f13355c-00fa-478d-af4d-5f4c2740912a','2487ae87-baec-471f-a9ae-6abafa23be69'),('1f13355c-00fa-478d-af4d-5f4c2740912a','279bb1a4-6626-4d3c-93df-dfb386492a22'),('1f13355c-00fa-478d-af4d-5f4c2740912a','280e1140-4815-439c-9e6f-35f4c7220d4a'),('1f13355c-00fa-478d-af4d-5f4c2740912a','28f52aef-f2ca-4076-ae87-1f435b197099'),('1f13355c-00fa-478d-af4d-5f4c2740912a','2a7cd02f-ea0c-47d8-9d52-da1d3bf673b4'),('1f13355c-00fa-478d-af4d-5f4c2740912a','2d174ae5-fb99-49c4-a36e-5b6accebfbea'),('1f13355c-00fa-478d-af4d-5f4c2740912a','3163198f-efb7-4142-806c-022b043a45f3'),('1f13355c-00fa-478d-af4d-5f4c2740912a','3354cfe4-a051-4e5b-af41-c55c548524f0'),('1f13355c-00fa-478d-af4d-5f4c2740912a','361fc656-9740-4994-9bab-7771c0884807'),('1f13355c-00fa-478d-af4d-5f4c2740912a','3627a5b5-9e31-4c02-b2aa-e201246a5e53'),('1f13355c-00fa-478d-af4d-5f4c2740912a','379a2639-f363-4187-b20d-1ff7602ac8a1'),('1f13355c-00fa-478d-af4d-5f4c2740912a','39cb2d77-950b-4582-8d7d-0ade3d6cdd66'),('1f13355c-00fa-478d-af4d-5f4c2740912a','3fc1b42a-348b-4745-b4a4-1ce65674b8cb'),('1f13355c-00fa-478d-af4d-5f4c2740912a','40e06566-9cee-4a43-8bda-bf366ba00d0b'),('1f13355c-00fa-478d-af4d-5f4c2740912a','447c1edb-5650-47e6-be06-602d1029a9bd'),('1f13355c-00fa-478d-af4d-5f4c2740912a','4b00654f-a74b-4efa-8e3d-b44757122962'),('1f13355c-00fa-478d-af4d-5f4c2740912a','4b15738e-50c7-4d1f-a3bf-c972a0beb915'),('1f13355c-00fa-478d-af4d-5f4c2740912a','51c45faa-4078-4ae3-870a-91af60e7571e'),('1f13355c-00fa-478d-af4d-5f4c2740912a','527b0844-231c-4759-9e36-02b4f3857faa'),('1f13355c-00fa-478d-af4d-5f4c2740912a','5620937f-df6b-4550-ab5e-e6ff85547811'),('1f13355c-00fa-478d-af4d-5f4c2740912a','5749cc87-8aa8-4677-88be-bf5e113e2f36'),('1f13355c-00fa-478d-af4d-5f4c2740912a','5a21da01-6a21-44a2-9a7e-a851e40eb8f0'),('1f13355c-00fa-478d-af4d-5f4c2740912a','5be1c942-e219-4a26-8cfe-8da090352ce8'),('1f13355c-00fa-478d-af4d-5f4c2740912a','5c7c4794-34ed-46ee-b547-a850564c890f'),('1f13355c-00fa-478d-af4d-5f4c2740912a','5d6461f4-68aa-4127-ab8c-c56fdd781bce'),('1f13355c-00fa-478d-af4d-5f4c2740912a','5e62e392-50d3-415d-b969-337bbe7e7c0a'),('1f13355c-00fa-478d-af4d-5f4c2740912a','5ee6f8dc-b618-4f8c-9870-c4359ad2ca49'),('1f13355c-00fa-478d-af4d-5f4c2740912a','613e53ce-915d-483c-8b48-bc98e8d377b7'),('1f13355c-00fa-478d-af4d-5f4c2740912a','6259ac68-c953-4cec-9e6d-ff437d84dca1'),('1f13355c-00fa-478d-af4d-5f4c2740912a','662ee109-4863-4584-8e29-cd107c664959'),('1f13355c-00fa-478d-af4d-5f4c2740912a','6866ade8-f039-4ffe-a819-9f4498a77d0e'),('1f13355c-00fa-478d-af4d-5f4c2740912a','6ac3225f-acc7-484c-b462-c8e57cbe75d4'),('1f13355c-00fa-478d-af4d-5f4c2740912a','6d1762e5-647e-425e-8351-3f3e7982e567'),('1f13355c-00fa-478d-af4d-5f4c2740912a','6dee3184-a5aa-4804-982d-58c17f680b92'),('1f13355c-00fa-478d-af4d-5f4c2740912a','735f91ba-9026-4ac7-a249-ce68eaa9cdf1'),('1f13355c-00fa-478d-af4d-5f4c2740912a','7ab524ae-bb23-4cd8-b637-88eeb99f5c8e'),('1f13355c-00fa-478d-af4d-5f4c2740912a','7b55e11a-380e-485f-9de1-4f237ed572bb'),('1f13355c-00fa-478d-af4d-5f4c2740912a','86f0d0c2-7641-46c3-9672-099fcd7cdb91'),('1f13355c-00fa-478d-af4d-5f4c2740912a','880a1cae-72ec-4126-8d95-ae8838676589'),('1f13355c-00fa-478d-af4d-5f4c2740912a','891a592c-24cd-4115-8f95-488e45dd5bcf'),('1f13355c-00fa-478d-af4d-5f4c2740912a','8a73870c-c0a5-44de-917c-a527a2f81aea'),('1f13355c-00fa-478d-af4d-5f4c2740912a','90ef5c69-59f6-4892-bab6-450055126341'),('1f13355c-00fa-478d-af4d-5f4c2740912a','92f45dc4-6517-4ed0-85c1-a1358ac92ff2'),('1f13355c-00fa-478d-af4d-5f4c2740912a','94df2d32-d3b5-4570-b015-b95684b811b3'),('1f13355c-00fa-478d-af4d-5f4c2740912a','94e6ab8f-19ab-4282-8ee6-d6323bacf4aa'),('1f13355c-00fa-478d-af4d-5f4c2740912a','97c3ac20-3403-45fa-8f10-f93283617f9f'),('1f13355c-00fa-478d-af4d-5f4c2740912a','9919d082-df1c-4ca4-a043-b1c44298410a'),('1f13355c-00fa-478d-af4d-5f4c2740912a','9affc859-ba1b-478c-a90d-7745d2515d3e'),('1f13355c-00fa-478d-af4d-5f4c2740912a','9c15ec54-80d9-4ea4-9b9d-cb670c642cbd'),('1f13355c-00fa-478d-af4d-5f4c2740912a','9dfb7f8e-5181-4537-a509-4f23a4d58b6f'),('1f13355c-00fa-478d-af4d-5f4c2740912a','9f2bf745-3978-48ac-b8f2-11a2e4483692'),('1f13355c-00fa-478d-af4d-5f4c2740912a','a23a6451-d9bd-44b4-b436-07378b38f69d'),('1f13355c-00fa-478d-af4d-5f4c2740912a','a2dfecf5-9df6-4252-9042-0d2e9c5c2a5f'),('1f13355c-00fa-478d-af4d-5f4c2740912a','a3aae270-586e-42c6-8e97-e1e4d5252339'),('1f13355c-00fa-478d-af4d-5f4c2740912a','abad458a-d38e-4505-989c-931e78b1306d'),('1f13355c-00fa-478d-af4d-5f4c2740912a','abc51e3a-093f-4338-9b28-16657ef2eb21'),('1f13355c-00fa-478d-af4d-5f4c2740912a','ad78468c-c5c2-44f4-bb70-aa2d1faf05fa'),('1f13355c-00fa-478d-af4d-5f4c2740912a','bac2e8dd-b4f8-4e9f-96e4-991ca1f239a7'),('1f13355c-00fa-478d-af4d-5f4c2740912a','bb5fc8cb-730d-4af1-8853-c776649fc129'),('1f13355c-00fa-478d-af4d-5f4c2740912a','bcc5dcb2-6cdc-4451-8df7-6b2aad557329'),('1f13355c-00fa-478d-af4d-5f4c2740912a','c0f573dd-7844-4dc3-a51a-f31ceee520d4'),('1f13355c-00fa-478d-af4d-5f4c2740912a','c3832f57-4034-46f4-91c1-85c7d2a1b493'),('1f13355c-00fa-478d-af4d-5f4c2740912a','c4fdb81c-9547-482b-8fce-790a0dba7c72'),('1f13355c-00fa-478d-af4d-5f4c2740912a','c6555030-fa3b-4394-ac2b-35aa05627e7e'),('1f13355c-00fa-478d-af4d-5f4c2740912a','c6627202-e934-40ca-9614-ec74569c143d'),('1f13355c-00fa-478d-af4d-5f4c2740912a','c68d0555-f57b-4348-8a63-f7a789fd1532'),('1f13355c-00fa-478d-af4d-5f4c2740912a','c70e962b-d7fa-471e-a007-b715bd383876'),('1f13355c-00fa-478d-af4d-5f4c2740912a','cae93096-081d-45d4-ab02-eb562f69ef76'),('1f13355c-00fa-478d-af4d-5f4c2740912a','cf9567c3-3b6c-4204-8ba9-bb11ae25b32b'),('1f13355c-00fa-478d-af4d-5f4c2740912a','d37c99cd-e2ec-40ab-89f5-fd2fbcc3cd10'),('1f13355c-00fa-478d-af4d-5f4c2740912a','d4eabc02-2223-4c12-850d-cb7fc73b3401'),('1f13355c-00fa-478d-af4d-5f4c2740912a','d504ee4d-fc52-4e94-8e84-e347ad08015d'),('1f13355c-00fa-478d-af4d-5f4c2740912a','d566aed3-37b9-4d78-9664-35eca8fbebcb'),('1f13355c-00fa-478d-af4d-5f4c2740912a','d899fbd8-633c-4586-ad0b-4a013f2a0c75'),('1f13355c-00fa-478d-af4d-5f4c2740912a','dbe2a3e5-1383-410d-8a01-64b5d0cc6d45'),('1f13355c-00fa-478d-af4d-5f4c2740912a','e001402d-fb2a-4d23-8c13-2af99913e887'),('1f13355c-00fa-478d-af4d-5f4c2740912a','e23845c8-56b7-4019-912b-7e2ae574e696'),('1f13355c-00fa-478d-af4d-5f4c2740912a','e295bbed-74d9-4044-90b7-500028810735'),('1f13355c-00fa-478d-af4d-5f4c2740912a','e352fe0c-06d6-4045-a841-a461073b6e5a'),('1f13355c-00fa-478d-af4d-5f4c2740912a','e8c6cae7-6c47-44a2-b03b-471868a4dde1'),('1f13355c-00fa-478d-af4d-5f4c2740912a','ea43acf1-82de-4be0-ab9b-ccd01b7618bb'),('1f13355c-00fa-478d-af4d-5f4c2740912a','f127674d-4753-48e0-990e-c5e1b828810f'),('1f13355c-00fa-478d-af4d-5f4c2740912a','f7fcdeae-257a-4138-99aa-588ac3be2cc4'),('1f13355c-00fa-478d-af4d-5f4c2740912a','f9ee9405-7101-4691-9df3-63ca60e95e5c'),('1f13355c-00fa-478d-af4d-5f4c2740912a','fa606b29-1dd1-4302-b5df-6159a40e803c'),('1f13355c-00fa-478d-af4d-5f4c2740912a','fa8c5d4a-2a2d-4d00-86ef-807fefde55a7'),('1f13355c-00fa-478d-af4d-5f4c2740912a','fb331597-b9d3-4392-963f-03971bc690df'),('1f13355c-00fa-478d-af4d-5f4c2740912a','fdb42cd2-27ef-41e0-ab1c-6337cab19451'),('1f13355c-00fa-478d-af4d-5f4c2740912a','fe180af4-a3a8-444a-ae93-c857ba65498f'),('1f13355c-00fa-478d-af4d-5f4c2740912a','fe55319a-7b14-47db-b39e-1b45155ad4d8'),('1f13355c-00fa-478d-af4d-5f4c2740912a','ff7fab6a-d2b0-43c0-9c71-99569d2874c0'),('1f13355c-00fa-478d-af4d-5f4c2740912a','ffb483de-fa4d-4cdc-a670-710af3ba41f3'),('2b587f58-af59-4e82-8253-0aca06d1138f','5a6423d8-f4c7-4bf0-9b4f-42adb669220a'),('2b587f58-af59-4e82-8253-0aca06d1138f','67dcf259-6999-47ed-9122-e00dc5222a6c'),('2b587f58-af59-4e82-8253-0aca06d1138f','f8b4617b-8a4b-454d-9e85-826d34daf267'),('2db94f07-d03e-4ad8-b2c3-69cb027d820b','42f46a9a-71a7-4de0-b372-672b561061ce'),('2db94f07-d03e-4ad8-b2c3-69cb027d820b','5ea3cd76-4b85-49ff-8f6b-b25662deb38a'),('2db94f07-d03e-4ad8-b2c3-69cb027d820b','67502093-a88c-4084-b691-4e6096710ac2'),('2db94f07-d03e-4ad8-b2c3-69cb027d820b','7cbae974-9824-4c76-8f46-9c30af199a16'),('2db94f07-d03e-4ad8-b2c3-69cb027d820b','7edf6052-a64a-4413-8b79-732b90806c24'),('2db94f07-d03e-4ad8-b2c3-69cb027d820b','8709f3c7-2db7-4820-8b4c-2e6d4553819a'),('2db94f07-d03e-4ad8-b2c3-69cb027d820b','95b164a2-6b95-4fe8-b27b-28fab90a372d'),('2db94f07-d03e-4ad8-b2c3-69cb027d820b','d066d55a-9192-4ecc-95f8-63d6f89f1ed3'),('2e19de41-f59e-400d-8b26-561703b334fd','e36873cf-ef84-41d3-a792-5acba1c565bc'),('3354cfe4-a051-4e5b-af41-c55c548524f0','891a592c-24cd-4115-8f95-488e45dd5bcf'),('3354cfe4-a051-4e5b-af41-c55c548524f0','fa606b29-1dd1-4302-b5df-6159a40e803c'),('34b892b4-6db8-426a-8ef2-25894068c31e','e24dcf2f-8323-4ca4-b1fe-b87d9f0326e4'),('3627a5b5-9e31-4c02-b2aa-e201246a5e53','4b00654f-a74b-4efa-8e3d-b44757122962'),('3ad2e570-cee0-4618-a99f-6d767ee2a385','13f7b345-a9da-407b-9c8b-e1bcd7e4e0a2'),('3ad2e570-cee0-4618-a99f-6d767ee2a385','535888f1-55f1-41ec-9957-67d782232af0'),('3ad2e570-cee0-4618-a99f-6d767ee2a385','5bdc81f1-6f01-4d3b-b776-850998c9fa63'),('3ad2e570-cee0-4618-a99f-6d767ee2a385','6f0b5d02-131c-49f8-97b8-74b818e93e0e'),('3f12dbb6-32d5-4419-b789-7edf631bf2a5','07a1888d-b5c7-480e-8738-6f91cf4dfa6f'),('3f7bdca7-c360-4010-a2e4-3f85ad6418be','8dc52841-d841-4365-9fa4-cb3111f0e5d6'),('3fa46cf1-bf9d-4c31-a9f4-3256a215cb96','660e5d9e-b972-4d17-bd4e-82dcd6582cd1'),('4317a957-dd6e-41c6-b3fb-2118c48a8f6a','793592b1-dbff-4778-b35e-19cdb9681830'),('4317a957-dd6e-41c6-b3fb-2118c48a8f6a','f8ad0b14-409f-4ae0-ac3d-51d4d6c71c71'),('43a0cf79-d2b8-488a-a3ec-5e621ccb9abf','bacadf7f-edca-4755-b6e2-1f76a62477f8'),('43de4389-64c9-4a7f-bb70-8cba7986f2d0','22a556b1-c5ae-43d5-8d25-21698df0b4b6'),('43de4389-64c9-4a7f-bb70-8cba7986f2d0','2482b501-5049-4f8c-98a2-557c96641f6b'),('43de4389-64c9-4a7f-bb70-8cba7986f2d0','53507c5e-b647-4eec-af29-43cd2bb96016'),('43de4389-64c9-4a7f-bb70-8cba7986f2d0','5d498f7a-28f1-4862-8633-61e026cafff4'),('43de4389-64c9-4a7f-bb70-8cba7986f2d0','be267d19-3305-4185-b833-5ac29b0b665c'),('43de4389-64c9-4a7f-bb70-8cba7986f2d0','c00fb823-0733-4605-8206-760c81ebef93'),('43de4389-64c9-4a7f-bb70-8cba7986f2d0','c0c0a50c-70b5-4ba7-ada2-583401aaedd9'),('43de4389-64c9-4a7f-bb70-8cba7986f2d0','c0c471d5-663f-403f-b33a-0bad8e7328a9'),('480952e6-ac1f-4eec-b526-aeb9aead56fb','38e0e999-4a63-457a-8d3c-ba440f342c12'),('4caf2865-3487-4803-a333-c9f2c6fa3c5e','e025ccdf-8a10-4066-851b-8eaf760f48ce'),('4f7f75e5-3cf9-4b4a-91b8-d6381d0e7abe','e59b30cd-dcf1-4a54-99e8-3077c935cf9e'),('4f7f75e5-3cf9-4b4a-91b8-d6381d0e7abe','e90549ec-b55c-4237-9d4d-d42c50458309'),('4f7f75e5-3cf9-4b4a-91b8-d6381d0e7abe','f8e6ce80-6747-4cbc-9eef-c6b48d8c9d24'),('534ae492-208a-4329-ac07-fd5bebc8017e','b94ada76-bb55-4104-9f46-3a7372882a98'),('534ae492-208a-4329-ac07-fd5bebc8017e','f436c9ed-08de-4a8f-aa80-97e595a7feb5'),('5bdc81f1-6f01-4d3b-b776-850998c9fa63','70605025-ccbe-442f-a63f-9dea118d0ce5'),('5c7c4794-34ed-46ee-b547-a850564c890f','86f0d0c2-7641-46c3-9672-099fcd7cdb91'),('5ee6f8dc-b618-4f8c-9870-c4359ad2ca49','2487ae87-baec-471f-a9ae-6abafa23be69'),('5ee6f8dc-b618-4f8c-9870-c4359ad2ca49','ad78468c-c5c2-44f4-bb70-aa2d1faf05fa'),('652f33df-5bff-4e35-9e1e-40b6a6f717f7','4c86b391-91a8-4968-bfdd-816a2ae4efa9'),('652f33df-5bff-4e35-9e1e-40b6a6f717f7','73f6933d-5e3f-40aa-a211-c73134c76678'),('6809f7f3-19bd-4e02-b894-e33f3c3879b2','3ad05f10-f903-4cb2-8925-a2be6c8994f1'),('6809f7f3-19bd-4e02-b894-e33f3c3879b2','fb06b2e5-a3af-40bb-8a0f-453184845a6b'),('6a0e8485-c569-42a2-8ca9-fb75b7007749','50aabf0d-c27b-46b1-a838-602a59f2c8e5'),('6a0e8485-c569-42a2-8ca9-fb75b7007749','e478c9c9-a299-4a38-80ce-342198cff104'),('6a5eaac8-03fe-4cbe-aaf4-267e8d5614d3','0840bb7d-56e0-479e-b3d5-b510a729d468'),('6a5eaac8-03fe-4cbe-aaf4-267e8d5614d3','673b825d-10ba-4658-b90a-0854ca6dacd4'),('6bd9c5f4-97b4-457e-8835-a14a932d8d63','43174789-3363-408b-81f6-dda1f17a1e5a'),('6bd9c5f4-97b4-457e-8835-a14a932d8d63','a062a342-9ccc-4009-8ebd-61e0f92d01a0'),('6c76b9f0-2ae8-4791-8e96-adec77b524b1','cadaa27f-6685-48f6-a67f-b071c649526f'),('6dee3184-a5aa-4804-982d-58c17f680b92','94df2d32-d3b5-4570-b015-b95684b811b3'),('6dee3184-a5aa-4804-982d-58c17f680b92','9affc859-ba1b-478c-a90d-7745d2515d3e'),('724eea70-abd8-482b-a0ff-46a90b0a1954','92a8a0bb-0644-4a46-a02b-b1a6118bc629'),('761cbec8-ef0b-418d-b9c6-6351cd4a4039','67dcf259-6999-47ed-9122-e00dc5222a6c'),('761cbec8-ef0b-418d-b9c6-6351cd4a4039','f8b4617b-8a4b-454d-9e85-826d34daf267'),('768c96d0-a799-4a5a-8eae-d1fa5b8f632f','605edcb7-d999-4716-ad8b-17a1f84d292b'),('770dbf71-b9d5-4983-b9b8-79d32f64e172','07703927-5265-41b4-a58c-aecca62c5d21'),('770dbf71-b9d5-4983-b9b8-79d32f64e172','198e452c-1dea-437d-868f-4b5493bd9105'),('770dbf71-b9d5-4983-b9b8-79d32f64e172','2e1b2ab5-91ef-4d41-99e9-b9bb444e04aa'),('770dbf71-b9d5-4983-b9b8-79d32f64e172','38e0e999-4a63-457a-8d3c-ba440f342c12'),('770dbf71-b9d5-4983-b9b8-79d32f64e172','470e82d1-6349-4730-8123-4afa5e707fdf'),('770dbf71-b9d5-4983-b9b8-79d32f64e172','480952e6-ac1f-4eec-b526-aeb9aead56fb'),('770dbf71-b9d5-4983-b9b8-79d32f64e172','4bdb5585-ee35-4812-a0b2-8f7a376cb86f'),('770dbf71-b9d5-4983-b9b8-79d32f64e172','502a0349-e901-4b43-89fb-07eb61014ace'),('770dbf71-b9d5-4983-b9b8-79d32f64e172','576405de-0c71-432d-940f-785675e0f12b'),('770dbf71-b9d5-4983-b9b8-79d32f64e172','6f2b45cd-450d-4015-b4a8-a1adab6e0459'),('770dbf71-b9d5-4983-b9b8-79d32f64e172','7d2d6542-e404-40f9-82a8-3bb5f23c59c3'),('770dbf71-b9d5-4983-b9b8-79d32f64e172','881568f1-284c-424a-a660-490c460fe013'),('770dbf71-b9d5-4983-b9b8-79d32f64e172','b42996aa-df56-4510-b76c-0c3733b45c66'),('770dbf71-b9d5-4983-b9b8-79d32f64e172','bb95765a-ded6-4b61-ae29-a75115a6c5e0'),('770dbf71-b9d5-4983-b9b8-79d32f64e172','c2224091-6c37-4634-972f-2767361b89ca'),('770dbf71-b9d5-4983-b9b8-79d32f64e172','d1722e6c-914c-4e33-9efa-9f16f7a4dc58'),('770dbf71-b9d5-4983-b9b8-79d32f64e172','dfdad190-b327-4bb7-a305-25db3df445b3'),('770dbf71-b9d5-4983-b9b8-79d32f64e172','e1afff95-a2d5-46da-8446-3a69e3c320d6'),('7dbb54ac-c3c9-40b9-b4c4-7476371eb725','09e47cc7-6d4a-400c-9787-a487425f5382'),('7dbb54ac-c3c9-40b9-b4c4-7476371eb725','65c4d68a-414a-4a92-b41b-13a57f79de65'),('7dbb54ac-c3c9-40b9-b4c4-7476371eb725','d15ba2db-61d1-4ef6-8858-1e90737cf6d5'),('7dbb54ac-c3c9-40b9-b4c4-7476371eb725','ed9080c5-b88f-49ed-83aa-7883e8dbede1'),('7e3a6f58-62a1-4ea9-bb50-5f24d545ec50','75f487db-0f18-42b1-9efa-f660dda152cd'),('7e3a6f58-62a1-4ea9-bb50-5f24d545ec50','daa0af79-c06f-4116-a234-f5196fe38ad5'),('7e4c3557-8136-4e5b-808c-6fb542d7f72f','3d4c3a1a-fb6f-42bf-a734-efadccaa4ad0'),('7e4c3557-8136-4e5b-808c-6fb542d7f72f','f25d3901-2cbd-45b4-87dc-937bd30d167b'),('7e8f6b12-3fc4-4fbd-8aa6-607b9d2c30bc','54273d5c-f450-48b7-bffc-0d775674e9fe'),('81658e71-c64b-4b7e-bb58-0a00f08a397f','7edf6052-a64a-4413-8b79-732b90806c24'),('81658e71-c64b-4b7e-bb58-0a00f08a397f','8709f3c7-2db7-4820-8b4c-2e6d4553819a'),('863f3c33-4fa1-47ed-bd69-955f715becad','e90549ec-b55c-4237-9d4d-d42c50458309'),('863f3c33-4fa1-47ed-bd69-955f715becad','f8e6ce80-6747-4cbc-9eef-c6b48d8c9d24'),('88598027-632e-4105-ac21-88a1dcb373db','0cc62e11-1dbf-461e-a966-0d4d3dbf1344'),('88598027-632e-4105-ac21-88a1dcb373db','90b2480b-2dbc-4d57-91e4-71d706135406'),('88598027-632e-4105-ac21-88a1dcb373db','bcce9acc-3a19-4a1e-acc8-d21626f4fa81'),('88598027-632e-4105-ac21-88a1dcb373db','c7cdedbe-5434-49e5-9548-9d5d6dc1c51b'),('9201ee66-0e4c-4d92-ab9e-2120a7390dab','0a925b92-087a-4c5e-aaed-85505bb9eb59'),('9201ee66-0e4c-4d92-ab9e-2120a7390dab','2e1da019-ad74-4c8e-be8e-d8fcbf47e62c'),('92bde222-43fd-4fee-b265-72f4ccaec199','5a5e3d26-a306-49d3-8b98-3d2e17cfd446'),('92bde222-43fd-4fee-b265-72f4ccaec199','7e8f6b12-3fc4-4fbd-8aa6-607b9d2c30bc'),('92bde222-43fd-4fee-b265-72f4ccaec199','c3c88538-83c6-43fa-8172-0d071b88aee4'),('92bde222-43fd-4fee-b265-72f4ccaec199','ddb59632-f10a-4410-af66-a4a04e4e8d57'),('94d463bc-0ba6-4d80-85f4-e63860357f80','8078aa9f-4275-4bbf-a881-32f2ff1cfda6'),('94d463bc-0ba6-4d80-85f4-e63860357f80','d36dd5c8-7ece-41a2-b226-5b0a94f449ba'),('957a70a3-5891-4e14-9765-2560c25916ee','11b02ef2-cac3-4420-b878-26ab43bc8d69'),('957a70a3-5891-4e14-9765-2560c25916ee','eb8ed358-e4aa-4a55-bb8f-98aed6f3e39f'),('96bd2210-1fcb-4deb-8fbb-563e0ca8f654','c2180217-3bf3-45fa-acb3-90dd20ef3772'),('96bd2210-1fcb-4deb-8fbb-563e0ca8f654','e182bbbc-5ce2-4f01-8011-8a858f41d66b'),('97c22ad8-48d8-49db-90e3-b0e205ef50de','422d8d19-390b-4e48-a9a8-d72074613be0'),('97c22ad8-48d8-49db-90e3-b0e205ef50de','4bc71a50-0bca-450d-80f5-0a0fe3f9f1f9'),('97c22ad8-48d8-49db-90e3-b0e205ef50de','54089fa4-da59-4bda-a24d-1f502f392a8e'),('97c22ad8-48d8-49db-90e3-b0e205ef50de','60530a2c-05f2-4ac7-b93e-734c1377dc84'),('97c22ad8-48d8-49db-90e3-b0e205ef50de','6e1fbe58-4de5-4613-a014-4a5123be8baa'),('97c22ad8-48d8-49db-90e3-b0e205ef50de','793592b1-dbff-4778-b35e-19cdb9681830'),('97c22ad8-48d8-49db-90e3-b0e205ef50de','c371c4ce-9c38-433c-8650-5774bf65f3f7'),('97c22ad8-48d8-49db-90e3-b0e205ef50de','f8ad0b14-409f-4ae0-ac3d-51d4d6c71c71'),('9b896e40-e851-42db-9546-bf6ef748c438','2482b501-5049-4f8c-98a2-557c96641f6b'),('9b896e40-e851-42db-9546-bf6ef748c438','c0c471d5-663f-403f-b33a-0bad8e7328a9'),('9c15ec54-80d9-4ea4-9b9d-cb670c642cbd','279bb1a4-6626-4d3c-93df-dfb386492a22'),('9c15ec54-80d9-4ea4-9b9d-cb670c642cbd','c4fdb81c-9547-482b-8fce-790a0dba7c72'),('9efaac6f-2cfc-4cfa-b4b1-5e400b184d52','495fa361-8cfe-4d98-98be-d1ec7a00469a'),('9efaac6f-2cfc-4cfa-b4b1-5e400b184d52','734c9a9f-b357-4f12-afe0-967048b091fb'),('9ff2af3b-6e78-4684-a859-6278fb8782f2','048685bc-626c-4b13-a44f-c721b4842248'),('9ff2af3b-6e78-4684-a859-6278fb8782f2','09e063cc-f899-411a-8e8d-0c4d8dac93f3'),('a0bd219e-58d5-4531-9cc9-085084bf34ef','04f1c209-0e58-486e-ad59-aee30e231346'),('a0bd219e-58d5-4531-9cc9-085084bf34ef','0659cb29-c072-47b1-a3f4-92df21ee751c'),('a0bd219e-58d5-4531-9cc9-085084bf34ef','4caf2865-3487-4803-a333-c9f2c6fa3c5e'),('a0bd219e-58d5-4531-9cc9-085084bf34ef','627895ee-bf17-48f9-915a-0f1f7fbff0a1'),('a0bd219e-58d5-4531-9cc9-085084bf34ef','793ff7d2-de83-4c2b-bd21-774736b861cc'),('a0bd219e-58d5-4531-9cc9-085084bf34ef','7b6b9a58-94f8-41bf-8612-4dbc9c1c0d57'),('a0bd219e-58d5-4531-9cc9-085084bf34ef','8cb6e65c-e8fa-498e-be5e-8ea555c306f3'),('a0bd219e-58d5-4531-9cc9-085084bf34ef','ada483a1-3f73-497d-965e-98da9951633d'),('a0bd219e-58d5-4531-9cc9-085084bf34ef','bf17d010-da1e-45d2-b4be-2dea5cab0290'),('a0bd219e-58d5-4531-9cc9-085084bf34ef','c3d1ddef-45d2-4cbf-bbde-8f8088ae0e3b'),('a0bd219e-58d5-4531-9cc9-085084bf34ef','cc9fa6cc-07fb-42cf-988e-7517cf6576c0'),('a0bd219e-58d5-4531-9cc9-085084bf34ef','cd8383d3-207e-4b00-b50f-622e9c7cf233'),('a0bd219e-58d5-4531-9cc9-085084bf34ef','d9ce6a3b-2422-4a83-9a4a-1ee10fbb70ef'),('a0bd219e-58d5-4531-9cc9-085084bf34ef','e025ccdf-8a10-4066-851b-8eaf760f48ce'),('a0bd219e-58d5-4531-9cc9-085084bf34ef','e3f82bd8-64f6-4935-904c-f4f643e1df16'),('a0bd219e-58d5-4531-9cc9-085084bf34ef','e757f666-1ac1-49b8-ba35-1578c45d2841'),('a0bd219e-58d5-4531-9cc9-085084bf34ef','f624c0c0-5db4-447b-96e9-5c19e128bea5'),('a0bd219e-58d5-4531-9cc9-085084bf34ef','f9b89120-048b-4541-94f2-a09a6165c06d'),('a3aae270-586e-42c6-8e97-e1e4d5252339','1eb6d3af-c8e8-408a-9b36-dba68b7d5a5c'),('a3aae270-586e-42c6-8e97-e1e4d5252339','5e62e392-50d3-415d-b969-337bbe7e7c0a'),('a5fe3dba-dc1f-4be9-aa19-7358e3d6f736','4133ad0f-e37f-4a12-9338-26e0b635a209'),('bac2e8dd-b4f8-4e9f-96e4-991ca1f239a7','0c840511-4078-4458-972e-80b78d016023'),('bac2e8dd-b4f8-4e9f-96e4-991ca1f239a7','10cdfe9d-de00-42a0-b1e8-cc341b34d57c'),('bcce9acc-3a19-4a1e-acc8-d21626f4fa81','b1a7632c-e05d-40f8-8d4e-cec6a71d6d14'),('c2afa323-6d36-40d0-bc7c-994d452775d7','6d54a31a-09e4-4b4d-bcbe-1488209196e9'),('c2afa323-6d36-40d0-bc7c-994d452775d7','8f37a057-52cd-4775-8de6-8566dca090e5'),('c2afa323-6d36-40d0-bc7c-994d452775d7','91f0653c-c2c2-4155-9afc-6c86de194e1c'),('c2afa323-6d36-40d0-bc7c-994d452775d7','e4dafa4b-6fb7-44d7-9345-391b6b1e8e66'),('c3d1ddef-45d2-4cbf-bbde-8f8088ae0e3b','7b6b9a58-94f8-41bf-8612-4dbc9c1c0d57'),('c3d1ddef-45d2-4cbf-bbde-8f8088ae0e3b','cd8383d3-207e-4b00-b50f-622e9c7cf233'),('c7d88b16-b9b1-4ee9-b88b-089f3cc4736c','1d412905-de80-4a7d-b291-dd246d6db03c'),('c7d88b16-b9b1-4ee9-b88b-089f3cc4736c','4379398f-286c-44b1-8472-839411166d36'),('c7d88b16-b9b1-4ee9-b88b-089f3cc4736c','46ea96c3-31d4-4962-af86-941298671482'),('c7d88b16-b9b1-4ee9-b88b-089f3cc4736c','4b5302d2-94c4-4e6d-af6b-d0f23bf96bde'),('c7d88b16-b9b1-4ee9-b88b-089f3cc4736c','585f7628-055c-474a-a70a-050f475f99c8'),('c7d88b16-b9b1-4ee9-b88b-089f3cc4736c','59c1594c-4c0c-4a1d-bde5-4e528e8f3e3b'),('c7d88b16-b9b1-4ee9-b88b-089f3cc4736c','605edcb7-d999-4716-ad8b-17a1f84d292b'),('c7d88b16-b9b1-4ee9-b88b-089f3cc4736c','674147b7-b603-4fa5-8cef-cfa712ef1a9c'),('c7d88b16-b9b1-4ee9-b88b-089f3cc4736c','753dfb59-6580-4177-9585-17dbbd162279'),('c7d88b16-b9b1-4ee9-b88b-089f3cc4736c','768c96d0-a799-4a5a-8eae-d1fa5b8f632f'),('c7d88b16-b9b1-4ee9-b88b-089f3cc4736c','798f1cc7-da39-4713-81bb-3f20a95f3c7e'),('c7d88b16-b9b1-4ee9-b88b-089f3cc4736c','9cf28ea5-af7b-4ad4-92e3-5fe99af53eb9'),('c7d88b16-b9b1-4ee9-b88b-089f3cc4736c','c347c471-4ed8-42cd-a8d5-17afdbcb07a0'),('c7d88b16-b9b1-4ee9-b88b-089f3cc4736c','cf5ec5b3-5d81-467f-baed-2cf3a30f3ce6'),('c7d88b16-b9b1-4ee9-b88b-089f3cc4736c','d4bd21d8-a4f9-459a-835d-651e19ac2874'),('c7d88b16-b9b1-4ee9-b88b-089f3cc4736c','d5e71213-1203-40bd-a3bf-e09154d15fa7'),('c7d88b16-b9b1-4ee9-b88b-089f3cc4736c','f7e23540-9140-4667-8a43-c413402d661e'),('c7d88b16-b9b1-4ee9-b88b-089f3cc4736c','fcfaf652-5abd-48b6-8715-fd1ea091cb89'),('ca326db1-1def-40b5-b442-186c8372dc54','2482b501-5049-4f8c-98a2-557c96641f6b'),('ca326db1-1def-40b5-b442-186c8372dc54','5d498f7a-28f1-4862-8633-61e026cafff4'),('ca326db1-1def-40b5-b442-186c8372dc54','c0c471d5-663f-403f-b33a-0bad8e7328a9'),('d4bd21d8-a4f9-459a-835d-651e19ac2874','1d412905-de80-4a7d-b291-dd246d6db03c'),('d4bd21d8-a4f9-459a-835d-651e19ac2874','798f1cc7-da39-4713-81bb-3f20a95f3c7e'),('e1afff95-a2d5-46da-8446-3a69e3c320d6','502a0349-e901-4b43-89fb-07eb61014ace'),('e1afff95-a2d5-46da-8446-3a69e3c320d6','b42996aa-df56-4510-b76c-0c3733b45c66'),('e349c309-f0a0-4d1a-bce8-7eacb93461ba','1581a7ac-9761-4bd3-a272-2145484bc5c4'),('e349c309-f0a0-4d1a-bce8-7eacb93461ba','3d4c3a1a-fb6f-42bf-a734-efadccaa4ad0'),('e349c309-f0a0-4d1a-bce8-7eacb93461ba','4133ad0f-e37f-4a12-9338-26e0b635a209'),('e349c309-f0a0-4d1a-bce8-7eacb93461ba','5f7b2fa7-65dd-4f7b-a985-70bc7638fd04'),('e349c309-f0a0-4d1a-bce8-7eacb93461ba','5fb370d9-9377-442d-9f11-57231df799d8'),('e349c309-f0a0-4d1a-bce8-7eacb93461ba','609906e9-5029-4978-a1ff-8cb38472f1b4'),('e349c309-f0a0-4d1a-bce8-7eacb93461ba','6be5f944-5cab-4bf8-b748-db285a707c0c'),('e349c309-f0a0-4d1a-bce8-7eacb93461ba','7e4c3557-8136-4e5b-808c-6fb542d7f72f'),('e349c309-f0a0-4d1a-bce8-7eacb93461ba','896b329a-a55e-4838-bee5-fd41c6d383eb'),('e349c309-f0a0-4d1a-bce8-7eacb93461ba','a5fe3dba-dc1f-4be9-aa19-7358e3d6f736'),('e349c309-f0a0-4d1a-bce8-7eacb93461ba','bac457d3-8963-4cf5-965f-b374480ff3d8'),('e349c309-f0a0-4d1a-bce8-7eacb93461ba','c14be266-8c8e-4ff0-b5c2-e836f4cd9aa4'),('e349c309-f0a0-4d1a-bce8-7eacb93461ba','ccc68d16-5d29-4583-b808-18872cd8df13'),('e349c309-f0a0-4d1a-bce8-7eacb93461ba','d1b6917d-84c7-4218-ae72-afa97afb7e0a'),('e349c309-f0a0-4d1a-bce8-7eacb93461ba','d7be9cfc-43ff-470b-8fc7-22a9e106d29b'),('e349c309-f0a0-4d1a-bce8-7eacb93461ba','f25d3901-2cbd-45b4-87dc-937bd30d167b'),('e349c309-f0a0-4d1a-bce8-7eacb93461ba','f558e3b3-b246-4ee1-b473-617831200bd6'),('e349c309-f0a0-4d1a-bce8-7eacb93461ba','f6fda7c5-39e4-4e03-bc93-4b47ebd887a6'),('e4dafa4b-6fb7-44d7-9345-391b6b1e8e66','740ba1ec-c805-4b44-9901-54bb4743e71f'),('e737d20e-6216-4da9-a281-f43102759f54','3010abd9-a4c4-49f7-b76e-093ca5360042'),('e737d20e-6216-4da9-a281-f43102759f54','45c2fe61-d5d0-4044-912c-13dcbaa3e873'),('e737d20e-6216-4da9-a281-f43102759f54','5a6423d8-f4c7-4bf0-9b4f-42adb669220a'),('e737d20e-6216-4da9-a281-f43102759f54','67dcf259-6999-47ed-9122-e00dc5222a6c'),('e737d20e-6216-4da9-a281-f43102759f54','6c0f37d2-2c65-427f-8e55-fa3677ec482a'),('e737d20e-6216-4da9-a281-f43102759f54','90d0c148-67ef-4bba-bd2f-8aa2086466f2'),('e737d20e-6216-4da9-a281-f43102759f54','aba52e43-5183-419c-b217-a2f670a69ec0'),('e737d20e-6216-4da9-a281-f43102759f54','f8b4617b-8a4b-454d-9e85-826d34daf267'),('ea43acf1-82de-4be0-ab9b-ccd01b7618bb','6866ade8-f039-4ffe-a819-9f4498a77d0e'),('eaf1d0ce-2944-4d39-bd99-377fea5b3132','0e894d70-def4-462e-aee7-d25f80c20b27'),('eaf1d0ce-2944-4d39-bd99-377fea5b3132','300c5b39-2fa9-4fcf-a1c1-82fc9110abc6'),('ed069635-3623-4e37-a85d-680301a31500','4bc71a50-0bca-450d-80f5-0a0fe3f9f1f9'),('ed069635-3623-4e37-a85d-680301a31500','793592b1-dbff-4778-b35e-19cdb9681830'),('ed069635-3623-4e37-a85d-680301a31500','f8ad0b14-409f-4ae0-ac3d-51d4d6c71c71'),('ed9080c5-b88f-49ed-83aa-7883e8dbede1','866f8eab-b4c8-4be2-a576-5065c06038a0'),('efd5a4cb-e141-4976-86a2-925c48e9a17c','f8e2a07b-1795-4cb5-b2b2-3ce3fbdb91be'),('efd5a4cb-e141-4976-86a2-925c48e9a17c','fccd3bea-270e-41dc-bd36-5b034e1aacd1'),('f98ff5a7-34c3-4473-abe3-270867f09df4','2a9ca2d5-b983-4d9c-971e-0de793a46363'),('f98ff5a7-34c3-4473-abe3-270867f09df4','3fa46cf1-bf9d-4c31-a9f4-3256a215cb96'),('f98ff5a7-34c3-4473-abe3-270867f09df4','60b3d091-e68e-4b0d-8486-8fe743cf6d1c'),('f98ff5a7-34c3-4473-abe3-270867f09df4','f9232b84-1ebd-45f1-beb5-21bf4eff1fdc'),('f9ee9405-7101-4691-9df3-63ca60e95e5c','c70e962b-d7fa-471e-a007-b715bd383876'),('fafdd08b-02fa-45e9-bc40-15befb734572','24329a10-91c8-4a8f-92b9-803b6d6dd776'),('fafdd08b-02fa-45e9-bc40-15befb734572','ce18d984-dce0-4e3c-82b7-f16678c7e155'),('fb331597-b9d3-4392-963f-03971bc690df','28f52aef-f2ca-4076-ae87-1f435b197099'),('fd2e0de6-8e32-4a51-8f7c-ad0ee28b4804','7edf6052-a64a-4413-8b79-732b90806c24'),('fd2e0de6-8e32-4a51-8f7c-ad0ee28b4804','8709f3c7-2db7-4820-8b4c-2e6d4553819a'),('fd2e0de6-8e32-4a51-8f7c-ad0ee28b4804','d066d55a-9192-4ecc-95f8-63d6f89f1ed3');
+/*!40000 ALTER TABLE `COMPOSITE_ROLE` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `CREDENTIAL`
+--
+
+DROP TABLE IF EXISTS `CREDENTIAL`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `CREDENTIAL` (
+  `ID` varchar(36) NOT NULL,
+  `SALT` tinyblob,
+  `TYPE` varchar(255) DEFAULT NULL,
+  `USER_ID` varchar(36) DEFAULT NULL,
+  `CREATED_DATE` bigint DEFAULT NULL,
+  `USER_LABEL` varchar(255) DEFAULT NULL,
+  `SECRET_DATA` longtext,
+  `CREDENTIAL_DATA` longtext,
+  `PRIORITY` int DEFAULT NULL,
+  PRIMARY KEY (`ID`),
+  KEY `IDX_USER_CREDENTIAL` (`USER_ID`),
+  CONSTRAINT `FK_PFYR0GLASQYL0DEI3KL69R6V0` FOREIGN KEY (`USER_ID`) REFERENCES `USER_ENTITY` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `CREDENTIAL`
+--
+
+LOCK TABLES `CREDENTIAL` WRITE;
+/*!40000 ALTER TABLE `CREDENTIAL` DISABLE KEYS */;
+INSERT INTO `CREDENTIAL` VALUES ('0b996e1b-955a-4d6b-8079-66cfdd10ff48',NULL,'password','98b18f6f-d105-437a-92f2-fb863b59805c',1709175212307,NULL,'{\"value\":\"ll4LdRDnybz8Js7zd+hViDOfU9fotPWAWNKPSBX14eZ/SAfvD49I+nB7BrsC60Vi/m2SJyFC9S7/+hoMi3SxBw==\",\"salt\":\"sDYP5R+C5enMYeyVLPuH1A==\",\"additionalParameters\":{}}','{\"hashIterations\":27500,\"algorithm\":\"pbkdf2-sha256\",\"additionalParameters\":{}}',10),('94610851-e642-4402-9c90-37433c509a2e',NULL,'password','56cae199-4b66-451c-a310-9dec3f649490',1709175234120,NULL,'{\"value\":\"cijqHnFUNa/+TVKb3z2/YbcGupnQlXsFHhnMDnh+FfyLsXQlZQ0jMakPuzp191fTS1pjliBDN7Fu5kzxOA/8Sg==\",\"salt\":\"rtlu+jJIbaW2UiETmw+YPw==\",\"additionalParameters\":{}}','{\"hashIterations\":27500,\"algorithm\":\"pbkdf2-sha256\",\"additionalParameters\":{}}',10),('bc591209-37e8-4e9b-a83a-4c43ed425fe0',NULL,'password','4e41ede7-f26a-4128-80cb-1174d275be90',1709175117597,NULL,'{\"value\":\"lTYFvQXLec00rtbtIefXYhUitZ5ebg+OdoY+SOYLeY/85ux5LWfa82j32gh6V6JAoZFizLYKq+Y6vXqxnDZOUQ==\",\"salt\":\"gngkqOpkLzRp8HuNSpiNDQ==\",\"additionalParameters\":{}}','{\"hashIterations\":27500,\"algorithm\":\"pbkdf2-sha256\",\"additionalParameters\":{}}',10),('c5c2a216-4783-43d5-9dd2-98bc66e82588',NULL,'password','74c8800a-f392-4c3c-9077-cfb96a52c947',1709175167550,NULL,'{\"value\":\"0mt3poTAkAe+SHUBI8oL2HMY36qTf/1niVo0lhHKPzV7f+J/1688373ofvqyRDHBmFxsbRBwYE0RmjhImd6fpg==\",\"salt\":\"vhRL06e/X1IitmSc+lJTzA==\",\"additionalParameters\":{}}','{\"hashIterations\":27500,\"algorithm\":\"pbkdf2-sha256\",\"additionalParameters\":{}}',10),('d6b9b738-ff31-48c0-8523-fa6eb650ce57',NULL,'password','fe934bbc-b716-474a-b1e0-eefc2a29e1b2',1709175195372,NULL,'{\"value\":\"d+mXyGYK1KgAeLntuFgRtROdjkc5cFJ9Gi2l1yNIVicaQx3Nr/JejtZoIGQxD+WUAJoILYt9tVmoArhcpdVm0Q==\",\"salt\":\"xOTh7nRMm6DpT0QJ6cc5Ww==\",\"additionalParameters\":{}}','{\"hashIterations\":27500,\"algorithm\":\"pbkdf2-sha256\",\"additionalParameters\":{}}',10),('e470df20-8c44-4ceb-8282-d1fb707f67fd',NULL,'password','85631ddb-cb91-4d18-a335-1646a78ee06a',1709175265727,NULL,'{\"value\":\"UQlWsCEG2hKD9fOp7xwG2qaOjLAt1loiJhFnhlzB+xyhTEmO025bCIxrmHzZZCTnS8VCMRiLKE2E9NoURAXUww==\",\"salt\":\"fiHur+nUQAVnPNXy/z8T/g==\",\"additionalParameters\":{}}','{\"hashIterations\":27500,\"algorithm\":\"pbkdf2-sha256\",\"additionalParameters\":{}}',10);
+/*!40000 ALTER TABLE `CREDENTIAL` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `DATABASECHANGELOG`
+--
+
+DROP TABLE IF EXISTS `DATABASECHANGELOG`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `DATABASECHANGELOG` (
+  `ID` varchar(255) NOT NULL,
+  `AUTHOR` varchar(255) NOT NULL,
+  `FILENAME` varchar(255) NOT NULL,
+  `DATEEXECUTED` datetime NOT NULL,
+  `ORDEREXECUTED` int NOT NULL,
+  `EXECTYPE` varchar(10) NOT NULL,
+  `MD5SUM` varchar(35) DEFAULT NULL,
+  `DESCRIPTION` varchar(255) DEFAULT NULL,
+  `COMMENTS` varchar(255) DEFAULT NULL,
+  `TAG` varchar(255) DEFAULT NULL,
+  `LIQUIBASE` varchar(20) DEFAULT NULL,
+  `CONTEXTS` varchar(255) DEFAULT NULL,
+  `LABELS` varchar(255) DEFAULT NULL,
+  `DEPLOYMENT_ID` varchar(10) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `DATABASECHANGELOG`
+--
+
+LOCK TABLES `DATABASECHANGELOG` WRITE;
+/*!40000 ALTER TABLE `DATABASECHANGELOG` DISABLE KEYS */;
+INSERT INTO `DATABASECHANGELOG` VALUES ('1.0.0.Final-KEYCLOAK-5461','sthorger@redhat.com','META-INF/jpa-changelog-1.0.0.Final.xml','2024-02-29 11:51:28',1,'EXECUTED','8:bda77d94bf90182a1e30c24f1c155ec7','createTable tableName=APPLICATION_DEFAULT_ROLES; createTable tableName=CLIENT; createTable tableName=CLIENT_SESSION; createTable tableName=CLIENT_SESSION_ROLE; createTable tableName=COMPOSITE_ROLE; createTable tableName=CREDENTIAL; createTable tab...','',NULL,'4.8.0',NULL,NULL,'9175084313'),('1.0.0.Final-KEYCLOAK-5461','sthorger@redhat.com','META-INF/db2-jpa-changelog-1.0.0.Final.xml','2024-02-29 11:51:28',2,'MARK_RAN','8:1ecb330f30986693d1cba9ab579fa219','createTable tableName=APPLICATION_DEFAULT_ROLES; createTable tableName=CLIENT; createTable tableName=CLIENT_SESSION; createTable tableName=CLIENT_SESSION_ROLE; createTable tableName=COMPOSITE_ROLE; createTable tableName=CREDENTIAL; createTable tab...','',NULL,'4.8.0',NULL,NULL,'9175084313'),('1.1.0.Beta1','sthorger@redhat.com','META-INF/jpa-changelog-1.1.0.Beta1.xml','2024-02-29 11:51:28',3,'EXECUTED','8:cb7ace19bc6d959f305605d255d4c843','delete tableName=CLIENT_SESSION_ROLE; delete tableName=CLIENT_SESSION; delete tableName=USER_SESSION; createTable tableName=CLIENT_ATTRIBUTES; createTable tableName=CLIENT_SESSION_NOTE; createTable tableName=APP_NODE_REGISTRATIONS; addColumn table...','',NULL,'4.8.0',NULL,NULL,'9175084313'),('1.1.0.Final','sthorger@redhat.com','META-INF/jpa-changelog-1.1.0.Final.xml','2024-02-29 11:51:29',4,'EXECUTED','8:80230013e961310e6872e871be424a63','renameColumn newColumnName=EVENT_TIME, oldColumnName=TIME, tableName=EVENT_ENTITY','',NULL,'4.8.0',NULL,NULL,'9175084313'),('1.2.0.Beta1','psilva@redhat.com','META-INF/jpa-changelog-1.2.0.Beta1.xml','2024-02-29 11:51:30',5,'EXECUTED','8:67f4c20929126adc0c8e9bf48279d244','delete tableName=CLIENT_SESSION_ROLE; delete tableName=CLIENT_SESSION_NOTE; delete tableName=CLIENT_SESSION; delete tableName=USER_SESSION; createTable tableName=PROTOCOL_MAPPER; createTable tableName=PROTOCOL_MAPPER_CONFIG; createTable tableName=...','',NULL,'4.8.0',NULL,NULL,'9175084313'),('1.2.0.Beta1','psilva@redhat.com','META-INF/db2-jpa-changelog-1.2.0.Beta1.xml','2024-02-29 11:51:30',6,'MARK_RAN','8:7311018b0b8179ce14628ab412bb6783','delete tableName=CLIENT_SESSION_ROLE; delete tableName=CLIENT_SESSION_NOTE; delete tableName=CLIENT_SESSION; delete tableName=USER_SESSION; createTable tableName=PROTOCOL_MAPPER; createTable tableName=PROTOCOL_MAPPER_CONFIG; createTable tableName=...','',NULL,'4.8.0',NULL,NULL,'9175084313'),('1.2.0.RC1','bburke@redhat.com','META-INF/jpa-changelog-1.2.0.CR1.xml','2024-02-29 11:51:32',7,'EXECUTED','8:037ba1216c3640f8785ee6b8e7c8e3c1','delete tableName=CLIENT_SESSION_ROLE; delete tableName=CLIENT_SESSION_NOTE; delete tableName=CLIENT_SESSION; delete tableName=USER_SESSION_NOTE; delete tableName=USER_SESSION; createTable tableName=MIGRATION_MODEL; createTable tableName=IDENTITY_P...','',NULL,'4.8.0',NULL,NULL,'9175084313'),('1.2.0.RC1','bburke@redhat.com','META-INF/db2-jpa-changelog-1.2.0.CR1.xml','2024-02-29 11:51:32',8,'MARK_RAN','8:7fe6ffe4af4df289b3157de32c624263','delete tableName=CLIENT_SESSION_ROLE; delete tableName=CLIENT_SESSION_NOTE; delete tableName=CLIENT_SESSION; delete tableName=USER_SESSION_NOTE; delete tableName=USER_SESSION; createTable tableName=MIGRATION_MODEL; createTable tableName=IDENTITY_P...','',NULL,'4.8.0',NULL,NULL,'9175084313'),('1.2.0.Final','keycloak','META-INF/jpa-changelog-1.2.0.Final.xml','2024-02-29 11:51:32',9,'EXECUTED','8:9c136bc3187083a98745c7d03bc8a303','update tableName=CLIENT; update tableName=CLIENT; update tableName=CLIENT','',NULL,'4.8.0',NULL,NULL,'9175084313'),('1.3.0','bburke@redhat.com','META-INF/jpa-changelog-1.3.0.xml','2024-02-29 11:51:33',10,'EXECUTED','8:b5f09474dca81fb56a97cf5b6553d331','delete tableName=CLIENT_SESSION_ROLE; delete tableName=CLIENT_SESSION_PROT_MAPPER; delete tableName=CLIENT_SESSION_NOTE; delete tableName=CLIENT_SESSION; delete tableName=USER_SESSION_NOTE; delete tableName=USER_SESSION; createTable tableName=ADMI...','',NULL,'4.8.0',NULL,NULL,'9175084313'),('1.4.0','bburke@redhat.com','META-INF/jpa-changelog-1.4.0.xml','2024-02-29 11:51:34',11,'EXECUTED','8:ca924f31bd2a3b219fdcfe78c82dacf4','delete tableName=CLIENT_SESSION_AUTH_STATUS; delete tableName=CLIENT_SESSION_ROLE; delete tableName=CLIENT_SESSION_PROT_MAPPER; delete tableName=CLIENT_SESSION_NOTE; delete tableName=CLIENT_SESSION; delete tableName=USER_SESSION_NOTE; delete table...','',NULL,'4.8.0',NULL,NULL,'9175084313'),('1.4.0','bburke@redhat.com','META-INF/db2-jpa-changelog-1.4.0.xml','2024-02-29 11:51:34',12,'MARK_RAN','8:8acad7483e106416bcfa6f3b824a16cd','delete tableName=CLIENT_SESSION_AUTH_STATUS; delete tableName=CLIENT_SESSION_ROLE; delete tableName=CLIENT_SESSION_PROT_MAPPER; delete tableName=CLIENT_SESSION_NOTE; delete tableName=CLIENT_SESSION; delete tableName=USER_SESSION_NOTE; delete table...','',NULL,'4.8.0',NULL,NULL,'9175084313'),('1.5.0','bburke@redhat.com','META-INF/jpa-changelog-1.5.0.xml','2024-02-29 11:51:34',13,'EXECUTED','8:9b1266d17f4f87c78226f5055408fd5e','delete tableName=CLIENT_SESSION_AUTH_STATUS; delete tableName=CLIENT_SESSION_ROLE; delete tableName=CLIENT_SESSION_PROT_MAPPER; delete tableName=CLIENT_SESSION_NOTE; delete tableName=CLIENT_SESSION; delete tableName=USER_SESSION_NOTE; delete table...','',NULL,'4.8.0',NULL,NULL,'9175084313'),('1.6.1_from15','mposolda@redhat.com','META-INF/jpa-changelog-1.6.1.xml','2024-02-29 11:51:35',14,'EXECUTED','8:d80ec4ab6dbfe573550ff72396c7e910','addColumn tableName=REALM; addColumn tableName=KEYCLOAK_ROLE; addColumn tableName=CLIENT; createTable tableName=OFFLINE_USER_SESSION; createTable tableName=OFFLINE_CLIENT_SESSION; addPrimaryKey constraintName=CONSTRAINT_OFFL_US_SES_PK2, tableName=...','',NULL,'4.8.0',NULL,NULL,'9175084313'),('1.6.1_from16-pre','mposolda@redhat.com','META-INF/jpa-changelog-1.6.1.xml','2024-02-29 11:51:35',15,'MARK_RAN','8:d86eb172171e7c20b9c849b584d147b2','delete tableName=OFFLINE_CLIENT_SESSION; delete tableName=OFFLINE_USER_SESSION','',NULL,'4.8.0',NULL,NULL,'9175084313'),('1.6.1_from16','mposolda@redhat.com','META-INF/jpa-changelog-1.6.1.xml','2024-02-29 11:51:35',16,'MARK_RAN','8:5735f46f0fa60689deb0ecdc2a0dea22','dropPrimaryKey constraintName=CONSTRAINT_OFFLINE_US_SES_PK, tableName=OFFLINE_USER_SESSION; dropPrimaryKey constraintName=CONSTRAINT_OFFLINE_CL_SES_PK, tableName=OFFLINE_CLIENT_SESSION; addColumn tableName=OFFLINE_USER_SESSION; update tableName=OF...','',NULL,'4.8.0',NULL,NULL,'9175084313'),('1.6.1','mposolda@redhat.com','META-INF/jpa-changelog-1.6.1.xml','2024-02-29 11:51:35',17,'EXECUTED','8:d41d8cd98f00b204e9800998ecf8427e','empty','',NULL,'4.8.0',NULL,NULL,'9175084313'),('1.7.0','bburke@redhat.com','META-INF/jpa-changelog-1.7.0.xml','2024-02-29 11:51:36',18,'EXECUTED','8:5c1a8fd2014ac7fc43b90a700f117b23','createTable tableName=KEYCLOAK_GROUP; createTable tableName=GROUP_ROLE_MAPPING; createTable tableName=GROUP_ATTRIBUTE; createTable tableName=USER_GROUP_MEMBERSHIP; createTable tableName=REALM_DEFAULT_GROUPS; addColumn tableName=IDENTITY_PROVIDER; ...','',NULL,'4.8.0',NULL,NULL,'9175084313'),('1.8.0','mposolda@redhat.com','META-INF/jpa-changelog-1.8.0.xml','2024-02-29 11:51:37',19,'EXECUTED','8:1f6c2c2dfc362aff4ed75b3f0ef6b331','addColumn tableName=IDENTITY_PROVIDER; createTable tableName=CLIENT_TEMPLATE; createTable tableName=CLIENT_TEMPLATE_ATTRIBUTES; createTable tableName=TEMPLATE_SCOPE_MAPPING; dropNotNullConstraint columnName=CLIENT_ID, tableName=PROTOCOL_MAPPER; ad...','',NULL,'4.8.0',NULL,NULL,'9175084313'),('1.8.0-2','keycloak','META-INF/jpa-changelog-1.8.0.xml','2024-02-29 11:51:37',20,'EXECUTED','8:dee9246280915712591f83a127665107','dropDefaultValue columnName=ALGORITHM, tableName=CREDENTIAL; update tableName=CREDENTIAL','',NULL,'4.8.0',NULL,NULL,'9175084313'),('1.8.0','mposolda@redhat.com','META-INF/db2-jpa-changelog-1.8.0.xml','2024-02-29 11:51:37',21,'MARK_RAN','8:9eb2ee1fa8ad1c5e426421a6f8fdfa6a','addColumn tableName=IDENTITY_PROVIDER; createTable tableName=CLIENT_TEMPLATE; createTable tableName=CLIENT_TEMPLATE_ATTRIBUTES; createTable tableName=TEMPLATE_SCOPE_MAPPING; dropNotNullConstraint columnName=CLIENT_ID, tableName=PROTOCOL_MAPPER; ad...','',NULL,'4.8.0',NULL,NULL,'9175084313'),('1.8.0-2','keycloak','META-INF/db2-jpa-changelog-1.8.0.xml','2024-02-29 11:51:37',22,'MARK_RAN','8:dee9246280915712591f83a127665107','dropDefaultValue columnName=ALGORITHM, tableName=CREDENTIAL; update tableName=CREDENTIAL','',NULL,'4.8.0',NULL,NULL,'9175084313'),('1.9.0','mposolda@redhat.com','META-INF/jpa-changelog-1.9.0.xml','2024-02-29 11:51:37',23,'EXECUTED','8:d9fa18ffa355320395b86270680dd4fe','update tableName=REALM; update tableName=REALM; update tableName=REALM; update tableName=REALM; update tableName=CREDENTIAL; update tableName=CREDENTIAL; update tableName=CREDENTIAL; update tableName=REALM; update tableName=REALM; customChange; dr...','',NULL,'4.8.0',NULL,NULL,'9175084313'),('1.9.1','keycloak','META-INF/jpa-changelog-1.9.1.xml','2024-02-29 11:51:37',24,'EXECUTED','8:90cff506fedb06141ffc1c71c4a1214c','modifyDataType columnName=PRIVATE_KEY, tableName=REALM; modifyDataType columnName=PUBLIC_KEY, tableName=REALM; modifyDataType columnName=CERTIFICATE, tableName=REALM','',NULL,'4.8.0',NULL,NULL,'9175084313'),('1.9.1','keycloak','META-INF/db2-jpa-changelog-1.9.1.xml','2024-02-29 11:51:37',25,'MARK_RAN','8:11a788aed4961d6d29c427c063af828c','modifyDataType columnName=PRIVATE_KEY, tableName=REALM; modifyDataType columnName=CERTIFICATE, tableName=REALM','',NULL,'4.8.0',NULL,NULL,'9175084313'),('1.9.2','keycloak','META-INF/jpa-changelog-1.9.2.xml','2024-02-29 11:51:37',26,'EXECUTED','8:a4218e51e1faf380518cce2af5d39b43','createIndex indexName=IDX_USER_EMAIL, tableName=USER_ENTITY; createIndex indexName=IDX_USER_ROLE_MAPPING, tableName=USER_ROLE_MAPPING; createIndex indexName=IDX_USER_GROUP_MAPPING, tableName=USER_GROUP_MEMBERSHIP; createIndex indexName=IDX_USER_CO...','',NULL,'4.8.0',NULL,NULL,'9175084313'),('authz-2.0.0','psilva@redhat.com','META-INF/jpa-changelog-authz-2.0.0.xml','2024-02-29 11:51:39',27,'EXECUTED','8:d9e9a1bfaa644da9952456050f07bbdc','createTable tableName=RESOURCE_SERVER; addPrimaryKey constraintName=CONSTRAINT_FARS, tableName=RESOURCE_SERVER; addUniqueConstraint constraintName=UK_AU8TT6T700S9V50BU18WS5HA6, tableName=RESOURCE_SERVER; createTable tableName=RESOURCE_SERVER_RESOU...','',NULL,'4.8.0',NULL,NULL,'9175084313'),('authz-2.5.1','psilva@redhat.com','META-INF/jpa-changelog-authz-2.5.1.xml','2024-02-29 11:51:39',28,'EXECUTED','8:d1bf991a6163c0acbfe664b615314505','update tableName=RESOURCE_SERVER_POLICY','',NULL,'4.8.0',NULL,NULL,'9175084313'),('2.1.0-KEYCLOAK-5461','bburke@redhat.com','META-INF/jpa-changelog-2.1.0.xml','2024-02-29 11:51:39',29,'EXECUTED','8:88a743a1e87ec5e30bf603da68058a8c','createTable tableName=BROKER_LINK; createTable tableName=FED_USER_ATTRIBUTE; createTable tableName=FED_USER_CONSENT; createTable tableName=FED_USER_CONSENT_ROLE; createTable tableName=FED_USER_CONSENT_PROT_MAPPER; createTable tableName=FED_USER_CR...','',NULL,'4.8.0',NULL,NULL,'9175084313'),('2.2.0','bburke@redhat.com','META-INF/jpa-changelog-2.2.0.xml','2024-02-29 11:51:40',30,'EXECUTED','8:c5517863c875d325dea463d00ec26d7a','addColumn tableName=ADMIN_EVENT_ENTITY; createTable tableName=CREDENTIAL_ATTRIBUTE; createTable tableName=FED_CREDENTIAL_ATTRIBUTE; modifyDataType columnName=VALUE, tableName=CREDENTIAL; addForeignKeyConstraint baseTableName=FED_CREDENTIAL_ATTRIBU...','',NULL,'4.8.0',NULL,NULL,'9175084313'),('2.3.0','bburke@redhat.com','META-INF/jpa-changelog-2.3.0.xml','2024-02-29 11:51:40',31,'EXECUTED','8:ada8b4833b74a498f376d7136bc7d327','createTable tableName=FEDERATED_USER; addPrimaryKey constraintName=CONSTR_FEDERATED_USER, tableName=FEDERATED_USER; dropDefaultValue columnName=TOTP, tableName=USER_ENTITY; dropColumn columnName=TOTP, tableName=USER_ENTITY; addColumn tableName=IDE...','',NULL,'4.8.0',NULL,NULL,'9175084313'),('2.4.0','bburke@redhat.com','META-INF/jpa-changelog-2.4.0.xml','2024-02-29 11:51:40',32,'EXECUTED','8:b9b73c8ea7299457f99fcbb825c263ba','customChange','',NULL,'4.8.0',NULL,NULL,'9175084313'),('2.5.0','bburke@redhat.com','META-INF/jpa-changelog-2.5.0.xml','2024-02-29 11:51:40',33,'EXECUTED','8:07724333e625ccfcfc5adc63d57314f3','customChange; modifyDataType columnName=USER_ID, tableName=OFFLINE_USER_SESSION','',NULL,'4.8.0',NULL,NULL,'9175084313'),('2.5.0-unicode-oracle','hmlnarik@redhat.com','META-INF/jpa-changelog-2.5.0.xml','2024-02-29 11:51:40',34,'MARK_RAN','8:8b6fd445958882efe55deb26fc541a7b','modifyDataType columnName=DESCRIPTION, tableName=AUTHENTICATION_FLOW; modifyDataType columnName=DESCRIPTION, tableName=CLIENT_TEMPLATE; modifyDataType columnName=DESCRIPTION, tableName=RESOURCE_SERVER_POLICY; modifyDataType columnName=DESCRIPTION,...','',NULL,'4.8.0',NULL,NULL,'9175084313'),('2.5.0-unicode-other-dbs','hmlnarik@redhat.com','META-INF/jpa-changelog-2.5.0.xml','2024-02-29 11:51:41',35,'EXECUTED','8:29b29cfebfd12600897680147277a9d7','modifyDataType columnName=DESCRIPTION, tableName=AUTHENTICATION_FLOW; modifyDataType columnName=DESCRIPTION, tableName=CLIENT_TEMPLATE; modifyDataType columnName=DESCRIPTION, tableName=RESOURCE_SERVER_POLICY; modifyDataType columnName=DESCRIPTION,...','',NULL,'4.8.0',NULL,NULL,'9175084313'),('2.5.0-duplicate-email-support','slawomir@dabek.name','META-INF/jpa-changelog-2.5.0.xml','2024-02-29 11:51:41',36,'EXECUTED','8:73ad77ca8fd0410c7f9f15a471fa52bc','addColumn tableName=REALM','',NULL,'4.8.0',NULL,NULL,'9175084313'),('2.5.0-unique-group-names','hmlnarik@redhat.com','META-INF/jpa-changelog-2.5.0.xml','2024-02-29 11:51:41',37,'EXECUTED','8:64f27a6fdcad57f6f9153210f2ec1bdb','addUniqueConstraint constraintName=SIBLING_NAMES, tableName=KEYCLOAK_GROUP','',NULL,'4.8.0',NULL,NULL,'9175084313'),('2.5.1','bburke@redhat.com','META-INF/jpa-changelog-2.5.1.xml','2024-02-29 11:51:41',38,'EXECUTED','8:27180251182e6c31846c2ddab4bc5781','addColumn tableName=FED_USER_CONSENT','',NULL,'4.8.0',NULL,NULL,'9175084313'),('3.0.0','bburke@redhat.com','META-INF/jpa-changelog-3.0.0.xml','2024-02-29 11:51:41',39,'EXECUTED','8:d56f201bfcfa7a1413eb3e9bc02978f9','addColumn tableName=IDENTITY_PROVIDER','',NULL,'4.8.0',NULL,NULL,'9175084313'),('3.2.0-fix','keycloak','META-INF/jpa-changelog-3.2.0.xml','2024-02-29 11:51:41',40,'MARK_RAN','8:91f5522bf6afdc2077dfab57fbd3455c','addNotNullConstraint columnName=REALM_ID, tableName=CLIENT_INITIAL_ACCESS','',NULL,'4.8.0',NULL,NULL,'9175084313'),('3.2.0-fix-with-keycloak-5416','keycloak','META-INF/jpa-changelog-3.2.0.xml','2024-02-29 11:51:41',41,'MARK_RAN','8:0f01b554f256c22caeb7d8aee3a1cdc8','dropIndex indexName=IDX_CLIENT_INIT_ACC_REALM, tableName=CLIENT_INITIAL_ACCESS; addNotNullConstraint columnName=REALM_ID, tableName=CLIENT_INITIAL_ACCESS; createIndex indexName=IDX_CLIENT_INIT_ACC_REALM, tableName=CLIENT_INITIAL_ACCESS','',NULL,'4.8.0',NULL,NULL,'9175084313'),('3.2.0-fix-offline-sessions','hmlnarik','META-INF/jpa-changelog-3.2.0.xml','2024-02-29 11:51:41',42,'EXECUTED','8:ab91cf9cee415867ade0e2df9651a947','customChange','',NULL,'4.8.0',NULL,NULL,'9175084313'),('3.2.0-fixed','keycloak','META-INF/jpa-changelog-3.2.0.xml','2024-02-29 11:51:43',43,'EXECUTED','8:ceac9b1889e97d602caf373eadb0d4b7','addColumn tableName=REALM; dropPrimaryKey constraintName=CONSTRAINT_OFFL_CL_SES_PK2, tableName=OFFLINE_CLIENT_SESSION; dropColumn columnName=CLIENT_SESSION_ID, tableName=OFFLINE_CLIENT_SESSION; addPrimaryKey constraintName=CONSTRAINT_OFFL_CL_SES_P...','',NULL,'4.8.0',NULL,NULL,'9175084313'),('3.3.0','keycloak','META-INF/jpa-changelog-3.3.0.xml','2024-02-29 11:51:43',44,'EXECUTED','8:84b986e628fe8f7fd8fd3c275c5259f2','addColumn tableName=USER_ENTITY','',NULL,'4.8.0',NULL,NULL,'9175084313'),('authz-3.4.0.CR1-resource-server-pk-change-part1','glavoie@gmail.com','META-INF/jpa-changelog-authz-3.4.0.CR1.xml','2024-02-29 11:51:43',45,'EXECUTED','8:a164ae073c56ffdbc98a615493609a52','addColumn tableName=RESOURCE_SERVER_POLICY; addColumn tableName=RESOURCE_SERVER_RESOURCE; addColumn tableName=RESOURCE_SERVER_SCOPE','',NULL,'4.8.0',NULL,NULL,'9175084313'),('authz-3.4.0.CR1-resource-server-pk-change-part2-KEYCLOAK-6095','hmlnarik@redhat.com','META-INF/jpa-changelog-authz-3.4.0.CR1.xml','2024-02-29 11:51:43',46,'EXECUTED','8:70a2b4f1f4bd4dbf487114bdb1810e64','customChange','',NULL,'4.8.0',NULL,NULL,'9175084313'),('authz-3.4.0.CR1-resource-server-pk-change-part3-fixed','glavoie@gmail.com','META-INF/jpa-changelog-authz-3.4.0.CR1.xml','2024-02-29 11:51:43',47,'MARK_RAN','8:7be68b71d2f5b94b8df2e824f2860fa2','dropIndex indexName=IDX_RES_SERV_POL_RES_SERV, tableName=RESOURCE_SERVER_POLICY; dropIndex indexName=IDX_RES_SRV_RES_RES_SRV, tableName=RESOURCE_SERVER_RESOURCE; dropIndex indexName=IDX_RES_SRV_SCOPE_RES_SRV, tableName=RESOURCE_SERVER_SCOPE','',NULL,'4.8.0',NULL,NULL,'9175084313'),('authz-3.4.0.CR1-resource-server-pk-change-part3-fixed-nodropindex','glavoie@gmail.com','META-INF/jpa-changelog-authz-3.4.0.CR1.xml','2024-02-29 11:51:44',48,'EXECUTED','8:bab7c631093c3861d6cf6144cd944982','addNotNullConstraint columnName=RESOURCE_SERVER_CLIENT_ID, tableName=RESOURCE_SERVER_POLICY; addNotNullConstraint columnName=RESOURCE_SERVER_CLIENT_ID, tableName=RESOURCE_SERVER_RESOURCE; addNotNullConstraint columnName=RESOURCE_SERVER_CLIENT_ID, ...','',NULL,'4.8.0',NULL,NULL,'9175084313'),('authn-3.4.0.CR1-refresh-token-max-reuse','glavoie@gmail.com','META-INF/jpa-changelog-authz-3.4.0.CR1.xml','2024-02-29 11:51:44',49,'EXECUTED','8:fa809ac11877d74d76fe40869916daad','addColumn tableName=REALM','',NULL,'4.8.0',NULL,NULL,'9175084313'),('3.4.0','keycloak','META-INF/jpa-changelog-3.4.0.xml','2024-02-29 11:51:45',50,'EXECUTED','8:fac23540a40208f5f5e326f6ceb4d291','addPrimaryKey constraintName=CONSTRAINT_REALM_DEFAULT_ROLES, tableName=REALM_DEFAULT_ROLES; addPrimaryKey constraintName=CONSTRAINT_COMPOSITE_ROLE, tableName=COMPOSITE_ROLE; addPrimaryKey constraintName=CONSTR_REALM_DEFAULT_GROUPS, tableName=REALM...','',NULL,'4.8.0',NULL,NULL,'9175084313'),('3.4.0-KEYCLOAK-5230','hmlnarik@redhat.com','META-INF/jpa-changelog-3.4.0.xml','2024-02-29 11:51:45',51,'EXECUTED','8:2612d1b8a97e2b5588c346e817307593','createIndex indexName=IDX_FU_ATTRIBUTE, tableName=FED_USER_ATTRIBUTE; createIndex indexName=IDX_FU_CONSENT, tableName=FED_USER_CONSENT; createIndex indexName=IDX_FU_CONSENT_RU, tableName=FED_USER_CONSENT; createIndex indexName=IDX_FU_CREDENTIAL, t...','',NULL,'4.8.0',NULL,NULL,'9175084313'),('3.4.1','psilva@redhat.com','META-INF/jpa-changelog-3.4.1.xml','2024-02-29 11:51:45',52,'EXECUTED','8:9842f155c5db2206c88bcb5d1046e941','modifyDataType columnName=VALUE, tableName=CLIENT_ATTRIBUTES','',NULL,'4.8.0',NULL,NULL,'9175084313'),('3.4.2','keycloak','META-INF/jpa-changelog-3.4.2.xml','2024-02-29 11:51:45',53,'EXECUTED','8:2e12e06e45498406db72d5b3da5bbc76','update tableName=REALM','',NULL,'4.8.0',NULL,NULL,'9175084313'),('3.4.2-KEYCLOAK-5172','mkanis@redhat.com','META-INF/jpa-changelog-3.4.2.xml','2024-02-29 11:51:45',54,'EXECUTED','8:33560e7c7989250c40da3abdabdc75a4','update tableName=CLIENT','',NULL,'4.8.0',NULL,NULL,'9175084313'),('4.0.0-KEYCLOAK-6335','bburke@redhat.com','META-INF/jpa-changelog-4.0.0.xml','2024-02-29 11:51:45',55,'EXECUTED','8:87a8d8542046817a9107c7eb9cbad1cd','createTable tableName=CLIENT_AUTH_FLOW_BINDINGS; addPrimaryKey constraintName=C_CLI_FLOW_BIND, tableName=CLIENT_AUTH_FLOW_BINDINGS','',NULL,'4.8.0',NULL,NULL,'9175084313'),('4.0.0-CLEANUP-UNUSED-TABLE','bburke@redhat.com','META-INF/jpa-changelog-4.0.0.xml','2024-02-29 11:51:45',56,'EXECUTED','8:3ea08490a70215ed0088c273d776311e','dropTable tableName=CLIENT_IDENTITY_PROV_MAPPING','',NULL,'4.8.0',NULL,NULL,'9175084313'),('4.0.0-KEYCLOAK-6228','bburke@redhat.com','META-INF/jpa-changelog-4.0.0.xml','2024-02-29 11:51:46',57,'EXECUTED','8:2d56697c8723d4592ab608ce14b6ed68','dropUniqueConstraint constraintName=UK_JKUWUVD56ONTGSUHOGM8UEWRT, tableName=USER_CONSENT; dropNotNullConstraint columnName=CLIENT_ID, tableName=USER_CONSENT; addColumn tableName=USER_CONSENT; addUniqueConstraint constraintName=UK_JKUWUVD56ONTGSUHO...','',NULL,'4.8.0',NULL,NULL,'9175084313'),('4.0.0-KEYCLOAK-5579-fixed','mposolda@redhat.com','META-INF/jpa-changelog-4.0.0.xml','2024-02-29 11:51:48',58,'EXECUTED','8:3e423e249f6068ea2bbe48bf907f9d86','dropForeignKeyConstraint baseTableName=CLIENT_TEMPLATE_ATTRIBUTES, constraintName=FK_CL_TEMPL_ATTR_TEMPL; renameTable newTableName=CLIENT_SCOPE_ATTRIBUTES, oldTableName=CLIENT_TEMPLATE_ATTRIBUTES; renameColumn newColumnName=SCOPE_ID, oldColumnName...','',NULL,'4.8.0',NULL,NULL,'9175084313'),('authz-4.0.0.CR1','psilva@redhat.com','META-INF/jpa-changelog-authz-4.0.0.CR1.xml','2024-02-29 11:51:48',59,'EXECUTED','8:15cabee5e5df0ff099510a0fc03e4103','createTable tableName=RESOURCE_SERVER_PERM_TICKET; addPrimaryKey constraintName=CONSTRAINT_FAPMT, tableName=RESOURCE_SERVER_PERM_TICKET; addForeignKeyConstraint baseTableName=RESOURCE_SERVER_PERM_TICKET, constraintName=FK_FRSRHO213XCX4WNKOG82SSPMT...','',NULL,'4.8.0',NULL,NULL,'9175084313'),('authz-4.0.0.Beta3','psilva@redhat.com','META-INF/jpa-changelog-authz-4.0.0.Beta3.xml','2024-02-29 11:51:49',60,'EXECUTED','8:4b80200af916ac54d2ffbfc47918ab0e','addColumn tableName=RESOURCE_SERVER_POLICY; addColumn tableName=RESOURCE_SERVER_PERM_TICKET; addForeignKeyConstraint baseTableName=RESOURCE_SERVER_PERM_TICKET, constraintName=FK_FRSRPO2128CX4WNKOG82SSRFY, referencedTableName=RESOURCE_SERVER_POLICY','',NULL,'4.8.0',NULL,NULL,'9175084313'),('authz-4.2.0.Final','mhajas@redhat.com','META-INF/jpa-changelog-authz-4.2.0.Final.xml','2024-02-29 11:51:49',61,'EXECUTED','8:66564cd5e168045d52252c5027485bbb','createTable tableName=RESOURCE_URIS; addForeignKeyConstraint baseTableName=RESOURCE_URIS, constraintName=FK_RESOURCE_SERVER_URIS, referencedTableName=RESOURCE_SERVER_RESOURCE; customChange; dropColumn columnName=URI, tableName=RESOURCE_SERVER_RESO...','',NULL,'4.8.0',NULL,NULL,'9175084313'),('authz-4.2.0.Final-KEYCLOAK-9944','hmlnarik@redhat.com','META-INF/jpa-changelog-authz-4.2.0.Final.xml','2024-02-29 11:51:49',62,'EXECUTED','8:1c7064fafb030222be2bd16ccf690f6f','addPrimaryKey constraintName=CONSTRAINT_RESOUR_URIS_PK, tableName=RESOURCE_URIS','',NULL,'4.8.0',NULL,NULL,'9175084313'),('4.2.0-KEYCLOAK-6313','wadahiro@gmail.com','META-INF/jpa-changelog-4.2.0.xml','2024-02-29 11:51:49',63,'EXECUTED','8:2de18a0dce10cdda5c7e65c9b719b6e5','addColumn tableName=REQUIRED_ACTION_PROVIDER','',NULL,'4.8.0',NULL,NULL,'9175084313'),('4.3.0-KEYCLOAK-7984','wadahiro@gmail.com','META-INF/jpa-changelog-4.3.0.xml','2024-02-29 11:51:49',64,'EXECUTED','8:03e413dd182dcbd5c57e41c34d0ef682','update tableName=REQUIRED_ACTION_PROVIDER','',NULL,'4.8.0',NULL,NULL,'9175084313'),('4.6.0-KEYCLOAK-7950','psilva@redhat.com','META-INF/jpa-changelog-4.6.0.xml','2024-02-29 11:51:49',65,'EXECUTED','8:d27b42bb2571c18fbe3fe4e4fb7582a7','update tableName=RESOURCE_SERVER_RESOURCE','',NULL,'4.8.0',NULL,NULL,'9175084313'),('4.6.0-KEYCLOAK-8377','keycloak','META-INF/jpa-changelog-4.6.0.xml','2024-02-29 11:51:49',66,'EXECUTED','8:698baf84d9fd0027e9192717c2154fb8','createTable tableName=ROLE_ATTRIBUTE; addPrimaryKey constraintName=CONSTRAINT_ROLE_ATTRIBUTE_PK, tableName=ROLE_ATTRIBUTE; addForeignKeyConstraint baseTableName=ROLE_ATTRIBUTE, constraintName=FK_ROLE_ATTRIBUTE_ID, referencedTableName=KEYCLOAK_ROLE...','',NULL,'4.8.0',NULL,NULL,'9175084313'),('4.6.0-KEYCLOAK-8555','gideonray@gmail.com','META-INF/jpa-changelog-4.6.0.xml','2024-02-29 11:51:49',67,'EXECUTED','8:ced8822edf0f75ef26eb51582f9a821a','createIndex indexName=IDX_COMPONENT_PROVIDER_TYPE, tableName=COMPONENT','',NULL,'4.8.0',NULL,NULL,'9175084313'),('4.7.0-KEYCLOAK-1267','sguilhen@redhat.com','META-INF/jpa-changelog-4.7.0.xml','2024-02-29 11:51:49',68,'EXECUTED','8:f0abba004cf429e8afc43056df06487d','addColumn tableName=REALM','',NULL,'4.8.0',NULL,NULL,'9175084313'),('4.7.0-KEYCLOAK-7275','keycloak','META-INF/jpa-changelog-4.7.0.xml','2024-02-29 11:51:49',69,'EXECUTED','8:6662f8b0b611caa359fcf13bf63b4e24','renameColumn newColumnName=CREATED_ON, oldColumnName=LAST_SESSION_REFRESH, tableName=OFFLINE_USER_SESSION; addNotNullConstraint columnName=CREATED_ON, tableName=OFFLINE_USER_SESSION; addColumn tableName=OFFLINE_USER_SESSION; customChange; createIn...','',NULL,'4.8.0',NULL,NULL,'9175084313'),('4.8.0-KEYCLOAK-8835','sguilhen@redhat.com','META-INF/jpa-changelog-4.8.0.xml','2024-02-29 11:51:49',70,'EXECUTED','8:9e6b8009560f684250bdbdf97670d39e','addNotNullConstraint columnName=SSO_MAX_LIFESPAN_REMEMBER_ME, tableName=REALM; addNotNullConstraint columnName=SSO_IDLE_TIMEOUT_REMEMBER_ME, tableName=REALM','',NULL,'4.8.0',NULL,NULL,'9175084313'),('authz-7.0.0-KEYCLOAK-10443','psilva@redhat.com','META-INF/jpa-changelog-authz-7.0.0.xml','2024-02-29 11:51:49',71,'EXECUTED','8:4223f561f3b8dc655846562b57bb502e','addColumn tableName=RESOURCE_SERVER','',NULL,'4.8.0',NULL,NULL,'9175084313'),('8.0.0-adding-credential-columns','keycloak','META-INF/jpa-changelog-8.0.0.xml','2024-02-29 11:51:50',72,'EXECUTED','8:215a31c398b363ce383a2b301202f29e','addColumn tableName=CREDENTIAL; addColumn tableName=FED_USER_CREDENTIAL','',NULL,'4.8.0',NULL,NULL,'9175084313'),('8.0.0-updating-credential-data-not-oracle-fixed','keycloak','META-INF/jpa-changelog-8.0.0.xml','2024-02-29 11:51:50',73,'EXECUTED','8:83f7a671792ca98b3cbd3a1a34862d3d','update tableName=CREDENTIAL; update tableName=CREDENTIAL; update tableName=CREDENTIAL; update tableName=FED_USER_CREDENTIAL; update tableName=FED_USER_CREDENTIAL; update tableName=FED_USER_CREDENTIAL','',NULL,'4.8.0',NULL,NULL,'9175084313'),('8.0.0-updating-credential-data-oracle-fixed','keycloak','META-INF/jpa-changelog-8.0.0.xml','2024-02-29 11:51:50',74,'MARK_RAN','8:f58ad148698cf30707a6efbdf8061aa7','update tableName=CREDENTIAL; update tableName=CREDENTIAL; update tableName=CREDENTIAL; update tableName=FED_USER_CREDENTIAL; update tableName=FED_USER_CREDENTIAL; update tableName=FED_USER_CREDENTIAL','',NULL,'4.8.0',NULL,NULL,'9175084313'),('8.0.0-credential-cleanup-fixed','keycloak','META-INF/jpa-changelog-8.0.0.xml','2024-02-29 11:51:50',75,'EXECUTED','8:79e4fd6c6442980e58d52ffc3ee7b19c','dropDefaultValue columnName=COUNTER, tableName=CREDENTIAL; dropDefaultValue columnName=DIGITS, tableName=CREDENTIAL; dropDefaultValue columnName=PERIOD, tableName=CREDENTIAL; dropDefaultValue columnName=ALGORITHM, tableName=CREDENTIAL; dropColumn ...','',NULL,'4.8.0',NULL,NULL,'9175084313'),('8.0.0-resource-tag-support','keycloak','META-INF/jpa-changelog-8.0.0.xml','2024-02-29 11:51:50',76,'EXECUTED','8:87af6a1e6d241ca4b15801d1f86a297d','addColumn tableName=MIGRATION_MODEL; createIndex indexName=IDX_UPDATE_TIME, tableName=MIGRATION_MODEL','',NULL,'4.8.0',NULL,NULL,'9175084313'),('9.0.0-always-display-client','keycloak','META-INF/jpa-changelog-9.0.0.xml','2024-02-29 11:51:50',77,'EXECUTED','8:b44f8d9b7b6ea455305a6d72a200ed15','addColumn tableName=CLIENT','',NULL,'4.8.0',NULL,NULL,'9175084313'),('9.0.0-drop-constraints-for-column-increase','keycloak','META-INF/jpa-changelog-9.0.0.xml','2024-02-29 11:51:50',78,'MARK_RAN','8:2d8ed5aaaeffd0cb004c046b4a903ac5','dropUniqueConstraint constraintName=UK_FRSR6T700S9V50BU18WS5PMT, tableName=RESOURCE_SERVER_PERM_TICKET; dropUniqueConstraint constraintName=UK_FRSR6T700S9V50BU18WS5HA6, tableName=RESOURCE_SERVER_RESOURCE; dropPrimaryKey constraintName=CONSTRAINT_O...','',NULL,'4.8.0',NULL,NULL,'9175084313'),('9.0.0-increase-column-size-federated-fk','keycloak','META-INF/jpa-changelog-9.0.0.xml','2024-02-29 11:51:51',79,'EXECUTED','8:e290c01fcbc275326c511633f6e2acde','modifyDataType columnName=CLIENT_ID, tableName=FED_USER_CONSENT; modifyDataType columnName=CLIENT_REALM_CONSTRAINT, tableName=KEYCLOAK_ROLE; modifyDataType columnName=OWNER, tableName=RESOURCE_SERVER_POLICY; modifyDataType columnName=CLIENT_ID, ta...','',NULL,'4.8.0',NULL,NULL,'9175084313'),('9.0.0-recreate-constraints-after-column-increase','keycloak','META-INF/jpa-changelog-9.0.0.xml','2024-02-29 11:51:51',80,'MARK_RAN','8:c9db8784c33cea210872ac2d805439f8','addNotNullConstraint columnName=CLIENT_ID, tableName=OFFLINE_CLIENT_SESSION; addNotNullConstraint columnName=OWNER, tableName=RESOURCE_SERVER_PERM_TICKET; addNotNullConstraint columnName=REQUESTER, tableName=RESOURCE_SERVER_PERM_TICKET; addNotNull...','',NULL,'4.8.0',NULL,NULL,'9175084313'),('9.0.1-add-index-to-client.client_id','keycloak','META-INF/jpa-changelog-9.0.1.xml','2024-02-29 11:51:51',81,'EXECUTED','8:95b676ce8fc546a1fcfb4c92fae4add5','createIndex indexName=IDX_CLIENT_ID, tableName=CLIENT','',NULL,'4.8.0',NULL,NULL,'9175084313'),('9.0.1-KEYCLOAK-12579-drop-constraints','keycloak','META-INF/jpa-changelog-9.0.1.xml','2024-02-29 11:51:51',82,'MARK_RAN','8:38a6b2a41f5651018b1aca93a41401e5','dropUniqueConstraint constraintName=SIBLING_NAMES, tableName=KEYCLOAK_GROUP','',NULL,'4.8.0',NULL,NULL,'9175084313'),('9.0.1-KEYCLOAK-12579-add-not-null-constraint','keycloak','META-INF/jpa-changelog-9.0.1.xml','2024-02-29 11:51:51',83,'EXECUTED','8:3fb99bcad86a0229783123ac52f7609c','addNotNullConstraint columnName=PARENT_GROUP, tableName=KEYCLOAK_GROUP','',NULL,'4.8.0',NULL,NULL,'9175084313'),('9.0.1-KEYCLOAK-12579-recreate-constraints','keycloak','META-INF/jpa-changelog-9.0.1.xml','2024-02-29 11:51:51',84,'MARK_RAN','8:64f27a6fdcad57f6f9153210f2ec1bdb','addUniqueConstraint constraintName=SIBLING_NAMES, tableName=KEYCLOAK_GROUP','',NULL,'4.8.0',NULL,NULL,'9175084313'),('9.0.1-add-index-to-events','keycloak','META-INF/jpa-changelog-9.0.1.xml','2024-02-29 11:51:51',85,'EXECUTED','8:ab4f863f39adafd4c862f7ec01890abc','createIndex indexName=IDX_EVENT_TIME, tableName=EVENT_ENTITY','',NULL,'4.8.0',NULL,NULL,'9175084313'),('map-remove-ri','keycloak','META-INF/jpa-changelog-11.0.0.xml','2024-02-29 11:51:51',86,'EXECUTED','8:13c419a0eb336e91ee3a3bf8fda6e2a7','dropForeignKeyConstraint baseTableName=REALM, constraintName=FK_TRAF444KK6QRKMS7N56AIWQ5Y; dropForeignKeyConstraint baseTableName=KEYCLOAK_ROLE, constraintName=FK_KJHO5LE2C0RAL09FL8CM9WFW9','',NULL,'4.8.0',NULL,NULL,'9175084313'),('map-remove-ri','keycloak','META-INF/jpa-changelog-12.0.0.xml','2024-02-29 11:51:51',87,'EXECUTED','8:e3fb1e698e0471487f51af1ed80fe3ac','dropForeignKeyConstraint baseTableName=REALM_DEFAULT_GROUPS, constraintName=FK_DEF_GROUPS_GROUP; dropForeignKeyConstraint baseTableName=REALM_DEFAULT_ROLES, constraintName=FK_H4WPD7W4HSOOLNI3H0SW7BTJE; dropForeignKeyConstraint baseTableName=CLIENT...','',NULL,'4.8.0',NULL,NULL,'9175084313'),('12.1.0-add-realm-localization-table','keycloak','META-INF/jpa-changelog-12.0.0.xml','2024-02-29 11:51:51',88,'EXECUTED','8:babadb686aab7b56562817e60bf0abd0','createTable tableName=REALM_LOCALIZATIONS; addPrimaryKey tableName=REALM_LOCALIZATIONS','',NULL,'4.8.0',NULL,NULL,'9175084313'),('default-roles','keycloak','META-INF/jpa-changelog-13.0.0.xml','2024-02-29 11:51:51',89,'EXECUTED','8:72d03345fda8e2f17093d08801947773','addColumn tableName=REALM; customChange','',NULL,'4.8.0',NULL,NULL,'9175084313'),('default-roles-cleanup','keycloak','META-INF/jpa-changelog-13.0.0.xml','2024-02-29 11:51:51',90,'EXECUTED','8:61c9233951bd96ffecd9ba75f7d978a4','dropTable tableName=REALM_DEFAULT_ROLES; dropTable tableName=CLIENT_DEFAULT_ROLES','',NULL,'4.8.0',NULL,NULL,'9175084313'),('13.0.0-KEYCLOAK-16844','keycloak','META-INF/jpa-changelog-13.0.0.xml','2024-02-29 11:51:51',91,'EXECUTED','8:ea82e6ad945cec250af6372767b25525','createIndex indexName=IDX_OFFLINE_USS_PRELOAD, tableName=OFFLINE_USER_SESSION','',NULL,'4.8.0',NULL,NULL,'9175084313'),('map-remove-ri-13.0.0','keycloak','META-INF/jpa-changelog-13.0.0.xml','2024-02-29 11:51:52',92,'EXECUTED','8:d3f4a33f41d960ddacd7e2ef30d126b3','dropForeignKeyConstraint baseTableName=DEFAULT_CLIENT_SCOPE, constraintName=FK_R_DEF_CLI_SCOPE_SCOPE; dropForeignKeyConstraint baseTableName=CLIENT_SCOPE_CLIENT, constraintName=FK_C_CLI_SCOPE_SCOPE; dropForeignKeyConstraint baseTableName=CLIENT_SC...','',NULL,'4.8.0',NULL,NULL,'9175084313'),('13.0.0-KEYCLOAK-17992-drop-constraints','keycloak','META-INF/jpa-changelog-13.0.0.xml','2024-02-29 11:51:52',93,'MARK_RAN','8:1284a27fbd049d65831cb6fc07c8a783','dropPrimaryKey constraintName=C_CLI_SCOPE_BIND, tableName=CLIENT_SCOPE_CLIENT; dropIndex indexName=IDX_CLSCOPE_CL, tableName=CLIENT_SCOPE_CLIENT; dropIndex indexName=IDX_CL_CLSCOPE, tableName=CLIENT_SCOPE_CLIENT','',NULL,'4.8.0',NULL,NULL,'9175084313'),('13.0.0-increase-column-size-federated','keycloak','META-INF/jpa-changelog-13.0.0.xml','2024-02-29 11:51:52',94,'EXECUTED','8:9d11b619db2ae27c25853b8a37cd0dea','modifyDataType columnName=CLIENT_ID, tableName=CLIENT_SCOPE_CLIENT; modifyDataType columnName=SCOPE_ID, tableName=CLIENT_SCOPE_CLIENT','',NULL,'4.8.0',NULL,NULL,'9175084313'),('13.0.0-KEYCLOAK-17992-recreate-constraints','keycloak','META-INF/jpa-changelog-13.0.0.xml','2024-02-29 11:51:52',95,'MARK_RAN','8:3002bb3997451bb9e8bac5c5cd8d6327','addNotNullConstraint columnName=CLIENT_ID, tableName=CLIENT_SCOPE_CLIENT; addNotNullConstraint columnName=SCOPE_ID, tableName=CLIENT_SCOPE_CLIENT; addPrimaryKey constraintName=C_CLI_SCOPE_BIND, tableName=CLIENT_SCOPE_CLIENT; createIndex indexName=...','',NULL,'4.8.0',NULL,NULL,'9175084313'),('json-string-accomodation-fixed','keycloak','META-INF/jpa-changelog-13.0.0.xml','2024-02-29 11:51:52',96,'EXECUTED','8:dfbee0d6237a23ef4ccbb7a4e063c163','addColumn tableName=REALM_ATTRIBUTE; update tableName=REALM_ATTRIBUTE; dropColumn columnName=VALUE, tableName=REALM_ATTRIBUTE; renameColumn newColumnName=VALUE, oldColumnName=VALUE_NEW, tableName=REALM_ATTRIBUTE','',NULL,'4.8.0',NULL,NULL,'9175084313'),('14.0.0-KEYCLOAK-11019','keycloak','META-INF/jpa-changelog-14.0.0.xml','2024-02-29 11:51:52',97,'EXECUTED','8:75f3e372df18d38c62734eebb986b960','createIndex indexName=IDX_OFFLINE_CSS_PRELOAD, tableName=OFFLINE_CLIENT_SESSION; createIndex indexName=IDX_OFFLINE_USS_BY_USER, tableName=OFFLINE_USER_SESSION; createIndex indexName=IDX_OFFLINE_USS_BY_USERSESS, tableName=OFFLINE_USER_SESSION','',NULL,'4.8.0',NULL,NULL,'9175084313'),('14.0.0-KEYCLOAK-18286','keycloak','META-INF/jpa-changelog-14.0.0.xml','2024-02-29 11:51:52',98,'MARK_RAN','8:7fee73eddf84a6035691512c85637eef','createIndex indexName=IDX_CLIENT_ATT_BY_NAME_VALUE, tableName=CLIENT_ATTRIBUTES','',NULL,'4.8.0',NULL,NULL,'9175084313'),('14.0.0-KEYCLOAK-18286-revert','keycloak','META-INF/jpa-changelog-14.0.0.xml','2024-02-29 11:51:52',99,'MARK_RAN','8:7a11134ab12820f999fbf3bb13c3adc8','dropIndex indexName=IDX_CLIENT_ATT_BY_NAME_VALUE, tableName=CLIENT_ATTRIBUTES','',NULL,'4.8.0',NULL,NULL,'9175084313'),('14.0.0-KEYCLOAK-18286-supported-dbs','keycloak','META-INF/jpa-changelog-14.0.0.xml','2024-02-29 11:51:52',100,'EXECUTED','8:f43dfba07ba249d5d932dc489fd2b886','createIndex indexName=IDX_CLIENT_ATT_BY_NAME_VALUE, tableName=CLIENT_ATTRIBUTES','',NULL,'4.8.0',NULL,NULL,'9175084313'),('14.0.0-KEYCLOAK-18286-unsupported-dbs','keycloak','META-INF/jpa-changelog-14.0.0.xml','2024-02-29 11:51:52',101,'MARK_RAN','8:18186f0008b86e0f0f49b0c4d0e842ac','createIndex indexName=IDX_CLIENT_ATT_BY_NAME_VALUE, tableName=CLIENT_ATTRIBUTES','',NULL,'4.8.0',NULL,NULL,'9175084313'),('KEYCLOAK-17267-add-index-to-user-attributes','keycloak','META-INF/jpa-changelog-14.0.0.xml','2024-02-29 11:51:52',102,'EXECUTED','8:09c2780bcb23b310a7019d217dc7b433','createIndex indexName=IDX_USER_ATTRIBUTE_NAME, tableName=USER_ATTRIBUTE','',NULL,'4.8.0',NULL,NULL,'9175084313'),('KEYCLOAK-18146-add-saml-art-binding-identifier','keycloak','META-INF/jpa-changelog-14.0.0.xml','2024-02-29 11:51:52',103,'EXECUTED','8:276a44955eab693c970a42880197fff2','customChange','',NULL,'4.8.0',NULL,NULL,'9175084313'),('15.0.0-KEYCLOAK-18467','keycloak','META-INF/jpa-changelog-15.0.0.xml','2024-02-29 11:51:52',104,'EXECUTED','8:ba8ee3b694d043f2bfc1a1079d0760d7','addColumn tableName=REALM_LOCALIZATIONS; update tableName=REALM_LOCALIZATIONS; dropColumn columnName=TEXTS, tableName=REALM_LOCALIZATIONS; renameColumn newColumnName=TEXTS, oldColumnName=TEXTS_NEW, tableName=REALM_LOCALIZATIONS; addNotNullConstrai...','',NULL,'4.8.0',NULL,NULL,'9175084313'),('17.0.0-9562','keycloak','META-INF/jpa-changelog-17.0.0.xml','2024-02-29 11:51:52',105,'EXECUTED','8:5e06b1d75f5d17685485e610c2851b17','createIndex indexName=IDX_USER_SERVICE_ACCOUNT, tableName=USER_ENTITY','',NULL,'4.8.0',NULL,NULL,'9175084313'),('18.0.0-10625-IDX_ADMIN_EVENT_TIME','keycloak','META-INF/jpa-changelog-18.0.0.xml','2024-02-29 11:51:52',106,'EXECUTED','8:4b80546c1dc550ac552ee7b24a4ab7c0','createIndex indexName=IDX_ADMIN_EVENT_TIME, tableName=ADMIN_EVENT_ENTITY','',NULL,'4.8.0',NULL,NULL,'9175084313'),('19.0.0-10135','keycloak','META-INF/jpa-changelog-19.0.0.xml','2024-02-29 11:51:52',107,'EXECUTED','8:af510cd1bb2ab6339c45372f3e491696','customChange','',NULL,'4.8.0',NULL,NULL,'9175084313'),('20.0.0-12964-supported-dbs','keycloak','META-INF/jpa-changelog-20.0.0.xml','2024-02-29 11:51:52',108,'EXECUTED','8:d00f99ed899c4d2ae9117e282badbef5','createIndex indexName=IDX_GROUP_ATT_BY_NAME_VALUE, tableName=GROUP_ATTRIBUTE','',NULL,'4.8.0',NULL,NULL,'9175084313'),('20.0.0-12964-unsupported-dbs','keycloak','META-INF/jpa-changelog-20.0.0.xml','2024-02-29 11:51:52',109,'MARK_RAN','8:314e803baf2f1ec315b3464e398b8247','createIndex indexName=IDX_GROUP_ATT_BY_NAME_VALUE, tableName=GROUP_ATTRIBUTE','',NULL,'4.8.0',NULL,NULL,'9175084313'),('client-attributes-string-accomodation-fixed','keycloak','META-INF/jpa-changelog-20.0.0.xml','2024-02-29 11:51:52',110,'EXECUTED','8:56e4677e7e12556f70b604c573840100','addColumn tableName=CLIENT_ATTRIBUTES; update tableName=CLIENT_ATTRIBUTES; dropColumn columnName=VALUE, tableName=CLIENT_ATTRIBUTES; renameColumn newColumnName=VALUE, oldColumnName=VALUE_NEW, tableName=CLIENT_ATTRIBUTES','',NULL,'4.8.0',NULL,NULL,'9175084313');
+/*!40000 ALTER TABLE `DATABASECHANGELOG` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `DATABASECHANGELOGLOCK`
+--
+
+DROP TABLE IF EXISTS `DATABASECHANGELOGLOCK`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `DATABASECHANGELOGLOCK` (
+  `ID` int NOT NULL,
+  `LOCKED` bit(1) NOT NULL,
+  `LOCKGRANTED` datetime DEFAULT NULL,
+  `LOCKEDBY` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `DATABASECHANGELOGLOCK`
+--
+
+LOCK TABLES `DATABASECHANGELOGLOCK` WRITE;
+/*!40000 ALTER TABLE `DATABASECHANGELOGLOCK` DISABLE KEYS */;
+INSERT INTO `DATABASECHANGELOGLOCK` VALUES (1,_binary '\0',NULL,NULL),(1000,_binary '\0',NULL,NULL),(1001,_binary '\0',NULL,NULL);
+/*!40000 ALTER TABLE `DATABASECHANGELOGLOCK` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `DEFAULT_CLIENT_SCOPE`
+--
+
+DROP TABLE IF EXISTS `DEFAULT_CLIENT_SCOPE`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `DEFAULT_CLIENT_SCOPE` (
+  `REALM_ID` varchar(36) NOT NULL,
+  `SCOPE_ID` varchar(36) NOT NULL,
+  `DEFAULT_SCOPE` bit(1) NOT NULL DEFAULT b'0',
+  PRIMARY KEY (`REALM_ID`,`SCOPE_ID`),
+  KEY `IDX_DEFCLS_REALM` (`REALM_ID`),
+  KEY `IDX_DEFCLS_SCOPE` (`SCOPE_ID`),
+  CONSTRAINT `FK_R_DEF_CLI_SCOPE_REALM` FOREIGN KEY (`REALM_ID`) REFERENCES `REALM` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `DEFAULT_CLIENT_SCOPE`
+--
+
+LOCK TABLES `DEFAULT_CLIENT_SCOPE` WRITE;
+/*!40000 ALTER TABLE `DEFAULT_CLIENT_SCOPE` DISABLE KEYS */;
+INSERT INTO `DEFAULT_CLIENT_SCOPE` VALUES ('dabc51bf-58ea-42ed-9918-4114e6b08338','1bca493a-f048-4583-8a05-06e5b2bbceeb',_binary '\0'),('dabc51bf-58ea-42ed-9918-4114e6b08338','36122d22-c5bc-471c-8694-ed913ee1de6f',_binary ''),('dabc51bf-58ea-42ed-9918-4114e6b08338','3f20050b-2690-4eae-932e-55d4033bcb9c',_binary ''),('dabc51bf-58ea-42ed-9918-4114e6b08338','628834b0-f4ce-431e-ad1a-7b1aa02bb389',_binary '\0'),('dabc51bf-58ea-42ed-9918-4114e6b08338','9d2ff12d-6798-416a-a938-998b1ea40a7c',_binary ''),('dabc51bf-58ea-42ed-9918-4114e6b08338','bc3d6466-832d-4c2a-8e64-b25af286304e',_binary ''),('dabc51bf-58ea-42ed-9918-4114e6b08338','c1960172-937d-4322-bc36-60cb8d62e029',_binary '\0'),('dabc51bf-58ea-42ed-9918-4114e6b08338','c7c12f84-00fc-4191-91f4-d9d53cfb760d',_binary '\0'),('dabc51bf-58ea-42ed-9918-4114e6b08338','e5edd8d0-323b-4ba8-b943-aeb19c7a514e',_binary ''),('dabc51bf-58ea-42ed-9918-4114e6b08338','e85ee535-40c7-463f-8a90-38f83987975c',_binary ''),('org1','32a6adf1-5209-4cc8-9f4f-97daf67777e4',_binary ''),('org1','522294da-4699-4dbc-ab7a-fcf6f50af4e1',_binary ''),('org1','63882871-ca1f-485c-8c37-7a4bb0ec13b4',_binary '\0'),('org1','7414b4b7-8306-4c6c-86b0-cc0a4a1f3752',_binary ''),('org1','786caaa4-7b36-474b-acff-b4cab4358208',_binary ''),('org1','a6d9ee28-55ef-4da3-b5da-03dab12522ce',_binary ''),('org1','c5171254-a8d1-4564-ac47-ef6890f0338f',_binary '\0'),('org1','ca8d577e-fc8e-4fab-bbd4-332b169fe26d',_binary '\0'),('org1','d4a4f8f3-865c-47a2-b5ef-21b4ef2bc4bb',_binary ''),('org1','dedb10ee-98c5-4f06-a7e7-ca5a600e5077',_binary '\0'),('org2','444fc554-8739-4d2d-a0d7-8f71b8a1d129',_binary '\0'),('org2','625f2210-714e-4d31-9f58-9a6d9d4aa95b',_binary ''),('org2','66dbbe7a-d6b9-4d1d-b437-f8f7a8da44da',_binary '\0'),('org2','6fb6e60c-85bc-4695-8127-a571e81a2fd7',_binary '\0'),('org2','7011312f-7085-4e66-af22-d73fd8d54724',_binary ''),('org2','70815eec-a377-4975-8ff7-4ddd86da41d0',_binary ''),('org2','816bef08-a6f0-4074-8879-01a7d67d4918',_binary '\0'),('org2','a27b05ba-3058-4404-8d07-becd0a92634a',_binary ''),('org2','aa710d34-15aa-41e8-bea7-78d5269af573',_binary ''),('org2','eea99c04-72d0-4364-a9f9-22afc631ee33',_binary ''),('org3','4b9a4275-ee4b-4dc9-a8a2-0428fb232c38',_binary '\0'),('org3','6209cbb9-9404-457c-9e29-68444a8347b8',_binary '\0'),('org3','7685469d-bb7f-48d5-abf1-01c16ca11f2f',_binary '\0'),('org3','79c357f1-a15a-404a-80fb-b3aacc5a3097',_binary '\0'),('org3','8ca87019-4bfe-43c7-b100-5adf8fd6fbbb',_binary ''),('org3','95893421-3e01-41ad-8d75-255e7e81e4d0',_binary ''),('org3','c63b2066-2601-46ba-be46-4865a2af9fb1',_binary ''),('org3','d347d989-0abc-4a13-8c14-c1ddb3264c27',_binary ''),('org3','e013d9cc-5fca-4f57-9ff2-c5e6ad5cc825',_binary ''),('org3','f14553d0-1ded-4935-a6ee-f84bf8265ec5',_binary ''),('org4','09814274-c074-43d4-90e9-b955a86ac5ab',_binary ''),('org4','2b1287b6-579c-4ca8-8c67-3ae43797f83f',_binary ''),('org4','2c6483d7-a7af-450e-bef4-ffe5af5b1261',_binary ''),('org4','46883c24-c9d6-40a4-a7ec-86086d6c9892',_binary ''),('org4','882ca1f6-cc4e-45fb-8c37-b28c9b367e20',_binary ''),('org4','88704bf7-69f8-4c11-9fce-96cf17f0fd85',_binary '\0'),('org4','8c9e794f-e41a-44d1-91b0-dcf521d7a60f',_binary '\0'),('org4','9d97a7e6-f4e0-42f8-b906-a8f674d5336d',_binary '\0'),('org4','a7cc0573-78dd-492f-a8d7-a66a9cd285de',_binary ''),('org4','f74057ad-184b-4f01-8947-fdd12da4a0fd',_binary '\0'),('org5','4da313aa-06ea-4fda-b4b5-80d2cd5a2a16',_binary ''),('org5','55ae0da8-23c0-4796-b3bb-a002ea377870',_binary '\0'),('org5','5ef9bc49-df97-44f6-bdaa-a40377368a1a',_binary ''),('org5','77983d6e-5896-40fc-8486-923344dba90c',_binary '\0'),('org5','7d63cd15-fc63-4eb0-a2b6-c894ed8cda92',_binary '\0'),('org5','816096c9-b105-455b-805d-d887b0cdf314',_binary ''),('org5','aaed6bc3-06fe-41bc-a2ce-17e0d69e9408',_binary ''),('org5','d906096a-7031-4608-ab7a-e1046aa24ebc',_binary ''),('org5','dc07de30-6518-4c49-b74c-7948f482a583',_binary ''),('org5','dd7e350c-b03e-4743-b081-d6c9e860662e',_binary '\0');
+/*!40000 ALTER TABLE `DEFAULT_CLIENT_SCOPE` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `EVENT_ENTITY`
+--
+
+DROP TABLE IF EXISTS `EVENT_ENTITY`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `EVENT_ENTITY` (
+  `ID` varchar(36) NOT NULL,
+  `CLIENT_ID` varchar(255) DEFAULT NULL,
+  `DETAILS_JSON` text,
+  `ERROR` varchar(255) DEFAULT NULL,
+  `IP_ADDRESS` varchar(255) DEFAULT NULL,
+  `REALM_ID` varchar(255) DEFAULT NULL,
+  `SESSION_ID` varchar(255) DEFAULT NULL,
+  `EVENT_TIME` bigint DEFAULT NULL,
+  `TYPE` varchar(255) DEFAULT NULL,
+  `USER_ID` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`ID`),
+  KEY `IDX_EVENT_TIME` (`REALM_ID`,`EVENT_TIME`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `EVENT_ENTITY`
+--
+
+LOCK TABLES `EVENT_ENTITY` WRITE;
+/*!40000 ALTER TABLE `EVENT_ENTITY` DISABLE KEYS */;
+/*!40000 ALTER TABLE `EVENT_ENTITY` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `FEDERATED_IDENTITY`
+--
+
+DROP TABLE IF EXISTS `FEDERATED_IDENTITY`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `FEDERATED_IDENTITY` (
+  `IDENTITY_PROVIDER` varchar(255) NOT NULL,
+  `REALM_ID` varchar(36) DEFAULT NULL,
+  `FEDERATED_USER_ID` varchar(255) DEFAULT NULL,
+  `FEDERATED_USERNAME` varchar(255) DEFAULT NULL,
+  `TOKEN` text,
+  `USER_ID` varchar(36) NOT NULL,
+  PRIMARY KEY (`IDENTITY_PROVIDER`,`USER_ID`),
+  KEY `IDX_FEDIDENTITY_USER` (`USER_ID`),
+  KEY `IDX_FEDIDENTITY_FEDUSER` (`FEDERATED_USER_ID`),
+  CONSTRAINT `FK404288B92EF007A6` FOREIGN KEY (`USER_ID`) REFERENCES `USER_ENTITY` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `FEDERATED_IDENTITY`
+--
+
+LOCK TABLES `FEDERATED_IDENTITY` WRITE;
+/*!40000 ALTER TABLE `FEDERATED_IDENTITY` DISABLE KEYS */;
+/*!40000 ALTER TABLE `FEDERATED_IDENTITY` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `FEDERATED_USER`
+--
+
+DROP TABLE IF EXISTS `FEDERATED_USER`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `FEDERATED_USER` (
+  `ID` varchar(255) NOT NULL,
+  `STORAGE_PROVIDER_ID` varchar(255) DEFAULT NULL,
+  `REALM_ID` varchar(36) NOT NULL,
+  PRIMARY KEY (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `FEDERATED_USER`
+--
+
+LOCK TABLES `FEDERATED_USER` WRITE;
+/*!40000 ALTER TABLE `FEDERATED_USER` DISABLE KEYS */;
+/*!40000 ALTER TABLE `FEDERATED_USER` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `FED_USER_ATTRIBUTE`
+--
+
+DROP TABLE IF EXISTS `FED_USER_ATTRIBUTE`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `FED_USER_ATTRIBUTE` (
+  `ID` varchar(36) NOT NULL,
+  `NAME` varchar(255) NOT NULL,
+  `USER_ID` varchar(255) NOT NULL,
+  `REALM_ID` varchar(36) NOT NULL,
+  `STORAGE_PROVIDER_ID` varchar(36) DEFAULT NULL,
+  `VALUE` text,
+  PRIMARY KEY (`ID`),
+  KEY `IDX_FU_ATTRIBUTE` (`USER_ID`,`REALM_ID`,`NAME`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `FED_USER_ATTRIBUTE`
+--
+
+LOCK TABLES `FED_USER_ATTRIBUTE` WRITE;
+/*!40000 ALTER TABLE `FED_USER_ATTRIBUTE` DISABLE KEYS */;
+/*!40000 ALTER TABLE `FED_USER_ATTRIBUTE` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `FED_USER_CONSENT`
+--
+
+DROP TABLE IF EXISTS `FED_USER_CONSENT`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `FED_USER_CONSENT` (
+  `ID` varchar(36) NOT NULL,
+  `CLIENT_ID` varchar(255) DEFAULT NULL,
+  `USER_ID` varchar(255) NOT NULL,
+  `REALM_ID` varchar(36) NOT NULL,
+  `STORAGE_PROVIDER_ID` varchar(36) DEFAULT NULL,
+  `CREATED_DATE` bigint DEFAULT NULL,
+  `LAST_UPDATED_DATE` bigint DEFAULT NULL,
+  `CLIENT_STORAGE_PROVIDER` varchar(36) DEFAULT NULL,
+  `EXTERNAL_CLIENT_ID` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`ID`),
+  KEY `IDX_FU_CONSENT` (`USER_ID`,`CLIENT_ID`),
+  KEY `IDX_FU_CONSENT_RU` (`REALM_ID`,`USER_ID`),
+  KEY `IDX_FU_CNSNT_EXT` (`USER_ID`,`CLIENT_STORAGE_PROVIDER`,`EXTERNAL_CLIENT_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `FED_USER_CONSENT`
+--
+
+LOCK TABLES `FED_USER_CONSENT` WRITE;
+/*!40000 ALTER TABLE `FED_USER_CONSENT` DISABLE KEYS */;
+/*!40000 ALTER TABLE `FED_USER_CONSENT` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `FED_USER_CONSENT_CL_SCOPE`
+--
+
+DROP TABLE IF EXISTS `FED_USER_CONSENT_CL_SCOPE`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `FED_USER_CONSENT_CL_SCOPE` (
+  `USER_CONSENT_ID` varchar(36) NOT NULL,
+  `SCOPE_ID` varchar(36) NOT NULL,
+  PRIMARY KEY (`USER_CONSENT_ID`,`SCOPE_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `FED_USER_CONSENT_CL_SCOPE`
+--
+
+LOCK TABLES `FED_USER_CONSENT_CL_SCOPE` WRITE;
+/*!40000 ALTER TABLE `FED_USER_CONSENT_CL_SCOPE` DISABLE KEYS */;
+/*!40000 ALTER TABLE `FED_USER_CONSENT_CL_SCOPE` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `FED_USER_CREDENTIAL`
+--
+
+DROP TABLE IF EXISTS `FED_USER_CREDENTIAL`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `FED_USER_CREDENTIAL` (
+  `ID` varchar(36) NOT NULL,
+  `SALT` tinyblob,
+  `TYPE` varchar(255) DEFAULT NULL,
+  `CREATED_DATE` bigint DEFAULT NULL,
+  `USER_ID` varchar(255) NOT NULL,
+  `REALM_ID` varchar(36) NOT NULL,
+  `STORAGE_PROVIDER_ID` varchar(36) DEFAULT NULL,
+  `USER_LABEL` varchar(255) DEFAULT NULL,
+  `SECRET_DATA` longtext,
+  `CREDENTIAL_DATA` longtext,
+  `PRIORITY` int DEFAULT NULL,
+  PRIMARY KEY (`ID`),
+  KEY `IDX_FU_CREDENTIAL` (`USER_ID`,`TYPE`),
+  KEY `IDX_FU_CREDENTIAL_RU` (`REALM_ID`,`USER_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `FED_USER_CREDENTIAL`
+--
+
+LOCK TABLES `FED_USER_CREDENTIAL` WRITE;
+/*!40000 ALTER TABLE `FED_USER_CREDENTIAL` DISABLE KEYS */;
+/*!40000 ALTER TABLE `FED_USER_CREDENTIAL` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `FED_USER_GROUP_MEMBERSHIP`
+--
+
+DROP TABLE IF EXISTS `FED_USER_GROUP_MEMBERSHIP`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `FED_USER_GROUP_MEMBERSHIP` (
+  `GROUP_ID` varchar(36) NOT NULL,
+  `USER_ID` varchar(255) NOT NULL,
+  `REALM_ID` varchar(36) NOT NULL,
+  `STORAGE_PROVIDER_ID` varchar(36) DEFAULT NULL,
+  PRIMARY KEY (`GROUP_ID`,`USER_ID`),
+  KEY `IDX_FU_GROUP_MEMBERSHIP` (`USER_ID`,`GROUP_ID`),
+  KEY `IDX_FU_GROUP_MEMBERSHIP_RU` (`REALM_ID`,`USER_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `FED_USER_GROUP_MEMBERSHIP`
+--
+
+LOCK TABLES `FED_USER_GROUP_MEMBERSHIP` WRITE;
+/*!40000 ALTER TABLE `FED_USER_GROUP_MEMBERSHIP` DISABLE KEYS */;
+/*!40000 ALTER TABLE `FED_USER_GROUP_MEMBERSHIP` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `FED_USER_REQUIRED_ACTION`
+--
+
+DROP TABLE IF EXISTS `FED_USER_REQUIRED_ACTION`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `FED_USER_REQUIRED_ACTION` (
+  `REQUIRED_ACTION` varchar(255) NOT NULL DEFAULT ' ',
+  `USER_ID` varchar(255) NOT NULL,
+  `REALM_ID` varchar(36) NOT NULL,
+  `STORAGE_PROVIDER_ID` varchar(36) DEFAULT NULL,
+  PRIMARY KEY (`REQUIRED_ACTION`,`USER_ID`),
+  KEY `IDX_FU_REQUIRED_ACTION` (`USER_ID`,`REQUIRED_ACTION`),
+  KEY `IDX_FU_REQUIRED_ACTION_RU` (`REALM_ID`,`USER_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `FED_USER_REQUIRED_ACTION`
+--
+
+LOCK TABLES `FED_USER_REQUIRED_ACTION` WRITE;
+/*!40000 ALTER TABLE `FED_USER_REQUIRED_ACTION` DISABLE KEYS */;
+/*!40000 ALTER TABLE `FED_USER_REQUIRED_ACTION` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `FED_USER_ROLE_MAPPING`
+--
+
+DROP TABLE IF EXISTS `FED_USER_ROLE_MAPPING`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `FED_USER_ROLE_MAPPING` (
+  `ROLE_ID` varchar(36) NOT NULL,
+  `USER_ID` varchar(255) NOT NULL,
+  `REALM_ID` varchar(36) NOT NULL,
+  `STORAGE_PROVIDER_ID` varchar(36) DEFAULT NULL,
+  PRIMARY KEY (`ROLE_ID`,`USER_ID`),
+  KEY `IDX_FU_ROLE_MAPPING` (`USER_ID`,`ROLE_ID`),
+  KEY `IDX_FU_ROLE_MAPPING_RU` (`REALM_ID`,`USER_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `FED_USER_ROLE_MAPPING`
+--
+
+LOCK TABLES `FED_USER_ROLE_MAPPING` WRITE;
+/*!40000 ALTER TABLE `FED_USER_ROLE_MAPPING` DISABLE KEYS */;
+/*!40000 ALTER TABLE `FED_USER_ROLE_MAPPING` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `GROUP_ATTRIBUTE`
+--
+
+DROP TABLE IF EXISTS `GROUP_ATTRIBUTE`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `GROUP_ATTRIBUTE` (
+  `ID` varchar(36) NOT NULL DEFAULT 'sybase-needs-something-here',
+  `NAME` varchar(255) NOT NULL,
+  `VALUE` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
+  `GROUP_ID` varchar(36) NOT NULL,
+  PRIMARY KEY (`ID`),
+  KEY `IDX_GROUP_ATTR_GROUP` (`GROUP_ID`),
+  KEY `IDX_GROUP_ATT_BY_NAME_VALUE` (`NAME`,`VALUE`),
+  CONSTRAINT `FK_GROUP_ATTRIBUTE_GROUP` FOREIGN KEY (`GROUP_ID`) REFERENCES `KEYCLOAK_GROUP` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `GROUP_ATTRIBUTE`
+--
+
+LOCK TABLES `GROUP_ATTRIBUTE` WRITE;
+/*!40000 ALTER TABLE `GROUP_ATTRIBUTE` DISABLE KEYS */;
+/*!40000 ALTER TABLE `GROUP_ATTRIBUTE` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `GROUP_ROLE_MAPPING`
+--
+
+DROP TABLE IF EXISTS `GROUP_ROLE_MAPPING`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `GROUP_ROLE_MAPPING` (
+  `ROLE_ID` varchar(36) NOT NULL,
+  `GROUP_ID` varchar(36) NOT NULL,
+  PRIMARY KEY (`ROLE_ID`,`GROUP_ID`),
+  KEY `IDX_GROUP_ROLE_MAPP_GROUP` (`GROUP_ID`),
+  CONSTRAINT `FK_GROUP_ROLE_GROUP` FOREIGN KEY (`GROUP_ID`) REFERENCES `KEYCLOAK_GROUP` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `GROUP_ROLE_MAPPING`
+--
+
+LOCK TABLES `GROUP_ROLE_MAPPING` WRITE;
+/*!40000 ALTER TABLE `GROUP_ROLE_MAPPING` DISABLE KEYS */;
+/*!40000 ALTER TABLE `GROUP_ROLE_MAPPING` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `IDENTITY_PROVIDER`
+--
+
+DROP TABLE IF EXISTS `IDENTITY_PROVIDER`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `IDENTITY_PROVIDER` (
+  `INTERNAL_ID` varchar(36) NOT NULL,
+  `ENABLED` bit(1) NOT NULL DEFAULT b'0',
+  `PROVIDER_ALIAS` varchar(255) DEFAULT NULL,
+  `PROVIDER_ID` varchar(255) DEFAULT NULL,
+  `STORE_TOKEN` bit(1) NOT NULL DEFAULT b'0',
+  `AUTHENTICATE_BY_DEFAULT` bit(1) NOT NULL DEFAULT b'0',
+  `REALM_ID` varchar(36) DEFAULT NULL,
+  `ADD_TOKEN_ROLE` bit(1) NOT NULL DEFAULT b'1',
+  `TRUST_EMAIL` bit(1) NOT NULL DEFAULT b'0',
+  `FIRST_BROKER_LOGIN_FLOW_ID` varchar(36) DEFAULT NULL,
+  `POST_BROKER_LOGIN_FLOW_ID` varchar(36) DEFAULT NULL,
+  `PROVIDER_DISPLAY_NAME` varchar(255) DEFAULT NULL,
+  `LINK_ONLY` bit(1) NOT NULL DEFAULT b'0',
+  PRIMARY KEY (`INTERNAL_ID`),
+  UNIQUE KEY `UK_2DAELWNIBJI49AVXSRTUF6XJ33` (`PROVIDER_ALIAS`,`REALM_ID`),
+  KEY `IDX_IDENT_PROV_REALM` (`REALM_ID`),
+  CONSTRAINT `FK2B4EBC52AE5C3B34` FOREIGN KEY (`REALM_ID`) REFERENCES `REALM` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `IDENTITY_PROVIDER`
+--
+
+LOCK TABLES `IDENTITY_PROVIDER` WRITE;
+/*!40000 ALTER TABLE `IDENTITY_PROVIDER` DISABLE KEYS */;
+/*!40000 ALTER TABLE `IDENTITY_PROVIDER` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `IDENTITY_PROVIDER_CONFIG`
+--
+
+DROP TABLE IF EXISTS `IDENTITY_PROVIDER_CONFIG`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `IDENTITY_PROVIDER_CONFIG` (
+  `IDENTITY_PROVIDER_ID` varchar(36) NOT NULL,
+  `VALUE` longtext,
+  `NAME` varchar(255) NOT NULL,
+  PRIMARY KEY (`IDENTITY_PROVIDER_ID`,`NAME`),
+  CONSTRAINT `FKDC4897CF864C4E43` FOREIGN KEY (`IDENTITY_PROVIDER_ID`) REFERENCES `IDENTITY_PROVIDER` (`INTERNAL_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `IDENTITY_PROVIDER_CONFIG`
+--
+
+LOCK TABLES `IDENTITY_PROVIDER_CONFIG` WRITE;
+/*!40000 ALTER TABLE `IDENTITY_PROVIDER_CONFIG` DISABLE KEYS */;
+/*!40000 ALTER TABLE `IDENTITY_PROVIDER_CONFIG` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `IDENTITY_PROVIDER_MAPPER`
+--
+
+DROP TABLE IF EXISTS `IDENTITY_PROVIDER_MAPPER`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `IDENTITY_PROVIDER_MAPPER` (
+  `ID` varchar(36) NOT NULL,
+  `NAME` varchar(255) NOT NULL,
+  `IDP_ALIAS` varchar(255) NOT NULL,
+  `IDP_MAPPER_NAME` varchar(255) NOT NULL,
+  `REALM_ID` varchar(36) NOT NULL,
+  PRIMARY KEY (`ID`),
+  KEY `IDX_ID_PROV_MAPP_REALM` (`REALM_ID`),
+  CONSTRAINT `FK_IDPM_REALM` FOREIGN KEY (`REALM_ID`) REFERENCES `REALM` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `IDENTITY_PROVIDER_MAPPER`
+--
+
+LOCK TABLES `IDENTITY_PROVIDER_MAPPER` WRITE;
+/*!40000 ALTER TABLE `IDENTITY_PROVIDER_MAPPER` DISABLE KEYS */;
+/*!40000 ALTER TABLE `IDENTITY_PROVIDER_MAPPER` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `IDP_MAPPER_CONFIG`
+--
+
+DROP TABLE IF EXISTS `IDP_MAPPER_CONFIG`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `IDP_MAPPER_CONFIG` (
+  `IDP_MAPPER_ID` varchar(36) NOT NULL,
+  `VALUE` longtext,
+  `NAME` varchar(255) NOT NULL,
+  PRIMARY KEY (`IDP_MAPPER_ID`,`NAME`),
+  CONSTRAINT `FK_IDPMCONFIG` FOREIGN KEY (`IDP_MAPPER_ID`) REFERENCES `IDENTITY_PROVIDER_MAPPER` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `IDP_MAPPER_CONFIG`
+--
+
+LOCK TABLES `IDP_MAPPER_CONFIG` WRITE;
+/*!40000 ALTER TABLE `IDP_MAPPER_CONFIG` DISABLE KEYS */;
+/*!40000 ALTER TABLE `IDP_MAPPER_CONFIG` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `KEYCLOAK_GROUP`
+--
+
+DROP TABLE IF EXISTS `KEYCLOAK_GROUP`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `KEYCLOAK_GROUP` (
+  `ID` varchar(36) NOT NULL,
+  `NAME` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
+  `PARENT_GROUP` varchar(36) NOT NULL,
+  `REALM_ID` varchar(36) DEFAULT NULL,
+  PRIMARY KEY (`ID`),
+  UNIQUE KEY `SIBLING_NAMES` (`REALM_ID`,`PARENT_GROUP`,`NAME`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `KEYCLOAK_GROUP`
+--
+
+LOCK TABLES `KEYCLOAK_GROUP` WRITE;
+/*!40000 ALTER TABLE `KEYCLOAK_GROUP` DISABLE KEYS */;
+/*!40000 ALTER TABLE `KEYCLOAK_GROUP` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `KEYCLOAK_ROLE`
+--
+
+DROP TABLE IF EXISTS `KEYCLOAK_ROLE`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `KEYCLOAK_ROLE` (
+  `ID` varchar(36) NOT NULL,
+  `CLIENT_REALM_CONSTRAINT` varchar(255) DEFAULT NULL,
+  `CLIENT_ROLE` bit(1) DEFAULT NULL,
+  `DESCRIPTION` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
+  `NAME` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
+  `REALM_ID` varchar(255) DEFAULT NULL,
+  `CLIENT` varchar(36) DEFAULT NULL,
+  `REALM` varchar(36) DEFAULT NULL,
+  PRIMARY KEY (`ID`),
+  UNIQUE KEY `UK_J3RWUVD56ONTGSUHOGM184WW2-2` (`NAME`,`CLIENT_REALM_CONSTRAINT`),
+  KEY `IDX_KEYCLOAK_ROLE_CLIENT` (`CLIENT`),
+  KEY `IDX_KEYCLOAK_ROLE_REALM` (`REALM`),
+  CONSTRAINT `FK_6VYQFE4CN4WLQ8R6KT5VDSJ5C` FOREIGN KEY (`REALM`) REFERENCES `REALM` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `KEYCLOAK_ROLE`
+--
+
+LOCK TABLES `KEYCLOAK_ROLE` WRITE;
+/*!40000 ALTER TABLE `KEYCLOAK_ROLE` DISABLE KEYS */;
+INSERT INTO `KEYCLOAK_ROLE` VALUES ('0121d427-696b-4bd0-97fd-ef2e49612705','5a324cc2-4d44-46de-9c51-9afcc3c1adda',_binary '',NULL,'_organization-manager','org4','5a324cc2-4d44-46de-9c51-9afcc3c1adda',NULL),('048685bc-626c-4b13-a44f-c721b4842248','01f89460-aba4-42ec-8eb3-f3c2d23cfbc2',_binary '',NULL,'_ws2-admin','org5','01f89460-aba4-42ec-8eb3-f3c2d23cfbc2',NULL),('04a523ce-3bf0-4a2e-823e-1eff666c53f5','47a07858-733a-4de8-a079-837b25a07547',_binary '','${role_view-groups}','view-groups','org3','47a07858-733a-4de8-a079-837b25a07547',NULL),('04f1c209-0e58-486e-ad59-aee30e231346','cd83ad65-7b39-444d-8f77-18a2e9ef8179',_binary '','${role_view-authorization}','view-authorization','org4','cd83ad65-7b39-444d-8f77-18a2e9ef8179',NULL),('056adae4-b910-4417-aa7b-2e37ee43f0da','d0763c7a-1183-4390-aa83-1804c4bf13dd',_binary '','${role_manage-authorization}','manage-authorization','org1','d0763c7a-1183-4390-aa83-1804c4bf13dd',NULL),('058bcf15-2e8c-48c1-8fda-bb79e359649c','c56d777e-7f90-4a13-9719-316e592b62fa',_binary '','${role_create-client}','create-client','dabc51bf-58ea-42ed-9918-4114e6b08338','c56d777e-7f90-4a13-9719-316e592b62fa',NULL),('05f13cff-8e49-4b33-8ef3-81c497e26e46','6c811e00-186f-4bbb-aa0d-7e3e27eb9605',_binary '','${role_create-client}','create-client','dabc51bf-58ea-42ed-9918-4114e6b08338','6c811e00-186f-4bbb-aa0d-7e3e27eb9605',NULL),('0659cb29-c072-47b1-a3f4-92df21ee751c','cd83ad65-7b39-444d-8f77-18a2e9ef8179',_binary '','${role_manage-clients}','manage-clients','org4','cd83ad65-7b39-444d-8f77-18a2e9ef8179',NULL),('07703927-5265-41b4-a58c-aecca62c5d21','5bfeb038-8be1-4744-bc58-74432ff827c6',_binary '','${role_manage-users}','manage-users','org3','5bfeb038-8be1-4744-bc58-74432ff827c6',NULL),('07a1888d-b5c7-480e-8738-6f91cf4dfa6f','37140475-df0f-4d9e-9d4d-9c9afbdda5f6',_binary '','${role_view-consent}','view-consent','org1','37140475-df0f-4d9e-9d4d-9c9afbdda5f6',NULL),('08312139-81fb-4c52-bb9e-a09738aaa765','c2a9a8ae-6fb5-4265-b8e5-012c8fb17857',_binary '','${role_query-realms}','query-realms','dabc51bf-58ea-42ed-9918-4114e6b08338','c2a9a8ae-6fb5-4265-b8e5-012c8fb17857',NULL),('0840bb7d-56e0-479e-b3d5-b510a729d468','01f89460-aba4-42ec-8eb3-f3c2d23cfbc2',_binary '',NULL,'ws3','org5','01f89460-aba4-42ec-8eb3-f3c2d23cfbc2',NULL),('09e063cc-f899-411a-8e8d-0c4d8dac93f3','01f89460-aba4-42ec-8eb3-f3c2d23cfbc2',_binary '',NULL,'ws2','org5','01f89460-aba4-42ec-8eb3-f3c2d23cfbc2',NULL),('09e47cc7-6d4a-400c-9787-a487425f5382','org5',_binary '\0','${role_uma_authorization}','uma_authorization','org5',NULL,NULL),('0a925b92-087a-4c5e-aaed-85505bb9eb59','a0d96aa1-71ac-4a7e-a769-306baf1c51fc',_binary '',NULL,'ws2','org2','a0d96aa1-71ac-4a7e-a769-306baf1c51fc',NULL),('0bc9d2b0-2988-4689-8073-cba6c6afada0','c56d777e-7f90-4a13-9719-316e592b62fa',_binary '','${role_view-identity-providers}','view-identity-providers','dabc51bf-58ea-42ed-9918-4114e6b08338','c56d777e-7f90-4a13-9719-316e592b62fa',NULL),('0c840511-4078-4458-972e-80b78d016023','81806f02-c6ca-42a2-b286-e6c2c0953955',_binary '','${role_query-groups}','query-groups','dabc51bf-58ea-42ed-9918-4114e6b08338','81806f02-c6ca-42a2-b286-e6c2c0953955',NULL),('0cc62e11-1dbf-461e-a966-0d4d3dbf1344','org1',_binary '\0','${role_uma_authorization}','uma_authorization','org1',NULL,NULL),('0cd9a547-26da-45c0-9c54-aee678b75a27','8ecdd6f7-f568-4a2a-acaa-cbe6cf8854b2',_binary '','${role_impersonation}','impersonation','dabc51bf-58ea-42ed-9918-4114e6b08338','8ecdd6f7-f568-4a2a-acaa-cbe6cf8854b2',NULL),('0e894d70-def4-462e-aee7-d25f80c20b27','d0763c7a-1183-4390-aa83-1804c4bf13dd',_binary '','${role_query-users}','query-users','org1','d0763c7a-1183-4390-aa83-1804c4bf13dd',NULL),('0ea53d0b-6bfa-45fd-8052-bf0692e3076b','da68d9d1-cd82-4d04-90ad-6a5aa63e301a',_binary '','${role_manage-authorization}','manage-authorization','dabc51bf-58ea-42ed-9918-4114e6b08338','da68d9d1-cd82-4d04-90ad-6a5aa63e301a',NULL),('0eefaf76-bc1b-4952-bbea-39359688aed5','c2a9a8ae-6fb5-4265-b8e5-012c8fb17857',_binary '','${role_impersonation}','impersonation','dabc51bf-58ea-42ed-9918-4114e6b08338','c2a9a8ae-6fb5-4265-b8e5-012c8fb17857',NULL),('0ff40488-4296-4983-915b-c79ef5c22baa','81806f02-c6ca-42a2-b286-e6c2c0953955',_binary '','${role_manage-realm}','manage-realm','dabc51bf-58ea-42ed-9918-4114e6b08338','81806f02-c6ca-42a2-b286-e6c2c0953955',NULL),('10cdfe9d-de00-42a0-b1e8-cc341b34d57c','81806f02-c6ca-42a2-b286-e6c2c0953955',_binary '','${role_query-users}','query-users','dabc51bf-58ea-42ed-9918-4114e6b08338','81806f02-c6ca-42a2-b286-e6c2c0953955',NULL),('1186de7f-4407-4e17-9d83-b8c0bae4893f','8ecdd6f7-f568-4a2a-acaa-cbe6cf8854b2',_binary '','${role_manage-identity-providers}','manage-identity-providers','dabc51bf-58ea-42ed-9918-4114e6b08338','8ecdd6f7-f568-4a2a-acaa-cbe6cf8854b2',NULL),('11b02ef2-cac3-4420-b878-26ab43bc8d69','d321d481-bc24-4294-af2c-7907fd6529b0',_binary '',NULL,'_ws3-admin','org1','d321d481-bc24-4294-af2c-7907fd6529b0',NULL),('131378c2-ebc0-4bc8-b44e-cba237a36171','c948de3b-8380-4528-a5b7-de403c58d40f',_binary '','${role_view-applications}','view-applications','dabc51bf-58ea-42ed-9918-4114e6b08338','c948de3b-8380-4528-a5b7-de403c58d40f',NULL),('13f7b345-a9da-407b-9c8b-e1bcd7e4e0a2','org4',_binary '\0','${role_uma_authorization}','uma_authorization','org4',NULL,NULL),('1581a7ac-9761-4bd3-a272-2145484bc5c4','8b27a0d1-98ac-4f83-affe-b80ecdd626ef',_binary '','${role_manage-identity-providers}','manage-identity-providers','org5','8b27a0d1-98ac-4f83-affe-b80ecdd626ef',NULL),('18a1a1b8-8388-4eae-94a4-0f108f03fdf1','918724dc-e6f6-424e-a42f-875f0da655ae',_binary '','${role_view-groups}','view-groups','org4','918724dc-e6f6-424e-a42f-875f0da655ae',NULL),('198e452c-1dea-437d-868f-4b5493bd9105','5bfeb038-8be1-4744-bc58-74432ff827c6',_binary '','${role_view-authorization}','view-authorization','org3','5bfeb038-8be1-4744-bc58-74432ff827c6',NULL),('1a84f37b-2b75-4762-83fc-72bab727c14f','8ecdd6f7-f568-4a2a-acaa-cbe6cf8854b2',_binary '','${role_view-clients}','view-clients','dabc51bf-58ea-42ed-9918-4114e6b08338','8ecdd6f7-f568-4a2a-acaa-cbe6cf8854b2',NULL),('1b7fe556-7551-49b2-82c1-052a25c06506','8ecdd6f7-f568-4a2a-acaa-cbe6cf8854b2',_binary '','${role_view-events}','view-events','dabc51bf-58ea-42ed-9918-4114e6b08338','8ecdd6f7-f568-4a2a-acaa-cbe6cf8854b2',NULL),('1b849fbb-23b2-41b3-8590-c4cf2e292e54','d0763c7a-1183-4390-aa83-1804c4bf13dd',_binary '','${role_realm-admin}','realm-admin','org1','d0763c7a-1183-4390-aa83-1804c4bf13dd',NULL),('1d412905-de80-4a7d-b291-dd246d6db03c','5dcb2e50-43d9-4731-af37-8415af71a5fb',_binary '','${role_query-users}','query-users','org2','5dcb2e50-43d9-4731-af37-8415af71a5fb',NULL),('1eb6d3af-c8e8-408a-9b36-dba68b7d5a5c','c56d777e-7f90-4a13-9719-316e592b62fa',_binary '','${role_query-groups}','query-groups','dabc51bf-58ea-42ed-9918-4114e6b08338','c56d777e-7f90-4a13-9719-316e592b62fa',NULL),('1ef11c4d-7be0-4e55-8a52-d62bd61aa1b9','c2a9a8ae-6fb5-4265-b8e5-012c8fb17857',_binary '','${role_manage-authorization}','manage-authorization','dabc51bf-58ea-42ed-9918-4114e6b08338','c2a9a8ae-6fb5-4265-b8e5-012c8fb17857',NULL),('1f13355c-00fa-478d-af4d-5f4c2740912a','dabc51bf-58ea-42ed-9918-4114e6b08338',_binary '\0','${role_admin}','admin','dabc51bf-58ea-42ed-9918-4114e6b08338',NULL,NULL),('1f7e3aa9-dd7a-44c5-9f78-9bbfbc7daa00','6c811e00-186f-4bbb-aa0d-7e3e27eb9605',_binary '','${role_manage-events}','manage-events','dabc51bf-58ea-42ed-9918-4114e6b08338','6c811e00-186f-4bbb-aa0d-7e3e27eb9605',NULL),('20fc34bc-79e1-44fc-9023-f7d64c30f099','da68d9d1-cd82-4d04-90ad-6a5aa63e301a',_binary '','${role_view-identity-providers}','view-identity-providers','dabc51bf-58ea-42ed-9918-4114e6b08338','da68d9d1-cd82-4d04-90ad-6a5aa63e301a',NULL),('21d3eed8-3018-49cb-9afb-8c590bb3121f','0d3bec04-1354-4db0-b7b6-96ee59ad7c4a',_binary '','${role_view-groups}','view-groups','org5','0d3bec04-1354-4db0-b7b6-96ee59ad7c4a',NULL),('22a556b1-c5ae-43d5-8d25-21698df0b4b6','d321d481-bc24-4294-af2c-7907fd6529b0',_binary '',NULL,'_og-role-usr','org1','d321d481-bc24-4294-af2c-7907fd6529b0',NULL),('24329a10-91c8-4a8f-92b9-803b6d6dd776','311ebcfe-7467-459c-856a-862094332329',_binary '',NULL,'ws3','org4','311ebcfe-7467-459c-856a-862094332329',NULL),('2482b501-5049-4f8c-98a2-557c96641f6b','d321d481-bc24-4294-af2c-7907fd6529b0',_binary '',NULL,'_og-ws-role-usr','org1','d321d481-bc24-4294-af2c-7907fd6529b0',NULL),('2487ae87-baec-471f-a9ae-6abafa23be69','c2a9a8ae-6fb5-4265-b8e5-012c8fb17857',_binary '','${role_query-users}','query-users','dabc51bf-58ea-42ed-9918-4114e6b08338','c2a9a8ae-6fb5-4265-b8e5-012c8fb17857',NULL),('279bb1a4-6626-4d3c-93df-dfb386492a22','8ecdd6f7-f568-4a2a-acaa-cbe6cf8854b2',_binary '','${role_query-groups}','query-groups','dabc51bf-58ea-42ed-9918-4114e6b08338','8ecdd6f7-f568-4a2a-acaa-cbe6cf8854b2',NULL),('280e1140-4815-439c-9e6f-35f4c7220d4a','6c811e00-186f-4bbb-aa0d-7e3e27eb9605',_binary '','${role_view-events}','view-events','dabc51bf-58ea-42ed-9918-4114e6b08338','6c811e00-186f-4bbb-aa0d-7e3e27eb9605',NULL),('28f52aef-f2ca-4076-ae87-1f435b197099','6c811e00-186f-4bbb-aa0d-7e3e27eb9605',_binary '','${role_query-clients}','query-clients','dabc51bf-58ea-42ed-9918-4114e6b08338','6c811e00-186f-4bbb-aa0d-7e3e27eb9605',NULL),('298093d9-4b4c-468c-8258-878481ed51c9','b3af9339-dbdc-4ec6-b142-91237381d1de',_binary '','${role_read-token}','read-token','org5','b3af9339-dbdc-4ec6-b142-91237381d1de',NULL),('29946df1-0c1a-4110-a2d1-27562a0bff83','6552251b-4819-4c12-9e6a-7602a75edc4d',_binary '','${role_read-token}','read-token','org4','6552251b-4819-4c12-9e6a-7602a75edc4d',NULL),('2a7cd02f-ea0c-47d8-9d52-da1d3bf673b4','da68d9d1-cd82-4d04-90ad-6a5aa63e301a',_binary '','${role_view-realm}','view-realm','dabc51bf-58ea-42ed-9918-4114e6b08338','da68d9d1-cd82-4d04-90ad-6a5aa63e301a',NULL),('2a9ca2d5-b983-4d9c-971e-0de793a46363','dabc51bf-58ea-42ed-9918-4114e6b08338',_binary '\0','${role_uma_authorization}','uma_authorization','dabc51bf-58ea-42ed-9918-4114e6b08338',NULL,NULL),('2b587f58-af59-4e82-8253-0aca06d1138f','3d62cf66-73c8-4ec7-ba0f-2b622bc5c747',_binary '',NULL,'_organization-user-role-manager','org5','3d62cf66-73c8-4ec7-ba0f-2b622bc5c747',NULL),('2d174ae5-fb99-49c4-a36e-5b6accebfbea','8ecdd6f7-f568-4a2a-acaa-cbe6cf8854b2',_binary '','${role_create-client}','create-client','dabc51bf-58ea-42ed-9918-4114e6b08338','8ecdd6f7-f568-4a2a-acaa-cbe6cf8854b2',NULL),('2db94f07-d03e-4ad8-b2c3-69cb027d820b','b0475217-c11a-49f5-833c-33aaee237a25',_binary '',NULL,'_organization-manager','org3','b0475217-c11a-49f5-833c-33aaee237a25',NULL),('2dda6a4f-3b0d-4857-aea6-d04d73f4075c','918724dc-e6f6-424e-a42f-875f0da655ae',_binary '','${role_view-applications}','view-applications','org4','918724dc-e6f6-424e-a42f-875f0da655ae',NULL),('2e19de41-f59e-400d-8b26-561703b334fd','0d3bec04-1354-4db0-b7b6-96ee59ad7c4a',_binary '','${role_manage-consent}','manage-consent','org5','0d3bec04-1354-4db0-b7b6-96ee59ad7c4a',NULL),('2e1b2ab5-91ef-4d41-99e9-b9bb444e04aa','5bfeb038-8be1-4744-bc58-74432ff827c6',_binary '','${role_view-events}','view-events','org3','5bfeb038-8be1-4744-bc58-74432ff827c6',NULL),('2e1da019-ad74-4c8e-be8e-d8fcbf47e62c','a0d96aa1-71ac-4a7e-a769-306baf1c51fc',_binary '',NULL,'_ws2-admin','org2','a0d96aa1-71ac-4a7e-a769-306baf1c51fc',NULL),('300c5b39-2fa9-4fcf-a1c1-82fc9110abc6','d0763c7a-1183-4390-aa83-1804c4bf13dd',_binary '','${role_query-groups}','query-groups','org1','d0763c7a-1183-4390-aa83-1804c4bf13dd',NULL),('3010abd9-a4c4-49f7-b76e-093ca5360042','01f89460-aba4-42ec-8eb3-f3c2d23cfbc2',_binary '',NULL,'_og-own-mt','org5','01f89460-aba4-42ec-8eb3-f3c2d23cfbc2',NULL),('3163198f-efb7-4142-806c-022b043a45f3','c56d777e-7f90-4a13-9719-316e592b62fa',_binary '','${role_query-realms}','query-realms','dabc51bf-58ea-42ed-9918-4114e6b08338','c56d777e-7f90-4a13-9719-316e592b62fa',NULL),('3354cfe4-a051-4e5b-af41-c55c548524f0','da68d9d1-cd82-4d04-90ad-6a5aa63e301a',_binary '','${role_view-users}','view-users','dabc51bf-58ea-42ed-9918-4114e6b08338','da68d9d1-cd82-4d04-90ad-6a5aa63e301a',NULL),('34b892b4-6db8-426a-8ef2-25894068c31e','47a07858-733a-4de8-a079-837b25a07547',_binary '','${role_manage-consent}','manage-consent','org3','47a07858-733a-4de8-a079-837b25a07547',NULL),('361fc656-9740-4994-9bab-7771c0884807','6c811e00-186f-4bbb-aa0d-7e3e27eb9605',_binary '','${role_impersonation}','impersonation','dabc51bf-58ea-42ed-9918-4114e6b08338','6c811e00-186f-4bbb-aa0d-7e3e27eb9605',NULL),('3627a5b5-9e31-4c02-b2aa-e201246a5e53','da68d9d1-cd82-4d04-90ad-6a5aa63e301a',_binary '','${role_view-clients}','view-clients','dabc51bf-58ea-42ed-9918-4114e6b08338','da68d9d1-cd82-4d04-90ad-6a5aa63e301a',NULL),('36558109-a205-44b3-bc0e-0d51e254b94b','d0763c7a-1183-4390-aa83-1804c4bf13dd',_binary '','${role_manage-events}','manage-events','org1','d0763c7a-1183-4390-aa83-1804c4bf13dd',NULL),('379a2639-f363-4187-b20d-1ff7602ac8a1','8ecdd6f7-f568-4a2a-acaa-cbe6cf8854b2',_binary '','${role_manage-realm}','manage-realm','dabc51bf-58ea-42ed-9918-4114e6b08338','8ecdd6f7-f568-4a2a-acaa-cbe6cf8854b2',NULL),('38e0e999-4a63-457a-8d3c-ba440f342c12','5bfeb038-8be1-4744-bc58-74432ff827c6',_binary '','${role_query-clients}','query-clients','org3','5bfeb038-8be1-4744-bc58-74432ff827c6',NULL),('39cb2d77-950b-4582-8d7d-0ade3d6cdd66','81806f02-c6ca-42a2-b286-e6c2c0953955',_binary '','${role_create-client}','create-client','dabc51bf-58ea-42ed-9918-4114e6b08338','81806f02-c6ca-42a2-b286-e6c2c0953955',NULL),('3ad05f10-f903-4cb2-8925-a2be6c8994f1','a0d96aa1-71ac-4a7e-a769-306baf1c51fc',_binary '',NULL,'_ws1-admin','org2','a0d96aa1-71ac-4a7e-a769-306baf1c51fc',NULL),('3ad2e570-cee0-4618-a99f-6d767ee2a385','org4',_binary '\0','${role_default-roles}','default-roles-org4','org4',NULL,NULL),('3d4c3a1a-fb6f-42bf-a734-efadccaa4ad0','8b27a0d1-98ac-4f83-affe-b80ecdd626ef',_binary '','${role_query-users}','query-users','org5','8b27a0d1-98ac-4f83-affe-b80ecdd626ef',NULL),('3f12dbb6-32d5-4419-b789-7edf631bf2a5','37140475-df0f-4d9e-9d4d-9c9afbdda5f6',_binary '','${role_manage-consent}','manage-consent','org1','37140475-df0f-4d9e-9d4d-9c9afbdda5f6',NULL),('3f7bdca7-c360-4010-a2e4-3f85ad6418be','c948de3b-8380-4528-a5b7-de403c58d40f',_binary '','${role_manage-consent}','manage-consent','dabc51bf-58ea-42ed-9918-4114e6b08338','c948de3b-8380-4528-a5b7-de403c58d40f',NULL),('3fa46cf1-bf9d-4c31-a9f4-3256a215cb96','c948de3b-8380-4528-a5b7-de403c58d40f',_binary '','${role_manage-account}','manage-account','dabc51bf-58ea-42ed-9918-4114e6b08338','c948de3b-8380-4528-a5b7-de403c58d40f',NULL),('3fc1b42a-348b-4745-b4a4-1ce65674b8cb','da68d9d1-cd82-4d04-90ad-6a5aa63e301a',_binary '','${role_manage-events}','manage-events','dabc51bf-58ea-42ed-9918-4114e6b08338','da68d9d1-cd82-4d04-90ad-6a5aa63e301a',NULL),('40e06566-9cee-4a43-8bda-bf366ba00d0b','c56d777e-7f90-4a13-9719-316e592b62fa',_binary '','${role_manage-authorization}','manage-authorization','dabc51bf-58ea-42ed-9918-4114e6b08338','c56d777e-7f90-4a13-9719-316e592b62fa',NULL),('4133ad0f-e37f-4a12-9338-26e0b635a209','8b27a0d1-98ac-4f83-affe-b80ecdd626ef',_binary '','${role_query-clients}','query-clients','org5','8b27a0d1-98ac-4f83-affe-b80ecdd626ef',NULL),('422d8d19-390b-4e48-a9a8-d72074613be0','a0d96aa1-71ac-4a7e-a769-306baf1c51fc',_binary '',NULL,'_og-own-mt','org2','a0d96aa1-71ac-4a7e-a769-306baf1c51fc',NULL),('42f46a9a-71a7-4de0-b372-672b561061ce','c28dd0b0-60ed-40df-91db-0d9b1e14074b',_binary '',NULL,'_og-role-usr','org3','c28dd0b0-60ed-40df-91db-0d9b1e14074b',NULL),('43174789-3363-408b-81f6-dda1f17a1e5a','d321d481-bc24-4294-af2c-7907fd6529b0',_binary '',NULL,'_ws2-admin','org1','d321d481-bc24-4294-af2c-7907fd6529b0',NULL),('4317a957-dd6e-41c6-b3fb-2118c48a8f6a','a15e680b-47bb-4b94-a832-5ca99cdbe134',_binary '',NULL,'_organization-user-manager','org2','a15e680b-47bb-4b94-a832-5ca99cdbe134',NULL),('4379398f-286c-44b1-8472-839411166d36','5dcb2e50-43d9-4731-af37-8415af71a5fb',_binary '','${role_view-events}','view-events','org2','5dcb2e50-43d9-4731-af37-8415af71a5fb',NULL),('43a0cf79-d2b8-488a-a3ec-5e621ccb9abf','6e5e1844-3f44-46b9-a6b7-4297aed21fcf',_binary '','${role_manage-consent}','manage-consent','org2','6e5e1844-3f44-46b9-a6b7-4297aed21fcf',NULL),('43de4389-64c9-4a7f-bb70-8cba7986f2d0','16fe410e-f1df-4ce0-b445-8dd3b5b80750',_binary '',NULL,'_organization-manager','org1','16fe410e-f1df-4ce0-b445-8dd3b5b80750',NULL),('447c1edb-5650-47e6-be06-602d1029a9bd','c2a9a8ae-6fb5-4265-b8e5-012c8fb17857',_binary '','${role_view-events}','view-events','dabc51bf-58ea-42ed-9918-4114e6b08338','c2a9a8ae-6fb5-4265-b8e5-012c8fb17857',NULL),('45c2fe61-d5d0-4044-912c-13dcbaa3e873','01f89460-aba4-42ec-8eb3-f3c2d23cfbc2',_binary '',NULL,'_og-usage','org5','01f89460-aba4-42ec-8eb3-f3c2d23cfbc2',NULL),('46ea96c3-31d4-4962-af86-941298671482','5dcb2e50-43d9-4731-af37-8415af71a5fb',_binary '','${role_create-client}','create-client','org2','5dcb2e50-43d9-4731-af37-8415af71a5fb',NULL),('470e82d1-6349-4730-8123-4afa5e707fdf','5bfeb038-8be1-4744-bc58-74432ff827c6',_binary '','${role_impersonation}','impersonation','org3','5bfeb038-8be1-4744-bc58-74432ff827c6',NULL),('480952e6-ac1f-4eec-b526-aeb9aead56fb','5bfeb038-8be1-4744-bc58-74432ff827c6',_binary '','${role_view-clients}','view-clients','org3','5bfeb038-8be1-4744-bc58-74432ff827c6',NULL),('488e0451-3f62-4279-b1c7-1c115d2b0277','f5768d73-d038-46a2-94b6-7370cb299152',_binary '','${role_read-token}','read-token','org3','f5768d73-d038-46a2-94b6-7370cb299152',NULL),('495fa361-8cfe-4d98-98be-d1ec7a00469a','c28dd0b0-60ed-40df-91db-0d9b1e14074b',_binary '',NULL,'ws3','org3','c28dd0b0-60ed-40df-91db-0d9b1e14074b',NULL),('49d680c3-0166-4ba3-9a23-665e5263f935','311ebcfe-7467-459c-856a-862094332329',_binary '',NULL,'_og-usage','org4','311ebcfe-7467-459c-856a-862094332329',NULL),('4b00654f-a74b-4efa-8e3d-b44757122962','da68d9d1-cd82-4d04-90ad-6a5aa63e301a',_binary '','${role_query-clients}','query-clients','dabc51bf-58ea-42ed-9918-4114e6b08338','da68d9d1-cd82-4d04-90ad-6a5aa63e301a',NULL),('4b15738e-50c7-4d1f-a3bf-c972a0beb915','8ecdd6f7-f568-4a2a-acaa-cbe6cf8854b2',_binary '','${role_view-identity-providers}','view-identity-providers','dabc51bf-58ea-42ed-9918-4114e6b08338','8ecdd6f7-f568-4a2a-acaa-cbe6cf8854b2',NULL),('4b5302d2-94c4-4e6d-af6b-d0f23bf96bde','5dcb2e50-43d9-4731-af37-8415af71a5fb',_binary '','${role_view-realm}','view-realm','org2','5dcb2e50-43d9-4731-af37-8415af71a5fb',NULL),('4bc71a50-0bca-450d-80f5-0a0fe3f9f1f9','a0d96aa1-71ac-4a7e-a769-306baf1c51fc',_binary '',NULL,'_og-ws-role-mt','org2','a0d96aa1-71ac-4a7e-a769-306baf1c51fc',NULL),('4bdb5585-ee35-4812-a0b2-8f7a376cb86f','5bfeb038-8be1-4744-bc58-74432ff827c6',_binary '','${role_manage-clients}','manage-clients','org3','5bfeb038-8be1-4744-bc58-74432ff827c6',NULL),('4c86b391-91a8-4968-bfdd-816a2ae4efa9','311ebcfe-7467-459c-856a-862094332329',_binary '',NULL,'ws2','org4','311ebcfe-7467-459c-856a-862094332329',NULL),('4caf2865-3487-4803-a333-c9f2c6fa3c5e','cd83ad65-7b39-444d-8f77-18a2e9ef8179',_binary '','${role_view-clients}','view-clients','org4','cd83ad65-7b39-444d-8f77-18a2e9ef8179',NULL),('4f7f75e5-3cf9-4b4a-91b8-d6381d0e7abe','5a324cc2-4d44-46de-9c51-9afcc3c1adda',_binary '',NULL,'_organization-user-role-manager','org4','5a324cc2-4d44-46de-9c51-9afcc3c1adda',NULL),('502a0349-e901-4b43-89fb-07eb61014ace','5bfeb038-8be1-4744-bc58-74432ff827c6',_binary '','${role_query-users}','query-users','org3','5bfeb038-8be1-4744-bc58-74432ff827c6',NULL),('50aabf0d-c27b-46b1-a838-602a59f2c8e5','c28dd0b0-60ed-40df-91db-0d9b1e14074b',_binary '',NULL,'ws1','org3','c28dd0b0-60ed-40df-91db-0d9b1e14074b',NULL),('51c45faa-4078-4ae3-870a-91af60e7571e','6c811e00-186f-4bbb-aa0d-7e3e27eb9605',_binary '','${role_manage-identity-providers}','manage-identity-providers','dabc51bf-58ea-42ed-9918-4114e6b08338','6c811e00-186f-4bbb-aa0d-7e3e27eb9605',NULL),('527b0844-231c-4759-9e36-02b4f3857faa','81806f02-c6ca-42a2-b286-e6c2c0953955',_binary '','${role_view-identity-providers}','view-identity-providers','dabc51bf-58ea-42ed-9918-4114e6b08338','81806f02-c6ca-42a2-b286-e6c2c0953955',NULL),('534ae492-208a-4329-ac07-fd5bebc8017e','b0475217-c11a-49f5-833c-33aaee237a25',_binary '',NULL,'_ws2-admin','org3','b0475217-c11a-49f5-833c-33aaee237a25',NULL),('53507c5e-b647-4eec-af29-43cd2bb96016','d321d481-bc24-4294-af2c-7907fd6529b0',_binary '',NULL,'_og-upd','org1','d321d481-bc24-4294-af2c-7907fd6529b0',NULL),('535888f1-55f1-41ec-9957-67d782232af0','org4',_binary '\0','${role_offline-access}','offline_access','org4',NULL,NULL),('54089fa4-da59-4bda-a24d-1f502f392a8e','a0d96aa1-71ac-4a7e-a769-306baf1c51fc',_binary '',NULL,'_og-role-usr','org2','a0d96aa1-71ac-4a7e-a769-306baf1c51fc',NULL),('54273d5c-f450-48b7-bffc-0d775674e9fe','6e5e1844-3f44-46b9-a6b7-4297aed21fcf',_binary '','${role_manage-account-links}','manage-account-links','org2','6e5e1844-3f44-46b9-a6b7-4297aed21fcf',NULL),('5620937f-df6b-4550-ab5e-e6ff85547811','8ecdd6f7-f568-4a2a-acaa-cbe6cf8854b2',_binary '','${role_manage-events}','manage-events','dabc51bf-58ea-42ed-9918-4114e6b08338','8ecdd6f7-f568-4a2a-acaa-cbe6cf8854b2',NULL),('5749cc87-8aa8-4677-88be-bf5e113e2f36','c2a9a8ae-6fb5-4265-b8e5-012c8fb17857',_binary '','${role_view-authorization}','view-authorization','dabc51bf-58ea-42ed-9918-4114e6b08338','c2a9a8ae-6fb5-4265-b8e5-012c8fb17857',NULL),('576405de-0c71-432d-940f-785675e0f12b','5bfeb038-8be1-4744-bc58-74432ff827c6',_binary '','${role_manage-authorization}','manage-authorization','org3','5bfeb038-8be1-4744-bc58-74432ff827c6',NULL),('585f7628-055c-474a-a70a-050f475f99c8','5dcb2e50-43d9-4731-af37-8415af71a5fb',_binary '','${role_manage-realm}','manage-realm','org2','5dcb2e50-43d9-4731-af37-8415af71a5fb',NULL),('59c1594c-4c0c-4a1d-bde5-4e528e8f3e3b','5dcb2e50-43d9-4731-af37-8415af71a5fb',_binary '','${role_query-realms}','query-realms','org2','5dcb2e50-43d9-4731-af37-8415af71a5fb',NULL),('5a21da01-6a21-44a2-9a7e-a851e40eb8f0','c56d777e-7f90-4a13-9719-316e592b62fa',_binary '','${role_manage-clients}','manage-clients','dabc51bf-58ea-42ed-9918-4114e6b08338','c56d777e-7f90-4a13-9719-316e592b62fa',NULL),('5a5e3d26-a306-49d3-8b98-3d2e17cfd446','6e5e1844-3f44-46b9-a6b7-4297aed21fcf',_binary '','${role_view-profile}','view-profile','org2','6e5e1844-3f44-46b9-a6b7-4297aed21fcf',NULL),('5a6423d8-f4c7-4bf0-9b4f-42adb669220a','01f89460-aba4-42ec-8eb3-f3c2d23cfbc2',_binary '',NULL,'_og-ws-role-mt','org5','01f89460-aba4-42ec-8eb3-f3c2d23cfbc2',NULL),('5bdc81f1-6f01-4d3b-b776-850998c9fa63','918724dc-e6f6-424e-a42f-875f0da655ae',_binary '','${role_manage-account}','manage-account','org4','918724dc-e6f6-424e-a42f-875f0da655ae',NULL),('5be1c942-e219-4a26-8cfe-8da090352ce8','81806f02-c6ca-42a2-b286-e6c2c0953955',_binary '','${role_impersonation}','impersonation','dabc51bf-58ea-42ed-9918-4114e6b08338','81806f02-c6ca-42a2-b286-e6c2c0953955',NULL),('5c7c4794-34ed-46ee-b547-a850564c890f','c56d777e-7f90-4a13-9719-316e592b62fa',_binary '','${role_view-clients}','view-clients','dabc51bf-58ea-42ed-9918-4114e6b08338','c56d777e-7f90-4a13-9719-316e592b62fa',NULL),('5d498f7a-28f1-4862-8633-61e026cafff4','d321d481-bc24-4294-af2c-7907fd6529b0',_binary '',NULL,'_og-ws-role-mt','org1','d321d481-bc24-4294-af2c-7907fd6529b0',NULL),('5d6461f4-68aa-4127-ab8c-c56fdd781bce','c56d777e-7f90-4a13-9719-316e592b62fa',_binary '','${role_view-events}','view-events','dabc51bf-58ea-42ed-9918-4114e6b08338','c56d777e-7f90-4a13-9719-316e592b62fa',NULL),('5e62e392-50d3-415d-b969-337bbe7e7c0a','c56d777e-7f90-4a13-9719-316e592b62fa',_binary '','${role_query-users}','query-users','dabc51bf-58ea-42ed-9918-4114e6b08338','c56d777e-7f90-4a13-9719-316e592b62fa',NULL),('5ea3cd76-4b85-49ff-8f6b-b25662deb38a','c28dd0b0-60ed-40df-91db-0d9b1e14074b',_binary '',NULL,'_og-upd','org3','c28dd0b0-60ed-40df-91db-0d9b1e14074b',NULL),('5ee6f8dc-b618-4f8c-9870-c4359ad2ca49','c2a9a8ae-6fb5-4265-b8e5-012c8fb17857',_binary '','${role_view-users}','view-users','dabc51bf-58ea-42ed-9918-4114e6b08338','c2a9a8ae-6fb5-4265-b8e5-012c8fb17857',NULL),('5f7b2fa7-65dd-4f7b-a985-70bc7638fd04','8b27a0d1-98ac-4f83-affe-b80ecdd626ef',_binary '','${role_view-identity-providers}','view-identity-providers','org5','8b27a0d1-98ac-4f83-affe-b80ecdd626ef',NULL),('5fb370d9-9377-442d-9f11-57231df799d8','8b27a0d1-98ac-4f83-affe-b80ecdd626ef',_binary '','${role_view-realm}','view-realm','org5','8b27a0d1-98ac-4f83-affe-b80ecdd626ef',NULL),('60530a2c-05f2-4ac7-b93e-734c1377dc84','a0d96aa1-71ac-4a7e-a769-306baf1c51fc',_binary '',NULL,'_og-ws-mt','org2','a0d96aa1-71ac-4a7e-a769-306baf1c51fc',NULL),('605edcb7-d999-4716-ad8b-17a1f84d292b','5dcb2e50-43d9-4731-af37-8415af71a5fb',_binary '','${role_query-clients}','query-clients','org2','5dcb2e50-43d9-4731-af37-8415af71a5fb',NULL),('609906e9-5029-4978-a1ff-8cb38472f1b4','8b27a0d1-98ac-4f83-affe-b80ecdd626ef',_binary '','${role_view-events}','view-events','org5','8b27a0d1-98ac-4f83-affe-b80ecdd626ef',NULL),('60b3d091-e68e-4b0d-8486-8fe743cf6d1c','c948de3b-8380-4528-a5b7-de403c58d40f',_binary '','${role_view-profile}','view-profile','dabc51bf-58ea-42ed-9918-4114e6b08338','c948de3b-8380-4528-a5b7-de403c58d40f',NULL),('613e53ce-915d-483c-8b48-bc98e8d377b7','6c811e00-186f-4bbb-aa0d-7e3e27eb9605',_binary '','${role_view-identity-providers}','view-identity-providers','dabc51bf-58ea-42ed-9918-4114e6b08338','6c811e00-186f-4bbb-aa0d-7e3e27eb9605',NULL),('6259ac68-c953-4cec-9e6d-ff437d84dca1','da68d9d1-cd82-4d04-90ad-6a5aa63e301a',_binary '','${role_manage-clients}','manage-clients','dabc51bf-58ea-42ed-9918-4114e6b08338','da68d9d1-cd82-4d04-90ad-6a5aa63e301a',NULL),('627895ee-bf17-48f9-915a-0f1f7fbff0a1','cd83ad65-7b39-444d-8f77-18a2e9ef8179',_binary '','${role_query-realms}','query-realms','org4','cd83ad65-7b39-444d-8f77-18a2e9ef8179',NULL),('647a97b1-a528-4909-a23f-7e5013c052bc','d0763c7a-1183-4390-aa83-1804c4bf13dd',_binary '','${role_view-events}','view-events','org1','d0763c7a-1183-4390-aa83-1804c4bf13dd',NULL),('652f33df-5bff-4e35-9e1e-40b6a6f717f7','5a324cc2-4d44-46de-9c51-9afcc3c1adda',_binary '',NULL,'_ws2-admin','org4','5a324cc2-4d44-46de-9c51-9afcc3c1adda',NULL),('65c4d68a-414a-4a92-b41b-13a57f79de65','org5',_binary '\0','${role_offline-access}','offline_access','org5',NULL,NULL),('660e5d9e-b972-4d17-bd4e-82dcd6582cd1','c948de3b-8380-4528-a5b7-de403c58d40f',_binary '','${role_manage-account-links}','manage-account-links','dabc51bf-58ea-42ed-9918-4114e6b08338','c948de3b-8380-4528-a5b7-de403c58d40f',NULL),('662ee109-4863-4584-8e29-cd107c664959','6c811e00-186f-4bbb-aa0d-7e3e27eb9605',_binary '','${role_manage-authorization}','manage-authorization','dabc51bf-58ea-42ed-9918-4114e6b08338','6c811e00-186f-4bbb-aa0d-7e3e27eb9605',NULL),('673b825d-10ba-4658-b90a-0854ca6dacd4','01f89460-aba4-42ec-8eb3-f3c2d23cfbc2',_binary '',NULL,'_ws3-admin','org5','01f89460-aba4-42ec-8eb3-f3c2d23cfbc2',NULL),('674147b7-b603-4fa5-8cef-cfa712ef1a9c','5dcb2e50-43d9-4731-af37-8415af71a5fb',_binary '','${role_manage-users}','manage-users','org2','5dcb2e50-43d9-4731-af37-8415af71a5fb',NULL),('67502093-a88c-4084-b691-4e6096710ac2','c28dd0b0-60ed-40df-91db-0d9b1e14074b',_binary '',NULL,'_og-ws-mt','org3','c28dd0b0-60ed-40df-91db-0d9b1e14074b',NULL),('67dcf259-6999-47ed-9122-e00dc5222a6c','01f89460-aba4-42ec-8eb3-f3c2d23cfbc2',_binary '',NULL,'_og-ws-role-usr','org5','01f89460-aba4-42ec-8eb3-f3c2d23cfbc2',NULL),('6809f7f3-19bd-4e02-b894-e33f3c3879b2','a15e680b-47bb-4b94-a832-5ca99cdbe134',_binary '',NULL,'_ws1-admin','org2','a15e680b-47bb-4b94-a832-5ca99cdbe134',NULL),('6866ade8-f039-4ffe-a819-9f4498a77d0e','81806f02-c6ca-42a2-b286-e6c2c0953955',_binary '','${role_query-clients}','query-clients','dabc51bf-58ea-42ed-9918-4114e6b08338','81806f02-c6ca-42a2-b286-e6c2c0953955',NULL),('6a0e8485-c569-42a2-8ca9-fb75b7007749','b0475217-c11a-49f5-833c-33aaee237a25',_binary '',NULL,'_ws1-admin','org3','b0475217-c11a-49f5-833c-33aaee237a25',NULL),('6a5eaac8-03fe-4cbe-aaf4-267e8d5614d3','3d62cf66-73c8-4ec7-ba0f-2b622bc5c747',_binary '',NULL,'_ws3-admin','org5','3d62cf66-73c8-4ec7-ba0f-2b622bc5c747',NULL),('6ac3225f-acc7-484c-b462-c8e57cbe75d4','c2a9a8ae-6fb5-4265-b8e5-012c8fb17857',_binary '','${role_view-identity-providers}','view-identity-providers','dabc51bf-58ea-42ed-9918-4114e6b08338','c2a9a8ae-6fb5-4265-b8e5-012c8fb17857',NULL),('6bd9c5f4-97b4-457e-8835-a14a932d8d63','16fe410e-f1df-4ce0-b445-8dd3b5b80750',_binary '',NULL,'_ws2-admin','org1','16fe410e-f1df-4ce0-b445-8dd3b5b80750',NULL),('6be5f944-5cab-4bf8-b748-db285a707c0c','8b27a0d1-98ac-4f83-affe-b80ecdd626ef',_binary '','${role_manage-clients}','manage-clients','org5','8b27a0d1-98ac-4f83-affe-b80ecdd626ef',NULL),('6c0f37d2-2c65-427f-8e55-fa3677ec482a','01f89460-aba4-42ec-8eb3-f3c2d23cfbc2',_binary '',NULL,'_og-upd','org5','01f89460-aba4-42ec-8eb3-f3c2d23cfbc2',NULL),('6c76b9f0-2ae8-4791-8e96-adec77b524b1','918724dc-e6f6-424e-a42f-875f0da655ae',_binary '','${role_manage-consent}','manage-consent','org4','918724dc-e6f6-424e-a42f-875f0da655ae',NULL),('6d1762e5-647e-425e-8351-3f3e7982e567','8ecdd6f7-f568-4a2a-acaa-cbe6cf8854b2',_binary '','${role_manage-authorization}','manage-authorization','dabc51bf-58ea-42ed-9918-4114e6b08338','8ecdd6f7-f568-4a2a-acaa-cbe6cf8854b2',NULL),('6d54a31a-09e4-4b4d-bcbe-1488209196e9','47a07858-733a-4de8-a079-837b25a07547',_binary '','${role_view-profile}','view-profile','org3','47a07858-733a-4de8-a079-837b25a07547',NULL),('6dee3184-a5aa-4804-982d-58c17f680b92','6c811e00-186f-4bbb-aa0d-7e3e27eb9605',_binary '','${role_view-users}','view-users','dabc51bf-58ea-42ed-9918-4114e6b08338','6c811e00-186f-4bbb-aa0d-7e3e27eb9605',NULL),('6e1fbe58-4de5-4613-a014-4a5123be8baa','a0d96aa1-71ac-4a7e-a769-306baf1c51fc',_binary '',NULL,'_og-usage','org2','a0d96aa1-71ac-4a7e-a769-306baf1c51fc',NULL),('6f0b5d02-131c-49f8-97b8-74b818e93e0e','918724dc-e6f6-424e-a42f-875f0da655ae',_binary '','${role_view-profile}','view-profile','org4','918724dc-e6f6-424e-a42f-875f0da655ae',NULL),('6f2b45cd-450d-4015-b4a8-a1adab6e0459','5bfeb038-8be1-4744-bc58-74432ff827c6',_binary '','${role_manage-realm}','manage-realm','org3','5bfeb038-8be1-4744-bc58-74432ff827c6',NULL),('6f88da0b-5285-45b3-ac3d-3ea7a246369c','37140475-df0f-4d9e-9d4d-9c9afbdda5f6',_binary '','${role_view-applications}','view-applications','org1','37140475-df0f-4d9e-9d4d-9c9afbdda5f6',NULL),('70605025-ccbe-442f-a63f-9dea118d0ce5','918724dc-e6f6-424e-a42f-875f0da655ae',_binary '','${role_manage-account-links}','manage-account-links','org4','918724dc-e6f6-424e-a42f-875f0da655ae',NULL),('70fd34a5-b70a-44c8-82fe-b1577bc97f29','d0763c7a-1183-4390-aa83-1804c4bf13dd',_binary '','${role_create-client}','create-client','org1','d0763c7a-1183-4390-aa83-1804c4bf13dd',NULL),('724eea70-abd8-482b-a0ff-46a90b0a1954','d0763c7a-1183-4390-aa83-1804c4bf13dd',_binary '','${role_view-clients}','view-clients','org1','d0763c7a-1183-4390-aa83-1804c4bf13dd',NULL),('7305b9cb-09ed-46cf-9779-0bc6182c7b25','d0763c7a-1183-4390-aa83-1804c4bf13dd',_binary '','${role_manage-users}','manage-users','org1','d0763c7a-1183-4390-aa83-1804c4bf13dd',NULL),('734c9a9f-b357-4f12-afe0-967048b091fb','c28dd0b0-60ed-40df-91db-0d9b1e14074b',_binary '',NULL,'_ws3-admin','org3','c28dd0b0-60ed-40df-91db-0d9b1e14074b',NULL),('735f91ba-9026-4ac7-a249-ce68eaa9cdf1','81806f02-c6ca-42a2-b286-e6c2c0953955',_binary '','${role_view-events}','view-events','dabc51bf-58ea-42ed-9918-4114e6b08338','81806f02-c6ca-42a2-b286-e6c2c0953955',NULL),('73f6933d-5e3f-40aa-a211-c73134c76678','311ebcfe-7467-459c-856a-862094332329',_binary '',NULL,'_ws2-admin','org4','311ebcfe-7467-459c-856a-862094332329',NULL),('740ba1ec-c805-4b44-9901-54bb4743e71f','47a07858-733a-4de8-a079-837b25a07547',_binary '','${role_manage-account-links}','manage-account-links','org3','47a07858-733a-4de8-a079-837b25a07547',NULL),('753dfb59-6580-4177-9585-17dbbd162279','5dcb2e50-43d9-4731-af37-8415af71a5fb',_binary '','${role_manage-clients}','manage-clients','org2','5dcb2e50-43d9-4731-af37-8415af71a5fb',NULL),('75f487db-0f18-42b1-9efa-f660dda152cd','311ebcfe-7467-459c-856a-862094332329',_binary '',NULL,'ws1','org4','311ebcfe-7467-459c-856a-862094332329',NULL),('761cbec8-ef0b-418d-b9c6-6351cd4a4039','3d62cf66-73c8-4ec7-ba0f-2b622bc5c747',_binary '',NULL,'_organization-user-manager','org5','3d62cf66-73c8-4ec7-ba0f-2b622bc5c747',NULL),('768c96d0-a799-4a5a-8eae-d1fa5b8f632f','5dcb2e50-43d9-4731-af37-8415af71a5fb',_binary '','${role_view-clients}','view-clients','org2','5dcb2e50-43d9-4731-af37-8415af71a5fb',NULL),('770dbf71-b9d5-4983-b9b8-79d32f64e172','5bfeb038-8be1-4744-bc58-74432ff827c6',_binary '','${role_realm-admin}','realm-admin','org3','5bfeb038-8be1-4744-bc58-74432ff827c6',NULL),('793592b1-dbff-4778-b35e-19cdb9681830','a0d96aa1-71ac-4a7e-a769-306baf1c51fc',_binary '',NULL,'_og-ws-role-usr','org2','a0d96aa1-71ac-4a7e-a769-306baf1c51fc',NULL),('793ff7d2-de83-4c2b-bd21-774736b861cc','cd83ad65-7b39-444d-8f77-18a2e9ef8179',_binary '','${role_manage-realm}','manage-realm','org4','cd83ad65-7b39-444d-8f77-18a2e9ef8179',NULL),('798f1cc7-da39-4713-81bb-3f20a95f3c7e','5dcb2e50-43d9-4731-af37-8415af71a5fb',_binary '','${role_query-groups}','query-groups','org2','5dcb2e50-43d9-4731-af37-8415af71a5fb',NULL),('7ab524ae-bb23-4cd8-b637-88eeb99f5c8e','c2a9a8ae-6fb5-4265-b8e5-012c8fb17857',_binary '','${role_manage-identity-providers}','manage-identity-providers','dabc51bf-58ea-42ed-9918-4114e6b08338','c2a9a8ae-6fb5-4265-b8e5-012c8fb17857',NULL),('7ae28612-8f93-4741-85d1-41ec25ba9450','918724dc-e6f6-424e-a42f-875f0da655ae',_binary '','${role_delete-account}','delete-account','org4','918724dc-e6f6-424e-a42f-875f0da655ae',NULL),('7b55e11a-380e-485f-9de1-4f237ed572bb','c56d777e-7f90-4a13-9719-316e592b62fa',_binary '','${role_manage-users}','manage-users','dabc51bf-58ea-42ed-9918-4114e6b08338','c56d777e-7f90-4a13-9719-316e592b62fa',NULL),('7b6b9a58-94f8-41bf-8612-4dbc9c1c0d57','cd83ad65-7b39-444d-8f77-18a2e9ef8179',_binary '','${role_query-users}','query-users','org4','cd83ad65-7b39-444d-8f77-18a2e9ef8179',NULL),('7cbae974-9824-4c76-8f46-9c30af199a16','c28dd0b0-60ed-40df-91db-0d9b1e14074b',_binary '',NULL,'_og-usage','org3','c28dd0b0-60ed-40df-91db-0d9b1e14074b',NULL),('7d2d6542-e404-40f9-82a8-3bb5f23c59c3','5bfeb038-8be1-4744-bc58-74432ff827c6',_binary '','${role_query-realms}','query-realms','org3','5bfeb038-8be1-4744-bc58-74432ff827c6',NULL),('7dbb54ac-c3c9-40b9-b4c4-7476371eb725','org5',_binary '\0','${role_default-roles}','default-roles-org5','org5',NULL,NULL),('7e3a6f58-62a1-4ea9-bb50-5f24d545ec50','5a324cc2-4d44-46de-9c51-9afcc3c1adda',_binary '',NULL,'_ws1-admin','org4','5a324cc2-4d44-46de-9c51-9afcc3c1adda',NULL),('7e4c3557-8136-4e5b-808c-6fb542d7f72f','8b27a0d1-98ac-4f83-affe-b80ecdd626ef',_binary '','${role_view-users}','view-users','org5','8b27a0d1-98ac-4f83-affe-b80ecdd626ef',NULL),('7e8f6b12-3fc4-4fbd-8aa6-607b9d2c30bc','6e5e1844-3f44-46b9-a6b7-4297aed21fcf',_binary '','${role_manage-account}','manage-account','org2','6e5e1844-3f44-46b9-a6b7-4297aed21fcf',NULL),('7edf6052-a64a-4413-8b79-732b90806c24','c28dd0b0-60ed-40df-91db-0d9b1e14074b',_binary '',NULL,'_og-usr-mt','org3','c28dd0b0-60ed-40df-91db-0d9b1e14074b',NULL),('8078aa9f-4275-4bbf-a881-32f2ff1cfda6','d321d481-bc24-4294-af2c-7907fd6529b0',_binary '',NULL,'_ws1-admin','org1','d321d481-bc24-4294-af2c-7907fd6529b0',NULL),('81658e71-c64b-4b7e-bb58-0a00f08a397f','b0475217-c11a-49f5-833c-33aaee237a25',_binary '',NULL,'_organization-user-manager','org3','b0475217-c11a-49f5-833c-33aaee237a25',NULL),('84ea6a9b-1895-4b25-a70a-078a00c98a9d','311ebcfe-7467-459c-856a-862094332329',_binary '',NULL,'_og-upd','org4','311ebcfe-7467-459c-856a-862094332329',NULL),('863f3c33-4fa1-47ed-bd69-955f715becad','5a324cc2-4d44-46de-9c51-9afcc3c1adda',_binary '',NULL,'_organization-user-manager','org4','5a324cc2-4d44-46de-9c51-9afcc3c1adda',NULL),('866f8eab-b4c8-4be2-a576-5065c06038a0','0d3bec04-1354-4db0-b7b6-96ee59ad7c4a',_binary '','${role_manage-account-links}','manage-account-links','org5','0d3bec04-1354-4db0-b7b6-96ee59ad7c4a',NULL),('86f0d0c2-7641-46c3-9672-099fcd7cdb91','c56d777e-7f90-4a13-9719-316e592b62fa',_binary '','${role_query-clients}','query-clients','dabc51bf-58ea-42ed-9918-4114e6b08338','c56d777e-7f90-4a13-9719-316e592b62fa',NULL),('8709f3c7-2db7-4820-8b4c-2e6d4553819a','c28dd0b0-60ed-40df-91db-0d9b1e14074b',_binary '',NULL,'_og-ws-role-usr','org3','c28dd0b0-60ed-40df-91db-0d9b1e14074b',NULL),('880a1cae-72ec-4126-8d95-ae8838676589','da68d9d1-cd82-4d04-90ad-6a5aa63e301a',_binary '','${role_impersonation}','impersonation','dabc51bf-58ea-42ed-9918-4114e6b08338','da68d9d1-cd82-4d04-90ad-6a5aa63e301a',NULL),('881568f1-284c-424a-a660-490c460fe013','5bfeb038-8be1-4744-bc58-74432ff827c6',_binary '','${role_view-realm}','view-realm','org3','5bfeb038-8be1-4744-bc58-74432ff827c6',NULL),('88598027-632e-4105-ac21-88a1dcb373db','org1',_binary '\0','${role_default-roles}','default-roles-org1','org1',NULL,NULL),('891a592c-24cd-4115-8f95-488e45dd5bcf','da68d9d1-cd82-4d04-90ad-6a5aa63e301a',_binary '','${role_query-users}','query-users','dabc51bf-58ea-42ed-9918-4114e6b08338','da68d9d1-cd82-4d04-90ad-6a5aa63e301a',NULL),('896b329a-a55e-4838-bee5-fd41c6d383eb','8b27a0d1-98ac-4f83-affe-b80ecdd626ef',_binary '','${role_manage-events}','manage-events','org5','8b27a0d1-98ac-4f83-affe-b80ecdd626ef',NULL),('8a73870c-c0a5-44de-917c-a527a2f81aea','6c811e00-186f-4bbb-aa0d-7e3e27eb9605',_binary '','${role_query-realms}','query-realms','dabc51bf-58ea-42ed-9918-4114e6b08338','6c811e00-186f-4bbb-aa0d-7e3e27eb9605',NULL),('8ca51207-6997-4724-b862-efee266dd255','0d3bec04-1354-4db0-b7b6-96ee59ad7c4a',_binary '','${role_delete-account}','delete-account','org5','0d3bec04-1354-4db0-b7b6-96ee59ad7c4a',NULL),('8cb6e65c-e8fa-498e-be5e-8ea555c306f3','cd83ad65-7b39-444d-8f77-18a2e9ef8179',_binary '','${role_manage-events}','manage-events','org4','cd83ad65-7b39-444d-8f77-18a2e9ef8179',NULL),('8dc52841-d841-4365-9fa4-cb3111f0e5d6','c948de3b-8380-4528-a5b7-de403c58d40f',_binary '','${role_view-consent}','view-consent','dabc51bf-58ea-42ed-9918-4114e6b08338','c948de3b-8380-4528-a5b7-de403c58d40f',NULL),('8f37a057-52cd-4775-8de6-8566dca090e5','org3',_binary '\0','${role_offline-access}','offline_access','org3',NULL,NULL),('9081d025-ef46-4876-9eab-5e516b75016a','d0763c7a-1183-4390-aa83-1804c4bf13dd',_binary '','${role_manage-identity-providers}','manage-identity-providers','org1','d0763c7a-1183-4390-aa83-1804c4bf13dd',NULL),('90b2480b-2dbc-4d57-91e4-71d706135406','37140475-df0f-4d9e-9d4d-9c9afbdda5f6',_binary '','${role_view-profile}','view-profile','org1','37140475-df0f-4d9e-9d4d-9c9afbdda5f6',NULL),('90d0c148-67ef-4bba-bd2f-8aa2086466f2','01f89460-aba4-42ec-8eb3-f3c2d23cfbc2',_binary '',NULL,'_og-role-usr','org5','01f89460-aba4-42ec-8eb3-f3c2d23cfbc2',NULL),('90ef5c69-59f6-4892-bab6-450055126341','6c811e00-186f-4bbb-aa0d-7e3e27eb9605',_binary '','${role_manage-realm}','manage-realm','dabc51bf-58ea-42ed-9918-4114e6b08338','6c811e00-186f-4bbb-aa0d-7e3e27eb9605',NULL),('91578263-c1be-4428-a732-d71e06597bcb','9f5cccd3-039b-4e2d-a53d-5c71869e0289',_binary '','${role_read-token}','read-token','dabc51bf-58ea-42ed-9918-4114e6b08338','9f5cccd3-039b-4e2d-a53d-5c71869e0289',NULL),('91f0653c-c2c2-4155-9afc-6c86de194e1c','org3',_binary '\0','${role_uma_authorization}','uma_authorization','org3',NULL,NULL),('9201ee66-0e4c-4d92-ab9e-2120a7390dab','a15e680b-47bb-4b94-a832-5ca99cdbe134',_binary '',NULL,'_ws2-admin','org2','a15e680b-47bb-4b94-a832-5ca99cdbe134',NULL),('92a8a0bb-0644-4a46-a02b-b1a6118bc629','d0763c7a-1183-4390-aa83-1804c4bf13dd',_binary '','${role_query-clients}','query-clients','org1','d0763c7a-1183-4390-aa83-1804c4bf13dd',NULL),('92bde222-43fd-4fee-b265-72f4ccaec199','org2',_binary '\0','${role_default-roles}','default-roles-org2','org2',NULL,NULL),('92f45dc4-6517-4ed0-85c1-a1358ac92ff2','81806f02-c6ca-42a2-b286-e6c2c0953955',_binary '','${role_manage-authorization}','manage-authorization','dabc51bf-58ea-42ed-9918-4114e6b08338','81806f02-c6ca-42a2-b286-e6c2c0953955',NULL),('94d463bc-0ba6-4d80-85f4-e63860357f80','16fe410e-f1df-4ce0-b445-8dd3b5b80750',_binary '',NULL,'_ws1-admin','org1','16fe410e-f1df-4ce0-b445-8dd3b5b80750',NULL),('94df2d32-d3b5-4570-b015-b95684b811b3','6c811e00-186f-4bbb-aa0d-7e3e27eb9605',_binary '','${role_query-users}','query-users','dabc51bf-58ea-42ed-9918-4114e6b08338','6c811e00-186f-4bbb-aa0d-7e3e27eb9605',NULL),('94e6ab8f-19ab-4282-8ee6-d6323bacf4aa','dabc51bf-58ea-42ed-9918-4114e6b08338',_binary '\0','${role_create-realm}','create-realm','dabc51bf-58ea-42ed-9918-4114e6b08338',NULL,NULL),('957a70a3-5891-4e14-9765-2560c25916ee','16fe410e-f1df-4ce0-b445-8dd3b5b80750',_binary '',NULL,'_ws3-admin','org1','16fe410e-f1df-4ce0-b445-8dd3b5b80750',NULL),('958941e6-9c2c-48c6-8458-181a5f7da4cb','d0763c7a-1183-4390-aa83-1804c4bf13dd',_binary '','${role_view-authorization}','view-authorization','org1','d0763c7a-1183-4390-aa83-1804c4bf13dd',NULL),('95b164a2-6b95-4fe8-b27b-28fab90a372d','c28dd0b0-60ed-40df-91db-0d9b1e14074b',_binary '',NULL,'_og-own-mt','org3','c28dd0b0-60ed-40df-91db-0d9b1e14074b',NULL),('96bd2210-1fcb-4deb-8fbb-563e0ca8f654','a15e680b-47bb-4b94-a832-5ca99cdbe134',_binary '',NULL,'_ws3-admin','org2','a15e680b-47bb-4b94-a832-5ca99cdbe134',NULL),('97c22ad8-48d8-49db-90e3-b0e205ef50de','a15e680b-47bb-4b94-a832-5ca99cdbe134',_binary '',NULL,'_organization-manager','org2','a15e680b-47bb-4b94-a832-5ca99cdbe134',NULL),('97c30574-d3d1-4e01-818f-0867ca808f9a','311ebcfe-7467-459c-856a-862094332329',_binary '',NULL,'_og-role-usr','org4','311ebcfe-7467-459c-856a-862094332329',NULL),('97c3ac20-3403-45fa-8f10-f93283617f9f','c2a9a8ae-6fb5-4265-b8e5-012c8fb17857',_binary '','${role_manage-realm}','manage-realm','dabc51bf-58ea-42ed-9918-4114e6b08338','c2a9a8ae-6fb5-4265-b8e5-012c8fb17857',NULL),('9919d082-df1c-4ca4-a043-b1c44298410a','da68d9d1-cd82-4d04-90ad-6a5aa63e301a',_binary '','${role_manage-realm}','manage-realm','dabc51bf-58ea-42ed-9918-4114e6b08338','da68d9d1-cd82-4d04-90ad-6a5aa63e301a',NULL),('9affc859-ba1b-478c-a90d-7745d2515d3e','6c811e00-186f-4bbb-aa0d-7e3e27eb9605',_binary '','${role_query-groups}','query-groups','dabc51bf-58ea-42ed-9918-4114e6b08338','6c811e00-186f-4bbb-aa0d-7e3e27eb9605',NULL),('9b896e40-e851-42db-9546-bf6ef748c438','16fe410e-f1df-4ce0-b445-8dd3b5b80750',_binary '',NULL,'_organization-user-manager','org1','16fe410e-f1df-4ce0-b445-8dd3b5b80750',NULL),('9c15ec54-80d9-4ea4-9b9d-cb670c642cbd','8ecdd6f7-f568-4a2a-acaa-cbe6cf8854b2',_binary '','${role_view-users}','view-users','dabc51bf-58ea-42ed-9918-4114e6b08338','8ecdd6f7-f568-4a2a-acaa-cbe6cf8854b2',NULL),('9cf28ea5-af7b-4ad4-92e3-5fe99af53eb9','5dcb2e50-43d9-4731-af37-8415af71a5fb',_binary '','${role_manage-identity-providers}','manage-identity-providers','org2','5dcb2e50-43d9-4731-af37-8415af71a5fb',NULL),('9dfb7f8e-5181-4537-a509-4f23a4d58b6f','c2a9a8ae-6fb5-4265-b8e5-012c8fb17857',_binary '','${role_create-client}','create-client','dabc51bf-58ea-42ed-9918-4114e6b08338','c2a9a8ae-6fb5-4265-b8e5-012c8fb17857',NULL),('9efaac6f-2cfc-4cfa-b4b1-5e400b184d52','b0475217-c11a-49f5-833c-33aaee237a25',_binary '',NULL,'_ws3-admin','org3','b0475217-c11a-49f5-833c-33aaee237a25',NULL),('9f2bf745-3978-48ac-b8f2-11a2e4483692','c2a9a8ae-6fb5-4265-b8e5-012c8fb17857',_binary '','${role_manage-users}','manage-users','dabc51bf-58ea-42ed-9918-4114e6b08338','c2a9a8ae-6fb5-4265-b8e5-012c8fb17857',NULL),('9ff2af3b-6e78-4684-a859-6278fb8782f2','3d62cf66-73c8-4ec7-ba0f-2b622bc5c747',_binary '',NULL,'_ws2-admin','org5','3d62cf66-73c8-4ec7-ba0f-2b622bc5c747',NULL),('a062a342-9ccc-4009-8ebd-61e0f92d01a0','d321d481-bc24-4294-af2c-7907fd6529b0',_binary '',NULL,'ws2','org1','d321d481-bc24-4294-af2c-7907fd6529b0',NULL),('a0bd219e-58d5-4531-9cc9-085084bf34ef','cd83ad65-7b39-444d-8f77-18a2e9ef8179',_binary '','${role_realm-admin}','realm-admin','org4','cd83ad65-7b39-444d-8f77-18a2e9ef8179',NULL),('a16b13ef-3fc5-479d-8066-0fcefa1d76ac','d0763c7a-1183-4390-aa83-1804c4bf13dd',_binary '','${role_view-identity-providers}','view-identity-providers','org1','d0763c7a-1183-4390-aa83-1804c4bf13dd',NULL),('a1db7c33-ffec-477f-9ee2-9b6c658034e2','37140475-df0f-4d9e-9d4d-9c9afbdda5f6',_binary '','${role_delete-account}','delete-account','org1','37140475-df0f-4d9e-9d4d-9c9afbdda5f6',NULL),('a23a6451-d9bd-44b4-b436-07378b38f69d','da68d9d1-cd82-4d04-90ad-6a5aa63e301a',_binary '','${role_view-events}','view-events','dabc51bf-58ea-42ed-9918-4114e6b08338','da68d9d1-cd82-4d04-90ad-6a5aa63e301a',NULL),('a2dfecf5-9df6-4252-9042-0d2e9c5c2a5f','da68d9d1-cd82-4d04-90ad-6a5aa63e301a',_binary '','${role_manage-users}','manage-users','dabc51bf-58ea-42ed-9918-4114e6b08338','da68d9d1-cd82-4d04-90ad-6a5aa63e301a',NULL),('a3aae270-586e-42c6-8e97-e1e4d5252339','c56d777e-7f90-4a13-9719-316e592b62fa',_binary '','${role_view-users}','view-users','dabc51bf-58ea-42ed-9918-4114e6b08338','c56d777e-7f90-4a13-9719-316e592b62fa',NULL),('a5fe3dba-dc1f-4be9-aa19-7358e3d6f736','8b27a0d1-98ac-4f83-affe-b80ecdd626ef',_binary '','${role_view-clients}','view-clients','org5','8b27a0d1-98ac-4f83-affe-b80ecdd626ef',NULL),('a652dd51-7932-4d4a-9ce1-50f07b7c1aa4','6e5e1844-3f44-46b9-a6b7-4297aed21fcf',_binary '','${role_delete-account}','delete-account','org2','6e5e1844-3f44-46b9-a6b7-4297aed21fcf',NULL),('a769b105-a75f-4b4b-9837-f144f3b32ea7','6e5e1844-3f44-46b9-a6b7-4297aed21fcf',_binary '','${role_view-groups}','view-groups','org2','6e5e1844-3f44-46b9-a6b7-4297aed21fcf',NULL),('aba52e43-5183-419c-b217-a2f670a69ec0','01f89460-aba4-42ec-8eb3-f3c2d23cfbc2',_binary '',NULL,'_og-ws-mt','org5','01f89460-aba4-42ec-8eb3-f3c2d23cfbc2',NULL),('abad458a-d38e-4505-989c-931e78b1306d','81806f02-c6ca-42a2-b286-e6c2c0953955',_binary '','${role_manage-clients}','manage-clients','dabc51bf-58ea-42ed-9918-4114e6b08338','81806f02-c6ca-42a2-b286-e6c2c0953955',NULL),('abc51e3a-093f-4338-9b28-16657ef2eb21','8ecdd6f7-f568-4a2a-acaa-cbe6cf8854b2',_binary '','${role_manage-clients}','manage-clients','dabc51bf-58ea-42ed-9918-4114e6b08338','8ecdd6f7-f568-4a2a-acaa-cbe6cf8854b2',NULL),('ad78468c-c5c2-44f4-bb70-aa2d1faf05fa','c2a9a8ae-6fb5-4265-b8e5-012c8fb17857',_binary '','${role_query-groups}','query-groups','dabc51bf-58ea-42ed-9918-4114e6b08338','c2a9a8ae-6fb5-4265-b8e5-012c8fb17857',NULL),('ada483a1-3f73-497d-965e-98da9951633d','cd83ad65-7b39-444d-8f77-18a2e9ef8179',_binary '','${role_impersonation}','impersonation','org4','cd83ad65-7b39-444d-8f77-18a2e9ef8179',NULL),('adf7276e-067b-4182-8110-dd0d42855fa9','47a07858-733a-4de8-a079-837b25a07547',_binary '','${role_delete-account}','delete-account','org3','47a07858-733a-4de8-a079-837b25a07547',NULL),('b18d5cd6-78f1-4b31-b254-6dececbc3f4f','d0763c7a-1183-4390-aa83-1804c4bf13dd',_binary '','${role_query-realms}','query-realms','org1','d0763c7a-1183-4390-aa83-1804c4bf13dd',NULL),('b1a7632c-e05d-40f8-8d4e-cec6a71d6d14','37140475-df0f-4d9e-9d4d-9c9afbdda5f6',_binary '','${role_manage-account-links}','manage-account-links','org1','37140475-df0f-4d9e-9d4d-9c9afbdda5f6',NULL),('b2769d0a-1434-4b96-840a-64405cc9cb87','d0763c7a-1183-4390-aa83-1804c4bf13dd',_binary '','${role_manage-clients}','manage-clients','org1','d0763c7a-1183-4390-aa83-1804c4bf13dd',NULL),('b42996aa-df56-4510-b76c-0c3733b45c66','5bfeb038-8be1-4744-bc58-74432ff827c6',_binary '','${role_query-groups}','query-groups','org3','5bfeb038-8be1-4744-bc58-74432ff827c6',NULL),('b6ef0a37-30a8-42aa-ba70-912bd53e2bfd','6e5e1844-3f44-46b9-a6b7-4297aed21fcf',_binary '','${role_view-applications}','view-applications','org2','6e5e1844-3f44-46b9-a6b7-4297aed21fcf',NULL),('b737a1d2-4963-4dcc-9bc4-3af13906c45d','47a07858-733a-4de8-a079-837b25a07547',_binary '','${role_view-applications}','view-applications','org3','47a07858-733a-4de8-a079-837b25a07547',NULL),('b94ada76-bb55-4104-9f46-3a7372882a98','c28dd0b0-60ed-40df-91db-0d9b1e14074b',_binary '',NULL,'ws2','org3','c28dd0b0-60ed-40df-91db-0d9b1e14074b',NULL),('bac2e8dd-b4f8-4e9f-96e4-991ca1f239a7','81806f02-c6ca-42a2-b286-e6c2c0953955',_binary '','${role_view-users}','view-users','dabc51bf-58ea-42ed-9918-4114e6b08338','81806f02-c6ca-42a2-b286-e6c2c0953955',NULL),('bac457d3-8963-4cf5-965f-b374480ff3d8','8b27a0d1-98ac-4f83-affe-b80ecdd626ef',_binary '','${role_impersonation}','impersonation','org5','8b27a0d1-98ac-4f83-affe-b80ecdd626ef',NULL),('bacadf7f-edca-4755-b6e2-1f76a62477f8','6e5e1844-3f44-46b9-a6b7-4297aed21fcf',_binary '','${role_view-consent}','view-consent','org2','6e5e1844-3f44-46b9-a6b7-4297aed21fcf',NULL),('bb5fc8cb-730d-4af1-8853-c776649fc129','6c811e00-186f-4bbb-aa0d-7e3e27eb9605',_binary '','${role_view-authorization}','view-authorization','dabc51bf-58ea-42ed-9918-4114e6b08338','6c811e00-186f-4bbb-aa0d-7e3e27eb9605',NULL),('bb95765a-ded6-4b61-ae29-a75115a6c5e0','5bfeb038-8be1-4744-bc58-74432ff827c6',_binary '','${role_manage-events}','manage-events','org3','5bfeb038-8be1-4744-bc58-74432ff827c6',NULL),('bcc5dcb2-6cdc-4451-8df7-6b2aad557329','da68d9d1-cd82-4d04-90ad-6a5aa63e301a',_binary '','${role_create-client}','create-client','dabc51bf-58ea-42ed-9918-4114e6b08338','da68d9d1-cd82-4d04-90ad-6a5aa63e301a',NULL),('bcce9acc-3a19-4a1e-acc8-d21626f4fa81','37140475-df0f-4d9e-9d4d-9c9afbdda5f6',_binary '','${role_manage-account}','manage-account','org1','37140475-df0f-4d9e-9d4d-9c9afbdda5f6',NULL),('be267d19-3305-4185-b833-5ac29b0b665c','d321d481-bc24-4294-af2c-7907fd6529b0',_binary '',NULL,'_og-own-mt','org1','d321d481-bc24-4294-af2c-7907fd6529b0',NULL),('bf17d010-da1e-45d2-b4be-2dea5cab0290','cd83ad65-7b39-444d-8f77-18a2e9ef8179',_binary '','${role_manage-users}','manage-users','org4','cd83ad65-7b39-444d-8f77-18a2e9ef8179',NULL),('c00fb823-0733-4605-8206-760c81ebef93','d321d481-bc24-4294-af2c-7907fd6529b0',_binary '',NULL,'_og-usage','org1','d321d481-bc24-4294-af2c-7907fd6529b0',NULL),('c0c0a50c-70b5-4ba7-ada2-583401aaedd9','d321d481-bc24-4294-af2c-7907fd6529b0',_binary '',NULL,'_og-ws-mt','org1','d321d481-bc24-4294-af2c-7907fd6529b0',NULL),('c0c471d5-663f-403f-b33a-0bad8e7328a9','d321d481-bc24-4294-af2c-7907fd6529b0',_binary '',NULL,'_og-usr-mt','org1','d321d481-bc24-4294-af2c-7907fd6529b0',NULL),('c0f573dd-7844-4dc3-a51a-f31ceee520d4','da68d9d1-cd82-4d04-90ad-6a5aa63e301a',_binary '','${role_query-realms}','query-realms','dabc51bf-58ea-42ed-9918-4114e6b08338','da68d9d1-cd82-4d04-90ad-6a5aa63e301a',NULL),('c14be266-8c8e-4ff0-b5c2-e836f4cd9aa4','8b27a0d1-98ac-4f83-affe-b80ecdd626ef',_binary '','${role_view-authorization}','view-authorization','org5','8b27a0d1-98ac-4f83-affe-b80ecdd626ef',NULL),('c2180217-3bf3-45fa-acb3-90dd20ef3772','a0d96aa1-71ac-4a7e-a769-306baf1c51fc',_binary '',NULL,'ws3','org2','a0d96aa1-71ac-4a7e-a769-306baf1c51fc',NULL),('c2224091-6c37-4634-972f-2767361b89ca','5bfeb038-8be1-4744-bc58-74432ff827c6',_binary '','${role_create-client}','create-client','org3','5bfeb038-8be1-4744-bc58-74432ff827c6',NULL),('c2afa323-6d36-40d0-bc7c-994d452775d7','org3',_binary '\0','${role_default-roles}','default-roles-org3','org3',NULL,NULL),('c347c471-4ed8-42cd-a8d5-17afdbcb07a0','5dcb2e50-43d9-4731-af37-8415af71a5fb',_binary '','${role_view-authorization}','view-authorization','org2','5dcb2e50-43d9-4731-af37-8415af71a5fb',NULL),('c371c4ce-9c38-433c-8650-5774bf65f3f7','a0d96aa1-71ac-4a7e-a769-306baf1c51fc',_binary '',NULL,'_og-upd','org2','a0d96aa1-71ac-4a7e-a769-306baf1c51fc',NULL),('c3832f57-4034-46f4-91c1-85c7d2a1b493','6c811e00-186f-4bbb-aa0d-7e3e27eb9605',_binary '','${role_view-realm}','view-realm','dabc51bf-58ea-42ed-9918-4114e6b08338','6c811e00-186f-4bbb-aa0d-7e3e27eb9605',NULL),('c3c88538-83c6-43fa-8172-0d071b88aee4','org2',_binary '\0','${role_offline-access}','offline_access','org2',NULL,NULL),('c3d1ddef-45d2-4cbf-bbde-8f8088ae0e3b','cd83ad65-7b39-444d-8f77-18a2e9ef8179',_binary '','${role_view-users}','view-users','org4','cd83ad65-7b39-444d-8f77-18a2e9ef8179',NULL),('c4fdb81c-9547-482b-8fce-790a0dba7c72','8ecdd6f7-f568-4a2a-acaa-cbe6cf8854b2',_binary '','${role_query-users}','query-users','dabc51bf-58ea-42ed-9918-4114e6b08338','8ecdd6f7-f568-4a2a-acaa-cbe6cf8854b2',NULL),('c5d3c276-eec7-4b8c-a069-27ba3589abc2','d0763c7a-1183-4390-aa83-1804c4bf13dd',_binary '','${role_view-realm}','view-realm','org1','d0763c7a-1183-4390-aa83-1804c4bf13dd',NULL),('c6555030-fa3b-4394-ac2b-35aa05627e7e','c56d777e-7f90-4a13-9719-316e592b62fa',_binary '','${role_impersonation}','impersonation','dabc51bf-58ea-42ed-9918-4114e6b08338','c56d777e-7f90-4a13-9719-316e592b62fa',NULL),('c6627202-e934-40ca-9614-ec74569c143d','da68d9d1-cd82-4d04-90ad-6a5aa63e301a',_binary '','${role_view-authorization}','view-authorization','dabc51bf-58ea-42ed-9918-4114e6b08338','da68d9d1-cd82-4d04-90ad-6a5aa63e301a',NULL),('c68d0555-f57b-4348-8a63-f7a789fd1532','c2a9a8ae-6fb5-4265-b8e5-012c8fb17857',_binary '','${role_manage-events}','manage-events','dabc51bf-58ea-42ed-9918-4114e6b08338','c2a9a8ae-6fb5-4265-b8e5-012c8fb17857',NULL),('c70e962b-d7fa-471e-a007-b715bd383876','c2a9a8ae-6fb5-4265-b8e5-012c8fb17857',_binary '','${role_query-clients}','query-clients','dabc51bf-58ea-42ed-9918-4114e6b08338','c2a9a8ae-6fb5-4265-b8e5-012c8fb17857',NULL),('c7cdedbe-5434-49e5-9548-9d5d6dc1c51b','org1',_binary '\0','${role_offline-access}','offline_access','org1',NULL,NULL),('c7d88b16-b9b1-4ee9-b88b-089f3cc4736c','5dcb2e50-43d9-4731-af37-8415af71a5fb',_binary '','${role_realm-admin}','realm-admin','org2','5dcb2e50-43d9-4731-af37-8415af71a5fb',NULL),('ca326db1-1def-40b5-b442-186c8372dc54','16fe410e-f1df-4ce0-b445-8dd3b5b80750',_binary '',NULL,'_organization-user-role-manager','org1','16fe410e-f1df-4ce0-b445-8dd3b5b80750',NULL),('cadaa27f-6685-48f6-a67f-b071c649526f','918724dc-e6f6-424e-a42f-875f0da655ae',_binary '','${role_view-consent}','view-consent','org4','918724dc-e6f6-424e-a42f-875f0da655ae',NULL),('cae93096-081d-45d4-ab02-eb562f69ef76','6c811e00-186f-4bbb-aa0d-7e3e27eb9605',_binary '','${role_manage-clients}','manage-clients','dabc51bf-58ea-42ed-9918-4114e6b08338','6c811e00-186f-4bbb-aa0d-7e3e27eb9605',NULL),('cbb3d40a-455d-475a-8f45-b0a19dc3d6b0','9f98a940-4d88-413d-af70-540c4673615f',_binary '','${role_read-token}','read-token','org2','9f98a940-4d88-413d-af70-540c4673615f',NULL),('cc9fa6cc-07fb-42cf-988e-7517cf6576c0','cd83ad65-7b39-444d-8f77-18a2e9ef8179',_binary '','${role_view-identity-providers}','view-identity-providers','org4','cd83ad65-7b39-444d-8f77-18a2e9ef8179',NULL),('ccc68d16-5d29-4583-b808-18872cd8df13','8b27a0d1-98ac-4f83-affe-b80ecdd626ef',_binary '','${role_manage-users}','manage-users','org5','8b27a0d1-98ac-4f83-affe-b80ecdd626ef',NULL),('cd8383d3-207e-4b00-b50f-622e9c7cf233','cd83ad65-7b39-444d-8f77-18a2e9ef8179',_binary '','${role_query-groups}','query-groups','org4','cd83ad65-7b39-444d-8f77-18a2e9ef8179',NULL),('ce18d984-dce0-4e3c-82b7-f16678c7e155','311ebcfe-7467-459c-856a-862094332329',_binary '',NULL,'_ws3-admin','org4','311ebcfe-7467-459c-856a-862094332329',NULL),('cf5ec5b3-5d81-467f-baed-2cf3a30f3ce6','5dcb2e50-43d9-4731-af37-8415af71a5fb',_binary '','${role_impersonation}','impersonation','org2','5dcb2e50-43d9-4731-af37-8415af71a5fb',NULL),('cf9567c3-3b6c-4204-8ba9-bb11ae25b32b','81806f02-c6ca-42a2-b286-e6c2c0953955',_binary '','${role_view-realm}','view-realm','dabc51bf-58ea-42ed-9918-4114e6b08338','81806f02-c6ca-42a2-b286-e6c2c0953955',NULL),('d066d55a-9192-4ecc-95f8-63d6f89f1ed3','c28dd0b0-60ed-40df-91db-0d9b1e14074b',_binary '',NULL,'_og-ws-role-mt','org3','c28dd0b0-60ed-40df-91db-0d9b1e14074b',NULL),('d15ba2db-61d1-4ef6-8858-1e90737cf6d5','0d3bec04-1354-4db0-b7b6-96ee59ad7c4a',_binary '','${role_view-profile}','view-profile','org5','0d3bec04-1354-4db0-b7b6-96ee59ad7c4a',NULL),('d1722e6c-914c-4e33-9efa-9f16f7a4dc58','5bfeb038-8be1-4744-bc58-74432ff827c6',_binary '','${role_manage-identity-providers}','manage-identity-providers','org3','5bfeb038-8be1-4744-bc58-74432ff827c6',NULL),('d17ebe14-aacf-465a-bd2b-a42112432780','311ebcfe-7467-459c-856a-862094332329',_binary '',NULL,'_og-ws-mt','org4','311ebcfe-7467-459c-856a-862094332329',NULL),('d1b6917d-84c7-4218-ae72-afa97afb7e0a','8b27a0d1-98ac-4f83-affe-b80ecdd626ef',_binary '','${role_create-client}','create-client','org5','8b27a0d1-98ac-4f83-affe-b80ecdd626ef',NULL),('d36dd5c8-7ece-41a2-b226-5b0a94f449ba','d321d481-bc24-4294-af2c-7907fd6529b0',_binary '',NULL,'ws1','org1','d321d481-bc24-4294-af2c-7907fd6529b0',NULL),('d37c99cd-e2ec-40ab-89f5-fd2fbcc3cd10','c56d777e-7f90-4a13-9719-316e592b62fa',_binary '','${role_view-realm}','view-realm','dabc51bf-58ea-42ed-9918-4114e6b08338','c56d777e-7f90-4a13-9719-316e592b62fa',NULL),('d4bd21d8-a4f9-459a-835d-651e19ac2874','5dcb2e50-43d9-4731-af37-8415af71a5fb',_binary '','${role_view-users}','view-users','org2','5dcb2e50-43d9-4731-af37-8415af71a5fb',NULL),('d4eabc02-2223-4c12-850d-cb7fc73b3401','81806f02-c6ca-42a2-b286-e6c2c0953955',_binary '','${role_manage-users}','manage-users','dabc51bf-58ea-42ed-9918-4114e6b08338','81806f02-c6ca-42a2-b286-e6c2c0953955',NULL),('d504ee4d-fc52-4e94-8e84-e347ad08015d','81806f02-c6ca-42a2-b286-e6c2c0953955',_binary '','${role_query-realms}','query-realms','dabc51bf-58ea-42ed-9918-4114e6b08338','81806f02-c6ca-42a2-b286-e6c2c0953955',NULL),('d566aed3-37b9-4d78-9664-35eca8fbebcb','8ecdd6f7-f568-4a2a-acaa-cbe6cf8854b2',_binary '','${role_view-authorization}','view-authorization','dabc51bf-58ea-42ed-9918-4114e6b08338','8ecdd6f7-f568-4a2a-acaa-cbe6cf8854b2',NULL),('d5e71213-1203-40bd-a3bf-e09154d15fa7','5dcb2e50-43d9-4731-af37-8415af71a5fb',_binary '','${role_view-identity-providers}','view-identity-providers','org2','5dcb2e50-43d9-4731-af37-8415af71a5fb',NULL),('d7be9cfc-43ff-470b-8fc7-22a9e106d29b','8b27a0d1-98ac-4f83-affe-b80ecdd626ef',_binary '','${role_manage-realm}','manage-realm','org5','8b27a0d1-98ac-4f83-affe-b80ecdd626ef',NULL),('d899fbd8-633c-4586-ad0b-4a013f2a0c75','c56d777e-7f90-4a13-9719-316e592b62fa',_binary '','${role_manage-realm}','manage-realm','dabc51bf-58ea-42ed-9918-4114e6b08338','c56d777e-7f90-4a13-9719-316e592b62fa',NULL),('d9ce6a3b-2422-4a83-9a4a-1ee10fbb70ef','cd83ad65-7b39-444d-8f77-18a2e9ef8179',_binary '','${role_manage-identity-providers}','manage-identity-providers','org4','cd83ad65-7b39-444d-8f77-18a2e9ef8179',NULL),('daa0af79-c06f-4116-a234-f5196fe38ad5','311ebcfe-7467-459c-856a-862094332329',_binary '',NULL,'_ws1-admin','org4','311ebcfe-7467-459c-856a-862094332329',NULL),('db0b20f6-7d53-4de6-a6eb-689fd283dda7','c948de3b-8380-4528-a5b7-de403c58d40f',_binary '','${role_view-groups}','view-groups','dabc51bf-58ea-42ed-9918-4114e6b08338','c948de3b-8380-4528-a5b7-de403c58d40f',NULL),('dbe2a3e5-1383-410d-8a01-64b5d0cc6d45','c56d777e-7f90-4a13-9719-316e592b62fa',_binary '','${role_manage-events}','manage-events','dabc51bf-58ea-42ed-9918-4114e6b08338','c56d777e-7f90-4a13-9719-316e592b62fa',NULL),('dce218cd-4c48-431f-99b8-3d2f2dcb6b66','37140475-df0f-4d9e-9d4d-9c9afbdda5f6',_binary '','${role_view-groups}','view-groups','org1','37140475-df0f-4d9e-9d4d-9c9afbdda5f6',NULL),('ddb59632-f10a-4410-af66-a4a04e4e8d57','org2',_binary '\0','${role_uma_authorization}','uma_authorization','org2',NULL,NULL),('dfdad190-b327-4bb7-a305-25db3df445b3','5bfeb038-8be1-4744-bc58-74432ff827c6',_binary '','${role_view-identity-providers}','view-identity-providers','org3','5bfeb038-8be1-4744-bc58-74432ff827c6',NULL),('e001402d-fb2a-4d23-8c13-2af99913e887','c2a9a8ae-6fb5-4265-b8e5-012c8fb17857',_binary '','${role_manage-clients}','manage-clients','dabc51bf-58ea-42ed-9918-4114e6b08338','c2a9a8ae-6fb5-4265-b8e5-012c8fb17857',NULL),('e025ccdf-8a10-4066-851b-8eaf760f48ce','cd83ad65-7b39-444d-8f77-18a2e9ef8179',_binary '','${role_query-clients}','query-clients','org4','cd83ad65-7b39-444d-8f77-18a2e9ef8179',NULL),('e182bbbc-5ce2-4f01-8011-8a858f41d66b','a0d96aa1-71ac-4a7e-a769-306baf1c51fc',_binary '',NULL,'_ws3-admin','org2','a0d96aa1-71ac-4a7e-a769-306baf1c51fc',NULL),('e1afff95-a2d5-46da-8446-3a69e3c320d6','5bfeb038-8be1-4744-bc58-74432ff827c6',_binary '','${role_view-users}','view-users','org3','5bfeb038-8be1-4744-bc58-74432ff827c6',NULL),('e1cfd142-b58b-4e06-ba13-418168875a25','0d3bec04-1354-4db0-b7b6-96ee59ad7c4a',_binary '','${role_view-applications}','view-applications','org5','0d3bec04-1354-4db0-b7b6-96ee59ad7c4a',NULL),('e23845c8-56b7-4019-912b-7e2ae574e696','da68d9d1-cd82-4d04-90ad-6a5aa63e301a',_binary '','${role_manage-identity-providers}','manage-identity-providers','dabc51bf-58ea-42ed-9918-4114e6b08338','da68d9d1-cd82-4d04-90ad-6a5aa63e301a',NULL),('e24dcf2f-8323-4ca4-b1fe-b87d9f0326e4','47a07858-733a-4de8-a079-837b25a07547',_binary '','${role_view-consent}','view-consent','org3','47a07858-733a-4de8-a079-837b25a07547',NULL),('e295bbed-74d9-4044-90b7-500028810735','81806f02-c6ca-42a2-b286-e6c2c0953955',_binary '','${role_manage-identity-providers}','manage-identity-providers','dabc51bf-58ea-42ed-9918-4114e6b08338','81806f02-c6ca-42a2-b286-e6c2c0953955',NULL),('e349c309-f0a0-4d1a-bce8-7eacb93461ba','8b27a0d1-98ac-4f83-affe-b80ecdd626ef',_binary '','${role_realm-admin}','realm-admin','org5','8b27a0d1-98ac-4f83-affe-b80ecdd626ef',NULL),('e352fe0c-06d6-4045-a841-a461073b6e5a','c56d777e-7f90-4a13-9719-316e592b62fa',_binary '','${role_view-authorization}','view-authorization','dabc51bf-58ea-42ed-9918-4114e6b08338','c56d777e-7f90-4a13-9719-316e592b62fa',NULL),('e36873cf-ef84-41d3-a792-5acba1c565bc','0d3bec04-1354-4db0-b7b6-96ee59ad7c4a',_binary '','${role_view-consent}','view-consent','org5','0d3bec04-1354-4db0-b7b6-96ee59ad7c4a',NULL),('e3f82bd8-64f6-4935-904c-f4f643e1df16','cd83ad65-7b39-444d-8f77-18a2e9ef8179',_binary '','${role_manage-authorization}','manage-authorization','org4','cd83ad65-7b39-444d-8f77-18a2e9ef8179',NULL),('e478c9c9-a299-4a38-80ce-342198cff104','c28dd0b0-60ed-40df-91db-0d9b1e14074b',_binary '',NULL,'_ws1-admin','org3','c28dd0b0-60ed-40df-91db-0d9b1e14074b',NULL),('e4dafa4b-6fb7-44d7-9345-391b6b1e8e66','47a07858-733a-4de8-a079-837b25a07547',_binary '','${role_manage-account}','manage-account','org3','47a07858-733a-4de8-a079-837b25a07547',NULL),('e59b30cd-dcf1-4a54-99e8-3077c935cf9e','311ebcfe-7467-459c-856a-862094332329',_binary '',NULL,'_og-ws-role-mt','org4','311ebcfe-7467-459c-856a-862094332329',NULL),('e5bdc39b-6350-4e68-b19d-d2f90dbfb0b0','c948de3b-8380-4528-a5b7-de403c58d40f',_binary '','${role_delete-account}','delete-account','dabc51bf-58ea-42ed-9918-4114e6b08338','c948de3b-8380-4528-a5b7-de403c58d40f',NULL),('e737d20e-6216-4da9-a281-f43102759f54','3d62cf66-73c8-4ec7-ba0f-2b622bc5c747',_binary '',NULL,'_organization-manager','org5','3d62cf66-73c8-4ec7-ba0f-2b622bc5c747',NULL),('e757f666-1ac1-49b8-ba35-1578c45d2841','cd83ad65-7b39-444d-8f77-18a2e9ef8179',_binary '','${role_view-events}','view-events','org4','cd83ad65-7b39-444d-8f77-18a2e9ef8179',NULL),('e8c6cae7-6c47-44a2-b03b-471868a4dde1','6c811e00-186f-4bbb-aa0d-7e3e27eb9605',_binary '','${role_manage-users}','manage-users','dabc51bf-58ea-42ed-9918-4114e6b08338','6c811e00-186f-4bbb-aa0d-7e3e27eb9605',NULL),('e90549ec-b55c-4237-9d4d-d42c50458309','311ebcfe-7467-459c-856a-862094332329',_binary '',NULL,'_og-usr-mt','org4','311ebcfe-7467-459c-856a-862094332329',NULL),('ea43acf1-82de-4be0-ab9b-ccd01b7618bb','81806f02-c6ca-42a2-b286-e6c2c0953955',_binary '','${role_view-clients}','view-clients','dabc51bf-58ea-42ed-9918-4114e6b08338','81806f02-c6ca-42a2-b286-e6c2c0953955',NULL),('eaf1d0ce-2944-4d39-bd99-377fea5b3132','d0763c7a-1183-4390-aa83-1804c4bf13dd',_binary '','${role_view-users}','view-users','org1','d0763c7a-1183-4390-aa83-1804c4bf13dd',NULL),('eb8ed358-e4aa-4a55-bb8f-98aed6f3e39f','d321d481-bc24-4294-af2c-7907fd6529b0',_binary '',NULL,'ws3','org1','d321d481-bc24-4294-af2c-7907fd6529b0',NULL),('ed069635-3623-4e37-a85d-680301a31500','a15e680b-47bb-4b94-a832-5ca99cdbe134',_binary '',NULL,'_organization-user-role-manager','org2','a15e680b-47bb-4b94-a832-5ca99cdbe134',NULL),('ed9080c5-b88f-49ed-83aa-7883e8dbede1','0d3bec04-1354-4db0-b7b6-96ee59ad7c4a',_binary '','${role_manage-account}','manage-account','org5','0d3bec04-1354-4db0-b7b6-96ee59ad7c4a',NULL),('efd5a4cb-e141-4976-86a2-925c48e9a17c','3d62cf66-73c8-4ec7-ba0f-2b622bc5c747',_binary '',NULL,'_ws1-admin','org5','3d62cf66-73c8-4ec7-ba0f-2b622bc5c747',NULL),('efdaf8ca-0ee6-4782-b9bc-594353a407b1','d0763c7a-1183-4390-aa83-1804c4bf13dd',_binary '','${role_manage-realm}','manage-realm','org1','d0763c7a-1183-4390-aa83-1804c4bf13dd',NULL),('f127674d-4753-48e0-990e-c5e1b828810f','8ecdd6f7-f568-4a2a-acaa-cbe6cf8854b2',_binary '','${role_view-realm}','view-realm','dabc51bf-58ea-42ed-9918-4114e6b08338','8ecdd6f7-f568-4a2a-acaa-cbe6cf8854b2',NULL),('f25d3901-2cbd-45b4-87dc-937bd30d167b','8b27a0d1-98ac-4f83-affe-b80ecdd626ef',_binary '','${role_query-groups}','query-groups','org5','8b27a0d1-98ac-4f83-affe-b80ecdd626ef',NULL),('f436c9ed-08de-4a8f-aa80-97e595a7feb5','c28dd0b0-60ed-40df-91db-0d9b1e14074b',_binary '',NULL,'_ws2-admin','org3','c28dd0b0-60ed-40df-91db-0d9b1e14074b',NULL),('f558e3b3-b246-4ee1-b473-617831200bd6','8b27a0d1-98ac-4f83-affe-b80ecdd626ef',_binary '','${role_query-realms}','query-realms','org5','8b27a0d1-98ac-4f83-affe-b80ecdd626ef',NULL),('f624c0c0-5db4-447b-96e9-5c19e128bea5','cd83ad65-7b39-444d-8f77-18a2e9ef8179',_binary '','${role_create-client}','create-client','org4','cd83ad65-7b39-444d-8f77-18a2e9ef8179',NULL),('f643d9a4-309a-4cb3-8b8d-9cc8b71a342e','311ebcfe-7467-459c-856a-862094332329',_binary '',NULL,'_og-own-mt','org4','311ebcfe-7467-459c-856a-862094332329',NULL),('f6fda7c5-39e4-4e03-bc93-4b47ebd887a6','8b27a0d1-98ac-4f83-affe-b80ecdd626ef',_binary '','${role_manage-authorization}','manage-authorization','org5','8b27a0d1-98ac-4f83-affe-b80ecdd626ef',NULL),('f7e23540-9140-4667-8a43-c413402d661e','5dcb2e50-43d9-4731-af37-8415af71a5fb',_binary '','${role_manage-events}','manage-events','org2','5dcb2e50-43d9-4731-af37-8415af71a5fb',NULL),('f7fcdeae-257a-4138-99aa-588ac3be2cc4','8ecdd6f7-f568-4a2a-acaa-cbe6cf8854b2',_binary '','${role_query-clients}','query-clients','dabc51bf-58ea-42ed-9918-4114e6b08338','8ecdd6f7-f568-4a2a-acaa-cbe6cf8854b2',NULL),('f8ad0b14-409f-4ae0-ac3d-51d4d6c71c71','a0d96aa1-71ac-4a7e-a769-306baf1c51fc',_binary '',NULL,'_og-usr-mt','org2','a0d96aa1-71ac-4a7e-a769-306baf1c51fc',NULL),('f8b4617b-8a4b-454d-9e85-826d34daf267','01f89460-aba4-42ec-8eb3-f3c2d23cfbc2',_binary '',NULL,'_og-usr-mt','org5','01f89460-aba4-42ec-8eb3-f3c2d23cfbc2',NULL),('f8e2a07b-1795-4cb5-b2b2-3ce3fbdb91be','01f89460-aba4-42ec-8eb3-f3c2d23cfbc2',_binary '',NULL,'_ws1-admin','org5','01f89460-aba4-42ec-8eb3-f3c2d23cfbc2',NULL),('f8e6ce80-6747-4cbc-9eef-c6b48d8c9d24','311ebcfe-7467-459c-856a-862094332329',_binary '',NULL,'_og-ws-role-usr','org4','311ebcfe-7467-459c-856a-862094332329',NULL),('f9232b84-1ebd-45f1-beb5-21bf4eff1fdc','dabc51bf-58ea-42ed-9918-4114e6b08338',_binary '\0','${role_offline-access}','offline_access','dabc51bf-58ea-42ed-9918-4114e6b08338',NULL,NULL),('f98ff5a7-34c3-4473-abe3-270867f09df4','dabc51bf-58ea-42ed-9918-4114e6b08338',_binary '\0','${role_default-roles}','default-roles-master','dabc51bf-58ea-42ed-9918-4114e6b08338',NULL,NULL),('f9b89120-048b-4541-94f2-a09a6165c06d','cd83ad65-7b39-444d-8f77-18a2e9ef8179',_binary '','${role_view-realm}','view-realm','org4','cd83ad65-7b39-444d-8f77-18a2e9ef8179',NULL),('f9ee9405-7101-4691-9df3-63ca60e95e5c','c2a9a8ae-6fb5-4265-b8e5-012c8fb17857',_binary '','${role_view-clients}','view-clients','dabc51bf-58ea-42ed-9918-4114e6b08338','c2a9a8ae-6fb5-4265-b8e5-012c8fb17857',NULL),('fa606b29-1dd1-4302-b5df-6159a40e803c','da68d9d1-cd82-4d04-90ad-6a5aa63e301a',_binary '','${role_query-groups}','query-groups','dabc51bf-58ea-42ed-9918-4114e6b08338','da68d9d1-cd82-4d04-90ad-6a5aa63e301a',NULL),('fa8c5d4a-2a2d-4d00-86ef-807fefde55a7','8ecdd6f7-f568-4a2a-acaa-cbe6cf8854b2',_binary '','${role_manage-users}','manage-users','dabc51bf-58ea-42ed-9918-4114e6b08338','8ecdd6f7-f568-4a2a-acaa-cbe6cf8854b2',NULL),('fa8ce51c-104a-4941-9284-c0cd5e926ae5','2379042f-9ee4-4597-80c6-45add2d7a487',_binary '','${role_read-token}','read-token','org1','2379042f-9ee4-4597-80c6-45add2d7a487',NULL),('fafdd08b-02fa-45e9-bc40-15befb734572','5a324cc2-4d44-46de-9c51-9afcc3c1adda',_binary '',NULL,'_ws3-admin','org4','5a324cc2-4d44-46de-9c51-9afcc3c1adda',NULL),('fb06b2e5-a3af-40bb-8a0f-453184845a6b','a0d96aa1-71ac-4a7e-a769-306baf1c51fc',_binary '',NULL,'ws1','org2','a0d96aa1-71ac-4a7e-a769-306baf1c51fc',NULL),('fb331597-b9d3-4392-963f-03971bc690df','6c811e00-186f-4bbb-aa0d-7e3e27eb9605',_binary '','${role_view-clients}','view-clients','dabc51bf-58ea-42ed-9918-4114e6b08338','6c811e00-186f-4bbb-aa0d-7e3e27eb9605',NULL),('fccd3bea-270e-41dc-bd36-5b034e1aacd1','01f89460-aba4-42ec-8eb3-f3c2d23cfbc2',_binary '',NULL,'ws1','org5','01f89460-aba4-42ec-8eb3-f3c2d23cfbc2',NULL),('fcfaf652-5abd-48b6-8715-fd1ea091cb89','5dcb2e50-43d9-4731-af37-8415af71a5fb',_binary '','${role_manage-authorization}','manage-authorization','org2','5dcb2e50-43d9-4731-af37-8415af71a5fb',NULL),('fd2e0de6-8e32-4a51-8f7c-ad0ee28b4804','b0475217-c11a-49f5-833c-33aaee237a25',_binary '',NULL,'_organization-user-role-manager','org3','b0475217-c11a-49f5-833c-33aaee237a25',NULL),('fdb42cd2-27ef-41e0-ab1c-6337cab19451','c2a9a8ae-6fb5-4265-b8e5-012c8fb17857',_binary '','${role_view-realm}','view-realm','dabc51bf-58ea-42ed-9918-4114e6b08338','c2a9a8ae-6fb5-4265-b8e5-012c8fb17857',NULL),('fe180af4-a3a8-444a-ae93-c857ba65498f','81806f02-c6ca-42a2-b286-e6c2c0953955',_binary '','${role_manage-events}','manage-events','dabc51bf-58ea-42ed-9918-4114e6b08338','81806f02-c6ca-42a2-b286-e6c2c0953955',NULL),('fe55319a-7b14-47db-b39e-1b45155ad4d8','c56d777e-7f90-4a13-9719-316e592b62fa',_binary '','${role_manage-identity-providers}','manage-identity-providers','dabc51bf-58ea-42ed-9918-4114e6b08338','c56d777e-7f90-4a13-9719-316e592b62fa',NULL),('fe84de5a-dc51-4fb6-bb63-7b5703c24bdc','d0763c7a-1183-4390-aa83-1804c4bf13dd',_binary '','${role_impersonation}','impersonation','org1','d0763c7a-1183-4390-aa83-1804c4bf13dd',NULL),('ff7fab6a-d2b0-43c0-9c71-99569d2874c0','81806f02-c6ca-42a2-b286-e6c2c0953955',_binary '','${role_view-authorization}','view-authorization','dabc51bf-58ea-42ed-9918-4114e6b08338','81806f02-c6ca-42a2-b286-e6c2c0953955',NULL),('ffb483de-fa4d-4cdc-a670-710af3ba41f3','8ecdd6f7-f568-4a2a-acaa-cbe6cf8854b2',_binary '','${role_query-realms}','query-realms','dabc51bf-58ea-42ed-9918-4114e6b08338','8ecdd6f7-f568-4a2a-acaa-cbe6cf8854b2',NULL);
+/*!40000 ALTER TABLE `KEYCLOAK_ROLE` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `MIGRATION_MODEL`
+--
+
+DROP TABLE IF EXISTS `MIGRATION_MODEL`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `MIGRATION_MODEL` (
+  `ID` varchar(36) NOT NULL,
+  `VERSION` varchar(36) DEFAULT NULL,
+  `UPDATE_TIME` bigint NOT NULL DEFAULT '0',
+  PRIMARY KEY (`ID`),
+  KEY `IDX_UPDATE_TIME` (`UPDATE_TIME`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `MIGRATION_MODEL`
+--
+
+LOCK TABLES `MIGRATION_MODEL` WRITE;
+/*!40000 ALTER TABLE `MIGRATION_MODEL` DISABLE KEYS */;
+INSERT INTO `MIGRATION_MODEL` VALUES ('b1ui6','20.0.5',1709175113);
+/*!40000 ALTER TABLE `MIGRATION_MODEL` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `OFFLINE_CLIENT_SESSION`
+--
+
+DROP TABLE IF EXISTS `OFFLINE_CLIENT_SESSION`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `OFFLINE_CLIENT_SESSION` (
+  `USER_SESSION_ID` varchar(36) NOT NULL,
+  `CLIENT_ID` varchar(255) NOT NULL,
+  `OFFLINE_FLAG` varchar(4) NOT NULL,
+  `TIMESTAMP` int DEFAULT NULL,
+  `DATA` longtext,
+  `CLIENT_STORAGE_PROVIDER` varchar(36) NOT NULL DEFAULT 'local',
+  `EXTERNAL_CLIENT_ID` varchar(255) NOT NULL DEFAULT 'local',
+  PRIMARY KEY (`USER_SESSION_ID`,`CLIENT_ID`,`CLIENT_STORAGE_PROVIDER`,`EXTERNAL_CLIENT_ID`,`OFFLINE_FLAG`),
+  KEY `IDX_US_SESS_ID_ON_CL_SESS` (`USER_SESSION_ID`),
+  KEY `IDX_OFFLINE_CSS_PRELOAD` (`CLIENT_ID`,`OFFLINE_FLAG`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `OFFLINE_CLIENT_SESSION`
+--
+
+LOCK TABLES `OFFLINE_CLIENT_SESSION` WRITE;
+/*!40000 ALTER TABLE `OFFLINE_CLIENT_SESSION` DISABLE KEYS */;
+/*!40000 ALTER TABLE `OFFLINE_CLIENT_SESSION` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `OFFLINE_USER_SESSION`
+--
+
+DROP TABLE IF EXISTS `OFFLINE_USER_SESSION`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `OFFLINE_USER_SESSION` (
+  `USER_SESSION_ID` varchar(36) NOT NULL,
+  `USER_ID` varchar(255) DEFAULT NULL,
+  `REALM_ID` varchar(36) NOT NULL,
+  `CREATED_ON` int NOT NULL,
+  `OFFLINE_FLAG` varchar(4) NOT NULL,
+  `DATA` longtext,
+  `LAST_SESSION_REFRESH` int NOT NULL DEFAULT '0',
+  PRIMARY KEY (`USER_SESSION_ID`,`OFFLINE_FLAG`),
+  KEY `IDX_OFFLINE_USS_CREATEDON` (`CREATED_ON`),
+  KEY `IDX_OFFLINE_USS_PRELOAD` (`OFFLINE_FLAG`,`CREATED_ON`,`USER_SESSION_ID`),
+  KEY `IDX_OFFLINE_USS_BY_USER` (`USER_ID`,`REALM_ID`,`OFFLINE_FLAG`),
+  KEY `IDX_OFFLINE_USS_BY_USERSESS` (`REALM_ID`,`OFFLINE_FLAG`,`USER_SESSION_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `OFFLINE_USER_SESSION`
+--
+
+LOCK TABLES `OFFLINE_USER_SESSION` WRITE;
+/*!40000 ALTER TABLE `OFFLINE_USER_SESSION` DISABLE KEYS */;
+/*!40000 ALTER TABLE `OFFLINE_USER_SESSION` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `POLICY_CONFIG`
+--
+
+DROP TABLE IF EXISTS `POLICY_CONFIG`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `POLICY_CONFIG` (
+  `POLICY_ID` varchar(36) NOT NULL,
+  `NAME` varchar(255) NOT NULL,
+  `VALUE` longtext,
+  PRIMARY KEY (`POLICY_ID`,`NAME`),
+  CONSTRAINT `FKDC34197CF864C4E43` FOREIGN KEY (`POLICY_ID`) REFERENCES `RESOURCE_SERVER_POLICY` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `POLICY_CONFIG`
+--
+
+LOCK TABLES `POLICY_CONFIG` WRITE;
+/*!40000 ALTER TABLE `POLICY_CONFIG` DISABLE KEYS */;
+/*!40000 ALTER TABLE `POLICY_CONFIG` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `PROTOCOL_MAPPER`
+--
+
+DROP TABLE IF EXISTS `PROTOCOL_MAPPER`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `PROTOCOL_MAPPER` (
+  `ID` varchar(36) NOT NULL,
+  `NAME` varchar(255) NOT NULL,
+  `PROTOCOL` varchar(255) NOT NULL,
+  `PROTOCOL_MAPPER_NAME` varchar(255) NOT NULL,
+  `CLIENT_ID` varchar(36) DEFAULT NULL,
+  `CLIENT_SCOPE_ID` varchar(36) DEFAULT NULL,
+  PRIMARY KEY (`ID`),
+  KEY `IDX_PROTOCOL_MAPPER_CLIENT` (`CLIENT_ID`),
+  KEY `IDX_CLSCOPE_PROTMAP` (`CLIENT_SCOPE_ID`),
+  CONSTRAINT `FK_CLI_SCOPE_MAPPER` FOREIGN KEY (`CLIENT_SCOPE_ID`) REFERENCES `CLIENT_SCOPE` (`ID`),
+  CONSTRAINT `FK_PCM_REALM` FOREIGN KEY (`CLIENT_ID`) REFERENCES `CLIENT` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `PROTOCOL_MAPPER`
+--
+
+LOCK TABLES `PROTOCOL_MAPPER` WRITE;
+/*!40000 ALTER TABLE `PROTOCOL_MAPPER` DISABLE KEYS */;
+INSERT INTO `PROTOCOL_MAPPER` VALUES ('01296555-5159-47f5-afe6-d9d5d7c5696c','website','openid-connect','oidc-usermodel-attribute-mapper',NULL,'d4a4f8f3-865c-47a2-b5ef-21b4ef2bc4bb'),('01b0f423-ab9f-4773-a13d-65d807d7ad6c','nickname','openid-connect','oidc-usermodel-attribute-mapper',NULL,'3f20050b-2690-4eae-932e-55d4033bcb9c'),('020c58dd-ba12-42ed-8eda-268bdb0cdc8b','Client ID','openid-connect','oidc-usersessionmodel-note-mapper','311ebcfe-7467-459c-856a-862094332329',NULL),('02659196-707f-402a-8d1f-67735ab34649','given name','openid-connect','oidc-usermodel-property-mapper',NULL,'d4a4f8f3-865c-47a2-b5ef-21b4ef2bc4bb'),('04715c11-d6c8-4f06-87bd-e012700bc653','gender','openid-connect','oidc-usermodel-attribute-mapper',NULL,'eea99c04-72d0-4364-a9f9-22afc631ee33'),('053b9ae7-ea11-4067-84fa-f08062cd0d46','profile','openid-connect','oidc-usermodel-attribute-mapper',NULL,'eea99c04-72d0-4364-a9f9-22afc631ee33'),('06fb13d0-28a2-4270-909b-01e552b7c89c','picture','openid-connect','oidc-usermodel-attribute-mapper',NULL,'4da313aa-06ea-4fda-b4b5-80d2cd5a2a16'),('07c7d021-39f3-42ac-b83f-e3bd1c01578a','phone number','openid-connect','oidc-usermodel-attribute-mapper',NULL,'f74057ad-184b-4f01-8947-fdd12da4a0fd'),('086d1078-0d2c-4414-8bae-4e40970632f8','realm roles','openid-connect','oidc-usermodel-realm-role-mapper',NULL,'8ca87019-4bfe-43c7-b100-5adf8fd6fbbb'),('0b5c6859-247e-42eb-b0d0-0ef062968ba9','middle name','openid-connect','oidc-usermodel-attribute-mapper',NULL,'eea99c04-72d0-4364-a9f9-22afc631ee33'),('0c0ea4e6-32da-4af8-baca-1a400e803985','updated at','openid-connect','oidc-usermodel-attribute-mapper',NULL,'eea99c04-72d0-4364-a9f9-22afc631ee33'),('0c9eec02-3b20-4c6f-8c01-09110d8c9923','birthdate','openid-connect','oidc-usermodel-attribute-mapper',NULL,'882ca1f6-cc4e-45fb-8c37-b28c9b367e20'),('0e6ff6bc-0ad4-4b95-ada9-761b8eff7246','audience resolve','openid-connect','oidc-audience-resolve-mapper',NULL,'32a6adf1-5209-4cc8-9f4f-97daf67777e4'),('102a311a-4ffb-4b75-905b-41c298bb1edb','Client Host','openid-connect','oidc-usersessionmodel-note-mapper','a0d96aa1-71ac-4a7e-a769-306baf1c51fc',NULL),('105d4ff4-ea40-4293-9ed3-71460675bb24','locale','openid-connect','oidc-usermodel-attribute-mapper','e7ce9cbf-460c-4fb6-9da2-484548018706',NULL),('10dfd392-a68e-47d7-adb3-cf4ac37f810e','picture','openid-connect','oidc-usermodel-attribute-mapper',NULL,'f14553d0-1ded-4935-a6ee-f84bf8265ec5'),('11484486-7a9e-4687-92fc-16103fec7578','zoneinfo','openid-connect','oidc-usermodel-attribute-mapper',NULL,'eea99c04-72d0-4364-a9f9-22afc631ee33'),('12adc221-e361-4ce9-a609-409f9a6841ef','Client Host','openid-connect','oidc-usersessionmodel-note-mapper','58e5ed05-5651-4e99-ac86-e93c28adc1f0',NULL),('1426a291-2af5-461b-a4b4-cd07794ef2b2','profile','openid-connect','oidc-usermodel-attribute-mapper',NULL,'4da313aa-06ea-4fda-b4b5-80d2cd5a2a16'),('153bd0b1-1fb0-4dc0-837e-3480479d7263','birthdate','openid-connect','oidc-usermodel-attribute-mapper',NULL,'4da313aa-06ea-4fda-b4b5-80d2cd5a2a16'),('16e4f6ea-8443-4056-8a2b-4f5f2b39acfc','audience resolve','openid-connect','oidc-audience-resolve-mapper',NULL,'46883c24-c9d6-40a4-a7ec-86086d6c9892'),('18178b9e-e3ed-47fb-bbf9-3c381751bc88','audience resolve','openid-connect','oidc-audience-resolve-mapper',NULL,'9d2ff12d-6798-416a-a938-998b1ea40a7c'),('18473503-448e-419e-9aa4-cae3b03c0dc7','address','openid-connect','oidc-address-mapper',NULL,'ca8d577e-fc8e-4fab-bbd4-332b169fe26d'),('18e8c88a-f7eb-4791-a2ca-8b62d07a9b55','groups','openid-connect','oidc-usermodel-realm-role-mapper',NULL,'1bca493a-f048-4583-8a05-06e5b2bbceeb'),('19a41a0c-22c5-49d4-a2ad-71037b2cd862','email verified','openid-connect','oidc-usermodel-property-mapper',NULL,'a27b05ba-3058-4404-8d07-becd0a92634a'),('1b5600f2-6e14-4503-975f-6c0f88259ef2','upn','openid-connect','oidc-usermodel-property-mapper',NULL,'6209cbb9-9404-457c-9e29-68444a8347b8'),('1d15003d-6d73-4250-b4fd-b3e993e3038b','Client ID','openid-connect','oidc-usersessionmodel-note-mapper','d321d481-bc24-4294-af2c-7907fd6529b0',NULL),('1de8ca83-3eeb-4e7e-874d-45ca97d7957e','phone number','openid-connect','oidc-usermodel-attribute-mapper',NULL,'7d63cd15-fc63-4eb0-a2b6-c894ed8cda92'),('1e6ad3d0-3264-424b-87e3-4e832ebd485c','audience resolve','openid-connect','oidc-audience-resolve-mapper','a45ffddc-de71-4c69-b026-cb2cf7f30d16',NULL),('1ea8c53b-e39f-4878-8277-bcb8efdcf315','upn','openid-connect','oidc-usermodel-property-mapper',NULL,'1bca493a-f048-4583-8a05-06e5b2bbceeb'),('217ba743-285b-4ec3-836a-c6af5146721b','given name','openid-connect','oidc-usermodel-property-mapper',NULL,'f14553d0-1ded-4935-a6ee-f84bf8265ec5'),('21ce2821-7168-415e-9107-de898d7b340d','upn','openid-connect','oidc-usermodel-property-mapper',NULL,'6fb6e60c-85bc-4695-8127-a571e81a2fd7'),('227bf755-5e72-4c2f-be7d-4de863ceab5e','username','openid-connect','oidc-usermodel-property-mapper',NULL,'f14553d0-1ded-4935-a6ee-f84bf8265ec5'),('23773eb6-5f61-401b-aa82-8695c4c3b24c','zoneinfo','openid-connect','oidc-usermodel-attribute-mapper',NULL,'f14553d0-1ded-4935-a6ee-f84bf8265ec5'),('24409356-3b69-4a42-a44c-3df669e3110f','groups','openid-connect','oidc-usermodel-realm-role-mapper',NULL,'dedb10ee-98c5-4f06-a7e7-ca5a600e5077'),('2683741f-4f68-4ed3-8636-b40f9a20b3d2','allowed web origins','openid-connect','oidc-allowed-origins-mapper',NULL,'a6d9ee28-55ef-4da3-b5da-03dab12522ce'),('2926eef3-0672-4900-8d02-095dba6a7194','address','openid-connect','oidc-address-mapper',NULL,'628834b0-f4ce-431e-ad1a-7b1aa02bb389'),('2953af68-6f96-41d6-843a-f3548332e7ee','full name','openid-connect','oidc-full-name-mapper',NULL,'d4a4f8f3-865c-47a2-b5ef-21b4ef2bc4bb'),('29a71dd4-303a-4d7d-8539-26e61d1aab0d','Client ID','openid-connect','oidc-usersessionmodel-note-mapper','58e5ed05-5651-4e99-ac86-e93c28adc1f0',NULL),('29c5dfe4-41b2-4f79-836e-89f12391a392','allowed web origins','openid-connect','oidc-allowed-origins-mapper',NULL,'09814274-c074-43d4-90e9-b955a86ac5ab'),('2a2aae15-611f-4327-9cd5-f385bf24feee','picture','openid-connect','oidc-usermodel-attribute-mapper',NULL,'882ca1f6-cc4e-45fb-8c37-b28c9b367e20'),('2b897e0f-6897-4512-9fea-c2d1f396b475','family name','openid-connect','oidc-usermodel-property-mapper',NULL,'882ca1f6-cc4e-45fb-8c37-b28c9b367e20'),('2d5d3dd6-6a3a-40c1-a3e2-372b9a4a5dcb','client roles','openid-connect','oidc-usermodel-client-role-mapper',NULL,'aa710d34-15aa-41e8-bea7-78d5269af573'),('2d6f1704-f523-43d9-81e8-0fffd97371cf','locale','openid-connect','oidc-usermodel-attribute-mapper','10447023-de56-4fa6-8669-07b054551ad1',NULL),('2d9fcdd5-7470-455b-8fa3-ddbdf8d4e491','realm roles','openid-connect','oidc-usermodel-realm-role-mapper',NULL,'aa710d34-15aa-41e8-bea7-78d5269af573'),('2f83a65d-1315-4634-988a-a1ee894c23aa','phone number verified','openid-connect','oidc-usermodel-attribute-mapper',NULL,'c7c12f84-00fc-4191-91f4-d9d53cfb760d'),('3047fdf2-71e6-491c-a0e1-32eeb6dc383c','middle name','openid-connect','oidc-usermodel-attribute-mapper',NULL,'f14553d0-1ded-4935-a6ee-f84bf8265ec5'),('356bb7f8-c002-47f1-a1cf-a26fe4f2136d','nickname','openid-connect','oidc-usermodel-attribute-mapper',NULL,'d4a4f8f3-865c-47a2-b5ef-21b4ef2bc4bb'),('35a5cebc-fa5a-409f-8808-3c1e020ed8b7','given name','openid-connect','oidc-usermodel-property-mapper',NULL,'3f20050b-2690-4eae-932e-55d4033bcb9c'),('35db4f8e-4856-465c-9c73-b8865f8ad4ba','groups','openid-connect','oidc-usermodel-realm-role-mapper',NULL,'6209cbb9-9404-457c-9e29-68444a8347b8'),('3776f7f3-3186-44e0-82d5-e1409c01863a','website','openid-connect','oidc-usermodel-attribute-mapper',NULL,'eea99c04-72d0-4364-a9f9-22afc631ee33'),('382f8506-9d45-4d03-ad11-49eb9272ef1b','phone number verified','openid-connect','oidc-usermodel-attribute-mapper',NULL,'4b9a4275-ee4b-4dc9-a8a2-0428fb232c38'),('3b41b1a2-5e67-4218-9be2-896f4d508dd0','birthdate','openid-connect','oidc-usermodel-attribute-mapper',NULL,'eea99c04-72d0-4364-a9f9-22afc631ee33'),('3c94af02-92ff-4fa0-9b09-b8bb158f709d','picture','openid-connect','oidc-usermodel-attribute-mapper',NULL,'d4a4f8f3-865c-47a2-b5ef-21b4ef2bc4bb'),('47068945-e0b5-4eb3-900b-03074083dc66','gender','openid-connect','oidc-usermodel-attribute-mapper',NULL,'f14553d0-1ded-4935-a6ee-f84bf8265ec5'),('474d6f9a-fbdf-4184-b0e1-f85b58b5909d','Client IP Address','openid-connect','oidc-usersessionmodel-note-mapper','311ebcfe-7467-459c-856a-862094332329',NULL),('48c4ba67-cd38-4e03-a5f4-094827b795fc','middle name','openid-connect','oidc-usermodel-attribute-mapper',NULL,'d4a4f8f3-865c-47a2-b5ef-21b4ef2bc4bb'),('49a2a06e-377e-4ac7-8667-20b98b9416b2','middle name','openid-connect','oidc-usermodel-attribute-mapper',NULL,'4da313aa-06ea-4fda-b4b5-80d2cd5a2a16'),('49f453d9-6f8d-4cd1-83fd-8693e13d064e','Client IP Address','openid-connect','oidc-usersessionmodel-note-mapper','a0d96aa1-71ac-4a7e-a769-306baf1c51fc',NULL),('4b96a3f8-3987-49ee-8fe1-f83dc21cf8ae','role list','saml','saml-role-list-mapper',NULL,'e85ee535-40c7-463f-8a90-38f83987975c'),('4cf746ea-e2d9-4fa3-81a2-b8aa91fcef44','audience resolve','openid-connect','oidc-audience-resolve-mapper',NULL,'aa710d34-15aa-41e8-bea7-78d5269af573'),('4cfa7f7d-f172-4996-aa98-addd7b0da118','website','openid-connect','oidc-usermodel-attribute-mapper',NULL,'4da313aa-06ea-4fda-b4b5-80d2cd5a2a16'),('519d4bf1-2923-4650-b0d6-cae2df760a83','client roles','openid-connect','oidc-usermodel-client-role-mapper',NULL,'32a6adf1-5209-4cc8-9f4f-97daf67777e4'),('52511c8b-af23-48a8-aed3-f91ad369a066','username','openid-connect','oidc-usermodel-property-mapper',NULL,'4da313aa-06ea-4fda-b4b5-80d2cd5a2a16'),('53fd823e-bdf2-4626-9721-a9f9a0efdc04','updated at','openid-connect','oidc-usermodel-attribute-mapper',NULL,'4da313aa-06ea-4fda-b4b5-80d2cd5a2a16'),('54bf61bf-9791-47c6-918c-7da9d44a3242','nickname','openid-connect','oidc-usermodel-attribute-mapper',NULL,'eea99c04-72d0-4364-a9f9-22afc631ee33'),('54ce2d13-1890-451f-937c-17d03ce4e746','role list','saml','saml-role-list-mapper',NULL,'aaed6bc3-06fe-41bc-a2ce-17e0d69e9408'),('560539cc-0188-409a-9109-c674c0600c1c','upn','openid-connect','oidc-usermodel-property-mapper',NULL,'dedb10ee-98c5-4f06-a7e7-ca5a600e5077'),('565f5624-2834-4160-950f-59ec87909229','full name','openid-connect','oidc-full-name-mapper',NULL,'f14553d0-1ded-4935-a6ee-f84bf8265ec5'),('568afc67-da4f-4fd7-8113-204c90014dae','locale','openid-connect','oidc-usermodel-attribute-mapper',NULL,'eea99c04-72d0-4364-a9f9-22afc631ee33'),('57db9101-eb9b-4d20-97a7-9f4c9e2b955c','address','openid-connect','oidc-address-mapper',NULL,'dd7e350c-b03e-4743-b081-d6c9e860662e'),('5bb1420b-92cc-4074-b536-c885d8380ada','Client Host','openid-connect','oidc-usersessionmodel-note-mapper','01f89460-aba4-42ec-8eb3-f3c2d23cfbc2',NULL),('5bb535c1-20b9-4c51-9966-44153c77ae92','email verified','openid-connect','oidc-usermodel-property-mapper',NULL,'95893421-3e01-41ad-8d75-255e7e81e4d0'),('5cc7be4f-190f-4225-a1eb-32e1a46c6467','realm roles','openid-connect','oidc-usermodel-realm-role-mapper',NULL,'32a6adf1-5209-4cc8-9f4f-97daf67777e4'),('5ce727cd-1158-482e-bf55-d22fdea4ed38','locale','openid-connect','oidc-usermodel-attribute-mapper',NULL,'f14553d0-1ded-4935-a6ee-f84bf8265ec5'),('5ebf7a21-e4a4-4cf5-b2c5-c3944b543377','middle name','openid-connect','oidc-usermodel-attribute-mapper',NULL,'882ca1f6-cc4e-45fb-8c37-b28c9b367e20'),('5f4c7cf9-4525-4d52-ad1b-c498bdb131bd','middle name','openid-connect','oidc-usermodel-attribute-mapper',NULL,'3f20050b-2690-4eae-932e-55d4033bcb9c'),('5f77636d-285f-4f91-9b79-5713ef4c7843','phone number verified','openid-connect','oidc-usermodel-attribute-mapper',NULL,'63882871-ca1f-485c-8c37-7a4bb0ec13b4'),('62ba3d85-2721-4499-bcd2-efd7b1df077a','nickname','openid-connect','oidc-usermodel-attribute-mapper',NULL,'882ca1f6-cc4e-45fb-8c37-b28c9b367e20'),('635c10da-812e-4cbd-897a-e2e9668b3d99','audience resolve','openid-connect','oidc-audience-resolve-mapper','ad5aa4ab-fe72-4d1d-8bab-e0a39529dca7',NULL),('658fa452-c8e1-43e2-be00-8249ef5ca6bc','locale','openid-connect','oidc-usermodel-attribute-mapper',NULL,'3f20050b-2690-4eae-932e-55d4033bcb9c'),('67673257-73f2-4ffd-a348-25f3af0b32d1','email verified','openid-connect','oidc-usermodel-property-mapper',NULL,'5ef9bc49-df97-44f6-bdaa-a40377368a1a'),('67afb08e-4c53-4c30-9de3-f223505144f5','email','openid-connect','oidc-usermodel-property-mapper',NULL,'a27b05ba-3058-4404-8d07-becd0a92634a'),('67d2f55a-3d87-47fa-84e2-e5bd3ad78814','allowed web origins','openid-connect','oidc-allowed-origins-mapper',NULL,'625f2210-714e-4d31-9f58-9a6d9d4aa95b'),('6b1e81fe-7abf-4e13-8d6b-d709f13c599f','given name','openid-connect','oidc-usermodel-property-mapper',NULL,'882ca1f6-cc4e-45fb-8c37-b28c9b367e20'),('6b399334-f5d3-4441-a8d1-a530e3e27b1a','birthdate','openid-connect','oidc-usermodel-attribute-mapper',NULL,'3f20050b-2690-4eae-932e-55d4033bcb9c'),('6eb78f0f-abc1-4164-afe0-306bad593644','email','openid-connect','oidc-usermodel-property-mapper',NULL,'786caaa4-7b36-474b-acff-b4cab4358208'),('6ed4a53a-2a47-4c60-9ad2-546422ae373c','groups','openid-connect','oidc-usermodel-realm-role-mapper',NULL,'55ae0da8-23c0-4796-b3bb-a002ea377870'),('71250195-fe7c-4973-8270-9674ee9eab92','updated at','openid-connect','oidc-usermodel-attribute-mapper',NULL,'882ca1f6-cc4e-45fb-8c37-b28c9b367e20'),('713463a5-4885-4220-9886-db9b70457980','locale','openid-connect','oidc-usermodel-attribute-mapper','bf0a8c22-455e-4840-9240-f2a7d5b415f7',NULL),('715316cd-111f-40dc-9cba-122ec7e64ce8','allowed web origins','openid-connect','oidc-allowed-origins-mapper',NULL,'816096c9-b105-455b-805d-d887b0cdf314'),('71d0d0ef-b97a-4693-80ac-3069d73ad2e9','client roles','openid-connect','oidc-usermodel-client-role-mapper',NULL,'8ca87019-4bfe-43c7-b100-5adf8fd6fbbb'),('71e5c33f-7621-4d81-b133-9ca177a7ea9c','birthdate','openid-connect','oidc-usermodel-attribute-mapper',NULL,'d4a4f8f3-865c-47a2-b5ef-21b4ef2bc4bb'),('728ab4a2-7819-4f36-8114-0af3aca4d4da','Client Host','openid-connect','oidc-usersessionmodel-note-mapper','311ebcfe-7467-459c-856a-862094332329',NULL),('742509a4-7d96-4622-8df1-699868da77ee','locale','openid-connect','oidc-usermodel-attribute-mapper','aa4ae80c-bbad-4217-a6a7-8ff0a871577f',NULL),('74af4d72-0ae7-4b13-9b90-eebacf9b295a','Client IP Address','openid-connect','oidc-usersessionmodel-note-mapper','c28dd0b0-60ed-40df-91db-0d9b1e14074b',NULL),('74cc0a5f-97ea-4a02-974b-538d2012ae19','realm roles','openid-connect','oidc-usermodel-realm-role-mapper',NULL,'9d2ff12d-6798-416a-a938-998b1ea40a7c'),('75ea1c9e-0232-4858-9542-84fec70c3af4','zoneinfo','openid-connect','oidc-usermodel-attribute-mapper',NULL,'4da313aa-06ea-4fda-b4b5-80d2cd5a2a16'),('76148c5e-ddde-470e-9503-420bd483f7c4','acr loa level','openid-connect','oidc-acr-mapper',NULL,'7011312f-7085-4e66-af22-d73fd8d54724'),('76456391-d004-4995-be63-4608dc71d6ae','Client IP Address','openid-connect','oidc-usersessionmodel-note-mapper','01f89460-aba4-42ec-8eb3-f3c2d23cfbc2',NULL),('76d251a3-e38a-4ea0-9ae8-5dbc01992993','updated at','openid-connect','oidc-usermodel-attribute-mapper',NULL,'f14553d0-1ded-4935-a6ee-f84bf8265ec5'),('77f9e5f6-63bb-47a4-bb33-eeb8e871e17c','nickname','openid-connect','oidc-usermodel-attribute-mapper',NULL,'f14553d0-1ded-4935-a6ee-f84bf8265ec5'),('7c58e868-f15e-48b9-aba1-2f67da7d41c4','birthdate','openid-connect','oidc-usermodel-attribute-mapper',NULL,'f14553d0-1ded-4935-a6ee-f84bf8265ec5'),('7f0a8823-6a82-4c59-995c-d022bdea6564','locale','openid-connect','oidc-usermodel-attribute-mapper',NULL,'d4a4f8f3-865c-47a2-b5ef-21b4ef2bc4bb'),('80faee43-1992-4f07-b7c1-2440e38eeed5','profile','openid-connect','oidc-usermodel-attribute-mapper',NULL,'3f20050b-2690-4eae-932e-55d4033bcb9c'),('82200c56-8b9f-4654-9304-257a4843f13a','username','openid-connect','oidc-usermodel-property-mapper',NULL,'3f20050b-2690-4eae-932e-55d4033bcb9c'),('829d36f8-147e-4195-b328-8a05b76ed93a','locale','openid-connect','oidc-usermodel-attribute-mapper',NULL,'882ca1f6-cc4e-45fb-8c37-b28c9b367e20'),('82f8336e-d8e3-4294-8bd4-69adc879d4fc','role list','saml','saml-role-list-mapper',NULL,'70815eec-a377-4975-8ff7-4ddd86da41d0'),('83829884-654c-4a23-8d13-f2676688bcde','Client ID','openid-connect','oidc-usersessionmodel-note-mapper','a0d96aa1-71ac-4a7e-a769-306baf1c51fc',NULL),('8404d3a9-cda7-4900-b577-375d7f2f034c','username','openid-connect','oidc-usermodel-property-mapper',NULL,'d4a4f8f3-865c-47a2-b5ef-21b4ef2bc4bb'),('86e9936d-895c-42d1-892a-a14a9ea130cc','phone number verified','openid-connect','oidc-usermodel-attribute-mapper',NULL,'816bef08-a6f0-4074-8879-01a7d67d4918'),('8837c5e0-eabe-4c8f-b314-c114b60ef94d','email','openid-connect','oidc-usermodel-property-mapper',NULL,'95893421-3e01-41ad-8d75-255e7e81e4d0'),('8a1428e0-9a43-47d7-beaf-f8ecc7f9909e','audience resolve','openid-connect','oidc-audience-resolve-mapper','2edff0cf-8f6c-44b6-917d-f00a3bb58261',NULL),('8a15ac6f-d645-4d42-863d-906bc69950b8','phone number verified','openid-connect','oidc-usermodel-attribute-mapper',NULL,'f74057ad-184b-4f01-8947-fdd12da4a0fd'),('8a28928f-d916-408f-bdc7-ab8c43edaadd','email verified','openid-connect','oidc-usermodel-property-mapper',NULL,'786caaa4-7b36-474b-acff-b4cab4358208'),('8b6085fa-1cec-4288-81f7-e78b9371a13b','address','openid-connect','oidc-address-mapper',NULL,'9d97a7e6-f4e0-42f8-b906-a8f674d5336d'),('8b88dd7a-5f2d-4fc4-8051-1447bf2820db','family name','openid-connect','oidc-usermodel-property-mapper',NULL,'4da313aa-06ea-4fda-b4b5-80d2cd5a2a16'),('8c0c9184-daa0-4aea-be9d-d6c026e9babb','phone number','openid-connect','oidc-usermodel-attribute-mapper',NULL,'c7c12f84-00fc-4191-91f4-d9d53cfb760d'),('8c7a7785-c693-45fe-83d4-5b280eb3a1a6','upn','openid-connect','oidc-usermodel-property-mapper',NULL,'55ae0da8-23c0-4796-b3bb-a002ea377870'),('8e1eccbe-30d5-42e1-ad5f-55c7648aa551','email verified','openid-connect','oidc-usermodel-property-mapper',NULL,'a7cc0573-78dd-492f-a8d7-a66a9cd285de'),('8fab545a-fa27-437f-abbe-eac19a5474f5','full name','openid-connect','oidc-full-name-mapper',NULL,'3f20050b-2690-4eae-932e-55d4033bcb9c'),('9092f7c5-56b7-44fb-8b46-f1d7fd22258f','zoneinfo','openid-connect','oidc-usermodel-attribute-mapper',NULL,'d4a4f8f3-865c-47a2-b5ef-21b4ef2bc4bb'),('92681f5d-b16f-4c83-9c94-1c469fafb1a1','realm roles','openid-connect','oidc-usermodel-realm-role-mapper',NULL,'dc07de30-6518-4c49-b74c-7948f482a583'),('9410d3b2-9a9e-4a37-94bb-1ac7e250f57f','phone number verified','openid-connect','oidc-usermodel-attribute-mapper',NULL,'7d63cd15-fc63-4eb0-a2b6-c894ed8cda92'),('94922771-cf2d-46d7-bc8b-38bfba048f24','client roles','openid-connect','oidc-usermodel-client-role-mapper',NULL,'9d2ff12d-6798-416a-a938-998b1ea40a7c'),('94efed4c-1656-49c7-a327-d2ea5eb5b572','gender','openid-connect','oidc-usermodel-attribute-mapper',NULL,'882ca1f6-cc4e-45fb-8c37-b28c9b367e20'),('9855ebce-1535-47c6-ba7f-98dca8200db0','phone number','openid-connect','oidc-usermodel-attribute-mapper',NULL,'63882871-ca1f-485c-8c37-7a4bb0ec13b4'),('9b791885-143d-4b1e-b7f0-08c4423913a2','acr loa level','openid-connect','oidc-acr-mapper',NULL,'2b1287b6-579c-4ca8-8c67-3ae43797f83f'),('9f6c1765-6808-41bd-96a4-bd37536d6f4a','nickname','openid-connect','oidc-usermodel-attribute-mapper',NULL,'4da313aa-06ea-4fda-b4b5-80d2cd5a2a16'),('a01c577a-f5c7-4d7f-8e26-9b582a3363c2','updated at','openid-connect','oidc-usermodel-attribute-mapper',NULL,'3f20050b-2690-4eae-932e-55d4033bcb9c'),('a037636f-7eac-434b-ac81-21da2d283a86','profile','openid-connect','oidc-usermodel-attribute-mapper',NULL,'d4a4f8f3-865c-47a2-b5ef-21b4ef2bc4bb'),('a12eb288-fb62-4128-a92b-f8c7a1af6fec','email','openid-connect','oidc-usermodel-property-mapper',NULL,'bc3d6466-832d-4c2a-8e64-b25af286304e'),('a41b6c2c-8aeb-47a7-b517-4c5e1d56a9fc','email','openid-connect','oidc-usermodel-property-mapper',NULL,'5ef9bc49-df97-44f6-bdaa-a40377368a1a'),('a4491e00-a919-485c-a5ce-ab207ba68ca9','full name','openid-connect','oidc-full-name-mapper',NULL,'eea99c04-72d0-4364-a9f9-22afc631ee33'),('a49547c5-d774-4e57-82bc-63a1b137ef22','phone number','openid-connect','oidc-usermodel-attribute-mapper',NULL,'816bef08-a6f0-4074-8879-01a7d67d4918'),('a70e89e7-c0e7-4035-9466-7fce5a8efe20','updated at','openid-connect','oidc-usermodel-attribute-mapper',NULL,'d4a4f8f3-865c-47a2-b5ef-21b4ef2bc4bb'),('a755c820-9961-4085-9a4c-f8f1566ec325','zoneinfo','openid-connect','oidc-usermodel-attribute-mapper',NULL,'882ca1f6-cc4e-45fb-8c37-b28c9b367e20'),('aa817b42-29b8-4067-8a2c-7ab67339b9aa','Client IP Address','openid-connect','oidc-usersessionmodel-note-mapper','d321d481-bc24-4294-af2c-7907fd6529b0',NULL),('aa974f70-ae57-449b-915b-38db9f4dc041','upn','openid-connect','oidc-usermodel-property-mapper',NULL,'88704bf7-69f8-4c11-9fce-96cf17f0fd85'),('aad9418c-6f05-4139-bf63-8affee9f098f','zoneinfo','openid-connect','oidc-usermodel-attribute-mapper',NULL,'3f20050b-2690-4eae-932e-55d4033bcb9c'),('afedd7e4-54fb-4860-a064-7e805ed626cb','audience resolve','openid-connect','oidc-audience-resolve-mapper','57f46d8e-a3aa-4587-abe4-ef652ebef40c',NULL),('b099d229-e38b-4bcc-a840-beff8f32557e','family name','openid-connect','oidc-usermodel-property-mapper',NULL,'eea99c04-72d0-4364-a9f9-22afc631ee33'),('b2065c75-ce0e-4bfb-bb28-54faf8512808','username','openid-connect','oidc-usermodel-property-mapper',NULL,'eea99c04-72d0-4364-a9f9-22afc631ee33'),('b62aaaae-cf07-49ae-9f67-a7cfa3844fa4','profile','openid-connect','oidc-usermodel-attribute-mapper',NULL,'f14553d0-1ded-4935-a6ee-f84bf8265ec5'),('b6d22526-30fd-4b79-80d9-e0b7f67620ba','allowed web origins','openid-connect','oidc-allowed-origins-mapper',NULL,'e5edd8d0-323b-4ba8-b943-aeb19c7a514e'),('b6ee21fb-6f38-467d-84f6-d5d2913700bc','locale','openid-connect','oidc-usermodel-attribute-mapper','166138a8-bf2f-4caa-97eb-8cabbe18a8f6',NULL),('b7e42777-56cd-49ec-a576-5e4663ea59b5','Client ID','openid-connect','oidc-usersessionmodel-note-mapper','01f89460-aba4-42ec-8eb3-f3c2d23cfbc2',NULL),('b7f226c1-eb4a-4367-bbb7-dc4d9fac5a45','gender','openid-connect','oidc-usermodel-attribute-mapper',NULL,'3f20050b-2690-4eae-932e-55d4033bcb9c'),('bbe0ccae-3ee5-417c-aba2-d29ab450b543','acr loa level','openid-connect','oidc-acr-mapper',NULL,'d347d989-0abc-4a13-8c14-c1ddb3264c27'),('be34553f-e2e0-4702-b48b-e5fa2378083f','website','openid-connect','oidc-usermodel-attribute-mapper',NULL,'f14553d0-1ded-4935-a6ee-f84bf8265ec5'),('bea20dbf-5474-442d-a2b4-bc18810c990e','audience resolve','openid-connect','oidc-audience-resolve-mapper',NULL,'dc07de30-6518-4c49-b74c-7948f482a583'),('c0977910-1e85-458d-9301-a6d4c3e967c5','full name','openid-connect','oidc-full-name-mapper',NULL,'882ca1f6-cc4e-45fb-8c37-b28c9b367e20'),('c3046306-40c2-4819-ad71-746970457939','Client Host','openid-connect','oidc-usersessionmodel-note-mapper','c28dd0b0-60ed-40df-91db-0d9b1e14074b',NULL),('c5a04d63-60fe-476a-b6db-11af5df300f7','acr loa level','openid-connect','oidc-acr-mapper',NULL,'36122d22-c5bc-471c-8694-ed913ee1de6f'),('c6a96141-f214-4bc5-9ca1-3d3a5f237740','website','openid-connect','oidc-usermodel-attribute-mapper',NULL,'882ca1f6-cc4e-45fb-8c37-b28c9b367e20'),('c718a12f-2a06-4f5f-b8d1-58b975920b2f','family name','openid-connect','oidc-usermodel-property-mapper',NULL,'3f20050b-2690-4eae-932e-55d4033bcb9c'),('c884abbf-b3cb-47fe-8c20-cbc8f3004cbd','Client ID','openid-connect','oidc-usersessionmodel-note-mapper','c28dd0b0-60ed-40df-91db-0d9b1e14074b',NULL),('c8d0c13f-db4d-48c3-97f3-d39d2435b0bf','acr loa level','openid-connect','oidc-acr-mapper',NULL,'d906096a-7031-4608-ab7a-e1046aa24ebc'),('cb66d495-5fc9-4137-9b0d-c696596ea1f4','address','openid-connect','oidc-address-mapper',NULL,'66dbbe7a-d6b9-4d1d-b437-f8f7a8da44da'),('cba66e86-d389-465e-a6fb-9741817893b4','Client Host','openid-connect','oidc-usersessionmodel-note-mapper','d321d481-bc24-4294-af2c-7907fd6529b0',NULL),('cbf7f65e-1af1-448c-8aeb-b1726c1ca61d','acr loa level','openid-connect','oidc-acr-mapper',NULL,'7414b4b7-8306-4c6c-86b0-cc0a4a1f3752'),('cc55208f-316f-497d-a4ab-d7f273884d68','locale','openid-connect','oidc-usermodel-attribute-mapper',NULL,'4da313aa-06ea-4fda-b4b5-80d2cd5a2a16'),('cd42329f-cf9c-489b-87c7-2723d2f684aa','groups','openid-connect','oidc-usermodel-realm-role-mapper',NULL,'88704bf7-69f8-4c11-9fce-96cf17f0fd85'),('ce836679-9c5f-437d-a1f0-f93a3f4f70df','audience resolve','openid-connect','oidc-audience-resolve-mapper','21f3aced-8905-4cbe-b76e-e4efc5f5b5d9',NULL),('cfb8d5d5-19dc-4b6a-874d-3d80d6875b66','gender','openid-connect','oidc-usermodel-attribute-mapper',NULL,'d4a4f8f3-865c-47a2-b5ef-21b4ef2bc4bb'),('d4b98ee3-e408-4ac3-8bdd-685aeb3f5e18','email','openid-connect','oidc-usermodel-property-mapper',NULL,'a7cc0573-78dd-492f-a8d7-a66a9cd285de'),('d5eb608c-0eab-407f-bc67-639e42e6f906','picture','openid-connect','oidc-usermodel-attribute-mapper',NULL,'3f20050b-2690-4eae-932e-55d4033bcb9c'),('d61a53e7-564d-4d91-89cc-13240323647e','realm roles','openid-connect','oidc-usermodel-realm-role-mapper',NULL,'46883c24-c9d6-40a4-a7ec-86086d6c9892'),('d79d26d6-3255-4bdf-a4e6-f3570b73f500','given name','openid-connect','oidc-usermodel-property-mapper',NULL,'eea99c04-72d0-4364-a9f9-22afc631ee33'),('d957dd7d-8d83-4409-bec6-8c14d9b2bb4e','picture','openid-connect','oidc-usermodel-attribute-mapper',NULL,'eea99c04-72d0-4364-a9f9-22afc631ee33'),('da3b309b-d87f-4e5e-a56f-912e2a5845cd','audience resolve','openid-connect','oidc-audience-resolve-mapper',NULL,'8ca87019-4bfe-43c7-b100-5adf8fd6fbbb'),('db78e4ab-10d3-40e3-8969-e6b24cd3a5af','client roles','openid-connect','oidc-usermodel-client-role-mapper',NULL,'dc07de30-6518-4c49-b74c-7948f482a583'),('dc56d939-c9db-44e9-89c5-15267c3c0f99','role list','saml','saml-role-list-mapper',NULL,'2c6483d7-a7af-450e-bef4-ffe5af5b1261'),('e339fc36-05e9-48b2-bcd8-d23399bf1dec','profile','openid-connect','oidc-usermodel-attribute-mapper',NULL,'882ca1f6-cc4e-45fb-8c37-b28c9b367e20'),('e3b18ec0-b690-4f8d-a5ba-74158c6bb0d1','address','openid-connect','oidc-address-mapper',NULL,'79c357f1-a15a-404a-80fb-b3aacc5a3097'),('e755800f-2523-4f7d-ba52-8afa3152d5b2','username','openid-connect','oidc-usermodel-property-mapper',NULL,'882ca1f6-cc4e-45fb-8c37-b28c9b367e20'),('e7b954ea-f180-4201-b714-62a14016f9c5','client roles','openid-connect','oidc-usermodel-client-role-mapper',NULL,'46883c24-c9d6-40a4-a7ec-86086d6c9892'),('e91746ff-ec24-46e7-9ca7-ebc3bba13fe0','gender','openid-connect','oidc-usermodel-attribute-mapper',NULL,'4da313aa-06ea-4fda-b4b5-80d2cd5a2a16'),('e929da15-3946-43e2-bf11-07cdf8624d47','phone number','openid-connect','oidc-usermodel-attribute-mapper',NULL,'4b9a4275-ee4b-4dc9-a8a2-0428fb232c38'),('e983b218-2694-4322-ac88-18d28c014541','Client IP Address','openid-connect','oidc-usersessionmodel-note-mapper','58e5ed05-5651-4e99-ac86-e93c28adc1f0',NULL),('eabe19ff-ed9d-4a8c-a143-204c6c6a7810','role list','saml','saml-role-list-mapper',NULL,'522294da-4699-4dbc-ab7a-fcf6f50af4e1'),('ef130573-30bc-4f90-9319-44806d2fc61a','family name','openid-connect','oidc-usermodel-property-mapper',NULL,'d4a4f8f3-865c-47a2-b5ef-21b4ef2bc4bb'),('ef8c17c5-f700-42ce-8ea8-f0abcc2bbe82','audience resolve','openid-connect','oidc-audience-resolve-mapper','8137d95e-0cab-4e9f-b666-92c7bd7ca71a',NULL),('f142bb85-5bf1-4a31-9984-ec80439d38b9','family name','openid-connect','oidc-usermodel-property-mapper',NULL,'f14553d0-1ded-4935-a6ee-f84bf8265ec5'),('f31628c5-f0ac-4490-831f-c290d94cba11','role list','saml','saml-role-list-mapper',NULL,'e013d9cc-5fca-4f57-9ff2-c5e6ad5cc825'),('f5a6ab42-d185-451d-9e02-b63e784d3952','groups','openid-connect','oidc-usermodel-realm-role-mapper',NULL,'6fb6e60c-85bc-4695-8127-a571e81a2fd7'),('f63a98d5-f50d-471c-ab30-734c57d1e3e4','given name','openid-connect','oidc-usermodel-property-mapper',NULL,'4da313aa-06ea-4fda-b4b5-80d2cd5a2a16'),('f63b4a3e-6736-4716-9530-159a2198e34c','email verified','openid-connect','oidc-usermodel-property-mapper',NULL,'bc3d6466-832d-4c2a-8e64-b25af286304e'),('fad7eec2-2644-45cd-b767-156aa87daf89','full name','openid-connect','oidc-full-name-mapper',NULL,'4da313aa-06ea-4fda-b4b5-80d2cd5a2a16'),('fc5252d7-b3d9-4881-82c6-aa3e6b91f7e8','allowed web origins','openid-connect','oidc-allowed-origins-mapper',NULL,'c63b2066-2601-46ba-be46-4865a2af9fb1'),('fecac6e6-e1b0-4453-846e-ca9e3ba888a3','locale','openid-connect','oidc-usermodel-attribute-mapper','fc9017e3-d5da-44aa-8c39-f16017ad8608',NULL),('ff52eab6-6457-47cc-8268-9dd0eb1d6b15','website','openid-connect','oidc-usermodel-attribute-mapper',NULL,'3f20050b-2690-4eae-932e-55d4033bcb9c');
+/*!40000 ALTER TABLE `PROTOCOL_MAPPER` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `PROTOCOL_MAPPER_CONFIG`
+--
+
+DROP TABLE IF EXISTS `PROTOCOL_MAPPER_CONFIG`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `PROTOCOL_MAPPER_CONFIG` (
+  `PROTOCOL_MAPPER_ID` varchar(36) NOT NULL,
+  `VALUE` longtext,
+  `NAME` varchar(255) NOT NULL,
+  PRIMARY KEY (`PROTOCOL_MAPPER_ID`,`NAME`),
+  CONSTRAINT `FK_PMCONFIG` FOREIGN KEY (`PROTOCOL_MAPPER_ID`) REFERENCES `PROTOCOL_MAPPER` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `PROTOCOL_MAPPER_CONFIG`
+--
+
+LOCK TABLES `PROTOCOL_MAPPER_CONFIG` WRITE;
+/*!40000 ALTER TABLE `PROTOCOL_MAPPER_CONFIG` DISABLE KEYS */;
+INSERT INTO `PROTOCOL_MAPPER_CONFIG` VALUES ('01296555-5159-47f5-afe6-d9d5d7c5696c','true','access.token.claim'),('01296555-5159-47f5-afe6-d9d5d7c5696c','website','claim.name'),('01296555-5159-47f5-afe6-d9d5d7c5696c','true','id.token.claim'),('01296555-5159-47f5-afe6-d9d5d7c5696c','String','jsonType.label'),('01296555-5159-47f5-afe6-d9d5d7c5696c','website','user.attribute'),('01296555-5159-47f5-afe6-d9d5d7c5696c','true','userinfo.token.claim'),('01b0f423-ab9f-4773-a13d-65d807d7ad6c','true','access.token.claim'),('01b0f423-ab9f-4773-a13d-65d807d7ad6c','nickname','claim.name'),('01b0f423-ab9f-4773-a13d-65d807d7ad6c','true','id.token.claim'),('01b0f423-ab9f-4773-a13d-65d807d7ad6c','String','jsonType.label'),('01b0f423-ab9f-4773-a13d-65d807d7ad6c','nickname','user.attribute'),('01b0f423-ab9f-4773-a13d-65d807d7ad6c','true','userinfo.token.claim'),('020c58dd-ba12-42ed-8eda-268bdb0cdc8b','true','access.token.claim'),('020c58dd-ba12-42ed-8eda-268bdb0cdc8b','clientId','claim.name'),('020c58dd-ba12-42ed-8eda-268bdb0cdc8b','true','id.token.claim'),('020c58dd-ba12-42ed-8eda-268bdb0cdc8b','String','jsonType.label'),('020c58dd-ba12-42ed-8eda-268bdb0cdc8b','clientId','user.session.note'),('020c58dd-ba12-42ed-8eda-268bdb0cdc8b','true','userinfo.token.claim'),('02659196-707f-402a-8d1f-67735ab34649','true','access.token.claim'),('02659196-707f-402a-8d1f-67735ab34649','given_name','claim.name'),('02659196-707f-402a-8d1f-67735ab34649','true','id.token.claim'),('02659196-707f-402a-8d1f-67735ab34649','String','jsonType.label'),('02659196-707f-402a-8d1f-67735ab34649','firstName','user.attribute'),('02659196-707f-402a-8d1f-67735ab34649','true','userinfo.token.claim'),('04715c11-d6c8-4f06-87bd-e012700bc653','true','access.token.claim'),('04715c11-d6c8-4f06-87bd-e012700bc653','gender','claim.name'),('04715c11-d6c8-4f06-87bd-e012700bc653','true','id.token.claim'),('04715c11-d6c8-4f06-87bd-e012700bc653','String','jsonType.label'),('04715c11-d6c8-4f06-87bd-e012700bc653','gender','user.attribute'),('04715c11-d6c8-4f06-87bd-e012700bc653','true','userinfo.token.claim'),('053b9ae7-ea11-4067-84fa-f08062cd0d46','true','access.token.claim'),('053b9ae7-ea11-4067-84fa-f08062cd0d46','profile','claim.name'),('053b9ae7-ea11-4067-84fa-f08062cd0d46','true','id.token.claim'),('053b9ae7-ea11-4067-84fa-f08062cd0d46','String','jsonType.label'),('053b9ae7-ea11-4067-84fa-f08062cd0d46','profile','user.attribute'),('053b9ae7-ea11-4067-84fa-f08062cd0d46','true','userinfo.token.claim'),('06fb13d0-28a2-4270-909b-01e552b7c89c','true','access.token.claim'),('06fb13d0-28a2-4270-909b-01e552b7c89c','picture','claim.name'),('06fb13d0-28a2-4270-909b-01e552b7c89c','true','id.token.claim'),('06fb13d0-28a2-4270-909b-01e552b7c89c','String','jsonType.label'),('06fb13d0-28a2-4270-909b-01e552b7c89c','picture','user.attribute'),('06fb13d0-28a2-4270-909b-01e552b7c89c','true','userinfo.token.claim'),('07c7d021-39f3-42ac-b83f-e3bd1c01578a','true','access.token.claim'),('07c7d021-39f3-42ac-b83f-e3bd1c01578a','phone_number','claim.name'),('07c7d021-39f3-42ac-b83f-e3bd1c01578a','true','id.token.claim'),('07c7d021-39f3-42ac-b83f-e3bd1c01578a','String','jsonType.label'),('07c7d021-39f3-42ac-b83f-e3bd1c01578a','phoneNumber','user.attribute'),('07c7d021-39f3-42ac-b83f-e3bd1c01578a','true','userinfo.token.claim'),('086d1078-0d2c-4414-8bae-4e40970632f8','true','access.token.claim'),('086d1078-0d2c-4414-8bae-4e40970632f8','realm_access.roles','claim.name'),('086d1078-0d2c-4414-8bae-4e40970632f8','String','jsonType.label'),('086d1078-0d2c-4414-8bae-4e40970632f8','true','multivalued'),('086d1078-0d2c-4414-8bae-4e40970632f8','foo','user.attribute'),('0b5c6859-247e-42eb-b0d0-0ef062968ba9','true','access.token.claim'),('0b5c6859-247e-42eb-b0d0-0ef062968ba9','middle_name','claim.name'),('0b5c6859-247e-42eb-b0d0-0ef062968ba9','true','id.token.claim'),('0b5c6859-247e-42eb-b0d0-0ef062968ba9','String','jsonType.label'),('0b5c6859-247e-42eb-b0d0-0ef062968ba9','middleName','user.attribute'),('0b5c6859-247e-42eb-b0d0-0ef062968ba9','true','userinfo.token.claim'),('0c0ea4e6-32da-4af8-baca-1a400e803985','true','access.token.claim'),('0c0ea4e6-32da-4af8-baca-1a400e803985','updated_at','claim.name'),('0c0ea4e6-32da-4af8-baca-1a400e803985','true','id.token.claim'),('0c0ea4e6-32da-4af8-baca-1a400e803985','long','jsonType.label'),('0c0ea4e6-32da-4af8-baca-1a400e803985','updatedAt','user.attribute'),('0c0ea4e6-32da-4af8-baca-1a400e803985','true','userinfo.token.claim'),('0c9eec02-3b20-4c6f-8c01-09110d8c9923','true','access.token.claim'),('0c9eec02-3b20-4c6f-8c01-09110d8c9923','birthdate','claim.name'),('0c9eec02-3b20-4c6f-8c01-09110d8c9923','true','id.token.claim'),('0c9eec02-3b20-4c6f-8c01-09110d8c9923','String','jsonType.label'),('0c9eec02-3b20-4c6f-8c01-09110d8c9923','birthdate','user.attribute'),('0c9eec02-3b20-4c6f-8c01-09110d8c9923','true','userinfo.token.claim'),('102a311a-4ffb-4b75-905b-41c298bb1edb','true','access.token.claim'),('102a311a-4ffb-4b75-905b-41c298bb1edb','clientHost','claim.name'),('102a311a-4ffb-4b75-905b-41c298bb1edb','true','id.token.claim'),('102a311a-4ffb-4b75-905b-41c298bb1edb','String','jsonType.label'),('102a311a-4ffb-4b75-905b-41c298bb1edb','clientHost','user.session.note'),('102a311a-4ffb-4b75-905b-41c298bb1edb','true','userinfo.token.claim'),('105d4ff4-ea40-4293-9ed3-71460675bb24','true','access.token.claim'),('105d4ff4-ea40-4293-9ed3-71460675bb24','locale','claim.name'),('105d4ff4-ea40-4293-9ed3-71460675bb24','true','id.token.claim'),('105d4ff4-ea40-4293-9ed3-71460675bb24','String','jsonType.label'),('105d4ff4-ea40-4293-9ed3-71460675bb24','locale','user.attribute'),('105d4ff4-ea40-4293-9ed3-71460675bb24','true','userinfo.token.claim'),('10dfd392-a68e-47d7-adb3-cf4ac37f810e','true','access.token.claim'),('10dfd392-a68e-47d7-adb3-cf4ac37f810e','picture','claim.name'),('10dfd392-a68e-47d7-adb3-cf4ac37f810e','true','id.token.claim'),('10dfd392-a68e-47d7-adb3-cf4ac37f810e','String','jsonType.label'),('10dfd392-a68e-47d7-adb3-cf4ac37f810e','picture','user.attribute'),('10dfd392-a68e-47d7-adb3-cf4ac37f810e','true','userinfo.token.claim'),('11484486-7a9e-4687-92fc-16103fec7578','true','access.token.claim'),('11484486-7a9e-4687-92fc-16103fec7578','zoneinfo','claim.name'),('11484486-7a9e-4687-92fc-16103fec7578','true','id.token.claim'),('11484486-7a9e-4687-92fc-16103fec7578','String','jsonType.label'),('11484486-7a9e-4687-92fc-16103fec7578','zoneinfo','user.attribute'),('11484486-7a9e-4687-92fc-16103fec7578','true','userinfo.token.claim'),('12adc221-e361-4ce9-a609-409f9a6841ef','true','access.token.claim'),('12adc221-e361-4ce9-a609-409f9a6841ef','clientHost','claim.name'),('12adc221-e361-4ce9-a609-409f9a6841ef','true','id.token.claim'),('12adc221-e361-4ce9-a609-409f9a6841ef','String','jsonType.label'),('12adc221-e361-4ce9-a609-409f9a6841ef','clientHost','user.session.note'),('12adc221-e361-4ce9-a609-409f9a6841ef','true','userinfo.token.claim'),('1426a291-2af5-461b-a4b4-cd07794ef2b2','true','access.token.claim'),('1426a291-2af5-461b-a4b4-cd07794ef2b2','profile','claim.name'),('1426a291-2af5-461b-a4b4-cd07794ef2b2','true','id.token.claim'),('1426a291-2af5-461b-a4b4-cd07794ef2b2','String','jsonType.label'),('1426a291-2af5-461b-a4b4-cd07794ef2b2','profile','user.attribute'),('1426a291-2af5-461b-a4b4-cd07794ef2b2','true','userinfo.token.claim'),('153bd0b1-1fb0-4dc0-837e-3480479d7263','true','access.token.claim'),('153bd0b1-1fb0-4dc0-837e-3480479d7263','birthdate','claim.name'),('153bd0b1-1fb0-4dc0-837e-3480479d7263','true','id.token.claim'),('153bd0b1-1fb0-4dc0-837e-3480479d7263','String','jsonType.label'),('153bd0b1-1fb0-4dc0-837e-3480479d7263','birthdate','user.attribute'),('153bd0b1-1fb0-4dc0-837e-3480479d7263','true','userinfo.token.claim'),('18473503-448e-419e-9aa4-cae3b03c0dc7','true','access.token.claim'),('18473503-448e-419e-9aa4-cae3b03c0dc7','true','id.token.claim'),('18473503-448e-419e-9aa4-cae3b03c0dc7','country','user.attribute.country'),('18473503-448e-419e-9aa4-cae3b03c0dc7','formatted','user.attribute.formatted'),('18473503-448e-419e-9aa4-cae3b03c0dc7','locality','user.attribute.locality'),('18473503-448e-419e-9aa4-cae3b03c0dc7','postal_code','user.attribute.postal_code'),('18473503-448e-419e-9aa4-cae3b03c0dc7','region','user.attribute.region'),('18473503-448e-419e-9aa4-cae3b03c0dc7','street','user.attribute.street'),('18473503-448e-419e-9aa4-cae3b03c0dc7','true','userinfo.token.claim'),('18e8c88a-f7eb-4791-a2ca-8b62d07a9b55','true','access.token.claim'),('18e8c88a-f7eb-4791-a2ca-8b62d07a9b55','groups','claim.name'),('18e8c88a-f7eb-4791-a2ca-8b62d07a9b55','true','id.token.claim'),('18e8c88a-f7eb-4791-a2ca-8b62d07a9b55','String','jsonType.label'),('18e8c88a-f7eb-4791-a2ca-8b62d07a9b55','true','multivalued'),('18e8c88a-f7eb-4791-a2ca-8b62d07a9b55','foo','user.attribute'),('19a41a0c-22c5-49d4-a2ad-71037b2cd862','true','access.token.claim'),('19a41a0c-22c5-49d4-a2ad-71037b2cd862','email_verified','claim.name'),('19a41a0c-22c5-49d4-a2ad-71037b2cd862','true','id.token.claim'),('19a41a0c-22c5-49d4-a2ad-71037b2cd862','boolean','jsonType.label'),('19a41a0c-22c5-49d4-a2ad-71037b2cd862','emailVerified','user.attribute'),('19a41a0c-22c5-49d4-a2ad-71037b2cd862','true','userinfo.token.claim'),('1b5600f2-6e14-4503-975f-6c0f88259ef2','true','access.token.claim'),('1b5600f2-6e14-4503-975f-6c0f88259ef2','upn','claim.name'),('1b5600f2-6e14-4503-975f-6c0f88259ef2','true','id.token.claim'),('1b5600f2-6e14-4503-975f-6c0f88259ef2','String','jsonType.label'),('1b5600f2-6e14-4503-975f-6c0f88259ef2','username','user.attribute'),('1b5600f2-6e14-4503-975f-6c0f88259ef2','true','userinfo.token.claim'),('1d15003d-6d73-4250-b4fd-b3e993e3038b','true','access.token.claim'),('1d15003d-6d73-4250-b4fd-b3e993e3038b','clientId','claim.name'),('1d15003d-6d73-4250-b4fd-b3e993e3038b','true','id.token.claim'),('1d15003d-6d73-4250-b4fd-b3e993e3038b','String','jsonType.label'),('1d15003d-6d73-4250-b4fd-b3e993e3038b','clientId','user.session.note'),('1d15003d-6d73-4250-b4fd-b3e993e3038b','true','userinfo.token.claim'),('1de8ca83-3eeb-4e7e-874d-45ca97d7957e','true','access.token.claim'),('1de8ca83-3eeb-4e7e-874d-45ca97d7957e','phone_number','claim.name'),('1de8ca83-3eeb-4e7e-874d-45ca97d7957e','true','id.token.claim'),('1de8ca83-3eeb-4e7e-874d-45ca97d7957e','String','jsonType.label'),('1de8ca83-3eeb-4e7e-874d-45ca97d7957e','phoneNumber','user.attribute'),('1de8ca83-3eeb-4e7e-874d-45ca97d7957e','true','userinfo.token.claim'),('1ea8c53b-e39f-4878-8277-bcb8efdcf315','true','access.token.claim'),('1ea8c53b-e39f-4878-8277-bcb8efdcf315','upn','claim.name'),('1ea8c53b-e39f-4878-8277-bcb8efdcf315','true','id.token.claim'),('1ea8c53b-e39f-4878-8277-bcb8efdcf315','String','jsonType.label'),('1ea8c53b-e39f-4878-8277-bcb8efdcf315','username','user.attribute'),('1ea8c53b-e39f-4878-8277-bcb8efdcf315','true','userinfo.token.claim'),('217ba743-285b-4ec3-836a-c6af5146721b','true','access.token.claim'),('217ba743-285b-4ec3-836a-c6af5146721b','given_name','claim.name'),('217ba743-285b-4ec3-836a-c6af5146721b','true','id.token.claim'),('217ba743-285b-4ec3-836a-c6af5146721b','String','jsonType.label'),('217ba743-285b-4ec3-836a-c6af5146721b','firstName','user.attribute'),('217ba743-285b-4ec3-836a-c6af5146721b','true','userinfo.token.claim'),('21ce2821-7168-415e-9107-de898d7b340d','true','access.token.claim'),('21ce2821-7168-415e-9107-de898d7b340d','upn','claim.name'),('21ce2821-7168-415e-9107-de898d7b340d','true','id.token.claim'),('21ce2821-7168-415e-9107-de898d7b340d','String','jsonType.label'),('21ce2821-7168-415e-9107-de898d7b340d','username','user.attribute'),('21ce2821-7168-415e-9107-de898d7b340d','true','userinfo.token.claim'),('227bf755-5e72-4c2f-be7d-4de863ceab5e','true','access.token.claim'),('227bf755-5e72-4c2f-be7d-4de863ceab5e','preferred_username','claim.name'),('227bf755-5e72-4c2f-be7d-4de863ceab5e','true','id.token.claim'),('227bf755-5e72-4c2f-be7d-4de863ceab5e','String','jsonType.label'),('227bf755-5e72-4c2f-be7d-4de863ceab5e','username','user.attribute'),('227bf755-5e72-4c2f-be7d-4de863ceab5e','true','userinfo.token.claim'),('23773eb6-5f61-401b-aa82-8695c4c3b24c','true','access.token.claim'),('23773eb6-5f61-401b-aa82-8695c4c3b24c','zoneinfo','claim.name'),('23773eb6-5f61-401b-aa82-8695c4c3b24c','true','id.token.claim'),('23773eb6-5f61-401b-aa82-8695c4c3b24c','String','jsonType.label'),('23773eb6-5f61-401b-aa82-8695c4c3b24c','zoneinfo','user.attribute'),('23773eb6-5f61-401b-aa82-8695c4c3b24c','true','userinfo.token.claim'),('24409356-3b69-4a42-a44c-3df669e3110f','true','access.token.claim'),('24409356-3b69-4a42-a44c-3df669e3110f','groups','claim.name'),('24409356-3b69-4a42-a44c-3df669e3110f','true','id.token.claim'),('24409356-3b69-4a42-a44c-3df669e3110f','String','jsonType.label'),('24409356-3b69-4a42-a44c-3df669e3110f','true','multivalued'),('24409356-3b69-4a42-a44c-3df669e3110f','foo','user.attribute'),('2926eef3-0672-4900-8d02-095dba6a7194','true','access.token.claim'),('2926eef3-0672-4900-8d02-095dba6a7194','true','id.token.claim'),('2926eef3-0672-4900-8d02-095dba6a7194','country','user.attribute.country'),('2926eef3-0672-4900-8d02-095dba6a7194','formatted','user.attribute.formatted'),('2926eef3-0672-4900-8d02-095dba6a7194','locality','user.attribute.locality'),('2926eef3-0672-4900-8d02-095dba6a7194','postal_code','user.attribute.postal_code'),('2926eef3-0672-4900-8d02-095dba6a7194','region','user.attribute.region'),('2926eef3-0672-4900-8d02-095dba6a7194','street','user.attribute.street'),('2926eef3-0672-4900-8d02-095dba6a7194','true','userinfo.token.claim'),('2953af68-6f96-41d6-843a-f3548332e7ee','true','access.token.claim'),('2953af68-6f96-41d6-843a-f3548332e7ee','true','id.token.claim'),('2953af68-6f96-41d6-843a-f3548332e7ee','true','userinfo.token.claim'),('29a71dd4-303a-4d7d-8539-26e61d1aab0d','true','access.token.claim'),('29a71dd4-303a-4d7d-8539-26e61d1aab0d','clientId','claim.name'),('29a71dd4-303a-4d7d-8539-26e61d1aab0d','true','id.token.claim'),('29a71dd4-303a-4d7d-8539-26e61d1aab0d','String','jsonType.label'),('29a71dd4-303a-4d7d-8539-26e61d1aab0d','clientId','user.session.note'),('29a71dd4-303a-4d7d-8539-26e61d1aab0d','true','userinfo.token.claim'),('2a2aae15-611f-4327-9cd5-f385bf24feee','true','access.token.claim'),('2a2aae15-611f-4327-9cd5-f385bf24feee','picture','claim.name'),('2a2aae15-611f-4327-9cd5-f385bf24feee','true','id.token.claim'),('2a2aae15-611f-4327-9cd5-f385bf24feee','String','jsonType.label'),('2a2aae15-611f-4327-9cd5-f385bf24feee','picture','user.attribute'),('2a2aae15-611f-4327-9cd5-f385bf24feee','true','userinfo.token.claim'),('2b897e0f-6897-4512-9fea-c2d1f396b475','true','access.token.claim'),('2b897e0f-6897-4512-9fea-c2d1f396b475','family_name','claim.name'),('2b897e0f-6897-4512-9fea-c2d1f396b475','true','id.token.claim'),('2b897e0f-6897-4512-9fea-c2d1f396b475','String','jsonType.label'),('2b897e0f-6897-4512-9fea-c2d1f396b475','lastName','user.attribute'),('2b897e0f-6897-4512-9fea-c2d1f396b475','true','userinfo.token.claim'),('2d5d3dd6-6a3a-40c1-a3e2-372b9a4a5dcb','true','access.token.claim'),('2d5d3dd6-6a3a-40c1-a3e2-372b9a4a5dcb','resource_access.${client_id}.roles','claim.name'),('2d5d3dd6-6a3a-40c1-a3e2-372b9a4a5dcb','String','jsonType.label'),('2d5d3dd6-6a3a-40c1-a3e2-372b9a4a5dcb','true','multivalued'),('2d5d3dd6-6a3a-40c1-a3e2-372b9a4a5dcb','foo','user.attribute'),('2d6f1704-f523-43d9-81e8-0fffd97371cf','true','access.token.claim'),('2d6f1704-f523-43d9-81e8-0fffd97371cf','locale','claim.name'),('2d6f1704-f523-43d9-81e8-0fffd97371cf','true','id.token.claim'),('2d6f1704-f523-43d9-81e8-0fffd97371cf','String','jsonType.label'),('2d6f1704-f523-43d9-81e8-0fffd97371cf','locale','user.attribute'),('2d6f1704-f523-43d9-81e8-0fffd97371cf','true','userinfo.token.claim'),('2d9fcdd5-7470-455b-8fa3-ddbdf8d4e491','true','access.token.claim'),('2d9fcdd5-7470-455b-8fa3-ddbdf8d4e491','realm_access.roles','claim.name'),('2d9fcdd5-7470-455b-8fa3-ddbdf8d4e491','String','jsonType.label'),('2d9fcdd5-7470-455b-8fa3-ddbdf8d4e491','true','multivalued'),('2d9fcdd5-7470-455b-8fa3-ddbdf8d4e491','foo','user.attribute'),('2f83a65d-1315-4634-988a-a1ee894c23aa','true','access.token.claim'),('2f83a65d-1315-4634-988a-a1ee894c23aa','phone_number_verified','claim.name'),('2f83a65d-1315-4634-988a-a1ee894c23aa','true','id.token.claim'),('2f83a65d-1315-4634-988a-a1ee894c23aa','boolean','jsonType.label'),('2f83a65d-1315-4634-988a-a1ee894c23aa','phoneNumberVerified','user.attribute'),('2f83a65d-1315-4634-988a-a1ee894c23aa','true','userinfo.token.claim'),('3047fdf2-71e6-491c-a0e1-32eeb6dc383c','true','access.token.claim'),('3047fdf2-71e6-491c-a0e1-32eeb6dc383c','middle_name','claim.name'),('3047fdf2-71e6-491c-a0e1-32eeb6dc383c','true','id.token.claim'),('3047fdf2-71e6-491c-a0e1-32eeb6dc383c','String','jsonType.label'),('3047fdf2-71e6-491c-a0e1-32eeb6dc383c','middleName','user.attribute'),('3047fdf2-71e6-491c-a0e1-32eeb6dc383c','true','userinfo.token.claim'),('356bb7f8-c002-47f1-a1cf-a26fe4f2136d','true','access.token.claim'),('356bb7f8-c002-47f1-a1cf-a26fe4f2136d','nickname','claim.name'),('356bb7f8-c002-47f1-a1cf-a26fe4f2136d','true','id.token.claim'),('356bb7f8-c002-47f1-a1cf-a26fe4f2136d','String','jsonType.label'),('356bb7f8-c002-47f1-a1cf-a26fe4f2136d','nickname','user.attribute'),('356bb7f8-c002-47f1-a1cf-a26fe4f2136d','true','userinfo.token.claim'),('35a5cebc-fa5a-409f-8808-3c1e020ed8b7','true','access.token.claim'),('35a5cebc-fa5a-409f-8808-3c1e020ed8b7','given_name','claim.name'),('35a5cebc-fa5a-409f-8808-3c1e020ed8b7','true','id.token.claim'),('35a5cebc-fa5a-409f-8808-3c1e020ed8b7','String','jsonType.label'),('35a5cebc-fa5a-409f-8808-3c1e020ed8b7','firstName','user.attribute'),('35a5cebc-fa5a-409f-8808-3c1e020ed8b7','true','userinfo.token.claim'),('35db4f8e-4856-465c-9c73-b8865f8ad4ba','true','access.token.claim'),('35db4f8e-4856-465c-9c73-b8865f8ad4ba','groups','claim.name'),('35db4f8e-4856-465c-9c73-b8865f8ad4ba','true','id.token.claim'),('35db4f8e-4856-465c-9c73-b8865f8ad4ba','String','jsonType.label'),('35db4f8e-4856-465c-9c73-b8865f8ad4ba','true','multivalued'),('35db4f8e-4856-465c-9c73-b8865f8ad4ba','foo','user.attribute'),('3776f7f3-3186-44e0-82d5-e1409c01863a','true','access.token.claim'),('3776f7f3-3186-44e0-82d5-e1409c01863a','website','claim.name'),('3776f7f3-3186-44e0-82d5-e1409c01863a','true','id.token.claim'),('3776f7f3-3186-44e0-82d5-e1409c01863a','String','jsonType.label'),('3776f7f3-3186-44e0-82d5-e1409c01863a','website','user.attribute'),('3776f7f3-3186-44e0-82d5-e1409c01863a','true','userinfo.token.claim'),('382f8506-9d45-4d03-ad11-49eb9272ef1b','true','access.token.claim'),('382f8506-9d45-4d03-ad11-49eb9272ef1b','phone_number_verified','claim.name'),('382f8506-9d45-4d03-ad11-49eb9272ef1b','true','id.token.claim'),('382f8506-9d45-4d03-ad11-49eb9272ef1b','boolean','jsonType.label'),('382f8506-9d45-4d03-ad11-49eb9272ef1b','phoneNumberVerified','user.attribute'),('382f8506-9d45-4d03-ad11-49eb9272ef1b','true','userinfo.token.claim'),('3b41b1a2-5e67-4218-9be2-896f4d508dd0','true','access.token.claim'),('3b41b1a2-5e67-4218-9be2-896f4d508dd0','birthdate','claim.name'),('3b41b1a2-5e67-4218-9be2-896f4d508dd0','true','id.token.claim'),('3b41b1a2-5e67-4218-9be2-896f4d508dd0','String','jsonType.label'),('3b41b1a2-5e67-4218-9be2-896f4d508dd0','birthdate','user.attribute'),('3b41b1a2-5e67-4218-9be2-896f4d508dd0','true','userinfo.token.claim'),('3c94af02-92ff-4fa0-9b09-b8bb158f709d','true','access.token.claim'),('3c94af02-92ff-4fa0-9b09-b8bb158f709d','picture','claim.name'),('3c94af02-92ff-4fa0-9b09-b8bb158f709d','true','id.token.claim'),('3c94af02-92ff-4fa0-9b09-b8bb158f709d','String','jsonType.label'),('3c94af02-92ff-4fa0-9b09-b8bb158f709d','picture','user.attribute'),('3c94af02-92ff-4fa0-9b09-b8bb158f709d','true','userinfo.token.claim'),('47068945-e0b5-4eb3-900b-03074083dc66','true','access.token.claim'),('47068945-e0b5-4eb3-900b-03074083dc66','gender','claim.name'),('47068945-e0b5-4eb3-900b-03074083dc66','true','id.token.claim'),('47068945-e0b5-4eb3-900b-03074083dc66','String','jsonType.label'),('47068945-e0b5-4eb3-900b-03074083dc66','gender','user.attribute'),('47068945-e0b5-4eb3-900b-03074083dc66','true','userinfo.token.claim'),('474d6f9a-fbdf-4184-b0e1-f85b58b5909d','true','access.token.claim'),('474d6f9a-fbdf-4184-b0e1-f85b58b5909d','clientAddress','claim.name'),('474d6f9a-fbdf-4184-b0e1-f85b58b5909d','true','id.token.claim'),('474d6f9a-fbdf-4184-b0e1-f85b58b5909d','String','jsonType.label'),('474d6f9a-fbdf-4184-b0e1-f85b58b5909d','clientAddress','user.session.note'),('474d6f9a-fbdf-4184-b0e1-f85b58b5909d','true','userinfo.token.claim'),('48c4ba67-cd38-4e03-a5f4-094827b795fc','true','access.token.claim'),('48c4ba67-cd38-4e03-a5f4-094827b795fc','middle_name','claim.name'),('48c4ba67-cd38-4e03-a5f4-094827b795fc','true','id.token.claim'),('48c4ba67-cd38-4e03-a5f4-094827b795fc','String','jsonType.label'),('48c4ba67-cd38-4e03-a5f4-094827b795fc','middleName','user.attribute'),('48c4ba67-cd38-4e03-a5f4-094827b795fc','true','userinfo.token.claim'),('49a2a06e-377e-4ac7-8667-20b98b9416b2','true','access.token.claim'),('49a2a06e-377e-4ac7-8667-20b98b9416b2','middle_name','claim.name'),('49a2a06e-377e-4ac7-8667-20b98b9416b2','true','id.token.claim'),('49a2a06e-377e-4ac7-8667-20b98b9416b2','String','jsonType.label'),('49a2a06e-377e-4ac7-8667-20b98b9416b2','middleName','user.attribute'),('49a2a06e-377e-4ac7-8667-20b98b9416b2','true','userinfo.token.claim'),('49f453d9-6f8d-4cd1-83fd-8693e13d064e','true','access.token.claim'),('49f453d9-6f8d-4cd1-83fd-8693e13d064e','clientAddress','claim.name'),('49f453d9-6f8d-4cd1-83fd-8693e13d064e','true','id.token.claim'),('49f453d9-6f8d-4cd1-83fd-8693e13d064e','String','jsonType.label'),('49f453d9-6f8d-4cd1-83fd-8693e13d064e','clientAddress','user.session.note'),('49f453d9-6f8d-4cd1-83fd-8693e13d064e','true','userinfo.token.claim'),('4b96a3f8-3987-49ee-8fe1-f83dc21cf8ae','Role','attribute.name'),('4b96a3f8-3987-49ee-8fe1-f83dc21cf8ae','Basic','attribute.nameformat'),('4b96a3f8-3987-49ee-8fe1-f83dc21cf8ae','false','single'),('4cfa7f7d-f172-4996-aa98-addd7b0da118','true','access.token.claim'),('4cfa7f7d-f172-4996-aa98-addd7b0da118','website','claim.name'),('4cfa7f7d-f172-4996-aa98-addd7b0da118','true','id.token.claim'),('4cfa7f7d-f172-4996-aa98-addd7b0da118','String','jsonType.label'),('4cfa7f7d-f172-4996-aa98-addd7b0da118','website','user.attribute'),('4cfa7f7d-f172-4996-aa98-addd7b0da118','true','userinfo.token.claim'),('519d4bf1-2923-4650-b0d6-cae2df760a83','true','access.token.claim'),('519d4bf1-2923-4650-b0d6-cae2df760a83','resource_access.${client_id}.roles','claim.name'),('519d4bf1-2923-4650-b0d6-cae2df760a83','String','jsonType.label'),('519d4bf1-2923-4650-b0d6-cae2df760a83','true','multivalued'),('519d4bf1-2923-4650-b0d6-cae2df760a83','foo','user.attribute'),('52511c8b-af23-48a8-aed3-f91ad369a066','true','access.token.claim'),('52511c8b-af23-48a8-aed3-f91ad369a066','preferred_username','claim.name'),('52511c8b-af23-48a8-aed3-f91ad369a066','true','id.token.claim'),('52511c8b-af23-48a8-aed3-f91ad369a066','String','jsonType.label'),('52511c8b-af23-48a8-aed3-f91ad369a066','username','user.attribute'),('52511c8b-af23-48a8-aed3-f91ad369a066','true','userinfo.token.claim'),('53fd823e-bdf2-4626-9721-a9f9a0efdc04','true','access.token.claim'),('53fd823e-bdf2-4626-9721-a9f9a0efdc04','updated_at','claim.name'),('53fd823e-bdf2-4626-9721-a9f9a0efdc04','true','id.token.claim'),('53fd823e-bdf2-4626-9721-a9f9a0efdc04','long','jsonType.label'),('53fd823e-bdf2-4626-9721-a9f9a0efdc04','updatedAt','user.attribute'),('53fd823e-bdf2-4626-9721-a9f9a0efdc04','true','userinfo.token.claim'),('54bf61bf-9791-47c6-918c-7da9d44a3242','true','access.token.claim'),('54bf61bf-9791-47c6-918c-7da9d44a3242','nickname','claim.name'),('54bf61bf-9791-47c6-918c-7da9d44a3242','true','id.token.claim'),('54bf61bf-9791-47c6-918c-7da9d44a3242','String','jsonType.label'),('54bf61bf-9791-47c6-918c-7da9d44a3242','nickname','user.attribute'),('54bf61bf-9791-47c6-918c-7da9d44a3242','true','userinfo.token.claim'),('54ce2d13-1890-451f-937c-17d03ce4e746','Role','attribute.name'),('54ce2d13-1890-451f-937c-17d03ce4e746','Basic','attribute.nameformat'),('54ce2d13-1890-451f-937c-17d03ce4e746','false','single'),('560539cc-0188-409a-9109-c674c0600c1c','true','access.token.claim'),('560539cc-0188-409a-9109-c674c0600c1c','upn','claim.name'),('560539cc-0188-409a-9109-c674c0600c1c','true','id.token.claim'),('560539cc-0188-409a-9109-c674c0600c1c','String','jsonType.label'),('560539cc-0188-409a-9109-c674c0600c1c','username','user.attribute'),('560539cc-0188-409a-9109-c674c0600c1c','true','userinfo.token.claim'),('565f5624-2834-4160-950f-59ec87909229','true','access.token.claim'),('565f5624-2834-4160-950f-59ec87909229','true','id.token.claim'),('565f5624-2834-4160-950f-59ec87909229','true','userinfo.token.claim'),('568afc67-da4f-4fd7-8113-204c90014dae','true','access.token.claim'),('568afc67-da4f-4fd7-8113-204c90014dae','locale','claim.name'),('568afc67-da4f-4fd7-8113-204c90014dae','true','id.token.claim'),('568afc67-da4f-4fd7-8113-204c90014dae','String','jsonType.label'),('568afc67-da4f-4fd7-8113-204c90014dae','locale','user.attribute'),('568afc67-da4f-4fd7-8113-204c90014dae','true','userinfo.token.claim'),('57db9101-eb9b-4d20-97a7-9f4c9e2b955c','true','access.token.claim'),('57db9101-eb9b-4d20-97a7-9f4c9e2b955c','true','id.token.claim'),('57db9101-eb9b-4d20-97a7-9f4c9e2b955c','country','user.attribute.country'),('57db9101-eb9b-4d20-97a7-9f4c9e2b955c','formatted','user.attribute.formatted'),('57db9101-eb9b-4d20-97a7-9f4c9e2b955c','locality','user.attribute.locality'),('57db9101-eb9b-4d20-97a7-9f4c9e2b955c','postal_code','user.attribute.postal_code'),('57db9101-eb9b-4d20-97a7-9f4c9e2b955c','region','user.attribute.region'),('57db9101-eb9b-4d20-97a7-9f4c9e2b955c','street','user.attribute.street'),('57db9101-eb9b-4d20-97a7-9f4c9e2b955c','true','userinfo.token.claim'),('5bb1420b-92cc-4074-b536-c885d8380ada','true','access.token.claim'),('5bb1420b-92cc-4074-b536-c885d8380ada','clientHost','claim.name'),('5bb1420b-92cc-4074-b536-c885d8380ada','true','id.token.claim'),('5bb1420b-92cc-4074-b536-c885d8380ada','String','jsonType.label'),('5bb1420b-92cc-4074-b536-c885d8380ada','clientHost','user.session.note'),('5bb1420b-92cc-4074-b536-c885d8380ada','true','userinfo.token.claim'),('5bb535c1-20b9-4c51-9966-44153c77ae92','true','access.token.claim'),('5bb535c1-20b9-4c51-9966-44153c77ae92','email_verified','claim.name'),('5bb535c1-20b9-4c51-9966-44153c77ae92','true','id.token.claim'),('5bb535c1-20b9-4c51-9966-44153c77ae92','boolean','jsonType.label'),('5bb535c1-20b9-4c51-9966-44153c77ae92','emailVerified','user.attribute'),('5bb535c1-20b9-4c51-9966-44153c77ae92','true','userinfo.token.claim'),('5cc7be4f-190f-4225-a1eb-32e1a46c6467','true','access.token.claim'),('5cc7be4f-190f-4225-a1eb-32e1a46c6467','realm_access.roles','claim.name'),('5cc7be4f-190f-4225-a1eb-32e1a46c6467','String','jsonType.label'),('5cc7be4f-190f-4225-a1eb-32e1a46c6467','true','multivalued'),('5cc7be4f-190f-4225-a1eb-32e1a46c6467','foo','user.attribute'),('5ce727cd-1158-482e-bf55-d22fdea4ed38','true','access.token.claim'),('5ce727cd-1158-482e-bf55-d22fdea4ed38','locale','claim.name'),('5ce727cd-1158-482e-bf55-d22fdea4ed38','true','id.token.claim'),('5ce727cd-1158-482e-bf55-d22fdea4ed38','String','jsonType.label'),('5ce727cd-1158-482e-bf55-d22fdea4ed38','locale','user.attribute'),('5ce727cd-1158-482e-bf55-d22fdea4ed38','true','userinfo.token.claim'),('5ebf7a21-e4a4-4cf5-b2c5-c3944b543377','true','access.token.claim'),('5ebf7a21-e4a4-4cf5-b2c5-c3944b543377','middle_name','claim.name'),('5ebf7a21-e4a4-4cf5-b2c5-c3944b543377','true','id.token.claim'),('5ebf7a21-e4a4-4cf5-b2c5-c3944b543377','String','jsonType.label'),('5ebf7a21-e4a4-4cf5-b2c5-c3944b543377','middleName','user.attribute'),('5ebf7a21-e4a4-4cf5-b2c5-c3944b543377','true','userinfo.token.claim'),('5f4c7cf9-4525-4d52-ad1b-c498bdb131bd','true','access.token.claim'),('5f4c7cf9-4525-4d52-ad1b-c498bdb131bd','middle_name','claim.name'),('5f4c7cf9-4525-4d52-ad1b-c498bdb131bd','true','id.token.claim'),('5f4c7cf9-4525-4d52-ad1b-c498bdb131bd','String','jsonType.label'),('5f4c7cf9-4525-4d52-ad1b-c498bdb131bd','middleName','user.attribute'),('5f4c7cf9-4525-4d52-ad1b-c498bdb131bd','true','userinfo.token.claim'),('5f77636d-285f-4f91-9b79-5713ef4c7843','true','access.token.claim'),('5f77636d-285f-4f91-9b79-5713ef4c7843','phone_number_verified','claim.name'),('5f77636d-285f-4f91-9b79-5713ef4c7843','true','id.token.claim'),('5f77636d-285f-4f91-9b79-5713ef4c7843','boolean','jsonType.label'),('5f77636d-285f-4f91-9b79-5713ef4c7843','phoneNumberVerified','user.attribute'),('5f77636d-285f-4f91-9b79-5713ef4c7843','true','userinfo.token.claim'),('62ba3d85-2721-4499-bcd2-efd7b1df077a','true','access.token.claim'),('62ba3d85-2721-4499-bcd2-efd7b1df077a','nickname','claim.name'),('62ba3d85-2721-4499-bcd2-efd7b1df077a','true','id.token.claim'),('62ba3d85-2721-4499-bcd2-efd7b1df077a','String','jsonType.label'),('62ba3d85-2721-4499-bcd2-efd7b1df077a','nickname','user.attribute'),('62ba3d85-2721-4499-bcd2-efd7b1df077a','true','userinfo.token.claim'),('658fa452-c8e1-43e2-be00-8249ef5ca6bc','true','access.token.claim'),('658fa452-c8e1-43e2-be00-8249ef5ca6bc','locale','claim.name'),('658fa452-c8e1-43e2-be00-8249ef5ca6bc','true','id.token.claim'),('658fa452-c8e1-43e2-be00-8249ef5ca6bc','String','jsonType.label'),('658fa452-c8e1-43e2-be00-8249ef5ca6bc','locale','user.attribute'),('658fa452-c8e1-43e2-be00-8249ef5ca6bc','true','userinfo.token.claim'),('67673257-73f2-4ffd-a348-25f3af0b32d1','true','access.token.claim'),('67673257-73f2-4ffd-a348-25f3af0b32d1','email_verified','claim.name'),('67673257-73f2-4ffd-a348-25f3af0b32d1','true','id.token.claim'),('67673257-73f2-4ffd-a348-25f3af0b32d1','boolean','jsonType.label'),('67673257-73f2-4ffd-a348-25f3af0b32d1','emailVerified','user.attribute'),('67673257-73f2-4ffd-a348-25f3af0b32d1','true','userinfo.token.claim'),('67afb08e-4c53-4c30-9de3-f223505144f5','true','access.token.claim'),('67afb08e-4c53-4c30-9de3-f223505144f5','email','claim.name'),('67afb08e-4c53-4c30-9de3-f223505144f5','true','id.token.claim'),('67afb08e-4c53-4c30-9de3-f223505144f5','String','jsonType.label'),('67afb08e-4c53-4c30-9de3-f223505144f5','email','user.attribute'),('67afb08e-4c53-4c30-9de3-f223505144f5','true','userinfo.token.claim'),('6b1e81fe-7abf-4e13-8d6b-d709f13c599f','true','access.token.claim'),('6b1e81fe-7abf-4e13-8d6b-d709f13c599f','given_name','claim.name'),('6b1e81fe-7abf-4e13-8d6b-d709f13c599f','true','id.token.claim'),('6b1e81fe-7abf-4e13-8d6b-d709f13c599f','String','jsonType.label'),('6b1e81fe-7abf-4e13-8d6b-d709f13c599f','firstName','user.attribute'),('6b1e81fe-7abf-4e13-8d6b-d709f13c599f','true','userinfo.token.claim'),('6b399334-f5d3-4441-a8d1-a530e3e27b1a','true','access.token.claim'),('6b399334-f5d3-4441-a8d1-a530e3e27b1a','birthdate','claim.name'),('6b399334-f5d3-4441-a8d1-a530e3e27b1a','true','id.token.claim'),('6b399334-f5d3-4441-a8d1-a530e3e27b1a','String','jsonType.label'),('6b399334-f5d3-4441-a8d1-a530e3e27b1a','birthdate','user.attribute'),('6b399334-f5d3-4441-a8d1-a530e3e27b1a','true','userinfo.token.claim'),('6eb78f0f-abc1-4164-afe0-306bad593644','true','access.token.claim'),('6eb78f0f-abc1-4164-afe0-306bad593644','email','claim.name'),('6eb78f0f-abc1-4164-afe0-306bad593644','true','id.token.claim'),('6eb78f0f-abc1-4164-afe0-306bad593644','String','jsonType.label'),('6eb78f0f-abc1-4164-afe0-306bad593644','email','user.attribute'),('6eb78f0f-abc1-4164-afe0-306bad593644','true','userinfo.token.claim'),('6ed4a53a-2a47-4c60-9ad2-546422ae373c','true','access.token.claim'),('6ed4a53a-2a47-4c60-9ad2-546422ae373c','groups','claim.name'),('6ed4a53a-2a47-4c60-9ad2-546422ae373c','true','id.token.claim'),('6ed4a53a-2a47-4c60-9ad2-546422ae373c','String','jsonType.label'),('6ed4a53a-2a47-4c60-9ad2-546422ae373c','true','multivalued'),('6ed4a53a-2a47-4c60-9ad2-546422ae373c','foo','user.attribute'),('71250195-fe7c-4973-8270-9674ee9eab92','true','access.token.claim'),('71250195-fe7c-4973-8270-9674ee9eab92','updated_at','claim.name'),('71250195-fe7c-4973-8270-9674ee9eab92','true','id.token.claim'),('71250195-fe7c-4973-8270-9674ee9eab92','long','jsonType.label'),('71250195-fe7c-4973-8270-9674ee9eab92','updatedAt','user.attribute'),('71250195-fe7c-4973-8270-9674ee9eab92','true','userinfo.token.claim'),('713463a5-4885-4220-9886-db9b70457980','true','access.token.claim'),('713463a5-4885-4220-9886-db9b70457980','locale','claim.name'),('713463a5-4885-4220-9886-db9b70457980','true','id.token.claim'),('713463a5-4885-4220-9886-db9b70457980','String','jsonType.label'),('713463a5-4885-4220-9886-db9b70457980','locale','user.attribute'),('713463a5-4885-4220-9886-db9b70457980','true','userinfo.token.claim'),('71d0d0ef-b97a-4693-80ac-3069d73ad2e9','true','access.token.claim'),('71d0d0ef-b97a-4693-80ac-3069d73ad2e9','resource_access.${client_id}.roles','claim.name'),('71d0d0ef-b97a-4693-80ac-3069d73ad2e9','String','jsonType.label'),('71d0d0ef-b97a-4693-80ac-3069d73ad2e9','true','multivalued'),('71d0d0ef-b97a-4693-80ac-3069d73ad2e9','foo','user.attribute'),('71e5c33f-7621-4d81-b133-9ca177a7ea9c','true','access.token.claim'),('71e5c33f-7621-4d81-b133-9ca177a7ea9c','birthdate','claim.name'),('71e5c33f-7621-4d81-b133-9ca177a7ea9c','true','id.token.claim'),('71e5c33f-7621-4d81-b133-9ca177a7ea9c','String','jsonType.label'),('71e5c33f-7621-4d81-b133-9ca177a7ea9c','birthdate','user.attribute'),('71e5c33f-7621-4d81-b133-9ca177a7ea9c','true','userinfo.token.claim'),('728ab4a2-7819-4f36-8114-0af3aca4d4da','true','access.token.claim'),('728ab4a2-7819-4f36-8114-0af3aca4d4da','clientHost','claim.name'),('728ab4a2-7819-4f36-8114-0af3aca4d4da','true','id.token.claim'),('728ab4a2-7819-4f36-8114-0af3aca4d4da','String','jsonType.label'),('728ab4a2-7819-4f36-8114-0af3aca4d4da','clientHost','user.session.note'),('728ab4a2-7819-4f36-8114-0af3aca4d4da','true','userinfo.token.claim'),('742509a4-7d96-4622-8df1-699868da77ee','true','access.token.claim'),('742509a4-7d96-4622-8df1-699868da77ee','locale','claim.name'),('742509a4-7d96-4622-8df1-699868da77ee','true','id.token.claim'),('742509a4-7d96-4622-8df1-699868da77ee','String','jsonType.label'),('742509a4-7d96-4622-8df1-699868da77ee','locale','user.attribute'),('742509a4-7d96-4622-8df1-699868da77ee','true','userinfo.token.claim'),('74af4d72-0ae7-4b13-9b90-eebacf9b295a','true','access.token.claim'),('74af4d72-0ae7-4b13-9b90-eebacf9b295a','clientAddress','claim.name'),('74af4d72-0ae7-4b13-9b90-eebacf9b295a','true','id.token.claim'),('74af4d72-0ae7-4b13-9b90-eebacf9b295a','String','jsonType.label'),('74af4d72-0ae7-4b13-9b90-eebacf9b295a','clientAddress','user.session.note'),('74af4d72-0ae7-4b13-9b90-eebacf9b295a','true','userinfo.token.claim'),('74cc0a5f-97ea-4a02-974b-538d2012ae19','true','access.token.claim'),('74cc0a5f-97ea-4a02-974b-538d2012ae19','realm_access.roles','claim.name'),('74cc0a5f-97ea-4a02-974b-538d2012ae19','String','jsonType.label'),('74cc0a5f-97ea-4a02-974b-538d2012ae19','true','multivalued'),('74cc0a5f-97ea-4a02-974b-538d2012ae19','foo','user.attribute'),('75ea1c9e-0232-4858-9542-84fec70c3af4','true','access.token.claim'),('75ea1c9e-0232-4858-9542-84fec70c3af4','zoneinfo','claim.name'),('75ea1c9e-0232-4858-9542-84fec70c3af4','true','id.token.claim'),('75ea1c9e-0232-4858-9542-84fec70c3af4','String','jsonType.label'),('75ea1c9e-0232-4858-9542-84fec70c3af4','zoneinfo','user.attribute'),('75ea1c9e-0232-4858-9542-84fec70c3af4','true','userinfo.token.claim'),('76148c5e-ddde-470e-9503-420bd483f7c4','true','access.token.claim'),('76148c5e-ddde-470e-9503-420bd483f7c4','true','id.token.claim'),('76456391-d004-4995-be63-4608dc71d6ae','true','access.token.claim'),('76456391-d004-4995-be63-4608dc71d6ae','clientAddress','claim.name'),('76456391-d004-4995-be63-4608dc71d6ae','true','id.token.claim'),('76456391-d004-4995-be63-4608dc71d6ae','String','jsonType.label'),('76456391-d004-4995-be63-4608dc71d6ae','clientAddress','user.session.note'),('76456391-d004-4995-be63-4608dc71d6ae','true','userinfo.token.claim'),('76d251a3-e38a-4ea0-9ae8-5dbc01992993','true','access.token.claim'),('76d251a3-e38a-4ea0-9ae8-5dbc01992993','updated_at','claim.name'),('76d251a3-e38a-4ea0-9ae8-5dbc01992993','true','id.token.claim'),('76d251a3-e38a-4ea0-9ae8-5dbc01992993','long','jsonType.label'),('76d251a3-e38a-4ea0-9ae8-5dbc01992993','updatedAt','user.attribute'),('76d251a3-e38a-4ea0-9ae8-5dbc01992993','true','userinfo.token.claim'),('77f9e5f6-63bb-47a4-bb33-eeb8e871e17c','true','access.token.claim'),('77f9e5f6-63bb-47a4-bb33-eeb8e871e17c','nickname','claim.name'),('77f9e5f6-63bb-47a4-bb33-eeb8e871e17c','true','id.token.claim'),('77f9e5f6-63bb-47a4-bb33-eeb8e871e17c','String','jsonType.label'),('77f9e5f6-63bb-47a4-bb33-eeb8e871e17c','nickname','user.attribute'),('77f9e5f6-63bb-47a4-bb33-eeb8e871e17c','true','userinfo.token.claim'),('7c58e868-f15e-48b9-aba1-2f67da7d41c4','true','access.token.claim'),('7c58e868-f15e-48b9-aba1-2f67da7d41c4','birthdate','claim.name'),('7c58e868-f15e-48b9-aba1-2f67da7d41c4','true','id.token.claim'),('7c58e868-f15e-48b9-aba1-2f67da7d41c4','String','jsonType.label'),('7c58e868-f15e-48b9-aba1-2f67da7d41c4','birthdate','user.attribute'),('7c58e868-f15e-48b9-aba1-2f67da7d41c4','true','userinfo.token.claim'),('7f0a8823-6a82-4c59-995c-d022bdea6564','true','access.token.claim'),('7f0a8823-6a82-4c59-995c-d022bdea6564','locale','claim.name'),('7f0a8823-6a82-4c59-995c-d022bdea6564','true','id.token.claim'),('7f0a8823-6a82-4c59-995c-d022bdea6564','String','jsonType.label'),('7f0a8823-6a82-4c59-995c-d022bdea6564','locale','user.attribute'),('7f0a8823-6a82-4c59-995c-d022bdea6564','true','userinfo.token.claim'),('80faee43-1992-4f07-b7c1-2440e38eeed5','true','access.token.claim'),('80faee43-1992-4f07-b7c1-2440e38eeed5','profile','claim.name'),('80faee43-1992-4f07-b7c1-2440e38eeed5','true','id.token.claim'),('80faee43-1992-4f07-b7c1-2440e38eeed5','String','jsonType.label'),('80faee43-1992-4f07-b7c1-2440e38eeed5','profile','user.attribute'),('80faee43-1992-4f07-b7c1-2440e38eeed5','true','userinfo.token.claim'),('82200c56-8b9f-4654-9304-257a4843f13a','true','access.token.claim'),('82200c56-8b9f-4654-9304-257a4843f13a','preferred_username','claim.name'),('82200c56-8b9f-4654-9304-257a4843f13a','true','id.token.claim'),('82200c56-8b9f-4654-9304-257a4843f13a','String','jsonType.label'),('82200c56-8b9f-4654-9304-257a4843f13a','username','user.attribute'),('82200c56-8b9f-4654-9304-257a4843f13a','true','userinfo.token.claim'),('829d36f8-147e-4195-b328-8a05b76ed93a','true','access.token.claim'),('829d36f8-147e-4195-b328-8a05b76ed93a','locale','claim.name'),('829d36f8-147e-4195-b328-8a05b76ed93a','true','id.token.claim'),('829d36f8-147e-4195-b328-8a05b76ed93a','String','jsonType.label'),('829d36f8-147e-4195-b328-8a05b76ed93a','locale','user.attribute'),('829d36f8-147e-4195-b328-8a05b76ed93a','true','userinfo.token.claim'),('82f8336e-d8e3-4294-8bd4-69adc879d4fc','Role','attribute.name'),('82f8336e-d8e3-4294-8bd4-69adc879d4fc','Basic','attribute.nameformat'),('82f8336e-d8e3-4294-8bd4-69adc879d4fc','false','single'),('83829884-654c-4a23-8d13-f2676688bcde','true','access.token.claim'),('83829884-654c-4a23-8d13-f2676688bcde','clientId','claim.name'),('83829884-654c-4a23-8d13-f2676688bcde','true','id.token.claim'),('83829884-654c-4a23-8d13-f2676688bcde','String','jsonType.label'),('83829884-654c-4a23-8d13-f2676688bcde','clientId','user.session.note'),('83829884-654c-4a23-8d13-f2676688bcde','true','userinfo.token.claim'),('8404d3a9-cda7-4900-b577-375d7f2f034c','true','access.token.claim'),('8404d3a9-cda7-4900-b577-375d7f2f034c','preferred_username','claim.name'),('8404d3a9-cda7-4900-b577-375d7f2f034c','true','id.token.claim'),('8404d3a9-cda7-4900-b577-375d7f2f034c','String','jsonType.label'),('8404d3a9-cda7-4900-b577-375d7f2f034c','username','user.attribute'),('8404d3a9-cda7-4900-b577-375d7f2f034c','true','userinfo.token.claim'),('86e9936d-895c-42d1-892a-a14a9ea130cc','true','access.token.claim'),('86e9936d-895c-42d1-892a-a14a9ea130cc','phone_number_verified','claim.name'),('86e9936d-895c-42d1-892a-a14a9ea130cc','true','id.token.claim'),('86e9936d-895c-42d1-892a-a14a9ea130cc','boolean','jsonType.label'),('86e9936d-895c-42d1-892a-a14a9ea130cc','phoneNumberVerified','user.attribute'),('86e9936d-895c-42d1-892a-a14a9ea130cc','true','userinfo.token.claim'),('8837c5e0-eabe-4c8f-b314-c114b60ef94d','true','access.token.claim'),('8837c5e0-eabe-4c8f-b314-c114b60ef94d','email','claim.name'),('8837c5e0-eabe-4c8f-b314-c114b60ef94d','true','id.token.claim'),('8837c5e0-eabe-4c8f-b314-c114b60ef94d','String','jsonType.label'),('8837c5e0-eabe-4c8f-b314-c114b60ef94d','email','user.attribute'),('8837c5e0-eabe-4c8f-b314-c114b60ef94d','true','userinfo.token.claim'),('8a15ac6f-d645-4d42-863d-906bc69950b8','true','access.token.claim'),('8a15ac6f-d645-4d42-863d-906bc69950b8','phone_number_verified','claim.name'),('8a15ac6f-d645-4d42-863d-906bc69950b8','true','id.token.claim'),('8a15ac6f-d645-4d42-863d-906bc69950b8','boolean','jsonType.label'),('8a15ac6f-d645-4d42-863d-906bc69950b8','phoneNumberVerified','user.attribute'),('8a15ac6f-d645-4d42-863d-906bc69950b8','true','userinfo.token.claim'),('8a28928f-d916-408f-bdc7-ab8c43edaadd','true','access.token.claim'),('8a28928f-d916-408f-bdc7-ab8c43edaadd','email_verified','claim.name'),('8a28928f-d916-408f-bdc7-ab8c43edaadd','true','id.token.claim'),('8a28928f-d916-408f-bdc7-ab8c43edaadd','boolean','jsonType.label'),('8a28928f-d916-408f-bdc7-ab8c43edaadd','emailVerified','user.attribute'),('8a28928f-d916-408f-bdc7-ab8c43edaadd','true','userinfo.token.claim'),('8b6085fa-1cec-4288-81f7-e78b9371a13b','true','access.token.claim'),('8b6085fa-1cec-4288-81f7-e78b9371a13b','true','id.token.claim'),('8b6085fa-1cec-4288-81f7-e78b9371a13b','country','user.attribute.country'),('8b6085fa-1cec-4288-81f7-e78b9371a13b','formatted','user.attribute.formatted'),('8b6085fa-1cec-4288-81f7-e78b9371a13b','locality','user.attribute.locality'),('8b6085fa-1cec-4288-81f7-e78b9371a13b','postal_code','user.attribute.postal_code'),('8b6085fa-1cec-4288-81f7-e78b9371a13b','region','user.attribute.region'),('8b6085fa-1cec-4288-81f7-e78b9371a13b','street','user.attribute.street'),('8b6085fa-1cec-4288-81f7-e78b9371a13b','true','userinfo.token.claim'),('8b88dd7a-5f2d-4fc4-8051-1447bf2820db','true','access.token.claim'),('8b88dd7a-5f2d-4fc4-8051-1447bf2820db','family_name','claim.name'),('8b88dd7a-5f2d-4fc4-8051-1447bf2820db','true','id.token.claim'),('8b88dd7a-5f2d-4fc4-8051-1447bf2820db','String','jsonType.label'),('8b88dd7a-5f2d-4fc4-8051-1447bf2820db','lastName','user.attribute'),('8b88dd7a-5f2d-4fc4-8051-1447bf2820db','true','userinfo.token.claim'),('8c0c9184-daa0-4aea-be9d-d6c026e9babb','true','access.token.claim'),('8c0c9184-daa0-4aea-be9d-d6c026e9babb','phone_number','claim.name'),('8c0c9184-daa0-4aea-be9d-d6c026e9babb','true','id.token.claim'),('8c0c9184-daa0-4aea-be9d-d6c026e9babb','String','jsonType.label'),('8c0c9184-daa0-4aea-be9d-d6c026e9babb','phoneNumber','user.attribute'),('8c0c9184-daa0-4aea-be9d-d6c026e9babb','true','userinfo.token.claim'),('8c7a7785-c693-45fe-83d4-5b280eb3a1a6','true','access.token.claim'),('8c7a7785-c693-45fe-83d4-5b280eb3a1a6','upn','claim.name'),('8c7a7785-c693-45fe-83d4-5b280eb3a1a6','true','id.token.claim'),('8c7a7785-c693-45fe-83d4-5b280eb3a1a6','String','jsonType.label'),('8c7a7785-c693-45fe-83d4-5b280eb3a1a6','username','user.attribute'),('8c7a7785-c693-45fe-83d4-5b280eb3a1a6','true','userinfo.token.claim'),('8e1eccbe-30d5-42e1-ad5f-55c7648aa551','true','access.token.claim'),('8e1eccbe-30d5-42e1-ad5f-55c7648aa551','email_verified','claim.name'),('8e1eccbe-30d5-42e1-ad5f-55c7648aa551','true','id.token.claim'),('8e1eccbe-30d5-42e1-ad5f-55c7648aa551','boolean','jsonType.label'),('8e1eccbe-30d5-42e1-ad5f-55c7648aa551','emailVerified','user.attribute'),('8e1eccbe-30d5-42e1-ad5f-55c7648aa551','true','userinfo.token.claim'),('8fab545a-fa27-437f-abbe-eac19a5474f5','true','access.token.claim'),('8fab545a-fa27-437f-abbe-eac19a5474f5','true','id.token.claim'),('8fab545a-fa27-437f-abbe-eac19a5474f5','true','userinfo.token.claim'),('9092f7c5-56b7-44fb-8b46-f1d7fd22258f','true','access.token.claim'),('9092f7c5-56b7-44fb-8b46-f1d7fd22258f','zoneinfo','claim.name'),('9092f7c5-56b7-44fb-8b46-f1d7fd22258f','true','id.token.claim'),('9092f7c5-56b7-44fb-8b46-f1d7fd22258f','String','jsonType.label'),('9092f7c5-56b7-44fb-8b46-f1d7fd22258f','zoneinfo','user.attribute'),('9092f7c5-56b7-44fb-8b46-f1d7fd22258f','true','userinfo.token.claim'),('92681f5d-b16f-4c83-9c94-1c469fafb1a1','true','access.token.claim'),('92681f5d-b16f-4c83-9c94-1c469fafb1a1','realm_access.roles','claim.name'),('92681f5d-b16f-4c83-9c94-1c469fafb1a1','String','jsonType.label'),('92681f5d-b16f-4c83-9c94-1c469fafb1a1','true','multivalued'),('92681f5d-b16f-4c83-9c94-1c469fafb1a1','foo','user.attribute'),('9410d3b2-9a9e-4a37-94bb-1ac7e250f57f','true','access.token.claim'),('9410d3b2-9a9e-4a37-94bb-1ac7e250f57f','phone_number_verified','claim.name'),('9410d3b2-9a9e-4a37-94bb-1ac7e250f57f','true','id.token.claim'),('9410d3b2-9a9e-4a37-94bb-1ac7e250f57f','boolean','jsonType.label'),('9410d3b2-9a9e-4a37-94bb-1ac7e250f57f','phoneNumberVerified','user.attribute'),('9410d3b2-9a9e-4a37-94bb-1ac7e250f57f','true','userinfo.token.claim'),('94922771-cf2d-46d7-bc8b-38bfba048f24','true','access.token.claim'),('94922771-cf2d-46d7-bc8b-38bfba048f24','resource_access.${client_id}.roles','claim.name'),('94922771-cf2d-46d7-bc8b-38bfba048f24','String','jsonType.label'),('94922771-cf2d-46d7-bc8b-38bfba048f24','true','multivalued'),('94922771-cf2d-46d7-bc8b-38bfba048f24','foo','user.attribute'),('94efed4c-1656-49c7-a327-d2ea5eb5b572','true','access.token.claim'),('94efed4c-1656-49c7-a327-d2ea5eb5b572','gender','claim.name'),('94efed4c-1656-49c7-a327-d2ea5eb5b572','true','id.token.claim'),('94efed4c-1656-49c7-a327-d2ea5eb5b572','String','jsonType.label'),('94efed4c-1656-49c7-a327-d2ea5eb5b572','gender','user.attribute'),('94efed4c-1656-49c7-a327-d2ea5eb5b572','true','userinfo.token.claim'),('9855ebce-1535-47c6-ba7f-98dca8200db0','true','access.token.claim'),('9855ebce-1535-47c6-ba7f-98dca8200db0','phone_number','claim.name'),('9855ebce-1535-47c6-ba7f-98dca8200db0','true','id.token.claim'),('9855ebce-1535-47c6-ba7f-98dca8200db0','String','jsonType.label'),('9855ebce-1535-47c6-ba7f-98dca8200db0','phoneNumber','user.attribute'),('9855ebce-1535-47c6-ba7f-98dca8200db0','true','userinfo.token.claim'),('9b791885-143d-4b1e-b7f0-08c4423913a2','true','access.token.claim'),('9b791885-143d-4b1e-b7f0-08c4423913a2','true','id.token.claim'),('9f6c1765-6808-41bd-96a4-bd37536d6f4a','true','access.token.claim'),('9f6c1765-6808-41bd-96a4-bd37536d6f4a','nickname','claim.name'),('9f6c1765-6808-41bd-96a4-bd37536d6f4a','true','id.token.claim'),('9f6c1765-6808-41bd-96a4-bd37536d6f4a','String','jsonType.label'),('9f6c1765-6808-41bd-96a4-bd37536d6f4a','nickname','user.attribute'),('9f6c1765-6808-41bd-96a4-bd37536d6f4a','true','userinfo.token.claim'),('a01c577a-f5c7-4d7f-8e26-9b582a3363c2','true','access.token.claim'),('a01c577a-f5c7-4d7f-8e26-9b582a3363c2','updated_at','claim.name'),('a01c577a-f5c7-4d7f-8e26-9b582a3363c2','true','id.token.claim'),('a01c577a-f5c7-4d7f-8e26-9b582a3363c2','long','jsonType.label'),('a01c577a-f5c7-4d7f-8e26-9b582a3363c2','updatedAt','user.attribute'),('a01c577a-f5c7-4d7f-8e26-9b582a3363c2','true','userinfo.token.claim'),('a037636f-7eac-434b-ac81-21da2d283a86','true','access.token.claim'),('a037636f-7eac-434b-ac81-21da2d283a86','profile','claim.name'),('a037636f-7eac-434b-ac81-21da2d283a86','true','id.token.claim'),('a037636f-7eac-434b-ac81-21da2d283a86','String','jsonType.label'),('a037636f-7eac-434b-ac81-21da2d283a86','profile','user.attribute'),('a037636f-7eac-434b-ac81-21da2d283a86','true','userinfo.token.claim'),('a12eb288-fb62-4128-a92b-f8c7a1af6fec','true','access.token.claim'),('a12eb288-fb62-4128-a92b-f8c7a1af6fec','email','claim.name'),('a12eb288-fb62-4128-a92b-f8c7a1af6fec','true','id.token.claim'),('a12eb288-fb62-4128-a92b-f8c7a1af6fec','String','jsonType.label'),('a12eb288-fb62-4128-a92b-f8c7a1af6fec','email','user.attribute'),('a12eb288-fb62-4128-a92b-f8c7a1af6fec','true','userinfo.token.claim'),('a41b6c2c-8aeb-47a7-b517-4c5e1d56a9fc','true','access.token.claim'),('a41b6c2c-8aeb-47a7-b517-4c5e1d56a9fc','email','claim.name'),('a41b6c2c-8aeb-47a7-b517-4c5e1d56a9fc','true','id.token.claim'),('a41b6c2c-8aeb-47a7-b517-4c5e1d56a9fc','String','jsonType.label'),('a41b6c2c-8aeb-47a7-b517-4c5e1d56a9fc','email','user.attribute'),('a41b6c2c-8aeb-47a7-b517-4c5e1d56a9fc','true','userinfo.token.claim'),('a4491e00-a919-485c-a5ce-ab207ba68ca9','true','access.token.claim'),('a4491e00-a919-485c-a5ce-ab207ba68ca9','true','id.token.claim'),('a4491e00-a919-485c-a5ce-ab207ba68ca9','true','userinfo.token.claim'),('a49547c5-d774-4e57-82bc-63a1b137ef22','true','access.token.claim'),('a49547c5-d774-4e57-82bc-63a1b137ef22','phone_number','claim.name'),('a49547c5-d774-4e57-82bc-63a1b137ef22','true','id.token.claim'),('a49547c5-d774-4e57-82bc-63a1b137ef22','String','jsonType.label'),('a49547c5-d774-4e57-82bc-63a1b137ef22','phoneNumber','user.attribute'),('a49547c5-d774-4e57-82bc-63a1b137ef22','true','userinfo.token.claim'),('a70e89e7-c0e7-4035-9466-7fce5a8efe20','true','access.token.claim'),('a70e89e7-c0e7-4035-9466-7fce5a8efe20','updated_at','claim.name'),('a70e89e7-c0e7-4035-9466-7fce5a8efe20','true','id.token.claim'),('a70e89e7-c0e7-4035-9466-7fce5a8efe20','long','jsonType.label'),('a70e89e7-c0e7-4035-9466-7fce5a8efe20','updatedAt','user.attribute'),('a70e89e7-c0e7-4035-9466-7fce5a8efe20','true','userinfo.token.claim'),('a755c820-9961-4085-9a4c-f8f1566ec325','true','access.token.claim'),('a755c820-9961-4085-9a4c-f8f1566ec325','zoneinfo','claim.name'),('a755c820-9961-4085-9a4c-f8f1566ec325','true','id.token.claim'),('a755c820-9961-4085-9a4c-f8f1566ec325','String','jsonType.label'),('a755c820-9961-4085-9a4c-f8f1566ec325','zoneinfo','user.attribute'),('a755c820-9961-4085-9a4c-f8f1566ec325','true','userinfo.token.claim'),('aa817b42-29b8-4067-8a2c-7ab67339b9aa','true','access.token.claim'),('aa817b42-29b8-4067-8a2c-7ab67339b9aa','clientAddress','claim.name'),('aa817b42-29b8-4067-8a2c-7ab67339b9aa','true','id.token.claim'),('aa817b42-29b8-4067-8a2c-7ab67339b9aa','String','jsonType.label'),('aa817b42-29b8-4067-8a2c-7ab67339b9aa','clientAddress','user.session.note'),('aa817b42-29b8-4067-8a2c-7ab67339b9aa','true','userinfo.token.claim'),('aa974f70-ae57-449b-915b-38db9f4dc041','true','access.token.claim'),('aa974f70-ae57-449b-915b-38db9f4dc041','upn','claim.name'),('aa974f70-ae57-449b-915b-38db9f4dc041','true','id.token.claim'),('aa974f70-ae57-449b-915b-38db9f4dc041','String','jsonType.label'),('aa974f70-ae57-449b-915b-38db9f4dc041','username','user.attribute'),('aa974f70-ae57-449b-915b-38db9f4dc041','true','userinfo.token.claim'),('aad9418c-6f05-4139-bf63-8affee9f098f','true','access.token.claim'),('aad9418c-6f05-4139-bf63-8affee9f098f','zoneinfo','claim.name'),('aad9418c-6f05-4139-bf63-8affee9f098f','true','id.token.claim'),('aad9418c-6f05-4139-bf63-8affee9f098f','String','jsonType.label'),('aad9418c-6f05-4139-bf63-8affee9f098f','zoneinfo','user.attribute'),('aad9418c-6f05-4139-bf63-8affee9f098f','true','userinfo.token.claim'),('b099d229-e38b-4bcc-a840-beff8f32557e','true','access.token.claim'),('b099d229-e38b-4bcc-a840-beff8f32557e','family_name','claim.name'),('b099d229-e38b-4bcc-a840-beff8f32557e','true','id.token.claim'),('b099d229-e38b-4bcc-a840-beff8f32557e','String','jsonType.label'),('b099d229-e38b-4bcc-a840-beff8f32557e','lastName','user.attribute'),('b099d229-e38b-4bcc-a840-beff8f32557e','true','userinfo.token.claim'),('b2065c75-ce0e-4bfb-bb28-54faf8512808','true','access.token.claim'),('b2065c75-ce0e-4bfb-bb28-54faf8512808','preferred_username','claim.name'),('b2065c75-ce0e-4bfb-bb28-54faf8512808','true','id.token.claim'),('b2065c75-ce0e-4bfb-bb28-54faf8512808','String','jsonType.label'),('b2065c75-ce0e-4bfb-bb28-54faf8512808','username','user.attribute'),('b2065c75-ce0e-4bfb-bb28-54faf8512808','true','userinfo.token.claim'),('b62aaaae-cf07-49ae-9f67-a7cfa3844fa4','true','access.token.claim'),('b62aaaae-cf07-49ae-9f67-a7cfa3844fa4','profile','claim.name'),('b62aaaae-cf07-49ae-9f67-a7cfa3844fa4','true','id.token.claim'),('b62aaaae-cf07-49ae-9f67-a7cfa3844fa4','String','jsonType.label'),('b62aaaae-cf07-49ae-9f67-a7cfa3844fa4','profile','user.attribute'),('b62aaaae-cf07-49ae-9f67-a7cfa3844fa4','true','userinfo.token.claim'),('b6ee21fb-6f38-467d-84f6-d5d2913700bc','true','access.token.claim'),('b6ee21fb-6f38-467d-84f6-d5d2913700bc','locale','claim.name'),('b6ee21fb-6f38-467d-84f6-d5d2913700bc','true','id.token.claim'),('b6ee21fb-6f38-467d-84f6-d5d2913700bc','String','jsonType.label'),('b6ee21fb-6f38-467d-84f6-d5d2913700bc','locale','user.attribute'),('b6ee21fb-6f38-467d-84f6-d5d2913700bc','true','userinfo.token.claim'),('b7e42777-56cd-49ec-a576-5e4663ea59b5','true','access.token.claim'),('b7e42777-56cd-49ec-a576-5e4663ea59b5','clientId','claim.name'),('b7e42777-56cd-49ec-a576-5e4663ea59b5','true','id.token.claim'),('b7e42777-56cd-49ec-a576-5e4663ea59b5','String','jsonType.label'),('b7e42777-56cd-49ec-a576-5e4663ea59b5','clientId','user.session.note'),('b7e42777-56cd-49ec-a576-5e4663ea59b5','true','userinfo.token.claim'),('b7f226c1-eb4a-4367-bbb7-dc4d9fac5a45','true','access.token.claim'),('b7f226c1-eb4a-4367-bbb7-dc4d9fac5a45','gender','claim.name'),('b7f226c1-eb4a-4367-bbb7-dc4d9fac5a45','true','id.token.claim'),('b7f226c1-eb4a-4367-bbb7-dc4d9fac5a45','String','jsonType.label'),('b7f226c1-eb4a-4367-bbb7-dc4d9fac5a45','gender','user.attribute'),('b7f226c1-eb4a-4367-bbb7-dc4d9fac5a45','true','userinfo.token.claim'),('bbe0ccae-3ee5-417c-aba2-d29ab450b543','true','access.token.claim'),('bbe0ccae-3ee5-417c-aba2-d29ab450b543','true','id.token.claim'),('be34553f-e2e0-4702-b48b-e5fa2378083f','true','access.token.claim'),('be34553f-e2e0-4702-b48b-e5fa2378083f','website','claim.name'),('be34553f-e2e0-4702-b48b-e5fa2378083f','true','id.token.claim'),('be34553f-e2e0-4702-b48b-e5fa2378083f','String','jsonType.label'),('be34553f-e2e0-4702-b48b-e5fa2378083f','website','user.attribute'),('be34553f-e2e0-4702-b48b-e5fa2378083f','true','userinfo.token.claim'),('c0977910-1e85-458d-9301-a6d4c3e967c5','true','access.token.claim'),('c0977910-1e85-458d-9301-a6d4c3e967c5','true','id.token.claim'),('c0977910-1e85-458d-9301-a6d4c3e967c5','true','userinfo.token.claim'),('c3046306-40c2-4819-ad71-746970457939','true','access.token.claim'),('c3046306-40c2-4819-ad71-746970457939','clientHost','claim.name'),('c3046306-40c2-4819-ad71-746970457939','true','id.token.claim'),('c3046306-40c2-4819-ad71-746970457939','String','jsonType.label'),('c3046306-40c2-4819-ad71-746970457939','clientHost','user.session.note'),('c3046306-40c2-4819-ad71-746970457939','true','userinfo.token.claim'),('c5a04d63-60fe-476a-b6db-11af5df300f7','true','access.token.claim'),('c5a04d63-60fe-476a-b6db-11af5df300f7','true','id.token.claim'),('c6a96141-f214-4bc5-9ca1-3d3a5f237740','true','access.token.claim'),('c6a96141-f214-4bc5-9ca1-3d3a5f237740','website','claim.name'),('c6a96141-f214-4bc5-9ca1-3d3a5f237740','true','id.token.claim'),('c6a96141-f214-4bc5-9ca1-3d3a5f237740','String','jsonType.label'),('c6a96141-f214-4bc5-9ca1-3d3a5f237740','website','user.attribute'),('c6a96141-f214-4bc5-9ca1-3d3a5f237740','true','userinfo.token.claim'),('c718a12f-2a06-4f5f-b8d1-58b975920b2f','true','access.token.claim'),('c718a12f-2a06-4f5f-b8d1-58b975920b2f','family_name','claim.name'),('c718a12f-2a06-4f5f-b8d1-58b975920b2f','true','id.token.claim'),('c718a12f-2a06-4f5f-b8d1-58b975920b2f','String','jsonType.label'),('c718a12f-2a06-4f5f-b8d1-58b975920b2f','lastName','user.attribute'),('c718a12f-2a06-4f5f-b8d1-58b975920b2f','true','userinfo.token.claim'),('c884abbf-b3cb-47fe-8c20-cbc8f3004cbd','true','access.token.claim'),('c884abbf-b3cb-47fe-8c20-cbc8f3004cbd','clientId','claim.name'),('c884abbf-b3cb-47fe-8c20-cbc8f3004cbd','true','id.token.claim'),('c884abbf-b3cb-47fe-8c20-cbc8f3004cbd','String','jsonType.label'),('c884abbf-b3cb-47fe-8c20-cbc8f3004cbd','clientId','user.session.note'),('c884abbf-b3cb-47fe-8c20-cbc8f3004cbd','true','userinfo.token.claim'),('c8d0c13f-db4d-48c3-97f3-d39d2435b0bf','true','access.token.claim'),('c8d0c13f-db4d-48c3-97f3-d39d2435b0bf','true','id.token.claim'),('cb66d495-5fc9-4137-9b0d-c696596ea1f4','true','access.token.claim'),('cb66d495-5fc9-4137-9b0d-c696596ea1f4','true','id.token.claim'),('cb66d495-5fc9-4137-9b0d-c696596ea1f4','country','user.attribute.country'),('cb66d495-5fc9-4137-9b0d-c696596ea1f4','formatted','user.attribute.formatted'),('cb66d495-5fc9-4137-9b0d-c696596ea1f4','locality','user.attribute.locality'),('cb66d495-5fc9-4137-9b0d-c696596ea1f4','postal_code','user.attribute.postal_code'),('cb66d495-5fc9-4137-9b0d-c696596ea1f4','region','user.attribute.region'),('cb66d495-5fc9-4137-9b0d-c696596ea1f4','street','user.attribute.street'),('cb66d495-5fc9-4137-9b0d-c696596ea1f4','true','userinfo.token.claim'),('cba66e86-d389-465e-a6fb-9741817893b4','true','access.token.claim'),('cba66e86-d389-465e-a6fb-9741817893b4','clientHost','claim.name'),('cba66e86-d389-465e-a6fb-9741817893b4','true','id.token.claim'),('cba66e86-d389-465e-a6fb-9741817893b4','String','jsonType.label'),('cba66e86-d389-465e-a6fb-9741817893b4','clientHost','user.session.note'),('cba66e86-d389-465e-a6fb-9741817893b4','true','userinfo.token.claim'),('cbf7f65e-1af1-448c-8aeb-b1726c1ca61d','true','access.token.claim'),('cbf7f65e-1af1-448c-8aeb-b1726c1ca61d','true','id.token.claim'),('cc55208f-316f-497d-a4ab-d7f273884d68','true','access.token.claim'),('cc55208f-316f-497d-a4ab-d7f273884d68','locale','claim.name'),('cc55208f-316f-497d-a4ab-d7f273884d68','true','id.token.claim'),('cc55208f-316f-497d-a4ab-d7f273884d68','String','jsonType.label'),('cc55208f-316f-497d-a4ab-d7f273884d68','locale','user.attribute'),('cc55208f-316f-497d-a4ab-d7f273884d68','true','userinfo.token.claim'),('cd42329f-cf9c-489b-87c7-2723d2f684aa','true','access.token.claim'),('cd42329f-cf9c-489b-87c7-2723d2f684aa','groups','claim.name'),('cd42329f-cf9c-489b-87c7-2723d2f684aa','true','id.token.claim'),('cd42329f-cf9c-489b-87c7-2723d2f684aa','String','jsonType.label'),('cd42329f-cf9c-489b-87c7-2723d2f684aa','true','multivalued'),('cd42329f-cf9c-489b-87c7-2723d2f684aa','foo','user.attribute'),('cfb8d5d5-19dc-4b6a-874d-3d80d6875b66','true','access.token.claim'),('cfb8d5d5-19dc-4b6a-874d-3d80d6875b66','gender','claim.name'),('cfb8d5d5-19dc-4b6a-874d-3d80d6875b66','true','id.token.claim'),('cfb8d5d5-19dc-4b6a-874d-3d80d6875b66','String','jsonType.label'),('cfb8d5d5-19dc-4b6a-874d-3d80d6875b66','gender','user.attribute'),('cfb8d5d5-19dc-4b6a-874d-3d80d6875b66','true','userinfo.token.claim'),('d4b98ee3-e408-4ac3-8bdd-685aeb3f5e18','true','access.token.claim'),('d4b98ee3-e408-4ac3-8bdd-685aeb3f5e18','email','claim.name'),('d4b98ee3-e408-4ac3-8bdd-685aeb3f5e18','true','id.token.claim'),('d4b98ee3-e408-4ac3-8bdd-685aeb3f5e18','String','jsonType.label'),('d4b98ee3-e408-4ac3-8bdd-685aeb3f5e18','email','user.attribute'),('d4b98ee3-e408-4ac3-8bdd-685aeb3f5e18','true','userinfo.token.claim'),('d5eb608c-0eab-407f-bc67-639e42e6f906','true','access.token.claim'),('d5eb608c-0eab-407f-bc67-639e42e6f906','picture','claim.name'),('d5eb608c-0eab-407f-bc67-639e42e6f906','true','id.token.claim'),('d5eb608c-0eab-407f-bc67-639e42e6f906','String','jsonType.label'),('d5eb608c-0eab-407f-bc67-639e42e6f906','picture','user.attribute'),('d5eb608c-0eab-407f-bc67-639e42e6f906','true','userinfo.token.claim'),('d61a53e7-564d-4d91-89cc-13240323647e','true','access.token.claim'),('d61a53e7-564d-4d91-89cc-13240323647e','realm_access.roles','claim.name'),('d61a53e7-564d-4d91-89cc-13240323647e','String','jsonType.label'),('d61a53e7-564d-4d91-89cc-13240323647e','true','multivalued'),('d61a53e7-564d-4d91-89cc-13240323647e','foo','user.attribute'),('d79d26d6-3255-4bdf-a4e6-f3570b73f500','true','access.token.claim'),('d79d26d6-3255-4bdf-a4e6-f3570b73f500','given_name','claim.name'),('d79d26d6-3255-4bdf-a4e6-f3570b73f500','true','id.token.claim'),('d79d26d6-3255-4bdf-a4e6-f3570b73f500','String','jsonType.label'),('d79d26d6-3255-4bdf-a4e6-f3570b73f500','firstName','user.attribute'),('d79d26d6-3255-4bdf-a4e6-f3570b73f500','true','userinfo.token.claim'),('d957dd7d-8d83-4409-bec6-8c14d9b2bb4e','true','access.token.claim'),('d957dd7d-8d83-4409-bec6-8c14d9b2bb4e','picture','claim.name'),('d957dd7d-8d83-4409-bec6-8c14d9b2bb4e','true','id.token.claim'),('d957dd7d-8d83-4409-bec6-8c14d9b2bb4e','String','jsonType.label'),('d957dd7d-8d83-4409-bec6-8c14d9b2bb4e','picture','user.attribute'),('d957dd7d-8d83-4409-bec6-8c14d9b2bb4e','true','userinfo.token.claim'),('db78e4ab-10d3-40e3-8969-e6b24cd3a5af','true','access.token.claim'),('db78e4ab-10d3-40e3-8969-e6b24cd3a5af','resource_access.${client_id}.roles','claim.name'),('db78e4ab-10d3-40e3-8969-e6b24cd3a5af','String','jsonType.label'),('db78e4ab-10d3-40e3-8969-e6b24cd3a5af','true','multivalued'),('db78e4ab-10d3-40e3-8969-e6b24cd3a5af','foo','user.attribute'),('dc56d939-c9db-44e9-89c5-15267c3c0f99','Role','attribute.name'),('dc56d939-c9db-44e9-89c5-15267c3c0f99','Basic','attribute.nameformat'),('dc56d939-c9db-44e9-89c5-15267c3c0f99','false','single'),('e339fc36-05e9-48b2-bcd8-d23399bf1dec','true','access.token.claim'),('e339fc36-05e9-48b2-bcd8-d23399bf1dec','profile','claim.name'),('e339fc36-05e9-48b2-bcd8-d23399bf1dec','true','id.token.claim'),('e339fc36-05e9-48b2-bcd8-d23399bf1dec','String','jsonType.label'),('e339fc36-05e9-48b2-bcd8-d23399bf1dec','profile','user.attribute'),('e339fc36-05e9-48b2-bcd8-d23399bf1dec','true','userinfo.token.claim'),('e3b18ec0-b690-4f8d-a5ba-74158c6bb0d1','true','access.token.claim'),('e3b18ec0-b690-4f8d-a5ba-74158c6bb0d1','true','id.token.claim'),('e3b18ec0-b690-4f8d-a5ba-74158c6bb0d1','country','user.attribute.country'),('e3b18ec0-b690-4f8d-a5ba-74158c6bb0d1','formatted','user.attribute.formatted'),('e3b18ec0-b690-4f8d-a5ba-74158c6bb0d1','locality','user.attribute.locality'),('e3b18ec0-b690-4f8d-a5ba-74158c6bb0d1','postal_code','user.attribute.postal_code'),('e3b18ec0-b690-4f8d-a5ba-74158c6bb0d1','region','user.attribute.region'),('e3b18ec0-b690-4f8d-a5ba-74158c6bb0d1','street','user.attribute.street'),('e3b18ec0-b690-4f8d-a5ba-74158c6bb0d1','true','userinfo.token.claim'),('e755800f-2523-4f7d-ba52-8afa3152d5b2','true','access.token.claim'),('e755800f-2523-4f7d-ba52-8afa3152d5b2','preferred_username','claim.name'),('e755800f-2523-4f7d-ba52-8afa3152d5b2','true','id.token.claim'),('e755800f-2523-4f7d-ba52-8afa3152d5b2','String','jsonType.label'),('e755800f-2523-4f7d-ba52-8afa3152d5b2','username','user.attribute'),('e755800f-2523-4f7d-ba52-8afa3152d5b2','true','userinfo.token.claim'),('e7b954ea-f180-4201-b714-62a14016f9c5','true','access.token.claim'),('e7b954ea-f180-4201-b714-62a14016f9c5','resource_access.${client_id}.roles','claim.name'),('e7b954ea-f180-4201-b714-62a14016f9c5','String','jsonType.label'),('e7b954ea-f180-4201-b714-62a14016f9c5','true','multivalued'),('e7b954ea-f180-4201-b714-62a14016f9c5','foo','user.attribute'),('e91746ff-ec24-46e7-9ca7-ebc3bba13fe0','true','access.token.claim'),('e91746ff-ec24-46e7-9ca7-ebc3bba13fe0','gender','claim.name'),('e91746ff-ec24-46e7-9ca7-ebc3bba13fe0','true','id.token.claim'),('e91746ff-ec24-46e7-9ca7-ebc3bba13fe0','String','jsonType.label'),('e91746ff-ec24-46e7-9ca7-ebc3bba13fe0','gender','user.attribute'),('e91746ff-ec24-46e7-9ca7-ebc3bba13fe0','true','userinfo.token.claim'),('e929da15-3946-43e2-bf11-07cdf8624d47','true','access.token.claim'),('e929da15-3946-43e2-bf11-07cdf8624d47','phone_number','claim.name'),('e929da15-3946-43e2-bf11-07cdf8624d47','true','id.token.claim'),('e929da15-3946-43e2-bf11-07cdf8624d47','String','jsonType.label'),('e929da15-3946-43e2-bf11-07cdf8624d47','phoneNumber','user.attribute'),('e929da15-3946-43e2-bf11-07cdf8624d47','true','userinfo.token.claim'),('e983b218-2694-4322-ac88-18d28c014541','true','access.token.claim'),('e983b218-2694-4322-ac88-18d28c014541','clientAddress','claim.name'),('e983b218-2694-4322-ac88-18d28c014541','true','id.token.claim'),('e983b218-2694-4322-ac88-18d28c014541','String','jsonType.label'),('e983b218-2694-4322-ac88-18d28c014541','clientAddress','user.session.note'),('e983b218-2694-4322-ac88-18d28c014541','true','userinfo.token.claim'),('eabe19ff-ed9d-4a8c-a143-204c6c6a7810','Role','attribute.name'),('eabe19ff-ed9d-4a8c-a143-204c6c6a7810','Basic','attribute.nameformat'),('eabe19ff-ed9d-4a8c-a143-204c6c6a7810','false','single'),('ef130573-30bc-4f90-9319-44806d2fc61a','true','access.token.claim'),('ef130573-30bc-4f90-9319-44806d2fc61a','family_name','claim.name'),('ef130573-30bc-4f90-9319-44806d2fc61a','true','id.token.claim'),('ef130573-30bc-4f90-9319-44806d2fc61a','String','jsonType.label'),('ef130573-30bc-4f90-9319-44806d2fc61a','lastName','user.attribute'),('ef130573-30bc-4f90-9319-44806d2fc61a','true','userinfo.token.claim'),('f142bb85-5bf1-4a31-9984-ec80439d38b9','true','access.token.claim'),('f142bb85-5bf1-4a31-9984-ec80439d38b9','family_name','claim.name'),('f142bb85-5bf1-4a31-9984-ec80439d38b9','true','id.token.claim'),('f142bb85-5bf1-4a31-9984-ec80439d38b9','String','jsonType.label'),('f142bb85-5bf1-4a31-9984-ec80439d38b9','lastName','user.attribute'),('f142bb85-5bf1-4a31-9984-ec80439d38b9','true','userinfo.token.claim'),('f31628c5-f0ac-4490-831f-c290d94cba11','Role','attribute.name'),('f31628c5-f0ac-4490-831f-c290d94cba11','Basic','attribute.nameformat'),('f31628c5-f0ac-4490-831f-c290d94cba11','false','single'),('f5a6ab42-d185-451d-9e02-b63e784d3952','true','access.token.claim'),('f5a6ab42-d185-451d-9e02-b63e784d3952','groups','claim.name'),('f5a6ab42-d185-451d-9e02-b63e784d3952','true','id.token.claim'),('f5a6ab42-d185-451d-9e02-b63e784d3952','String','jsonType.label'),('f5a6ab42-d185-451d-9e02-b63e784d3952','true','multivalued'),('f5a6ab42-d185-451d-9e02-b63e784d3952','foo','user.attribute'),('f63a98d5-f50d-471c-ab30-734c57d1e3e4','true','access.token.claim'),('f63a98d5-f50d-471c-ab30-734c57d1e3e4','given_name','claim.name'),('f63a98d5-f50d-471c-ab30-734c57d1e3e4','true','id.token.claim'),('f63a98d5-f50d-471c-ab30-734c57d1e3e4','String','jsonType.label'),('f63a98d5-f50d-471c-ab30-734c57d1e3e4','firstName','user.attribute'),('f63a98d5-f50d-471c-ab30-734c57d1e3e4','true','userinfo.token.claim'),('f63b4a3e-6736-4716-9530-159a2198e34c','true','access.token.claim'),('f63b4a3e-6736-4716-9530-159a2198e34c','email_verified','claim.name'),('f63b4a3e-6736-4716-9530-159a2198e34c','true','id.token.claim'),('f63b4a3e-6736-4716-9530-159a2198e34c','boolean','jsonType.label'),('f63b4a3e-6736-4716-9530-159a2198e34c','emailVerified','user.attribute'),('f63b4a3e-6736-4716-9530-159a2198e34c','true','userinfo.token.claim'),('fad7eec2-2644-45cd-b767-156aa87daf89','true','access.token.claim'),('fad7eec2-2644-45cd-b767-156aa87daf89','true','id.token.claim'),('fad7eec2-2644-45cd-b767-156aa87daf89','true','userinfo.token.claim'),('fecac6e6-e1b0-4453-846e-ca9e3ba888a3','true','access.token.claim'),('fecac6e6-e1b0-4453-846e-ca9e3ba888a3','locale','claim.name'),('fecac6e6-e1b0-4453-846e-ca9e3ba888a3','true','id.token.claim'),('fecac6e6-e1b0-4453-846e-ca9e3ba888a3','String','jsonType.label'),('fecac6e6-e1b0-4453-846e-ca9e3ba888a3','locale','user.attribute'),('fecac6e6-e1b0-4453-846e-ca9e3ba888a3','true','userinfo.token.claim'),('ff52eab6-6457-47cc-8268-9dd0eb1d6b15','true','access.token.claim'),('ff52eab6-6457-47cc-8268-9dd0eb1d6b15','website','claim.name'),('ff52eab6-6457-47cc-8268-9dd0eb1d6b15','true','id.token.claim'),('ff52eab6-6457-47cc-8268-9dd0eb1d6b15','String','jsonType.label'),('ff52eab6-6457-47cc-8268-9dd0eb1d6b15','website','user.attribute'),('ff52eab6-6457-47cc-8268-9dd0eb1d6b15','true','userinfo.token.claim');
+/*!40000 ALTER TABLE `PROTOCOL_MAPPER_CONFIG` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `REALM`
+--
+
+DROP TABLE IF EXISTS `REALM`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `REALM` (
+  `ID` varchar(36) NOT NULL,
+  `ACCESS_CODE_LIFESPAN` int DEFAULT NULL,
+  `USER_ACTION_LIFESPAN` int DEFAULT NULL,
+  `ACCESS_TOKEN_LIFESPAN` int DEFAULT NULL,
+  `ACCOUNT_THEME` varchar(255) DEFAULT NULL,
+  `ADMIN_THEME` varchar(255) DEFAULT NULL,
+  `EMAIL_THEME` varchar(255) DEFAULT NULL,
+  `ENABLED` bit(1) NOT NULL DEFAULT b'0',
+  `EVENTS_ENABLED` bit(1) NOT NULL DEFAULT b'0',
+  `EVENTS_EXPIRATION` bigint DEFAULT NULL,
+  `LOGIN_THEME` varchar(255) DEFAULT NULL,
+  `NAME` varchar(255) DEFAULT NULL,
+  `NOT_BEFORE` int DEFAULT NULL,
+  `PASSWORD_POLICY` text,
+  `REGISTRATION_ALLOWED` bit(1) NOT NULL DEFAULT b'0',
+  `REMEMBER_ME` bit(1) NOT NULL DEFAULT b'0',
+  `RESET_PASSWORD_ALLOWED` bit(1) NOT NULL DEFAULT b'0',
+  `SOCIAL` bit(1) NOT NULL DEFAULT b'0',
+  `SSL_REQUIRED` varchar(255) DEFAULT NULL,
+  `SSO_IDLE_TIMEOUT` int DEFAULT NULL,
+  `SSO_MAX_LIFESPAN` int DEFAULT NULL,
+  `UPDATE_PROFILE_ON_SOC_LOGIN` bit(1) NOT NULL DEFAULT b'0',
+  `VERIFY_EMAIL` bit(1) NOT NULL DEFAULT b'0',
+  `MASTER_ADMIN_CLIENT` varchar(36) DEFAULT NULL,
+  `LOGIN_LIFESPAN` int DEFAULT NULL,
+  `INTERNATIONALIZATION_ENABLED` bit(1) NOT NULL DEFAULT b'0',
+  `DEFAULT_LOCALE` varchar(255) DEFAULT NULL,
+  `REG_EMAIL_AS_USERNAME` bit(1) NOT NULL DEFAULT b'0',
+  `ADMIN_EVENTS_ENABLED` bit(1) NOT NULL DEFAULT b'0',
+  `ADMIN_EVENTS_DETAILS_ENABLED` bit(1) NOT NULL DEFAULT b'0',
+  `EDIT_USERNAME_ALLOWED` bit(1) NOT NULL DEFAULT b'0',
+  `OTP_POLICY_COUNTER` int DEFAULT '0',
+  `OTP_POLICY_WINDOW` int DEFAULT '1',
+  `OTP_POLICY_PERIOD` int DEFAULT '30',
+  `OTP_POLICY_DIGITS` int DEFAULT '6',
+  `OTP_POLICY_ALG` varchar(36) DEFAULT 'HmacSHA1',
+  `OTP_POLICY_TYPE` varchar(36) DEFAULT 'totp',
+  `BROWSER_FLOW` varchar(36) DEFAULT NULL,
+  `REGISTRATION_FLOW` varchar(36) DEFAULT NULL,
+  `DIRECT_GRANT_FLOW` varchar(36) DEFAULT NULL,
+  `RESET_CREDENTIALS_FLOW` varchar(36) DEFAULT NULL,
+  `CLIENT_AUTH_FLOW` varchar(36) DEFAULT NULL,
+  `OFFLINE_SESSION_IDLE_TIMEOUT` int DEFAULT '0',
+  `REVOKE_REFRESH_TOKEN` bit(1) NOT NULL DEFAULT b'0',
+  `ACCESS_TOKEN_LIFE_IMPLICIT` int DEFAULT '0',
+  `LOGIN_WITH_EMAIL_ALLOWED` bit(1) NOT NULL DEFAULT b'1',
+  `DUPLICATE_EMAILS_ALLOWED` bit(1) NOT NULL DEFAULT b'0',
+  `DOCKER_AUTH_FLOW` varchar(36) DEFAULT NULL,
+  `REFRESH_TOKEN_MAX_REUSE` int DEFAULT '0',
+  `ALLOW_USER_MANAGED_ACCESS` bit(1) NOT NULL DEFAULT b'0',
+  `SSO_MAX_LIFESPAN_REMEMBER_ME` int NOT NULL,
+  `SSO_IDLE_TIMEOUT_REMEMBER_ME` int NOT NULL,
+  `DEFAULT_ROLE` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`ID`),
+  UNIQUE KEY `UK_ORVSDMLA56612EAEFIQ6WL5OI` (`NAME`),
+  KEY `IDX_REALM_MASTER_ADM_CLI` (`MASTER_ADMIN_CLIENT`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `REALM`
+--
+
+LOCK TABLES `REALM` WRITE;
+/*!40000 ALTER TABLE `REALM` DISABLE KEYS */;
+INSERT INTO `REALM` VALUES ('dabc51bf-58ea-42ed-9918-4114e6b08338',60,300,60,NULL,NULL,NULL,_binary '',_binary '\0',0,NULL,'master',0,NULL,_binary '\0',_binary '\0',_binary '\0',_binary '\0','NONE',1800,36000,_binary '\0',_binary '\0','da68d9d1-cd82-4d04-90ad-6a5aa63e301a',1800,_binary '\0',NULL,_binary '\0',_binary '\0',_binary '\0',_binary '\0',0,1,30,6,'HmacSHA1','totp','78fd3ef3-8171-4a55-b550-6f44cf6db2d8','daa518b7-df95-4ec7-bebf-002dad9ec5f4','df42398f-1333-45f5-9b00-f179b3231906','fc25ac1b-911a-42ac-a364-8e985575220a','9b61a41b-7902-4235-af5b-5c04aac15529',31536000,_binary '\0',900,_binary '',_binary '\0','54bcf4e0-40f3-4849-a2c4-b8cae6181a08',0,_binary '\0',0,0,'f98ff5a7-34c3-4473-abe3-270867f09df4'),('org1',60,300,300,NULL,NULL,NULL,_binary '',_binary '\0',0,NULL,'org1',0,NULL,_binary '\0',_binary '\0',_binary '\0',_binary '\0','NONE',1800,36000,_binary '\0',_binary '\0','81806f02-c6ca-42a2-b286-e6c2c0953955',1800,_binary '','ja',_binary '\0',_binary '',_binary '',_binary '\0',0,1,30,6,'HmacSHA1','totp','df7d87da-d586-4532-a693-f60a82707840','b5aece4d-8a04-4f29-91ca-9bbe0e1cda49','48598438-66c2-4ea4-aa92-fba11475c609','6111d7d7-524e-41ea-85c5-76d8e515d243','fe921562-834e-4b69-b052-148ee5251a05',31536000,_binary '\0',900,_binary '',_binary '\0','5952f91a-4b9b-44b5-bab7-0022487183cf',0,_binary '\0',0,0,'88598027-632e-4105-ac21-88a1dcb373db'),('org2',60,300,300,NULL,NULL,NULL,_binary '',_binary '\0',0,NULL,'org2',0,NULL,_binary '\0',_binary '\0',_binary '\0',_binary '\0','NONE',1800,36000,_binary '\0',_binary '\0','c2a9a8ae-6fb5-4265-b8e5-012c8fb17857',1800,_binary '','ja',_binary '\0',_binary '',_binary '',_binary '\0',0,1,30,6,'HmacSHA1','totp','36140312-1555-4074-b820-ce9677ca3316','41ab6d77-5d8b-422b-89ce-888262d83ff8','8b66555b-c54b-40e5-ac47-2220b747d26a','81a74ca2-2b1d-4d9a-bae5-3e8d085d4578','3bbdf73f-08ef-4660-9d2e-a8f220010d3f',31536000,_binary '\0',900,_binary '',_binary '\0','bfa6c3a2-eae7-47ae-b6bb-1c217b7b3b47',0,_binary '\0',0,0,'92bde222-43fd-4fee-b265-72f4ccaec199'),('org3',60,300,300,NULL,NULL,NULL,_binary '',_binary '\0',0,NULL,'org3',0,NULL,_binary '\0',_binary '\0',_binary '\0',_binary '\0','NONE',1800,36000,_binary '\0',_binary '\0','8ecdd6f7-f568-4a2a-acaa-cbe6cf8854b2',1800,_binary '','ja',_binary '\0',_binary '',_binary '',_binary '\0',0,1,30,6,'HmacSHA1','totp','a9b11600-a61a-4715-9e73-0408e4cbd455','c88e8469-b79a-4bc3-880d-26f3753f1c76','1437c314-ae6f-48bd-b27b-544ba44af41f','ad2e0b48-8a09-4454-9ad5-a0d0f102ad48','cb06f7b0-679e-431b-90d4-a564d37c9d44',31536000,_binary '\0',900,_binary '',_binary '\0','2b4bb0ca-0c8f-4b9b-b962-ce55320e342c',0,_binary '\0',0,0,'c2afa323-6d36-40d0-bc7c-994d452775d7'),('org4',60,300,300,NULL,NULL,NULL,_binary '',_binary '\0',0,NULL,'org4',0,NULL,_binary '\0',_binary '\0',_binary '\0',_binary '\0','NONE',1800,36000,_binary '\0',_binary '\0','6c811e00-186f-4bbb-aa0d-7e3e27eb9605',1800,_binary '','ja',_binary '\0',_binary '',_binary '',_binary '\0',0,1,30,6,'HmacSHA1','totp','77f45827-9c32-40cc-88af-f10c237535e3','61a9ce97-518b-4b3f-a9b5-220d79a6353e','f0198c42-6838-4333-a2e3-5902ecc9bef8','a8b74522-d279-460c-9856-ae76be89898a','915c5551-b590-403f-9798-c55b24e5c0c6',31536000,_binary '\0',900,_binary '',_binary '\0','01b74f0e-be68-4a43-8154-a04e50bba9b3',0,_binary '\0',0,0,'3ad2e570-cee0-4618-a99f-6d767ee2a385'),('org5',60,300,300,NULL,NULL,NULL,_binary '',_binary '\0',0,NULL,'org5',0,NULL,_binary '\0',_binary '\0',_binary '\0',_binary '\0','NONE',1800,36000,_binary '\0',_binary '\0','c56d777e-7f90-4a13-9719-316e592b62fa',1800,_binary '','ja',_binary '\0',_binary '',_binary '',_binary '\0',0,1,30,6,'HmacSHA1','totp','bd77106d-ca23-4bb4-9151-11bc8afb1f4b','e61e12a5-8571-4a32-8209-068c7595b6bd','1680c8f5-dd45-435b-b73c-03de482c49e1','ef4879c9-f5ef-43fe-9bf5-5e87961404ed','975ef3b1-b6f5-4db1-a3c6-fea5fa1376b8',31536000,_binary '\0',900,_binary '',_binary '\0','f3eb6f5d-79a6-4e3c-b79c-9e9738068ddb',0,_binary '\0',0,0,'7dbb54ac-c3c9-40b9-b4c4-7476371eb725');
+/*!40000 ALTER TABLE `REALM` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `REALM_ATTRIBUTE`
+--
+
+DROP TABLE IF EXISTS `REALM_ATTRIBUTE`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `REALM_ATTRIBUTE` (
+  `NAME` varchar(255) NOT NULL,
+  `REALM_ID` varchar(36) NOT NULL,
+  `VALUE` longtext CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci,
+  PRIMARY KEY (`NAME`,`REALM_ID`),
+  KEY `IDX_REALM_ATTR_REALM` (`REALM_ID`),
+  CONSTRAINT `FK_8SHXD6L3E9ATQUKACXGPFFPTW` FOREIGN KEY (`REALM_ID`) REFERENCES `REALM` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `REALM_ATTRIBUTE`
+--
+
+LOCK TABLES `REALM_ATTRIBUTE` WRITE;
+/*!40000 ALTER TABLE `REALM_ATTRIBUTE` DISABLE KEYS */;
+INSERT INTO `REALM_ATTRIBUTE` VALUES ('actionTokenGeneratedByAdminLifespan','org1','43200'),('actionTokenGeneratedByAdminLifespan','org2','43200'),('actionTokenGeneratedByAdminLifespan','org3','43200'),('actionTokenGeneratedByAdminLifespan','org4','43200'),('actionTokenGeneratedByAdminLifespan','org5','43200'),('actionTokenGeneratedByUserLifespan','org1','300'),('actionTokenGeneratedByUserLifespan','org2','300'),('actionTokenGeneratedByUserLifespan','org3','300'),('actionTokenGeneratedByUserLifespan','org4','300'),('actionTokenGeneratedByUserLifespan','org5','300'),('bruteForceProtected','dabc51bf-58ea-42ed-9918-4114e6b08338','false'),('bruteForceProtected','org1','false'),('bruteForceProtected','org2','false'),('bruteForceProtected','org3','false'),('bruteForceProtected','org4','false'),('bruteForceProtected','org5','false'),('cibaAuthRequestedUserHint','dabc51bf-58ea-42ed-9918-4114e6b08338','login_hint'),('cibaAuthRequestedUserHint','org1','login_hint'),('cibaAuthRequestedUserHint','org2','login_hint'),('cibaAuthRequestedUserHint','org3','login_hint'),('cibaAuthRequestedUserHint','org4','login_hint'),('cibaAuthRequestedUserHint','org5','login_hint'),('cibaBackchannelTokenDeliveryMode','dabc51bf-58ea-42ed-9918-4114e6b08338','poll'),('cibaBackchannelTokenDeliveryMode','org1','poll'),('cibaBackchannelTokenDeliveryMode','org2','poll'),('cibaBackchannelTokenDeliveryMode','org3','poll'),('cibaBackchannelTokenDeliveryMode','org4','poll'),('cibaBackchannelTokenDeliveryMode','org5','poll'),('cibaExpiresIn','dabc51bf-58ea-42ed-9918-4114e6b08338','120'),('cibaExpiresIn','org1','120'),('cibaExpiresIn','org2','120'),('cibaExpiresIn','org3','120'),('cibaExpiresIn','org4','120'),('cibaExpiresIn','org5','120'),('cibaInterval','dabc51bf-58ea-42ed-9918-4114e6b08338','5'),('cibaInterval','org1','5'),('cibaInterval','org2','5'),('cibaInterval','org3','5'),('cibaInterval','org4','5'),('cibaInterval','org5','5'),('defaultSignatureAlgorithm','dabc51bf-58ea-42ed-9918-4114e6b08338','RS256'),('defaultSignatureAlgorithm','org1','RS256'),('defaultSignatureAlgorithm','org2','RS256'),('defaultSignatureAlgorithm','org3','RS256'),('defaultSignatureAlgorithm','org4','RS256'),('defaultSignatureAlgorithm','org5','RS256'),('displayName','dabc51bf-58ea-42ed-9918-4114e6b08338','Keycloak'),('displayName','org1','name of organization'),('displayName','org2','name of organization'),('displayName','org3','name of organization'),('displayName','org4','name of organization'),('displayName','org5','name of organization'),('displayNameHtml','dabc51bf-58ea-42ed-9918-4114e6b08338','<div class=\"kc-logo-text\"><span>Keycloak</span></div>'),('failureFactor','dabc51bf-58ea-42ed-9918-4114e6b08338','30'),('failureFactor','org1','30'),('failureFactor','org2','30'),('failureFactor','org3','30'),('failureFactor','org4','30'),('failureFactor','org5','30'),('maxDeltaTimeSeconds','dabc51bf-58ea-42ed-9918-4114e6b08338','43200'),('maxDeltaTimeSeconds','org1','43200'),('maxDeltaTimeSeconds','org2','43200'),('maxDeltaTimeSeconds','org3','43200'),('maxDeltaTimeSeconds','org4','43200'),('maxDeltaTimeSeconds','org5','43200'),('maxFailureWaitSeconds','dabc51bf-58ea-42ed-9918-4114e6b08338','900'),('maxFailureWaitSeconds','org1','900'),('maxFailureWaitSeconds','org2','900'),('maxFailureWaitSeconds','org3','900'),('maxFailureWaitSeconds','org4','900'),('maxFailureWaitSeconds','org5','900'),('minimumQuickLoginWaitSeconds','dabc51bf-58ea-42ed-9918-4114e6b08338','60'),('minimumQuickLoginWaitSeconds','org1','60'),('minimumQuickLoginWaitSeconds','org2','60'),('minimumQuickLoginWaitSeconds','org3','60'),('minimumQuickLoginWaitSeconds','org4','60'),('minimumQuickLoginWaitSeconds','org5','60'),('oauth2DeviceCodeLifespan','dabc51bf-58ea-42ed-9918-4114e6b08338','600'),('oauth2DeviceCodeLifespan','org1','600'),('oauth2DeviceCodeLifespan','org2','600'),('oauth2DeviceCodeLifespan','org3','600'),('oauth2DeviceCodeLifespan','org4','600'),('oauth2DeviceCodeLifespan','org5','600'),('oauth2DevicePollingInterval','dabc51bf-58ea-42ed-9918-4114e6b08338','5'),('oauth2DevicePollingInterval','org1','5'),('oauth2DevicePollingInterval','org2','5'),('oauth2DevicePollingInterval','org3','5'),('oauth2DevicePollingInterval','org4','5'),('oauth2DevicePollingInterval','org5','5'),('offlineSessionMaxLifespan','dabc51bf-58ea-42ed-9918-4114e6b08338','31536000'),('offlineSessionMaxLifespan','org1','31536000'),('offlineSessionMaxLifespan','org2','31536000'),('offlineSessionMaxLifespan','org3','31536000'),('offlineSessionMaxLifespan','org4','31536000'),('offlineSessionMaxLifespan','org5','31536000'),('offlineSessionMaxLifespanEnabled','dabc51bf-58ea-42ed-9918-4114e6b08338','true'),('offlineSessionMaxLifespanEnabled','org1','true'),('offlineSessionMaxLifespanEnabled','org2','true'),('offlineSessionMaxLifespanEnabled','org3','true'),('offlineSessionMaxLifespanEnabled','org4','true'),('offlineSessionMaxLifespanEnabled','org5','true'),('parRequestUriLifespan','dabc51bf-58ea-42ed-9918-4114e6b08338','60'),('parRequestUriLifespan','org1','60'),('parRequestUriLifespan','org2','60'),('parRequestUriLifespan','org3','60'),('parRequestUriLifespan','org4','60'),('parRequestUriLifespan','org5','60'),('permanentLockout','dabc51bf-58ea-42ed-9918-4114e6b08338','false'),('permanentLockout','org1','false'),('permanentLockout','org2','false'),('permanentLockout','org3','false'),('permanentLockout','org4','false'),('permanentLockout','org5','false'),('quickLoginCheckMilliSeconds','dabc51bf-58ea-42ed-9918-4114e6b08338','1000'),('quickLoginCheckMilliSeconds','org1','1000'),('quickLoginCheckMilliSeconds','org2','1000'),('quickLoginCheckMilliSeconds','org3','1000'),('quickLoginCheckMilliSeconds','org4','1000'),('quickLoginCheckMilliSeconds','org5','1000'),('realmReusableOtpCode','dabc51bf-58ea-42ed-9918-4114e6b08338','false'),('realmReusableOtpCode','org1','false'),('realmReusableOtpCode','org2','false'),('realmReusableOtpCode','org3','false'),('realmReusableOtpCode','org4','false'),('realmReusableOtpCode','org5','false'),('waitIncrementSeconds','dabc51bf-58ea-42ed-9918-4114e6b08338','60'),('waitIncrementSeconds','org1','60'),('waitIncrementSeconds','org2','60'),('waitIncrementSeconds','org3','60'),('waitIncrementSeconds','org4','60'),('waitIncrementSeconds','org5','60'),('webAuthnPolicyAttestationConveyancePreference','dabc51bf-58ea-42ed-9918-4114e6b08338','not specified'),('webAuthnPolicyAttestationConveyancePreference','org1','not specified'),('webAuthnPolicyAttestationConveyancePreference','org2','not specified'),('webAuthnPolicyAttestationConveyancePreference','org3','not specified'),('webAuthnPolicyAttestationConveyancePreference','org4','not specified'),('webAuthnPolicyAttestationConveyancePreference','org5','not specified'),('webAuthnPolicyAttestationConveyancePreferencePasswordless','dabc51bf-58ea-42ed-9918-4114e6b08338','not specified'),('webAuthnPolicyAttestationConveyancePreferencePasswordless','org1','not specified'),('webAuthnPolicyAttestationConveyancePreferencePasswordless','org2','not specified'),('webAuthnPolicyAttestationConveyancePreferencePasswordless','org3','not specified'),('webAuthnPolicyAttestationConveyancePreferencePasswordless','org4','not specified'),('webAuthnPolicyAttestationConveyancePreferencePasswordless','org5','not specified'),('webAuthnPolicyAuthenticatorAttachment','dabc51bf-58ea-42ed-9918-4114e6b08338','not specified'),('webAuthnPolicyAuthenticatorAttachment','org1','not specified'),('webAuthnPolicyAuthenticatorAttachment','org2','not specified'),('webAuthnPolicyAuthenticatorAttachment','org3','not specified'),('webAuthnPolicyAuthenticatorAttachment','org4','not specified'),('webAuthnPolicyAuthenticatorAttachment','org5','not specified'),('webAuthnPolicyAuthenticatorAttachmentPasswordless','dabc51bf-58ea-42ed-9918-4114e6b08338','not specified'),('webAuthnPolicyAuthenticatorAttachmentPasswordless','org1','not specified'),('webAuthnPolicyAuthenticatorAttachmentPasswordless','org2','not specified'),('webAuthnPolicyAuthenticatorAttachmentPasswordless','org3','not specified'),('webAuthnPolicyAuthenticatorAttachmentPasswordless','org4','not specified'),('webAuthnPolicyAuthenticatorAttachmentPasswordless','org5','not specified'),('webAuthnPolicyAvoidSameAuthenticatorRegister','dabc51bf-58ea-42ed-9918-4114e6b08338','false'),('webAuthnPolicyAvoidSameAuthenticatorRegister','org1','false'),('webAuthnPolicyAvoidSameAuthenticatorRegister','org2','false'),('webAuthnPolicyAvoidSameAuthenticatorRegister','org3','false'),('webAuthnPolicyAvoidSameAuthenticatorRegister','org4','false'),('webAuthnPolicyAvoidSameAuthenticatorRegister','org5','false'),('webAuthnPolicyAvoidSameAuthenticatorRegisterPasswordless','dabc51bf-58ea-42ed-9918-4114e6b08338','false'),('webAuthnPolicyAvoidSameAuthenticatorRegisterPasswordless','org1','false'),('webAuthnPolicyAvoidSameAuthenticatorRegisterPasswordless','org2','false'),('webAuthnPolicyAvoidSameAuthenticatorRegisterPasswordless','org3','false'),('webAuthnPolicyAvoidSameAuthenticatorRegisterPasswordless','org4','false'),('webAuthnPolicyAvoidSameAuthenticatorRegisterPasswordless','org5','false'),('webAuthnPolicyCreateTimeout','dabc51bf-58ea-42ed-9918-4114e6b08338','0'),('webAuthnPolicyCreateTimeout','org1','0'),('webAuthnPolicyCreateTimeout','org2','0'),('webAuthnPolicyCreateTimeout','org3','0'),('webAuthnPolicyCreateTimeout','org4','0'),('webAuthnPolicyCreateTimeout','org5','0'),('webAuthnPolicyCreateTimeoutPasswordless','dabc51bf-58ea-42ed-9918-4114e6b08338','0'),('webAuthnPolicyCreateTimeoutPasswordless','org1','0'),('webAuthnPolicyCreateTimeoutPasswordless','org2','0'),('webAuthnPolicyCreateTimeoutPasswordless','org3','0'),('webAuthnPolicyCreateTimeoutPasswordless','org4','0'),('webAuthnPolicyCreateTimeoutPasswordless','org5','0'),('webAuthnPolicyRequireResidentKey','dabc51bf-58ea-42ed-9918-4114e6b08338','not specified'),('webAuthnPolicyRequireResidentKey','org1','not specified'),('webAuthnPolicyRequireResidentKey','org2','not specified'),('webAuthnPolicyRequireResidentKey','org3','not specified'),('webAuthnPolicyRequireResidentKey','org4','not specified'),('webAuthnPolicyRequireResidentKey','org5','not specified'),('webAuthnPolicyRequireResidentKeyPasswordless','dabc51bf-58ea-42ed-9918-4114e6b08338','not specified'),('webAuthnPolicyRequireResidentKeyPasswordless','org1','not specified'),('webAuthnPolicyRequireResidentKeyPasswordless','org2','not specified'),('webAuthnPolicyRequireResidentKeyPasswordless','org3','not specified'),('webAuthnPolicyRequireResidentKeyPasswordless','org4','not specified'),('webAuthnPolicyRequireResidentKeyPasswordless','org5','not specified'),('webAuthnPolicyRpEntityName','dabc51bf-58ea-42ed-9918-4114e6b08338','keycloak'),('webAuthnPolicyRpEntityName','org1','keycloak'),('webAuthnPolicyRpEntityName','org2','keycloak'),('webAuthnPolicyRpEntityName','org3','keycloak'),('webAuthnPolicyRpEntityName','org4','keycloak'),('webAuthnPolicyRpEntityName','org5','keycloak'),('webAuthnPolicyRpEntityNamePasswordless','dabc51bf-58ea-42ed-9918-4114e6b08338','keycloak'),('webAuthnPolicyRpEntityNamePasswordless','org1','keycloak'),('webAuthnPolicyRpEntityNamePasswordless','org2','keycloak'),('webAuthnPolicyRpEntityNamePasswordless','org3','keycloak'),('webAuthnPolicyRpEntityNamePasswordless','org4','keycloak'),('webAuthnPolicyRpEntityNamePasswordless','org5','keycloak'),('webAuthnPolicyRpId','dabc51bf-58ea-42ed-9918-4114e6b08338',''),('webAuthnPolicyRpId','org1',''),('webAuthnPolicyRpId','org2',''),('webAuthnPolicyRpId','org3',''),('webAuthnPolicyRpId','org4',''),('webAuthnPolicyRpId','org5',''),('webAuthnPolicyRpIdPasswordless','dabc51bf-58ea-42ed-9918-4114e6b08338',''),('webAuthnPolicyRpIdPasswordless','org1',''),('webAuthnPolicyRpIdPasswordless','org2',''),('webAuthnPolicyRpIdPasswordless','org3',''),('webAuthnPolicyRpIdPasswordless','org4',''),('webAuthnPolicyRpIdPasswordless','org5',''),('webAuthnPolicySignatureAlgorithms','dabc51bf-58ea-42ed-9918-4114e6b08338','ES256'),('webAuthnPolicySignatureAlgorithms','org1','ES256'),('webAuthnPolicySignatureAlgorithms','org2','ES256'),('webAuthnPolicySignatureAlgorithms','org3','ES256'),('webAuthnPolicySignatureAlgorithms','org4','ES256'),('webAuthnPolicySignatureAlgorithms','org5','ES256'),('webAuthnPolicySignatureAlgorithmsPasswordless','dabc51bf-58ea-42ed-9918-4114e6b08338','ES256'),('webAuthnPolicySignatureAlgorithmsPasswordless','org1','ES256'),('webAuthnPolicySignatureAlgorithmsPasswordless','org2','ES256'),('webAuthnPolicySignatureAlgorithmsPasswordless','org3','ES256'),('webAuthnPolicySignatureAlgorithmsPasswordless','org4','ES256'),('webAuthnPolicySignatureAlgorithmsPasswordless','org5','ES256'),('webAuthnPolicyUserVerificationRequirement','dabc51bf-58ea-42ed-9918-4114e6b08338','not specified'),('webAuthnPolicyUserVerificationRequirement','org1','not specified'),('webAuthnPolicyUserVerificationRequirement','org2','not specified'),('webAuthnPolicyUserVerificationRequirement','org3','not specified'),('webAuthnPolicyUserVerificationRequirement','org4','not specified'),('webAuthnPolicyUserVerificationRequirement','org5','not specified'),('webAuthnPolicyUserVerificationRequirementPasswordless','dabc51bf-58ea-42ed-9918-4114e6b08338','not specified'),('webAuthnPolicyUserVerificationRequirementPasswordless','org1','not specified'),('webAuthnPolicyUserVerificationRequirementPasswordless','org2','not specified'),('webAuthnPolicyUserVerificationRequirementPasswordless','org3','not specified'),('webAuthnPolicyUserVerificationRequirementPasswordless','org4','not specified'),('webAuthnPolicyUserVerificationRequirementPasswordless','org5','not specified'),('_browser_header.contentSecurityPolicy','dabc51bf-58ea-42ed-9918-4114e6b08338','frame-src \'self\'; frame-ancestors \'self\'; object-src \'none\';'),('_browser_header.contentSecurityPolicy','org1','frame-src \'self\'; frame-ancestors \'self\'; object-src \'none\';'),('_browser_header.contentSecurityPolicy','org2','frame-src \'self\'; frame-ancestors \'self\'; object-src \'none\';'),('_browser_header.contentSecurityPolicy','org3','frame-src \'self\'; frame-ancestors \'self\'; object-src \'none\';'),('_browser_header.contentSecurityPolicy','org4','frame-src \'self\'; frame-ancestors \'self\'; object-src \'none\';'),('_browser_header.contentSecurityPolicy','org5','frame-src \'self\'; frame-ancestors \'self\'; object-src \'none\';'),('_browser_header.contentSecurityPolicyReportOnly','dabc51bf-58ea-42ed-9918-4114e6b08338',''),('_browser_header.contentSecurityPolicyReportOnly','org1',''),('_browser_header.contentSecurityPolicyReportOnly','org2',''),('_browser_header.contentSecurityPolicyReportOnly','org3',''),('_browser_header.contentSecurityPolicyReportOnly','org4',''),('_browser_header.contentSecurityPolicyReportOnly','org5',''),('_browser_header.strictTransportSecurity','dabc51bf-58ea-42ed-9918-4114e6b08338','max-age=31536000; includeSubDomains'),('_browser_header.strictTransportSecurity','org1','max-age=31536000; includeSubDomains'),('_browser_header.strictTransportSecurity','org2','max-age=31536000; includeSubDomains'),('_browser_header.strictTransportSecurity','org3','max-age=31536000; includeSubDomains'),('_browser_header.strictTransportSecurity','org4','max-age=31536000; includeSubDomains'),('_browser_header.strictTransportSecurity','org5','max-age=31536000; includeSubDomains'),('_browser_header.xContentTypeOptions','dabc51bf-58ea-42ed-9918-4114e6b08338','nosniff'),('_browser_header.xContentTypeOptions','org1','nosniff'),('_browser_header.xContentTypeOptions','org2','nosniff'),('_browser_header.xContentTypeOptions','org3','nosniff'),('_browser_header.xContentTypeOptions','org4','nosniff'),('_browser_header.xContentTypeOptions','org5','nosniff'),('_browser_header.xFrameOptions','dabc51bf-58ea-42ed-9918-4114e6b08338','SAMEORIGIN'),('_browser_header.xFrameOptions','org1','SAMEORIGIN'),('_browser_header.xFrameOptions','org2','SAMEORIGIN'),('_browser_header.xFrameOptions','org3','SAMEORIGIN'),('_browser_header.xFrameOptions','org4','SAMEORIGIN'),('_browser_header.xFrameOptions','org5','SAMEORIGIN'),('_browser_header.xRobotsTag','dabc51bf-58ea-42ed-9918-4114e6b08338','none'),('_browser_header.xRobotsTag','org1','none'),('_browser_header.xRobotsTag','org2','none'),('_browser_header.xRobotsTag','org3','none'),('_browser_header.xRobotsTag','org4','none'),('_browser_header.xRobotsTag','org5','none'),('_browser_header.xXSSProtection','dabc51bf-58ea-42ed-9918-4114e6b08338','1; mode=block'),('_browser_header.xXSSProtection','org1','1; mode=block'),('_browser_header.xXSSProtection','org2','1; mode=block'),('_browser_header.xXSSProtection','org3','1; mode=block'),('_browser_header.xXSSProtection','org4','1; mode=block'),('_browser_header.xXSSProtection','org5','1; mode=block');
+/*!40000 ALTER TABLE `REALM_ATTRIBUTE` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `REALM_DEFAULT_GROUPS`
+--
+
+DROP TABLE IF EXISTS `REALM_DEFAULT_GROUPS`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `REALM_DEFAULT_GROUPS` (
+  `REALM_ID` varchar(36) NOT NULL,
+  `GROUP_ID` varchar(36) NOT NULL,
+  PRIMARY KEY (`REALM_ID`,`GROUP_ID`),
+  UNIQUE KEY `CON_GROUP_ID_DEF_GROUPS` (`GROUP_ID`),
+  KEY `IDX_REALM_DEF_GRP_REALM` (`REALM_ID`),
+  CONSTRAINT `FK_DEF_GROUPS_REALM` FOREIGN KEY (`REALM_ID`) REFERENCES `REALM` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `REALM_DEFAULT_GROUPS`
+--
+
+LOCK TABLES `REALM_DEFAULT_GROUPS` WRITE;
+/*!40000 ALTER TABLE `REALM_DEFAULT_GROUPS` DISABLE KEYS */;
+/*!40000 ALTER TABLE `REALM_DEFAULT_GROUPS` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `REALM_ENABLED_EVENT_TYPES`
+--
+
+DROP TABLE IF EXISTS `REALM_ENABLED_EVENT_TYPES`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `REALM_ENABLED_EVENT_TYPES` (
+  `REALM_ID` varchar(36) NOT NULL,
+  `VALUE` varchar(255) NOT NULL,
+  PRIMARY KEY (`REALM_ID`,`VALUE`),
+  KEY `IDX_REALM_EVT_TYPES_REALM` (`REALM_ID`),
+  CONSTRAINT `FK_H846O4H0W8EPX5NWEDRF5Y69J` FOREIGN KEY (`REALM_ID`) REFERENCES `REALM` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `REALM_ENABLED_EVENT_TYPES`
+--
+
+LOCK TABLES `REALM_ENABLED_EVENT_TYPES` WRITE;
+/*!40000 ALTER TABLE `REALM_ENABLED_EVENT_TYPES` DISABLE KEYS */;
+INSERT INTO `REALM_ENABLED_EVENT_TYPES` VALUES ('org1','AUTHREQID_TO_TOKEN'),('org1','AUTHREQID_TO_TOKEN_ERROR'),('org1','CLIENT_DELETE'),('org1','CLIENT_DELETE_ERROR'),('org1','CLIENT_INITIATED_ACCOUNT_LINKING'),('org1','CLIENT_INITIATED_ACCOUNT_LINKING_ERROR'),('org1','CLIENT_LOGIN'),('org1','CLIENT_LOGIN_ERROR'),('org1','CLIENT_REGISTER'),('org1','CLIENT_REGISTER_ERROR'),('org1','CLIENT_UPDATE'),('org1','CLIENT_UPDATE_ERROR'),('org1','CODE_TO_TOKEN'),('org1','CODE_TO_TOKEN_ERROR'),('org1','CUSTOM_REQUIRED_ACTION'),('org1','CUSTOM_REQUIRED_ACTION_ERROR'),('org1','DELETE_ACCOUNT'),('org1','DELETE_ACCOUNT_ERROR'),('org1','EXECUTE_ACTIONS'),('org1','EXECUTE_ACTIONS_ERROR'),('org1','EXECUTE_ACTION_TOKEN'),('org1','EXECUTE_ACTION_TOKEN_ERROR'),('org1','FEDERATED_IDENTITY_LINK'),('org1','FEDERATED_IDENTITY_LINK_ERROR'),('org1','GRANT_CONSENT'),('org1','GRANT_CONSENT_ERROR'),('org1','IDENTITY_PROVIDER_FIRST_LOGIN'),('org1','IDENTITY_PROVIDER_FIRST_LOGIN_ERROR'),('org1','IDENTITY_PROVIDER_LINK_ACCOUNT'),('org1','IDENTITY_PROVIDER_LINK_ACCOUNT_ERROR'),('org1','IDENTITY_PROVIDER_POST_LOGIN'),('org1','IDENTITY_PROVIDER_POST_LOGIN_ERROR'),('org1','IMPERSONATE'),('org1','IMPERSONATE_ERROR'),('org1','LOGIN'),('org1','LOGIN_ERROR'),('org1','LOGOUT'),('org1','LOGOUT_ERROR'),('org1','OAUTH2_DEVICE_AUTH'),('org1','OAUTH2_DEVICE_AUTH_ERROR'),('org1','OAUTH2_DEVICE_CODE_TO_TOKEN'),('org1','OAUTH2_DEVICE_CODE_TO_TOKEN_ERROR'),('org1','OAUTH2_DEVICE_VERIFY_USER_CODE'),('org1','OAUTH2_DEVICE_VERIFY_USER_CODE_ERROR'),('org1','PERMISSION_TOKEN'),('org1','REGISTER'),('org1','REGISTER_ERROR'),('org1','REMOVE_FEDERATED_IDENTITY'),('org1','REMOVE_FEDERATED_IDENTITY_ERROR'),('org1','REMOVE_TOTP'),('org1','REMOVE_TOTP_ERROR'),('org1','RESET_PASSWORD'),('org1','RESET_PASSWORD_ERROR'),('org1','RESTART_AUTHENTICATION'),('org1','RESTART_AUTHENTICATION_ERROR'),('org1','REVOKE_GRANT'),('org1','REVOKE_GRANT_ERROR'),('org1','SEND_IDENTITY_PROVIDER_LINK'),('org1','SEND_IDENTITY_PROVIDER_LINK_ERROR'),('org1','SEND_RESET_PASSWORD'),('org1','SEND_RESET_PASSWORD_ERROR'),('org1','SEND_VERIFY_EMAIL'),('org1','SEND_VERIFY_EMAIL_ERROR'),('org1','TOKEN_EXCHANGE'),('org1','TOKEN_EXCHANGE_ERROR'),('org1','UPDATE_CONSENT'),('org1','UPDATE_CONSENT_ERROR'),('org1','UPDATE_EMAIL'),('org1','UPDATE_EMAIL_ERROR'),('org1','UPDATE_PASSWORD'),('org1','UPDATE_PASSWORD_ERROR'),('org1','UPDATE_PROFILE'),('org1','UPDATE_PROFILE_ERROR'),('org1','UPDATE_TOTP'),('org1','UPDATE_TOTP_ERROR'),('org1','VERIFY_EMAIL'),('org1','VERIFY_EMAIL_ERROR'),('org1','VERIFY_PROFILE'),('org1','VERIFY_PROFILE_ERROR'),('org2','AUTHREQID_TO_TOKEN'),('org2','AUTHREQID_TO_TOKEN_ERROR'),('org2','CLIENT_DELETE'),('org2','CLIENT_DELETE_ERROR'),('org2','CLIENT_INITIATED_ACCOUNT_LINKING'),('org2','CLIENT_INITIATED_ACCOUNT_LINKING_ERROR'),('org2','CLIENT_LOGIN'),('org2','CLIENT_LOGIN_ERROR'),('org2','CLIENT_REGISTER'),('org2','CLIENT_REGISTER_ERROR'),('org2','CLIENT_UPDATE'),('org2','CLIENT_UPDATE_ERROR'),('org2','CODE_TO_TOKEN'),('org2','CODE_TO_TOKEN_ERROR'),('org2','CUSTOM_REQUIRED_ACTION'),('org2','CUSTOM_REQUIRED_ACTION_ERROR'),('org2','DELETE_ACCOUNT'),('org2','DELETE_ACCOUNT_ERROR'),('org2','EXECUTE_ACTIONS'),('org2','EXECUTE_ACTIONS_ERROR'),('org2','EXECUTE_ACTION_TOKEN'),('org2','EXECUTE_ACTION_TOKEN_ERROR'),('org2','FEDERATED_IDENTITY_LINK'),('org2','FEDERATED_IDENTITY_LINK_ERROR'),('org2','GRANT_CONSENT'),('org2','GRANT_CONSENT_ERROR'),('org2','IDENTITY_PROVIDER_FIRST_LOGIN'),('org2','IDENTITY_PROVIDER_FIRST_LOGIN_ERROR'),('org2','IDENTITY_PROVIDER_LINK_ACCOUNT'),('org2','IDENTITY_PROVIDER_LINK_ACCOUNT_ERROR'),('org2','IDENTITY_PROVIDER_POST_LOGIN'),('org2','IDENTITY_PROVIDER_POST_LOGIN_ERROR'),('org2','IMPERSONATE'),('org2','IMPERSONATE_ERROR'),('org2','LOGIN'),('org2','LOGIN_ERROR'),('org2','LOGOUT'),('org2','LOGOUT_ERROR'),('org2','OAUTH2_DEVICE_AUTH'),('org2','OAUTH2_DEVICE_AUTH_ERROR'),('org2','OAUTH2_DEVICE_CODE_TO_TOKEN'),('org2','OAUTH2_DEVICE_CODE_TO_TOKEN_ERROR'),('org2','OAUTH2_DEVICE_VERIFY_USER_CODE'),('org2','OAUTH2_DEVICE_VERIFY_USER_CODE_ERROR'),('org2','PERMISSION_TOKEN'),('org2','REGISTER'),('org2','REGISTER_ERROR'),('org2','REMOVE_FEDERATED_IDENTITY'),('org2','REMOVE_FEDERATED_IDENTITY_ERROR'),('org2','REMOVE_TOTP'),('org2','REMOVE_TOTP_ERROR'),('org2','RESET_PASSWORD'),('org2','RESET_PASSWORD_ERROR'),('org2','RESTART_AUTHENTICATION'),('org2','RESTART_AUTHENTICATION_ERROR'),('org2','REVOKE_GRANT'),('org2','REVOKE_GRANT_ERROR'),('org2','SEND_IDENTITY_PROVIDER_LINK'),('org2','SEND_IDENTITY_PROVIDER_LINK_ERROR'),('org2','SEND_RESET_PASSWORD'),('org2','SEND_RESET_PASSWORD_ERROR'),('org2','SEND_VERIFY_EMAIL'),('org2','SEND_VERIFY_EMAIL_ERROR'),('org2','TOKEN_EXCHANGE'),('org2','TOKEN_EXCHANGE_ERROR'),('org2','UPDATE_CONSENT'),('org2','UPDATE_CONSENT_ERROR'),('org2','UPDATE_EMAIL'),('org2','UPDATE_EMAIL_ERROR'),('org2','UPDATE_PASSWORD'),('org2','UPDATE_PASSWORD_ERROR'),('org2','UPDATE_PROFILE'),('org2','UPDATE_PROFILE_ERROR'),('org2','UPDATE_TOTP'),('org2','UPDATE_TOTP_ERROR'),('org2','VERIFY_EMAIL'),('org2','VERIFY_EMAIL_ERROR'),('org2','VERIFY_PROFILE'),('org2','VERIFY_PROFILE_ERROR'),('org3','AUTHREQID_TO_TOKEN'),('org3','AUTHREQID_TO_TOKEN_ERROR'),('org3','CLIENT_DELETE'),('org3','CLIENT_DELETE_ERROR'),('org3','CLIENT_INITIATED_ACCOUNT_LINKING'),('org3','CLIENT_INITIATED_ACCOUNT_LINKING_ERROR'),('org3','CLIENT_LOGIN'),('org3','CLIENT_LOGIN_ERROR'),('org3','CLIENT_REGISTER'),('org3','CLIENT_REGISTER_ERROR'),('org3','CLIENT_UPDATE'),('org3','CLIENT_UPDATE_ERROR'),('org3','CODE_TO_TOKEN'),('org3','CODE_TO_TOKEN_ERROR'),('org3','CUSTOM_REQUIRED_ACTION'),('org3','CUSTOM_REQUIRED_ACTION_ERROR'),('org3','DELETE_ACCOUNT'),('org3','DELETE_ACCOUNT_ERROR'),('org3','EXECUTE_ACTIONS'),('org3','EXECUTE_ACTIONS_ERROR'),('org3','EXECUTE_ACTION_TOKEN'),('org3','EXECUTE_ACTION_TOKEN_ERROR'),('org3','FEDERATED_IDENTITY_LINK'),('org3','FEDERATED_IDENTITY_LINK_ERROR'),('org3','GRANT_CONSENT'),('org3','GRANT_CONSENT_ERROR'),('org3','IDENTITY_PROVIDER_FIRST_LOGIN'),('org3','IDENTITY_PROVIDER_FIRST_LOGIN_ERROR'),('org3','IDENTITY_PROVIDER_LINK_ACCOUNT'),('org3','IDENTITY_PROVIDER_LINK_ACCOUNT_ERROR'),('org3','IDENTITY_PROVIDER_POST_LOGIN'),('org3','IDENTITY_PROVIDER_POST_LOGIN_ERROR'),('org3','IMPERSONATE'),('org3','IMPERSONATE_ERROR'),('org3','LOGIN'),('org3','LOGIN_ERROR'),('org3','LOGOUT'),('org3','LOGOUT_ERROR'),('org3','OAUTH2_DEVICE_AUTH'),('org3','OAUTH2_DEVICE_AUTH_ERROR'),('org3','OAUTH2_DEVICE_CODE_TO_TOKEN'),('org3','OAUTH2_DEVICE_CODE_TO_TOKEN_ERROR'),('org3','OAUTH2_DEVICE_VERIFY_USER_CODE'),('org3','OAUTH2_DEVICE_VERIFY_USER_CODE_ERROR'),('org3','PERMISSION_TOKEN'),('org3','REGISTER'),('org3','REGISTER_ERROR'),('org3','REMOVE_FEDERATED_IDENTITY'),('org3','REMOVE_FEDERATED_IDENTITY_ERROR'),('org3','REMOVE_TOTP'),('org3','REMOVE_TOTP_ERROR'),('org3','RESET_PASSWORD'),('org3','RESET_PASSWORD_ERROR'),('org3','RESTART_AUTHENTICATION'),('org3','RESTART_AUTHENTICATION_ERROR'),('org3','REVOKE_GRANT'),('org3','REVOKE_GRANT_ERROR'),('org3','SEND_IDENTITY_PROVIDER_LINK'),('org3','SEND_IDENTITY_PROVIDER_LINK_ERROR'),('org3','SEND_RESET_PASSWORD'),('org3','SEND_RESET_PASSWORD_ERROR'),('org3','SEND_VERIFY_EMAIL'),('org3','SEND_VERIFY_EMAIL_ERROR'),('org3','TOKEN_EXCHANGE'),('org3','TOKEN_EXCHANGE_ERROR'),('org3','UPDATE_CONSENT'),('org3','UPDATE_CONSENT_ERROR'),('org3','UPDATE_EMAIL'),('org3','UPDATE_EMAIL_ERROR'),('org3','UPDATE_PASSWORD'),('org3','UPDATE_PASSWORD_ERROR'),('org3','UPDATE_PROFILE'),('org3','UPDATE_PROFILE_ERROR'),('org3','UPDATE_TOTP'),('org3','UPDATE_TOTP_ERROR'),('org3','VERIFY_EMAIL'),('org3','VERIFY_EMAIL_ERROR'),('org3','VERIFY_PROFILE'),('org3','VERIFY_PROFILE_ERROR'),('org4','AUTHREQID_TO_TOKEN'),('org4','AUTHREQID_TO_TOKEN_ERROR'),('org4','CLIENT_DELETE'),('org4','CLIENT_DELETE_ERROR'),('org4','CLIENT_INITIATED_ACCOUNT_LINKING'),('org4','CLIENT_INITIATED_ACCOUNT_LINKING_ERROR'),('org4','CLIENT_LOGIN'),('org4','CLIENT_LOGIN_ERROR'),('org4','CLIENT_REGISTER'),('org4','CLIENT_REGISTER_ERROR'),('org4','CLIENT_UPDATE'),('org4','CLIENT_UPDATE_ERROR'),('org4','CODE_TO_TOKEN'),('org4','CODE_TO_TOKEN_ERROR'),('org4','CUSTOM_REQUIRED_ACTION'),('org4','CUSTOM_REQUIRED_ACTION_ERROR'),('org4','DELETE_ACCOUNT'),('org4','DELETE_ACCOUNT_ERROR'),('org4','EXECUTE_ACTIONS'),('org4','EXECUTE_ACTIONS_ERROR'),('org4','EXECUTE_ACTION_TOKEN'),('org4','EXECUTE_ACTION_TOKEN_ERROR'),('org4','FEDERATED_IDENTITY_LINK'),('org4','FEDERATED_IDENTITY_LINK_ERROR'),('org4','GRANT_CONSENT'),('org4','GRANT_CONSENT_ERROR'),('org4','IDENTITY_PROVIDER_FIRST_LOGIN'),('org4','IDENTITY_PROVIDER_FIRST_LOGIN_ERROR'),('org4','IDENTITY_PROVIDER_LINK_ACCOUNT'),('org4','IDENTITY_PROVIDER_LINK_ACCOUNT_ERROR'),('org4','IDENTITY_PROVIDER_POST_LOGIN'),('org4','IDENTITY_PROVIDER_POST_LOGIN_ERROR'),('org4','IMPERSONATE'),('org4','IMPERSONATE_ERROR'),('org4','LOGIN'),('org4','LOGIN_ERROR'),('org4','LOGOUT'),('org4','LOGOUT_ERROR'),('org4','OAUTH2_DEVICE_AUTH'),('org4','OAUTH2_DEVICE_AUTH_ERROR'),('org4','OAUTH2_DEVICE_CODE_TO_TOKEN'),('org4','OAUTH2_DEVICE_CODE_TO_TOKEN_ERROR'),('org4','OAUTH2_DEVICE_VERIFY_USER_CODE'),('org4','OAUTH2_DEVICE_VERIFY_USER_CODE_ERROR'),('org4','PERMISSION_TOKEN'),('org4','REGISTER'),('org4','REGISTER_ERROR'),('org4','REMOVE_FEDERATED_IDENTITY'),('org4','REMOVE_FEDERATED_IDENTITY_ERROR'),('org4','REMOVE_TOTP'),('org4','REMOVE_TOTP_ERROR'),('org4','RESET_PASSWORD'),('org4','RESET_PASSWORD_ERROR'),('org4','RESTART_AUTHENTICATION'),('org4','RESTART_AUTHENTICATION_ERROR'),('org4','REVOKE_GRANT'),('org4','REVOKE_GRANT_ERROR'),('org4','SEND_IDENTITY_PROVIDER_LINK'),('org4','SEND_IDENTITY_PROVIDER_LINK_ERROR'),('org4','SEND_RESET_PASSWORD'),('org4','SEND_RESET_PASSWORD_ERROR'),('org4','SEND_VERIFY_EMAIL'),('org4','SEND_VERIFY_EMAIL_ERROR'),('org4','TOKEN_EXCHANGE'),('org4','TOKEN_EXCHANGE_ERROR'),('org4','UPDATE_CONSENT'),('org4','UPDATE_CONSENT_ERROR'),('org4','UPDATE_EMAIL'),('org4','UPDATE_EMAIL_ERROR'),('org4','UPDATE_PASSWORD'),('org4','UPDATE_PASSWORD_ERROR'),('org4','UPDATE_PROFILE'),('org4','UPDATE_PROFILE_ERROR'),('org4','UPDATE_TOTP'),('org4','UPDATE_TOTP_ERROR'),('org4','VERIFY_EMAIL'),('org4','VERIFY_EMAIL_ERROR'),('org4','VERIFY_PROFILE'),('org4','VERIFY_PROFILE_ERROR'),('org5','AUTHREQID_TO_TOKEN'),('org5','AUTHREQID_TO_TOKEN_ERROR'),('org5','CLIENT_DELETE'),('org5','CLIENT_DELETE_ERROR'),('org5','CLIENT_INITIATED_ACCOUNT_LINKING'),('org5','CLIENT_INITIATED_ACCOUNT_LINKING_ERROR'),('org5','CLIENT_LOGIN'),('org5','CLIENT_LOGIN_ERROR'),('org5','CLIENT_REGISTER'),('org5','CLIENT_REGISTER_ERROR'),('org5','CLIENT_UPDATE'),('org5','CLIENT_UPDATE_ERROR'),('org5','CODE_TO_TOKEN'),('org5','CODE_TO_TOKEN_ERROR'),('org5','CUSTOM_REQUIRED_ACTION'),('org5','CUSTOM_REQUIRED_ACTION_ERROR'),('org5','DELETE_ACCOUNT'),('org5','DELETE_ACCOUNT_ERROR'),('org5','EXECUTE_ACTIONS'),('org5','EXECUTE_ACTIONS_ERROR'),('org5','EXECUTE_ACTION_TOKEN'),('org5','EXECUTE_ACTION_TOKEN_ERROR'),('org5','FEDERATED_IDENTITY_LINK'),('org5','FEDERATED_IDENTITY_LINK_ERROR'),('org5','GRANT_CONSENT'),('org5','GRANT_CONSENT_ERROR'),('org5','IDENTITY_PROVIDER_FIRST_LOGIN'),('org5','IDENTITY_PROVIDER_FIRST_LOGIN_ERROR'),('org5','IDENTITY_PROVIDER_LINK_ACCOUNT'),('org5','IDENTITY_PROVIDER_LINK_ACCOUNT_ERROR'),('org5','IDENTITY_PROVIDER_POST_LOGIN'),('org5','IDENTITY_PROVIDER_POST_LOGIN_ERROR'),('org5','IMPERSONATE'),('org5','IMPERSONATE_ERROR'),('org5','LOGIN'),('org5','LOGIN_ERROR'),('org5','LOGOUT'),('org5','LOGOUT_ERROR'),('org5','OAUTH2_DEVICE_AUTH'),('org5','OAUTH2_DEVICE_AUTH_ERROR'),('org5','OAUTH2_DEVICE_CODE_TO_TOKEN'),('org5','OAUTH2_DEVICE_CODE_TO_TOKEN_ERROR'),('org5','OAUTH2_DEVICE_VERIFY_USER_CODE'),('org5','OAUTH2_DEVICE_VERIFY_USER_CODE_ERROR'),('org5','PERMISSION_TOKEN'),('org5','REGISTER'),('org5','REGISTER_ERROR'),('org5','REMOVE_FEDERATED_IDENTITY'),('org5','REMOVE_FEDERATED_IDENTITY_ERROR'),('org5','REMOVE_TOTP'),('org5','REMOVE_TOTP_ERROR'),('org5','RESET_PASSWORD'),('org5','RESET_PASSWORD_ERROR'),('org5','RESTART_AUTHENTICATION'),('org5','RESTART_AUTHENTICATION_ERROR'),('org5','REVOKE_GRANT'),('org5','REVOKE_GRANT_ERROR'),('org5','SEND_IDENTITY_PROVIDER_LINK'),('org5','SEND_IDENTITY_PROVIDER_LINK_ERROR'),('org5','SEND_RESET_PASSWORD'),('org5','SEND_RESET_PASSWORD_ERROR'),('org5','SEND_VERIFY_EMAIL'),('org5','SEND_VERIFY_EMAIL_ERROR'),('org5','TOKEN_EXCHANGE'),('org5','TOKEN_EXCHANGE_ERROR'),('org5','UPDATE_CONSENT'),('org5','UPDATE_CONSENT_ERROR'),('org5','UPDATE_EMAIL'),('org5','UPDATE_EMAIL_ERROR'),('org5','UPDATE_PASSWORD'),('org5','UPDATE_PASSWORD_ERROR'),('org5','UPDATE_PROFILE'),('org5','UPDATE_PROFILE_ERROR'),('org5','UPDATE_TOTP'),('org5','UPDATE_TOTP_ERROR'),('org5','VERIFY_EMAIL'),('org5','VERIFY_EMAIL_ERROR'),('org5','VERIFY_PROFILE'),('org5','VERIFY_PROFILE_ERROR');
+/*!40000 ALTER TABLE `REALM_ENABLED_EVENT_TYPES` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `REALM_EVENTS_LISTENERS`
+--
+
+DROP TABLE IF EXISTS `REALM_EVENTS_LISTENERS`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `REALM_EVENTS_LISTENERS` (
+  `REALM_ID` varchar(36) NOT NULL,
+  `VALUE` varchar(255) NOT NULL,
+  PRIMARY KEY (`REALM_ID`,`VALUE`),
+  KEY `IDX_REALM_EVT_LIST_REALM` (`REALM_ID`),
+  CONSTRAINT `FK_H846O4H0W8EPX5NXEV9F5Y69J` FOREIGN KEY (`REALM_ID`) REFERENCES `REALM` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `REALM_EVENTS_LISTENERS`
+--
+
+LOCK TABLES `REALM_EVENTS_LISTENERS` WRITE;
+/*!40000 ALTER TABLE `REALM_EVENTS_LISTENERS` DISABLE KEYS */;
+INSERT INTO `REALM_EVENTS_LISTENERS` VALUES ('dabc51bf-58ea-42ed-9918-4114e6b08338','jboss-logging'),('org1','jboss-logging'),('org2','jboss-logging'),('org3','jboss-logging'),('org4','jboss-logging'),('org5','jboss-logging');
+/*!40000 ALTER TABLE `REALM_EVENTS_LISTENERS` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `REALM_LOCALIZATIONS`
+--
+
+DROP TABLE IF EXISTS `REALM_LOCALIZATIONS`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `REALM_LOCALIZATIONS` (
+  `REALM_ID` varchar(255) NOT NULL,
+  `LOCALE` varchar(255) NOT NULL,
+  `TEXTS` longtext CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
+  PRIMARY KEY (`REALM_ID`,`LOCALE`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `REALM_LOCALIZATIONS`
+--
+
+LOCK TABLES `REALM_LOCALIZATIONS` WRITE;
+/*!40000 ALTER TABLE `REALM_LOCALIZATIONS` DISABLE KEYS */;
+/*!40000 ALTER TABLE `REALM_LOCALIZATIONS` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `REALM_REQUIRED_CREDENTIAL`
+--
+
+DROP TABLE IF EXISTS `REALM_REQUIRED_CREDENTIAL`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `REALM_REQUIRED_CREDENTIAL` (
+  `TYPE` varchar(255) NOT NULL,
+  `FORM_LABEL` varchar(255) DEFAULT NULL,
+  `INPUT` bit(1) NOT NULL DEFAULT b'0',
+  `SECRET` bit(1) NOT NULL DEFAULT b'0',
+  `REALM_ID` varchar(36) NOT NULL,
+  PRIMARY KEY (`REALM_ID`,`TYPE`),
+  CONSTRAINT `FK_5HG65LYBEVAVKQFKI3KPONH9V` FOREIGN KEY (`REALM_ID`) REFERENCES `REALM` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `REALM_REQUIRED_CREDENTIAL`
+--
+
+LOCK TABLES `REALM_REQUIRED_CREDENTIAL` WRITE;
+/*!40000 ALTER TABLE `REALM_REQUIRED_CREDENTIAL` DISABLE KEYS */;
+INSERT INTO `REALM_REQUIRED_CREDENTIAL` VALUES ('password','password',_binary '',_binary '','dabc51bf-58ea-42ed-9918-4114e6b08338'),('password','password',_binary '',_binary '','org1'),('password','password',_binary '',_binary '','org2'),('password','password',_binary '',_binary '','org3'),('password','password',_binary '',_binary '','org4'),('password','password',_binary '',_binary '','org5');
+/*!40000 ALTER TABLE `REALM_REQUIRED_CREDENTIAL` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `REALM_SMTP_CONFIG`
+--
+
+DROP TABLE IF EXISTS `REALM_SMTP_CONFIG`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `REALM_SMTP_CONFIG` (
+  `REALM_ID` varchar(36) NOT NULL,
+  `VALUE` varchar(255) DEFAULT NULL,
+  `NAME` varchar(255) NOT NULL,
+  PRIMARY KEY (`REALM_ID`,`NAME`),
+  CONSTRAINT `FK_70EJ8XDXGXD0B9HH6180IRR0O` FOREIGN KEY (`REALM_ID`) REFERENCES `REALM` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `REALM_SMTP_CONFIG`
+--
+
+LOCK TABLES `REALM_SMTP_CONFIG` WRITE;
+/*!40000 ALTER TABLE `REALM_SMTP_CONFIG` DISABLE KEYS */;
+/*!40000 ALTER TABLE `REALM_SMTP_CONFIG` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `REALM_SUPPORTED_LOCALES`
+--
+
+DROP TABLE IF EXISTS `REALM_SUPPORTED_LOCALES`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `REALM_SUPPORTED_LOCALES` (
+  `REALM_ID` varchar(36) NOT NULL,
+  `VALUE` varchar(255) NOT NULL,
+  PRIMARY KEY (`REALM_ID`,`VALUE`),
+  KEY `IDX_REALM_SUPP_LOCAL_REALM` (`REALM_ID`),
+  CONSTRAINT `FK_SUPPORTED_LOCALES_REALM` FOREIGN KEY (`REALM_ID`) REFERENCES `REALM` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `REALM_SUPPORTED_LOCALES`
+--
+
+LOCK TABLES `REALM_SUPPORTED_LOCALES` WRITE;
+/*!40000 ALTER TABLE `REALM_SUPPORTED_LOCALES` DISABLE KEYS */;
+INSERT INTO `REALM_SUPPORTED_LOCALES` VALUES ('org1','en'),('org1','ja'),('org2','en'),('org2','ja'),('org3','en'),('org3','ja'),('org4','en'),('org4','ja'),('org5','en'),('org5','ja');
+/*!40000 ALTER TABLE `REALM_SUPPORTED_LOCALES` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `REDIRECT_URIS`
+--
+
+DROP TABLE IF EXISTS `REDIRECT_URIS`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `REDIRECT_URIS` (
+  `CLIENT_ID` varchar(36) NOT NULL,
+  `VALUE` varchar(255) NOT NULL,
+  PRIMARY KEY (`CLIENT_ID`,`VALUE`),
+  KEY `IDX_REDIR_URI_CLIENT` (`CLIENT_ID`),
+  CONSTRAINT `FK_1BURS8PB4OUJ97H5WUPPAHV9F` FOREIGN KEY (`CLIENT_ID`) REFERENCES `CLIENT` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `REDIRECT_URIS`
+--
+
+LOCK TABLES `REDIRECT_URIS` WRITE;
+/*!40000 ALTER TABLE `REDIRECT_URIS` DISABLE KEYS */;
+INSERT INTO `REDIRECT_URIS` VALUES ('0d3bec04-1354-4db0-b7b6-96ee59ad7c4a','/realms/org5/account/*'),('10447023-de56-4fa6-8669-07b054551ad1','/admin/org5/console/*'),('166138a8-bf2f-4caa-97eb-8cabbe18a8f6','/admin/org3/console/*'),('16fe410e-f1df-4ce0-b445-8dd3b5b80750','/*'),('21f3aced-8905-4cbe-b76e-e4efc5f5b5d9','/realms/org3/account/*'),('2edff0cf-8f6c-44b6-917d-f00a3bb58261','/realms/org2/account/*'),('37140475-df0f-4d9e-9d4d-9c9afbdda5f6','/realms/org1/account/*'),('3d62cf66-73c8-4ec7-ba0f-2b622bc5c747','/*'),('47a07858-733a-4de8-a079-837b25a07547','/realms/org3/account/*'),('57f46d8e-a3aa-4587-abe4-ef652ebef40c','/realms/org4/account/*'),('5a324cc2-4d44-46de-9c51-9afcc3c1adda','/*'),('6e5e1844-3f44-46b9-a6b7-4297aed21fcf','/realms/org2/account/*'),('8137d95e-0cab-4e9f-b666-92c7bd7ca71a','/realms/master/account/*'),('908e528c-5deb-476b-9612-751d1944f79a','/*'),('918724dc-e6f6-424e-a42f-875f0da655ae','/realms/org4/account/*'),('a15e680b-47bb-4b94-a832-5ca99cdbe134','/*'),('a45ffddc-de71-4c69-b026-cb2cf7f30d16','/realms/org1/account/*'),('aa4ae80c-bbad-4217-a6a7-8ff0a871577f','/admin/master/console/*'),('ad5aa4ab-fe72-4d1d-8bab-e0a39529dca7','/realms/org5/account/*'),('b0475217-c11a-49f5-833c-33aaee237a25','/*'),('bf0a8c22-455e-4840-9240-f2a7d5b415f7','/admin/org2/console/*'),('c948de3b-8380-4528-a5b7-de403c58d40f','/realms/master/account/*'),('e7ce9cbf-460c-4fb6-9da2-484548018706','/admin/org4/console/*'),('fc9017e3-d5da-44aa-8c39-f16017ad8608','/admin/org1/console/*');
+/*!40000 ALTER TABLE `REDIRECT_URIS` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `REQUIRED_ACTION_CONFIG`
+--
+
+DROP TABLE IF EXISTS `REQUIRED_ACTION_CONFIG`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `REQUIRED_ACTION_CONFIG` (
+  `REQUIRED_ACTION_ID` varchar(36) NOT NULL,
+  `VALUE` longtext,
+  `NAME` varchar(255) NOT NULL,
+  PRIMARY KEY (`REQUIRED_ACTION_ID`,`NAME`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `REQUIRED_ACTION_CONFIG`
+--
+
+LOCK TABLES `REQUIRED_ACTION_CONFIG` WRITE;
+/*!40000 ALTER TABLE `REQUIRED_ACTION_CONFIG` DISABLE KEYS */;
+/*!40000 ALTER TABLE `REQUIRED_ACTION_CONFIG` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `REQUIRED_ACTION_PROVIDER`
+--
+
+DROP TABLE IF EXISTS `REQUIRED_ACTION_PROVIDER`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `REQUIRED_ACTION_PROVIDER` (
+  `ID` varchar(36) NOT NULL,
+  `ALIAS` varchar(255) DEFAULT NULL,
+  `NAME` varchar(255) DEFAULT NULL,
+  `REALM_ID` varchar(36) DEFAULT NULL,
+  `ENABLED` bit(1) NOT NULL DEFAULT b'0',
+  `DEFAULT_ACTION` bit(1) NOT NULL DEFAULT b'0',
+  `PROVIDER_ID` varchar(255) DEFAULT NULL,
+  `PRIORITY` int DEFAULT NULL,
+  PRIMARY KEY (`ID`),
+  KEY `IDX_REQ_ACT_PROV_REALM` (`REALM_ID`),
+  CONSTRAINT `FK_REQ_ACT_REALM` FOREIGN KEY (`REALM_ID`) REFERENCES `REALM` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `REQUIRED_ACTION_PROVIDER`
+--
+
+LOCK TABLES `REQUIRED_ACTION_PROVIDER` WRITE;
+/*!40000 ALTER TABLE `REQUIRED_ACTION_PROVIDER` DISABLE KEYS */;
+INSERT INTO `REQUIRED_ACTION_PROVIDER` VALUES ('181620b3-1107-4f8a-ab2d-c8f3a373cf72','UPDATE_PROFILE','Update Profile','org4',_binary '',_binary '\0','UPDATE_PROFILE',40),('18bd42f7-08eb-4cb9-82ac-d40f32fbacdf','webauthn-register','Webauthn Register','org3',_binary '',_binary '\0','webauthn-register',70),('1fec9a6a-ec49-4e9a-8f71-0bb7e0ce3d05','CONFIGURE_TOTP','Configure OTP','org2',_binary '',_binary '\0','CONFIGURE_TOTP',10),('209a0734-cb73-4363-9250-8b1107155249','webauthn-register','Webauthn Register','dabc51bf-58ea-42ed-9918-4114e6b08338',_binary '',_binary '\0','webauthn-register',70),('23a1916d-9a57-4314-9f9d-1a84d3ec4811','webauthn-register-passwordless','Webauthn Register Passwordless','org1',_binary '',_binary '\0','webauthn-register-passwordless',80),('261c64ec-aba8-404a-bb0b-337a4e5ea74a','UPDATE_PROFILE','Update Profile','dabc51bf-58ea-42ed-9918-4114e6b08338',_binary '',_binary '\0','UPDATE_PROFILE',40),('2bdf7768-f61f-430f-8ed5-2277f03cbf3c','terms_and_conditions','Terms and Conditions','org2',_binary '\0',_binary '\0','terms_and_conditions',20),('2d60b66e-e2ed-4d6e-bbf7-0310a511c9f3','VERIFY_EMAIL','Verify Email','org4',_binary '',_binary '\0','VERIFY_EMAIL',50),('3006bed4-6f56-4224-84d3-141776c75645','CONFIGURE_TOTP','Configure OTP','org1',_binary '',_binary '\0','CONFIGURE_TOTP',10),('3272cd93-73eb-495c-8f11-cd78293b113a','webauthn-register-passwordless','Webauthn Register Passwordless','dabc51bf-58ea-42ed-9918-4114e6b08338',_binary '',_binary '\0','webauthn-register-passwordless',80),('39631721-b888-4562-b01c-a21d81541980','delete_account','Delete Account','org5',_binary '\0',_binary '\0','delete_account',60),('4c39ebdd-6e24-46c7-be83-0955bb2d34a4','VERIFY_EMAIL','Verify Email','org3',_binary '',_binary '\0','VERIFY_EMAIL',50),('50c84157-2fa4-48c2-9e72-4f3e44ebeaa9','UPDATE_PROFILE','Update Profile','org1',_binary '',_binary '\0','UPDATE_PROFILE',40),('57467061-8bb4-4a26-9b1a-db88447f635b','webauthn-register-passwordless','Webauthn Register Passwordless','org2',_binary '',_binary '\0','webauthn-register-passwordless',80),('5eb8c15c-8e99-43e1-8379-1dc51b75bf8c','VERIFY_EMAIL','Verify Email','org1',_binary '',_binary '\0','VERIFY_EMAIL',50),('662d6c41-d498-4cb7-b701-907a79648f67','update_user_locale','Update User Locale','org5',_binary '',_binary '\0','update_user_locale',1000),('6708c5aa-baaa-4c7a-9052-263ad1811141','webauthn-register','Webauthn Register','org2',_binary '',_binary '\0','webauthn-register',70),('6886f806-9c4d-4e46-8871-847ba01ee15f','UPDATE_PROFILE','Update Profile','org2',_binary '',_binary '\0','UPDATE_PROFILE',40),('707ccebb-0633-465f-8a80-1321af1b4d1d','webauthn-register','Webauthn Register','org1',_binary '',_binary '\0','webauthn-register',70),('717739be-d43d-4667-9e97-c0dad973e4e0','CONFIGURE_TOTP','Configure OTP','dabc51bf-58ea-42ed-9918-4114e6b08338',_binary '',_binary '\0','CONFIGURE_TOTP',10),('720ec2ce-4793-4f23-9eb1-14616e91f137','terms_and_conditions','Terms and Conditions','org5',_binary '\0',_binary '\0','terms_and_conditions',20),('767b3738-5ca6-48f3-b7a8-3e3266c90b8b','VERIFY_EMAIL','Verify Email','dabc51bf-58ea-42ed-9918-4114e6b08338',_binary '',_binary '\0','VERIFY_EMAIL',50),('7929db7b-7104-4d28-9404-239769072b64','update_user_locale','Update User Locale','org4',_binary '',_binary '\0','update_user_locale',1000),('792e69b0-c41f-412e-9e51-c61035070692','webauthn-register-passwordless','Webauthn Register Passwordless','org3',_binary '',_binary '\0','webauthn-register-passwordless',80),('7e028501-e4f6-4749-a9c6-daf59aba6e37','update_user_locale','Update User Locale','org3',_binary '',_binary '\0','update_user_locale',1000),('8231b82b-23f3-48b3-b63e-a44303b9dbf5','delete_account','Delete Account','org4',_binary '\0',_binary '\0','delete_account',60),('86d8de7e-d75f-4205-9b25-cab71bb2cec4','update_user_locale','Update User Locale','dabc51bf-58ea-42ed-9918-4114e6b08338',_binary '',_binary '\0','update_user_locale',1000),('87b793e8-72b8-4433-9e8e-1c40b75168b2','delete_account','Delete Account','org2',_binary '\0',_binary '\0','delete_account',60),('8a61cba5-2446-4dae-9377-e62c1eff20fa','update_user_locale','Update User Locale','org1',_binary '',_binary '\0','update_user_locale',1000),('90c54010-6118-4c87-920d-b501b3b49f8f','delete_account','Delete Account','dabc51bf-58ea-42ed-9918-4114e6b08338',_binary '\0',_binary '\0','delete_account',60),('9cdc45c2-890c-4dee-9855-ffd3c1ad8d19','CONFIGURE_TOTP','Configure OTP','org3',_binary '',_binary '\0','CONFIGURE_TOTP',10),('a0d442d4-2a4d-4587-8435-fea9843a0795','terms_and_conditions','Terms and Conditions','org4',_binary '\0',_binary '\0','terms_and_conditions',20),('a4e47f97-def6-450c-b26b-c8ed23c8fc36','UPDATE_PROFILE','Update Profile','org5',_binary '',_binary '\0','UPDATE_PROFILE',40),('ad118bb0-adc8-46c9-8b9f-3d65e5b882bd','UPDATE_PASSWORD','Update Password','org2',_binary '',_binary '\0','UPDATE_PASSWORD',30),('b46a1e23-690c-45e0-9c64-73c7e0d495cd','UPDATE_PROFILE','Update Profile','org3',_binary '',_binary '\0','UPDATE_PROFILE',40),('b8acfbdd-db85-42fb-82b7-18990428b725','UPDATE_PASSWORD','Update Password','org5',_binary '',_binary '\0','UPDATE_PASSWORD',30),('b8b3169b-5ba7-45a2-af28-c19a9df56976','terms_and_conditions','Terms and Conditions','dabc51bf-58ea-42ed-9918-4114e6b08338',_binary '\0',_binary '\0','terms_and_conditions',20),('bc18c5f6-90ff-4040-82e3-ff3df742bb23','CONFIGURE_TOTP','Configure OTP','org5',_binary '',_binary '\0','CONFIGURE_TOTP',10),('bcd76a3d-7635-4d6c-a7ac-f88c9d1e73da','delete_account','Delete Account','org1',_binary '\0',_binary '\0','delete_account',60),('c78deb57-7304-45ef-bafd-f6b114b0b831','UPDATE_PASSWORD','Update Password','org3',_binary '',_binary '\0','UPDATE_PASSWORD',30),('c8386b02-0584-469f-b173-d04b596b104d','UPDATE_PASSWORD','Update Password','org4',_binary '',_binary '\0','UPDATE_PASSWORD',30),('cc68a3ba-5000-4d5b-a72f-109af37dcac7','webauthn-register-passwordless','Webauthn Register Passwordless','org4',_binary '',_binary '\0','webauthn-register-passwordless',80),('d147ae0a-72f0-41bb-8711-763ff539512d','CONFIGURE_TOTP','Configure OTP','org4',_binary '',_binary '\0','CONFIGURE_TOTP',10),('d1c89205-c617-4258-b3ee-2338f08add66','update_user_locale','Update User Locale','org2',_binary '',_binary '\0','update_user_locale',1000),('db1f5130-f3c3-4cbb-a2e8-3fd8e518b037','terms_and_conditions','Terms and Conditions','org1',_binary '\0',_binary '\0','terms_and_conditions',20),('dc28fb45-4dfc-42a5-95f3-bf0a72a759b6','webauthn-register','Webauthn Register','org5',_binary '',_binary '\0','webauthn-register',70),('e9bfb7c0-39e7-4ea9-9e56-8335a6c4bcd3','UPDATE_PASSWORD','Update Password','org1',_binary '',_binary '\0','UPDATE_PASSWORD',30),('eaaef41c-9cc3-42d1-8cce-67688b1a8e3f','webauthn-register','Webauthn Register','org4',_binary '',_binary '\0','webauthn-register',70),('ebdbf379-2bc5-4458-b800-84257e21685c','UPDATE_PASSWORD','Update Password','dabc51bf-58ea-42ed-9918-4114e6b08338',_binary '',_binary '\0','UPDATE_PASSWORD',30),('f2e0293a-c8fb-4225-bb22-154d305f05ae','delete_account','Delete Account','org3',_binary '\0',_binary '\0','delete_account',60),('f617cc77-8801-4583-8aa5-3f248db2c9ca','terms_and_conditions','Terms and Conditions','org3',_binary '\0',_binary '\0','terms_and_conditions',20),('f61db7f5-c204-41c9-9d35-2d9597507201','VERIFY_EMAIL','Verify Email','org5',_binary '',_binary '\0','VERIFY_EMAIL',50),('f9989d04-8aaa-4bfe-8306-84e57d375e70','webauthn-register-passwordless','Webauthn Register Passwordless','org5',_binary '',_binary '\0','webauthn-register-passwordless',80),('fe526832-2ea4-44ce-a81b-98ea04bbe53d','VERIFY_EMAIL','Verify Email','org2',_binary '',_binary '\0','VERIFY_EMAIL',50);
+/*!40000 ALTER TABLE `REQUIRED_ACTION_PROVIDER` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `RESOURCE_ATTRIBUTE`
+--
+
+DROP TABLE IF EXISTS `RESOURCE_ATTRIBUTE`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `RESOURCE_ATTRIBUTE` (
+  `ID` varchar(36) NOT NULL DEFAULT 'sybase-needs-something-here',
+  `NAME` varchar(255) NOT NULL,
+  `VALUE` varchar(255) DEFAULT NULL,
+  `RESOURCE_ID` varchar(36) NOT NULL,
+  PRIMARY KEY (`ID`),
+  KEY `FK_5HRM2VLF9QL5FU022KQEPOVBR` (`RESOURCE_ID`),
+  CONSTRAINT `FK_5HRM2VLF9QL5FU022KQEPOVBR` FOREIGN KEY (`RESOURCE_ID`) REFERENCES `RESOURCE_SERVER_RESOURCE` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `RESOURCE_ATTRIBUTE`
+--
+
+LOCK TABLES `RESOURCE_ATTRIBUTE` WRITE;
+/*!40000 ALTER TABLE `RESOURCE_ATTRIBUTE` DISABLE KEYS */;
+/*!40000 ALTER TABLE `RESOURCE_ATTRIBUTE` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `RESOURCE_POLICY`
+--
+
+DROP TABLE IF EXISTS `RESOURCE_POLICY`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `RESOURCE_POLICY` (
+  `RESOURCE_ID` varchar(36) NOT NULL,
+  `POLICY_ID` varchar(36) NOT NULL,
+  PRIMARY KEY (`RESOURCE_ID`,`POLICY_ID`),
+  KEY `IDX_RES_POLICY_POLICY` (`POLICY_ID`),
+  CONSTRAINT `FK_FRSRPOS53XCX4WNKOG82SSRFY` FOREIGN KEY (`RESOURCE_ID`) REFERENCES `RESOURCE_SERVER_RESOURCE` (`ID`),
+  CONSTRAINT `FK_FRSRPP213XCX4WNKOG82SSRFY` FOREIGN KEY (`POLICY_ID`) REFERENCES `RESOURCE_SERVER_POLICY` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `RESOURCE_POLICY`
+--
+
+LOCK TABLES `RESOURCE_POLICY` WRITE;
+/*!40000 ALTER TABLE `RESOURCE_POLICY` DISABLE KEYS */;
+/*!40000 ALTER TABLE `RESOURCE_POLICY` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `RESOURCE_SCOPE`
+--
+
+DROP TABLE IF EXISTS `RESOURCE_SCOPE`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `RESOURCE_SCOPE` (
+  `RESOURCE_ID` varchar(36) NOT NULL,
+  `SCOPE_ID` varchar(36) NOT NULL,
+  PRIMARY KEY (`RESOURCE_ID`,`SCOPE_ID`),
+  KEY `IDX_RES_SCOPE_SCOPE` (`SCOPE_ID`),
+  CONSTRAINT `FK_FRSRPOS13XCX4WNKOG82SSRFY` FOREIGN KEY (`RESOURCE_ID`) REFERENCES `RESOURCE_SERVER_RESOURCE` (`ID`),
+  CONSTRAINT `FK_FRSRPS213XCX4WNKOG82SSRFY` FOREIGN KEY (`SCOPE_ID`) REFERENCES `RESOURCE_SERVER_SCOPE` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `RESOURCE_SCOPE`
+--
+
+LOCK TABLES `RESOURCE_SCOPE` WRITE;
+/*!40000 ALTER TABLE `RESOURCE_SCOPE` DISABLE KEYS */;
+/*!40000 ALTER TABLE `RESOURCE_SCOPE` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `RESOURCE_SERVER`
+--
+
+DROP TABLE IF EXISTS `RESOURCE_SERVER`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `RESOURCE_SERVER` (
+  `ID` varchar(36) NOT NULL,
+  `ALLOW_RS_REMOTE_MGMT` bit(1) NOT NULL DEFAULT b'0',
+  `POLICY_ENFORCE_MODE` varchar(15) NOT NULL,
+  `DECISION_STRATEGY` tinyint NOT NULL DEFAULT '1',
+  PRIMARY KEY (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `RESOURCE_SERVER`
+--
+
+LOCK TABLES `RESOURCE_SERVER` WRITE;
+/*!40000 ALTER TABLE `RESOURCE_SERVER` DISABLE KEYS */;
+/*!40000 ALTER TABLE `RESOURCE_SERVER` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `RESOURCE_SERVER_PERM_TICKET`
+--
+
+DROP TABLE IF EXISTS `RESOURCE_SERVER_PERM_TICKET`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `RESOURCE_SERVER_PERM_TICKET` (
+  `ID` varchar(36) NOT NULL,
+  `OWNER` varchar(255) DEFAULT NULL,
+  `REQUESTER` varchar(255) DEFAULT NULL,
+  `CREATED_TIMESTAMP` bigint NOT NULL,
+  `GRANTED_TIMESTAMP` bigint DEFAULT NULL,
+  `RESOURCE_ID` varchar(36) NOT NULL,
+  `SCOPE_ID` varchar(36) DEFAULT NULL,
+  `RESOURCE_SERVER_ID` varchar(36) NOT NULL,
+  `POLICY_ID` varchar(36) DEFAULT NULL,
+  PRIMARY KEY (`ID`),
+  UNIQUE KEY `UK_FRSR6T700S9V50BU18WS5PMT` (`OWNER`,`REQUESTER`,`RESOURCE_SERVER_ID`,`RESOURCE_ID`,`SCOPE_ID`),
+  KEY `FK_FRSRHO213XCX4WNKOG82SSPMT` (`RESOURCE_SERVER_ID`),
+  KEY `FK_FRSRHO213XCX4WNKOG83SSPMT` (`RESOURCE_ID`),
+  KEY `FK_FRSRHO213XCX4WNKOG84SSPMT` (`SCOPE_ID`),
+  KEY `FK_FRSRPO2128CX4WNKOG82SSRFY` (`POLICY_ID`),
+  CONSTRAINT `FK_FRSRHO213XCX4WNKOG82SSPMT` FOREIGN KEY (`RESOURCE_SERVER_ID`) REFERENCES `RESOURCE_SERVER` (`ID`),
+  CONSTRAINT `FK_FRSRHO213XCX4WNKOG83SSPMT` FOREIGN KEY (`RESOURCE_ID`) REFERENCES `RESOURCE_SERVER_RESOURCE` (`ID`),
+  CONSTRAINT `FK_FRSRHO213XCX4WNKOG84SSPMT` FOREIGN KEY (`SCOPE_ID`) REFERENCES `RESOURCE_SERVER_SCOPE` (`ID`),
+  CONSTRAINT `FK_FRSRPO2128CX4WNKOG82SSRFY` FOREIGN KEY (`POLICY_ID`) REFERENCES `RESOURCE_SERVER_POLICY` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `RESOURCE_SERVER_PERM_TICKET`
+--
+
+LOCK TABLES `RESOURCE_SERVER_PERM_TICKET` WRITE;
+/*!40000 ALTER TABLE `RESOURCE_SERVER_PERM_TICKET` DISABLE KEYS */;
+/*!40000 ALTER TABLE `RESOURCE_SERVER_PERM_TICKET` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `RESOURCE_SERVER_POLICY`
+--
+
+DROP TABLE IF EXISTS `RESOURCE_SERVER_POLICY`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `RESOURCE_SERVER_POLICY` (
+  `ID` varchar(36) NOT NULL,
+  `NAME` varchar(255) NOT NULL,
+  `DESCRIPTION` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
+  `TYPE` varchar(255) NOT NULL,
+  `DECISION_STRATEGY` varchar(20) DEFAULT NULL,
+  `LOGIC` varchar(20) DEFAULT NULL,
+  `RESOURCE_SERVER_ID` varchar(36) DEFAULT NULL,
+  `OWNER` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`ID`),
+  UNIQUE KEY `UK_FRSRPT700S9V50BU18WS5HA6` (`NAME`,`RESOURCE_SERVER_ID`),
+  KEY `IDX_RES_SERV_POL_RES_SERV` (`RESOURCE_SERVER_ID`),
+  CONSTRAINT `FK_FRSRPO213XCX4WNKOG82SSRFY` FOREIGN KEY (`RESOURCE_SERVER_ID`) REFERENCES `RESOURCE_SERVER` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `RESOURCE_SERVER_POLICY`
+--
+
+LOCK TABLES `RESOURCE_SERVER_POLICY` WRITE;
+/*!40000 ALTER TABLE `RESOURCE_SERVER_POLICY` DISABLE KEYS */;
+/*!40000 ALTER TABLE `RESOURCE_SERVER_POLICY` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `RESOURCE_SERVER_RESOURCE`
+--
+
+DROP TABLE IF EXISTS `RESOURCE_SERVER_RESOURCE`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `RESOURCE_SERVER_RESOURCE` (
+  `ID` varchar(36) NOT NULL,
+  `NAME` varchar(255) NOT NULL,
+  `TYPE` varchar(255) DEFAULT NULL,
+  `ICON_URI` varchar(255) DEFAULT NULL,
+  `OWNER` varchar(255) DEFAULT NULL,
+  `RESOURCE_SERVER_ID` varchar(36) DEFAULT NULL,
+  `OWNER_MANAGED_ACCESS` bit(1) NOT NULL DEFAULT b'0',
+  `DISPLAY_NAME` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`ID`),
+  UNIQUE KEY `UK_FRSR6T700S9V50BU18WS5HA6` (`NAME`,`OWNER`,`RESOURCE_SERVER_ID`),
+  KEY `IDX_RES_SRV_RES_RES_SRV` (`RESOURCE_SERVER_ID`),
+  CONSTRAINT `FK_FRSRHO213XCX4WNKOG82SSRFY` FOREIGN KEY (`RESOURCE_SERVER_ID`) REFERENCES `RESOURCE_SERVER` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `RESOURCE_SERVER_RESOURCE`
+--
+
+LOCK TABLES `RESOURCE_SERVER_RESOURCE` WRITE;
+/*!40000 ALTER TABLE `RESOURCE_SERVER_RESOURCE` DISABLE KEYS */;
+/*!40000 ALTER TABLE `RESOURCE_SERVER_RESOURCE` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `RESOURCE_SERVER_SCOPE`
+--
+
+DROP TABLE IF EXISTS `RESOURCE_SERVER_SCOPE`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `RESOURCE_SERVER_SCOPE` (
+  `ID` varchar(36) NOT NULL,
+  `NAME` varchar(255) NOT NULL,
+  `ICON_URI` varchar(255) DEFAULT NULL,
+  `RESOURCE_SERVER_ID` varchar(36) DEFAULT NULL,
+  `DISPLAY_NAME` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`ID`),
+  UNIQUE KEY `UK_FRSRST700S9V50BU18WS5HA6` (`NAME`,`RESOURCE_SERVER_ID`),
+  KEY `IDX_RES_SRV_SCOPE_RES_SRV` (`RESOURCE_SERVER_ID`),
+  CONSTRAINT `FK_FRSRSO213XCX4WNKOG82SSRFY` FOREIGN KEY (`RESOURCE_SERVER_ID`) REFERENCES `RESOURCE_SERVER` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `RESOURCE_SERVER_SCOPE`
+--
+
+LOCK TABLES `RESOURCE_SERVER_SCOPE` WRITE;
+/*!40000 ALTER TABLE `RESOURCE_SERVER_SCOPE` DISABLE KEYS */;
+/*!40000 ALTER TABLE `RESOURCE_SERVER_SCOPE` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `RESOURCE_URIS`
+--
+
+DROP TABLE IF EXISTS `RESOURCE_URIS`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `RESOURCE_URIS` (
+  `RESOURCE_ID` varchar(36) NOT NULL,
+  `VALUE` varchar(255) NOT NULL,
+  PRIMARY KEY (`RESOURCE_ID`,`VALUE`),
+  CONSTRAINT `FK_RESOURCE_SERVER_URIS` FOREIGN KEY (`RESOURCE_ID`) REFERENCES `RESOURCE_SERVER_RESOURCE` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `RESOURCE_URIS`
+--
+
+LOCK TABLES `RESOURCE_URIS` WRITE;
+/*!40000 ALTER TABLE `RESOURCE_URIS` DISABLE KEYS */;
+/*!40000 ALTER TABLE `RESOURCE_URIS` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ROLE_ATTRIBUTE`
+--
+
+DROP TABLE IF EXISTS `ROLE_ATTRIBUTE`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `ROLE_ATTRIBUTE` (
+  `ID` varchar(36) NOT NULL,
+  `ROLE_ID` varchar(36) NOT NULL,
+  `NAME` varchar(255) NOT NULL,
+  `VALUE` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
+  PRIMARY KEY (`ID`),
+  KEY `IDX_ROLE_ATTRIBUTE` (`ROLE_ID`),
+  CONSTRAINT `FK_ROLE_ATTRIBUTE_ID` FOREIGN KEY (`ROLE_ID`) REFERENCES `KEYCLOAK_ROLE` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ROLE_ATTRIBUTE`
+--
+
+LOCK TABLES `ROLE_ATTRIBUTE` WRITE;
+/*!40000 ALTER TABLE `ROLE_ATTRIBUTE` DISABLE KEYS */;
+INSERT INTO `ROLE_ATTRIBUTE` VALUES ('0849e831-7ea3-45eb-96d8-ec3be7636d87','97c22ad8-48d8-49db-90e3-b0e205ef50de','kind','organization'),('0a4a5575-96fb-41ae-911a-83f75c386c54','fd2e0de6-8e32-4a51-8f7c-ad0ee28b4804','kind','organization'),('10b8d77d-110c-4bca-ab02-331bc9b93c71','0121d427-696b-4bd0-97fd-ef2e49612705','kind','organization'),('18df7682-f184-4652-b0e0-842911bf8ef2','2b587f58-af59-4e82-8253-0aca06d1138f','kind','organization'),('19399f9f-77ce-4b4f-a286-3650bda96cf5','4f7f75e5-3cf9-4b4a-91b8-d6381d0e7abe','kind','organization'),('26e09699-021d-4aca-b2b9-b9b64715505e','94d463bc-0ba6-4d80-85f4-e63860357f80','kind','workspace'),('2ac35df5-f0e4-485e-9c4e-2169d23a2c79','9b896e40-e851-42db-9546-bf6ef748c438','kind','organization'),('2ad7123a-8625-4b7f-9437-2d3a07571a14','9efaac6f-2cfc-4cfa-b4b1-5e400b184d52','kind','workspace'),('2b9ae3de-b725-4f35-9ef5-4e2bd64d95cf','957a70a3-5891-4e14-9765-2560c25916ee','kind','workspace'),('2d0ed231-a454-4988-b31a-2cdcd19f3d82','2e1da019-ad74-4c8e-be8e-d8fcbf47e62c','kind','workspace'),('35f4ffa4-6211-4faf-bdf9-3b1224be05d6','761cbec8-ef0b-418d-b9c6-6351cd4a4039','kind','organization'),('3ad5faa2-070d-4d88-841f-bee9f334ef4d','495fa361-8cfe-4d98-98be-d1ec7a00469a','kind','workspace'),('3c1e4ed5-82dd-4974-a06f-11ccfba69020','048685bc-626c-4b13-a44f-c721b4842248','kind','workspace'),('3cce2436-81fe-46e4-94a9-980f1556b17e','43de4389-64c9-4a7f-bb70-8cba7986f2d0','kind','organization'),('3fe488ae-93e5-4fc6-89ef-ac5699f9b94f','9ff2af3b-6e78-4684-a859-6278fb8782f2','kind','workspace'),('405bd953-6266-4f9c-bfca-d1d69ae8ab79','fafdd08b-02fa-45e9-bc40-15befb734572','kind','workspace'),('4413dd32-df7b-46fa-95eb-12785a764b86','6809f7f3-19bd-4e02-b894-e33f3c3879b2','kind','workspace'),('47f8f79a-d7f6-4fc8-a680-13ea93862d05','fccd3bea-270e-41dc-bd36-5b034e1aacd1','kind','workspace'),('49254062-6fac-47c9-9675-5f758f57709b','2db94f07-d03e-4ad8-b2c3-69cb027d820b','kind','organization'),('496e0516-043f-4af5-8d94-d60cc497b879','6bd9c5f4-97b4-457e-8835-a14a932d8d63','kind','workspace'),('49a34066-114d-4cde-9852-4841c240c473','9201ee66-0e4c-4d92-ab9e-2120a7390dab','kind','workspace'),('4e62697b-e324-47df-b327-7cb4cf362f8e','f8e2a07b-1795-4cb5-b2b2-3ce3fbdb91be','kind','workspace'),('4f0eb5ad-a179-4570-9910-20860631ff8f','e478c9c9-a299-4a38-80ce-342198cff104','kind','workspace'),('4f843593-0adb-4e25-abd1-d67e3a795868','673b825d-10ba-4658-b90a-0854ca6dacd4','kind','workspace'),('5277c07c-bb0b-45e4-a7bc-79a25bf09a89','e182bbbc-5ce2-4f01-8011-8a858f41d66b','kind','workspace'),('52842a26-9bf6-448d-8537-2e93e9d7390f','11b02ef2-cac3-4420-b878-26ab43bc8d69','kind','workspace'),('5e05e85d-5647-4000-9dcc-20a86fdafcf2','81658e71-c64b-4b7e-bb58-0a00f08a397f','kind','organization'),('60bb52cc-ae87-416b-b638-f37490aa6cd4','fb06b2e5-a3af-40bb-8a0f-453184845a6b','kind','workspace'),('61b4f51f-71ce-483b-b15a-b1d19af11bfc','75f487db-0f18-42b1-9efa-f660dda152cd','kind','workspace'),('6ce63153-3424-451d-b9cb-8ab5e8af0637','3ad05f10-f903-4cb2-8925-a2be6c8994f1','kind','workspace'),('714d65ea-cafc-4c76-a5ca-9384452194d5','a062a342-9ccc-4009-8ebd-61e0f92d01a0','kind','workspace'),('73d084ba-4e92-4393-b4be-056df714aaf5','ca326db1-1def-40b5-b442-186c8372dc54','kind','organization'),('762d5be1-c7a4-4e6c-b568-793322b53922','daa0af79-c06f-4116-a234-f5196fe38ad5','kind','workspace'),('8616c437-b237-401f-a94b-9561f482cdb3','734c9a9f-b357-4f12-afe0-967048b091fb','kind','workspace'),('86c68bfd-8aba-4e3d-a146-9a9d633de9b8','c2180217-3bf3-45fa-acb3-90dd20ef3772','kind','workspace'),('8a656a6e-f05e-46bd-a36c-1a21b841534c','652f33df-5bff-4e35-9e1e-40b6a6f717f7','kind','workspace'),('8e940978-efbe-4450-8942-69bfb3c2a431','24329a10-91c8-4a8f-92b9-803b6d6dd776','kind','workspace'),('9963ae2d-a7d9-4545-8bf0-8c60f370b796','ed069635-3623-4e37-a85d-680301a31500','kind','organization'),('9ccda049-b95a-4411-9960-4b89b4f93ca0','73f6933d-5e3f-40aa-a211-c73134c76678','kind','workspace'),('a0ad699e-eab9-4bd8-af5d-8eb6deb81e37','4317a957-dd6e-41c6-b3fb-2118c48a8f6a','kind','organization'),('a934f495-2f73-4870-9e52-8e8f16f2f22d','7e3a6f58-62a1-4ea9-bb50-5f24d545ec50','kind','workspace'),('accc2124-183a-4e60-a1c5-23d25295e7f6','43174789-3363-408b-81f6-dda1f17a1e5a','kind','workspace'),('af8b0117-6433-49c8-97c3-ac984877ae50','50aabf0d-c27b-46b1-a838-602a59f2c8e5','kind','workspace'),('b87e3788-ed0d-4aeb-b238-07e08bff1951','8078aa9f-4275-4bbf-a881-32f2ff1cfda6','kind','workspace'),('c091f648-7976-4824-9ac4-c1e97d504e30','6a5eaac8-03fe-4cbe-aaf4-267e8d5614d3','kind','workspace'),('c355d7c4-e3da-4dc4-81c3-b75e51e178bf','b94ada76-bb55-4104-9f46-3a7372882a98','kind','workspace'),('ca743938-d8df-4f5b-97fa-22eedab59269','d36dd5c8-7ece-41a2-b226-5b0a94f449ba','kind','workspace'),('ce12ec1f-2c52-4cbe-9682-a113cd1b1a90','e737d20e-6216-4da9-a281-f43102759f54','kind','organization'),('d10617a2-dc79-405c-be17-25af03013b54','eb8ed358-e4aa-4a55-bb8f-98aed6f3e39f','kind','workspace'),('d1960655-b138-4f1a-8507-3d8edc81b066','863f3c33-4fa1-47ed-bd69-955f715becad','kind','organization'),('d4801f77-0b08-4b9f-a282-5cc8b21ab8c1','f436c9ed-08de-4a8f-aa80-97e595a7feb5','kind','workspace'),('dce1a360-0d9b-42aa-bbf4-eb4c8656cfb4','534ae492-208a-4329-ac07-fd5bebc8017e','kind','workspace'),('dfd9ae2f-fcb6-4497-85b7-c9c827fcd872','0a925b92-087a-4c5e-aaed-85505bb9eb59','kind','workspace'),('e4b4519f-39cf-4d16-8fcc-f7047002e37d','4c86b391-91a8-4968-bfdd-816a2ae4efa9','kind','workspace'),('e96b8340-d695-4a5d-b1c3-e23e28a9bffd','efd5a4cb-e141-4976-86a2-925c48e9a17c','kind','workspace'),('ebd1800f-4a80-4066-9aeb-731c16d7577d','09e063cc-f899-411a-8e8d-0c4d8dac93f3','kind','workspace'),('ef532e8a-e91d-4ccc-aa83-77489846921c','ce18d984-dce0-4e3c-82b7-f16678c7e155','kind','workspace'),('f93876bf-a8a3-4adc-8732-7ae3a3ab32af','6a0e8485-c569-42a2-8ca9-fb75b7007749','kind','workspace'),('fce5e1cb-b769-46b1-a8dc-746a55523436','0840bb7d-56e0-479e-b3d5-b510a729d468','kind','workspace'),('ffc2eca4-ce6d-4ec1-8bf3-acf95083396a','96bd2210-1fcb-4deb-8fbb-563e0ca8f654','kind','workspace');
+/*!40000 ALTER TABLE `ROLE_ATTRIBUTE` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `SCOPE_MAPPING`
+--
+
+DROP TABLE IF EXISTS `SCOPE_MAPPING`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `SCOPE_MAPPING` (
+  `CLIENT_ID` varchar(36) NOT NULL,
+  `ROLE_ID` varchar(36) NOT NULL,
+  PRIMARY KEY (`CLIENT_ID`,`ROLE_ID`),
+  KEY `IDX_SCOPE_MAPPING_ROLE` (`ROLE_ID`),
+  CONSTRAINT `FK_OUSE064PLMLR732LXJCN1Q5F1` FOREIGN KEY (`CLIENT_ID`) REFERENCES `CLIENT` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `SCOPE_MAPPING`
+--
+
+LOCK TABLES `SCOPE_MAPPING` WRITE;
+/*!40000 ALTER TABLE `SCOPE_MAPPING` DISABLE KEYS */;
+INSERT INTO `SCOPE_MAPPING` VALUES ('21f3aced-8905-4cbe-b76e-e4efc5f5b5d9','04a523ce-3bf0-4a2e-823e-1eff666c53f5'),('57f46d8e-a3aa-4587-abe4-ef652ebef40c','18a1a1b8-8388-4eae-94a4-0f108f03fdf1'),('ad5aa4ab-fe72-4d1d-8bab-e0a39529dca7','21d3eed8-3018-49cb-9afb-8c590bb3121f'),('8137d95e-0cab-4e9f-b666-92c7bd7ca71a','3fa46cf1-bf9d-4c31-a9f4-3256a215cb96'),('57f46d8e-a3aa-4587-abe4-ef652ebef40c','5bdc81f1-6f01-4d3b-b776-850998c9fa63'),('2edff0cf-8f6c-44b6-917d-f00a3bb58261','7e8f6b12-3fc4-4fbd-8aa6-607b9d2c30bc'),('2edff0cf-8f6c-44b6-917d-f00a3bb58261','a769b105-a75f-4b4b-9837-f144f3b32ea7'),('a45ffddc-de71-4c69-b026-cb2cf7f30d16','bcce9acc-3a19-4a1e-acc8-d21626f4fa81'),('8137d95e-0cab-4e9f-b666-92c7bd7ca71a','db0b20f6-7d53-4de6-a6eb-689fd283dda7'),('a45ffddc-de71-4c69-b026-cb2cf7f30d16','dce218cd-4c48-431f-99b8-3d2f2dcb6b66'),('21f3aced-8905-4cbe-b76e-e4efc5f5b5d9','e4dafa4b-6fb7-44d7-9345-391b6b1e8e66'),('ad5aa4ab-fe72-4d1d-8bab-e0a39529dca7','ed9080c5-b88f-49ed-83aa-7883e8dbede1');
+/*!40000 ALTER TABLE `SCOPE_MAPPING` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `SCOPE_POLICY`
+--
+
+DROP TABLE IF EXISTS `SCOPE_POLICY`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `SCOPE_POLICY` (
+  `SCOPE_ID` varchar(36) NOT NULL,
+  `POLICY_ID` varchar(36) NOT NULL,
+  PRIMARY KEY (`SCOPE_ID`,`POLICY_ID`),
+  KEY `IDX_SCOPE_POLICY_POLICY` (`POLICY_ID`),
+  CONSTRAINT `FK_FRSRASP13XCX4WNKOG82SSRFY` FOREIGN KEY (`POLICY_ID`) REFERENCES `RESOURCE_SERVER_POLICY` (`ID`),
+  CONSTRAINT `FK_FRSRPASS3XCX4WNKOG82SSRFY` FOREIGN KEY (`SCOPE_ID`) REFERENCES `RESOURCE_SERVER_SCOPE` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `SCOPE_POLICY`
+--
+
+LOCK TABLES `SCOPE_POLICY` WRITE;
+/*!40000 ALTER TABLE `SCOPE_POLICY` DISABLE KEYS */;
+/*!40000 ALTER TABLE `SCOPE_POLICY` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `USERNAME_LOGIN_FAILURE`
+--
+
+DROP TABLE IF EXISTS `USERNAME_LOGIN_FAILURE`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `USERNAME_LOGIN_FAILURE` (
+  `REALM_ID` varchar(36) NOT NULL,
+  `USERNAME` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
+  `FAILED_LOGIN_NOT_BEFORE` int DEFAULT NULL,
+  `LAST_FAILURE` bigint DEFAULT NULL,
+  `LAST_IP_FAILURE` varchar(255) DEFAULT NULL,
+  `NUM_FAILURES` int DEFAULT NULL,
+  PRIMARY KEY (`REALM_ID`,`USERNAME`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `USERNAME_LOGIN_FAILURE`
+--
+
+LOCK TABLES `USERNAME_LOGIN_FAILURE` WRITE;
+/*!40000 ALTER TABLE `USERNAME_LOGIN_FAILURE` DISABLE KEYS */;
+/*!40000 ALTER TABLE `USERNAME_LOGIN_FAILURE` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `USER_ATTRIBUTE`
+--
+
+DROP TABLE IF EXISTS `USER_ATTRIBUTE`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `USER_ATTRIBUTE` (
+  `NAME` varchar(255) NOT NULL,
+  `VALUE` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
+  `USER_ID` varchar(36) NOT NULL,
+  `ID` varchar(36) NOT NULL DEFAULT 'sybase-needs-something-here',
+  PRIMARY KEY (`ID`),
+  KEY `IDX_USER_ATTRIBUTE` (`USER_ID`),
+  KEY `IDX_USER_ATTRIBUTE_NAME` (`NAME`,`VALUE`),
+  CONSTRAINT `FK_5HRM2VLF9QL5FU043KQEPOVBR` FOREIGN KEY (`USER_ID`) REFERENCES `USER_ENTITY` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `USER_ATTRIBUTE`
+--
+
+LOCK TABLES `USER_ATTRIBUTE` WRITE;
+/*!40000 ALTER TABLE `USER_ATTRIBUTE` DISABLE KEYS */;
+/*!40000 ALTER TABLE `USER_ATTRIBUTE` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `USER_CONSENT`
+--
+
+DROP TABLE IF EXISTS `USER_CONSENT`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `USER_CONSENT` (
+  `ID` varchar(36) NOT NULL,
+  `CLIENT_ID` varchar(255) DEFAULT NULL,
+  `USER_ID` varchar(36) NOT NULL,
+  `CREATED_DATE` bigint DEFAULT NULL,
+  `LAST_UPDATED_DATE` bigint DEFAULT NULL,
+  `CLIENT_STORAGE_PROVIDER` varchar(36) DEFAULT NULL,
+  `EXTERNAL_CLIENT_ID` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`ID`),
+  UNIQUE KEY `UK_JKUWUVD56ONTGSUHOGM8UEWRT` (`CLIENT_ID`,`CLIENT_STORAGE_PROVIDER`,`EXTERNAL_CLIENT_ID`,`USER_ID`),
+  KEY `IDX_USER_CONSENT` (`USER_ID`),
+  CONSTRAINT `FK_GRNTCSNT_USER` FOREIGN KEY (`USER_ID`) REFERENCES `USER_ENTITY` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `USER_CONSENT`
+--
+
+LOCK TABLES `USER_CONSENT` WRITE;
+/*!40000 ALTER TABLE `USER_CONSENT` DISABLE KEYS */;
+/*!40000 ALTER TABLE `USER_CONSENT` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `USER_CONSENT_CLIENT_SCOPE`
+--
+
+DROP TABLE IF EXISTS `USER_CONSENT_CLIENT_SCOPE`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `USER_CONSENT_CLIENT_SCOPE` (
+  `USER_CONSENT_ID` varchar(36) NOT NULL,
+  `SCOPE_ID` varchar(36) NOT NULL,
+  PRIMARY KEY (`USER_CONSENT_ID`,`SCOPE_ID`),
+  KEY `IDX_USCONSENT_CLSCOPE` (`USER_CONSENT_ID`),
+  CONSTRAINT `FK_GRNTCSNT_CLSC_USC` FOREIGN KEY (`USER_CONSENT_ID`) REFERENCES `USER_CONSENT` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `USER_CONSENT_CLIENT_SCOPE`
+--
+
+LOCK TABLES `USER_CONSENT_CLIENT_SCOPE` WRITE;
+/*!40000 ALTER TABLE `USER_CONSENT_CLIENT_SCOPE` DISABLE KEYS */;
+/*!40000 ALTER TABLE `USER_CONSENT_CLIENT_SCOPE` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `USER_ENTITY`
+--
+
+DROP TABLE IF EXISTS `USER_ENTITY`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `USER_ENTITY` (
+  `ID` varchar(36) NOT NULL,
+  `EMAIL` varchar(255) DEFAULT NULL,
+  `EMAIL_CONSTRAINT` varchar(255) DEFAULT NULL,
+  `EMAIL_VERIFIED` bit(1) NOT NULL DEFAULT b'0',
+  `ENABLED` bit(1) NOT NULL DEFAULT b'0',
+  `FEDERATION_LINK` varchar(255) DEFAULT NULL,
+  `FIRST_NAME` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
+  `LAST_NAME` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
+  `REALM_ID` varchar(255) DEFAULT NULL,
+  `USERNAME` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
+  `CREATED_TIMESTAMP` bigint DEFAULT NULL,
+  `SERVICE_ACCOUNT_CLIENT_LINK` varchar(255) DEFAULT NULL,
+  `NOT_BEFORE` int NOT NULL DEFAULT '0',
+  PRIMARY KEY (`ID`),
+  UNIQUE KEY `UK_DYKN684SL8UP1CRFEI6ECKHD7` (`REALM_ID`,`EMAIL_CONSTRAINT`),
+  UNIQUE KEY `UK_RU8TT6T700S9V50BU18WS5HA6` (`REALM_ID`,`USERNAME`),
+  KEY `IDX_USER_EMAIL` (`EMAIL`),
+  KEY `IDX_USER_SERVICE_ACCOUNT` (`REALM_ID`,`SERVICE_ACCOUNT_CLIENT_LINK`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `USER_ENTITY`
+--
+
+LOCK TABLES `USER_ENTITY` WRITE;
+/*!40000 ALTER TABLE `USER_ENTITY` DISABLE KEYS */;
+INSERT INTO `USER_ENTITY` VALUES ('0eb52a14-0c83-4db6-b40b-19355bfc54ae',NULL,'ea8eabea-7ab8-4191-aa40-174aaa614272',_binary '\0',_binary '',NULL,NULL,NULL,'org4','service-account-org4-workspaces',1709175232502,'311ebcfe-7467-459c-856a-862094332329',0),('2e008a28-22ba-4bec-94c3-f26482afb61b',NULL,'3510ab52-3de5-4520-a45e-b5fa3077ab75',_binary '\0',_binary '',NULL,NULL,NULL,'org1','service-account-org1-workspaces',1709175164641,'d321d481-bc24-4294-af2c-7907fd6529b0',0),('47ce89fe-bcd3-45ef-9925-2f6cffef721b',NULL,'9e2f4d9f-09ac-4ba1-be07-9a82ec6120bb',_binary '\0',_binary '',NULL,NULL,NULL,'org5','service-account-org5-workspaces',1709175263909,'01f89460-aba4-42ec-8eb3-f3c2d23cfbc2',0),('4e41ede7-f26a-4128-80cb-1174d275be90',NULL,'c972278d-34d7-445b-8905-6d14e94ffbef',_binary '\0',_binary '',NULL,NULL,NULL,'dabc51bf-58ea-42ed-9918-4114e6b08338','admin',1709175117266,NULL,0),('56cae199-4b66-451c-a310-9dec3f649490','admin@example.com','admin@example.com',_binary '\0',_binary '',NULL,'admin','admin','org4','admin',1709175234028,NULL,0),('74c8800a-f392-4c3c-9077-cfb96a52c947','admin@example.com','admin@example.com',_binary '\0',_binary '',NULL,'admin','admin','org1','admin',1709175167453,NULL,0),('85631ddb-cb91-4d18-a335-1646a78ee06a','admin@example.com','admin@example.com',_binary '\0',_binary '',NULL,'admin','admin','org5','admin',1709175265645,NULL,0),('8a37f068-a80b-4b4b-82a8-5a4c40c51869',NULL,'0c1b86eb-9c47-4742-ab2f-2b21526ef187',_binary '\0',_binary '',NULL,NULL,NULL,'org2','service-account-org2-workspaces',1709175193853,'a0d96aa1-71ac-4a7e-a769-306baf1c51fc',0),('98b18f6f-d105-437a-92f2-fb863b59805c','admin@example.com','admin@example.com',_binary '\0',_binary '',NULL,'admin','admin','org3','admin',1709175212206,NULL,0),('99050347-6740-4d25-891b-ae451c2c1f62',NULL,'ed4daca0-d003-4636-ba3f-fc1514386b6b',_binary '\0',_binary '',NULL,NULL,NULL,'dabc51bf-58ea-42ed-9918-4114e6b08338','service-account-_platform',1709175123360,'58e5ed05-5651-4e99-ac86-e93c28adc1f0',0),('e74edb4f-b238-4208-8996-dd6ab65ec257',NULL,'32f96a50-aa62-45b4-ab08-500c4cc56d20',_binary '\0',_binary '',NULL,NULL,NULL,'org3','service-account-org3-workspaces',1709175210902,'c28dd0b0-60ed-40df-91db-0d9b1e14074b',0),('fe934bbc-b716-474a-b1e0-eefc2a29e1b2','admin@example.com','admin@example.com',_binary '\0',_binary '',NULL,'admin','admin','org2','admin',1709175195298,NULL,0);
+/*!40000 ALTER TABLE `USER_ENTITY` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `USER_FEDERATION_CONFIG`
+--
+
+DROP TABLE IF EXISTS `USER_FEDERATION_CONFIG`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `USER_FEDERATION_CONFIG` (
+  `USER_FEDERATION_PROVIDER_ID` varchar(36) NOT NULL,
+  `VALUE` varchar(255) DEFAULT NULL,
+  `NAME` varchar(255) NOT NULL,
+  PRIMARY KEY (`USER_FEDERATION_PROVIDER_ID`,`NAME`),
+  CONSTRAINT `FK_T13HPU1J94R2EBPEKR39X5EU5` FOREIGN KEY (`USER_FEDERATION_PROVIDER_ID`) REFERENCES `USER_FEDERATION_PROVIDER` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `USER_FEDERATION_CONFIG`
+--
+
+LOCK TABLES `USER_FEDERATION_CONFIG` WRITE;
+/*!40000 ALTER TABLE `USER_FEDERATION_CONFIG` DISABLE KEYS */;
+/*!40000 ALTER TABLE `USER_FEDERATION_CONFIG` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `USER_FEDERATION_MAPPER`
+--
+
+DROP TABLE IF EXISTS `USER_FEDERATION_MAPPER`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `USER_FEDERATION_MAPPER` (
+  `ID` varchar(36) NOT NULL,
+  `NAME` varchar(255) NOT NULL,
+  `FEDERATION_PROVIDER_ID` varchar(36) NOT NULL,
+  `FEDERATION_MAPPER_TYPE` varchar(255) NOT NULL,
+  `REALM_ID` varchar(36) NOT NULL,
+  PRIMARY KEY (`ID`),
+  KEY `IDX_USR_FED_MAP_FED_PRV` (`FEDERATION_PROVIDER_ID`),
+  KEY `IDX_USR_FED_MAP_REALM` (`REALM_ID`),
+  CONSTRAINT `FK_FEDMAPPERPM_FEDPRV` FOREIGN KEY (`FEDERATION_PROVIDER_ID`) REFERENCES `USER_FEDERATION_PROVIDER` (`ID`),
+  CONSTRAINT `FK_FEDMAPPERPM_REALM` FOREIGN KEY (`REALM_ID`) REFERENCES `REALM` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `USER_FEDERATION_MAPPER`
+--
+
+LOCK TABLES `USER_FEDERATION_MAPPER` WRITE;
+/*!40000 ALTER TABLE `USER_FEDERATION_MAPPER` DISABLE KEYS */;
+/*!40000 ALTER TABLE `USER_FEDERATION_MAPPER` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `USER_FEDERATION_MAPPER_CONFIG`
+--
+
+DROP TABLE IF EXISTS `USER_FEDERATION_MAPPER_CONFIG`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `USER_FEDERATION_MAPPER_CONFIG` (
+  `USER_FEDERATION_MAPPER_ID` varchar(36) NOT NULL,
+  `VALUE` varchar(255) DEFAULT NULL,
+  `NAME` varchar(255) NOT NULL,
+  PRIMARY KEY (`USER_FEDERATION_MAPPER_ID`,`NAME`),
+  CONSTRAINT `FK_FEDMAPPER_CFG` FOREIGN KEY (`USER_FEDERATION_MAPPER_ID`) REFERENCES `USER_FEDERATION_MAPPER` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `USER_FEDERATION_MAPPER_CONFIG`
+--
+
+LOCK TABLES `USER_FEDERATION_MAPPER_CONFIG` WRITE;
+/*!40000 ALTER TABLE `USER_FEDERATION_MAPPER_CONFIG` DISABLE KEYS */;
+/*!40000 ALTER TABLE `USER_FEDERATION_MAPPER_CONFIG` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `USER_FEDERATION_PROVIDER`
+--
+
+DROP TABLE IF EXISTS `USER_FEDERATION_PROVIDER`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `USER_FEDERATION_PROVIDER` (
+  `ID` varchar(36) NOT NULL,
+  `CHANGED_SYNC_PERIOD` int DEFAULT NULL,
+  `DISPLAY_NAME` varchar(255) DEFAULT NULL,
+  `FULL_SYNC_PERIOD` int DEFAULT NULL,
+  `LAST_SYNC` int DEFAULT NULL,
+  `PRIORITY` int DEFAULT NULL,
+  `PROVIDER_NAME` varchar(255) DEFAULT NULL,
+  `REALM_ID` varchar(36) DEFAULT NULL,
+  PRIMARY KEY (`ID`),
+  KEY `IDX_USR_FED_PRV_REALM` (`REALM_ID`),
+  CONSTRAINT `FK_1FJ32F6PTOLW2QY60CD8N01E8` FOREIGN KEY (`REALM_ID`) REFERENCES `REALM` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `USER_FEDERATION_PROVIDER`
+--
+
+LOCK TABLES `USER_FEDERATION_PROVIDER` WRITE;
+/*!40000 ALTER TABLE `USER_FEDERATION_PROVIDER` DISABLE KEYS */;
+/*!40000 ALTER TABLE `USER_FEDERATION_PROVIDER` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `USER_GROUP_MEMBERSHIP`
+--
+
+DROP TABLE IF EXISTS `USER_GROUP_MEMBERSHIP`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `USER_GROUP_MEMBERSHIP` (
+  `GROUP_ID` varchar(36) NOT NULL,
+  `USER_ID` varchar(36) NOT NULL,
+  PRIMARY KEY (`GROUP_ID`,`USER_ID`),
+  KEY `IDX_USER_GROUP_MAPPING` (`USER_ID`),
+  CONSTRAINT `FK_USER_GROUP_USER` FOREIGN KEY (`USER_ID`) REFERENCES `USER_ENTITY` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `USER_GROUP_MEMBERSHIP`
+--
+
+LOCK TABLES `USER_GROUP_MEMBERSHIP` WRITE;
+/*!40000 ALTER TABLE `USER_GROUP_MEMBERSHIP` DISABLE KEYS */;
+/*!40000 ALTER TABLE `USER_GROUP_MEMBERSHIP` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `USER_REQUIRED_ACTION`
+--
+
+DROP TABLE IF EXISTS `USER_REQUIRED_ACTION`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `USER_REQUIRED_ACTION` (
+  `USER_ID` varchar(36) NOT NULL,
+  `REQUIRED_ACTION` varchar(255) NOT NULL DEFAULT ' ',
+  PRIMARY KEY (`REQUIRED_ACTION`,`USER_ID`),
+  KEY `IDX_USER_REQACTIONS` (`USER_ID`),
+  CONSTRAINT `FK_6QJ3W1JW9CVAFHE19BWSIUVMD` FOREIGN KEY (`USER_ID`) REFERENCES `USER_ENTITY` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `USER_REQUIRED_ACTION`
+--
+
+LOCK TABLES `USER_REQUIRED_ACTION` WRITE;
+/*!40000 ALTER TABLE `USER_REQUIRED_ACTION` DISABLE KEYS */;
+/*!40000 ALTER TABLE `USER_REQUIRED_ACTION` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `USER_ROLE_MAPPING`
+--
+
+DROP TABLE IF EXISTS `USER_ROLE_MAPPING`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `USER_ROLE_MAPPING` (
+  `ROLE_ID` varchar(255) NOT NULL,
+  `USER_ID` varchar(36) NOT NULL,
+  PRIMARY KEY (`ROLE_ID`,`USER_ID`),
+  KEY `IDX_USER_ROLE_MAPPING` (`USER_ID`),
+  CONSTRAINT `FK_C4FQV34P1MBYLLOXANG7B1Q3L` FOREIGN KEY (`USER_ID`) REFERENCES `USER_ENTITY` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `USER_ROLE_MAPPING`
+--
+
+LOCK TABLES `USER_ROLE_MAPPING` WRITE;
+/*!40000 ALTER TABLE `USER_ROLE_MAPPING` DISABLE KEYS */;
+INSERT INTO `USER_ROLE_MAPPING` VALUES ('3ad2e570-cee0-4618-a99f-6d767ee2a385','0eb52a14-0c83-4db6-b40b-19355bfc54ae'),('a0bd219e-58d5-4531-9cc9-085084bf34ef','0eb52a14-0c83-4db6-b40b-19355bfc54ae'),('1b849fbb-23b2-41b3-8590-c4cf2e292e54','2e008a28-22ba-4bec-94c3-f26482afb61b'),('88598027-632e-4105-ac21-88a1dcb373db','2e008a28-22ba-4bec-94c3-f26482afb61b'),('7dbb54ac-c3c9-40b9-b4c4-7476371eb725','47ce89fe-bcd3-45ef-9925-2f6cffef721b'),('e349c309-f0a0-4d1a-bce8-7eacb93461ba','47ce89fe-bcd3-45ef-9925-2f6cffef721b'),('1f13355c-00fa-478d-af4d-5f4c2740912a','4e41ede7-f26a-4128-80cb-1174d275be90'),('f98ff5a7-34c3-4473-abe3-270867f09df4','4e41ede7-f26a-4128-80cb-1174d275be90'),('0121d427-696b-4bd0-97fd-ef2e49612705','56cae199-4b66-451c-a310-9dec3f649490'),('3ad2e570-cee0-4618-a99f-6d767ee2a385','56cae199-4b66-451c-a310-9dec3f649490'),('652f33df-5bff-4e35-9e1e-40b6a6f717f7','56cae199-4b66-451c-a310-9dec3f649490'),('7e3a6f58-62a1-4ea9-bb50-5f24d545ec50','56cae199-4b66-451c-a310-9dec3f649490'),('fafdd08b-02fa-45e9-bc40-15befb734572','56cae199-4b66-451c-a310-9dec3f649490'),('43de4389-64c9-4a7f-bb70-8cba7986f2d0','74c8800a-f392-4c3c-9077-cfb96a52c947'),('6bd9c5f4-97b4-457e-8835-a14a932d8d63','74c8800a-f392-4c3c-9077-cfb96a52c947'),('88598027-632e-4105-ac21-88a1dcb373db','74c8800a-f392-4c3c-9077-cfb96a52c947'),('94d463bc-0ba6-4d80-85f4-e63860357f80','74c8800a-f392-4c3c-9077-cfb96a52c947'),('957a70a3-5891-4e14-9765-2560c25916ee','74c8800a-f392-4c3c-9077-cfb96a52c947'),('6a5eaac8-03fe-4cbe-aaf4-267e8d5614d3','85631ddb-cb91-4d18-a335-1646a78ee06a'),('7dbb54ac-c3c9-40b9-b4c4-7476371eb725','85631ddb-cb91-4d18-a335-1646a78ee06a'),('9ff2af3b-6e78-4684-a859-6278fb8782f2','85631ddb-cb91-4d18-a335-1646a78ee06a'),('e737d20e-6216-4da9-a281-f43102759f54','85631ddb-cb91-4d18-a335-1646a78ee06a'),('efd5a4cb-e141-4976-86a2-925c48e9a17c','85631ddb-cb91-4d18-a335-1646a78ee06a'),('92bde222-43fd-4fee-b265-72f4ccaec199','8a37f068-a80b-4b4b-82a8-5a4c40c51869'),('c7d88b16-b9b1-4ee9-b88b-089f3cc4736c','8a37f068-a80b-4b4b-82a8-5a4c40c51869'),('2db94f07-d03e-4ad8-b2c3-69cb027d820b','98b18f6f-d105-437a-92f2-fb863b59805c'),('534ae492-208a-4329-ac07-fd5bebc8017e','98b18f6f-d105-437a-92f2-fb863b59805c'),('6a0e8485-c569-42a2-8ca9-fb75b7007749','98b18f6f-d105-437a-92f2-fb863b59805c'),('9efaac6f-2cfc-4cfa-b4b1-5e400b184d52','98b18f6f-d105-437a-92f2-fb863b59805c'),('c2afa323-6d36-40d0-bc7c-994d452775d7','98b18f6f-d105-437a-92f2-fb863b59805c'),('1f13355c-00fa-478d-af4d-5f4c2740912a','99050347-6740-4d25-891b-ae451c2c1f62'),('f98ff5a7-34c3-4473-abe3-270867f09df4','99050347-6740-4d25-891b-ae451c2c1f62'),('770dbf71-b9d5-4983-b9b8-79d32f64e172','e74edb4f-b238-4208-8996-dd6ab65ec257'),('c2afa323-6d36-40d0-bc7c-994d452775d7','e74edb4f-b238-4208-8996-dd6ab65ec257'),('6809f7f3-19bd-4e02-b894-e33f3c3879b2','fe934bbc-b716-474a-b1e0-eefc2a29e1b2'),('9201ee66-0e4c-4d92-ab9e-2120a7390dab','fe934bbc-b716-474a-b1e0-eefc2a29e1b2'),('92bde222-43fd-4fee-b265-72f4ccaec199','fe934bbc-b716-474a-b1e0-eefc2a29e1b2'),('96bd2210-1fcb-4deb-8fbb-563e0ca8f654','fe934bbc-b716-474a-b1e0-eefc2a29e1b2'),('97c22ad8-48d8-49db-90e3-b0e205ef50de','fe934bbc-b716-474a-b1e0-eefc2a29e1b2');
+/*!40000 ALTER TABLE `USER_ROLE_MAPPING` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `USER_SESSION`
+--
+
+DROP TABLE IF EXISTS `USER_SESSION`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `USER_SESSION` (
+  `ID` varchar(36) NOT NULL,
+  `AUTH_METHOD` varchar(255) DEFAULT NULL,
+  `IP_ADDRESS` varchar(255) DEFAULT NULL,
+  `LAST_SESSION_REFRESH` int DEFAULT NULL,
+  `LOGIN_USERNAME` varchar(255) DEFAULT NULL,
+  `REALM_ID` varchar(255) DEFAULT NULL,
+  `REMEMBER_ME` bit(1) NOT NULL DEFAULT b'0',
+  `STARTED` int DEFAULT NULL,
+  `USER_ID` varchar(255) DEFAULT NULL,
+  `USER_SESSION_STATE` int DEFAULT NULL,
+  `BROKER_SESSION_ID` varchar(255) DEFAULT NULL,
+  `BROKER_USER_ID` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `USER_SESSION`
+--
+
+LOCK TABLES `USER_SESSION` WRITE;
+/*!40000 ALTER TABLE `USER_SESSION` DISABLE KEYS */;
+/*!40000 ALTER TABLE `USER_SESSION` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `USER_SESSION_NOTE`
+--
+
+DROP TABLE IF EXISTS `USER_SESSION_NOTE`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `USER_SESSION_NOTE` (
+  `USER_SESSION` varchar(36) NOT NULL,
+  `NAME` varchar(255) NOT NULL,
+  `VALUE` text,
+  PRIMARY KEY (`USER_SESSION`,`NAME`),
+  CONSTRAINT `FK5EDFB00FF51D3472` FOREIGN KEY (`USER_SESSION`) REFERENCES `USER_SESSION` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `USER_SESSION_NOTE`
+--
+
+LOCK TABLES `USER_SESSION_NOTE` WRITE;
+/*!40000 ALTER TABLE `USER_SESSION_NOTE` DISABLE KEYS */;
+/*!40000 ALTER TABLE `USER_SESSION_NOTE` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `WEB_ORIGINS`
+--
+
+DROP TABLE IF EXISTS `WEB_ORIGINS`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `WEB_ORIGINS` (
+  `CLIENT_ID` varchar(36) NOT NULL,
+  `VALUE` varchar(255) NOT NULL,
+  PRIMARY KEY (`CLIENT_ID`,`VALUE`),
+  KEY `IDX_WEB_ORIG_CLIENT` (`CLIENT_ID`),
+  CONSTRAINT `FK_LOJPHO213XCX4WNKOG82SSRFY` FOREIGN KEY (`CLIENT_ID`) REFERENCES `CLIENT` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `WEB_ORIGINS`
+--
+
+LOCK TABLES `WEB_ORIGINS` WRITE;
+/*!40000 ALTER TABLE `WEB_ORIGINS` DISABLE KEYS */;
+INSERT INTO `WEB_ORIGINS` VALUES ('10447023-de56-4fa6-8669-07b054551ad1','+'),('166138a8-bf2f-4caa-97eb-8cabbe18a8f6','+'),('aa4ae80c-bbad-4217-a6a7-8ff0a871577f','+'),('bf0a8c22-455e-4840-9240-f2a7d5b415f7','+'),('e7ce9cbf-460c-4fb6-9da2-484548018706','+'),('fc9017e3-d5da-44aa-8c39-f16017ad8608','+');
+/*!40000 ALTER TABLE `WEB_ORIGINS` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Current Database: `platform`
+--
+
+CREATE DATABASE /*!32312 IF NOT EXISTS*/ `platform` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+
+USE `platform`;
+
+--
+-- Table structure for table `M_SYSTEM_CONFIG`
+--
+
+DROP TABLE IF EXISTS `M_SYSTEM_CONFIG`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `M_SYSTEM_CONFIG` (
+  `CONFIG_KEY` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `CONFIG_VALUE` varchar(4000) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `DESCRIPTION` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `CREATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `CREATE_USER` varchar(40) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `LAST_UPDATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `LAST_UPDATE_USER` varchar(40) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`CONFIG_KEY`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `M_SYSTEM_CONFIG`
+--
+
+LOCK TABLES `M_SYSTEM_CONFIG` WRITE;
+/*!40000 ALTER TABLE `M_SYSTEM_CONFIG` DISABLE KEYS */;
+INSERT INTO `M_SYSTEM_CONFIG` VALUES ('ita.system.ansible.execution_limit','25','Maximum number of movement executions for whole of IT automation','2024-02-29 11:52:10','dummy','2024-02-29 11:52:10','dummy');
+/*!40000 ALTER TABLE `M_SYSTEM_CONFIG` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `T_MAINTENANCE_MODE`
+--
+
+DROP TABLE IF EXISTS `T_MAINTENANCE_MODE`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `T_MAINTENANCE_MODE` (
+  `MAINTENANCE_ID` varchar(40) COLLATE utf8mb4_bin NOT NULL,
+  `MODE_NAME` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `SETTING_VALUE` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `LAST_UPDATE_TIMESTAMP` datetime(6) DEFAULT NULL,
+  `LAST_UPDATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  PRIMARY KEY (`MAINTENANCE_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `T_MAINTENANCE_MODE`
+--
+
+LOCK TABLES `T_MAINTENANCE_MODE` WRITE;
+/*!40000 ALTER TABLE `T_MAINTENANCE_MODE` DISABLE KEYS */;
+INSERT INTO `T_MAINTENANCE_MODE` VALUES ('1','BACKYARD_EXECUTE_STOP','0','2024-02-29 11:52:04.000000',NULL),('2','DATA_UPDATE_STOP','0','2024-02-29 11:52:04.000000',NULL);
+/*!40000 ALTER TABLE `T_MAINTENANCE_MODE` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `T_ORGANIZATION`
+--
+
+DROP TABLE IF EXISTS `T_ORGANIZATION`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `T_ORGANIZATION` (
+  `ORGANIZATION_ID` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `ORGANIZATION_NAME` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `INFORMATIONS` json NOT NULL,
+  `CREATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `CREATE_USER` varchar(40) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `LAST_UPDATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `LAST_UPDATE_USER` varchar(40) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`ORGANIZATION_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `T_ORGANIZATION`
+--
+
+LOCK TABLES `T_ORGANIZATION` WRITE;
+/*!40000 ALTER TABLE `T_ORGANIZATION` DISABLE KEYS */;
+INSERT INTO `T_ORGANIZATION` VALUES ('org1','name of organization','{\"status\": \"Organization Create Complete\", \"options\": {}, \"ext_options\": {\"options_ita\": {\"drivers\": {\"oase\": false, \"ci_cd\": false, \"terraform_cli\": false, \"terraform_cloud_ep\": false}}}}','2024-02-29 11:52:41','unittest-user01','2024-02-29 11:52:52','unittest-user01'),('org2','name of organization','{\"status\": \"Organization Create Complete\", \"options\": {}, \"ext_options\": {\"options_ita\": {\"drivers\": {\"oase\": false, \"ci_cd\": false, \"terraform_cli\": false, \"terraform_cloud_ep\": false}}}}','2024-02-29 11:53:11','unittest-user01','2024-02-29 11:53:16','unittest-user01'),('org3','name of organization','{\"status\": \"Organization Create Complete\", \"options\": {}, \"ext_options\": {\"options_ita\": {\"drivers\": {\"oase\": false, \"ci_cd\": false, \"terraform_cli\": false, \"terraform_cloud_ep\": false}}}}','2024-02-29 11:53:28','unittest-user01','2024-02-29 11:53:33','unittest-user01'),('org4','name of organization','{\"status\": \"Organization Create Complete\", \"options\": {}, \"ext_options\": {\"options_ita\": {\"drivers\": {\"oase\": false, \"ci_cd\": false, \"terraform_cli\": false, \"terraform_cloud_ep\": false}}}}','2024-02-29 11:53:50','unittest-user01','2024-02-29 11:53:55','unittest-user01'),('org5','name of organization','{\"status\": \"Organization Create Complete\", \"options\": {}, \"ext_options\": {\"options_ita\": {\"drivers\": {\"oase\": false, \"ci_cd\": false, \"terraform_cli\": false, \"terraform_cloud_ep\": false}}}}','2024-02-29 11:54:22','unittest-user01','2024-02-29 11:54:27','unittest-user01');
+/*!40000 ALTER TABLE `T_ORGANIZATION` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `T_ORGANIZATION_DB`
+--
+
+DROP TABLE IF EXISTS `T_ORGANIZATION_DB`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `T_ORGANIZATION_DB` (
+  `ORGANIZATION_ID` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `DB_HOST` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `DB_PORT` int DEFAULT NULL,
+  `DB_DATABASE` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `DB_USER` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `DB_PASSWORD` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `CREATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `CREATE_USER` varchar(40) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `LAST_UPDATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `LAST_UPDATE_USER` varchar(40) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`ORGANIZATION_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `T_ORGANIZATION_DB`
+--
+
+LOCK TABLES `T_ORGANIZATION_DB` WRITE;
+/*!40000 ALTER TABLE `T_ORGANIZATION_DB` DISABLE KEYS */;
+INSERT INTO `T_ORGANIZATION_DB` VALUES ('org1','unittest-platform-db',3306,'PF_ORG_BEYWKWYCFWAHPNCAM8LA','PF_ORG_BEYWKWYCFWAHPNCAM8LA','umauTSKqTnT9toGzQxPFpY57MGHB0Gz614CXcIohU0l24rLIxYBNcB+oh85M22LU','2024-02-29 11:52:48','unittest-user01','2024-02-29 11:54:50','unittest-user01'),('org2','unittest-platform-db',3306,'PF_ORG_NQE9W9K838TXFHL5AQHT','PF_ORG_NQE9W9K838TXFHL5AQHT','KStKvbzBWcbIzyrHcYJHWGyridLWmBwAgDwRT3dhwGL/NX6IgaKVhrybXSo7VWng','2024-02-29 11:53:15','unittest-user01','2024-02-29 11:54:50','unittest-user01'),('org3','unittest-platform-db',3306,'PF_ORG_PA9P5Y7OE76R0LA3BTGM','PF_ORG_PA9P5Y7OE76R0LA3BTGM','cecGNf3sc6RhidZ8uhFeDGiO0CYtoVXhmvNRXnHXIQr2aYwgr61HiTnmkVe0SMGP','2024-02-29 11:53:32','unittest-user01','2024-02-29 11:54:50','unittest-user01'),('org4','unittest-platform-db',3306,'PF_ORG_UZ5M3JKTLNP3EP1LC02H','PF_ORG_UZ5M3JKTLNP3EP1LC02H','rhD4KY6zZ7QIIBJRY+QLUZgJwqkldUQslenmL+aJnwxmY5twIq3Q5wJ6wOulSfth','2024-02-29 11:53:54','unittest-user01','2024-02-29 11:54:50','unittest-user01'),('org5','unittest-platform-db',3306,'PF_ORG_QXBO0Y8ME39VH9IEPBWI','PF_ORG_QXBO0Y8ME39VH9IEPBWI','NHdcFZt7NRtjgCDH6veQt4BX5gDFHdNcPfOjf1Eb43q5BWO3IJ+tRGpGqZoq17oQ','2024-02-29 11:54:26','unittest-user01','2024-02-29 11:54:50','unittest-user01');
+/*!40000 ALTER TABLE `T_ORGANIZATION_DB` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `T_ORGANIZATION_PLAN`
+--
+
+DROP TABLE IF EXISTS `T_ORGANIZATION_PLAN`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `T_ORGANIZATION_PLAN` (
+  `ORGANIZATION_ID` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `START_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `PLAN_ID` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `CREATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `CREATE_USER` varchar(40) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `LAST_UPDATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `LAST_UPDATE_USER` varchar(40) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`ORGANIZATION_ID`,`START_TIMESTAMP`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `T_ORGANIZATION_PLAN`
+--
+
+LOCK TABLES `T_ORGANIZATION_PLAN` WRITE;
+/*!40000 ALTER TABLE `T_ORGANIZATION_PLAN` DISABLE KEYS */;
+/*!40000 ALTER TABLE `T_ORGANIZATION_PLAN` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `T_PLAN`
+--
+
+DROP TABLE IF EXISTS `T_PLAN`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `T_PLAN` (
+  `PLAN_ID` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `PLAN_NAME` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `INFORMATIONS` json NOT NULL,
+  `CREATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `CREATE_USER` varchar(40) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `LAST_UPDATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `LAST_UPDATE_USER` varchar(40) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`PLAN_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `T_PLAN`
+--
+
+LOCK TABLES `T_PLAN` WRITE;
+/*!40000 ALTER TABLE `T_PLAN` DISABLE KEYS */;
+INSERT INTO `T_PLAN` VALUES ('_default','_default plan','{\"description\": \"default plan\"}','2024-02-29 11:52:02','system','2024-02-29 11:52:02','system');
+/*!40000 ALTER TABLE `T_PLAN` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `T_PLAN_ITEM`
+--
+
+DROP TABLE IF EXISTS `T_PLAN_ITEM`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `T_PLAN_ITEM` (
+  `LIMIT_ID` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `INFORMATIONS` json NOT NULL,
+  `CREATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `CREATE_USER` varchar(40) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `LAST_UPDATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `LAST_UPDATE_USER` varchar(40) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`LIMIT_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `T_PLAN_ITEM`
+--
+
+LOCK TABLES `T_PLAN_ITEM` WRITE;
+/*!40000 ALTER TABLE `T_PLAN_ITEM` DISABLE KEYS */;
+INSERT INTO `T_PLAN_ITEM` VALUES ('ita.organization.ansible.execution_limit','{\"max\": 1000, \"description\": \"Maximum number of movement executions for organization default\"}','2024-02-29 11:52:10','dummy','2024-02-29 11:52:10','dummy'),('platform.roles','{\"max\": 1000, \"description\": \"Maximum number of roles for organization default\"}','2024-02-29 11:52:02','system','2024-02-29 11:52:04','system'),('platform.users','{\"max\": 10000, \"description\": \"Maximum number of users for organization default\"}','2024-02-29 11:52:02','system','2024-02-29 11:52:04','system'),('platform.workspaces','{\"max\": 1000, \"description\": \"Maximum number of workspaces for organization default\"}','2024-02-29 11:52:02','system','2024-02-29 11:52:04','system');
+/*!40000 ALTER TABLE `T_PLAN_ITEM` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `T_PLAN_LIMIT`
+--
+
+DROP TABLE IF EXISTS `T_PLAN_LIMIT`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `T_PLAN_LIMIT` (
+  `PLAN_ID` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `LIMIT_ID` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `LIMIT_VALUE` int NOT NULL,
+  `CREATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `CREATE_USER` varchar(40) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `LAST_UPDATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `LAST_UPDATE_USER` varchar(40) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`PLAN_ID`,`LIMIT_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `T_PLAN_LIMIT`
+--
+
+LOCK TABLES `T_PLAN_LIMIT` WRITE;
+/*!40000 ALTER TABLE `T_PLAN_LIMIT` DISABLE KEYS */;
+INSERT INTO `T_PLAN_LIMIT` VALUES ('_default','ita.organization.ansible.execution_limit',25,'2024-02-29 11:52:10','dummy','2024-02-29 11:52:10','dummy'),('_default','platform.roles',1000,'2024-02-29 11:52:02','system','2024-02-29 11:52:02','system'),('_default','platform.users',10000,'2024-02-29 11:52:02','system','2024-02-29 11:52:02','system'),('_default','platform.workspaces',100,'2024-02-29 11:52:02','system','2024-02-29 11:52:02','system');
+/*!40000 ALTER TABLE `T_PLAN_LIMIT` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `T_PLATFORM_MIGRATION_HISTORY`
+--
+
+DROP TABLE IF EXISTS `T_PLATFORM_MIGRATION_HISTORY`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `T_PLATFORM_MIGRATION_HISTORY` (
+  `ID` int NOT NULL AUTO_INCREMENT,
+  `VERSION` varchar(16) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `RESULT` varchar(16) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `MESSAGE` varchar(4096) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `CREATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `CREATE_USER` varchar(40) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `LAST_UPDATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `LAST_UPDATE_USER` varchar(40) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`ID`)
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `T_PLATFORM_MIGRATION_HISTORY`
+--
+
+LOCK TABLES `T_PLATFORM_MIGRATION_HISTORY` WRITE;
+/*!40000 ALTER TABLE `T_PLATFORM_MIGRATION_HISTORY` DISABLE KEYS */;
+INSERT INTO `T_PLATFORM_MIGRATION_HISTORY` VALUES (1,'1.3.0','START',NULL,'2024-02-29 11:52:01','1.8.0','2024-02-29 11:52:01','1.8.0'),(2,'1.3.0','SUCCEED',NULL,'2024-02-29 11:52:03','1.8.0','2024-02-29 11:52:03','1.8.0'),(3,'1.5.0','START',NULL,'2024-02-29 11:52:04','1.8.0','2024-02-29 11:52:04','1.8.0'),(4,'1.5.0','SUCCEED',NULL,'2024-02-29 11:52:04','1.8.0','2024-02-29 11:52:04','1.8.0'),(5,'1.5.2','START',NULL,'2024-02-29 11:52:04','1.8.0','2024-02-29 11:52:04','1.8.0'),(6,'1.5.2','SUCCEED',NULL,'2024-02-29 11:52:04','1.8.0','2024-02-29 11:52:04','1.8.0'),(7,'1.6.0','START',NULL,'2024-02-29 11:52:04','1.8.0','2024-02-29 11:52:04','1.8.0'),(8,'1.6.0','SUCCEED',NULL,'2024-02-29 11:52:04','1.8.0','2024-02-29 11:52:04','1.8.0'),(9,'1.7.0','START',NULL,'2024-02-29 11:52:04','1.8.0','2024-02-29 11:52:04','1.8.0'),(10,'1.7.0','SUCCEED',NULL,'2024-02-29 11:52:05','1.8.0','2024-02-29 11:52:05','1.8.0'),(11,'1.8.0','START',NULL,'2024-02-29 11:52:05','1.8.0','2024-02-29 11:52:05','1.8.0'),(12,'1.8.0','SUCCEED',NULL,'2024-02-29 11:52:05','1.8.0','2024-02-29 11:52:05','1.8.0');
+/*!40000 ALTER TABLE `T_PLATFORM_MIGRATION_HISTORY` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `T_PLATFORM_PRIVATE`
+--
+
+DROP TABLE IF EXISTS `T_PLATFORM_PRIVATE`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `T_PLATFORM_PRIVATE` (
+  `ID` int NOT NULL,
+  `INFORMATIONS` json NOT NULL,
+  `CREATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `CREATE_USER` varchar(40) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `LAST_UPDATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `LAST_UPDATE_USER` varchar(40) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `T_PLATFORM_PRIVATE`
+--
+
+LOCK TABLES `T_PLATFORM_PRIVATE` WRITE;
+/*!40000 ALTER TABLE `T_PLATFORM_PRIVATE` DISABLE KEYS */;
+INSERT INTO `T_PLATFORM_PRIVATE` VALUES (1,'{\"API_TOKEN_CLIENT_ID\": \"93f6c7ec-5361-4216-9f3f-bda1f99ccd7d\", \"TOKEN_CHECK_REALM_ID\": \"master\", \"TOKEN_CHECK_CLIENT_ID\": \"58e5ed05-5651-4e99-ac86-e93c28adc1f0\", \"API_TOKEN_CLIENT_CLIENTID\": \"_platform-api\", \"TOKEN_CHECK_CLIENT_SECRET\": \"sspQc20tWySZgUWfngyq3zt64Igd6n7N\", \"TOKEN_CHECK_CLIENT_CLIENTID\": \"_platform\"}','2024-02-29 11:52:03','system','2024-02-29 11:52:03','system');
+/*!40000 ALTER TABLE `T_PLATFORM_PRIVATE` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `T_PLATFORM_VERSION`
+--
+
+DROP TABLE IF EXISTS `T_PLATFORM_VERSION`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `T_PLATFORM_VERSION` (
+  `ID` int NOT NULL,
+  `VERSION` varchar(16) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `CREATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `CREATE_USER` varchar(40) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `LAST_UPDATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `LAST_UPDATE_USER` varchar(40) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `T_PLATFORM_VERSION`
+--
+
+LOCK TABLES `T_PLATFORM_VERSION` WRITE;
+/*!40000 ALTER TABLE `T_PLATFORM_VERSION` DISABLE KEYS */;
+INSERT INTO `T_PLATFORM_VERSION` VALUES (1,'1.8.0','2024-02-29 11:51:02','system','2024-02-29 11:52:05','1.8.0');
+/*!40000 ALTER TABLE `T_PLATFORM_VERSION` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `T_PROCESS_QUEUE`
+--
+
+DROP TABLE IF EXISTS `T_PROCESS_QUEUE`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `T_PROCESS_QUEUE` (
+  `PROCESS_ID` varchar(26) COLLATE utf8mb4_bin NOT NULL,
+  `PROCESS_KIND` varchar(36) COLLATE utf8mb4_bin DEFAULT NULL,
+  `PROCESS_EXEC_ID` varchar(26) COLLATE utf8mb4_bin DEFAULT NULL,
+  `ORGANIZATION_ID` varchar(36) COLLATE utf8mb4_bin DEFAULT NULL,
+  `WORKSPACE_ID` varchar(36) COLLATE utf8mb4_bin DEFAULT NULL,
+  `LAST_UPDATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `LAST_UPDATE_USER` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  PRIMARY KEY (`PROCESS_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `T_PROCESS_QUEUE`
+--
+
+LOCK TABLES `T_PROCESS_QUEUE` WRITE;
+/*!40000 ALTER TABLE `T_PROCESS_QUEUE` DISABLE KEYS */;
+/*!40000 ALTER TABLE `T_PROCESS_QUEUE` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `T_REFRESH_TOKEN`
+--
+
+DROP TABLE IF EXISTS `T_REFRESH_TOKEN`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `T_REFRESH_TOKEN` (
+  `USER_ID` varchar(40) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `SESSION_ID` varchar(40) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `EXPIRE_TIMESTAMP` datetime DEFAULT NULL,
+  `CREATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `CREATE_USER` varchar(40) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `LAST_UPDATE_TIMESTAMP` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `LAST_UPDATE_USER` varchar(40) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`USER_ID`,`SESSION_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `T_REFRESH_TOKEN`
+--
+
+LOCK TABLES `T_REFRESH_TOKEN` WRITE;
+/*!40000 ALTER TABLE `T_REFRESH_TOKEN` DISABLE KEYS */;
+/*!40000 ALTER TABLE `T_REFRESH_TOKEN` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2024-02-29 11:54:52
