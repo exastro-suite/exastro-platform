@@ -2,6 +2,7 @@
 
 BASEDIR=$(dirname $0)
 
+rm -rf "${BASEDIR}/db/exports/__pycache__"
 ln -sf "${BASEDIR}/db/exports/mysql/testdata.py" "${BASEDIR}/db/exports/testdata.py"
 ln -sf "${BASEDIR}/db/exports/mysql/pytest2_restore_databases.sql" "${BASEDIR}/db/exports/pytest2_restore_databases.sql"
 
@@ -17,5 +18,3 @@ $(
     sudo docker compose rm -s -f;
 )
 
-rm "${BASEDIR}/db/exports/testdata.py"
-rm "${BASEDIR}/db/exports/pytest2_restore_databases.sql"

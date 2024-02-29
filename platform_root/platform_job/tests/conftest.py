@@ -26,14 +26,13 @@ from contextlib import closing
 import signal
 import inspect
 
+from importlib import import_module
 
 from tests.common import test_common
 import globals
 from common_library.common.db import DBconnector
 from common_library.common import api_keycloak_tokens, api_keycloak_realms, multi_lang
 from common_resources.en import language
-
-from tests.db.exports import testdata
 
 import job_manager
 
@@ -111,6 +110,8 @@ def data_initalize():
 
     """
     globals.init(pytest=True)
+    testdata = import_module("tests.db.exports.testdata")
+
     #
     # keycloak token取得
     #
@@ -229,6 +230,7 @@ def encrypt_key(mocker):
     Args:
         mocker (_type_): _description_
     """
+    testdata = import_module("tests.db.exports.testdata")
     mocker.patch.dict(os.environ, {"ENCRYPT_KEY": testdata.ENCRYPT_KEY})
 
 
