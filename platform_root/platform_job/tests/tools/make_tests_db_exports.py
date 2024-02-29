@@ -265,7 +265,14 @@ def sample_data_organization(id, update={}):
             }
         ],
         "options": {},
-        "optionsIta": {}
+        "optionsIta": {
+            "drivers": {
+                "terraform_cloud_ep": False,
+                "terraform_cli": False,
+                "ci_cd": False,
+                "oase": False
+            }
+        }
     }, **update)
 
 

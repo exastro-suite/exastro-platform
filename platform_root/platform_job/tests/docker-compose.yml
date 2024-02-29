@@ -22,15 +22,15 @@ services:
       retries: 200
     volumes:
       - ${PLATFORM_REPO_ROOT}/platform_root/platform_db/conf/my.cnf:/etc/mysql/conf.d/my.cnf
-      - ${PLATFORM_REPO_ROOT}/platform_root/platform_job/tests/db/exports/pytest1_init_databases.sql:/docker-entrypoint-initdb.d/pytest1_init_databases.sql
-      - ${PLATFORM_REPO_ROOT}/platform_root/platform_job/tests/db/exports/pytest9_database_users.sql:/docker-entrypoint-initdb.d/pytest9_database_users.sql
+      - ${PLATFORM_REPO_ROOT}/platform_root/platform_job/tests/db/exports/mariadb/pytest1_init_databases.sql:/docker-entrypoint-initdb.d/pytest1_init_databases.sql
+      - ${PLATFORM_REPO_ROOT}/platform_root/platform_job/tests/db/exports/mariadb/pytest9_database_users.sql:/docker-entrypoint-initdb.d/pytest9_database_users.sql
     environment:
       - TZ=Asia/Tokyo
       - MYSQL_ROOT_PASSWORD=password
     networks:
       - exastro
     ports:
-      - "0.0.0.0:3308:3306"
+      - "0.0.0.0:${EXT_PORT_PLATFORM_UNITTEST_DB:-3308}:3306"
   unittest-keycloak:
     image: quay.io/keycloak/keycloak:20.0
     healthcheck:

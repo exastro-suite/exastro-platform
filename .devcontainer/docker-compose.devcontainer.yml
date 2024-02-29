@@ -71,8 +71,8 @@ services:
       - ../platform_root/platform_api/config/httpd.conf/wsgi.conf:/etc/httpd/conf.d/wsgi.conf:cached
       - ~/.netrc:/home/app_user/.netrc
       - ~/.gitconfig:/home/app_user/.gitconfig
-      - ./platform-api/.vscode/launch.json:/workspace/.vscode/launch.json
-      - ./platform-api/.vscode/tasks.json:/workspace/.vscode/tasks.json
+      - ./platform-api-with-ita/.vscode/launch.json:/workspace/.vscode/launch.json
+      - ./platform-api-with-ita/.vscode/tasks.json:/workspace/.vscode/tasks.json
       - /usr/share/pki/ca-trust-source/anchors/UserRootCertificate.crt:/etc/ssl/certs/ca-certificates.crt
       - /mnt/mainte/talisman/.talismanrc:/mnt/mainte/talisman/.talismanrc
       - ~/.config/git/ignore:/home/app_user/.config/git/ignore
@@ -95,6 +95,7 @@ services:
       - NODE_EXTRA_CA_CERTS=/etc/ssl/certs/ca-certificates.crt
       - NODE_TLS_REJECT_UNAUTHORIZED=${NODE_TLS_REJECT_UNAUTHORIZED:-1}
       - NETWORK_ID=${NETWORK_ID:-}
+      - EXT_PORT_PLATFORM_UNITTEST_DB=${EXT_PORT_PLATFORM_UNITTEST_DB:-3308}
   platform-job:
     build:
       target: develop_build
@@ -133,6 +134,8 @@ services:
       - NODE_TLS_REJECT_UNAUTHORIZED=${NODE_TLS_REJECT_UNAUTHORIZED:-1}
       - NETWORK_ID=${NETWORK_ID:-}
       - JOB_NOTIFICATION_SMTPS_SSL_VERIFY_ENABLED=FALSE
+      - EXT_PORT_PLATFORM_UNITTEST_DB=${EXT_PORT_PLATFORM_UNITTEST_DB:-3308}
+      - PLATFORM_DBMS=${PLATFORM_DBMS:-mariadb}
   platform-web:
     build:
       target: develop_build
@@ -176,7 +179,24 @@ services:
 
   platform-db:
     ports:
-      - "0.0.0.0:3307:3306"
+      - "0.0.0.0:${EXT_PORT_PLATFORM_DB:-3307}:3306"
+
+  platform-db-mysql:
+    image: mysql:8.0
+    healthcheck:
+      test: mysqladmin ping --silent && mysql -u root -p$${MYSQL_ROOT_PASSWORD} -e 'select 1;'
+      interval: 3s
+      retries: 200
+    volumes:
+      - ../.volumes/platform-db-mysql/data:/var/lib/mysql
+      - ../platform_root/platform_db/conf/my.cnf:/etc/mysql/conf.d/my.cnf
+    environment:
+      - TZ=Asia/Tokyo
+      - MYSQL_ROOT_PASSWORD=password
+    ports:
+      - "0.0.0.0:${EXT_PORT_PLATFORM_DB_MYSQL:-3309}:3306"
+    networks:
+      - exastro
 
   # platform-migration-1:
   #   build:
