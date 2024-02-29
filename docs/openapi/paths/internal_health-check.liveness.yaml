@@ -1,4 +1,4 @@
-#   Copyright 2022 NEC Corporation
+#   Copyright 2024 NEC Corporation
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -14,26 +14,10 @@
 
 get:
   tags:
-  - InternalCommonService
-  summary: alive
-  x-openapi-router-controller: controllers.internal_common_service_controller
-  operationId: alive
-  parameters:
-    - name: User-Id
-      in: header
-      required: true
-      schema:
-        type: string
-    - name: Roles
-      in: header
-      required: true
-      schema:
-        type: string
-    - name: Language
-      in: header
-      required: true
-      schema:
-        type: string
+  - InternalHealthCheckService
+  summary: Internal health check liveness
+  x-openapi-router-controller: controllers.internal_health_check_service_controller
+  operationId: internal_health_check_liveness
   responses:
     200:
       description: A successful response.

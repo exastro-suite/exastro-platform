@@ -68,6 +68,8 @@ tags:
   description: メンテナンスモードに関する操作(内部用)
 - name: InternalNotificationService
   description: 通知機能に関する操作(内部用)
+- name: InternalHealthCheckService
+  description: ヘルスチェックに関する操作(内部用)
 paths:
   /api/platform/organizations:
     get:
@@ -2487,48 +2489,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/runtimeError'
       x-openapi-router-controller: controllers.organization_setting_service_controller
-  /internal-api/alive:
-    get:
-      tags:
-      - InternalCommonService
-      summary: alive
-      operationId: alive
-      parameters:
-      - name: User_Id
-        in: header
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-      - name: Roles
-        in: header
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-      - name: Language
-        in: header
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-      responses:
-        "200":
-          description: A successful response.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/inline_response_200_2'
-        default:
-          description: An unexpected error response.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/runtimeError'
-      x-openapi-router-controller: controllers.internal_common_service_controller
   /internal-api/platform/settings/common:
     get:
       tags:
@@ -3359,6 +3319,46 @@ paths:
               schema:
                 $ref: '#/components/schemas/runtimeError'
       x-openapi-router-controller: controllers.internal_notification_service_controller
+  /internal-api/health-check/liveness:
+    get:
+      tags:
+      - InternalHealthCheckService
+      summary: Internal health check liveness
+      operationId: internal_health_check_liveness
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_2'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+      x-openapi-router-controller: controllers.internal_health_check_service_controller
+  /internal-api/health-check/readness:
+    get:
+      tags:
+      - InternalHealthCheckService
+      summary: Internal health check readness
+      operationId: internal_health_check_readness
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_2'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+      x-openapi-router-controller: controllers.internal_health_check_service_controller
 components:
   schemas:
     responseOk:

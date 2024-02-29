@@ -27,16 +27,6 @@ MSG_FUNCTION_ID = "20"
 
 
 @common.platform_exception_handler
-def alive():
-    """死活監視 Life and death monitoring
-
-    Returns:
-        Response: HTTP Respose
-    """
-    return common.response_200_ok(None)
-
-
-@common.platform_exception_handler
 def internal_settings_system_config_create(body):
     """Create creates an system config value
 
