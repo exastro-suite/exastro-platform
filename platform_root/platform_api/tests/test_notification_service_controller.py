@@ -652,7 +652,7 @@ def test_settings_notification_list(connexion_client):
         # validate get normal
         #
         response = connexion_client.get(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/settings/notifications?event_type_true=ita.event_type.new|ita.event_type.evaluated",
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/settings/notifications?event_type_true=ita.event_type.new,ita.event_type.evaluated",
             content_type='application/json',
             headers=request_parameters.request_headers(organization['user_id']))
 
