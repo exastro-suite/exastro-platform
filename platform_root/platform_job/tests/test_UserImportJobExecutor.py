@@ -27,6 +27,7 @@ from contextlib import closing
 
 from unittest import mock
 import threading
+from importlib import import_module
 
 from common_library.common import const
 from common_library.common import encrypt
@@ -39,7 +40,6 @@ import job_manager_config
 from jobs.UserImportJobExecutor import UserImportJobExecutor
 
 from tests.common import test_common
-from tests.db.exports import testdata
 
 from libs.job_manager_classes import SubProcessesManager
 from common_library.common import user_import_file_common
@@ -50,6 +50,8 @@ ERROR_TEXT_COL_INDEX = 12
 def test_execute_registration_nomally():
     """ユーザー登録正常系 / User registration normal pattern
     """
+    testdata = import_module("tests.db.exports.testdata")
+
     with test_common.requsts_mocker_default():
 
         organization_id = list(testdata.ORGANIZATIONS.keys())[0]
@@ -73,6 +75,8 @@ def test_execute_registration_nomally():
 def test_execute_file_error():
     """ファイル異常パターン
     """
+    testdata = import_module("tests.db.exports.testdata")
+
     # ファイルの形式エラーパターン
     with test_common.requsts_mocker_default():
 
@@ -159,6 +163,7 @@ def test_execute_file_error():
 def test_execute_validation_error():
     """Validation error pattern
     """
+    testdata = import_module("tests.db.exports.testdata")
 
     # ユーザー名エラー
     with test_common.requsts_mocker_default():
@@ -383,6 +388,8 @@ def test_execute_validation_error():
 def test_execute_registration_error_limits():
     """userのlimit超過エラー
     """
+    testdata = import_module("tests.db.exports.testdata")
+
     # 上限数エラー
     limit_users = 2
     with test_common.requsts_mocker_default(), \
@@ -420,6 +427,8 @@ def test_execute_registration_error_limits():
 def test_execute_registration_error_duplicate():
     """重複ユーザーの登録
     """
+    testdata = import_module("tests.db.exports.testdata")
+
     # 重複エラー（ユーザー名）
     with test_common.requsts_mocker_default():
         organization_id = list(testdata.ORGANIZATIONS.keys())[0]
@@ -479,6 +488,8 @@ def test_execute_registration_error_duplicate():
 def test_execute_registration_error_user_create():
     """ユーザー作成失敗
     """
+    testdata = import_module("tests.db.exports.testdata")
+
     # keycloak HTTP-400応答
     with test_common.requsts_mocker_default() as requests_mocker:
         organization_id = list(testdata.ORGANIZATIONS.keys())[0]
@@ -603,6 +614,8 @@ def test_execute_registration_error_user_create():
 def test_execute_registration_error_role_mapping():
     """ロール付与失敗
     """
+    testdata = import_module("tests.db.exports.testdata")
+
     # keycloak role mapping失敗
     with test_common.requsts_mocker_default() as requests_mocker:
         organization_id = list(testdata.ORGANIZATIONS.keys())[0]
@@ -635,6 +648,8 @@ def test_execute_registration_error_role_mapping():
 def test_execute_error_not_found_jobs_table():
     """TABLEの情報なし
     """
+    testdata = import_module("tests.db.exports.testdata")
+
     with test_common.requsts_mocker_default():
         organization_id = list(testdata.ORGANIZATIONS.keys())[0]
         queue = make_queue_import_user('ja', organization_id, user_import_data=[data_sample_registration])
@@ -674,6 +689,8 @@ def test_execute_error_not_found_jobs_table():
 def test_execute_error_get_specifiable_roles():
     """オーガナイゼーションのロール一覧取得失敗
     """
+    testdata = import_module("tests.db.exports.testdata")
+
     with test_common.requsts_mocker_default() as requests_mocker:
         organization_id = list(testdata.ORGANIZATIONS.keys())[0]
         requests_mocker.register_uri(
@@ -699,6 +716,8 @@ def test_execute_error_get_specifiable_roles():
 def test_execute_timeout():
     """Timeoutによる中断
     """
+    testdata = import_module("tests.db.exports.testdata")
+
     organization_id = list(testdata.ORGANIZATIONS.keys())[0]
 
     timeout_sec = 5
@@ -761,6 +780,8 @@ def test_execute_timeout():
 def test_force_update_status_normally():
     """強制ステータス更新の確認
     """
+    testdata = import_module("tests.db.exports.testdata")
+
     datas = [
         {
             "organization_id": list(testdata.ORGANIZATIONS.keys())[0],
