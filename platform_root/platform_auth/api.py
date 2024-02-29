@@ -67,15 +67,26 @@ globals.audit = audit_getLogger('audit',
                                 int(os.getenv('AUDIT_LOG_BACKUP_COUNT')))
 
 
-@app.route('/alive', methods=["GET"])
+@app.route('/health-check/liveness', methods=["GET"])
 @common.platform_exception_handler
-def alive():
-    """死活監視 If the string is empty, return None
+def liveness():
+    """health check - liveness
 
     Returns:
         Response: HTTP Response
     """
-    return jsonify({"result": "200", "time": common.datetime_to_str(datetime.now())}), 200
+    return "OK", 200
+
+
+@app.route('/health-check/readness', methods=["GET"])
+@common.platform_exception_handler
+def readness():
+    """health check - readness
+
+    Returns:
+        Response: HTTP Response
+    """
+    return "OK", 200
 
 
 @app.route('/auth/realms/<string:organization_id>/protocol/openid-connect/token', methods=["POST"])
