@@ -21,7 +21,7 @@
   "configurations": [
     {
       "name": "Python: start job manager",
-      "type": "python",
+      "type": "debugpy",
       "request": "launch",
       "program": "/app/job_manager.py",
       "env": {
@@ -43,7 +43,7 @@
     },
     {
       "name": "[DEBUG] Python: start job manager",
-      "type": "python",
+      "type": "debugpy",
       "request": "launch",
       "program": "/app/job_manager.py",
       "env": {
