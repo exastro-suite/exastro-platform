@@ -1,3 +1,4 @@
+import os
 import logging
 import logging.handlers
 import datetime
@@ -81,6 +82,12 @@ def audit_getLogger(module_name, logfile="", enabled=True, maxBytes=100000000, b
     logger.setLevel(999)
 
     if logfile and enabled:
+        dirname = os.path.dirname(logfile)
+        # 出力先のディレクトリが存在しない場合は作成する
+        # Create the output destination directory if it does not exist
+        if not os.path.isdir(dirname):
+            os.makedirs(dirname)
+
         formatter = JsonFormatter()
         logger.setLevel(logging.INFO)
 

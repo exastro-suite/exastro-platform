@@ -33,6 +33,8 @@ ENV APACHE_GROUPNAME        $GROUPNAME
 ENV LOG_LEVEL               INFO
 ENV AUDIT_LOG_ENABLED       True
 ENV AUDIT_LOG_PATH          exastro-audit.log
+ENV AUDIT_LOG_FILE_MAX_BYTE 100000000
+ENV AUDIT_LOG_BACKUP_COUNT  30
 
 RUN dnf install -y \
     langpacks-en \
