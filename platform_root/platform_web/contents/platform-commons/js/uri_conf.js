@@ -99,7 +99,7 @@ var api_conf = {
             "post": "/api/platform/plans"
         },
         "maintenance-mode-setting": {
-            "get": "/api/{organization_id}/platform/maintenance-mode-setting"
+            "get": "/api/{organization_id}/platform/maintenance-mode-setting",
         },
         "settings": {
             "mailserver": {
@@ -107,6 +107,19 @@ var api_conf = {
                 "post": "/api/{organization_id}/platform/settings/mailserver",
                 "delete": "/api/{organization_id}/platform/settings/mailserver",
             },
+            "maintenance-mode-setting": {
+                "get": "/api/platform/maintenance-mode-setting",
+                "patch": "/api/platform/maintenance-mode-setting",
+            },
+            "ita":{
+                "loglevel": {
+                    "get": "/api/ita/loglevel-settings/",
+                    "patch": "/api/ita/loglevel-settings/"
+                },
+                "backyard_execute_check": {
+                    "get": "/api/ita/backyard-execute-check/",
+                }
+            }
         },
 }
 }
@@ -171,8 +184,8 @@ var location_conf = {
             "new": "/platform/plans/_new",
             "list": "/platform/plans",
         },
-        "system_settings": {
-            "top": "/platform/settings",
+        "settings_running_state": {
+            "top": "/platform/settings/running_state",
         },
         "keycloak": {
             "console": "/auth/admin/master/console",

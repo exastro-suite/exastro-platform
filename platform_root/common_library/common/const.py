@@ -163,9 +163,17 @@ NOTIFICATION_STATUS_UNSENT = "Unsent"           # 未送信
 NOTIFICATION_STATUS_SUCCESSFUL = "Successful"   # 送信成功
 NOTIFICATION_STATUS_FAILED = "Failed"           # 送信失敗
 
+# ユーザ一括インポート/エクスポートステータス
+JOB_USER_NOT_EXEC = "NotExecuted"               # 未実行
+JOB_USER_EXEC = "Executing"                     # 実行中
+JOB_USER_COMP = "Completion"                    # 完了
+JOB_USER_FAILED = "Failed"                      # 失敗
+
 # 処理区分
 # process kind
 PROCESS_KIND_NOTIFICATION = "NOTIFICATION"      # 通知処理
+PROCESS_KIND_USER_IMPORT = "USERIMPORT"         # ユーザー一括インポート
+PROCESS_KIND_USER_EXPORT = "USEREXPORT"         # ユーザー一括エクスポート
 
 # smtp_idのデフォルト
 # Default when smtp_id

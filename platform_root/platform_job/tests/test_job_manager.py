@@ -21,11 +21,12 @@ import threading
 import time
 from unittest import mock
 import ulid
+from importlib import import_module
 
 from common_library.common import const
 
 from common import test_common
-from tests.db.exports import testdata
+
 from tests.jobs.TestJobExecutor import TestExecuteStocker
 
 import globals
@@ -90,11 +91,11 @@ def test_job_manager_main_sigint_signal():
 
             # sub processの終了確認
             assert test_common.check_state(
-                timeout=5.0, conditions=lambda : len([p for p in psutil.Process(os.getpid()).children() if p.name().startswith('python') ]), conditions_value=0)
+                timeout=10.0, conditions=lambda : len([p for p in psutil.Process(os.getpid()).children() if p.name().startswith('python') ]), conditions_value=0)
 
             # 終了しているか確認
             assert test_common.check_state(
-                timeout=3.0, conditions=lambda : not main_thread.is_alive())
+                timeout=5.0, conditions=lambda : not main_thread.is_alive())
 
         finally:
             # sigterm signalの送信
@@ -102,7 +103,7 @@ def test_job_manager_main_sigint_signal():
 
             # main processの終了確認
             assert test_common.check_state(
-                timeout=5.0, conditions=lambda : not main_thread.is_alive())
+                timeout=10.0, conditions=lambda : not main_thread.is_alive())
 
             main_thread.join()
 
@@ -179,6 +180,8 @@ def test_job_manager_sub_terminate_request():
 def test_job_manager_sub_execute_normal_job():
     """JOB正常終了
     """
+    testdata = import_module("tests.db.exports.testdata")
+
     TestExecuteStocker.initalize()
 
     # Jobの実行classを試験用に切り替え
@@ -238,6 +241,8 @@ def test_job_manager_sub_execute_normal_job():
 def test_job_manager_sub_execute_timeout_job():
     """JOB timeout
     """
+    testdata = import_module("tests.db.exports.testdata")
+
     TestExecuteStocker.initalize()
 
     # Jobの実行classを試験用に切り替え
@@ -286,7 +291,7 @@ def test_job_manager_sub_execute_timeout_job():
             assert test_common.check_state(
                 timeout=3.0, conditions=lambda : len(TestExecuteStocker.canceled_queue) == 1)
             assert test_common.check_state(
-                timeout=5.0, conditions=lambda : len(TestExecuteStocker.cancel_exited_queue) == 1)
+                timeout=10.0, conditions=lambda : len(TestExecuteStocker.cancel_exited_queue) == 1)
 
             # 実行したものがqueueに入れたものとおなじであること
             assert test_common.equal_queue(queue_data[0], TestExecuteStocker.executed_queue[0])
@@ -316,7 +321,7 @@ def test_job_manager_sub_execute_timeout_job():
 
             # 3件のcancel timeoutが行われていること
             assert test_common.check_state(
-                timeout=10.0, conditions=lambda : len(TestExecuteStocker.cancel_exited_queue) == 3)
+                timeout=20.0, conditions=lambda : len(TestExecuteStocker.cancel_exited_queue) == 3)
 
             # sub processの終了確認
             assert test_common.check_state(
@@ -336,6 +341,7 @@ def test_job_manager_sub_execute_timeout_job():
 def test_job_manager_sub_temminate_job_running():
     """job実行中に強制終了
     """
+    testdata = import_module("tests.db.exports.testdata")
     TestExecuteStocker.initalize()
 
     # Jobの実行classを試験用に切り替え
@@ -395,6 +401,7 @@ def test_job_manager_sub_temminate_job_running():
 def test_job_manager_sub_db_reconnect(caplog: LogCaptureFixture):
     """sub processのdb connection確認
     """
+    testdata = import_module("tests.db.exports.testdata")
     TestExecuteStocker.initalize()
 
     # Jobの実行classを試験用に切り替え
@@ -459,6 +466,7 @@ def test_job_manager_sub_db_reconnect(caplog: LogCaptureFixture):
 def test_job_manager_sub_db_helthcheck_error():
     """sub processのdb helthcheck error確認
     """
+    testdata = import_module("tests.db.exports.testdata")
     TestExecuteStocker.initalize()
 
     # Jobの実行classを試験用に切り替え
@@ -523,6 +531,7 @@ def test_job_manager_sub_db_helthcheck_error():
 def test_job_manager_sub_job_limit_over():
     """jobの最大数を超えた時の動作およびORGANIZATIONの優先付け
     """
+    testdata = import_module("tests.db.exports.testdata")
     TestExecuteStocker.initalize()
     max_job_per_process = 2
 

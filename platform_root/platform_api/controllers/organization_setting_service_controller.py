@@ -17,6 +17,8 @@ from contextlib import closing
 
 import connexion
 import globals
+import json
+from common_library.common import api_keycloak_tokens, api_keycloak_realms
 from common_library.common import bl_organization_setting_service, common, const, multi_lang
 from common_library.common.db import DBconnector
 from libs import queries_mailserver
@@ -98,6 +100,8 @@ def settings_mailserver_create(body, organization_id):  # noqa: E501
 
     bl_organization_setting_service.settings_mailserver_register_or_update(body, organization_id, user_id)
 
+    __keycloak_mailserver_set(body, organization_id)
+
     return common.response_200_ok(data=None)
 
 
@@ -118,6 +122,7 @@ def setting_mailserver_delete(organization_id):  # noqa: E501
             try:
                 cursor.execute(queries_mailserver.SQL_DELETE_SMTP_SERVER, {"smtp_id": const.DEFAULT_SMTP_ID})
                 conn.commit()
+                __keycloak_mailserver_delete(organization_id)
             except Exception as e:
                 globals.logger.error(f"exception:{e.args}")
                 message_id = f"500-{MSG_FUNCTION_ID}002"
@@ -128,3 +133,122 @@ def setting_mailserver_delete(organization_id):  # noqa: E501
                 raise common.InternalErrorException(message_id=message_id, message=message)
 
     return common.response_200_ok(data=None)
+
+
+def __get_token():
+    """get a token
+
+    Raises:
+        common.AuthException: _description_
+
+    Returns:
+        str: token
+    """
+
+    private = DBconnector().get_platform_private()
+
+    # サービスアカウントのTOKEN取得
+    # Get a service account token
+    response = api_keycloak_tokens.service_account_get_token(
+        private.token_check_realm_id, private.token_check_client_clientid, private.token_check_client_secret)
+    if response.status_code != 200:
+        message_id = "401-00001"
+        message = multi_lang.get_text(message_id,
+                                      "tokenの取得に失敗しました。 realm:[{0}] client:[{1}]",
+                                      private.token_check_realm_id,
+                                      private.token_check_client_clientid)
+        raise common.AuthException(message_id=message_id, message=message)
+
+    token = json.loads(response.text).get("access_token")
+
+    return token
+
+
+def __keycloak_mailserver_set(body, organization_id):
+    """Set up a mail server in keycloak
+
+    Args:
+        body (dict): json
+    """
+    globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
+
+    # サービスアカウントのTOKEN取得
+    # Get a service account token
+    token = __get_token()
+
+    realm_json = {
+        "resetPasswordAllowed": True,
+        "smtpServer":{
+            "host": body.get("smtp_host"),
+            "port": body.get("smtp_port"),
+            "from": body.get("send_from"),
+            "fromDisplayName": body.get("send_name"),
+            "replyTo": body.get("reply_to"),
+            "replyToDisplayName": body.get("reply_name"),
+            "envelopeFrom": body.get("envelope_from"),
+            "ssl": body.get("ssl_enable"),
+            "starttls": body.get("start_tls_enable"),
+            "auth": body.get("authentication_enable"),
+            "user": body.get("authentication_user"),
+            "password": body.get("authentication_password")
+        }
+    }
+
+    # realm更新
+    # realm update to keycloak
+    response = api_keycloak_realms.realm_update(organization_id, realm_json, token)
+    if response.status_code not in [200, 204]:
+        globals.logger.error(f"response.status_code:{response.status_code}")
+        globals.logger.error(f"response.text:{response.text}")
+        message_id = f"500-{MSG_FUNCTION_ID}003"
+        message = multi_lang.get_text(message_id,
+                                      "Keycloakへのメールサーバー設定の登録・更新に失敗しました(対象ID:{0})",
+                                      organization_id)
+        raise common.InternalErrorException(message_id=message_id, message=message)
+
+    return
+
+
+def __keycloak_mailserver_delete(organization_id):
+    """Set up a mail server in keycloak
+
+    Args:
+        body (dict): json
+    """
+    globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
+
+    # サービスアカウントのTOKEN取得
+    # Get a service account token
+    token = __get_token()
+
+    realm_json = {
+        "resetPasswordAllowed": False,
+        "smtpServer":{
+            "host": "",
+            "port": "",
+            "from": "",
+            "fromDisplayName": "",
+            "replyTo": "",
+            "replyToDisplayName": "",
+            "envelopeFrom": "",
+            "ssl": False,
+            "starttls": False,
+            "auth": False,
+            "user": "",
+            "password": ""
+        }
+    }
+
+    # realm更新
+    # realm update to keycloak
+    response = api_keycloak_realms.realm_update(organization_id, realm_json, token)
+    if response.status_code not in [200, 204]:
+        globals.logger.error(f"response.status_code:{response.status_code}")
+        globals.logger.error(f"response.text:{response.text}")
+        message_id = f"500-{MSG_FUNCTION_ID}004"
+        message = multi_lang.get_text(message_id,
+                                      "Keycloakへのメールサーバの解除に失敗しました(対象ID:{0})",
+                                      organization_id)
+        raise common.InternalErrorException(message_id=message_id, message=message)
+
+    return

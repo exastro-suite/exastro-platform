@@ -255,15 +255,13 @@ function displayMenu(curent) {
         $('.menuList').empty().append(`
             <li class="menuItem"><a class="menuLink" id="menu_organizations" href="#" tabindex="-1">${getText("000-80037", "オーガナイゼーション管理")}</a></li>
             <li class="menuItem"><a class="menuLink" id="menu_plans" href="#">${getText("000-80038", "リソースプラン管理")}</a></li>
-            <li class="menuItem"><a class="menuLink" id="menu_system_settings" href="#">${getText("000-80039", "システム設定")}</a></li>
+            <li class="menuItem"><a class="menuLink" id="menu_settings_running_state" href="#">${getText("000-80039", "システム状態設定")}</a></li>
             <li class="menuItem"><a class="menuLink" id="menu_keycloak" href="#" target="exastro_platform_keycloak">${getText("000-80040", "keycloakコンソール")}</a></li>
         `);
         $('#menu_organizations').attr('href', location_conf.href.organizations.list);
         $('#menu_plans').attr('href', location_conf.href.plans.list);
-        // $('#menu_system_settings').attr('href', location_conf.href.system_settings.top);
+        $('#menu_settings_running_state').attr('href', location_conf.href.settings_running_state.top);
         $('#menu_keycloak').attr('href', location_conf.href.keycloak.console);
-        // not support menu to hidden
-        $("#menu_system_settings").css("display", "None");
     } else {
         $('.menuList').empty().append(`
             <li class="menuItem"><a class="menuLink" id="menu_workspace" href="#" tabindex="-1">${getText("000-80005", "ワークスペース管理")}</a></li>

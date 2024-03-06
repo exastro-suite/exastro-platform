@@ -20,6 +20,7 @@ import base64
 from urllib.parse import urlparse
 import traceback
 import re
+import inspect
 
 # User Imports
 import globals
@@ -81,7 +82,7 @@ class auth_proxy:
         self.user_token_client_id = user_token_client_id
         self.user_token_client_secret = user_token_client_secret
 
-    def check_authorization(self):
+    def check_authorization(self):  # noqa: C901
         """認証情報チェック Authorization check
 
         Returns:
@@ -93,12 +94,12 @@ class auth_proxy:
             }
         """
 
-        globals.logger.info('CALLED auth_proxy.call_fnc')
+        globals.logger.debug(f"### start func:{inspect.currentframe().f_code.co_name}")
 
         # methodを取得
         # get method
         method = request.method
-        globals.logger.info(f'wsgi method={method}')
+        globals.logger.debug(f'wsgi method={method}')
 
         # methodがOPTIONSならstatus 200でリターンを返す（preflight）
         # If method is OPTIONS, return with status 200 (preflight)
@@ -268,7 +269,11 @@ class auth_proxy:
             "Org-Roles": org_roles_str,
             "Language": self.token_decode.get("locale"),
         }
-        return {"status_code": status_code, "data": info}
+        user_info = {
+            "user_id": self.token_decode.get("sub"),
+            "username": self.token_decode.get("preferred_username"),
+        }
+        return {"status_code": status_code, "data": info, "user_info": user_info}
 
     def get_authorization(self, auth_str, auth_type):
         """認証情報取得 get authorization
@@ -323,7 +328,7 @@ class auth_proxy:
             _type_: _description_
         """
 
-        globals.logger.info('CALLED auth_proxy.call_api')
+        globals.logger.debug(f"### start func:{inspect.currentframe().f_code.co_name}")
 
         # ヘッダにuser_idの付与 addtional header user_id
         post_headers = {
@@ -384,7 +389,7 @@ class auth_proxy:
         # ----ここまでAPサーバへのリクエスト処理---- #
         # Request processing to the AP server so far
 
-        globals.logger.info(f'return main_request ret={ret}')
+        globals.logger.debug(f'return main_request ret={ret}')
 
         # レスポンスをリターン
         # Return response
@@ -393,13 +398,13 @@ class auth_proxy:
             info = json.loads(ret.text)
             result_dump = json.dumps(info)
             result_encode = result_dump.encode('utf-8')
-            globals.logger.info(f'SUCCESS call_api. status_code={status_code} info={result_encode}')
+            globals.logger.debug(f'SUCCESS call_api. status_code={status_code} info={result_encode}')
 
             return ret
         except json.JSONDecodeError:
             info = ret.text
             message_id = "500-00001"
-            globals.logger.info(f'SUCCESS call_api. status_code={status_code} info={info}')
+            globals.logger.debug(f'SUCCESS call_api. status_code={status_code} info={info}')
         raise common.InternalErrorException(None, message_id, common.multi_lang.get_text(message_id, "システムエラー"))
 
     def call_fnc(self, func, args):
@@ -410,7 +415,7 @@ class auth_proxy:
             args (_type_): _description_
         """
         try:
-            globals.logger.info('CALLED auth_proxy.call_fnc')
+            globals.logger.debug(f"### start func:{inspect.currentframe().f_code.co_name}")
         except Exception as e:
             globals.logger.error(f'Exception : {e.args}')
             globals.logger.error(''.join(list(traceback.TracebackException.from_exception(e).format())))
@@ -434,8 +439,8 @@ class auth_proxy:
             esponse: HTTP Respose
         """
 
-        globals.logger.info(f'Start main_request. method={method} url={url} request_body={request_body} query_string={query_string}'
-                            f'request_content_type={request_content_type} request_form={request_form}, request_files={request_form}')
+        globals.logger.debug(f'### start func:{inspect.currentframe().f_code.co_name} {method=} {url=} {request_body=} {query_string=}'
+                             f'{request_content_type=} {request_form=}, {request_form=}')
 
         # method、request_content_typeによって、呼び出しの内容を変える
         # Change the content of the call depending on method and request_content_type
@@ -473,7 +478,7 @@ class auth_proxy:
         # Save the contents of the acquired response
         self.response_original = ret
 
-        globals.logger.info('SUCCESS main_request.')
+        globals.logger.debug(f"### end func:{inspect.currentframe().f_code.co_name}")
 
         # エンコードしたレスポンスをリターン
         # Return the encoded response
@@ -491,7 +496,7 @@ class auth_proxy:
             str: access_token
         """
         try:
-            globals.logger.info('Get access token. method={}, realm={}'.format(request.method, realm))
+            globals.logger.debug(f"### start func:{inspect.currentframe().f_code.co_name} {request.method=} {realm=}")
 
             # アクセストークン取得
             # get access token
@@ -505,7 +510,7 @@ class auth_proxy:
 
             access_token = json.loads(access_token_response.text)["access_token"]
 
-            globals.logger.info('SUCCEED access token.')
+            globals.logger.debug(f"### end func:{inspect.currentframe().f_code.co_name}")
 
             return access_token
 
@@ -531,7 +536,7 @@ class auth_proxy:
             str: active
         """
         try:
-            globals.logger.info('Token Introspection. method={}, realm={}'.format(request.method, realm))
+            globals.logger.debug(f"### start func:{inspect.currentframe().f_code.co_name} {request.method=} {realm=}")
 
             # パラメータ情報(JSON形式)
             # Parameter information (JSON format)
@@ -552,7 +557,7 @@ class auth_proxy:
 
             active = json.loads(introspect_response.text).get('active')
 
-            globals.logger.info('SUCCEED Token Introspection.')
+            globals.logger.debug(f"### end func:{inspect.currentframe().f_code.co_name}")
 
             return active
 
@@ -565,7 +570,7 @@ class auth_proxy:
         Returns:
             bool: True = allowed / False = denied
         """
-        globals.logger.info('Is allowed request. path={}, method={}'.format(request.path, request.method))
+        globals.logger.debug(f"### start func:{inspect.currentframe().f_code.co_name} {request.path=} {request.method=}")
 
         # check from the back - 後ろから順番にチェックする
         for pattern in reversed(auth_pattern.AUTH_PATTERN):
@@ -596,7 +601,7 @@ class auth_proxy:
                         my_roles = self.token_decode.get("realm_access", {}).get("roles", [])
                         for my_role in my_roles:
                             if re.match(role_name_re, my_role):
-                                globals.logger.info('SUCCEED Is allowed request. Realm-role={}'.format(role_name))
+                                globals.logger.debug('SUCCEED Is allowed request. Realm-role={}'.format(role_name))
                                 return True
                     else:
                         # If client is specified, check if there is anything that matches the client role
@@ -605,20 +610,20 @@ class auth_proxy:
                         my_roles = self.token_decode.get("resource_access", {}).get(role_client, {}).get("roles", [])
                         for my_role in my_roles:
                             if re.match(role_name_re, my_role):
-                                globals.logger.info('SUCCEED Is allowed request. client-role={}.{}'.format(role_client, role_name))
+                                globals.logger.debug('SUCCEED Is allowed request. client-role={}.{}'.format(role_client, role_name))
                                 return True
 
                 # Access is not allowed when the method matches and there is no match for the role
                 # - methodが一致し、roleに合致するものが存在しないときはaccess不可
-                globals.logger.info('FORBIDDEN Is allowed request.')
+                globals.logger.debug('FORBIDDEN Is allowed request.')
                 return False
 
             # Access is allowed when there is no matching method
             # - methodに一致するものが無いときはAccess可する
-            globals.logger.info('SUCCEED Is allowed request. method no match')
+            globals.logger.debug('SUCCEED Is allowed request. method no match')
             return True
 
         # Access is allowed when there is no matching url
         # - urlに一致するものが無いときはAccess可する
-        globals.logger.info('SUCCEED Is allowed request. pattern no match')
+        globals.logger.debug('SUCCEED Is allowed request. pattern no match')
         return True

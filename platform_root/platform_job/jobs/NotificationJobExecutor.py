@@ -25,7 +25,7 @@ import random
 import ssl
 import smtplib
 from email.message import EmailMessage
-from email.utils import formatdate, formataddr
+from email.utils import formatdate, formataddr, make_msgid
 
 from common_library.common.db import DBconnector
 from common_library.common import encrypt, const, common
@@ -166,6 +166,10 @@ class NotificationJobExecutor(BaseJobExecutor):
             email_message = EmailMessage()
             email_message.set_content(message_infomations.get("message"))
             email_message['Subject'] = message_infomations.get("title")
+
+            email_message['Date'] = formatdate(localtime=True)
+            email_message['Message-ID'] = make_msgid(domain=smtp_conn_info["SMTP_HOST"])
+
             email_message['From'] = formataddr((smtp_conn_info['SEND_NAME'], smtp_conn_info['SEND_FROM']))
             email_message['To'] = ",".join([dest['email'] for dest in destination_informations if dest['address_header'] == const.MAIL_HEADER_TO])
             email_message['Cc'] = ",".join([dest['email'] for dest in destination_informations if dest['address_header'] == const.MAIL_HEADER_CC])

@@ -17,6 +17,7 @@ import ulid
 import json
 import datetime
 from contextlib import closing
+from importlib import import_module
 
 from unittest import mock
 import smtplib
@@ -32,12 +33,13 @@ import job_manager_config
 from jobs.NotificationJobExecutor import NotificationJobExecutor
 
 from tests.common import test_common
-from tests.db.exports import testdata
 
 
 def test_execute_teams_nomally():
     """teams送信正常パターン / teams sending successful pattern
     """
+    testdata = import_module("tests.db.exports.testdata")
+
     organization_id = list(testdata.ORGANIZATIONS.keys())[0]
     workspace_id = testdata.ORGANIZATIONS[organization_id]["workspace_id"][0]
 
@@ -73,6 +75,8 @@ def test_execute_teams_nomally():
 def test_execute_teams_http_error():
     """teams送信httpエラーパターン / teams send http error pattern
     """
+    testdata = import_module("tests.db.exports.testdata")
+
     organization_id = list(testdata.ORGANIZATIONS.keys())[0]
     workspace_id = testdata.ORGANIZATIONS[organization_id]["workspace_id"][0]
 
@@ -108,6 +112,8 @@ def test_execute_teams_http_error():
 def test_execute_mail_smtp_normally():
     """email送信(smtp認証無し)正常パターン / email sending(no smtp authentication) successful pattern
     """
+    testdata = import_module("tests.db.exports.testdata")
+
     organization_id = list(testdata.ORGANIZATIONS.keys())[0]
     workspace_id = testdata.ORGANIZATIONS[organization_id]["workspace_id"][0]
 
@@ -172,6 +178,8 @@ def test_execute_mail_smtp_normally():
 def test_execute_mail_smtp_error():
     """email送信エラーパターン / email sending error pattern
     """
+    testdata = import_module("tests.db.exports.testdata")
+
     organization_id = list(testdata.ORGANIZATIONS.keys())[0]
     workspace_id = testdata.ORGANIZATIONS[organization_id]["workspace_id"][0]
 
@@ -210,6 +218,8 @@ def test_execute_mail_smtp_error():
 def test_execute_mail_smtp_tls_normally():
     """email送信(smtp starttls認証あり)正常パターン / email sending(smtp start tls authentication) successful pattern
     """
+    testdata = import_module("tests.db.exports.testdata")
+
     organization_id = list(testdata.ORGANIZATIONS.keys())[0]
     workspace_id = testdata.ORGANIZATIONS[organization_id]["workspace_id"][0]
 
@@ -279,6 +289,8 @@ def test_execute_mail_smtp_tls_normally():
 def test_execute_mail_smtp_ssl_normally():
     """email送信(smtps認証あり)正常パターン / email sending(smtps authentication) successful pattern
     """
+    testdata = import_module("tests.db.exports.testdata")
+
     organization_id = list(testdata.ORGANIZATIONS.keys())[0]
     workspace_id = testdata.ORGANIZATIONS[organization_id]["workspace_id"][0]
 
@@ -349,6 +361,8 @@ def test_execute_mail_smtp_ssl_normally():
 def test_execute_no_notification():
     """通知情報なしパターン / No notification information pattern
     """
+    testdata = import_module("tests.db.exports.testdata")
+
     organization_id = list(testdata.ORGANIZATIONS.keys())[0]
     workspace_id = testdata.ORGANIZATIONS[organization_id]["workspace_id"][0]
 
@@ -373,6 +387,8 @@ def test_execute_no_notification():
 def test_cancel_normally():
     """cancel実行パターン / cancel execution pattern
     """
+    testdata = import_module("tests.db.exports.testdata")
+
     organization_id = list(testdata.ORGANIZATIONS.keys())[0]
     workspace_id = testdata.ORGANIZATIONS[organization_id]["workspace_id"][0]
 
@@ -400,6 +416,8 @@ def test_cancel_normally():
 def test_force_update_status_normally():
     """ 強制ステータス更新正常パターン / Forced status update normal pattern
     """
+    testdata = import_module("tests.db.exports.testdata")
+
     datas = [
         {
             "organization_id": list(testdata.ORGANIZATIONS.keys())[0],
