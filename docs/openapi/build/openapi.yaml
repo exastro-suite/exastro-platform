@@ -200,16 +200,21 @@ paths:
                             - terraform_cli
                             - ci_cd
                             - oase
-                        document_store:
+                        services:
                           type: object
-                          description: Only supports mongodb.
                           properties:
-                            name:
-                              type: string
-                            owner:
-                              type: boolean
-                            connection_string:
-                              type: string
+                            document_store:
+                              type: object
+                              description: Only supports mongodb.
+                              properties:
+                                name:
+                                  type: string
+                                  example: mongodb
+                                owner:
+                                  type: boolean
+                                connection_string:
+                                  type: string
+                                  example: XXXXXXXXXXXXXXXX
                       required:
                         - drivers
                   required:
@@ -227,10 +232,11 @@ paths:
                       terraform_cli: true
                       ci_cd: true
                       oase: true
-                    document_store:
-                      name: mongodb
-                      owner: true
-                      connection_string: XXXXXXXXXXXXXXXX
+                    services:
+                      document_store:
+                        name: mongodb
+                        owner: true
+                        connection_string: XXXXXXXXXXXXXXXX
         required: true
       responses:
         '200':
@@ -3296,18 +3302,21 @@ components:
                   type: boolean
                 oase:
                   type: boolean
-            document_store:
+            services:
               type: object
-              description: Only supports mongodb.
               properties:
-                name:
-                  type: string
-                  example: mongodb
-                owner:
-                  type: boolean
-                connection_string:
-                  type: string
-                  example: XXXXXXXXXXXXXXXX
+                document_store:
+                  type: object
+                  description: Only supports mongodb.
+                  properties:
+                    name:
+                      type: string
+                      example: mongodb
+                    owner:
+                      type: boolean
+                    connection_string:
+                      type: string
+                      example: XXXXXXXXXXXXXXXX
       required:
         - id
     organizationUserCreate:
