@@ -1386,18 +1386,21 @@ components:
                   type: boolean
                 oase:
                   type: boolean
-            document_store:
+            services:
               type: object
-              description: Only supports mongodb.
               properties:
-                name:
-                  type: string
-                  example: mongodb
-                owner:
-                  type: boolean
-                connection_string:
-                  type: string
-                  example: XXXXXXXXXXXXXXXX
+                document_store:
+                  type: object
+                  description: Only supports mongodb.
+                  properties:
+                    name:
+                      type: string
+                      example: mongodb
+                    owner:
+                      type: boolean
+                    connection_string:
+                      type: string
+                      example: XXXXXXXXXXXXXXXX
       required:
         - id
     organizationUserCreate:
