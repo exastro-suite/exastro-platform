@@ -78,10 +78,10 @@ def liveness():
     return "OK", 200
 
 
-@app.route('/health-check/readness', methods=["GET"])
+@app.route('/health-check/readiness', methods=["GET"])
 @common.platform_exception_handler
-def readness():
-    """health check - readness
+def readiness():
+    """health check - readiness
 
     Returns:
         Response: HTTP Response
