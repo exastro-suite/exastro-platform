@@ -225,8 +225,8 @@ paths:
   "/internal-api/health-check/liveness":
       $ref: './paths/internal_health-check.liveness.yaml'
 
-  "/internal-api/health-check/readness":
-      $ref: './paths/internal_health-check.readness.yaml'
+  "/internal-api/health-check/readiness":
+      $ref: './paths/internal_health-check.readiness.yaml'
 
 components:
   schemas:

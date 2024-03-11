@@ -15,9 +15,9 @@
 get:
   tags:
   - InternalHealthCheckService
-  summary: Internal health check readness
+  summary: Internal health check readiness
   x-openapi-router-controller: controllers.internal_health_check_service_controller
-  operationId: internal_health_check_readness
+  operationId: internal_health_check_readiness
   responses:
     200:
       description: A successful response.
