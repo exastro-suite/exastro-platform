@@ -298,12 +298,21 @@ def test_organization_get(connexion_client):
     with test_common.requsts_mocker_default() as requests_mocker:
         sample_data = sample_data_organization('organization-01')
         response_get_ita_data = {
-            "optionsita": {"drivers": {
-                "terraform_cloud_ep": True,
-                "terraform_cli": False,
-                "ci_cd": True,
-                "oase": False,
-            }}
+            "optionsita": {
+                "drivers": {
+                    "terraform_cloud_ep": True,
+                    "terraform_cli": False,
+                    "ci_cd": True,
+                    "oase": False,
+                },
+                "services": {
+                    "document_store": {
+                        "name": "mongodb",
+                        "owner": False,
+                        "connection_string": "XXXXXXXXXXXXXXXX"
+                    }
+                }
+            }
         }
 
         requests_mocker.register_uri(
@@ -497,12 +506,12 @@ def test_organization_update(connexion_client):
         assert response.status_code == 400, "optionsIta == {}"
         assert response.status == "400 BAD REQUEST", "optionsIta == {}"
 
-        # validate: dirivers == {}
+        # validate: drivers == {}
         response = connexion_client.put(
             f'/api/platform/organizations/{organization["organization_id"]}',
             content_type='application/json',
             headers=request_parameters.request_headers(),
-            json=sample_data_organization_update({"optionsIta": {"dirivers": {}}}))
+            json=sample_data_organization_update({"optionsIta": {"drivers": {}}}))
 
         assert response.status_code == 400, "optionsIta == {}"
         assert response.status == "400 BAD REQUEST", "optionsIta == {}"
@@ -513,7 +522,7 @@ def test_organization_update(connexion_client):
             content_type='application/json',
             headers=request_parameters.request_headers(),
             json=sample_data_organization_update({"optionsIta": {
-                "dirivers": {
+                "drivers": {
                     "terraform_cli": True,
                     "ci_cd": False,
                     "oase": False
@@ -529,7 +538,7 @@ def test_organization_update(connexion_client):
             content_type='application/json',
             headers=request_parameters.request_headers(),
             json=sample_data_organization_update({"optionsIta": {
-                "dirivers": {
+                "drivers": {
                     "terraform_cloud_ep": False,
                     "ci_cd": False,
                     "oase": False
@@ -545,7 +554,7 @@ def test_organization_update(connexion_client):
             content_type='application/json',
             headers=request_parameters.request_headers(),
             json=sample_data_organization_update({"optionsIta": {
-                "dirivers": {
+                "drivers": {
                     "terraform_cloud_ep": False,
                     "terraform_cli": True,
                     "oase": False
@@ -561,7 +570,7 @@ def test_organization_update(connexion_client):
             content_type='application/json',
             headers=request_parameters.request_headers(),
             json=sample_data_organization_update({"optionsIta": {
-                "dirivers": {
+                "drivers": {
                     "terraform_cloud_ep": False,
                     "terraform_cli": True,
                     "ci_cd": False
@@ -577,7 +586,7 @@ def test_organization_update(connexion_client):
             content_type='application/json',
             headers=request_parameters.request_headers(),
             json=sample_data_organization_update({"optionsIta": {
-                "dirivers": {
+                "drivers": {
                     "terraform_cloud_ep": None,
                     "terraform_cli": True,
                     "ci_cd": False,
@@ -594,7 +603,7 @@ def test_organization_update(connexion_client):
             content_type='application/json',
             headers=request_parameters.request_headers(),
             json=sample_data_organization_update({"optionsIta": {
-                "dirivers": {
+                "drivers": {
                     "terraform_cloud_ep": True,
                     "terraform_cli": None,
                     "ci_cd": False,
@@ -611,7 +620,7 @@ def test_organization_update(connexion_client):
             content_type='application/json',
             headers=request_parameters.request_headers(),
             json=sample_data_organization_update({"optionsIta": {
-                "dirivers": {
+                "drivers": {
                     "terraform_cloud_ep": True,
                     "terraform_cli": False,
                     "ci_cd": None,
@@ -628,7 +637,7 @@ def test_organization_update(connexion_client):
             content_type='application/json',
             headers=request_parameters.request_headers(),
             json=sample_data_organization_update({"optionsIta": {
-                "dirivers": {
+                "drivers": {
                     "terraform_cloud_ep": True,
                     "terraform_cli": False,
                     "ci_cd": False,
@@ -645,7 +654,7 @@ def test_organization_update(connexion_client):
             content_type='application/json',
             headers=request_parameters.request_headers(),
             json=sample_data_organization_update({"optionsIta": {
-                "dirivers": {
+                "drivers": {
                     "terraform_cloud_ep": "True",
                     "terraform_cli": False,
                     "ci_cd": False,
@@ -662,7 +671,7 @@ def test_organization_update(connexion_client):
             content_type='application/json',
             headers=request_parameters.request_headers(),
             json=sample_data_organization_update({"optionsIta": {
-                "dirivers": {
+                "drivers": {
                     "terraform_cloud_ep": True,
                     "terraform_cli": "False",
                     "ci_cd": False,
@@ -679,7 +688,7 @@ def test_organization_update(connexion_client):
             content_type='application/json',
             headers=request_parameters.request_headers(),
             json=sample_data_organization_update({"optionsIta": {
-                "dirivers": {
+                "drivers": {
                     "terraform_cloud_ep": True,
                     "terraform_cli": False,
                     "ci_cd": "False",
@@ -696,7 +705,7 @@ def test_organization_update(connexion_client):
             content_type='application/json',
             headers=request_parameters.request_headers(),
             json=sample_data_organization_update({"optionsIta": {
-                "dirivers": {
+                "drivers": {
                     "terraform_cloud_ep": True,
                     "terraform_cli": False,
                     "ci_cd": False,
@@ -713,7 +722,7 @@ def test_organization_update(connexion_client):
             content_type='application/json',
             headers=request_parameters.request_headers(),
             json=sample_data_organization_update({"optionsIta": {
-                "dirivers": {
+                "drivers": {
                     "terraform_cloud_ep": 1,
                     "terraform_cli": False,
                     "ci_cd": False,
@@ -730,7 +739,7 @@ def test_organization_update(connexion_client):
             content_type='application/json',
             headers=request_parameters.request_headers(),
             json=sample_data_organization_update({"optionsIta": {
-                "dirivers": {
+                "drivers": {
                     "terraform_cloud_ep": True,
                     "terraform_cli": 0,
                     "ci_cd": False,
@@ -747,7 +756,7 @@ def test_organization_update(connexion_client):
             content_type='application/json',
             headers=request_parameters.request_headers(),
             json=sample_data_organization_update({"optionsIta": {
-                "dirivers": {
+                "drivers": {
                     "terraform_cloud_ep": True,
                     "terraform_cli": False,
                     "ci_cd": 0,
@@ -764,7 +773,7 @@ def test_organization_update(connexion_client):
             content_type='application/json',
             headers=request_parameters.request_headers(),
             json=sample_data_organization_update({"optionsIta": {
-                "dirivers": {
+                "drivers": {
                     "terraform_cloud_ep": True,
                     "terraform_cli": False,
                     "ci_cd": False,
@@ -774,6 +783,78 @@ def test_organization_update(connexion_client):
 
         assert response.status_code == 400, "oase is integer"
         assert response.status == "400 BAD REQUEST", "oase is integer"
+
+        # validate: services.document_store.name is integer
+        response = connexion_client.put(
+            f'/api/platform/organizations/{organization["organization_id"]}',
+            content_type='application/json',
+            headers=request_parameters.request_headers(),
+            json=sample_data_organization_update({"optionsIta": {
+                "drivers": {
+                    "terraform_cloud_ep": True,
+                    "terraform_cli": True,
+                    "ci_cd": True,
+                    "oase": True,
+                },
+                "services": {
+                    "document_store": {
+                        "name": 1,
+                        "owner": False,
+                        "connection_string": "XXXXXXXXXXXXXXXX"
+                    }
+                }
+            }}))
+
+        assert response.status_code == 400, "services.document_store.name is integer"
+        assert response.status == "400 BAD REQUEST", "services.document_store.name is integer"
+
+        # validate: services.document_store.owner is integer
+        response = connexion_client.put(
+            f'/api/platform/organizations/{organization["organization_id"]}',
+            content_type='application/json',
+            headers=request_parameters.request_headers(),
+            json=sample_data_organization_update({"optionsIta": {
+                "drivers": {
+                    "terraform_cloud_ep": True,
+                    "terraform_cli": True,
+                    "ci_cd": True,
+                    "oase": True,
+                },
+                "services": {
+                    "document_store": {
+                        "name": "mongodb",
+                        "owner": 1,
+                        "connection_string": "XXXXXXXXXXXXXXXX"
+                    }
+                }
+            }}))
+
+        assert response.status_code == 400, "services.document_store.owner is integer"
+        assert response.status == "400 BAD REQUEST", "services.document_store.owner is integer"
+
+        # validate: services.document_store.connection_string is integer
+        response = connexion_client.put(
+            f'/api/platform/organizations/{organization["organization_id"]}',
+            content_type='application/json',
+            headers=request_parameters.request_headers(),
+            json=sample_data_organization_update({"optionsIta": {
+                "drivers": {
+                    "terraform_cloud_ep": True,
+                    "terraform_cli": True,
+                    "ci_cd": True,
+                    "oase": True,
+                },
+                "services": {
+                    "document_store": {
+                        "name": "mongodb",
+                        "owner": False,
+                        "connection_string": 1
+                    }
+                }
+            }}))
+
+        assert response.status_code == 400, "services.document_store.connection_string is integer"
+        assert response.status == "400 BAD REQUEST", "services.document_store.connection_string is integer"
 
     #
     # DB Error
@@ -824,7 +905,14 @@ def test_organization_update(connexion_client):
                         "terraform_cloud_ep": False,
                         "terraform_cli": True,
                         "ci_cd": False,
-                        "oase": False
+                        "oase": True
+                    },
+                    "services": {
+                        "document_store": {
+                            "name": "mongodb",
+                            "owner": False,
+                            "connection_string": "XXXXXXXXXXXXXXXX"
+                        }
                     }
                 }
             }
@@ -843,7 +931,12 @@ def test_organization_update(connexion_client):
         assert drivers["terraform_cloud_ep"] is False, "create status"
         assert drivers["terraform_cli"] is True, "create status"
         assert drivers["ci_cd"] is False, "create status"
-        assert drivers["oase"] is False, "create status"
+        assert drivers["oase"] is True, "create status"
+
+        document_store = json.loads(org_info["INFORMATIONS"])["ext_options"]["options_ita"]["services"]["document_store"]
+        assert document_store["name"] == "mongodb", "create status"
+        assert document_store["owner"] is False, "create status"
+        assert document_store["connection_string"] == "XXXXXXXXXXXXXXXX", "create status"
 
         # normal root
         tmp = sample_data_organization_update(
@@ -851,9 +944,16 @@ def test_organization_update(connexion_client):
                 "optionsIta": {
                     "drivers": {
                         "terraform_cloud_ep": True,
-                        "terraform_cli": False,
+                        "terraform_cli": True,
                         "ci_cd": True,
                         "oase": True
+                    },
+                    "services": {
+                        "document_store": {
+                            "name": "mongodb",
+                            "owner": False,
+                            "connection_string": "YYYYYYYYYYYYYYYY"
+                        }
                     }
                 }
             }
@@ -870,28 +970,51 @@ def test_organization_update(connexion_client):
         updated_org_info = __fetch_organization_informations(organization_id)
         drivers = json.loads(updated_org_info["INFORMATIONS"])["ext_options"]["options_ita"]["drivers"]
         assert drivers["terraform_cloud_ep"] is True, "update status"
-        assert drivers["terraform_cli"] is False, "update status"
+        assert drivers["terraform_cli"] is True, "update status"
         assert drivers["ci_cd"] is True, "update status"
         assert drivers["oase"] is True, "update status"
+
+        document_store = json.loads(updated_org_info["INFORMATIONS"])["ext_options"]["options_ita"]["services"]["document_store"]
+        assert document_store["name"] == "mongodb", "update status"
+        assert document_store["owner"] is False, "update status"
+        assert document_store["connection_string"] == "YYYYYYYYYYYYYYYY", "update status"
 
 
 def test_organization_list(connexion_client):
     response_get_ita_data = {
         "organization-01": {
-            "optionsita": {"drivers": {
-                "terraform_cloud_ep": True,
-                "terraform_cli": False,
-                "ci_cd": True,
-                "oase": False,
-            }}
+            "optionsita": {
+                "drivers": {
+                    "terraform_cloud_ep": True,
+                    "terraform_cli": False,
+                    "ci_cd": True,
+                    "oase": False,
+                },
+                "services": {
+                    "document_store": {
+                        "name": "mongodb",
+                        "owner": False,
+                        "connection_string": "XXXXXXXXXXXXXXXX"
+                    }
+                }
+            }
         },
         "organization-02": {
-            "optionsita": {"drivers": {
-                "terraform_cloud_ep": False,
-                "terraform_cli": True,
-                "ci_cd": False,
-                "oase": True,
-            }}
+            "optionsita": {
+                "drivers": {
+                    "terraform_cloud_ep": False,
+                    "terraform_cli": True,
+                    "ci_cd": False,
+                    "oase": True,
+                },
+                "services": {
+                    "document_store": {
+                        "name": "mongodb",
+                        "owner": False,
+                        "connection_string": "YYYYYYYYYYYYYYYY"
+                    }
+                }
+            }
         }
     }
     sample_data = {
@@ -1098,6 +1221,13 @@ def sample_data_organization_update(update={}):
                 "terraform_cli": True,
                 "ci_cd": True,
                 "oase": True
+            },
+            "services": {
+                "document_store": {
+                    "name": "mongodb",
+                    "owner": False,
+                    "connection_string": "XXXXXXXXXXXXXXXX"
+                }
             }
         }
     }, **update)

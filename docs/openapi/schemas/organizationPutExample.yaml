@@ -22,6 +22,13 @@ value:
         "terraform_cli": true,
         "ci_cd": true,
         "oase": true
+      },
+      "services": {
+        "document_store": {
+          "name": "mongodb",
+          "owner": true,
+          "connection_string": "XXXXXXXXXXXXXXXX"
+        }
       }
     }
   }

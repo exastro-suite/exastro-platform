@@ -42,7 +42,6 @@ properties:
     type: object
     description: Organization Add Json Parameter (json of exastro-it-automation)
     properties:
-
       drivers:
         type: object
         description: "terraform_cloud_ep: Terraform-Cloud/EP driver
@@ -59,6 +58,21 @@ properties:
             type: boolean
           oase:
             type: boolean
+      services:
+        type: object
+        properties:
+          document_store:
+            type: object
+            description: "Only supports mongodb."
+            properties:
+              name:
+                type: string
+                example: "mongodb"
+              owner:
+                type: boolean
+              connection_string:
+                type: string
+                example: "XXXXXXXXXXXXXXXX"
 
 required:
   - id

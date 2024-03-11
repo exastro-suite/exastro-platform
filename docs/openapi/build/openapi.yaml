@@ -200,6 +200,21 @@ paths:
                             - terraform_cli
                             - ci_cd
                             - oase
+                        services:
+                          type: object
+                          properties:
+                            document_store:
+                              type: object
+                              description: Only supports mongodb.
+                              properties:
+                                name:
+                                  type: string
+                                  example: mongodb
+                                owner:
+                                  type: boolean
+                                connection_string:
+                                  type: string
+                                  example: XXXXXXXXXXXXXXXX
                       required:
                         - drivers
                   required:
@@ -217,6 +232,11 @@ paths:
                       terraform_cli: true
                       ci_cd: true
                       oase: true
+                    services:
+                      document_store:
+                        name: mongodb
+                        owner: true
+                        connection_string: XXXXXXXXXXXXXXXX
         required: true
       responses:
         '200':
@@ -2089,259 +2109,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/runtimeError'
-  '/api/{organization_id}/platform/jobs/users/import/status':
-    get:
-      tags:
-        - JobsService
-      summary: Get all import status
-      x-openapi-router-controller: controllers.jobs_service_controller
-      operationId: jobs_users_import_status
-      parameters:
-        - name: organization_id
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: A successful response.
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: '#/components/schemas/responseOk'
-                  - type: object
-                    properties:
-                      data:
-                        type: object
-                        example: null
-        default:
-          description: An unexpected error response.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/runtimeError'
-  '/api/{organization_id}/platform/jobs/users/import/status/{job_id}':
-    get:
-      tags:
-        - JobsService
-      summary: Get import status
-      x-openapi-router-controller: controllers.jobs_service_controller
-      operationId: jobs_users_import_status_job_id
-      parameters:
-        - name: organization_id
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: job_id
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: A successful response.
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: '#/components/schemas/responseOk'
-                  - type: object
-                    properties:
-                      data:
-                        type: object
-                        example: null
-        default:
-          description: An unexpected error response.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/runtimeError'
-  '/api/{organization_id}/platform/jobs/users/import/status/{job_id}/download':
-    get:
-      tags:
-        - JobsService
-      summary: Download import status
-      x-openapi-router-controller: controllers.jobs_service_controller
-      operationId: jobs_users_import_status_job_id_download
-      parameters:
-        - name: organization_id
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: job_id
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: A successful response.
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: '#/components/schemas/responseOk'
-                  - type: object
-                    properties:
-                      data:
-                        type: object
-                        example: null
-        default:
-          description: An unexpected error response.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/runtimeError'
-  '/api/{organization_id}/platform/jobs/users/export':
-    post:
-      tags:
-        - JobsService
-      summary: Export user list
-      x-openapi-router-controller: controllers.jobs_service_controller
-      operationId: jobs_users_export
-      parameters:
-        - name: organization_id
-          in: path
-          required: true
-          schema:
-            type: string
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                temporary_value:
-                  type: string
-        required: true
-      responses:
-        '200':
-          description: A successful response.
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: '#/components/schemas/responseOk'
-                  - type: object
-                    properties:
-                      data:
-                        type: object
-                        example: null
-        default:
-          description: An unexpected error response.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/runtimeError'
-  '/api/{organization_id}/platform/jobs/users/export/status':
-    get:
-      tags:
-        - JobsService
-      summary: Get all export status
-      x-openapi-router-controller: controllers.jobs_service_controller
-      operationId: jobs_users_export_status
-      parameters:
-        - name: organization_id
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: A successful response.
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: '#/components/schemas/responseOk'
-                  - type: object
-                    properties:
-                      data:
-                        type: object
-                        example: null
-        default:
-          description: An unexpected error response.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/runtimeError'
-  '/api/{organization_id}/platform/jobs/users/export/status/{job_id}':
-    get:
-      tags:
-        - JobsService
-      summary: Get export status
-      x-openapi-router-controller: controllers.jobs_service_controller
-      operationId: jobs_users_export_status_job_id
-      parameters:
-        - name: organization_id
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: job_id
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: A successful response.
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: '#/components/schemas/responseOk'
-                  - type: object
-                    properties:
-                      data:
-                        type: object
-                        example: null
-        default:
-          description: An unexpected error response.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/runtimeError'
-  '/api/{organization_id}/platform/jobs/users/export/status/{job_id}/download':
-    get:
-      tags:
-        - JobsService
-      summary: Download export status
-      x-openapi-router-controller: controllers.jobs_service_controller
-      operationId: jobs_users_export_status_job_id_download
-      parameters:
-        - name: organization_id
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: job_id
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: A successful response.
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: '#/components/schemas/responseOk'
-                  - type: object
-                    properties:
-                      data:
-                        type: object
-                        example: null
-        default:
-          description: An unexpected error response.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/runtimeError'
   /api/platform/maintenance-mode-setting:
     get:
       tags:
@@ -3345,13 +3112,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/runtimeError'
-  /internal-api/health-check/readness:
+  /internal-api/health-check/readiness:
     get:
       tags:
         - InternalHealthCheckService
-      summary: Internal health check readness
+      summary: Internal health check readiness
       x-openapi-router-controller: controllers.internal_health_check_service_controller
-      operationId: internal_health_check_readness
+      operationId: internal_health_check_readiness
       responses:
         '200':
           description: A successful response.
@@ -3535,6 +3302,21 @@ components:
                   type: boolean
                 oase:
                   type: boolean
+            services:
+              type: object
+              properties:
+                document_store:
+                  type: object
+                  description: Only supports mongodb.
+                  properties:
+                    name:
+                      type: string
+                      example: mongodb
+                    owner:
+                      type: boolean
+                    connection_string:
+                      type: string
+                      example: XXXXXXXXXXXXXXXX
       required:
         - id
     organizationUserCreate:

@@ -41,9 +41,9 @@ def test_internal_healthcheck_api(connexion_client):
 
         assert response.status_code == 200, "internal health check response code"
 
-        # health check readness
+        # health check readiness
         response = connexion_client.get(
-            "/internal-api/health-check/readness",
+            "/internal-api/health-check/readiness",
             content_type='application/json',
             headers=request_parameters.request_headers("dummy_user_id"))
 
@@ -64,9 +64,9 @@ def test_internal_healthcheck_api(connexion_client):
         assert response.json["result"] == "500-39001"
         assert response.json["message"] == "Health check failed."
 
-        # health check readness
+        # health check readiness
         response = connexion_client.get(
-            "/internal-api/health-check/readness",
+            "/internal-api/health-check/readiness",
             content_type='application/json',
             headers=request_parameters.request_headers("dummy_user_id"))
 

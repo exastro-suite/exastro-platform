@@ -301,6 +301,21 @@ paths:
                             - terraform_cli
                             - ci_cd
                             - oase
+                        services:
+                          type: object
+                          properties:
+                            document_store:
+                              type: object
+                              description: Only supports mongodb.
+                              properties:
+                                name:
+                                  type: string
+                                  example: mongodb
+                                owner:
+                                  type: boolean
+                                connection_string:
+                                  type: string
+                                  example: XXXXXXXXXXXXXXXX
                       required:
                         - drivers
                   required:
@@ -318,6 +333,11 @@ paths:
                       terraform_cli: true
                       ci_cd: true
                       oase: true
+                    services:
+                      document_store:
+                        name: mongodb
+                        owner: true
+                        connection_string: XXXXXXXXXXXXXXXX
         required: true
       responses:
         '200':
@@ -776,6 +796,21 @@ components:
                   type: boolean
                 oase:
                   type: boolean
+            services:
+              type: object
+              properties:
+                document_store:
+                  type: object
+                  description: Only supports mongodb.
+                  properties:
+                    name:
+                      type: string
+                      example: mongodb
+                    owner:
+                      type: boolean
+                    connection_string:
+                      type: string
+                      example: XXXXXXXXXXXXXXXX
       required:
         - id
     organizationUserCreate:

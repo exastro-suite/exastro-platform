@@ -44,8 +44,8 @@ def internal_health_check_liveness():  # noqa: E501
 
 
 @common.platform_exception_handler
-def internal_health_check_readness():  # noqa: E501
-    """Internal health check readness
+def internal_health_check_readiness():  # noqa: E501
+    """Internal health check readiness
 
      # noqa: E501
 

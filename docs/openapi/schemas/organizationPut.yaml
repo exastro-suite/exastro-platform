@@ -47,6 +47,21 @@ properties:
           - terraform_cli
           - ci_cd
           - oase
+      services:
+        type: object
+        properties:
+          document_store:
+            type: object
+            description: "Only supports mongodb."
+            properties:
+              name:
+                type: string
+                example: "mongodb"
+              owner:
+                type: boolean
+              connection_string:
+                type: string
+                example: "XXXXXXXXXXXXXXXX"
     required:
       - drivers
 required:
