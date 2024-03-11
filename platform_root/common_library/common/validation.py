@@ -326,7 +326,7 @@ def validate_role_kind(role_kind):
 
     if role_kind not in [const.ROLE_KIND_WORKSPACE]:
         return result(
-            False, 400, '400-000002', 'リクエストボディのパラメータ({})が不正です。'.format('kind'),
+            False, 400, '400-00002', 'リクエストボディのパラメータ({})が不正です。'.format('kind'),
             'kind'
         )
 
@@ -363,19 +363,19 @@ def validate_role_workspaces(role_workspaces):
     """
     if not isinstance(role_workspaces, list):
         return result(
-            False, 400, '400-000002', 'リクエストボディのパラメータ({})が不正です。'.format('workspaces'),
+            False, 400, '400-00002', 'リクエストボディのパラメータ({})が不正です。'.format('workspaces'),
             'workspaces'
         )
 
     if len([t for t in role_workspaces if not isinstance(t.get('id', None), str)]) > 0:
         return result(
-            False, 400, '400-000002', 'リクエストボディのパラメータ({})が不正です。'.format('workspaces'),
+            False, 400, '400-00002', 'リクエストボディのパラメータ({})が不正です。'.format('workspaces'),
             'workspaces'
         )
 
     if len([t for t in role_workspaces if len(t.get('id', '')) == 0]) > 0:
         return result(
-            False, 400, '400-000002', 'リクエストボディのパラメータ({})が不正です。'.format('workspaces'),
+            False, 400, '400-00002', 'リクエストボディのパラメータ({})が不正です。'.format('workspaces'),
             'workspaces'
         )
 
