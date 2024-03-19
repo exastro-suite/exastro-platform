@@ -73,6 +73,31 @@ $(function(){
         display_ita_drivers(itaOptions.drivers.options);
 
         //
+        // OASE check event
+        //
+        $("#ita-option-driver-oase").change(function(){
+            if($(this).prop("checked")){
+                $(".ita-option-services").show();
+            }else{
+                $(".ita-option-services").hide();
+            }
+        });
+
+        //
+        // MongoDB owner check event
+        //
+        $("#ita-option-service-owner").change(function(){
+            if($(this).prop("checked")){
+                $("#connection-string-input").prop("inert", true);
+                $("#ita-option-service-connection-string").val("");
+                $("#ita-option-service-connection-string").prop("disabled", true);
+            }else{
+                $("#connection-string-input").prop("inert", false);
+                $("#ita-option-service-connection-string").prop("disabled", false);
+            }
+        });
+
+        //
         // register button
         //
         $('#button_register').on('click',() => {
@@ -156,6 +181,12 @@ $(function(){
             .replace(/\${description-display}/g, typeof row.description === "undefined"? "display: none;" : "")
             .replace(/\${disabled}/g, fn.cv(row.enable,false,false) ? "": "disabled")
             .replace(/\${checked}/g, fn.cv(row.enable,false,false) ? "checked": "")
+
+            // Add mongodb info for oase
+            if(row.id == "oase"){
+                mongodb_info_area = OrganizationsCommon.ita_option_service_settings.add_mongodb_info_new(true);
+                html += mongodb_info_area;
+            }
         }
         $(".ita-option-drivers").append(html);
         $(".ita-option-drivers .datarow").css('display', '');
@@ -210,6 +241,16 @@ $(function(){
             $("#message_user_password").text("");
         }
 
+        //validate connection string
+        if($("#ita-option-driver-oase").prop("checked") == true) {
+            if($("#ita-option-service-owner").prop("checked") == false && $("#ita-option-service-connection-string").val() === "") {
+                $("#message_connection_string").text(getText("000-85056", "管理者権限にチェックがない場合は、接続文字列の入力が必須です。"));
+                result = false;
+            } else {
+                $("#message_connection_string").text("");
+            }
+        }
+
         console.log("--- validate check end [" + result + "] ----");
 
         return result;
@@ -227,6 +268,15 @@ $(function(){
         $('.ita-option-drivers .datarow .ita-option-driver').each(function() {
             ita_install_drivers[$(this).val()] = $(this).prop("checked");
         })
+
+        const ita_services = {}
+        if(ita_install_drivers["oase"] == true) {
+            ita_services["document_store"] = {
+                "name": "mongodb",
+                "owner": ($('#ita-option-service-owner').prop("checked") ? true : false),
+                "connection_string": $('#ita-option-service-connection-string').val()
+            }
+        }
 
         let reqbody =   {
             "id": $('#form_organization_id').val(),
@@ -254,6 +304,9 @@ $(function(){
         }
         if(Object.keys(ita_install_drivers).length > 0) {
             reqbody.optionsIta = {"drivers" :  ita_install_drivers};
+            if(Object.keys(ita_services).length > 0) {
+                reqbody.optionsIta["services"] = ita_services
+            }
         }
 
         show_progress();
