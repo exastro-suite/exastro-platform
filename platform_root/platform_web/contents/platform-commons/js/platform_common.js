@@ -649,6 +649,88 @@ const OrganizationsCommon = {
                 return false;
             }
         }
+    },
+
+    // MongoDB設定情報入力欄
+    ita_option_service_settings: {
+        add_mongodb_info_new: function(default_open){
+            let content = "";
+            if(default_open == true){
+                content += `<div class="ci ita-option-services">`
+            }else{
+                content += `<div class="ci ita-option-services" style="display: none;">`
+            }
+            content += `
+                    <span>${getText("000-85054", "OASEで利用するデータベースに接続するための設定を入力します。")}</span>
+                    <br>
+                    <span>${getText("000-85051", "Document Store")}</span>
+                    <input type="text" value="mongodb" id="ita-option-service-database-name" maxlength="32" disabled>
+                    <span class="icon icon-circle_question popup question-icon" title="${getText("000-85057", "mongodb固定です。")}"></span>
+                    <br>
+                    <span>${getText("000-85052", "自動払い出し")}</span>
+                    <input type="checkbox" value="" id="ita-option-service-owner">
+                    <span class="icon icon-circle_question popup question-icon" title="${getText("000-85058", "インストール時に設定したMongoDBを利用する場合はチェックを入れます。利用しない場合は、チェックを外しPython接続文字列を入力します。")}"></span>
+                    <br>
+                    <div id="edit-connection-string">
+                        <span>${getText("000-85053", "Python接続文字列")}</span>
+                        <span id="connection-string-input"><input type="text" value="" id="ita-option-service-connection-string" maxlength="512"></span>
+                        <span class="icon icon-circle_question popup question-icon" title="${getText("000-85059", "利用するMongoDBのPython用接続文字列を入力します。&#13;&#10;例: mongodb://username:password@hostname:27017/")}"></span>
+                        <br>
+                    </div>
+                    <span class="validate_error" id="message_connection_string"></span>
+                </div>
+            `;
+            return content;
+        },
+        add_mongodb_info_edit: function(document_store){
+            let database_name = document_store.name;
+            let owner = document_store.owner;
+            let connection_string = document_store.connection_string;
+            let content = "";
+            content += `<div class="ci ita-option-services">`;
+            if(owner == false){
+                content += `<span>${getText("000-85055", "Python接続文字列のみ変更できます。")}</span><br>`
+            }
+            content += `<span>${getText("000-85051", "Document Store")}: ${database_name}</span>`;
+            content += `<span class="icon icon-circle_question popup question-icon" title="${getText("000-85057", "mongodb固定です。")}"></span>`;
+            content += `<br><span>${getText("000-85052", "自動払い出し")}</span>`;
+            if(owner == true){
+                content += `<input type="checkbox" value="" id="ita-option-service-owner" checked="checked" disabled>`;
+                content += `<span class="icon icon-circle_question popup question-icon" title="${getText("000-85058", "インストール時に設定したMongoDBを利用する場合はチェックを入れます。利用しない場合は、チェックを外しPython接続文字列を入力します。")}"></span>`;
+            }else{
+                content += `
+                <input type="checkbox" value="" id="ita-option-service-owner" disabled>
+                <span class="icon icon-circle_question popup question-icon" title="${getText("000-85058", "インストール時に設定したMongoDBを利用する場合はチェックを入れます。利用しない場合は、チェックを外しPython接続文字列を入力します。")}"></span>
+                <br>
+                <div id="edit-connection-string">
+                    <span>${getText("000-85053", "Python接続文字列")}</span>
+                    <span id="connection-string-input"><input type="text" value="" id="ita-option-service-connection-string" maxlength="512" placeholder="${connection_string}"></span>
+                    <span class="icon icon-circle_question popup question-icon" title="${getText("000-85059", "利用するMongoDBのPython用接続文字列を入力します。&#13;&#10;例: mongodb://username:password@hostname:27017/")}"></span>
+                    <br>
+                    <span class="validate_error" id="message_connection_string"></span>
+                </div>
+                `;
+            }
+            content += '</div>';
+            return content;
+        },
+        add_mongodb_info_detail: function(document_store){
+            let database_name = document_store.name;
+            let owner = document_store.owner;
+            let connection_string = document_store.connection_string;
+            let content = "";
+            content += `<div class="ci ita-option-services">`;
+            content += `<span>${getText("000-85051", "Document Store")}: ${database_name}</span>`;
+            content += `<br><span>${getText("000-85052", "自動払い出し")}:</span>`;
+            if(owner == true){
+                content += `<input type="checkbox" value="" id="ita-option-service-owner" checked="checked" disabled>`;
+            }else{
+                content += `<input type="checkbox" value="" id="ita-option-service-owner" disabled>`
+                content += `<br><span>${getText("000-85053", "Python接続文字列")}: ${connection_string}</span>`;
+            }
+            content += '</div>';
+            return content;
+        }
     }
 }
 

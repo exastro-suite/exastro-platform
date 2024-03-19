@@ -152,6 +152,17 @@ input[type=checkbox]:disabled+.itaOptionsDriversLabel  {
     text-overflow: clip !important;
 }
 
+.ita-option-services {
+    margin-left: 40px;
+    margin-right: 10px;
+    border: solid 1px var(--black20);
+}
+
+#edit-connection-string input[type="text"]{
+    width: 400px;
+    min-width: 320px;
+}
+
 /* ボタンを表示するエリア / Button area */
 .switchArea {
     line-height: 32px;
@@ -254,4 +265,10 @@ input[type=checkbox]:disabled+.itaOptionsDriversLabel  {
 
 .question-icon {
     color: #888;
+}
+
+[inert] {
+    & :is(input) {
+        background-color: #CCD5E0 !important;
+    }
 }

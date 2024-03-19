@@ -199,6 +199,12 @@ $(function(){
                     html += row_template
                     .replace(/\${id}/g, fn.cv(row.id,'',true))
                     .replace(/\${name}/g, fn.cv(row.name,'',true))
+
+                    // Add mongodb info for oase
+                    if(row.id == "oase"){
+                        mongodb_info_area = OrganizationsCommon.ita_option_service_settings.add_mongodb_info_detail(optionsIta.services.document_store);
+                        html += mongodb_info_area;
+                    }
                 }
             }
             if(html !== '') {
