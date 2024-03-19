@@ -244,7 +244,7 @@ $(function(){
         //validate connection string
         if($("#ita-option-driver-oase").prop("checked") == true) {
             if($("#ita-option-service-owner").prop("checked") == false && $("#ita-option-service-connection-string").val() === "") {
-                $("#message_connection_string").text(getText("000-85056", "管理者権限にチェックがない場合は、接続文字列の入力が必須です。"));
+                $("#message_connection_string").text(getText("000-85056", "自動払い出しにチェックがない場合は、接続文字列の入力が必須です。"));
                 result = false;
             } else {
                 $("#message_connection_string").text("");
