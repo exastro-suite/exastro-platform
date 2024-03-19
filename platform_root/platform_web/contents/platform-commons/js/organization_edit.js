@@ -519,7 +519,7 @@ $(function(){
         //validate connection string
         if($("#ita-option-driver-oase").prop("checked") == true && $(".ita-option-services").hasClass("add-oase-flag") == true) {
             if($("#ita-option-service-owner").prop("checked") == false && $("#ita-option-service-connection-string").val() === "") {
-                $("#message_connection_string").text(getText("000-85056", "管理者権限にチェックがない場合は、接続文字列の入力が必須です。"));
+                $("#message_connection_string").text(getText("000-85056", "自動払い出しにチェックがない場合は、接続文字列の入力が必須です。"));
                 result = false;
             } else {
                 $("#message_connection_string").text("");
@@ -617,7 +617,7 @@ $(function(){
             ita_install_drivers[$(this).val()] = $(this).prop("checked");
         })
 
-        // OASEが既に有効かつ管理者権限なしで、接続文字列を変更するケース
+        // OASEが既に有効かつ自動払い出しなしで、接続文字列を変更するケース
         const ita_services = {};
         let connection_string = $("#ita-option-service-connection-string").val();
 
@@ -629,7 +629,7 @@ $(function(){
                 "connection_string": connection_string
             }
         }else{
-            // OASEが既に有効かつ管理者権限なしで、接続文字列を変更するケース
+            // OASEが既に有効かつ自動払い出しなしで、接続文字列を変更するケース
             if(connection_string){
                 ita_services["document_store"] = {
                     "owner": ($('#ita-option-service-owner').prop("checked") ? true : false),
