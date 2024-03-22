@@ -183,7 +183,7 @@ $(function(){
             .replace(/\${checked}/g, fn.cv(row.enable,false,false) ? "checked": "")
 
             // Add mongodb info for oase
-            if(row.id == "oase"){
+            if(row.id == "oase" && row.enable == true){
                 mongodb_info_area = OrganizationsCommon.ita_option_service_settings.add_mongodb_info_new(true);
                 html += mongodb_info_area;
             }

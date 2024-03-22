@@ -340,7 +340,7 @@ $(function(){
                 .replace(/\${disabled}/g, fn.cv(row.enable,false,false) ? "": "disabled")
 
                 // Add mongodb info for oase
-                if(row.id == "oase"){
+                if(row.id == "oase" && row.enable == true){
                     if(optionsIta.drivers.oase == true){
                         mongodb_info_area = OrganizationsCommon.ita_option_service_settings.add_mongodb_info_edit(optionsIta.services.document_store);
                     }else{
