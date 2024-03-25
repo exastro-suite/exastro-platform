@@ -179,12 +179,15 @@ $(function(){
             .replace(/\${name}/g, fn.cv(row.name,'',true))
             .replace(/\${description-text}/g, typeof row.description === "undefined"? "" : fn.cv(row.description,'',true))
             .replace(/\${description-display}/g, typeof row.description === "undefined"? "display: none;" : "")
-            .replace(/\${disabled}/g, fn.cv(row.enable,false,false) ? "": "disabled")
             .replace(/\${checked}/g, fn.cv(row.enable,false,false) ? "checked": "")
 
             // Add mongodb info for oase
-            if(row.id == "oase" && row.enable == true){
-                mongodb_info_area = OrganizationsCommon.ita_option_service_settings.add_mongodb_info_new(true);
+            if(row.id == "oase"){
+                if(row.enable == true){
+                    mongodb_info_area = OrganizationsCommon.ita_option_service_settings.add_mongodb_info_new(true, true);
+                }else{
+                    mongodb_info_area = OrganizationsCommon.ita_option_service_settings.add_mongodb_info_new(false, false);
+                }
                 html += mongodb_info_area;
             }
         }
