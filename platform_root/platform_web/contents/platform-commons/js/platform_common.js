@@ -653,7 +653,7 @@ const OrganizationsCommon = {
 
     // MongoDB設定情報入力欄
     ita_option_service_settings: {
-        add_mongodb_info_new: function(default_open){
+        add_mongodb_info_new: function(default_open, owner_enable){
             let content = "";
             if(default_open == true){
                 content += `<div class="ci ita-option-services">`
@@ -668,7 +668,13 @@ const OrganizationsCommon = {
                     <span class="icon icon-circle_question popup question-icon" title="${getText("000-85057", "mongodb固定です。")}"></span>
                     <br>
                     <span>${getText("000-85052", "自動払い出し")}</span>
-                    <input type="checkbox" value="" id="ita-option-service-owner">
+                    `
+            if(owner_enable == true){
+                content += `<input type="checkbox" value="" id="ita-option-service-owner">`
+            }else{
+                content += `<input type="checkbox" value="" id="ita-option-service-owner" disabled>`
+            }
+            content += `
                     <span class="icon icon-circle_question popup question-icon" title="${getText("000-85058", "インストール時に設定したMongoDBを利用する場合はチェックを入れます。利用しない場合は、チェックを外しPython接続文字列を入力します。")}"></span>
                     <br>
                     <div id="edit-connection-string">

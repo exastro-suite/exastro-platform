@@ -337,14 +337,13 @@ $(function(){
                 .replace(/\${edit_display}/g, optionsIta.drivers[row.id]? "display: none": "")
                 .replace(/\${description-text}/g, typeof row.description === "undefined"? "" : fn.cv(row.description,'',true))
                 .replace(/\${description-display}/g, typeof row.description === "undefined"? "display: none;" : "")
-                .replace(/\${disabled}/g, fn.cv(row.enable,false,false) ? "": "disabled")
 
                 // Add mongodb info for oase
-                if(row.id == "oase" && row.enable == true){
+                if(row.id == "oase"){
                     if(optionsIta.drivers.oase == true){
                         mongodb_info_area = OrganizationsCommon.ita_option_service_settings.add_mongodb_info_edit(optionsIta.services.document_store);
                     }else{
-                        mongodb_info_area = OrganizationsCommon.ita_option_service_settings.add_mongodb_info_new(false);
+                        mongodb_info_area = OrganizationsCommon.ita_option_service_settings.add_mongodb_info_new(false, row.enable);
                     }
                     html += mongodb_info_area;
                 }
