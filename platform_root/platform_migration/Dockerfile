@@ -24,7 +24,7 @@ ARG APP_PATH
 
 ENV PYTHONPATH              $APP_PATH/
 ENV PYTHONIOENCODING        utf-8
-ENV KEYCLOAK_VERSION        "20.0"
+ENV KEYCLOAK_VERSION        "24.0"
 
 RUN dnf install -y \
     langpacks-en \

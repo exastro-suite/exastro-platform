@@ -13,7 +13,7 @@
 #   limitations under the License.
 
 # FROM jboss/keycloak:16.1.1 as common_build
-FROM quay.io/keycloak/keycloak:20.0 as common_build
+FROM quay.io/keycloak/keycloak:24.0 as common_build
 
 # Keycloakのtagを変更した場合は、platform-migrationのDockerfileにあるENV KEYCLOAK_VERSIONも合わせて変更する必要があります
 # If you change Keycloak tag, you need to change ENV KEYCLOAK_VERSION in platform-migration Dockerfile as well
