@@ -2,12 +2,31 @@
   "version": "2.0.0",
   "tasks": [
     {
+      "label": "Coverage Report",
+      "type": "shell",
+      "command": "coverage report --data-file=${workspaceFolder}/platform_root/platform_api/.coverage",
+      "problemMatcher": []
+    },
+    {
+      "label": "Unittest Container Up - mariadb",
+      "type": "shell",
+      "command": "${workspaceFolder}/platform_root/platform_api/tests/docker-compose-up-mariadb.sh",
+      "problemMatcher": []
+    },
+    {
+      "label": "Unittest Container Up - mysql",
+      "type": "shell",
+      "command": "${workspaceFolder}/platform_root/platform_api/tests/docker-compose-up-mysql.sh",
+      "problemMatcher": []
+    },
+    {
       "label": "Auto Debug Satrt - platform-api",
       "type": "shell",
       "command": "${command:workbench.action.debug.start}",
       "runOptions": {
         "runOn": "folderOpen"
-      }
+      },
+      "problemMatcher": []
     }
   ]
 }

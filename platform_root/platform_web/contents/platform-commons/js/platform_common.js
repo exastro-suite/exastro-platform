@@ -1,5 +1,5 @@
 /*
-#   Copyright 2019 NEC Corporation
+#   Copyright 2023 NEC Corporation
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -21,6 +21,29 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 const DEFAULT_ROWS_PER_PAGE = 100;
 
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//   Max Mail count
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+const MAX_MAIL_COUNT = 100;
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//   destination kind const defination
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+const DESTINATION_KIND_MAIL = 'Mail';
+const DESTINATION_KIND_TEAMS = 'Teams';
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//   encryption method type port defatult value
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+const ENCRYPTION_METHOD_NONE = 25;
+const ENCRYPTION_METHOD_SSL = 465;
+const ENCRYPTION_METHOD_TLS = 587;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -150,13 +173,63 @@ function replaceLanguageText() {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
+//   Json Key Link to Text
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+function json_key_link_to_text(json, key_parent) {
+    var ret = "";
+    console.log("json:" + json);
+    for (var key in json){
+        console.log("key:" + key);
+        console.log("key_parent:" + key_parent);
+        obj = json[key];
+        if (isObject(obj)){
+            ret = json_key_link_to_text(obj, key_parent + key + ".");
+        }
+        else{
+            ret += key_parent + key + ": " + json[key] + "\n";
+        }
+    }
+    return ret;
+}
+
+function isObject(value) {
+    return value !== null && typeof value === 'object'
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//   Array not empty count
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+function array_not_empty_count(arr) {
+    var cnt = 0;
+    if (arr !== ""){
+        arr.forEach(str => {
+            str = str.trim();
+            if (str !== "") cnt++;
+        });
+    }
+
+    return cnt;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
 //   Display Topic Path
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 function displayTopicPath(topicPaths) {
-    topicPaths.unshift(
-        {"text": getText("000-80001", "メインメニュー"), "href": location_conf.href.menu.toppage.replace(/{organization_id}/g, CommonAuth.getRealm())}
-    );
+
+    if(CommonAuth.isPlatformAdminSite()) {
+        topicPaths.unshift(
+            {"text": getText("000-80001", "メインメニュー"), "href": location_conf.href.menu.platform_admin_site.toppage}
+        );
+    } else {
+        topicPaths.unshift(
+            {"text": getText("000-80001", "メインメニュー"), "href": location_conf.href.menu.organization_user_site.toppage.replace(/{organization_id}/g, CommonAuth.getRealm())}
+        );
+    }
     let $topichPathList = $('.topichPathList');
     for(let i = 0; i < topicPaths.length; ++i ) {
         let topicPath = topicPaths[i];
@@ -178,30 +251,50 @@ function displayTopicPath(topicPaths) {
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 function displayMenu(curent) {
-    $('.menuList').append(`
-        <li class="menuItem"><a class="menuLink" id="menu_workspace" href="#" tabindex="-1">${getText("000-80005", "ワークスペース管理")}</a></li>
-        <li class="menuItem"><a class="menuLink" id="menu_account_management" href="#" style="display: none;">${getText("000-80006", "ユーザー管理")}</a></li>
-        <li class="menuItem"><a class="menuLink" id="menu_role_management" href="#" style="display: none;">${getText("000-80007", "ロール管理")}</a></li>
-    `);
+    if(CommonAuth.isPlatformAdminSite()) {
+        $('.menuList').empty().append(`
+            <li class="menuItem"><a class="menuLink" id="menu_organizations" href="#" tabindex="-1">${getText("000-80037", "オーガナイゼーション管理")}</a></li>
+            <li class="menuItem"><a class="menuLink" id="menu_plans" href="#">${getText("000-80038", "リソースプラン管理")}</a></li>
+            <li class="menuItem"><a class="menuLink" id="menu_settings_running_state" href="#">${getText("000-80039", "システム状態設定")}</a></li>
+            <li class="menuItem"><a class="menuLink" id="menu_keycloak" href="#" target="exastro_platform_keycloak">${getText("000-80040", "keycloakコンソール")}</a></li>
+        `);
+        $('#menu_organizations').attr('href', location_conf.href.organizations.list);
+        $('#menu_plans').attr('href', location_conf.href.plans.list);
+        $('#menu_settings_running_state').attr('href', location_conf.href.settings_running_state.top);
+        $('#menu_keycloak').attr('href', location_conf.href.keycloak.console);
+    } else {
+        $('.menuList').empty().append(`
+            <li class="menuItem"><a class="menuLink" id="menu_workspace" href="#" tabindex="-1">${getText("000-80005", "ワークスペース管理")}</a></li>
+            <li class="menuItem"><a class="menuLink" id="menu_account_management" href="#" style="display: none;">${getText("000-80006", "ユーザー管理")}</a></li>
+            <li class="menuItem"><a class="menuLink" id="menu_role_management" href="#" style="display: none;">${getText("000-80007", "ロール管理")}</a></li>
+            <li class="menuItem"><a class="menuLink" id="menu_settings_notifications" href="#">${getText("000-00183", "通知管理")}</a></li>
+            <li class="menuItem"><a class="menuLink" id="menu_settings_mailserver" href="#" style="display: none;">${getText("000-88002", "メール送信サーバー設定")}</a></li>
+        `);
+
+        $('#menu_workspace').attr('href', location_conf.href.workspaces.list.replace(/{organization_id}/g, CommonAuth.getRealm()));
+        $('#menu_account_management').attr('href', location_conf.href.users.list.replace(/{organization_id}/g, CommonAuth.getRealm()));
+        $('#menu_role_management').attr('href', location_conf.href.roles.list.replace(/{organization_id}/g, CommonAuth.getRealm()));
+        $('#menu_settings_notifications').attr('href', location_conf.href.workspaces.settings.notifications.workspaces.replace(/{organization_id}/g, CommonAuth.getRealm()));
+        $('#menu_settings_mailserver').attr('href', location_conf.href.settings.mailserver.replace(/{organization_id}/g, CommonAuth.getRealm()));
+
+        if (CommonAuth.hasAuthority(RolesCommon.ORG_AUTH_USER_MAINTE)) {
+            $("#menu_account_management").css("display", "");
+        }
+        let adminWorkspaces = CommonAuth.getAdminWorkspaces();
+        if (CommonAuth.hasAuthority(RolesCommon.ORG_AUTH_OWNER_MAINTE)
+        ||  CommonAuth.hasAuthority(RolesCommon.ORG_AUTH_ROLE_USER)
+        ||  CommonAuth.hasAuthority(RolesCommon.ORG_AUTH_WS_ROLE_MAINTE)
+        ||  CommonAuth.hasAuthority(RolesCommon.ORG_AUTH_WS_ROLE_USER)
+        ||  adminWorkspaces.length > 0) {
+            $("#menu_role_management").css("display", "");
+        }
+        if (CommonAuth.hasAuthority(RolesCommon.ORG_AUTH_UPDATE)) {
+            $("#menu_settings_mailserver").css("display", "");
+        }
+    }
+
     if(curent != null) {
         $(`#${curent}`).addClass("current");
-    }
-
-    $('#menu_workspace').attr('href', location_conf.href.workspaces.list.replace(/{organization_id}/g, CommonAuth.getRealm()));
-    // $('#menu_account_management').attr('href', location_conf.href.menu.account_manaagement.replace(/{organization_id}/g, CommonAuth.getRealm()));
-    $('#menu_account_management').attr('href', location_conf.href.users.list.replace(/{organization_id}/g, CommonAuth.getRealm()));
-    $('#menu_role_management').attr('href', location_conf.href.roles.list.replace(/{organization_id}/g, CommonAuth.getRealm()));
-
-    if (CommonAuth.hasAuthority("_og-usr-mt")) {
-        $("#menu_account_management").css("display", "");
-    }
-    let adminWorkspaces = CommonAuth.getAdminWorkspaces();
-    if (CommonAuth.hasAuthority(RolesCommon.ORG_AUTH_OWNER_MAINTE)
-    ||  CommonAuth.hasAuthority(RolesCommon.ORG_AUTH_ROLE_USER)
-    ||  CommonAuth.hasAuthority(RolesCommon.ORG_AUTH_WS_ROLE_MAINTE)
-    ||  CommonAuth.hasAuthority(RolesCommon.ORG_AUTH_WS_ROLE_USER)
-    ||  adminWorkspaces.length > 0) {
-        $("#menu_role_management").css("display", "");
     }
 }
 
@@ -261,7 +354,13 @@ function call_api_promise(ajaxparam, api_description, succeed_httpcodes = [200])
                 let msg;
                 try {
                     msg = `status:[${jqXHR.status}]`
-                    msg += `\nmessage_id:[${jqXHR.responseJSON.result}]\n${jqXHR.responseJSON.message}`;
+                    if ('result' in jqXHR.responseJSON){
+                        msg += `\nmessage_id:[${jqXHR.responseJSON.result}]\n${jqXHR.responseJSON.message}`;
+                    }
+                    else if ('detail' in jqXHR.responseJSON)
+                    {
+                        msg += ` ${jqXHR.responseJSON.title}\n${jqXHR.responseJSON.detail}`;
+                    }
                 } catch(e) { }
 
                 console.log(`[ERROR] ${ajaxparam.type} ${ajaxparam.url}\n${msg}`);
@@ -427,6 +526,289 @@ function deleteConfirmMessage(title, message, deleteResources, cautionMessage, i
     dialog.open(content);
 }
 
+function CancellationConfirmMessage(title, message, deleteResources, cautionMessage, input, onOk = null, onCancel = null) {
+    const dialog = new Dialog({
+        mode: 'modeless',
+        position: 'center',
+        width: 'auto',
+        header: {
+            title: title,
+        },
+        footer: {
+            button: {
+                ok: { text: '<span class="iconButtonIcon icon"></span>' + getText("000-80045", "はい、解除します"), action: "danger" },
+                cancel: { text: getText("000-80013", "キャンセル"), action: "normal" }
+            }
+        },
+    },
+    {
+        ok: function() {
+            if($(dialog.$.dbody).find(".confirm_yes").val() != input) {
+                $(dialog.$.dbody).find(".validate_error").css("display", "");
+                $(dialog.$.dbody).find(".confirm_yes").focus();
+                return;
+            }
+            dialog.close();
+            if(onOk !== null) {
+                onOk();
+            }
+        },
+        cancel: function() {
+            dialog.close();
+            if(onCancel !== null) {
+                onCancel();
+            }
+        }
+    });
+
+    let content = "";
+    content += '<div class="alertMessage" style="margin-left: 30px; margin-right: 30px;">'
+    content += message + '<br>';
+    if((typeof deleteResources) == "string") {
+        content += '<ul style="list-style-type:disc; padding-left:30px; background-color: #FFFFEE;"><li>' + fn.cv(deleteResources, "", true) + '</li></ul>'
+    } else {
+        content += '<div style="max-height: 200px; overflow: auto;">'
+        content += '<ul style="list-style-type:disc; padding-left:30px; background-color: #FFFFEE;">' + deleteResources.map((value, i) => { return '<li>' + fn.cv(value, "", true) + '</li>'; }).join("") + '</ul>'
+        content += '</div>'
+    }
+    if(cautionMessage != null && cautionMessage != "" ) {
+        content += '<span class="caution_message">' + cautionMessage+ '</span><br>'
+    }
+    content += '<hr>' + getText("000-80015", '続行する場合は <span style="font-weight: bold;">{0}</span> と入力してください。', fn.cv(input, "", true)) + '<br>'
+    content += '<input class="confirm_yes inputText input" type="text" maxlength="' + input.length + '">'
+    content += '<span class="validate_error" style="display:none;">' + getText("000-80016",'<span style="font-weight: bold;">{0}</span> と入力してください',fn.cv(input, "", true)) + '</span>'
+    content += '</div>';
+
+    dialog.open(content);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//   Organizations Common
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+const OrganizationsCommon = {
+    validate: {
+        //
+        // validate organization id
+        //
+        organization_id: function(organization_id) {
+            if(organization_id === "") {
+                return {
+                    "result": false,
+                    "message": getText("400-00011", "必須項目が不足しています。({0})", getText("000-00103", "オーガナイゼーションID"))
+                }
+            } else if(organization_id.replace(/[a-zA-Z0-9_-]/g,"") !== "") {
+                return {
+                    "result": false,
+                    "message": getText("400-00017", "指定できない文字が含まれています。(項目:{0},指定可能な文字:{1})",
+                                    getText("000-00103", "オーガナイゼーションID"),
+                                    getText("000-31001", "半角英数・ハイフン・アンダースコア")
+                                )
+                }
+
+            } else if( ! organization_id.match(/^[a-zA-Z]/)) {
+                return {
+                    "result": false,
+                    "message": getText("400-00014", "先頭の文字にアルファベット以外が指定されています。({0})", getText("000-00103", "オーガナイゼーションID"))
+                }
+            } else {
+                return {
+                    "result": true,
+                    "message": ""
+                }
+            }
+        },
+
+        //
+        // validate organization name
+        //
+        organization_name: function(organization_name) {
+            if(organization_name === "") {
+                return {
+                    "result": false,
+                    "message": getText("400-00011", "必須項目が不足しています。({0})", getText("000-00104", "オーガナイゼーション名"))
+                }
+            } else {
+                return {
+                    "result": true,
+                    "message": ""
+                }
+            }
+        }
+
+    },
+
+    // ステータスによる有効無効チェック
+    // enabled/disabled check by status
+    enabled_check: {
+        edit_button: function(status) {
+            if(status === "Organization Create Complete") {
+                return true;
+            } else {
+                return false;
+            }
+        }
+    },
+
+    // MongoDB設定情報入力欄
+    ita_option_service_settings: {
+        add_mongodb_info_new: function(default_open, owner_enable){
+            let content = "";
+            if(default_open == true){
+                content += `<div class="ci ita-option-services">`
+            }else{
+                content += `<div class="ci ita-option-services" style="display: none;">`
+            }
+            content += `
+                    <span>${getText("000-85054", "OASEで利用するデータベースに接続するための設定を入力します。")}</span>
+                    <br>
+                    <span>${getText("000-85051", "Document Store")}</span>
+                    <input type="text" value="mongodb" id="ita-option-service-database-name" maxlength="32" disabled>
+                    <span class="icon icon-circle_question popup question-icon" title="${getText("000-85057", "mongodb固定です。")}"></span>
+                    <br>
+                    <span>${getText("000-85052", "自動払い出し")}</span>
+                    `
+            if(owner_enable == true){
+                content += `<input type="checkbox" value="" id="ita-option-service-owner">`
+            }else{
+                content += `<input type="checkbox" value="" id="ita-option-service-owner" disabled>`
+            }
+            content += `
+                    <span class="icon icon-circle_question popup question-icon" title="${getText("000-85058", "インストール時に設定したMongoDBを利用する場合はチェックを入れます。利用しない場合は、チェックを外しPython接続文字列を入力します。")}"></span>
+                    <br>
+                    <div id="edit-connection-string">
+                        <span>${getText("000-85053", "Python接続文字列")}</span>
+                        <span id="connection-string-input"><input type="text" value="" id="ita-option-service-connection-string" maxlength="512"></span>
+                        <span class="icon icon-circle_question popup question-icon" title="${getText("000-85059", "利用するMongoDBのPython用接続文字列を入力します。&#13;&#10;例: mongodb://username:password@hostname:27017/")}"></span>
+                        <br>
+                    </div>
+                    <span class="validate_error" id="message_connection_string"></span>
+                </div>
+            `;
+            return content;
+        },
+        add_mongodb_info_edit: function(document_store){
+            let database_name = document_store.name;
+            let owner = document_store.owner;
+            let connection_string = document_store.connection_string;
+            let content = "";
+            content += `<div class="ci ita-option-services">`;
+            if(owner == false){
+                content += `<span>${getText("000-85055", "Python接続文字列のみ変更できます。")}</span><br>`
+            }
+            content += `<span>${getText("000-85051", "Document Store")}: ${database_name}</span>`;
+            content += `<span class="icon icon-circle_question popup question-icon" title="${getText("000-85057", "mongodb固定です。")}"></span>`;
+            content += `<br><span>${getText("000-85052", "自動払い出し")}</span>`;
+            if(owner == true){
+                content += `<input type="checkbox" value="" id="ita-option-service-owner" checked="checked" disabled>`;
+                content += `<span class="icon icon-circle_question popup question-icon" title="${getText("000-85058", "インストール時に設定したMongoDBを利用する場合はチェックを入れます。利用しない場合は、チェックを外しPython接続文字列を入力します。")}"></span>`;
+            }else{
+                content += `
+                <input type="checkbox" value="" id="ita-option-service-owner" disabled>
+                <span class="icon icon-circle_question popup question-icon" title="${getText("000-85058", "インストール時に設定したMongoDBを利用する場合はチェックを入れます。利用しない場合は、チェックを外しPython接続文字列を入力します。")}"></span>
+                <br>
+                <div id="edit-connection-string">
+                    <span>${getText("000-85053", "Python接続文字列")}</span>
+                    <span id="connection-string-input"><input type="text" value="" id="ita-option-service-connection-string" maxlength="512" placeholder="${connection_string}"></span>
+                    <span class="icon icon-circle_question popup question-icon" title="${getText("000-85059", "利用するMongoDBのPython用接続文字列を入力します。&#13;&#10;例: mongodb://username:password@hostname:27017/")}"></span>
+                    <br>
+                    <span class="validate_error" id="message_connection_string"></span>
+                </div>
+                `;
+            }
+            content += '</div>';
+            return content;
+        },
+        add_mongodb_info_detail: function(document_store){
+            let database_name = document_store.name;
+            let owner = document_store.owner;
+            let connection_string = document_store.connection_string;
+            let content = "";
+            content += `<div class="ci ita-option-services">`;
+            content += `<span>${getText("000-85051", "Document Store")}: ${database_name}</span>`;
+            content += `<br><span>${getText("000-85052", "自動払い出し")}:</span>`;
+            if(owner == true){
+                content += `<input type="checkbox" value="" id="ita-option-service-owner" checked="checked" disabled>`;
+            }else{
+                content += `<input type="checkbox" value="" id="ita-option-service-owner" disabled>`
+                content += `<br><span>${getText("000-85053", "Python接続文字列")}: ${connection_string}</span>`;
+            }
+            content += '</div>';
+            return content;
+        }
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//   Plans Common
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+const PlansCommon = {
+    validate: {
+        //
+        // validate plan id
+        //
+        plan_id: function(plan_id) {
+            if(plan_id === "") {
+                return {
+                    "result": false,
+                    "message": getText("400-00011", "必須項目が不足しています。({0})", getText("000-00103", "リソースプランID"))
+                }
+            } else if(plan_id.replace(/[a-zA-Z0-9_-]/g,"") !== "") {
+                return {
+                    "result": false,
+                    "message": getText("400-00017", "指定できない文字が含まれています。(項目:{0},指定可能な文字:{1})",
+                                    getText("000-00103", "リソースプランID"),
+                                    getText("000-31001", "半角英数・ハイフン・アンダースコア")
+                                )
+                }
+
+            } else if( ! plan_id.match(/^[a-zA-Z]/)) {
+                return {
+                    "result": false,
+                    "message": getText("400-00014", "先頭の文字にアルファベット以外が指定されています。({0})", getText("000-00103", "リソースプランID"))
+                }
+            } else {
+                return {
+                    "result": true,
+                    "message": ""
+                }
+            }
+        },
+
+        //
+        // validate plan name
+        //
+        plan_name: function(plan_name) {
+            if(plan_name === "") {
+                return {
+                    "result": false,
+                    "message": getText("400-00011", "必須項目が不足しています。({0})", getText("000-00104", "リソースプラン名"))
+                }
+            } else {
+                return {
+                    "result": true,
+                    "message": ""
+                }
+            }
+        },
+    },
+
+    // ステータスによる有効無効チェック
+    // enabled/disabled check by status
+    enabled_check: {
+        edit_button: function(status) {
+            if(status === "plan Create Complete") {
+                return true;
+            } else {
+                return false;
+            }
+        }
+    }
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //   Workspaces Common
@@ -448,7 +830,7 @@ const WorkspacesCommon = {
                     "result": false,
                     "message": getText("400-00017", "指定できない文字が含まれています。(項目:{0},指定可能な文字:{1})",
                                     getText("000-00101", "ワークスペースID"),
-                                    getText("000-00101", "半角英数・ハイフン・アンダースコア")
+                                    getText("000-31001", "半角英数・ハイフン・アンダースコア")
                                 )
                 }
 
@@ -706,5 +1088,431 @@ const UsersCommon =
             return false;
         }
         return true;
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//   Maintenance mode
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+function maintenanceMode() {
+    call_api_promise({
+        type: "GET",
+        url: api_conf.api["maintenance-mode-setting"].get.replace('{organization_id}', CommonAuth.getRealm()),
+        headers: {
+            Authorization: "Bearer " + CommonAuth.getToken(),
+        },
+        dataType: "json",
+    }).then(function( result ){
+        if ( result.data && result.message === 'SUCCESS' && result.data.data_update_stop === '1') {
+            const container = document.getElementById('container');
+            const message = document.querySelector('.modeMessageText');
+            if ( container !== null && message !== null ) {
+                container.classList.add('inMaintenanceMode');
+                message.textContent = getText('000-80048', 'メンテナンス中のため、ワークスペース作成を行うことができません。');
+            }
+        }
+    }).catch(function( error ){
+        console.error( error );
+    });
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//   Settings Notifications Common
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+const settings_notifications_common = {
+
+    "set_conditions": function() {
+
+        const row_template_top = $('#conditions_list .datarow-template-top').clone(true).removeClass('datarow-template').addClass('datarow').prop('outerHTML');
+        const row_template_2nd = $('#conditions_list .datarow-template-2nd').clone(true).removeClass('datarow-template-sub').addClass('datarow').prop('outerHTML');
+        const row_template_3rd = $('#conditions_list .datarow-template-3rd').clone(true).removeClass('datarow-template-sub').addClass('datarow').prop('outerHTML');
+        // 固定のイベントタイプを指定
+        // Specify a fixed event type
+        let html='';
+        html += row_template_top
+            .replace(/\${conditions_all_count}/g, 4)
+            .replace(/\${conditions_group_name}/g, getText("000-87022", "OASE／イベント種別"))
+            .replace(/\${conditions_group_count}/g, 4)
+            .replace(/\${conditions_name}/g, getText("000-00153", '新規'))
+            .replace(/\${conditions_key}/g, 'ita_event_type_new')
+            .replace(/\${conditions_remarks}/g, getText("000-87023", "OASEで利用されるイベントの種別ごとに通知の有無を選択します。") + "<br>" +
+            getText("000-87024", "　新規：OASEエージェントから収集、あるいは、外部システムから受け取った直後のイベント") + "<br>" +
+            getText("000-87025", "　既知（判定済）：いずれかのルールにマッチしたイベント") + "<br>" +
+            getText("000-87026", "　既知（時間切れ）：一部の条件には当てはまったものの、全ての条件に当てはまらないまま、有効期限が切れたイベント") + "<br>" +
+            getText("000-87027", "　未知：ルールやルール内の条件の一切にあてはまらなかったイベント"));
+        html += row_template_3rd
+            .replace(/\${conditions_name}/g, getText("000-00154", '既知（判定済み）'))
+            .replace(/\${conditions_key}/g, 'ita_event_type_evaluated');
+        html += row_template_3rd
+            .replace(/\${conditions_name}/g, getText("000-00155", '既知（時間切れ）'))
+            .replace(/\${conditions_key}/g, 'ita_event_type_timeout');
+        html += row_template_3rd
+            .replace(/\${conditions_name}/g, getText("000-00156", '未知'))
+            .replace(/\${conditions_key}/g, 'ita_event_type_undetected');
+        $("#conditions_list tbody").append(html);
+        $("#conditions_list .datarow").css('display', '');
+    },
+
+    "set_destination_informations": function(kind, destination_informations) {
+        if (kind === DESTINATION_KIND_MAIL){
+            $("#form_destination_kind_mail").prop('checked', true);
+            ret_mail = settings_notifications_common.get_mail_destination_informations(destination_informations);
+            $("#form_destination_informations_mail_to").val(ret_mail.mail_to);
+            $("#form_destination_informations_mail_cc").val(ret_mail.mail_cc);
+            $("#form_destination_informations_mail_bcc").val(ret_mail.mail_bcc)
+        }
+        else if (kind === DESTINATION_KIND_TEAMS){
+            $("#form_destination_kind_teams").prop('checked', true);
+            destination_informations.forEach(function(element){
+                $("#form_destination_informations_teams").val(fn.cv(element.webhook, '', false));
+            });
+        }
+    },
+
+    "set_destination_informations_text": function(kind, destination_informations) {
+        if (kind === DESTINATION_KIND_MAIL){
+            ret_mail = settings_notifications_common.get_mail_destination_informations(destination_informations);
+            $("#text_destination_informations_mail_to").css('display', '');
+            $("#hr_destination_informations_mail_to").css('display', '');
+            $("#text_destination_informations_mail_cc").css('display', '');
+            $("#hr_destination_informations_mail_cc").css('display', '');
+            $("#text_destination_informations_mail_bcc").css('display', '');
+            $("#text_destination_informations_mail_to").text("to: " + ret_mail.mail_to);
+            $("#text_destination_informations_mail_cc").text("cc: " + ret_mail.mail_cc);
+            $("#text_destination_informations_mail_bcc").text("bcc: " + ret_mail.mail_bcc)
+        }
+        else if (kind === DESTINATION_KIND_TEAMS){
+            $("#text_destination_informations_teams").css('display', '');
+            destination_informations.forEach(function(element){
+                $("#text_destination_informations_teams").text(fn.cv(element.webhook, '', false));
+            });
+        }
+    },
+
+    "get_mail_destination_informations": function(destination_informations) {
+        var mail_to = "";
+        var mail_cc = "";
+        var mail_bcc = "";
+        destination_informations.forEach(function(element){
+            if (fn.cv(element.address_header, '', false) === "to"){
+                mail_to += fn.cv(element.email, '', false) + ", ";
+            }
+            else if (fn.cv(element.address_header, '', false) === "cc"){
+                mail_cc += fn.cv(element.email, '', false) + ", ";
+            }
+            else if (fn.cv(element.address_header, '', false) === "bcc"){
+                mail_bcc += fn.cv(element.email, '', false) + ", ";
+            }
+        });
+        if (mail_to.length > 0){
+            mail_to = mail_to.slice( 0, -2 );
+        }
+        if (mail_cc.length > 0){
+            mail_cc = mail_cc.slice( 0, -2 );
+        }
+        if (mail_bcc.length > 0){
+            mail_bcc = mail_bcc.slice( 0, -2 );
+        }
+        return { mail_to: mail_to, mail_cc: mail_cc, mail_bcc: mail_bcc, }
+    },
+
+    "get_destination_informations": function() {
+
+        var destination_informations = [];
+        var destination_kind = $("input[name=form_destination_kind]:checked").val();
+        if (destination_kind === "Mail"){
+            split_informations_mail_to = $("#form_destination_informations_mail_to").val();
+            split_informations_mail_cc = $("#form_destination_informations_mail_cc").val();
+            split_informations_mail_bcc = $("#form_destination_informations_mail_bcc").val();
+            if (split_informations_mail_to !== ""){
+                split_informations_mail_to.split(/,|\n|;/).forEach(address => {
+                    address = address.trim();
+                    if (address !== ""){
+                        var mail = {
+                            "address_header": "to",
+                            "email": address,
+                        }
+                        destination_informations.push(mail);
+                    }
+                });
+            }
+            if (split_informations_mail_cc !== ""){
+                split_informations_mail_cc.split(/,|\n|;/).forEach(address => {
+                    address = address.trim();
+                    if (address !== ""){
+                            var mail = {
+                            "address_header": "cc",
+                            "email": address,
+                        }
+                        destination_informations.push(mail);
+                    }
+                });
+            }
+            if (split_informations_mail_bcc !== ""){
+                split_informations_mail_bcc.split(/,|\n|;/).forEach(address => {
+                    address = address.trim();
+                    if (address !== ""){
+                            var mail = {
+                            "address_header": "bcc",
+                            "email": address,
+                        }
+                        destination_informations.push(mail);
+                    }
+                });
+            }
+        }
+        else if (destination_kind === "Teams"){
+            var teams = { "webhook": $("#form_destination_informations_teams").val() }
+            destination_informations.push(teams);
+        }
+        else if (destination_kind === "WebHook"){
+            var webhook = {
+                "url": $("#form_destination_informations_webhook").val(),
+                "header": $("#form_destination_informations_webhook_header").val()
+            }
+            destination_informations.push(webhook);
+        }
+
+        return destination_informations;
+    },
+
+    validate: {
+        //
+        // validate destination id
+        //
+        destination_id: function(destination_id) {
+            if(destination_id === "") {
+                return {
+                    "result": false,
+                    "message": getText("400-00011", "必須項目が不足しています。({0})", getText("000-00145", "通知先ID"))
+                }
+            } else if(destination_id.replace(/[a-zA-Z0-9_-]/g,"") !== "") {
+                return {
+                    "result": false,
+                    "message": getText("400-00017", "指定できない文字が含まれています。(項目:{0},指定可能な文字:{1})",
+                                    getText("000-00145", "通知先ID"),
+                                    getText("000-31001", "半角英数・ハイフン・アンダースコア")
+                                )
+                }
+
+            } else if( ! destination_id.match(/^[a-zA-Z]/)) {
+                return {
+                    "result": false,
+                    "message": getText("400-00014", "先頭の文字にアルファベット以外が指定されています。({0})", getText("000-00145", "通知先ID"))
+                }
+            } else {
+                return {
+                    "result": true,
+                    "message": ""
+                }
+            }
+        },
+
+        //
+        // validate destination name
+        //
+        destination_name: function(destination_name) {
+            if(destination_name === "") {
+                return {
+                    "result": false,
+                    "message": getText("400-00011", "必須項目が不足しています。({0})", getText("000-00146", "通知先名"))
+                }
+            } else {
+                return {
+                    "result": true,
+                    "message": ""
+                }
+            }
+        },
+
+        //
+        // validate destination kind
+        //
+        destination_kind: function(destination_kind) {
+            console.log("destination_kind: " + destination_kind);
+            if(destination_kind.length === 0) {
+                return {
+                    "result": false,
+                    "message": getText("400-00011", "必須項目が不足しています。({0})", getText("000-00147", "通知方法"))
+                }
+            } else {
+                return {
+                    "result": true,
+                    "message": ""
+                }
+            }
+        },
+
+        //
+        // validate description informations (mail)
+        //
+        destination_informations_mail: function(destination_informations_to, destination_informations_cc, destination_informations_bcc) {
+            if(destination_informations_to === "" && destination_informations_cc === "" && destination_informations_bcc === "") {
+                return {
+                    "result": false,
+                    "message": getText("400-00011", "必須項目が不足しています。({0})", getText("000-00150", "通知先"))
+                }
+            } else {
+                split_informations_to = destination_informations_to.split(/,|\n|;/);
+                split_informations_cc = destination_informations_cc.split(/,|\n|;/);
+                split_informations_bcc = destination_informations_bcc.split(/,|\n|;/);
+
+                if ((array_not_empty_count(split_informations_to) + array_not_empty_count(split_informations_cc) + array_not_empty_count(split_informations_bcc)) > MAX_MAIL_COUNT){
+                    return {
+                        "result": false,
+                        "message": getText("400-87001", "メールアドレスの指定が最大{0}件を超えています。({1})", MAX_MAIL_COUNT, getText("000-00150", "通知先"))
+                    }
+                } else {
+                    return {
+                        "result": true,
+                        "message": ""
+                    }
+                }
+            }
+        },
+
+        //
+        // validate description informations (teams)
+        //
+        destination_informations_teams: function(destination_informations_teams) {
+            if(destination_informations_teams === "") {
+                return {
+                    "result": false,
+                    "message": getText("400-00011", "必須項目が不足しています。({0})", getText("000-00150", "通知先"))
+                }
+            } else {
+                return {
+                    "result": true,
+                    "message": ""
+                }
+            }
+        },
+
+        //
+        // validate description informations (webhook)
+        //
+        destination_informations_webhook: function(destination_informations_webhook, destination_informations_webhook_header) {
+            if(destination_informations_webhook === "") {
+                return {
+                    "result": false,
+                    "message": getText("400-00011", "必須項目が不足しています。({0})", getText("000-00150", "通知先"))
+                }
+            } else {
+                return {
+                    "result": true,
+                    "message": ""
+                }
+            }
+        },
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//   Settings Mailserver Common
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+const settings_mailserver_common = {
+    validate: {
+        //
+        // validate smtp server host
+        //
+        smtp_host: function(smtp_host) {
+            if(smtp_host === "") {
+                return {
+                    "result": false,
+                    "message": getText("400-00011", "必須項目が不足しています。({0})", getText("000-00187", "SMTPサーバーホスト"))
+                }
+            } else if(smtp_host.replace(/^[a-zA-Z0-9-.]+$/g,"") !== "") {
+                return {
+                    "result": false,
+                    "message": getText("400-00017", "指定できない文字が含まれています。(項目:{0},指定可能な文字:{1})",
+                                    getText("000-00187", "SMTPサーバーホスト"),
+                                    getText("000-31002", "半角英数字・ハイフン・ピリオド")
+                                )
+                }
+            } else {
+                return {
+                    "result": true,
+                    "message": ""
+                }
+            }
+        },
+        //
+        // validate smtp server port
+        //
+        smtp_port: function(smtp_port) {
+            if(smtp_port === "") {
+                return {
+                    "result": false,
+                    "message": getText("400-00011", "必須項目が不足しています。({0})", getText("000-00188", "SMTPサーバーポート"))
+                }
+            } else if(smtp_port.replace(/[0-9]/g,"") !== "") {
+                return {
+                    "result": false,
+                    "message": getText("400-00017", "指定できない文字が含まれています。(項目:{0},指定可能な文字:{1})",
+                                    getText("000-00188", "SMTPサーバーポート"),
+                                    getText("000-31002", "半角数字")
+                                )
+                }
+            } else {
+                return {
+                    "result": true,
+                    "message": ""
+                }
+            }
+        },
+        //
+        // validate sender mail adrress
+        //
+        send_from: function(send_from) {
+            if(send_from === "") {
+                return {
+                    "result": false,
+                    "message": getText("400-00011", "必須項目が不足しています。({0})", getText("000-00189", "送信元メールアドレス"))
+                }
+            } else {
+                return {
+                    "result": true,
+                    "message": ""
+                }
+            }
+        },
+        //
+        // validate Authentication user
+        //
+        authentication_user: function(authentication_user) {
+            if(authentication_user === "") {
+                return {
+                    "result": false,
+                    "message": getText("400-00011", "必須項目が不足しています。({0})", getText("000-00197", "認証ユーザー"))
+                }
+            } else {
+                return {
+                    "result": true,
+                    "message": ""
+                }
+            }
+        },
+        //
+        // validate Authentication password
+        //
+        authentication_password: function(authentication_password) {
+            if(authentication_password === "") {
+                return {
+                    "result": false,
+                    "message": getText("400-00011", "必須項目が不足しています。({0})", getText("000-00198", "認証パスワード"))
+                }
+            } else {
+                return {
+                    "result": true,
+                    "message": ""
+                }
+            }
+        },
     }
 }

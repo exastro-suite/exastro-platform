@@ -27,6 +27,7 @@ class DBinit(DBconnector):
     """
 
     prefix_org_db = "PF_ORG"
+    prefix_workspace_db = "PF_WS"
 
     def generate_dbinfo(self, prefix="") -> DBconnector.DBinfo:
         """generate dbinfo
@@ -129,9 +130,8 @@ class DBinit(DBconnector):
         """
         with closing(super().connection(dbinfo)) as conn:
             with conn.cursor() as cursor:
-                cursor.execute(queries_dbinit.SQL_CREATE_ORGANIZATION_PRIVATE)
-                cursor.execute(queries_dbinit.SQL_CREATE_WORKSPACE)
-                cursor.execute(queries_dbinit.SQL_CREATE_REFRESH_TOKEN)
+                for query in queries_dbinit.SQL_ORGANIZATION_CREATE_TABLES:
+                    cursor.execute(query)
         return
 
     def insert_organization_dbinfo(self, dbinfo: DBconnector.DBinfo, organization_id, user_id):
@@ -139,6 +139,8 @@ class DBinit(DBconnector):
 
         Args:
             dbinfo (DBconnector.DBinfo): _description_
+            organization_id (str): organization id
+            user_id (str): user id
         """
         with closing(super().connect_platformdb()) as conn:
             with conn.cursor() as cursor:
@@ -165,5 +167,56 @@ class DBinit(DBconnector):
         with closing(super().connect_platformdb()) as conn:
             with conn.cursor() as cursor:
                 cursor.execute(queries_dbinit.SQL_DELETE_ORGANIZATION_DBINFO, {"organization_id": organization_id})
+                conn.commit()
+        return
+
+    def create_table_workspacedb(self, dbinfo: DBconnector.DBinfo):
+        """create table in workspace database
+
+        Args:
+            dbinfo (DBconnector.DBinfo): _description_
+        """
+        with closing(super().connection(dbinfo)) as conn:
+            with conn.cursor() as cursor:
+                for query in queries_dbinit.SQL_WORKSPACE_CREATE_TABLES:
+                    cursor.execute(query)
+        return
+
+    def insert_workspace_dbinfo(self, dbinfo: DBconnector.DBinfo, organization_id, workspace_id, user_id):
+        """insert workspace database info
+
+        Args:
+            dbinfo (DBconnector.DBinfo): _description_
+            organization_id (str): organization id
+            workspace_id (str): workspace id
+            user_id (str): user id
+        """
+        with closing(super().connect_orgdb(organization_id)) as conn:
+            with conn.cursor() as cursor:
+                parameter = {
+                    "organization_id": organization_id,
+                    "workspace_id": workspace_id,
+                    "db_host": dbinfo.db_host,
+                    "db_port": dbinfo.db_port,
+                    "db_database": dbinfo.db_database,
+                    "db_user": dbinfo.db_user,
+                    "db_password": dbinfo.db_password,
+                    "create_user": user_id,
+                    "last_update_user": user_id,
+                }
+                cursor.execute(queries_dbinit.SQL_INSERT_WORKSPACE_DBINFO, parameter)
+                conn.commit()
+        return
+
+    def delete_workspace_dbinfo(self, organization_id, workspace_id):
+        """delete workspace database info
+
+        Args:
+            organization_id (str): organization id
+            workspace_id (str): workspace id
+        """
+        with closing(super().connect_orgdb(organization_id)) as conn:
+            with conn.cursor() as cursor:
+                cursor.execute(queries_dbinit.SQL_DELETE_WORKSPACE_DBINFO, {"organization_id": organization_id, "workspace_id": workspace_id})
                 conn.commit()
         return

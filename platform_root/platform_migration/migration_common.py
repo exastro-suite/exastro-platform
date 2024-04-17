@@ -53,6 +53,8 @@ def wait_until_connect_to_db(host, user, password, database):
                 user=user,
                 password=password,
                 port=3306,
+                charset='utf8mb4',
+                collation='utf8mb4_general_ci',
                 cursorclass=pymysql.cursors.DictCursor,
             )
             break
@@ -223,6 +225,8 @@ def connect_platform_db():
         user=os.environ.get('DB_USER'),
         password=os.environ.get('DB_PASSWORD'),
         port=3306,
+        charset='utf8mb4',
+        collation='utf8mb4_general_ci',
         cursorclass=pymysql.cursors.DictCursor,
     )
     return conn

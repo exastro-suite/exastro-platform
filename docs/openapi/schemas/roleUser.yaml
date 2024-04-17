@@ -36,3 +36,5 @@ properties:
   create_timestamp:
     type: string
     format: date-time
+required:
+  - preferred_username

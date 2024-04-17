@@ -31,3 +31,6 @@ properties:
 #   key: platform.max_organization
 #   value: 100
 #   description: platform max organization
+required:
+  - key
+  - value

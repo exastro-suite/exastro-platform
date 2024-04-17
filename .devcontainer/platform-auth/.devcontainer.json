@@ -44,7 +44,7 @@
 
 		"python.linting.flake8Args": [
 			"--ignore=W293, W504",
-			"--max-line-length=150",
+			"--max-line-length=250",
 			"--max-complexity=20",
 		],
 
@@ -73,13 +73,14 @@
 		"mechatroner.rainbow-csv",
 		"ryu1kn.partial-diff",
 		"pkief.material-icon-theme",
-		"rangav.vscode-thunder-client",
+		//"rangav.vscode-thunder-client",
 		//"mtxr.sqltools",
 		//"mtxr.sqltools-driver-mysql",
 		"formulahendry.vscode-mysql",
 		"mitchdenny.ecdc",
 		"ms-vsliveshare.vsliveshare",
 		"snyk-security.snyk-vulnerability-scanner",
+		"humao.rest-client",
 	],
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	"forwardPorts": [

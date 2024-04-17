@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: Exastro Platform API
   description: Exastro Platform API
-  version: 1.5.0
+  version: 1.8.0
 servers:
   - url: 'https://{host}'
     description: API endpoint
@@ -43,6 +43,12 @@ tags:
     description: ロールに関する操作
   - name: RoleMappingsService
     description: ロール・マッピングに関する操作
+  - name: JobService
+    description: ジョブに関する操作
+  - name: MaintenanceModeService
+    description: メンテナンスモードに関する操作
+  - name: NotificationService
+    description: 通知機能に関する操作
 paths:
   '/auth/realms/{organization_id}/protocol/openid-connect/token':
     post:
@@ -264,6 +270,34 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/runtimeError'
+  '/api/{organization_id}/platform/maintenance-mode-setting':
+    get:
+      tags:
+        - MaintenanceModeService
+      description: メンテナンスモードの設定を取得する
+      operationId: get_maintenance_mode_setting_organization
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - $ref: '#/components/schemas/maintenanceModeSettings'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+      x-openapi-router-controller: controllers.maintenance_mode_setting_controller
   '/api/{organization_id}/platform/workspaces':
     get:
       tags:
@@ -466,6 +500,170 @@ paths:
                 allOf:
                   - $ref: '#/components/schemas/responseOk'
                   - $ref: '#/components/schemas/memberList'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+  '/api/{organization_id}/platform/workspaces/{workspace_id}/notifications':
+    get:
+      tags:
+        - NotificationService
+      summary: Returns a list of message notifications
+      x-openapi-router-controller: controllers.notification_service_controller
+      operationId: notification_list
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: workspace_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: page_size
+          in: query
+          description: 'Maximum number of return values ​​at one time (default: 100)'
+          schema:
+            type: number
+            minimum: 1
+            default: 100
+        - name: current_page
+          in: query
+          description: 'Current display page (default: 1)'
+          schema:
+            type: number
+            minimum: 1
+            default: 1
+        - name: details_info
+          in: query
+          description: With message output
+          schema:
+            type: boolean
+            default: false
+        - name: func_id
+          in: query
+          description: Filter by function ID
+          schema:
+            type: string
+        - name: match
+          in: query
+          description: |
+            Specify exact match condition. Separate with "," specify the item name in the odd numbered columns and the search character in the even numbered columns.
+          schema:
+            type: array
+            items:
+              type: string
+          style: form
+          explode: false
+          example: 'match=save_year,2023,save_month,12'
+        - name: like_before
+          in: query
+          description: |
+            Specifying conditions for beginning match. Separate with "," specify the item name in the odd numbered columns and the search character in the even numbered columns.
+          schema:
+            type: array
+            items:
+              type: string
+          style: form
+          explode: false
+        - name: like_after
+          in: query
+          description: |
+            Specifying conditions for suffix match. Separate with "," specify the item name in the odd numbered columns and the search character in the even numbered columns.
+          schema:
+            type: array
+            items:
+              type: string
+          style: form
+          explode: false
+        - name: like_all
+          in: query
+          description: |
+            Specifying conditions for fuzzy search. Separate with "," specify the item name in the odd numbered columns and the search character in the even numbered columns.
+          schema:
+            type: array
+            items:
+              type: string
+          style: form
+          explode: false
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - $ref: '#/components/schemas/workspaceList'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+    post:
+      tags:
+        - NotificationService
+      summary: Register for message notifications
+      x-openapi-router-controller: controllers.notification_service_controller
+      operationId: notification_register
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: workspace_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/notifications.create'
+            examples:
+              mail message post:
+                value:
+                  - destination_id: 00000001Z7ZXFAED6872F6C9W8
+                    func_id: '00000000'
+                    func_informations:
+                      key-1: value-1
+                      key-2: value-2
+                    message:
+                      title: subjects
+                      message: event message
+              teams message post:
+                value:
+                  - destination_id: 00000001Z7ZXFAED6872F6C9W9
+                    func_id: '00000000'
+                    func_informations:
+                      key-1: value-1
+                      key-2: value-2
+                    message:
+                      title: send title
+                      text: send message
+        required: true
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        example: null
         default:
           description: An unexpected error response.
           content:
@@ -920,8 +1118,6 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/roleMappingUser'
-              required:
-                - preferred_username
         required: true
       responses:
         '200':
@@ -964,6 +1160,48 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/roleMappingUser'
+        required: true
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        example: null
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+  '/api/{organization_id}/platform/jobs/users/import':
+    post:
+      tags:
+        - JobsService
+      summary: Import user bulk registration
+      x-openapi-router-controller: controllers.jobs_service_controller
+      operationId: jobs_users_import
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                import_file:
+                  type: string
+                  format: binary
         required: true
       responses:
         '200':
@@ -1057,7 +1295,27 @@ components:
         organization_managers:
           type: array
           items:
-            $ref: '#/components/schemas/usernameOnly'
+            type: object
+            properties:
+              id:
+                type: string
+                format: uuid
+              username:
+                type: string
+              name:
+                type: string
+                example: firstname lastname
+              firstName:
+                type: string
+              lastName:
+                type: string
+              email:
+                type: string
+              enabled:
+                type: boolean
+              create_timestamp:
+                type: string
+                format: date-time
         active_plan:
           type: object
           properties:
@@ -1072,6 +1330,20 @@ components:
           type: boolean
           description: organization enabled(true) or disabled(false)
           example: true
+        optionsIta:
+          type: object
+          properties:
+            drivers:
+              type: object
+              properties:
+                terraform_cloud_ep:
+                  type: boolean
+                terraform_cli:
+                  type: boolean
+                ci_cd:
+                  type: boolean
+                oase:
+                  type: boolean
         status:
           type: string
           example: Organization Create Complete
@@ -1102,15 +1374,33 @@ components:
           type: object
           description: Organization Add Json Parameter (json of exastro-it-automation)
           properties:
-            no_install_driver:
-              type: array
-              items:
-                description: 'terraform_cloud_ep: Terraform-Cloud/EPドライバ, <br/>terraform_cli: Terraform-CLIドライバ, <br/>ci_cd: CI/CD for IaC '
-                type: string
-                enum:
-                  - terraform_cloud_ep
-                  - terraform_cli
-                  - ci_cd
+            drivers:
+              type: object
+              description: 'terraform_cloud_ep: Terraform-Cloud/EP driver <br/>terraform_cli: Terraform-CLI driver, <br/>ci_cd: CI/CD for IaC, <br/>oase: OASE, '
+              properties:
+                terraform_cloud_ep:
+                  type: boolean
+                terraform_cli:
+                  type: boolean
+                ci_cd:
+                  type: boolean
+                oase:
+                  type: boolean
+            services:
+              type: object
+              properties:
+                document_store:
+                  type: object
+                  description: Only supports mongodb.
+                  properties:
+                    name:
+                      type: string
+                      example: mongodb
+                    owner:
+                      type: boolean
+                    connection_string:
+                      type: string
+                      example: XXXXXXXXXXXXXXXX
       required:
         - id
     organizationUserCreate:
@@ -1493,6 +1783,26 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/member'
+    notifications.create:
+      title: Notification is a definition of Notification resource.
+      type: object
+      properties:
+        destination_id:
+          type: string
+          description: Destination ID is a 26-digit string
+        func_id:
+          type: string
+          description: Function ID unique to the caller (for filtering)
+        func_informations:
+          type: object
+          description: Caller-specific details (for filtering)
+        message:
+          type: object
+          description: 'Webhook systems simply pass the value as the body. For e-mail, construct Json after reserving title and text'
+      required:
+        - destination_id
+        - func_id
+        - message
     workspace:
       title: workspace is a definition of Workspace resource.
       type: object
@@ -1694,6 +2004,8 @@ components:
         create_timestamp:
           type: string
           format: date-time
+      required:
+        - preferred_username
     tokenRequestBody:
       title: create refresh token request parameter.
       type: object
@@ -1789,6 +2101,9 @@ components:
           type: string
           description: config description
           example: platform max organization
+      required:
+        - key
+        - value
     systemConfigList:
       title: system config list is list of system config resources.
       type: object
@@ -1802,9 +2117,6 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/systemConfig'
-        required:
-          - key
-          - value
       example:
         - key: platform.max_organization
           value: '100'
@@ -1837,6 +2149,264 @@ components:
       example:
         value: 100
         description: ''
+    maintenanceModeSettings:
+      title: maintenance mode settings resource.
+      type: object
+      properties:
+        result:
+          type: string
+          example: 000-00000
+        data:
+          type: object
+          properties:
+            backyard_execute_stop:
+              type: string
+              example: '0'
+            data_update_stop:
+              type: string
+              example: '0'
+    settingsDestination:
+      title: destination is a definition of Destination resource.
+      type: object
+      properties:
+        id:
+          type: string
+          description: Destination ID is a 26-digit string
+        name:
+          type: string
+          description: Destination name can be any string
+        kind:
+          type: string
+          description: Select destination kind from Mail/Teams/Webhook
+        conditions:
+          $ref: '#/components/schemas/settingsDestinationConditions'
+        destination_informations:
+          type: array
+          items:
+            type: object
+            description: Set the destination information for the destination
+            oneOf:
+              - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsMail'
+              - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsTeams'
+    settingsDestinationList:
+      title: destinationList is list of Destination resources.
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            allOf:
+              - $ref: '#/components/schemas/settingsDestination'
+              - $ref: '#/components/schemas/responseStat'
+    settingsDestinationOne:
+      title: destination is a definition of Destination resource.
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/settingsDestination'
+    settingsDestinationCreate:
+      title: destination is a definition of Destination resource.
+      type: object
+      properties:
+        id:
+          type: string
+          description: Destination ID is a 26-digit string
+        name:
+          type: string
+          description: Destination name can be any string
+        kind:
+          type: string
+          enum:
+            - Mail
+            - Teams
+            - Webhook
+          description: Select destination kind from Mail/Teams/Webhook
+        conditions:
+          $ref: '#/components/schemas/settingsDestinationConditions'
+        destination_informations:
+          type: array
+          items:
+            type: object
+            description: Set the destination information for the destination
+            anyOf:
+              - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsMail'
+              - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsTeams'
+      required:
+        - id
+        - name
+        - kind
+        - conditions
+        - destination_informations
+    settingsDestinationPut:
+      title: destination is a definition of Destination resource.
+      type: object
+      properties:
+        name:
+          type: string
+          description: Destination name can be any string
+        kind:
+          type: string
+          enum:
+            - Mail
+            - Teams
+            - Webhook
+          description: Select destination kind from Mail/Teams/Webhook
+        conditions:
+          $ref: '#/components/schemas/settingsDestinationConditions'
+        destination_informations:
+          type: array
+          items:
+            type: object
+            description: Set the destination information for the destination
+            anyOf:
+              - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsMail'
+              - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsTeams'
+      required:
+        - name
+        - kind
+        - conditions
+        - destination_informations
+    settingsDestinationSubDestinationInformationsMail:
+      title: destinations destination_informations(mail) resource.
+      type: object
+      properties:
+        address_header:
+          type: string
+          description: Header to set email address
+        email:
+          type: string
+          description: email address
+    settingsDestinationSubDestinationInformationsTeams:
+      title: destinations destination_informations(teams) resource.
+      type: object
+      properties:
+        webhook:
+          type: string
+          description: teams webhook url
+    settingsDestinationConditions:
+      title: destinations conditions resource.
+      type: object
+      properties:
+        ita:
+          type: object
+          description: Exastro IT Automation conditions
+          properties:
+            event_type:
+              type: object
+              description: event type
+              properties:
+                new:
+                  type: boolean
+                  description: Whether to be notified of new events
+                evaluated:
+                  type: boolean
+                  description: Whether to be notified of evaluated event
+                timeout:
+                  type: boolean
+                  description: Whether to be notified of timeout event
+                undetected:
+                  type: boolean
+                  description: Whether to be notified of undetected event
+              required:
+                - new
+                - evaluated
+                - timeout
+                - undetected
+          required:
+            - event_type
+      required:
+        - ita
+    settingsMailserverCreate:
+      title: mailserver is a mailserver of mailserver resource.
+      type: object
+      properties:
+        smtp_host:
+          type: string
+          description: SMTP Server Host
+        smtp_port:
+          type: string
+          description: SMTP server port number
+        send_from:
+          type: string
+          description: Sender's email address
+        send_name:
+          type: string
+          description: The display name of the sender
+        reply_to:
+          type: string
+          description: Reply-to email address
+        reply_name:
+          type: string
+          description: Reply-to display name
+        envelope_from:
+          type: string
+          description: Envelope from email address
+        ssl_enable:
+          type: boolean
+          description: SSL enable
+        start_tls_enable:
+          type: boolean
+          description: StartTLS enable
+        authentication_enable:
+          type: boolean
+          description: Authentication enable
+        authentication_user:
+          type: string
+          description: Authentication users
+        authentication_password:
+          type: string
+          description: Authentication password
+      required:
+        - smtp_host
+        - smtp_port
+        - send_from
+    settingsMailserverList:
+      title: mailserver is list of Mailserver resources.
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            allOf:
+              - $ref: '#/components/schemas/settingsMailserverGet'
+              - $ref: '#/components/schemas/responseStat'
+    settingsMailserverGet:
+      title: mailserver is a definition of Mailserver resource.
+      type: object
+      properties:
+        smtp_host:
+          type: string
+          description: SMTP Server Host
+        smtp_port:
+          type: string
+          description: SMTP server port number
+        send_from:
+          type: string
+          description: Sender's email address
+        send_name:
+          type: string
+          description: The display name of the sender
+        reply_to:
+          type: string
+          description: Reply-to email address
+        reply_name:
+          type: string
+          description: Reply-to display name
+        envelope_from:
+          type: string
+          description: Envelope from email address
+        ssl_enable:
+          type: boolean
+          description: SSL enable
+        start_tls_enable:
+          type: boolean
+          description: StartTLS enable
+        authentication_enable:
+          type: boolean
+          description: Authentication enable
+        authentication_user:
+          type: string
+          description: Authentication users
   securitySchemes:
     BearerAuth:
       description: Credentials or access token for API

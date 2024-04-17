@@ -1,0 +1,35 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Stop daemon (SIGTERM)",
+      "type": "shell",
+      "command": "kill $(ps -ef | grep '[j]ob_manager.py' | grep -v  ' -- ' | awk 'BEGIN {FS=\" \"}{ print $2 }' | sort | head -n 1)",
+      "problemMatcher": []
+    },
+    {
+      "label": "Stop daemon (SIGINT)",
+      "type": "shell",
+      "command": "kill -2 $(ps -ef | grep '[j]ob_manager.py' | grep -v  ' -- ' | awk 'BEGIN {FS=\" \"}{ print $2 }' | sort | head -n 1)",
+      "problemMatcher": []
+    },
+    {
+      "label": "Coverage Report",
+      "type": "shell",
+      "command": "coverage report --data-file=${workspaceFolder}/platform_root/platform_job/.coverage",
+      "problemMatcher": []
+    },
+    {
+      "label": "Unittest Container Up - mariadb",
+      "type": "shell",
+      "command": "${workspaceFolder}/platform_root/platform_job/tests/docker-compose-up-mariadb.sh",
+      "problemMatcher": []
+    },
+    {
+      "label": "Unittest Container Up - mysql",
+      "type": "shell",
+      "command": "${workspaceFolder}/platform_root/platform_job/tests/docker-compose-up-mysql.sh",
+      "problemMatcher": []
+    },
+  ]
+}

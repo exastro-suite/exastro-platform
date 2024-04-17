@@ -16,9 +16,6 @@ title: system config value is a definition of system config resource.
 type: array
 items:
   $ref: './systemConfig.yaml'
-  required:
-    - key
-    - value
 example:
   [
     {

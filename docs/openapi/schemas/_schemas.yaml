@@ -76,6 +76,8 @@ member:
   $ref: "./member.yaml"
 memberList:
   $ref: "./memberList.yaml"
+notifications.create:
+  $ref: "./notifications.create.yaml"
 workspace:
   $ref: "./workspace.yaml"
 workspaceList:
@@ -120,3 +122,27 @@ systemConfigUpdate:
   $ref: "./systemConfigUpdate.yaml"
 systemConfigValue:
   $ref: "./systemConfigValue.yaml"
+maintenanceModeSettings:
+  $ref: "./maintenanceModeSettings.yaml"
+settingsDestination:
+  $ref: "./settings.destination.yaml"
+settingsDestinationList:
+  $ref: "./settings.destinationList.yaml"
+settingsDestinationOne:
+  $ref: "./settings.destinationOne.yaml"
+settingsDestinationCreate:
+  $ref: "./settings.destinations.create.yaml"
+settingsDestinationPut:
+  $ref: "./settings.destinations.put.yaml"
+settingsDestinationSubDestinationInformationsMail:
+  $ref: "./settings.destinations.sub.destination_informations.mail.yaml"
+settingsDestinationSubDestinationInformationsTeams:
+  $ref: "./settings.destinations.sub.destination_informations.teams.yaml"
+settingsDestinationConditions:
+  $ref: "./settings.destinations.sub.conditions.yaml"
+settingsMailserverCreate:
+  $ref: "./settings.mailserver.create.yaml"
+settingsMailserverList:
+  $ref: "./settings.mailserverList.yaml"
+settingsMailserverGet:
+  $ref: "./settings.mailserver.yaml"

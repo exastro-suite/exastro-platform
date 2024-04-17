@@ -50,6 +50,9 @@ services:
       - ITA_API_ADMIN_PROTOCOL=http
       - ITA_API_ADMIN_HOST=ita-api
       - ITA_API_ADMIN_PORT=8000
+      - ITA_API_OASE_RECEIVER_PROTOCOL=http
+      - ITA_API_OASE_RECEIVER_HOST=ita-api
+      - ITA_API_OASE_RECEIVER_PORT=8000
       #- PLATFORM_WEB_LOCATION=/*/platform/
       - PLATFORM_WEB_PROTOCOL=http
       - PLATFORM_WEB_HOST=platform-web
@@ -57,16 +60,26 @@ services:
       - PLATFORM_API_PROTOCOL=http
       - PLATFORM_API_HOST=platform-api
       - PLATFORM_API_PORT=8000
-      - DB_HOST=platform-db
+      - DB_HOST=${PLATFORM_DB_HOST:-platform-db}
       - DB_DATABASE=platform
       - DB_USER=app_user
       - DB_PASSWORD=password
       - ENCRYPT_KEY=${ENCRYPT_KEY}
       - EXTERNAL_URL=${EXTERNAL_URL:-}
       - EXTERNAL_URL_MNG=${EXTERNAL_URL_MNG:-}
+      # AuditLogの設定は、いずれも既定値あるため、環境変数から渡すのはオプション
+      # All AuditLog settings have default values, so passing them from environment variables is optional.
+      # - AUDIT_LOG_ENABLED=${AUDIT_LOG_ENABLED:-True}
+      # - AUDIT_LOG_PATH=${AUDIT_LOG_PATH}
+      # - AUDIT_LOG_FILE_MAX_BYTE=${AUDIT_LOG_FILE_MAX_BYTE}
+      # - AUDIT_LOG_BACKUP_COUNT=${AUDIT_LOG_BACKUP_COUNT}
+    volumes:
+      - ../.volumes/exastro/log:/var/log/exastro
     ports:
       - "0.0.0.0:8000:8000"
       - "0.0.0.0:8001:8001"
+    networks:
+      - exastro
 
     depends_on:
       platform-migration-2:
@@ -89,13 +102,15 @@ services:
       - TZ=Asia/Tokyo
       - KEYCLOAK_ADMIN=${KEYCLOAK_ADMIN:-admin}
       - KEYCLOAK_ADMIN_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD:-password}
-      - KC_DB=mariadb
-      - KC_DB_URL_HOST=platform-db
+      - KC_DB=${PLATFORM_DBMS:-mariadb}
+      - KC_DB_URL_HOST=${PLATFORM_DB_HOST:-platform-db}
       - KC_DB_URL_DATABASE=keycloak
       - KC_DB_USERNAME=keycloak
       - KC_DB_PASSWORD=password
       - KC_PROXY=passthrough
       - KC_HTTP_RELATIVE_PATH=/auth
+    networks:
+      - exastro
     command:
       # 開発モードで起動
       - start-dev --spi-theme-static-max-age=-1 --spi-theme-cache-themes=false --spi-theme-cache-templates=false
@@ -115,6 +130,8 @@ services:
     environment:
       - TZ=Asia/Tokyo
       - MYSQL_ROOT_PASSWORD=password
+    networks:
+      - exastro
 
   platform-web:
     user: 1000:1000
@@ -129,6 +146,8 @@ services:
     environment:
       - TZ=Asia/Tokyo
       - LISTEN_PORT=80
+    networks:
+      - exastro
 
   platform-api:
     user: 1000:1000
@@ -151,13 +170,39 @@ services:
       - ITA_API_ADMIN_PROTOCOL=http
       - ITA_API_ADMIN_HOST=ita-api
       - ITA_API_ADMIN_PORT=8000
-      - DB_HOST=platform-db
+      - DB_HOST=${PLATFORM_DB_HOST:-platform-db}
       - DB_DATABASE=platform
       - DB_USER=app_user
       - DB_PASSWORD=password
       - DB_ADMIN_USER=root
       - DB_ADMIN_PASSWORD=password
       - ENCRYPT_KEY=${ENCRYPT_KEY}
+    networks:
+      - exastro
+
+  platform-job:
+    user: 1000:1000
+    build:
+      dockerfile: ./platform_root/platform_job/Dockerfile
+      context: ../.
+      args:
+        - HTTP_PROXY=${HTTP_PROXY}
+        - http_proxy=${HTTP_PROXY}
+        - HTTPS_PROXY=${HTTPS_PROXY}
+        - https_proxy=${HTTPS_PROXY}
+    environment:
+      - TZ=Asia/Tokyo
+      - PYTHONIOENCODING=utf-8
+      - DB_HOST=${PLATFORM_DB_HOST:-platform-db}
+      - DB_DATABASE=platform
+      - DB_USER=app_user
+      - DB_PASSWORD=password
+      - API_KEYCLOAK_HOST=keycloak
+      - API_KEYCLOAK_PROTOCOL=http
+      - API_KEYCLOAK_PORT=8080
+      - ENCRYPT_KEY=${ENCRYPT_KEY}
+    networks:
+      - exastro
 
   platform-migration-1:
     user: 1000:1000
@@ -173,7 +218,7 @@ services:
     environment:
       - TZ=Asia/Tokyo
       - PYTHONIOENCODING=utf-8
-      - DB_HOST=platform-db
+      - DB_HOST=${PLATFORM_DB_HOST:-platform-db}
       - DB_DATABASE=platform
       - DB_USER=app_user
       - DB_PASSWORD=password
@@ -184,6 +229,8 @@ services:
       - KEYCLOAK_DB_PASSWORD=password
       # - TIMEOUT_SECONDS_CONNECT_DB=600
       # - TIMEOUT_SECONDS_KEYCLOAK_START=600
+    networks:
+      - exastro
 
   platform-migration-2:
     user: 1000:1000
@@ -204,7 +251,7 @@ services:
       - API_KEYCLOAK_HOST=keycloak
       - API_KEYCLOAK_PROTOCOL=http
       - API_KEYCLOAK_PORT=8080
-      - DB_HOST=platform-db
+      - DB_HOST=${PLATFORM_DB_HOST:-platform-db}
       - DB_DATABASE=platform
       - DB_USER=app_user
       - DB_PASSWORD=password
@@ -216,7 +263,12 @@ services:
       # - TIMEOUT_SECONDS_CONNECT_DB=600
       # - TIMEOUT_SECONDS_KEYCLOAK_START=600
       - ENCRYPT_KEY=${ENCRYPT_KEY}
+    networks:
+      - exastro
     depends_on:
       platform-migration-1:
         condition: service_completed_successfully
 
+networks:
+  exastro:
+    name: "exastro_${NETWORK_ID}"

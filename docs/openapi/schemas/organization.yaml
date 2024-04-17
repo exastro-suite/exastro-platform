@@ -24,7 +24,7 @@ properties:
   organization_managers:
     type: array
     items:
-      $ref: "./usernameOnly.yaml"
+      $ref: "./organizationUser.yaml"
   active_plan:
     type: object
     properties:
@@ -39,6 +39,20 @@ properties:
     type: boolean
     description: organization enabled(true) or disabled(false)
     example: true
+  optionsIta:
+    type: object
+    properties:
+      drivers:
+        type: object
+        properties:
+          terraform_cloud_ep:
+            type: boolean
+          terraform_cli:
+            type: boolean
+          ci_cd:
+            type: boolean
+          oase:
+            type: boolean
   status:
     type: string
     example: Organization Create Complete

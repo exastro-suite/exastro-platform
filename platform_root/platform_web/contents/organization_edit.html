@@ -1,0 +1,291 @@
+<!--
+#   Copyright 2022 NEC Corporation
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+-->
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="format-detection" content="telephone=no,email=no,address=no">
+        <meta name="theme-color" content="#002B62">
+        <title text-id="000-85036">
+            オーガナイゼーション編集 / オーガナイゼーション管理 / Exastro Platform
+        </title>
+        <link rel="stylesheet" href="/_/platform-commons/css/platform.css?ver=__BUILD_VERSION__">
+
+        <script type="text/javascript" src="/auth/js/keycloak.js?ver=__BUILD_VERSION__"></script>
+        <script type="text/javascript" src="/_/common-auth/js/exastro-common-auth-config.js?ver=__BUILD_VERSION__"></script>
+        <script type="text/javascript" src="/_/common-auth/js/exastro-common-auth.js?ver=__BUILD_VERSION__"></script>
+        <script src="/_/platform-commons/common/js/jquery.js?ver=__BUILD_VERSION__"></script>
+
+        <link rel="stylesheet" href="/_/platform-commons/css/custom_properties.css?ver=__BUILD_VERSION__">
+        <link rel="stylesheet" href="/_/platform-commons/css/common.css?ver=__BUILD_VERSION__">
+        <link rel="stylesheet" href="/_/platform-commons/css/dialog.css?ver=__BUILD_VERSION__">
+
+        <script src="/_/platform-commons/common/js/words.js?ver=__BUILD_VERSION__"></script>
+        <script src="/_/platform-commons/common/js/common.js?ver=__BUILD_VERSION__"></script>
+        <script src="/_/platform-commons/common/js/dialog.js?ver=__BUILD_VERSION__"></script>
+        <script src="/_/platform-commons/common/js/ui.js?ver=__BUILD_VERSION__"></script>
+
+        <script src="/_/platform-commons/js/platform_common.js?ver=__BUILD_VERSION__"></script>
+        <script src="/_/platform-commons/js/uri_conf.js?ver=__BUILD_VERSION__"></script>
+        <script src="/_/platform-commons/js/organization_edit.js?ver=__BUILD_VERSION__"></script>
+
+    </head>
+    <body>
+        <div id="container">
+            <div class="containerHeader">
+                <header id="header">
+                    <div class="logo">
+                        <img class="logoImage" src="/_/platform-commons/img/Exastro-logo2-white-rgb.svg?ver=__BUILD_VERSION__" alt="Exastro" style="height:32px; margin:5px 18px;">
+                    </div>
+                    <div class="topicPath">
+                        <ol class="topichPathList" style="visibility:hidden;">
+                        </ol>
+                    </div>
+                    <div class="headerMenu">
+                        <ul class="headerMenuList">
+                            <li class="userInfomation headerMenuItem">
+                            </li>
+                        </ul>
+                    </div>
+                </header>
+            </div>
+            <div class="containerBody">
+                <aside id="menu" class="">
+                    <!--
+                    <div class="menuHeader"></div>
+                    -->
+                    <div class="menuBody">
+                        <nav class="menuNavi">
+                            <ul class="menuList" style="display:none;">
+                            </ul>
+                        </nav>
+                    </div>
+                </aside>
+                <main id="main" style="visibility:hidden;">
+                    <div id="content">
+                        <div class="contentHeader">
+                            <h1 class="contentTitle"><span class="contentTitleInner" text-id="000-85035">オーガナイゼーション編集</span></h1>
+                            <p class="contentMenuInfo" text-id="000-85037">オーガナイゼーションを変更します。</p>
+                        </div>
+                        <div class="contentBody">
+                            <div class="contentMenu">
+                                <ul class="contentMenuList">
+                                    <li class="contentMenuItem">
+                                        <a class="contentMenuLink tabOpen" href="#dataList" tabindex="-1">
+                                            <span class="inner" text-id="000-80022">入力</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <section class="section tabOpen" id="dataList">
+                                <div class="sectionBody">
+                                    <div id="MT" class="tableContainer viewTable">
+                                        <div class="tableBody">
+                                            <table class="table" width="100%">
+                                                <thead class="tbody">
+                                                    <tr class="tBodyTr tr">
+                                                        <td data-id="c1" data-rest="id" class="popup th2" rowspan="1" colspan="3" }="" title="【オーガナイゼーション基本情報】" attr-text-id="title=000-85013"><div class="ci" text-id="000-85013">【オーガナイゼーション基本情報設定】</div></td>
+                                                    </tr>
+                                                </thead>
+                                                <thead class="thead">
+                                                    <tr class="tHeadTr tr">
+                                                        <th data-id="c1" data-rest="id" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="項目名" attr-text-id="title=000-80020" width="250px;"><div class="ci" text-id="000-80020">項目名</div></th>
+                                                        <th data-id="c2" data-rest="name" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="設定値" attr-text-id="title=000-80021" style="min-width:400px;"><div class="ci" text-id="000-80021">設定値</div></th>
+                                                        <th data-id="c3" data-rest="name" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="備考" attr-text-id="title=000-80023"><div class="ci" text-id="000-80023">備考</div></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody class="tbody">
+                                                    <tr class="tBodyTr tr">
+                                                        <th class="tBodyTh th" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: left;"><span text-id="000-00103">オーガナイゼーションID</span></div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci textOverWrap" id="text_organization_id">
+                                                        </div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }=""></td>
+                                                    </tr>
+                                                    <tr class="tBodyTr tr">
+                                                        <th class="tBodyTh th" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: left;"><span text-id="000-00102">オーガナイゼーション名</span><span class="tHeadRequired" text-id="000-80024">必須</span></div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci">
+                                                            <input type="text" value="" class="tableEditInputText inputText input inputTextWidthAdjustment" id="form_organization_name" maxlength="255">
+                                                            <span class="validate_error" id="message_organization_name"></span>
+                                                        </div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci textOverWrap" text-id="000-85015">最大255文字 / 使用可能文字：全角・半角文字</div></td>
+                                                    </tr>
+                                                    <tr class="tBodyTr tr">
+                                                        <th class="tBodyTh th" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: left;" text-id="000-85033">現在のリソースプラン</div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci textOverWrap" id="text_active_plan">
+                                                        </div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }=""></td>
+                                                    </tr>
+                                                    <tr class="tBodyTr tr">
+                                                        <th class="tBodyTh th" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: left;" text-id="000-80031">有効</div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci textOverWrap">
+                                                            <input type="checkbox" value="" id="form_organization_enabled" checked>
+                                                        </div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }=""></td>
+                                                    </tr>
+                                                    <tr class="tBodyTr tr">
+                                                        <th class="tBodyTh th" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: left;" text-id="000-85006">オーガナイゼーション作成ステータス</div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }="">
+                                                            <div class="ci" id="text_status">
+                                                        </div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }=""></td>
+                                                    </tr>
+                                                </tbody>
+                                                <tbody class="tbody">
+                                                    <tr class="tBodyTr tr">
+                                                        <td data-id="c1" data-rest="id" class="popup th2" rowspan="1" colspan="3" }="" title="【IT Automation オプション設定】" attr-text-id="title=000-85019"><div class="ci" text-id="000-85019">【Exastro IT Automation オプション設定】</div></td>
+                                                    </tr>
+                                                </tbody>
+                                                <thead class="thead">
+                                                    <tr class="tHeadTr tr">
+                                                        <th data-id="c1" data-rest="id" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="項目名" attr-text-id="title=000-80020" width="250px;"><div class="ci" text-id="000-80020">項目名</div></th>
+                                                        <th data-id="c2" data-rest="name" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="設定値" attr-text-id="title=000-80021" style="min-width:400px;"><div class="ci" text-id="000-80021">設定値</div></th>
+                                                        <th data-id="c3" data-rest="name" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="備考" attr-text-id="title=000-80023"><div class="ci" text-id="000-80023">備考</div></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody class="tbody">
+                                                    <tr class="tBodyTr tr">
+                                                        <th class="tBodyTh th" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: left;" text-id="000-85020">インストールドライバ</div></td>
+                                                        <td class="tBodyTd td ita-option-drivers" rowspan="1" colspan="1" }="">
+                                                            <div class="ci datarow-template" style="display:none">
+                                                                <span style="${readonly_display};">
+                                                                    <span class="icon icon-check" style="margin-left:5px;"></span>${name}
+                                                                </span>
+                                                                <span style="${edit_display};">
+                                                                    <input type="checkbox" class="ita-option-driver" id="ita-option-driver-${id}" value="${id}" ${checked} ${disabled}>
+                                                                    <label for="ita-option-driver-${id}" class="itaOptionsDriversLabel">${name}</label>
+                                                                </span>
+                                                                <span class="icon icon-circle_question popup question-icon" title="${description-text}" style="${description-display}"></span>
+                                                            </div>
+                                                        </td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci textOverWrap" text-id="000-85049">インストール済みのドライバの削除はできません</div></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                            <table class="table" width="100%">
+                                                <tbody class="tHeadBlank">
+                                                    <tr class="tHeadBlank">
+                                                        <td data-id="c1" data-rest="id" class="popup th2" rowspan="1" colspan="1" }="" width="250px;" title="【リソースプラン】" attr-text-id="title=000-85040" style="vertical-align: bottom;"><div class="ci" text-id="000-85040">【リソースプラン】</div></td>
+                                                        <td data-id="c2" data-rest="id" class="popup th2" rowspan="1" colspan="1" }="" width="100%;"></td>
+                                                        <td data-id="c3" data-rest="id" class="popup th2" rowspan="1" colspan="1" }="" width="100%;" style="width: 100%; text-align: right;"><div class="ci" width="100%;"  style="width: 100%; text-align: right;">
+                                                            <button title="リソースプラン設定" attr-text-id="title=000-85044" id="button_detail_modal_open" data-action="positive" class="itaButton button button_edit_organization_plan" style="width:200px;">
+                                                                <span class="inner">
+                                                                    <span class="iconButtonIcon icon icon-plus"></span>
+                                                                    <span class="iconButtonBody" text-id="000-85044">リソースプラン設定</span>
+                                                                </span>
+                                                            </button>
+                                                        </div></td>
+                                                    </tr>
+                                                </tbody>
+                                                <tbody class="tHeadBlank">
+                                                    <tr class="tHeadBlank">
+                                                        <td class="tHeadBlank" rowspan="1" colspan="3" }="">
+                                                            <div class="tableBody">
+                                                                <table class="table" width="100%" id="organization_plan_list">
+                                                                    <thead class="thead">
+                                                                        <tr class="tHeadTr tr">
+                                                                            <th class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="リソースプランID" attr-text-id="title=000-00121"><div class="ci" text-id="000-00121">リソースプランID</div></th>
+                                                                            <th class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="リソースプラン名" attr-text-id="title=000-00122"><div class="ci" text-id="000-00122">リソースプラン名</div></th>
+                                                                            <th class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="リソースプラン開始日時" attr-text-id="title=000-00125"><div class="ci" text-id="000-00125">リソースプラン開始日時</div></th>
+                                                                            <th class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="登録日時" attr-text-id="title=000-00142"><div class="ci" text-id="000-00142">登録日時</div></th>
+                                                                            <th class="tHeadTh popup th" rowspan="1" colspan="1" }="" width="130px;"><div class="ci"></div></th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody class="tbody">
+                                                                        <tr class="tBodyTr tr datarow-template ${changed}" style="display:none">
+                                                                            <td class="tBodyTh th" rowspan="1" colspan="1" }="" ><div class="ci">${plan_id}</div></td>
+                                                                            <td class="tBodyTd td" rowspan="1" colspan="1" }="" ><div class="ci textOverWrap">${plan_name}</div></td>
+                                                                            <td class="tBodyTd td" rowspan="1" colspan="1" }="" ><div class="ci">${plan_start_datetime}</div></td>
+                                                                            <td class="tBodyTd td" rowspan="1" colspan="1" }="" ><div class="ci">${plan_create_timestamp}</div></td>
+                                                                            <td class="tBodyTd td" rowspan="1" colspan="1" }="" ><div class="ci" style="text-align: center;">
+                                                                                <button title="解除" attr-text-id="title=000-80044" data-action="danger" class="itaButton button button_delete_organization_plan ${changed}" data-id="${plan_id}" data-start-datetime="${plan_start_datetime}" style="width:100px;" ${button_disabled}>
+                                                                                    <span class="inner">
+                                                                                        <span class="iconButtonIcon icon icon-minus"></span>
+                                                                                        <span class="iconButtonBody" text-id="000-80044">解除</span>
+                                                                                    </span>
+                                                                                </button>
+                                                                            </div></td>
+                                                                        </tr>
+                                                                        <tr class="tBodyTr tr notfound" style="display:none">
+                                                                            <td class="tBodyTh tBodyTd td" rowspan="1" colspan="1" }="" ><div class="ci">_default</div></td>
+                                                                            <td class="tBodyTd td" rowspan="1" colspan="1" }="" ><div class="ci">_default plan</div></td>
+                                                                            <td class="tBodyTd td" rowspan="1" colspan="1" }="" ><div class="ci"></div></td>
+                                                                            <td class="tBodyTd td" rowspan="1" colspan="1" }="" ><div class="ci"></div></td>
+                                                                            <td class="tBodyTd td" rowspan="1" colspan="1" }="" ><div class="ci"></div></td>
+                                                                        </tr>
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <div class="tableHeader">
+                                            <ul class="tableHeaderMainMenuList">
+                                                <li class="tableHeaderMainMenuItem">
+                                                    <button data-type="tableNew" data-action="positive" style="width:200px;" class="itaButton tableHeaderMainMenuButton button" id="button_register">
+                                                        <span class="inner"><span class="icon icon-edit"></span>
+                                                        <span text-id="000-80025">登録</span></span>
+                                                    </button>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+                        </div>
+                    </div>
+                </main>
+            </div>
+            <div class="containerLoading"></div>
+        </div>
+        <!--
+            Dialog
+        -->
+        <div class="dialog-template" style="display: none">
+            <div id="organization_plan_detail_dialog">
+                <div class="tableContainer" style="width:50vw; height:40vh;">
+                    <div class="tableBody">
+                        <table class="table" width="100%">
+                            <tbody class="tBody">
+                                <tr class="tBodyTr tr">
+                                    <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1" }="" width="300px;"><div class="ci" style="text-align: left;"><span text-id="000-00121">リソースプランID</span><span class="tHeadRequired" text-id="000-80024">必須</span></div></td>
+                                    <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci">
+                                        <select class="input form_plan_id" id="edit_plan_id"></select>
+                                        <span class="validate_error" id="message_edit_plan_id"></span>
+                                    </div>
+                                    </td>
+                                </tr>
+                                <tr class="tBodyTr tr">
+                                    <th class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: left;" ><span text-id="000-00125">リソースプラン開始日時</span><span class="tHeadRequired" text-id="000-80024">必須</span></div></td>
+                                        <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci"><div class="inputDateContainer">
+                                        <div class="inputDateBody">
+                                            <input type="text" data-timeflag="true" placeholder="yyyy/MM/dd HH:mm:ss" id="edit_start_time" value="" class="executeSchedule inputDate inputText input" autocomplete="off">
+                                        </div>
+                                        <div class="inputDateCalendar">
+                                            <button data-action="normal" data-timeflag="true" id="btn_start_time" class="itaButton inputDateCalendarButton button"><span class="inner"><span class="icon icon-cal"></span></span></button>
+                                        </div>
+                                        </div>
+                                        <span class="validate_error" id="message_edit_start_time"></span></div></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

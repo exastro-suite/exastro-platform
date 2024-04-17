@@ -51,6 +51,10 @@ services:
       - SSL_CERT_DIR=/etc/ssl/certs
       - NODE_EXTRA_CA_CERTS=/etc/ssl/certs/ca-certificates.crt
       - NODE_TLS_REJECT_UNAUTHORIZED=${NODE_TLS_REJECT_UNAUTHORIZED:-1}
+      - AUDIT_LOG_ENABLED=${AUDIT_LOG_ENABLED:-True}
+      - AUDIT_LOG_PATH=${AUDIT_LOG_PATH:-exastro-audit.log}
+      - AUDIT_LOG_FILE_MAX_BYTE=${AUDIT_LOG_FILE_MAX_BYTE:-100000000}
+      - AUDIT_LOG_BACKUP_COUNT=${AUDIT_LOG_BACKUP_COUNT:-30}
 
   platform-api:
     build:
@@ -67,8 +71,8 @@ services:
       - ../platform_root/platform_api/config/httpd.conf/wsgi.conf:/etc/httpd/conf.d/wsgi.conf:cached
       - ~/.netrc:/home/app_user/.netrc
       - ~/.gitconfig:/home/app_user/.gitconfig
-      - ./platform-api/.vscode/launch.json:/workspace/.vscode/launch.json
-      - ./platform-api/.vscode/tasks.json:/workspace/.vscode/tasks.json
+      - ./platform-api-with-ita/.vscode/launch.json:/workspace/.vscode/launch.json
+      - ./platform-api-with-ita/.vscode/tasks.json:/workspace/.vscode/tasks.json
       - /usr/share/pki/ca-trust-source/anchors/UserRootCertificate.crt:/etc/ssl/certs/ca-certificates.crt
       - /mnt/mainte/talisman/.talismanrc:/mnt/mainte/talisman/.talismanrc
       - ~/.config/git/ignore:/home/app_user/.config/git/ignore
@@ -77,6 +81,7 @@ services:
       - ../.vscode_extensions/platform-api/.vscode-server/extensions:/home/app_user/.vscode-server/extensions
       - ../.vscode_extensions/platform-api/.vscode-server-insiders/extensions:/home/app_user/.vscode-server-insiders/extensions
     environment:
+      - PLATFORM_REPO_ROOT=${PLATFORM_REPO_ROOT:-}
       - FLASK_ENV=development
       - LOG_LEVEL=DEBUG
       - HTTP_PROXY=${HTTP_PROXY}
@@ -89,7 +94,48 @@ services:
       - SSL_CERT_DIR=/etc/ssl/certs
       - NODE_EXTRA_CA_CERTS=/etc/ssl/certs/ca-certificates.crt
       - NODE_TLS_REJECT_UNAUTHORIZED=${NODE_TLS_REJECT_UNAUTHORIZED:-1}
-
+      - NETWORK_ID=${NETWORK_ID:-}
+      - EXT_PORT_PLATFORM_UNITTEST_DB=${EXT_PORT_PLATFORM_UNITTEST_DB:-3308}
+  platform-job:
+    build:
+      target: develop_build
+    volumes:
+      - ..:/workspace:cached
+      - ../platform_root/common_library:/workspace/platform_root/platform_job/common_library:cached
+      - ../platform_root/common_resources:/workspace/platform_root/platform_job/common_resources:cached
+      - ../platform_root/platform_job:/app:cached
+      - ../platform_root/common_library:/app/common_library:cached
+      - ../platform_root/common_resources:/app/common_resources:cached
+      - ../platform_root/version:/app/version:cached
+      - ~/.netrc:/home/app_user/.netrc
+      - ~/.gitconfig:/home/app_user/.gitconfig
+      - ./platform-job/.vscode/launch.json:/workspace/.vscode/launch.json
+      - ./platform-job/.vscode/tasks.json:/workspace/.vscode/tasks.json
+      - /usr/share/pki/ca-trust-source/anchors/UserRootCertificate.crt:/etc/ssl/certs/ca-certificates.crt
+      - /mnt/mainte/talisman/.talismanrc:/mnt/mainte/talisman/.talismanrc
+      - ~/.config/git/ignore:/home/app_user/.config/git/ignore
+      - ${TALISMAN_HOME}:${TALISMAN_HOME}
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ../.vscode_extensions/platform-job/.vscode-server/extensions:/home/app_user/.vscode-server/extensions
+      - ../.vscode_extensions/platform-job/.vscode-server-insiders/extensions:/home/app_user/.vscode-server-insiders/extensions
+    environment:
+      - PLATFORM_REPO_ROOT=${PLATFORM_REPO_ROOT:-}
+      - FLASK_ENV=development
+      - LOG_LEVEL=DEBUG
+      - HTTP_PROXY=${HTTP_PROXY}
+      - http_proxy=${HTTP_PROXY}
+      - HTTPS_PROXY=${HTTPS_PROXY}
+      - https_proxy=${HTTPS_PROXY}
+      - NO_PROXY=localhost,127.0.0.1,keycloak,platform-auth,platform-api,platform-web,ita-web,ita-api
+      - no_proxy=localhost,127.0.0.1,keycloak,platform-auth,platform-api,platform-web,ita-web,ita-api
+      - SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
+      - SSL_CERT_DIR=/etc/ssl/certs
+      - NODE_EXTRA_CA_CERTS=/etc/ssl/certs/ca-certificates.crt
+      - NODE_TLS_REJECT_UNAUTHORIZED=${NODE_TLS_REJECT_UNAUTHORIZED:-1}
+      - NETWORK_ID=${NETWORK_ID:-}
+      - JOB_NOTIFICATION_SMTPS_SSL_VERIFY_ENABLED=FALSE
+      - EXT_PORT_PLATFORM_UNITTEST_DB=${EXT_PORT_PLATFORM_UNITTEST_DB:-3308}
+      - PLATFORM_DBMS=${PLATFORM_DBMS:-mariadb}
   platform-web:
     build:
       target: develop_build
@@ -133,7 +179,24 @@ services:
 
   platform-db:
     ports:
-      - "0.0.0.0:3307:3306"
+      - "0.0.0.0:${EXT_PORT_PLATFORM_DB:-3307}:3306"
+
+  platform-db-mysql:
+    image: mysql:8.0
+    healthcheck:
+      test: mysqladmin ping --silent && mysql -u root -p$${MYSQL_ROOT_PASSWORD} -e 'select 1;'
+      interval: 3s
+      retries: 200
+    volumes:
+      - ../.volumes/platform-db-mysql/data:/var/lib/mysql
+      - ../platform_root/platform_db/conf/my.cnf:/etc/mysql/conf.d/my.cnf
+    environment:
+      - TZ=Asia/Tokyo
+      - MYSQL_ROOT_PASSWORD=password
+    ports:
+      - "0.0.0.0:${EXT_PORT_PLATFORM_DB_MYSQL:-3309}:3306"
+    networks:
+      - exastro
 
   # platform-migration-1:
   #   build:
@@ -204,40 +267,6 @@ services:
       - NODE_EXTRA_CA_CERTS=/etc/ssl/certs/ca-certificates.crt
       - NODE_TLS_REJECT_UNAUTHORIZED=${NODE_TLS_REJECT_UNAUTHORIZED:-1}
 
-  # platform-job:
-  #   build:
-  #     target: develop_build
-  #   volumes:
-  #     - ..:/workspace:cached
-  #     - ../platform_root/common_library:/workspace/platform_root/platform_job/common_library:cached
-  #     - ../platform_root/common_resources:/workspace/platform_root/platform_job/common_resources:cached
-  #     - ../platform_root/platform_job:/app:cached
-  #     - ../platform_root/common_library:/app/common_library:cached
-  #     - ../platform_root/common_resources:/app/common_resources:cached
-  #     - ../platform_root/version:/app/version:cached
-  #     - ~/.netrc:/home/app_user/.netrc
-  #     - ~/.gitconfig:/home/app_user/.gitconfig
-  #     - ./platform-job/.vscode/launch.json:/workspace/.vscode/launch.json
-  #     - /usr/share/pki/ca-trust-source/anchors/UserRootCertificate.crt:/etc/ssl/certs/ca-certificates.crt
-  #     - /mnt/mainte/talisman/.talismanrc:/mnt/mainte/talisman/.talismanrc
-  #     - ~/.config/git/ignore:/home/app_user/.config/git/ignore
-  #     - ${TALISMAN_HOME}:${TALISMAN_HOME}
-  #     - /var/run/docker.sock:/var/run/docker.sock
-  #     - ../.vscode_extensions/platform-job/.vscode-server/extensions:/home/app_user/.vscode-server/extensions
-  #     - ../.vscode_extensions/platform-job/.vscode-server-insiders/extensions:/home/app_user/.vscode-server-insiders/extensions
-  #   environment:
-  #     - FLASK_ENV=development
-  #     - HTTP_PROXY=${HTTP_PROXY}
-  #     - http_proxy=${HTTP_PROXY}
-  #     - HTTPS_PROXY=${HTTPS_PROXY}
-  #     - https_proxy=${HTTPS_PROXY}
-  #     - NO_PROXY=localhost,127.0.0.1,keycloak,platform-auth,platform-api,platform-web,ita-web,ita-api
-  #     - no_proxy=localhost,127.0.0.1,keycloak,platform-auth,platform-api,platform-web,ita-web,ita-api
-  #     - SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
-  #     - SSL_CERT_DIR=/etc/ssl/certs
-  #     - NODE_EXTRA_CA_CERTS=/etc/ssl/certs/ca-certificates.crt
-  #     - NODE_TLS_REJECT_UNAUTHORIZED=${NODE_TLS_REJECT_UNAUTHORIZED:-1}
-
   ita-api:
     build:
       dockerfile: ./Dockerfile
@@ -254,6 +283,8 @@ services:
       - API_PORT=8000
       - PYTHONIOENCODING=utf-8
       - FLASK_ENV=development
+    networks:
+      - exastro
 
   ita-web:
     build:
@@ -270,3 +301,12 @@ services:
       - ../test/web/config/httpd.conf/httpd.conf:/etc/httpd/conf/httpd.conf:cached
       - ../test/web/config/httpd.conf/rewrite.conf:/etc/httpd/conf.d/rewrite.conf:cached
       - ../test/web/contents:/var/www/html:cached
+    networks:
+      - exastro
+  platform-init-containers:
+    # 監査ログ用の出力フォルダの権限を設定
+    # Set output folder permissions for audit logs
+    image: busybox:stable
+    volumes:
+      - ../.volumes/exastro/log:/var/log/exastro
+    command: "sh -c 'chmod 777 /var/log/exastro'"

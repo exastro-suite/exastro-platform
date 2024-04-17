@@ -94,7 +94,9 @@
                                             <ul class="tableHeaderMainMenuList">
                                                 <li class="tableHeaderMainMenuItem">
                                                     <button data-type="tableNew" data-action="positive" style="width:200px; display: none;" class="itaButton tableHeaderMainMenuButton button" id="new_role">
-                                                        <span class="inner"><span class="icon icon-edit"></span><span text-id="000-80009">作成</span></span></button>
+                                                        <span class="inner"><span class="icon icon-plus"></span>
+                                                        <span text-id="000-80009">作成</span></span>
+                                                    </button>
                                                 </li>
                                             </ul>
                                         </div>
@@ -102,31 +104,35 @@
                                             <table class="table" width="100%" id="roles_list">
                                                 <thead class="thead">
                                                     <tr class="tHeadTr tr">
-                                                        <th data-id="c1" data-rest="name" class="tHeadLeftSticky tHeadTh popup th" rowspan="1" colspan="1" }="" title="ロール名" attr-text-id="title=000-00107" width="300px;"><div class="ci" text-id="000-00107">ロール名</div></th>
+                                                        <th data-id="c1" data-rest="name" class="tHeadLeftSticky tHeadTh popup th" rowspan="1" colspan="1" }="" title="ロール名" attr-text-id="title=000-00107" width="300px;" style="min-width: 300px;"><div class="ci" text-id="000-00107">ロール名</div></th>
                                                         <th data-id="c2" data-rest="kind" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="種類" attr-text-id="title=000-00108" width="300px;"><div class="ci" text-id="000-00108">種類</div></th>
                                                         <th data-id="c3" data-rest="description" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="説明" attr-text-id="title=000-00106" width="40%"><div class="ci" text-id="000-00106">説明</div></th>
                                                         <th data-id="c4" data-rest="auth" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="権限 / ワークスペース" attr-text-id="title=000-84004" width="35%"><div class="ci" text-id="000-84004">権限 / ワークスペース</div></th>
-                                                        <th data-id="c5" data-rest="edit" class="tHeadTh popup th" rowspan="1" colspan="1" }="" width="80px"><div class="ci"></div></th>
-                                                        <th data-id="c6" data-rest="member" class="tHeadTh popup th" rowspan="1" colspan="1" }="" width="100px"><div class="ci"></div></th>
-                                                        <th data-id="c7" data-rest="delete" class="tHeadTh popup th" rowspan="1" colspan="1" }="" width="100px"><div class="ci"></div></th>
+                                                        <th data-id="c5" data-rest="edit" class="tHeadTh popup th" rowspan="1" colspan="1" }="" width="100px" style="min-width: 100px;"><div class="ci"></div></th>
+                                                        <th data-id="c6" data-rest="member" class="tHeadTh popup th" rowspan="1" colspan="1" }="" width="100px" style="min-width: 100px;"><div class="ci"></div></th>
+                                                        <th data-id="c7" data-rest="delete" class="tHeadTh popup th" rowspan="1" colspan="1" }="" width="100px" style="min-width: 100px;"><div class="ci"></div></th>
                                                     </tr>
                                                 </thead>
                                                 <tbody class="tbody">
                                                     <tr class="tBodyTr tr datarow-template" style="display:none">
-                                                        <th class="tBodyLeftSticky tBodyTh th to_detail" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: left;">${role_name}</div></td>
+                                                        <th class="tBodyLeftSticky tBodyTh th to_detail" rowspan="1" colspan="1" }=""><div class="ci textOverWrap" style="text-align: left;">${role_name}</div></td>
                                                         <td class="tBodyTd td to_detail" rowspan="1" colspan="1" }="" ><div class="ci">${role_kind}</div></td>
                                                         <td class="tBodyTd td to_detail" rowspan="1" colspan="1" }="" ><div class="ci pre_ht100">${role_description}</div></td>
                                                         <td class="tBodyTd td to_detail" rowspan="1" colspan="1" }="">${role_authority}</td>
                                                         <td class="tBodyTd td to_detail" rowspan="1" colspan="1" }=""><div class="ci">
-                                                            <button class="pl_button btn_edit" data-id="${role_name}" disabled>
-                                                                <span class="inner"><span class="icon icon-edit"></span><span text-id="000-80026">編集</span></span></button>
+                                                            <button class="pl_button btn_edit" data-id="${role_name}" style="width:90px;" disabled>
+                                                                <span class="inner"><span class="icon icon-edit"></span>
+                                                                <span text-id="000-80026">編集</span></span>
+                                                            </button>
                                                         </div></td>
                                                         <td class="tBodyTd td to_detail" rowspan="1" colspan="1" }=""><div class="ci">
-                                                            <button class="pl_button btn_member" data-id="${role_name}" disabled>
-                                                                <span class="inner"></span><span class="icon icon-user"></span><span text-id="000-00135">ユーザー</span></span></button>
+                                                            <button class="pl_button btn_member" data-id="${role_name}" style="width:90px;" disabled>
+                                                                <span class="inner"></span><span class="icon icon-user"></span>
+                                                                <span text-id="000-00135">ユーザー</span></span>
+                                                            </button>
                                                         </div></td>
                                                         <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: center;">
-                                                            <button title="削除" attr-text-id="title=000-80010" data-action="danger" class="itaButton button button_delete" data-id="${role_name}" style="width:100px;">
+                                                            <button title="削除" attr-text-id="title=000-80010" data-action="danger" class="itaButton button button_delete" data-id="${role_name}" style="width:90px;">
                                                                 <span class="inner">
                                                                     <span class="iconButtonIcon icon icon-trash"></span>
                                                                     <span class="iconButtonBody" text-id="000-80010">削除</span>

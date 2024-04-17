@@ -20,8 +20,9 @@ import inspect
 import pymysql
 import base64
 
-from common_library.common import common, validation, multi_lang
+from common_library.common import common, validation, multi_lang, maintenancemode
 from common_library.common import api_keycloak_tokens, api_keycloak_roles, api_ita_admin_call
+from common_library.common.db_init import DBinit
 from common_library.common import resources
 from common_library.common import bl_plan_service
 import common_library.common.const as common_const
@@ -66,6 +67,20 @@ def workspace_create(body, organization_id):
         description = ""
         environments = []
         wsadmin_users = []
+
+    # メンテナンスモード(data_update_stop)中は、エラー
+    # error during maintenance mode (data_update_stop)
+    mode_name = "data_update_stop"
+    target_name = "Workspace"
+    maintenance_mode = maintenancemode.maintenace_mode_get(mode_name)
+    if maintenance_mode == "1":
+        message_id = f"498-{MSG_FUNCTION_ID}001"
+        message = multi_lang.get_text(
+            message_id,
+            "メンテナンス中の為、{}の作成は出来ません。({})",
+            target_name,
+            workspace_id)
+        raise common.MaintenanceException(message_id=message_id, message=message)
 
     # validation check
     validate = validation.validate_workspace_id(workspace_id)
@@ -263,6 +278,9 @@ def workspace_create(body, organization_id):
                     )
                     raise common.InternalErrorException(message_id=message_id, message=message)
 
+            # workspace database create
+            __workspace_database_create(organization_id, workspace_id, user_id)
+
             # IT Automation call
             r_create_ita_workspace = api_ita_admin_call.ita_workspace_create(
                 organization_id, workspace_id, role_name_wsadmin, user_id, encode_roles, language,
@@ -283,6 +301,79 @@ def workspace_create(body, organization_id):
     return common.response_200_ok(data=None)
 
 
+def __workspace_database_create(organization_id, workspace_id, create_user):
+    """get workspace
+
+    Args:
+        organization_id (str): organization id
+        workspace_id (str): workspace id
+        create_user (str): create user
+
+    Raises:
+        common.InternalErrorException: _description_
+    """
+
+    globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
+
+    # DBが存在する場合は、処理しない
+    # If DB exists, do not process
+    if workspace_db_exsits_check(organization_id, workspace_id):
+        return
+
+    dbinit = DBinit()
+    ws_dbinfo = dbinit.generate_dbinfo(dbinit.prefix_workspace_db)
+
+    try:
+        # workspace database 作成
+        # create workspace database
+        dbinit.create_database(ws_dbinfo)
+
+        # Table 作成
+        # create table in workspace database
+        dbinit.create_table_workspacedb(ws_dbinfo)
+
+        # workspace database 接続情報登録
+        # workspace database connect infomation registration
+        dbinit.insert_workspace_dbinfo(ws_dbinfo, organization_id, workspace_id, create_user)
+
+    except Exception as e:
+        globals.logger.error(f"create workspace database error:{str(e)}")
+
+        dbinit.drop_database(ws_dbinfo)
+
+        message_id = f"500-{MSG_FUNCTION_ID}009"
+        message = multi_lang.get_text(
+            message_id,
+            "Workspace Database 作成に失敗しました(organization id:{0} workspace id:{1})",
+            organization_id,
+            workspace_id,
+        )
+        raise common.InternalErrorException(message_id=message_id, message=message)
+
+    return
+
+
+def workspace_db_exsits_check(organization_id, workspace_id):
+    """worskspace database exists check
+
+    Args:
+        organization_id (str): organization id
+        workspace_id (str): workspace id
+
+    Returns:
+        Boolean: True:Exists false:Not Exists
+    """
+
+    try:
+        # Database存在チェック
+        # database exists check
+        with closing(DBconnector().connect_workspacedb(organization_id, workspace_id)):
+            # 存在するためチェック終了
+            return True
+    except Exception:
+        return False
+
+
 @common.platform_exception_handler
 def workspace_delete(organization_id, workspace_id):  # noqa: E501
     """Delete an workspace
@@ -295,6 +386,20 @@ def workspace_delete(organization_id, workspace_id):  # noqa: E501
         Response: http response
     """
     globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
+
+    # メンテナンスモード(data_update_stop)中は、エラー
+    # error during maintenance mode (data_update_stop)
+    mode_name = "data_update_stop"
+    target_name = "Workspace"
+    maintenance_mode = maintenancemode.maintenace_mode_get(mode_name)
+    if maintenance_mode == "1":
+        message_id = f"498-{MSG_FUNCTION_ID}002"
+        message = multi_lang.get_text(
+            message_id,
+            "メンテナンス中の為、{}の削除は出来ません。({})",
+            target_name,
+            workspace_id)
+        raise common.MaintenanceException(message_id=message_id, message=message)
 
     r = connexion.request
 
@@ -366,7 +471,7 @@ def workspace_delete(organization_id, workspace_id):  # noqa: E501
             delete_roles = [
                 {"client_uid": private.internal_api_client_id, "role_name": workspace_id},
                 {"client_uid": private.internal_api_client_id, "role_name": common.get_ws_admin_rolename(workspace_id)},
-                {"client_uid": private.user_token_client_id, "role_name": common.get_ws_admin_rolename(workspace_id) }
+                {"client_uid": private.user_token_client_id, "role_name": common.get_ws_admin_rolename(workspace_id)}
             ]
 
             for delete_role in delete_roles:
@@ -389,6 +494,17 @@ def workspace_delete(organization_id, workspace_id):  # noqa: E501
 
             conn.commit()
 
+    # get DBinit instance
+    dbinit = DBinit()
+
+    # Delete Platform Workspace Database
+    globals.logger.info(f"Delete Platform Workspace Database : organization_id={organization_id} workspace_id={workspace_id}")
+    dbinit.drop_database(DBconnector().get_dbinfo_workspace(organization_id, workspace_id))
+
+    # Delete Platform Workspace db info
+    globals.logger.info(f"Delete Platform Workspace db info : organization_id={organization_id} workspace_id={workspace_id}")
+    dbinit.delete_workspace_dbinfo(organization_id, workspace_id)
+
     return common.response_200_ok(data=None)
 
 
@@ -408,6 +524,20 @@ def workspace_update(body, organization_id, workspace_id):  # noqa: E501
     :rtype: ResponseOk
     """
     globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
+
+    # メンテナンスモード(data_update_stop)中は、エラー
+    # error during maintenance mode (data_update_stop)
+    mode_name = "data_update_stop"
+    target_name = "Workspace"
+    maintenance_mode = maintenancemode.maintenace_mode_get(mode_name)
+    if maintenance_mode == "1":
+        message_id = f"498-{MSG_FUNCTION_ID}003"
+        message = multi_lang.get_text(
+            message_id,
+            "メンテナンス中の為、{}の更新は出来ません。({})",
+            target_name,
+            workspace_id)
+        raise common.MaintenanceException(message_id=message_id, message=message)
 
     # 更新する情報の取得
     # get information to be updated

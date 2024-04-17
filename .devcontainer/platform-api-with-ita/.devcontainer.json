@@ -32,6 +32,8 @@
 			}
 		},
 		"terminal.integrated.defaultProfile.linux": "bash",
+		// Remove trailing spaces when saving
+		"files.trimTrailingWhitespace": true,
 
 		// git menu setting
 		"git.allowNoVerifyCommit": true,
@@ -41,15 +43,29 @@
 		"thunder-client.saveToWorkspace": true,
 		"thunder-client.workspaceRelativePath": ".vscode_extensions",
 
+		// rest-client setting
+		"rest-client.environmentVariables": {
+			"$shared": {
+				"sys-mng-port": "8001",
+				"org-mng-port": "8000"
+			}
+		},
+
 		// python extension setting
 		"python.linting.pylintEnabled": false,
 		"python.linting.flake8Enabled": true,
 
 		"python.linting.lintOnSave": true,
 
+		"flake8.args": [
+			"--ignore=W293, W504",
+			"--max-line-length=250",
+			"--max-complexity=20",
+		],
+
 		"python.linting.flake8Args": [
 			"--ignore=W293, W504",
-			"--max-line-length=150",
+			"--max-line-length=250",
 			"--max-complexity=20",
 		],
 
@@ -58,6 +74,20 @@
 		"python.formatting.autopep8Args": [
 			"--aggressive", "--aggressive",
 		],
+
+		"python.testing.cwd": "${workspaceFolder}/platform_root/platform_api",
+		"python.testing.unittestEnabled": false,
+		"python.testing.pytestEnabled": true,
+		"python.testing.pytestArgs": [
+			"--cov=${workspaceFolder}/platform_root/platform_api/",
+			"--cov-report=xml",
+		],
+		"python.testing.autoTestDiscoverOnSaveEnabled": true,
+		"coverage-gutters.showGutterCoverage": false,
+		"coverage-gutters.showLineCoverage": true,
+		"coverage-gutters.showRulerCoverage": false,
+		"coverage-gutters.coverageBaseDir": "platform_root/platform_api",
+		"coverage-gutters.coverageReportFileName": "platform_root/platform_api/coverage.xml",
 	},
 	// Add the IDs of extensions you want installed when the container is created.
 	"extensions": [
@@ -65,6 +95,8 @@
 		"ms-python.vscode-pylance",
 		"ms-ceintl.vscode-language-pack-ja",
 		"ms-vscode.references-view",
+		"ms-python.flake8",
+		"ms-python.black-formatter",
 		"eamodio.gitlens",
 		"mhutchie.git-graph",
 		"42crunch.vscode-openapi",
@@ -85,13 +117,110 @@
 		"mitchdenny.ecdc",
 		"ms-vsliveshare.vsliveshare",
 		"snyk-security.snyk-vulnerability-scanner",
+		// "rapidapi.vscode-rapidapi-client",
+		"humao.rest-client",
+		"ryanluker.vscode-coverage-gutters",
 	],
+	"customizations": {
+		"vscode": {
+			// Set *default* container specific settings.json values on container create.
+			"settings": {
+				"terminal.integrated.profiles.linux": {
+					"bash": {
+						"path": "/bin/bash"
+					}
+				},
+				"terminal.integrated.defaultProfile.linux": "bash",
+
+				// git menu setting
+				"git.allowNoVerifyCommit": true,
+
+				// rest-client setting
+				"rest-client.environmentVariables": {
+					"$shared": {
+						"sys-mng-port": "8001",
+						"org-mng-port": "8000"
+					}
+				},
+
+				// python extension setting
+				"python.linting.pylintEnabled": false,
+				"python.linting.flake8Enabled": true,
+
+				"python.linting.lintOnSave": true,
+
+				"python.linting.flake8Args": [
+					"--ignore=W293, W504",
+					"--max-line-length=150",
+					"--max-complexity=20",
+				],
+
+				"python.formatting.provider": "autopep8",
+
+				"python.formatting.autopep8Args": [
+					"--aggressive", "--aggressive",
+				],
+
+				"python.testing.cwd": "${workspaceFolder}/platform_root/platform_api",
+				"python.testing.unittestEnabled": false,
+				"python.testing.pytestEnabled": true,
+				"python.testing.pytestArgs": [
+					"--cov=${workspaceFolder}/platform_root/platform_api/",
+					"--cov-report=xml",
+				],
+				"python.testing.autoTestDiscoverOnSaveEnabled": true,
+				"coverage-gutters.showGutterCoverage": false,
+				"coverage-gutters.showLineCoverage": true,
+				"coverage-gutters.showRulerCoverage": false,
+				"coverage-gutters.coverageBaseDir": "platform_root/platform_api",
+				"coverage-gutters.coverageReportFileName": "platform_root/platform_api/coverage.xml",
+			},
+			// Add the IDs of extensions you want installed when the container is created.
+			"extensions": [
+				"donjayamanne.python-extension-pack",
+				"ms-python.vscode-pylance",
+				"ms-ceintl.vscode-language-pack-ja",
+				"ms-vscode.references-view",
+				"ms-python.flake8",
+				"ms-python.black-formatter",
+				"eamodio.gitlens",
+				"mhutchie.git-graph",
+				"42crunch.vscode-openapi",
+				"arjun.swagger-viewer",
+				"redhat.vscode-yaml",
+				"adisreyaj.swagger-snippets",
+				"hediet.vscode-drawio",
+				"oderwat.indent-rainbow",
+				"aaron-bond.better-comments",
+				//"sonarsource.sonarlint-vscode",
+				"mechatroner.rainbow-csv",
+				"ryu1kn.partial-diff",
+				"pkief.material-icon-theme",
+				"rangav.vscode-thunder-client",
+				//"mtxr.sqltools",
+				//"mtxr.sqltools-driver-mysql",
+				//"formulahendry.vscode-mysql",
+				"mitchdenny.ecdc",
+				"ms-vsliveshare.vsliveshare",
+				"snyk-security.snyk-vulnerability-scanner",
+				// "rapidapi.vscode-rapidapi-client",
+				"humao.rest-client",
+				"ryanluker.vscode-coverage-gutters",
+			],
+		},
+	},
+
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	"forwardPorts": [
 	],
 	// Use 'postCreateCommand' to run commands after the container is created.
 	// "onCreateCommand":"sudo dnf install -y git vim diffutils bind-utils iputils && sudo pip3.9 install flake8 && sudo pip3.9 install autopep8",
 	"postCreateCommand": "sudo chmod -R 777 /home/app_user/.vscode-server && sudo chmod 777 /home/app_user/.vscode-server-insiders",
+	"postAttachCommand": "httpd -k stop",
 	"workspaceFolder": "/workspace",
-	"overrideCommand": true,
+	"overrideCommand": false,
+
+	"[python]": {
+		"editor.defaultFormatter": "ms-python.black-formatter"
+	},
 }

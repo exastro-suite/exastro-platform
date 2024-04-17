@@ -80,6 +80,20 @@ class NotFoundException(Exception):
         self.message = message
 
 
+class MaintenanceException(Exception):
+    """メンテナンス中 - Maintenance Exception
+
+    Args:
+        Exception (Exception): Exception
+    """
+
+    def __init__(self, data=None, message_id=None, message=None):
+        self.status_code = 498
+        self.data = data
+        self.message_id = message_id
+        self.message = message
+
+
 class InternalErrorException(Exception):
     """Internal Error Exception
 
@@ -96,6 +110,20 @@ class InternalErrorException(Exception):
 
 class OtherException(Exception):
     """Other Exception
+
+    Args:
+        Exception (Exception): Exception
+    """
+
+    def __init__(self, status_code, data=None, message_id=None, message=None):
+        self.status_code = status_code
+        self.data = data
+        self.message_id = message_id
+        self.message = message
+
+
+class CallException(Exception):
+    """Call Exception
 
     Args:
         Exception (Exception): Exception
@@ -231,6 +259,24 @@ def response_status(status_code, data, message_id, base_message="", *args):
     return jsonify({"result": message_id, "data": data, "message": message, "ts": datetime_to_str(datetime.now())}), status_code
 
 
+def response_status_direct(status_code, data, message_id, message=""):
+    """サーバーレスポンス共通 Server response common
+
+    Args:
+        status_cd (int): ステータスコード status code
+        data (str): 戻り値
+                    return values
+        message_id (str): MESSAGEに設定するmessage_id
+                          Message_id set in MESSAGE
+        message (str): メッセージ
+                            message
+    Returns:
+        response: HTTP Response (HTTP-500)
+    """
+
+    return jsonify({"result": message_id, "data": data, "message": message, "ts": datetime_to_str(datetime.now())}), status_code
+
+
 def response_server_error(e):
     """サーバーエラーレスポンス Server error response
 
@@ -266,10 +312,14 @@ def platform_exception_handler(func):
     def inner_func(*args, **kwargs):
         try:
             response = func(*args, **kwargs)
-        except (BadRequestException, AuthException, NotAllowedException, NotFoundException, InternalErrorException, OtherException) as err:
+        except (BadRequestException, AuthException, NotAllowedException, NotFoundException, InternalErrorException, MaintenanceException, OtherException) as err:
             globals.logger.error(f'exception handler:\n status_code:[{err.status_code}]\n message_id:[{err.message_id}]')
             globals.logger.error(''.join(list(traceback.TracebackException.from_exception(err).format())))
             return response_status(err.status_code, err.data, err.message_id, err.message)
+        except CallException as err:
+            globals.logger.error(f'exception handler:\n status_code:[{err.status_code}]\n message_id:[{err.message_id}]')
+            globals.logger.error(''.join(list(traceback.TracebackException.from_exception(err).format())))
+            return response_status_direct(err.status_code, err.data, err.message_id, err.message)
         except Exception as err:
             return response_server_error(err)
         return response
@@ -546,9 +596,9 @@ def val_to_boolean(val):
     """
     # 値がbool値の場合は、そのまま返却する
     # If the value is a bool value, return it as is
-    if type(val) == bool:
+    if type(val) is bool:
         return val
-    elif type(val) == str:
+    elif type(val) is str:
         if val.upper() == "TRUE":
             return True
         elif val.upper() == "FALSE":
@@ -574,3 +624,31 @@ def get_response_error_message(res):
         return json_text.get("errorMessage")
     except Exception:
         return None
+
+
+def rep_sql_json_para(str):
+    """SQL parameter json strings SQL Injection supports
+
+    Args:
+        str (str): update strings
+    """
+
+    str = str.replace(",", "")
+    str = str.replace("'", "")
+    str = str.replace('"', '')
+    str = str.replace(" ", "")
+    str = str.replace("%", "")
+
+    return str
+
+
+def is_none_or_empty_string(str):
+    """is None or EmptyString
+
+    Args:
+        str (str): check str
+
+    Returns:
+        bool: True : None or Empty String
+    """
+    return str is None or str == ""

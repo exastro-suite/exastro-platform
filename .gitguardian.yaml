@@ -1,0 +1,9 @@
+version: 2
+secret:
+  ignored-paths:
+    - 'platform_root/platform_api/tests/db/exports/**'
+    - 'platform_root/platform_job/tests/db/exports/**'
+    - 'platform_root/platform_job/tests/db/exports/mariadb/**'
+    - 'platform_root/platform_job/tests/db/exports/mysql/**'
+    - 'platform_root/platform_job/pytest.ini.sample'
+    - 'platform_root/platform_job/data/**'

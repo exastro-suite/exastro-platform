@@ -28,6 +28,21 @@ var api_conf = {
                     "get": "/api/{organization_id}/platform/workspaces/{workspace_id}/members",
                 },
             },
+            "settings": {
+                "notifications": {
+                    "get": "/api/{organization_id}/platform/workspaces/{workspace_id}/settings/notifications",
+                    "post": "/api/{organization_id}/platform/workspaces/{workspace_id}/settings/notifications",
+                    "put": "/api/{organization_id}/platform/workspaces/{workspace_id}/settings/notifications/{destination_id}",
+                    "delete": "/api/{organization_id}/platform/workspaces/{workspace_id}/settings/notifications/{destination_id}",
+
+                    "detail": {
+                        "get": "/api/{organization_id}/platform/workspaces/{workspace_id}/settings/notifications/{destination_id}",
+                    },
+                },
+            },
+            "notifications": {
+                "post": "/api/{organization_id}/platform/workspaces/{workspace_id}/notifications",
+            },
         },
         "roles": {
             "post": "/api/{organization_id}/platform/roles",
@@ -49,11 +64,64 @@ var api_conf = {
             "delete": "/api/{organization_id}/platform/users/{user_id}",
         },
         "token": {
-            "post": "/auth/realms/{organization_id}/protocol/openid-connect/token",
-            "get": "/api/{organization_id}/platform/users/_current/refresh_tokens",
-            "delete": "/api/{organization_id}/platform/users/_current/refresh_tokens"
-        }
-    }
+            "post": "/auth/realms/{realm_name}/protocol/openid-connect/token",
+            "platform_admin_site": {
+                "get": "/api/platform/users/_current/refresh_tokens",
+                "delete": "/api/platform/users/_current/refresh_tokens"
+            },
+            "organization_user_site": {
+                "get": "/api/{organization_id}/platform/users/_current/refresh_tokens",
+                "delete": "/api/{organization_id}/platform/users/_current/refresh_tokens"
+            },
+        },
+        "organizations": {
+            "get": "/api/platform/organizations",
+            "post": "/api/platform/organizations",
+            "delete": "/api/platform/organizations/{organization_id}",
+            "detail": {
+                "get": "/api/platform/organizations/{organization_id}",
+                "put": "/api/platform/organizations/{organization_id}",
+            },
+            "plans": {
+                "get": "/api/platform/{organization_id}/plans",
+                "post": "/api/platform/{organization_id}/plans",
+                "delete": "/api/platform/{organization_id}/plans/{plan_start_datetime}"
+            },
+        },
+        "it-automation": {
+            "settings": {
+                "get": "/api/ita/settings/"
+            }
+        },
+        "plans": {
+            "get": "/api/platform/plans",
+            "getPlanItem": "/api/platform/plan_items",
+            "post": "/api/platform/plans"
+        },
+        "maintenance-mode-setting": {
+            "get": "/api/{organization_id}/platform/maintenance-mode-setting",
+        },
+        "settings": {
+            "mailserver": {
+                "get": "/api/{organization_id}/platform/settings/mailserver",
+                "post": "/api/{organization_id}/platform/settings/mailserver",
+                "delete": "/api/{organization_id}/platform/settings/mailserver",
+            },
+            "maintenance-mode-setting": {
+                "get": "/api/platform/maintenance-mode-setting",
+                "patch": "/api/platform/maintenance-mode-setting",
+            },
+            "ita":{
+                "loglevel": {
+                    "get": "/api/ita/loglevel-settings/",
+                    "patch": "/api/ita/loglevel-settings/"
+                },
+                "backyard_execute_check": {
+                    "get": "/api/ita/backyard-execute-check/",
+                }
+            }
+        },
+}
 }
 
 var location_conf = {
@@ -63,13 +131,22 @@ var location_conf = {
             "list": "/{organization_id}/platform/workspaces",
             "detail": "/{organization_id}/platform/workspaces/{workspace_id}",
             "edit": "/{organization_id}/platform/workspaces/{workspace_id}/edit",
-            "ita": "/{organization_id}/workspaces/{workspace_id}/ita/"
+            "ita": "/{organization_id}/workspaces/{workspace_id}/ita/",
+            "settings": {
+                "notifications": {
+                    "workspaces": "/{organization_id}/platform/workspaces/_settings/notifications",
+                    "new" : "/{organization_id}/platform/workspaces/{workspace_id}/settings/notifications/_new",
+                    "list": "/{organization_id}/platform/workspaces/{workspace_id}/settings/notifications",
+                    "detail": "/{organization_id}/platform/workspaces/{workspace_id}/settings/notifications/{destination_id}",
+                    "edit": "/{organization_id}/platform/workspaces/{workspace_id}/settings/notifications/{destination_id}/edit",
+                },
+            },
         },
         "roles": {
             "new": "/{organization_id}/platform/roles/_new",
             "list": "/{organization_id}/platform/roles",
             "edit": "/{organization_id}/platform/roles/{role_name}",
-            "user": "/{organization_id}/platform/roles/{role_name}/user"
+            "user": "/{organization_id}/platform/roles/{role_name}/user",
         },
         "users": {
             "new": "/{organization_id}/platform/users/_new",
@@ -78,14 +155,43 @@ var location_conf = {
             "edit": "/{organization_id}/platform/users/{user_id}/edit",
         },
         "menu": {
-            "toppage": "/{organization_id}/platform/workspaces",
-            "account_manaagement": "/auth/admin/{organization_id}/console/#/realms/{organization_id}/users",
+            "platform_admin_site": {
+                "toppage": "/platform/organizations",
+            },
+            "organization_user_site": {
+                "toppage": "/{organization_id}/platform/workspaces",
+            }
         },
         "account": {
-            "main_page": "/{organization_id}/platform/account",
-            "account_edit": "/auth/realms/{organization_id}/account/",
-            "update_password": "/auth/realms/{organization_id}/account/password",
-            "two_factor_auth": "/auth/realms/{organization_id}/account/totp"
-        }
+            "platform_admin_site": {
+                "main_page": "/platform/account",
+            },
+            "organization_user_site": {
+                "main_page": "/{organization_id}/platform/account",
+            },
+            "account_edit": "/auth/realms/{realm_name}/account/",
+            "update_password": "/auth/realms/{realm_name}/account/password",
+            "two_factor_auth": "/auth/realms/{realm_name}/account/totp",
+        },
+
+        "organizations": {
+            "new": "/platform/organizations/_new",
+            "list": "/platform/organizations",
+            "detail": "/platform/organizations/{organization_id}",
+            "edit": "/platform/organizations/{organization_id}/edit",
+        },
+        "plans": {
+            "new": "/platform/plans/_new",
+            "list": "/platform/plans",
+        },
+        "settings_running_state": {
+            "top": "/platform/settings/running_state",
+        },
+        "keycloak": {
+            "console": "/auth/admin/master/console",
+        },
+        "settings": {
+            "mailserver": "/{organization_id}/platform/settings/mailserver",
+        },
     }
 }

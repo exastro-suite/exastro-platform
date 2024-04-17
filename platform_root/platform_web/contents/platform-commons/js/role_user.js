@@ -306,7 +306,7 @@ $(function(){
                     } else {
                         // 画面を開く権限がなくなってしまった場合は、topへ
                         alert(getText("000-84020", "画面を開く権限が無くなったので、トップページに戻ります"));
-                        window.location = location_conf.href.menu.toppage.replace(/{organization_id}/g, CommonAuth.getRealm());
+                        window.location = location_conf.href.menu.organization_user_site.toppage.replace(/{organization_id}/g, CommonAuth.getRealm());
                     }
                 });
             });
@@ -341,7 +341,7 @@ $(function(){
             },
             footer: {
                 button: {
-                    append: { text: '<span class="iconButtonIcon icon icon-plus"></span>'+getText("000-84013", '付与'), action: 'positive', style: 'width:200px;'},
+                    append: { text: '<span class="iconButtonIcon icon icon-plus"></span> '+getText("000-84013", '付与'), action: 'positive', style: 'width:200px;'},
                     close: { text: getText("000-80011", "閉じる"), action: "normal", style: 'width:200px;' }
                 }
             },

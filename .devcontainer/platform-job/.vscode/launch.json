@@ -14,30 +14,53 @@
 #   limitations under the License.
 */
 {
-    // IntelliSense を使用して利用可能な属性を学べます。
-    // 既存の属性の説明をホバーして表示します。
-    // 詳細情報は次を確認してください: https://go.microsoft.com/fwlink/?linkid=830387
-    "version": "0.2.0",
-    "configurations": [
-      {
-        "name": "Python: platform_init.py",
-        "type": "python",
-        "request": "launch",
-        "program": "/app/platform_init.py",
-        "cwd": "/app",
-        "pathMappings": [
-          {
-            "localRoot": "${workspaceFolder}/platform_root/platform_job",
-            "remoteRoot": "/app"
-          }
-        ],
-        "noDebug": false,
-        "args": [
-            "run",
-            "--no-debugger"
-        ],
-        "jinja": true,
-        "justMyCode": true
+  // IntelliSense を使用して利用可能な属性を学べます。
+  // 既存の属性の説明をホバーして表示します。
+  // 詳細情報は次を確認してください: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Python: start job manager",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "/app/job_manager.py",
+      "env": {
       },
- ]
+      "cwd": "/app",
+      "pathMappings": [
+        {
+          "localRoot": "${workspaceFolder}/platform_root/platform_job",
+          "remoteRoot": "/app"
+        }
+      ],
+      "noDebug": true,
+      "args": [
+          "run",
+          "--no-debugger"
+      ],
+      "jinja": true,
+      "justMyCode": true
+    },
+    {
+      "name": "[DEBUG] Python: start job manager",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "/app/job_manager.py",
+      "env": {
+      },
+      "cwd": "/app",
+      "pathMappings": [
+        {
+          "localRoot": "${workspaceFolder}/platform_root/platform_job",
+          "remoteRoot": "/app"
+        }
+      ],
+      "args": [
+          "run",
+          "--no-debugger"
+      ],
+      "jinja": true,
+      "justMyCode": true
+    },
+  ]
 }

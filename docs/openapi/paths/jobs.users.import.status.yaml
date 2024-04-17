@@ -1,4 +1,4 @@
-#   Copyright 2022 NEC Corporation
+#   Copyright 2024 NEC Corporation
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -14,26 +14,16 @@
 
 get:
   tags:
-  - InternalCommonService
-  summary: alive
-  x-openapi-router-controller: controllers.internal_common_service_controller
-  operationId: alive
+  - JobsService
+  summary: Get all import status
+  x-openapi-router-controller: controllers.jobs_service_controller
+  operationId: jobs_users_import_status
   parameters:
-    - name: User-Id
-      in: header
-      required: true
-      schema:
-        type: string
-    - name: Roles
-      in: header
-      required: true
-      schema:
-        type: string
-    - name: Language
-      in: header
-      required: true
-      schema:
-        type: string
+  - name: organization_id
+    in: path
+    required: true
+    schema:
+      type: string
   responses:
     200:
       description: A successful response.

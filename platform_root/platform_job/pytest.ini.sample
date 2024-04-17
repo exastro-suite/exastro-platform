@@ -1,0 +1,51 @@
+; 当ファイルをpytest.iniにコピーして利用してください
+
+[pytest]
+; pythonのimportディレクトリを/appからカレントディレクトリ(/workspace/platform_root/***)に変更
+; この設定を読み込まないとpytestのカバレッジやdebuggerがうまく動きません(/app配下のソースがimportされちゃう)
+pythonpath=.
+
+;
+; 環境変数
+;
+env =
+    ; unit test用のコンテナに接続に切り替え
+    API_KEYCLOAK_HOST=unittest-keycloak
+    API_KEYCLOAK_PROTOCOL=http
+    API_KEYCLOAK_PORT=8080
+    DB_HOST=unittest-platform-db
+    DB_DATABASE=platform
+    DB_USER=app_user
+    DB_PASSWORD=password
+    DB_ADMIN_USER=root
+    DB_ADMIN_PASSWORD=password
+    ; ITAはmockするので要求は飛ばないが、間違って本物に飛ばないようにするため置き換える
+    ITA_API_ADMIN_PROTOCOL=http
+    ITA_API_ADMIN_HOST=dummy
+    ITA_API_ADMIN_PORT=8079
+
+    TEST_OUTPUT_PATH=/workspace/platform_root/platform_job/tests/temp
+
+    ; pytest起動時にunit test用のコンテナを起動するかの指定
+    ;
+    ;   DOCKER_COMPOSE_UP_UNITTEST_NODE=MANUAL (開発時は基本こちらで利用)
+    ;       手動でunit test用のコンテナを起動します
+    ;       起動を待つ時間が省かれるのでunit testの実行時間が短くて済みます
+    ;
+    ;       unit test用のコンテナを起動コマンド(devcontainer内から実行)
+    ;           ./platform_root/platform_api/tests/docker-compose-up.sh
+    ;
+    ;   DOCKER_COMPOSE_UP_UNITTEST_NODE=AUTO
+    ;       自動でunit test用のコンテナを起動・停止します
+    ;       毎回起動・停止するので環境的にはクリーンになりますが、unit testの実行時間は遅くなります
+    ;
+    DOCKER_COMPOSE_UP_UNITTEST_NODE=MANUAL
+    ; DOCKER_COMPOSE_UP_UNITTEST_NODE=AUTO
+
+    ; pytest作成したで試験データのExcelをTEST_OUTPUT_PATHに保存します
+    ; USER_EXCEL_FILE_SAVED=TRUE
+
+; pytestのデバック（debugger使用）時のみコメントアウトを解除してください
+; ※コメントアウトを解除中はカバレッジの情報は更新されません
+; addopts=--no-cov
+

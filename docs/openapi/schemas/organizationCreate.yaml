@@ -42,18 +42,37 @@ properties:
     type: object
     description: Organization Add Json Parameter (json of exastro-it-automation)
     properties:
-      no_install_driver:
-        type: array
-        items:
-          description: "terraform_cloud_ep: Terraform-Cloud/EPドライバ,
-          <br/>terraform_cli: Terraform-CLIドライバ,
-          <br/>ci_cd: CI/CD for IaC
+      drivers:
+        type: object
+        description: "terraform_cloud_ep: Terraform-Cloud/EP driver
+          <br/>terraform_cli: Terraform-CLI driver,
+          <br/>ci_cd: CI/CD for IaC,
+          <br/>oase: OASE,
           "
-          type: "string"
-          enum:
-            - "terraform_cloud_ep"
-            - "terraform_cli"
-            - "ci_cd"
+        properties:
+          terraform_cloud_ep:
+            type: boolean
+          terraform_cli:
+            type: boolean
+          ci_cd:
+            type: boolean
+          oase:
+            type: boolean
+      services:
+        type: object
+        properties:
+          document_store:
+            type: object
+            description: "Only supports mongodb."
+            properties:
+              name:
+                type: string
+                example: "mongodb"
+              owner:
+                type: boolean
+              connection_string:
+                type: string
+                example: "XXXXXXXXXXXXXXXX"
 
 required:
   - id

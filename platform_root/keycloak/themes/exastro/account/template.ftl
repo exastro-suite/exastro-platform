@@ -83,11 +83,13 @@
 </body>
 <script language="javascript">
 window.addEventListener('DOMContentLoaded', (event) => {
-    if(location.pathname.split('/')[3] == 'master') {
-        document.querySelectorAll('.ifra-hidden').forEach(function(elm) {
-            elm.style.display = '';
-        })
-    }
+    try {
+        if(top == window) {
+            document.querySelectorAll('.ifra-hidden').forEach(function(elm) {
+                elm.style.display = '';
+            })
+        }
+    } catch(e) { }
 });
 </script>
 </html>
