@@ -176,6 +176,12 @@ services:
       - ../platform_root/keycloak/themes/exastro/admin:/opt/keycloak/themes/exastro.v2/admin:cached
       - ../platform_root/keycloak/themes/exastro:/opt/keycloak/themes/exastro:cached
       - ../platform_root/keycloak/themes/keycloak-themes.json:/opt/keycloak/META-INF/keycloak-themes.json:cached
+    command:
+      # 開発モードで起動
+      - start-dev
+      - --spi-theme-static-max-age=-1
+      - --spi-theme-cache-themes=false
+      - --spi-theme-cache-templates=false
 
   platform-db:
     ports:
