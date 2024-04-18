@@ -1,0 +1,10 @@
+/* ヘッダの非表示 */
+header.pf-c-page__header {
+    display: none !important;
+}
+/* メニューのstyle変更 */
+#page-sidebar .pf-c-nav__link {
+    padding-top: 4px;
+    padding-bottom: 4px;
+    font-size: 14px;
+}
