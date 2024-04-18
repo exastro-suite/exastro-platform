@@ -256,7 +256,7 @@ function displayMenu(curent) {
             <li class="menuItem"><a class="menuLink" id="menu_organizations" href="#" tabindex="-1">${getText("000-80037", "オーガナイゼーション管理")}</a></li>
             <li class="menuItem"><a class="menuLink" id="menu_plans" href="#">${getText("000-80038", "リソースプラン管理")}</a></li>
             <li class="menuItem"><a class="menuLink" id="menu_settings_running_state" href="#">${getText("000-80039", "システム状態設定")}</a></li>
-            <li class="menuItem"><a class="menuLink" id="menu_keycloak" href="#" target="exastro_platform_keycloak">${getText("000-80040", "keycloakコンソール")}</a></li>
+            <li class="menuItem"><a class="menuLink" id="menu_keycloak" href="#">${getText("000-80040", "Keycloakコンソール")}</a></li>
         `);
         $('#menu_organizations').attr('href', location_conf.href.organizations.list);
         $('#menu_plans').attr('href', location_conf.href.plans.list);

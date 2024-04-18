@@ -165,13 +165,13 @@ var location_conf = {
         "account": {
             "platform_admin_site": {
                 "main_page": "/platform/account",
+                "token": "/platform/token",
             },
             "organization_user_site": {
                 "main_page": "/{organization_id}/platform/account",
+                "token": "/{organization_id}/platform/token",
             },
             "account_edit": "/auth/realms/{realm_name}/account/",
-            "update_password": "/auth/realms/{realm_name}/account/password",
-            "two_factor_auth": "/auth/realms/{realm_name}/account/totp",
         },
 
         "organizations": {
@@ -188,7 +188,8 @@ var location_conf = {
             "top": "/platform/settings/running_state",
         },
         "keycloak": {
-            "console": "/auth/admin/master/console",
+            "console": "/platform/keycloak_console",
+            "console_frame": "/auth/admin/master/console",
         },
         "settings": {
             "mailserver": "/{organization_id}/platform/settings/mailserver",
