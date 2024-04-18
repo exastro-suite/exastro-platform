@@ -45,12 +45,17 @@ def __get_token(realm_name, data_para):
 
     header_para = {
         "Content-Type": "application/x-www-form-urlencoded",
-        "X-Forwarded-Host": request.headers.get("X-Forwarded-Host"),
-        "X-Forwarded-Proto": request.headers.get("X-Forwarded-Proto"),
     }
-
-    globals.logger.debug("X-Forwarded-Host:{}".format(request.headers.get("X-Forwarded-Host")))
-    globals.logger.debug("X-Forwarded-Proto:{}".format(request.headers.get("X-Forwarded-Proto")))
+    try:
+        if request.headers.get("X-Forwarded-Host") is not None:
+            header_para["X-Forwarded-Host"] = request.headers.get("X-Forwarded-Host")
+    except Exception:
+        pass
+    try:
+        if request.headers.get("X-Forwarded-Proto") is not None:
+            header_para["X-Forwarded-Proto"] = request.headers.get("X-Forwarded-Proto")
+    except Exception:
+        pass
 
     globals.logger.debug("get token")
     # token情報取得
