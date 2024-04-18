@@ -16,7 +16,7 @@
 import os
 import inspect
 import requests
-import urllib
+from flask import request
 
 # User Imports
 import globals  # 共通的なglobals Common globals
@@ -45,7 +45,12 @@ def __get_token(realm_name, data_para):
 
     header_para = {
         "Content-Type": "application/x-www-form-urlencoded",
+        "X-Forwarded-Host": request.headers.get("X-Forwarded-Host"),
+        "X-Forwarded-Proto": request.headers.get("X-Forwarded-Proto"),
     }
+
+    globals.logger.debug("X-Forwarded-Host:{}".format(request.headers.get("X-Forwarded-Host")))
+    globals.logger.debug("X-Forwarded-Proto:{}".format(request.headers.get("X-Forwarded-Proto")))
 
     globals.logger.debug("get token")
     # token情報取得
@@ -83,14 +88,13 @@ def client_user_get_token(realm_name, client_id, client_secret, user_id, user_pa
         "client_id": client_id,
         "username": user_id,
         "password": user_password,
-        "grant_type" :grant_type,
+        "grant_type": grant_type,
     }
 
     # その他のオプション値はすべてそのまま受け渡す
     # Pass all other option values ​​as they are
     if client_secret is not None:
         data_para["client_secret"] = client_secret
-
 
     # 下位の取得ロジックを呼びだし
     # Call the lower acquisition logic
@@ -117,7 +121,7 @@ def service_account_get_token(realm_name, client_id, client_secret):
     # Call destination setting
     data_para = {
         "client_id": client_id,
-        "grant_type" :"client_credentials",
+        "grant_type": "client_credentials",
     }
 
     # その他のオプション値はすべてそのまま受け渡す
