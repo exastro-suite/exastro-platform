@@ -1,4 +1,4 @@
-# Copyright 2023 NEC Corporation
+# Copyright 2024 NEC Corporation
 #
 # Licensed under the Apache License, Version 2.0 (the ""License"");
 # you may not use this file except in compliance with the License.
@@ -192,7 +192,7 @@ class LanguageList:
     lang_array['000-80037'] = 'Organization management'
     lang_array['000-80038'] = 'Resource plan management'
     lang_array['000-80039'] = 'System status settings'
-    lang_array['000-80040'] = 'keycloak console'
+    lang_array['000-80040'] = 'Keycloak console'
     lang_array['000-80041'] = 'no rolls'
     lang_array['000-80042'] = 'Creation confirmation'
     lang_array['000-80043'] = 'Single-byte numbers'
@@ -209,7 +209,7 @@ class LanguageList:
     lang_array['000-81004'] = 'Token Issuance'
     lang_array['000-81005'] = 'Account management / Exastro Platform'
     lang_array['000-81006'] = 'Account management'
-    lang_array['000-81007'] = 'You can edit your account, change your password, set up two-factor authentication and issue a token for the API.'
+    lang_array['000-81007'] = 'You can edit your account, change your password and issue two-factor authentication settings.'
     lang_array['000-81008'] = 'ID'
     lang_array['000-81009'] = 'Date of issue'
     lang_array['000-81010'] = 'Expiration date'
@@ -229,6 +229,8 @@ class LanguageList:
     lang_array['000-81024'] = 'If an API call is being made using a deleted refresh token, the API call will no longer be available.'
     lang_array['000-81025'] = 'All refresh tokens issued by you have been removed (deactivated).'
     lang_array['000-81026'] = 'Failed to get refresh token.'
+    lang_array['000-81027'] = 'Token Issuance / Exastro Platform'
+    lang_array['000-81028'] = 'You can issue tokens for API.'
     lang_array['000-82001'] = 'Workspace list'
     lang_array['000-82002'] = 'You can maintain (view/register/update/delete) workspaces.'
     lang_array['000-82003'] = 'Workspace list / Workspace management / Exastro Platform'
@@ -458,6 +460,9 @@ class LanguageList:
     lang_array['000-89012'] = 'When turned ON, server side jobs start and stop.'
     lang_array['000-89013'] = 'When turned ON, it becomes read-only mode. *If ON, the log level will not be changed.'
     lang_array['000-89014'] = 'Changed maintenance mode/log level settings'
+    lang_array['000-90001'] = 'Keycloak console / Exastro Platform'
+    lang_array['000-90002'] = 'Keycloak console'
+    lang_array['000-90003'] = 'You can change various settings of Keycloak.'
     lang_array['400-00001'] = 'Request-Header Paramater({}) is Invalid'
     lang_array['400-00002'] = 'Request-Body Paramater({}) is Invalid'
     #
@@ -632,6 +637,8 @@ class LanguageList:
     lang_array['500-23022'] = 'Failed to delete realm (Target ID: {0})'
     #
     lang_array['500-23024'] = 'Failed to update organization (Target ID:{0})'
+    lang_array['500-23025'] = 'Failed to get User Profile (Target ID:{0})'
+    lang_array['500-23026'] = 'Failed to update User Profile (Target ID:{0})'
     lang_array['500-24001'] = 'Failed to get workspace role (Target ID: {0})'
     lang_array['500-24002'] = 'Role creation failed (target role: {})'
     lang_array['500-24003'] = 'Failed to associate role and workspace role (target role: {})'
