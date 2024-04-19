@@ -1,6 +1,6 @@
 version: 2
 secret:
-  ignored-paths:
+  ignored_paths:
     - 'platform_root/platform_api/tests/db/exports/**'
     - 'platform_root/platform_job/tests/db/exports/**'
     - 'platform_root/platform_job/tests/db/exports/mariadb/**'
