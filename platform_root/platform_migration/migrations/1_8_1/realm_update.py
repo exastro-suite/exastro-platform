@@ -67,6 +67,7 @@ class realm_update:
     # realm update json
     update_master_json = {
         "loginTheme": "exastro",
+        "internationalizationEnabled": True,
         "supportedLocales": [
             "ja",
             "en"
