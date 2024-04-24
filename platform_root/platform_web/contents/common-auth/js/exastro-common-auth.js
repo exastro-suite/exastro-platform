@@ -85,7 +85,10 @@ const CommonAuth = {
             DebugConsole.log("CommonAuth", "[INFO] _login authenticated", authenticated);
             if(!authenticated) {
                 // Login failure - ログイン失敗
-                throw "not authenticated";
+                // If authentication fails, log in - 認証に失敗した時はログインへ
+                DebugConsole.log("CommonAuth", "[INFO] _login call keycloak.login");
+                CommonAuth.keycloak.login({redirectUri: location.href});
+                return;
             }
 
             // Contents of token - tokenの内容
@@ -104,10 +107,15 @@ const CommonAuth = {
             interval_worker.addEventListener('message', (e) => {CommonAuth._autoRefreshToken()});
             interval_worker.postMessage(CommonAuthConfig.TOKEN_CHECK_INTERVAL * 1000);
 
-        }).catch((e) => {
-            // If authentication fails, log in - 認証に失敗した時はログインへ
-            DebugConsole.log("CommonAuth", "[INFO] _login call keycloak.login");
-            CommonAuth.keycloak.login({redirectUri: location.href});
+        }).catch(() => {
+            DebugConsole.log("CommonAuth","[ERROR] _login keycloak.init exception");
+            if(window.location.pathname.search(/^\/platform\//) >= 0) {
+                console.log("Exastro Platform:\nInitial authentication processing failed.\nPlease make sure that the exastro platform is started properly or the \"EXTERNAL URL\" settings are set correctly.");
+                alert("Exastro Platform:\nInitial authentication processing failed.\nPlease make sure that the exastro platform is started properly or the \"EXTERNAL URL\" settings are set correctly.");
+            } else {
+                console.log("Exastro Platform:\nInitial authentication processing failed.");
+                alert("Exastro Platform:\nInitial authentication processing failed.");
+            }
         });
     },
 
