@@ -27,10 +27,6 @@ ENV KC_HTTP_RELATIVE_PATH=/auth
 ENV KC_HTTP_ENABLED=true
 ENV KC_HOSTNAME_STRICT=false
 
-# Install Curl 
-RUN dnf install -y curl
-
-
 # # Configure a database vendor
 # # ENV KC_DB=mariadb
 
