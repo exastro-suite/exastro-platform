@@ -345,6 +345,23 @@ const CommonAuth = {
     },
 
     /**
+     * check authority realm management - realm management権限の有無をチェックする
+     * @param {string} authority
+     * @returns {boolean}
+     */
+    "hasRealmManagementAuthority": function(authority) {
+        try {
+            if( CommonAuth.keycloak.tokenParsed.resource_access["realm-management"].roles.indexOf(authority) !== -1 ) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch(e) {
+            return false;
+        }
+    },
+
+    /**
      * The process of calling token updates on a regular basis - トークンの更新を定期的に呼び出す処理
      */
     "_autoRefreshToken": function() {
