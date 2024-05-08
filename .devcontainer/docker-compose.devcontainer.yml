@@ -174,8 +174,11 @@ services:
       - ..:/workspace:cached
       - ../platform_root/keycloak/themes/exastro:/opt/keycloak/themes/exastro:cached
       - ../platform_root/keycloak/themes/keycloak-themes.json:/opt/keycloak/META-INF/keycloak-themes.json:cached
+      - /usr/share/pki/ca-trust-source/anchors/UserRootCertificate.crt:/etc/ssl/certs/ca-certificates.crt
     environment:
       - JAVA_OPTS_APPEND=-Xms256m -Xmx256m
+      - SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
+      - SSL_CERT_DIR=/etc/ssl/certs
     command:
       # 開発モードで起動
       - start-dev
