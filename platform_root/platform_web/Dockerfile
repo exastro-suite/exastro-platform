@@ -27,7 +27,8 @@ ENV APACHE_SOCKET_DIR       /var/run_$USERNAME/httpd/socket
 ENV APACHE_USERNAME         $USERNAME
 ENV APACHE_GROUPNAME        $GROUPNAME
 
-RUN dnf install -y httpd \
+RUN --mount=type=secret,id=host_certificate_file,dst=/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem \
+    dnf install -y httpd \
 &&  groupadd $GROUPNAME \
 &&  useradd -m -s /bin/bash -g $GROUPNAME $USERNAME \
 &&  setcap 'cap_net_bind_service=+ep' /usr/sbin/httpd \
@@ -47,7 +48,8 @@ ARG USERNAME
 ARG GROUPNAME
 ARG APP_PATH
 
-RUN dnf config-manager --add-repo=https://download.docker.com/linux/centos/docker-ce.repo \
+RUN --mount=type=secret,id=host_certificate_file,dst=/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem \
+    dnf config-manager --add-repo=https://download.docker.com/linux/centos/docker-ce.repo \
 &&  dnf install -y \
     sudo \
     git \
