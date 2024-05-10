@@ -27,7 +27,7 @@ $(function(){
 
         ]).then(function() {
             // Display Menu
-            displayMenu(null);
+            displayMenu('menu_identity_providers');
             // Display Topic Path
             displayTopicPath([
                 {
