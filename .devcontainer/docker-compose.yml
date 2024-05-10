@@ -100,6 +100,12 @@ services:
       retries: 200
     environment:
       - TZ=Asia/Tokyo
+      - HTTP_PROXY=${HTTP_PROXY}
+      - http_proxy=${HTTP_PROXY}
+      - HTTPS_PROXY=${HTTPS_PROXY}
+      - https_proxy=${HTTPS_PROXY}
+      - NO_PROXY=127.0.0.1,localhost,${NO_PROXY}
+      - no_proxy=127.0.0.1,localhost,${NO_PROXY}
       - KEYCLOAK_ADMIN=${KEYCLOAK_ADMIN:-admin}
       - KEYCLOAK_ADMIN_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD:-password}
       - KC_DB=${PLATFORM_DBMS:-mariadb}

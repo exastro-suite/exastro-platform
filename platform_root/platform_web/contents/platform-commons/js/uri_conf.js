@@ -190,6 +190,8 @@ var location_conf = {
         "keycloak": {
             "console": "/platform/keycloak_console",
             "console_frame": "/auth/admin/master/console",
+            "identity_providers": "/{organization_id}/platform/identity_providers",
+            "identity_providers_frame": "/auth/admin/{organization_id}/console/#/{organization_id}/identity-providers"
         },
         "settings": {
             "mailserver": "/{organization_id}/platform/settings/mailserver",

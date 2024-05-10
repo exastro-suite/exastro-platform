@@ -995,7 +995,7 @@ def __client_role_setting(organization_id, user_id):
     # create a authority for organization admin
     client_clientid = common.get_platform_client_id(organization_id)
 
-    # client取得
+    # client取得({organization_id}-workspaces)
     # client get to keycloak
     response = api_keycloak_clients.clients_get(organization_id, client_clientid, token)
     if response.status_code != 200:
@@ -1038,7 +1038,7 @@ def __client_role_setting(organization_id, user_id):
     # create a role for organization admin
     client_clientid = common.get_user_token_client_id(organization_id)
 
-    # client取得
+    # client取得({organization_id})
     # client get to keycloak
     response = api_keycloak_clients.clients_get(organization_id, client_clientid, token)
     if response.status_code != 200:
@@ -1055,6 +1055,25 @@ def __client_role_setting(organization_id, user_id):
 
     client_info = json.loads(response.text)
     client_id = client_info[0].get("id")
+
+    # client取得(realm-management)
+    # client get to keycloak
+    realm_management_clientid = "realm-management"
+    response = api_keycloak_clients.clients_get(organization_id, realm_management_clientid, token)
+    if response.status_code != 200:
+        globals.logger.error(f"response.status_code:{response.status_code}")
+        globals.logger.error(f"response.text:{response.text}")
+        message_id = f"500-{MSG_FUNCTION_ID}004"
+        message = multi_lang.get_text(
+            message_id,
+            "clientの取得に失敗しました(対象ID:{0} client:{1})",
+            organization_id,
+            realm_management_clientid
+        )
+        raise common.InternalErrorException(message_id=message_id, message=message)
+
+    client_info = json.loads(response.text)
+    realm_management_client_id = client_info[0].get("id")
 
     # オーガナイゼーションロール権限 登録
     # Organization role authority registration
@@ -1098,7 +1117,12 @@ def __client_role_setting(organization_id, user_id):
         for permission in arr_permissions:
             # 該当Clientのorganization管理者ロールを取得
             # Process for the number of organization administrators
-            response = api_keycloak_roles.clients_role_get(organization_id, platform_client_id, permission, token)
+            if permission in common_const.ORG_PERMISSION_IDP_MANAGER:
+                client_id_permission = realm_management_client_id
+            else:
+                client_id_permission = platform_client_id
+            
+            response = api_keycloak_roles.clients_role_get(organization_id, client_id_permission, permission, token)
             if response.status_code != 200:
                 globals.logger.error(f"response.status_code:{response.status_code}")
                 globals.logger.error(f"response.text:{response.text}")
@@ -1107,7 +1131,7 @@ def __client_role_setting(organization_id, user_id):
                     message_id,
                     "client roleの取得に失敗しました(対象ID:{0} client:{1})",
                     organization_id,
-                    common.get_platform_client_id(organization_id)
+                    client_id_permission
                 )
                 raise common.InternalErrorException(message_id=message_id, message=message)
 
