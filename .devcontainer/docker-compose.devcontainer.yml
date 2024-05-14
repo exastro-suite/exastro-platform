@@ -16,6 +16,8 @@ services:
   platform-auth:
     build:
       target: develop_build
+      secrets:
+        - host_certificate_file
     volumes:
       - ..:/workspace:cached
       - ../platform_root/common_library:/workspace/platform_root/platform_auth/common_library:cached
@@ -59,6 +61,8 @@ services:
   platform-api:
     build:
       target: develop_build
+      secrets:
+        - host_certificate_file
     volumes:
       - ..:/workspace:cached
       - ../platform_root/common_library:/workspace/platform_root/platform_api/common_library:cached
@@ -99,6 +103,8 @@ services:
   platform-job:
     build:
       target: develop_build
+      secrets:
+        - host_certificate_file
     volumes:
       - ..:/workspace:cached
       - ../platform_root/common_library:/workspace/platform_root/platform_job/common_library:cached
@@ -139,6 +145,8 @@ services:
   platform-web:
     build:
       target: develop_build
+      secrets:
+        - host_certificate_file
     volumes:
       - ..:/workspace:cached
       - ../platform_root/platform_web/config/httpd.conf/httpd.conf:/etc/httpd/conf/httpd.conf:cached
@@ -207,9 +215,16 @@ services:
     networks:
       - exastro
 
+  platform-migration-1:
+    build:
+      secrets:
+        - host_certificate_file
+
   # platform-migration-1:
   #   build:
   #     target: develop_build
+  #     secrets:
+  #       - host_certificate_file
   #   volumes:
   #     - ..:/workspace:cached
   #     - ../platform_root/common_library:/workspace/platform_root/platform_migration/common_library:cached
@@ -244,6 +259,8 @@ services:
   platform-migration-2:
     build:
       target: develop_build
+      secrets:
+        - host_certificate_file
     volumes:
       - ..:/workspace:cached
       - ../platform_root/common_library:/workspace/platform_root/platform_migration/common_library:cached
@@ -319,3 +336,7 @@ services:
     volumes:
       - ../.volumes/exastro/log:/var/log/exastro
     command: "sh -c 'chmod 777 /var/log/exastro'"
+
+secrets:
+  host_certificate_file:
+    file: ${HOST_CERTIFICATE_FILE:-/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem}

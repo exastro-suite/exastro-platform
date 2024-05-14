@@ -36,7 +36,8 @@ ENV AUDIT_LOG_PATH          exastro-audit.log
 ENV AUDIT_LOG_FILE_MAX_BYTE 100000000
 ENV AUDIT_LOG_BACKUP_COUNT  30
 
-RUN dnf install -y \
+RUN --mount=type=secret,id=host_certificate_file,dst=/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem \
+    dnf install -y \
     langpacks-en \
     wget \
     unzip \
@@ -60,8 +61,12 @@ RUN dnf install -y \
 WORKDIR $APP_PATH
 
 COPY ./platform_root/platform_auth/pyproject.toml ./platform_root/platform_auth/poetry.lock $APP_PATH/
-RUN poetry install --only first_install
-RUN poetry install --without develop_build
+
+RUN --mount=type=secret,id=host_certificate_file,dst=/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem \
+    poetry install --only first_install
+
+RUN --mount=type=secret,id=host_certificate_file,dst=/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem \
+    poetry install --without develop_build
 
 #
 # Build for development
@@ -73,7 +78,8 @@ ARG USERNAME
 ARG GROUPNAME
 ARG APP_PATH
 
-RUN dnf config-manager --add-repo=https://download.docker.com/linux/centos/docker-ce.repo \
+RUN --mount=type=secret,id=host_certificate_file,dst=/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem \
+    dnf config-manager --add-repo=https://download.docker.com/linux/centos/docker-ce.repo \
 &&  dnf install -y \
     sudo \
     git \
@@ -87,7 +93,8 @@ RUN dnf config-manager --add-repo=https://download.docker.com/linux/centos/docke
 &&  echo '%wheel ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers \
 &&  echo "%${GROUPNAME} ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 
-RUN poetry install --with develop_build
+RUN --mount=type=secret,id=host_certificate_file,dst=/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem \
+    poetry install --with develop_build
 
 USER $USERNAME
 
