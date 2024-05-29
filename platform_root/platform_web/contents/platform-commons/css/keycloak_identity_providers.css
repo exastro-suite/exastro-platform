@@ -1,0 +1,12 @@
+/*
+ヘッダの非表示
+*/
+header.pf-c-page__header {
+    display: none !important;
+}
+/*
+メニューのstyle変更
+*/
+#page-sidebar {
+    display: none !important;
+}

@@ -45,11 +45,17 @@ def token_create(organization_id):  # noqa: E501
     try:
         globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
 
+        headers_data = {
+            "Content-Type": request.content_type,
+            "X-Forwarded-Host": request.headers.get("X-Forwarded-Host"),
+            "X-Forwarded-Proto": request.headers.get("X-Forwarded-Proto"),
+        }
+
         # call keycloak token api
         redirect_response = requests.post(
             f"{os.environ['API_KEYCLOAK_PROTOCOL']}://{os.environ['API_KEYCLOAK_HOST']}:{os.environ['API_KEYCLOAK_PORT']}/auth/realms/{organization_id}/protocol/openid-connect/token",
             data=request.form,
-            headers={"Content-Type": request.content_type},
+            headers=headers_data,
         )
 
         if redirect_response.status_code == 200:
