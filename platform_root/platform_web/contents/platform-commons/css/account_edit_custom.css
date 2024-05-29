@@ -1,0 +1,17 @@
+/* hidden account console header */
+header.pf-c-page__header {
+    display: none;
+}
+/* hidden login page header */
+div.login-pf-page-header {
+    display: none;
+}
+/* hidden applications menu */
+li.pf-c-nav__item:has([data-testid="applications"]) {
+    display: none;
+}
+
+/* two factor authentication setting page width */
+div.login-pf-page div.card-pf:has(#kc-totp-settings) {
+    max-width: 800px;
+}

@@ -26,7 +26,7 @@ import datetime
 # import base64
 
 from common_library.common import common, validation, maintenancemode
-from common_library.common import api_keycloak_tokens, api_keycloak_realms, api_keycloak_clients, api_keycloak_users, api_keycloak_roles
+from common_library.common import api_keycloak_tokens, api_keycloak_realms, api_keycloak_clients, api_keycloak_users, api_keycloak_roles, api_keycloak_users_profile
 from common_library.common.db import DBconnector
 from common_library.common.db_init import DBinit
 from common_library.common import bl_plan_service
@@ -995,7 +995,7 @@ def __client_role_setting(organization_id, user_id):
     # create a authority for organization admin
     client_clientid = common.get_platform_client_id(organization_id)
 
-    # client取得
+    # client取得({organization_id}-workspaces)
     # client get to keycloak
     response = api_keycloak_clients.clients_get(organization_id, client_clientid, token)
     if response.status_code != 200:
@@ -1038,7 +1038,7 @@ def __client_role_setting(organization_id, user_id):
     # create a role for organization admin
     client_clientid = common.get_user_token_client_id(organization_id)
 
-    # client取得
+    # client取得({organization_id})
     # client get to keycloak
     response = api_keycloak_clients.clients_get(organization_id, client_clientid, token)
     if response.status_code != 200:
@@ -1055,6 +1055,25 @@ def __client_role_setting(organization_id, user_id):
 
     client_info = json.loads(response.text)
     client_id = client_info[0].get("id")
+
+    # client取得(realm-management)
+    # client get to keycloak
+    realm_management_clientid = "realm-management"
+    response = api_keycloak_clients.clients_get(organization_id, realm_management_clientid, token)
+    if response.status_code != 200:
+        globals.logger.error(f"response.status_code:{response.status_code}")
+        globals.logger.error(f"response.text:{response.text}")
+        message_id = f"500-{MSG_FUNCTION_ID}004"
+        message = multi_lang.get_text(
+            message_id,
+            "clientの取得に失敗しました(対象ID:{0} client:{1})",
+            organization_id,
+            realm_management_clientid
+        )
+        raise common.InternalErrorException(message_id=message_id, message=message)
+
+    client_info = json.loads(response.text)
+    realm_management_client_id = client_info[0].get("id")
 
     # オーガナイゼーションロール権限 登録
     # Organization role authority registration
@@ -1098,7 +1117,12 @@ def __client_role_setting(organization_id, user_id):
         for permission in arr_permissions:
             # 該当Clientのorganization管理者ロールを取得
             # Process for the number of organization administrators
-            response = api_keycloak_roles.clients_role_get(organization_id, platform_client_id, permission, token)
+            if permission in common_const.ORG_PERMISSION_IDP_MANAGER:
+                client_id_permission = realm_management_client_id
+            else:
+                client_id_permission = platform_client_id
+            
+            response = api_keycloak_roles.clients_role_get(organization_id, client_id_permission, permission, token)
             if response.status_code != 200:
                 globals.logger.error(f"response.status_code:{response.status_code}")
                 globals.logger.error(f"response.text:{response.text}")
@@ -1107,7 +1131,7 @@ def __client_role_setting(organization_id, user_id):
                     message_id,
                     "client roleの取得に失敗しました(対象ID:{0} client:{1})",
                     organization_id,
-                    common.get_platform_client_id(organization_id)
+                    client_id_permission
                 )
                 raise common.InternalErrorException(message_id=message_id, message=message)
 
@@ -1261,6 +1285,39 @@ def __user_create(organization_id, user_id, org_mng_users):
     # サービスアカウントのTOKEN取得
     # Get a service account token
     token = __get_token()
+
+    # users profilesを設定する
+    # get users profiles
+    response = api_keycloak_users_profile.get_users_profiles(organization_id, token)
+    if response.status_code != 200:
+        globals.logger.error(f"get_users_profiles response.status_code:{response.status_code}")
+        globals.logger.error(f"get_users_profiles response.text:{response.text}")
+        message_id = f"500-{MSG_FUNCTION_ID}025"
+        message = multi_lang.get_text(
+            message_id,
+            "User Profileの取得に失敗しました(対象ID:{0})",
+            organization_id
+        )
+        raise common.InternalErrorException(message_id=message_id, message=message)
+
+    # users profilesを設定する
+    # Set user profiles
+    users_profiles = json.loads(response.text)
+    api_keycloak_users_profile.configure_realm_users_profiles(users_profiles)
+
+    # users profilesを更新する
+    # update users profiles
+    response = api_keycloak_users_profile.put_users_profiles(organization_id, users_profiles, token)
+    if response.status_code != 200:
+        globals.logger.error(f"put_users_profiles response.status_code:{response.status_code}")
+        globals.logger.error(f"put_users_profiles response.text:{response.text}")
+        message_id = f"500-{MSG_FUNCTION_ID}026"
+        message = multi_lang.get_text(
+            message_id,
+            "User Profileの更新に失敗しました(対象ID:{0})",
+            organization_id
+        )
+        raise common.InternalErrorException(message_id=message_id, message=message)
 
     # オーガナイゼーション管理者数分処理する
     # Process for the number of organization administrators
@@ -1894,9 +1951,22 @@ def __realms_detail_get(organization_id, keycloak_org, org_row, org_informations
         common.InternalErrorException: _description_
     """
 
-    org_plans = bl_plan_service.organization_plan_get(organization_id)
+    try:
+        org_plans = bl_plan_service.organization_plan_get(organization_id)
 
-    private = DBconnector().get_organization_private(organization_id)
+        private = DBconnector().get_organization_private(organization_id)
+    except Exception:
+        # create organizationに失敗した時の対応
+        # What to do when create organization fails
+        return {
+            "id": organization_id,
+            "name": org_row.get("ORGANIZATION_NAME"),
+            "organization_managers": [],
+            "active_plan": {"id": None},
+            "plans": [],
+            "status": org_informations.get("status"),
+            "enabled": keycloak_org.get("enabled"),
+        }
 
     users_response = api_keycloak_roles.role_uesrs_get(
         realm_name=organization_id,

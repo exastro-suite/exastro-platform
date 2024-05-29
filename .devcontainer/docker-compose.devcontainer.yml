@@ -16,6 +16,8 @@ services:
   platform-auth:
     build:
       target: develop_build
+      secrets:
+        - host_certificate_file
     volumes:
       - ..:/workspace:cached
       - ../platform_root/common_library:/workspace/platform_root/platform_auth/common_library:cached
@@ -59,6 +61,8 @@ services:
   platform-api:
     build:
       target: develop_build
+      secrets:
+        - host_certificate_file
     volumes:
       - ..:/workspace:cached
       - ../platform_root/common_library:/workspace/platform_root/platform_api/common_library:cached
@@ -99,6 +103,8 @@ services:
   platform-job:
     build:
       target: develop_build
+      secrets:
+        - host_certificate_file
     volumes:
       - ..:/workspace:cached
       - ../platform_root/common_library:/workspace/platform_root/platform_job/common_library:cached
@@ -139,6 +145,8 @@ services:
   platform-web:
     build:
       target: develop_build
+      secrets:
+        - host_certificate_file
     volumes:
       - ..:/workspace:cached
       - ../platform_root/platform_web/config/httpd.conf/httpd.conf:/etc/httpd/conf/httpd.conf:cached
@@ -172,10 +180,19 @@ services:
       target: develop_build
     volumes:
       - ..:/workspace:cached
-      - ../platform_root/keycloak/themes/exastro/account:/opt/keycloak/themes/exastro.v2/account:cached
-      - ../platform_root/keycloak/themes/exastro/admin:/opt/keycloak/themes/exastro.v2/admin:cached
       - ../platform_root/keycloak/themes/exastro:/opt/keycloak/themes/exastro:cached
       - ../platform_root/keycloak/themes/keycloak-themes.json:/opt/keycloak/META-INF/keycloak-themes.json:cached
+      - /usr/share/pki/ca-trust-source/anchors/UserRootCertificate.crt:/etc/ssl/certs/ca-certificates.crt
+    environment:
+      - JAVA_OPTS_APPEND=-Xms256m -Xmx256m
+      - SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
+      - SSL_CERT_DIR=/etc/ssl/certs
+    command:
+      # 開発モードで起動
+      - start-dev
+      - --spi-theme-static-max-age=-1
+      - --spi-theme-cache-themes=false
+      - --spi-theme-cache-templates=false
 
   platform-db:
     ports:
@@ -198,9 +215,16 @@ services:
     networks:
       - exastro
 
+  platform-migration-1:
+    build:
+      secrets:
+        - host_certificate_file
+
   # platform-migration-1:
   #   build:
   #     target: develop_build
+  #     secrets:
+  #       - host_certificate_file
   #   volumes:
   #     - ..:/workspace:cached
   #     - ../platform_root/common_library:/workspace/platform_root/platform_migration/common_library:cached
@@ -235,6 +259,8 @@ services:
   platform-migration-2:
     build:
       target: develop_build
+      secrets:
+        - host_certificate_file
     volumes:
       - ..:/workspace:cached
       - ../platform_root/common_library:/workspace/platform_root/platform_migration/common_library:cached
@@ -310,3 +336,7 @@ services:
     volumes:
       - ../.volumes/exastro/log:/var/log/exastro
     command: "sh -c 'chmod 777 /var/log/exastro'"
+
+secrets:
+  host_certificate_file:
+    file: ${HOST_CERTIFICATE_FILE:-/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem}

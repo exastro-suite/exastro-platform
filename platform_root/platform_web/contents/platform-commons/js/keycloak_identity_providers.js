@@ -25,23 +25,19 @@ $(function(){
             // Load Common Contents
             loadCommonContents(),
 
-        ]).then(function(results) {
+        ]).then(function() {
             // Display Menu
-            displayMenu(null);
+            displayMenu('menu_identity_providers');
             // Display Topic Path
             displayTopicPath([
                 {
-                    "text": getText("000-81006", "アカウント管理"),
-                    "href": CommonAuth.isPlatformAdminSite()?
-                                location_conf.href.account.platform_admin_site.main_page:
-                                location_conf.href.account.organization_user_site.main_page.replace(/{organization_id}/g, CommonAuth.getRealm())
+                    "text": getText("000-80051", "アイデンティティー・プロバイダー"),
+                    "href": location_conf.href.keycloak.identity_providers.replace(/{organization_id}/g, CommonAuth.getRealm())
                 },
             ]);
-
-            $("#ifra_account_edit").prop("src",location_conf.href.account.account_edit.replace(/{realm_name}/g, CommonAuth.getRealm()));
-            $("#ifra_account_edit").on('load', () => {
-                // 追加cssの読み込み / Loading additional css
-                $("#ifra_account_edit").contents().find('head').append('<link rel="stylesheet" href="/_/platform-commons/css/account_edit_custom.css?ver=__BUILD_VERSION__">');
+            $("#ifra_keycloak").prop("src", location_conf.href.keycloak.identity_providers_frame.replace(/{organization_id}/g, CommonAuth.getRealm()));
+            $("#ifra_keycloak").on('load', () => {
+                $("#ifra_keycloak").contents().find('head').append('<link rel="stylesheet" href="/_/platform-commons/css/keycloak_identity_providers.css?ver=__BUILD_VERSION__">');
             })
             finish_onload_progress();
         }).catch((e) => {

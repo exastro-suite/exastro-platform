@@ -31,17 +31,15 @@ $(function(){
             // Display Topic Path
             displayTopicPath([
                 {
-                    "text": getText("000-81006", "アカウント管理"),
-                    "href": CommonAuth.isPlatformAdminSite()?
-                                location_conf.href.account.platform_admin_site.main_page:
-                                location_conf.href.account.organization_user_site.main_page.replace(/{organization_id}/g, CommonAuth.getRealm())
+                    "text": getText("000-90002", "Keycloakコンソール"),
+                    "href": location_conf.href.keycloak.console,
                 },
             ]);
 
-            $("#ifra_account_edit").prop("src",location_conf.href.account.account_edit.replace(/{realm_name}/g, CommonAuth.getRealm()));
-            $("#ifra_account_edit").on('load', () => {
+            $("#ifra_keycloak_console").prop("src",location_conf.href.keycloak.console_frame);
+            $("#ifra_keycloak_console").on('load', () => {
                 // 追加cssの読み込み / Loading additional css
-                $("#ifra_account_edit").contents().find('head').append('<link rel="stylesheet" href="/_/platform-commons/css/account_edit_custom.css?ver=__BUILD_VERSION__">');
+                $("#ifra_keycloak_console").contents().find('head').append('<link rel="stylesheet" href="/_/platform-commons/css/keycloak_console_custom.css?ver=__BUILD_VERSION__">');
             })
             finish_onload_progress();
         }).catch((e) => {
