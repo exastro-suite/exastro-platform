@@ -81,6 +81,9 @@ ORG_AUTH_USER_MAINTE = "_og-usr-mt"
 ORG_AUTH_WS_ROLE_MAINTE = "_og-ws-role-mt"
 ORG_AUTH_WS_ROLE_USER = "_og-ws-role-usr"
 ORG_AUTH_WS_MAINTE = "_og-ws-mt"
+ORG_AUTH_MANAGE_IDP = "manage-identity-providers"
+ORG_AUTH_VIEW_IDP = "view-identity-providers"
+ORG_AUTH_VIEW_REALM = "view-realm"
 
 # ワークスペースロール権限
 # workspace role authority
@@ -90,9 +93,11 @@ WS_AUTH_ADMIN_ANY = "_.*-admin"
 # Roleと権限の紐づけ
 # Associating Roles and Permissions
 ORG_PERMISSION_ORG_MANAGER = [ORG_AUTH_UPDATE, ORG_AUTH_OWNER_MAINTE, ORG_AUTH_ROLE_USER, ORG_AUTH_USAGE_SITUATION,
-                              ORG_AUTH_USER_MAINTE, ORG_AUTH_WS_ROLE_MAINTE, ORG_AUTH_WS_ROLE_USER, ORG_AUTH_WS_MAINTE]
+                              ORG_AUTH_USER_MAINTE, ORG_AUTH_WS_ROLE_MAINTE, ORG_AUTH_WS_ROLE_USER, ORG_AUTH_WS_MAINTE,
+                              ORG_AUTH_MANAGE_IDP, ORG_AUTH_VIEW_IDP, ORG_AUTH_VIEW_REALM]
 ORG_PERMISSION_USER_ROLE_MANAGER = [ORG_AUTH_USER_MAINTE, ORG_AUTH_WS_ROLE_MAINTE, ORG_AUTH_WS_ROLE_USER]
 ORG_PERMISSION_USER_MANAGER = [ORG_AUTH_USER_MAINTE, ORG_AUTH_WS_ROLE_USER]
+ORG_PERMISSION_IDP_MANAGER = [ORG_AUTH_MANAGE_IDP, ORG_AUTH_VIEW_IDP, ORG_AUTH_VIEW_REALM]
 
 # オーガナイゼーションロール権限 登録
 # Organization role authority registration

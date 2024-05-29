@@ -4,6 +4,7 @@
     "displayName": "{{organization_name}}",
     "enabled": false,
     "smtpServer": {},
+    "loginTheme": "exastro",
     "eventsEnabled": false,
     "eventsListeners": [
         "jboss-logging"

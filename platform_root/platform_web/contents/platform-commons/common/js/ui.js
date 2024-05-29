@@ -156,6 +156,14 @@ headerMenu() {
             window.location.href = location_conf.href.account.organization_user_site.main_page.replace(/{organization_id}/g, CommonAuth.getRealm());
         }
     });
+    // トークン発行
+    ui.$.header.find('.userInfoMenuButton[data-type=token]').on('click', function(){
+        if(CommonAuth.isPlatformAdminSite()) {
+            window.location.href = location_conf.href.account.platform_admin_site.token;
+        } else {
+            window.location.href = location_conf.href.account.organization_user_site.token.replace(/{organization_id}/g, CommonAuth.getRealm());
+        }
+    });
 
     // ログアウト
     ui.$.header.find('.userInfoMenuButton[data-type=logout]').on('click', function(){
@@ -214,6 +222,9 @@ userInfo() {
                 <ul class="userInfoMenuList">
                     <li class="userInfoMenuItem">
                         ${fn.html.button(fn.html.icon('gear') + '<span text-id="000-80003">アカウント管理</span>', ['userInfoMenuButton', 'itaButton'], { type: 'account', action: 'default'})}
+                    </li>
+                    <li class="userInfoMenuItem">
+                        ${fn.html.button(fn.html.icon('gear') + '<span text-id="000-81004">トークン発行</span>', ['userInfoMenuButton', 'itaButton'], { type: 'token', action: 'default'})}
                     </li>
                 </ul>
 
