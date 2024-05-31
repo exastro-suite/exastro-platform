@@ -94,6 +94,49 @@ def test_jobs_api(connexion_client):
         assert response.json["result"] == "500-38002"
         assert response.json["message"] == "Failed to register processing queue (process id:{0})", "DB error route"
 
+    with test_common.requsts_mocker_default():
+        # ユーザー一覧Excelファイル出力(正常)
+        response = connexion_client.post(
+            f"/api/{organization['organization_id']}/platform/jobs/users/export",
+            content_type="application/json",
+            headers=request_parameters.request_headers(),
+            json={}
+        )
+
+        assert response.status_code == 200, "jobs user export response code"
+
+    with test_common.requsts_mocker_default(), \
+            test_common.pymysql_execute_raise_exception_mocker(queries_bl_jobs.SQL_INSERT_JOBS_USER_EXPORT, Exception("DB Error Test")):
+        #
+        # DB error route
+        #
+        response = connexion_client.post(
+            f"/api/{organization['organization_id']}/platform/jobs/users/export",
+            content_type="application/json",
+            headers=request_parameters.request_headers(),
+            json={}
+        )
+
+        assert response.status_code == 500, "DB error route"
+        assert response.json["result"] == "500-38001"
+        assert response.json["message"] == "Failed to register job (job id:{0})", "DB error route"
+
+    with test_common.requsts_mocker_default(), \
+            test_common.pymysql_execute_raise_exception_mocker(queries_bl_notification.SQL_INSERT_PROCESS_QUEUE, Exception("DB Error Test")):
+        #
+        # DB error route
+        #
+        response = connexion_client.post(
+            f"/api/{organization['organization_id']}/platform/jobs/users/export",
+            content_type="application/json",
+            headers=request_parameters.request_headers(),
+            json={}
+        )
+
+        assert response.status_code == 500, "DB error route"
+        assert response.json["result"] == "500-38002"
+        assert response.json["message"] == "Failed to register processing queue (process id:{0})", "DB error route"
+
 
 def __fetch_jobs_user_file(organization_id):
     with closing(DBconnector().connect_orgdb(organization_id)) as conn:
