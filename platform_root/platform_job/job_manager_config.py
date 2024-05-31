@@ -125,6 +125,23 @@ JOBS = {
             "xl_buffered_rows": int(os.environ.get('JOB_USER_IMPORT_XL_BUFFERED_ROWS')),
         }
     },
+    const.PROCESS_KIND_USER_EXPORT: {
+        "timeout_seconds": int(os.environ.get('JOB_USER_EXPORT_TIMEOUT_SECONDS')),
+        "module": "jobs.UserExportJobExecutor",
+        "class": "UserExportJobExecutor",
+        "job_trigger": "queue",
+        "max_job_per_process": int(os.environ.get('JOB_USER_EXPORT_MAX_JOB_PER_PROCESS')),
+        "extra_config": {
+            # 出力可能なExcelファイルの最大行数 / Maximum number of rows in an Excel file that can be read
+            "max_number_of_rows_allowd": int(os.environ.get('JOB_USER_EXPORT_MAX_ROWS_ALLOWD')),
+            # 1件処理毎にwaitする時間(ミリ秒) / Wait time for each process (milliseconds)
+            "user_export_interval_millisecond": float(os.environ.get('JOB_USER_EXPORT_WAIT_MILLISECONDS')),
+            # 処理中の件数を更新するインターバル / Interval for updating the number of items being processed
+            "status_update_interval": int(os.environ.get('JOB_USER_EXPORT_UPDATE_COUNT_INTERVAL')),
+            # Excelファイルバッファリング行数 / Excel file buffering row count
+            "xl_buffered_rows": int(os.environ.get('JOB_USER_EXPORT_XL_BUFFERED_ROWS')),
+        }
+    },
     job_manager_const.PROCESS_KIND_FORCE_UPDATE_STATUS: {
         "timeout_seconds": int(os.environ.get('JOB_FORCE_UPDATE_STATUS_TIMEOUT_SECONDS')),
         "module": "jobs.ForceUpdateStatusJobExecutor",
