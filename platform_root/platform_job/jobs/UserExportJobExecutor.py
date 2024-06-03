@@ -18,23 +18,20 @@ from contextlib import closing
 import traceback
 import datetime
 import time
-import json
 import random
 
 from common_library.common.db import DBconnector
 from common_library.common import const, common
-from common_library.common import validation
 from common_library.common import multi_lang
 from common_library.common import user_export_file_common
-from common_library.common import api_keycloak_users, api_keycloak_roles
+from common_library.common import api_keycloak_users
 from common_library.common import bl_plan_service
-from common_library.common import resources
 
 import globals
 import job_manager_config
 import job_manager_const
 from jobs import jobs_common
-from libs.exceptions import JobTimeoutException, FileFormatErrorException
+from libs.exceptions import JobTimeoutException
 from libs import queries_user_import 
 
 class UserExportJobExecutor(BaseJobExecutor):
@@ -129,93 +126,28 @@ class UserExportJobExecutor(BaseJobExecutor):
                 specifiable_roles = self.__get_specifiable_roles()
                 globals.logger.debug(f'Role lists : {[key for key in specifiable_roles.keys()]}')
 
-                # リソースプランの最大ユーザー数を取得 / Get the maximum number of users for a resource plan
-                limits = bl_plan_service.organization_limits_get(self.organization_id, const.RESOURCE_COUNT_USERS)
-
                 # 結果雛形ファイルのOpen / Open result template file
                 globals.logger.debug('Get excel template')
-                self.err_wb = user_export_file_common.UserResultWorkbook(lang=self.language, error_column=True)
+                self.result_wb = user_export_file_common.UserResultWorkbook(lang=self.language, error_column=True)
 
-                # import Excelファイルイメージ取り込み / import Excel file image import
-                globals.logger.debug('Load imports user excel')
-                self.imp_wb = user_export_file_common.UserExportWorkbook(self.language, t_jobs_user_file["FILE_DATA"])
+                # ユーザーの取得 / Add user
+                users = self.__get_users()
 
-                # 全明細の件数をカウントする / Count the number of all items
-                globals.logger.debug('Count of records to process')
-                self.count_register, self.count_update, self.count_delete = self.imp_wb.count_proc_type()
-                globals.logger.info(f'Count of records to process [count_register:{self.count_register}] [count_update:{self.count_update}] [count_delete:{self.count_delete}]')
-
-                # 全明細の件数を更新 / Update the number of all items
-                self.__update_t_jobs_user(conn, job_status=const.JOB_USER_EXEC, message=None)
-                conn.commit()
-
-                # 全明細を処理する / Process all items
-                while True:
-                    cell_values = self.imp_wb.read_row()
-                    if cell_values is None:
-                        # 全明細が処理終了したので終了する / Close as all details have been processed.
-                        break
-
-                    try:
-                        if cell_values["PROC_TYPE"] in user_export_file_common.PROC_TYPE_ADD:
-                            # ユーザ数がLimit値になっていないかチェックする / Check if the number of users is at the limit value
-                            self.__check_users_limit(limits)
-
-                            # validationチェック / validation check
-                            validate = self.__validate_row(cell_values, specifiable_roles)
-                            if validate.ok:
-                                # ユーザーの追加 / Add user
-                                user_id = self.__add_user(cell_values)
-                                # ロールの付与 / Grant role
-                                self.__add_roles(cell_values, user_id, specifiable_roles)
-                                self.success_register += 1
-                            else:
-                                self.failed_register += 1
-                                # 処理結果ファイルへ情報出力 / Output information to processing result file
-                                cell_values["ERROR_TEXT"] = multi_lang.get_text_spec(self.language, validate.message_id, validate.base_message, *validate.args)
-                                self.err_wb.write_row(cell_values)
-                                globals.logger.debug(f'Failed User Registration(validate error) : [ROW:{self.imp_wb.get_row_idx()}] [USERNAME:{cell_values["USERNAME"]}] [ERROR_TEXT:{cell_values["ERROR_TEXT"]}]')
-
-                    except JobTimeoutException as ex:
-                        # Timeout発生時はThrowして処理を中断する
-                        self.failed_register += 1
-                        # 処理結果ファイルへ情報出力 / Output information to processing result file
-                        cell_values["ERROR_TEXT"] = multi_lang.get_text_spec(self.language, '401-00021', 'タイムアウト発生のため、この行を処理中に中断しました。')
-                        self.err_wb.write_row(cell_values)
-                        raise ex
-
-                    except (common.BadRequestException, common.InternalErrorException) as ex:
-                        # keycloakへの登録失敗
-                        self.failed_register += 1
-                        # 処理結果ファイルへ情報出力 / Output information to processing result file
-                        cell_values["ERROR_TEXT"] = ex.message
-                        self.err_wb.write_row(cell_values)
-                        globals.logger.debug(f'Failed User Registration : [ROW:{self.imp_wb.get_row_idx()}] [USERNAME:{cell_values["USERNAME"]}] [ERROR_TEXT:{cell_values["ERROR_TEXT"]}]')
-
-                    except Exception as ex:
-                        # その他何らかの失敗
-                        self.failed_register += 1
-                        # 処理結果ファイルへ情報出力 / Output information to processing result file
-                        cell_values["ERROR_TEXT"] = multi_lang.get_text_spec(self.language, '401-00020', 'エラーのため処理できませんでした。({0})', ex)
-                        self.err_wb.write_row(cell_values)
-                        globals.logger.debug(f'Failed User Registration : [ROW:{self.imp_wb.get_row_idx()}] [USERNAME:{cell_values["USERNAME"]}] [ERROR_TEXT:{cell_values["ERROR_TEXT"]}]')
-
-                    if (self.imp_wb.get_row_idx() - user_export_file_common.EXCEL_HEADER_ROWS) % job_manager_config.JOBS[const.PROCESS_KIND_USER_IMPORT]["extra_config"]["status_update_interval"] == 0:
-                        # 処理件数を更新
-                        self.__update_t_jobs_user(conn, job_status=const.JOB_USER_EXEC, message=None)
-                        conn.commit()
-
+                #ファイル出力
+                for user in users:
+                    row = {
+                        "USERNAME": user.username,
+                        "EMAIL": user.email,
+                        "FIRSTNAME": user.firstName,
+                        "LASTNAME": user.lastName,
+                        "PASSWORD": "-",
+                        "AFFILIATION": user.affiliation,
+                        "DESCRIPTION": user.description,
+                        "ENABLED": user.enabled
+                    }
+                    self.result_wb.write_row(row)
                     # 1JOBでリソースを占有しないようにsleepする / Sleep so that 1JOB does not occupy resources
                     time.sleep(job_manager_config.JOBS[const.PROCESS_KIND_USER_IMPORT]["extra_config"]["user_import_interval_millisecond"]/1000)
-
-                # 最終的なステータスに更新する / Update to final status
-                self.__update_t_jobs_user(conn, job_status=const.JOB_USER_COMP, message=None)
-                conn.commit()
-
-            except FileFormatErrorException as ex:
-                # ファイル形式のエラー / File format error
-                self.__update_t_jobs_user(conn, job_status=const.JOB_USER_FAILED, message=ex.message)
-                raise ex
 
             except JobTimeoutException as ex:
                 # タイムアウトエラー / timeout error
@@ -239,7 +171,7 @@ class UserExportJobExecutor(BaseJobExecutor):
 
             finally:
                 try:
-                    globals.logger.info(f'Count of records processed [success_register:{self.success_register}] [success_update:{self.success_update}] [success_delete:{self.success_delete}] [failed_register:{self.failed_register}] [failed_update:{self.failed_update}] [failed_delete:{self.failed_delete}]')
+                    globals.logger.info(f'User Export processed')
 
                     if self.failed_register > 0 or self.failed_update > 0 or self.failed_delete > 0:
                         # 結果ファイル保存
@@ -254,248 +186,31 @@ class UserExportJobExecutor(BaseJobExecutor):
                 conn.commit()
 
         return True
-
-    def __get_specifiable_roles(self):
-        """指定可能なロールの取得 / Get specifiable roles
-
-        Returns:
-            dict: ロール情報 / Role information
-        """
-        first=0
-        max=50
-        ret_roles = {}
-
-        while True:
-            # ロールを取得 / get role
-            response = api_keycloak_roles.clients_roles_get(
-                realm_name=self.organization_id, client_id=self.organization_private.user_token_client_id, token=self.organization_sa_token.get(), briefRepresentation=False,
-                first=first, max=max
-            )
-            if response.status_code != 200:
-                # keycloakから想定外の応答 / Unexpected response from keycloak
-                message_id = f"500-00010"
-                message = multi_lang.get_text(
-                    message_id,
-                    "ロールの取得に失敗しました(対象ID:{0} client:{1})",
-                    self.organization_id,
-                    self.organization_private.user_token_client_clientid
-                )
-                raise common.InternalErrorException(message_id=message_id, message=message)
-
-            # ロールの情報を格納 / Stores role information
-            response_json = json.loads(response.text)
-            ret_roles = {**ret_roles, **{role["name"]: role for role in response_json}}
-
-            if len(response_json) < max:
-                # max件数まで取れなかった時は全て取得し終えたので終了する
-                # If you cannot get the maximum number of items, exit because all have been obtained.
-                break
-            else:
-                # max件数取れた時は次の明細を位置づける
-                # When the max number of items is obtained, position the next item.
-                first += max
-
-        return ret_roles
-
-    def __check_users_limit(self, limits):
-        """ユーザーリミット値のチェック / Check user limit value
-
-        Args:
-            limits (dict): オーガナイゼーションのリミット情報 / Organization limit information
-
-        Raises:
-            common.BadRequestException: リミット値になっている場合 / If the limit value is reached
-        """
-        if const.RESOURCE_COUNT_USERS not in limits:
-            # リミット値が無い時は何もしない / Do nothing when there is no limit value
-            return
-
-        # 現状のリソース数を取得してリミット値と比較し、リミット値に到達している場合は例外を発行する
-        # Obtain the current number of resources, compare it with the limit value, and issue an exception if the limit value has been reached.
-        resources_counter = resources.counter(self.organization_id)
-        if resources_counter(const.RESOURCE_COUNT_USERS) >= limits[const.RESOURCE_COUNT_USERS]:
-            message_id = "400-00022"
-            message = multi_lang.get_text_spec(
-                self.language,
-                message_id,
-                "{0}の上限数({1})を超えるため、新しい{0}は作成できません。",
-                multi_lang.get_text_spec(self.language, '000-00135', "ユーザー"),
-                limits[const.RESOURCE_COUNT_USERS]
-            )
-            raise common.BadRequestException(message_id=message_id, message=message)
-
-    def __validate_row(self, cell_values, specifiable_roles):
-        """validate row
-
-        Args:
-            cell_values (dict): cellの値 / cell value
-            specifiable_roles (dict): 指定可能なロール / Roles that can be specified
+    
+    def __get_users(self):
+        """ユーザ一覧の取得 / get users
 
         Returns:
-            validation.result: vaidation result
+            dict: users
         """
-        # validation check
-        validate = validation.validate_user_name(cell_values["USERNAME"], lang=self.language)
-        if not validate.ok:
-            return validate
-        validate = validation.validate_user_email(cell_values["EMAIL"], lang=self.language)
-        if not validate.ok:
-            return validate
-        validate = validation.validate_user_firstName(cell_values["FIRSTNAME"], lang=self.language)
-        if not validate.ok:
-            return validate
-        validate = validation.validate_user_lastName(cell_values["LASTNAME"], lang=self.language)
-        if not validate.ok:
-            return validate
-
-        # 登録時のみPASSWORDを必須とする / Require PASSWORD only during registration
-        if cell_values["PROC_TYPE"] in user_export_file_common.PROC_TYPE_ADD:
-            if cell_values["PASSWORD"] is None or cell_values["PASSWORD"] == "":
-                return validation.result(
-                    False, 400, '400-00011', '必須項目が不足しています。({0})',
-                    user_export_file_common.COLUMN_IDS["PASSWORD"]["text"]
-                )
-
-        validate = validation.validate_user_affiliation(cell_values["AFFILIATION"] if cell_values["AFFILIATION"] is not None else "",lang=self.language)
-        if not validate.ok:
-            return validate
-        validate = validation.validate_user_description(cell_values["DESCRIPTION"] if cell_values["DESCRIPTION"] is not None else "", lang=self.language)
-        if not validate.ok:
-            return validate
-        validate = validation.validate_user_enabled(cell_values["ENABLED"], lang=self.language)
-        if not validate.ok:
-            return validate
-
-        # ロールのチェック（カンマ毎に分割して指定可能なロールに含まれているかチェック）
-        # Checking roles (divide by comma and check if it is included in the specifiable roles)
-        for role in cell_values["ROLES"].split(','):
-            if role != "" and role not in specifiable_roles:
-                return validation.result(
-                    False, 400, '400-62001', '指定されたロール({0})は存在しません',
-                    role
-                )
-
-        return validate
-
-    def __add_user(self, cell_values):
-        """ユーザの追加 / add user
-
-        Args:
-            cell_values (dict): cellの値 / cell value
-
-        Returns:
-            str: user id
-        """
-        # keycloakに渡すBODYの生成 / Generate BODY to pass to keycloak
-        user_json = {
-            "username": cell_values["USERNAME"],
-            "email": cell_values["EMAIL"],
-            "firstName": cell_values["FIRSTNAME"],
-            "lastName": cell_values["LASTNAME"],
-            "credentials": [
-                {
-                    "type": "password",
-                    "value": cell_values["PASSWORD"],
-                    "temporary": True,
-                }
-            ],
-            "attributes":
-            {
-                "affiliation": [cell_values["AFFILIATION"]],
-                "description": [cell_values["DESCRIPTION"]],
-            },
-            "enabled": cell_values["ENABLED"]
-        }
-
         # ユーザーの追加 / add user
-        u_create = api_keycloak_users.user_create(
-            realm_name=self.organization_id, user_json=user_json, token=self.organization_sa_token.get()
-        )
-        if u_create.status_code == 409:
-            globals.logger.debug(f"response:{u_create.text}")
-            message_id = f"409-25001"
-            message = multi_lang.get_text_spec(
-                self.language,
-                message_id,
-                "指定されたユーザーはすでに存在しているため作成できません。[{0}]",
-                json.loads(u_create.text)["errorMessage"])
-
-            raise common.BadRequestException(message_id=message_id, message=message)
-        elif u_create.status_code == 400:
-            globals.logger.debug(f"response:{u_create.text}")
-            message_id = f"400-25001"
-            message = multi_lang.get_text_spec(
-                self.language,
-                message_id,
-                "ユーザー作成に失敗しました({0})",
-                common.get_response_error_message(u_create.text))
-            raise common.BadRequestException(message_id=message_id, message=message)
-
-        elif u_create.status_code != 201:
-            globals.logger.debug(f"response:{u_create.text}")
-            message_id = f"500-25002"
-            message = multi_lang.get_text_spec(
-                self.language,
-                message_id,
-                "ユーザー作成に失敗しました(対象ユーザー:{0})",
-                cell_values["USERNAME"])
-
-            raise common.InternalErrorException(message_id=message_id, message=message)
-
-        # 作成したユーザーを取得 / Get created user
-        u_get = api_keycloak_users.user_get(realm_name=self.organization_id, user_name=cell_values["USERNAME"], token=self.organization_sa_token.get())
-        if u_get.status_code != 200:
-            message_id = f"500-25002"
-            message = multi_lang.get_text_spec(
-                self.language,
-                message_id,
-                "ユーザー作成に失敗しました({0})",
-                "Failed Get Created User/" + common.get_response_error_message(u_get.text))
-            raise common.InternalErrorException(message_id=message_id, message=message)
-
-        u_get_json = json.loads(u_get.text)
-        if len(u_get_json) == 0:
-            message_id = f"500-25002"
-            message = multi_lang.get_text_spec(
-                self.language,
-                message_id,
-                "ユーザー作成に失敗しました({0})",
-                "Not Found Created User")
-            raise common.InternalErrorException(message_id=message_id, message=message)
-            
-        user_id = u_get_json[0]["id"]
-        globals.logger.info(f'User Created [OG:{self.organization_id}] [UID:{user_id}] [USERNAME:{cell_values["USERNAME"]}]')
-        return user_id
-
-
-    def __add_roles(self, cell_values, user_id, specifiable_roles):
-        """ロールの付与 / Grant role
-
-        Args:
-            cell_values (dict): cellの値 / cell value
-            user_id (str): user id
-            specifiable_roles (dict): ロール情報 / Role information
-        """
-
-        # keycloakに渡す付与するロールの一覧を生成 / Generate a list of roles to grant to pass to keycloak
-        client_roles = [specifiable_roles[role] for role in cell_values["ROLES"].split(',') if role != ""]
-
-        # ロールの付与 / Grant role
-        response = api_keycloak_roles.user_client_role_mapping_create(
-            realm_name=self.organization_id, user_id=user_id, client_id=self.organization_private.user_token_client_id,
-            client_roles=client_roles, token=self.organization_sa_token.get()
+        users = api_keycloak_users.user_get(
+            realm_name=self.organization_id, token=self.organization_sa_token.get(), max=job_manager_config.JOBS[const.PROCESS_KIND_USER_IMPORT]["extra_config"]["max_number_of_rows_allowd"]
         )
 
-        if response.status_code not in [200, 204]:
-            message_id = f"500-26002"
-            message = multi_lang.get_text(
+        if users.status_code != 201:
+            globals.logger.debug(f"response:{users.text}")
+            message_id = f"500-25002"
+            message = multi_lang.get_text_spec(
+                self.language,
                 message_id,
-                "ロール設定に失敗しました(対象ID:{0} client:{1} username:{2})",
-                self.organization_id,
-                self.organization_private.user_token_client_clientid,
-                cell_values["USERNAME"]
-            )
+                "ユーザー取得に失敗しました",
+                )
+
             raise common.InternalErrorException(message_id=message_id, message=message)
+    
+        globals.logger.info(f'Get Users [OG:{self.organization_id}]')
+        return users
 
     def __update_t_jobs_user(self, conn, job_status, message):
         """JOBの状態、件数の更新 / Update of JOB status and number of jobs
