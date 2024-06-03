@@ -668,4 +668,38 @@ def test_job_manager_sub_force_update_status():
                 timeout=10.0, conditions=lambda : not main_thread.is_alive())
 
             main_thread.join()
+            
+            
+def test_job_manager_sub_liveness_file():
+    """ハングアップ監視用ファイルの確認
+    """
+    testdata = import_module("tests.db.exports.testdata")
 
+    mock_time = time.time()
+    with mock.patch("time.time", return_value = mock_time):
+
+        # sub process起動用の情報生成
+        sub_processes_mgr = SubProcessesManager()
+        sub_process_parameter = sub_processes_mgr.generate_sub_process_parameter()
+        sub_processes_mgr.append_new_process(sub_process_parameter, test_common.get_main_process(os.getpid()))
+
+        # sub processの起動
+        main_thread = threading.Thread(
+            target=job_manager.job_manager_sub_process,
+            args=(sub_process_parameter,),
+            name="sub_process",
+            daemon=True
+        )
+        main_thread.start()
+        time.sleep(3)
+        try:
+            # livenessファイルの時刻がmock_timeと同じであること
+            with open(os.environ.get('FILE_PATH_LIVENESS'), 'r') as f:
+                actual_value = f.read()
+                assert actual_value == str(int(mock_time))
+
+        finally:
+            # sub processの終了要求
+            sub_processes_mgr.set_sub_process_termination_request(force=True)
+
+            main_thread.join()

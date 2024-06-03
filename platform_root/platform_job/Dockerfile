@@ -49,6 +49,9 @@ RUN --mount=type=secret,id=host_certificate_file,dst=/etc/pki/ca-trust/extracted
 # config default
 #
 
+# ハングアップ監視用ファイル
+ENV FILE_PATH_LIVENESS=/tmp/liveness
+
 # SUB PROCESSを再起動するインターバル / Interval for restarting SUB PROCESS
 # ※各JOBのタイムアウト時間より大きい数字とするとこ / Set the number to be larger than the timeout time of each JOB
 ENV SUB_PROCESS_TERMINATE_REQUEST_SECONDS=7200

@@ -1,4 +1,5 @@
-#   Copyright 2024 NEC Corporation
+
+#   Copyright 2023 NEC Corporation
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -12,4 +13,22 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-type: object
+from . import update_organization_db
+
+
+def main():
+
+    # オーガナイゼーションデータベースの更新
+    # Update organization database
+    api = update_organization_db.update_organization_db()
+    result = api.start()
+
+    if result != 0:
+        return result
+
+    return 0
+
+
+if __name__ == '__main__':
+    ret = main()
+    exit(ret)

@@ -54,3 +54,22 @@ VALUES (
 )
 ;
 """
+
+SQL_INSERT_JOBS_USER_EXPORT = """
+INSERT
+INTO T_JOBS_USER_EXPORT(
+JOB_ID,
+JOB_TYPE,
+JOB_STATUS,
+CREATE_USER,
+LAST_UPDATE_USER
+)
+VALUES (
+%(job_id)s,
+%(job_type)s,
+%(job_status)s,
+%(create_user)s,
+%(last_update_user)s
+)
+;
+"""
