@@ -39,6 +39,7 @@ def jobs_users_export(body, organization_id):  # noqa: E501
     """
     r = connexion.request
     user_id = r.headers.get("User-id")
+    language = r.headers.get("Language")
 
     # write to JOBS USER EXPORT DB
     reg_flag = False
@@ -50,13 +51,14 @@ def jobs_users_export(body, organization_id):  # noqa: E501
                     "job_id": job_id,
                     "job_type": const.PROCESS_KIND_USER_EXPORT,
                     "job_status": const.JOB_USER_NOT_EXEC,
+                    "language": language,
                     "create_user": user_id,
                     "last_update_user": user_id
                 }
                 cursor.execute(queries_bl_jobs.SQL_INSERT_JOBS_USER_EXPORT, parameter)
                 conn.commit()
                 reg_flag = True
-                
+
             except Exception as e:
                 conn.rollback()
                 globals.logger.error(f"exception:{e.args}")
@@ -67,7 +69,7 @@ def jobs_users_export(body, organization_id):  # noqa: E501
                     job_id,
                 )
                 raise common.InternalErrorException(message_id=message_id, message=message)
-    
+
     # write to PROCESS QUEUE DB
     if reg_flag is True:
         with closing(DBconnector().connect_platformdb()) as conn:
