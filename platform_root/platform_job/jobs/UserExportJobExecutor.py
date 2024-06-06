@@ -18,6 +18,7 @@ from contextlib import closing
 import traceback
 import datetime
 import time
+import json
 import random
 
 from common_library.common.db import DBconnector
@@ -25,6 +26,7 @@ from common_library.common import const, common
 from common_library.common import multi_lang
 from common_library.common import user_export_file_common
 from common_library.common import api_keycloak_users
+from common_library.common import api_keycloak_roles
 from common_library.common import bl_plan_service
 
 import globals
@@ -32,7 +34,7 @@ import job_manager_config
 import job_manager_const
 from jobs import jobs_common
 from libs.exceptions import JobTimeoutException
-from libs import queries_user_import 
+from libs import queries_user_export 
 
 class UserExportJobExecutor(BaseJobExecutor):
     """ユーザ情報エクスポート / User Export Job
@@ -65,15 +67,7 @@ class UserExportJobExecutor(BaseJobExecutor):
         # 処理結果ファイルID / Processing result file ID
         self.result_id = ulid.new().str
         # 処理件数 / Number of cases processed
-        self.count_register = None
-        self.count_update = None
-        self.count_delete = None
-        self.success_register = 0
-        self.success_update = 0
-        self.success_delete = 0
-        self.failed_register = 0
-        self.failed_update = 0
-        self.failed_delete = 0
+        self.count_export = 0
 
     def execute(self):
         """ユーザ情報エクスポート実行 / User Export
@@ -95,7 +89,7 @@ class UserExportJobExecutor(BaseJobExecutor):
 
                 # SELECT T_JOBS_USER
                 with conn.cursor() as cursor:
-                    cursor.execute(queries_user_import.SQL_QUERY_JOBS_USER, {"job_id": self.job_id})
+                    cursor.execute(queries_user_export.SQL_QUERY_JOBS_USER, {"job_id": self.job_id})
                     t_jobs_user = cursor.fetchone()
                     if t_jobs_user is None:
                         message_id = f"500-62001"
@@ -106,25 +100,8 @@ class UserExportJobExecutor(BaseJobExecutor):
                         )
                         raise common.InternalErrorException(message_id=message_id, message=message)
 
-                # SELECT T_JOBS_USER_FILE
-                with conn.cursor() as cursor:
-                    cursor.execute(queries_user_import.SQL_QUERY_JOBS_USER_FILE, {"job_id": self.job_id})
-                    t_jobs_user_file = cursor.fetchone()
-                    if t_jobs_user_file is None:
-                        message_id = f"500-62001"
-                        message = multi_lang.get_text(
-                            message_id,
-                            "処理対象のレコードの取得に失敗しました(テーブル:{0})",
-                            "T_JOBS_USER_FILE"
-                        )
-                        raise common.InternalErrorException(message_id=message_id, message=message)
-
                 # 言語情報 / Language information
                 self.language = t_jobs_user["LANGUAGE"]
-
-                # 指定可能なロールの一覧を取得する / Get a list of available roles
-                specifiable_roles = self.__get_specifiable_roles()
-                globals.logger.debug(f'Role lists : {[key for key in specifiable_roles.keys()]}')
 
                 # 結果雛形ファイルのOpen / Open result template file
                 globals.logger.debug('Get excel template')
@@ -136,18 +113,22 @@ class UserExportJobExecutor(BaseJobExecutor):
                 #ファイル出力
                 for user in users:
                     row = {
-                        "USERNAME": user.username,
-                        "EMAIL": user.email,
-                        "FIRSTNAME": user.firstName,
-                        "LASTNAME": user.lastName,
-                        "PASSWORD": "-",
-                        "AFFILIATION": user.affiliation,
-                        "DESCRIPTION": user.description,
-                        "ENABLED": user.enabled
+                        "USERNAME": user["username"],
+                        "EMAIL": user["email"],
+                        "FIRSTNAME": user["firstName"],
+                        "LASTNAME": user["lastName"],
+                        "PASSWORD": "",
+                        "AFFILIATION": self.__get_user_affiliation(user),
+                        "DESCRIPTION": self.__get_user_description(user),
+                        "ENABLED": user["enabled"],
+                        "ROLES" : user["roles"],
+                        "USER_ID" : user["id"]
                     }
                     self.result_wb.write_row(row)
                     # 1JOBでリソースを占有しないようにsleepする / Sleep so that 1JOB does not occupy resources
-                    time.sleep(job_manager_config.JOBS[const.PROCESS_KIND_USER_IMPORT]["extra_config"]["user_import_interval_millisecond"]/1000)
+                    time.sleep(job_manager_config.JOBS[const.PROCESS_KIND_USER_EXPORT]["extra_config"]["user_export_interval_millisecond"]/1000)
+
+                self.count_export = len(user)
 
             except JobTimeoutException as ex:
                 # タイムアウトエラー / timeout error
@@ -173,11 +154,11 @@ class UserExportJobExecutor(BaseJobExecutor):
                 try:
                     globals.logger.info(f'User Export processed')
 
-                    if self.failed_register > 0 or self.failed_update > 0 or self.failed_delete > 0:
+                    if self.count_export > 0:
                         # 結果ファイル保存
-                        excel_bytes_image = self.err_wb.get_workbook_bytes_image()
+                        excel_bytes_image = self.result_wb.get_workbook_bytes_image()
                         with conn.cursor() as cursor:
-                            cursor.execute(queries_user_import.SQL_INSERT_JOBS_USER_RESULT, {"result_id": self.result_id, "job_id": self.job_id, "file_data": excel_bytes_image})
+                            cursor.execute(queries_user_export.SQL_INSERT_JOBS_USER_RESULT, {"file_id": self.result_id, "job_id": self.job_id, "file_data": excel_bytes_image})
                         del excel_bytes_image
 
                 except Exception as ex:
@@ -187,19 +168,45 @@ class UserExportJobExecutor(BaseJobExecutor):
 
         return True
     
+    def __get_user_affiliation(self, user):
+        """ユーザ所属の取得
+        """
+        if "attributes" in user:
+            if "affiliation" in user["attributes"]:
+                return user["attributes"]["affiliation"][0]
+            else:
+                return ""
+        else:
+            return ""
+            
+    def __get_user_description(self, user):
+        """ユーザ所属の取得
+        """
+        if "attributes" in user:
+            if "description" in user["attributes"]:
+                return user["attributes"]["description"][0]
+            else:
+                return ""
+        else:
+            return ""
+            
+    
     def __get_users(self):
         """ユーザ一覧の取得 / get users
 
         Returns:
             dict: users
         """
-        # ユーザーの追加 / add user
-        users = api_keycloak_users.user_get(
-            realm_name=self.organization_id, token=self.organization_sa_token.get(), max=job_manager_config.JOBS[const.PROCESS_KIND_USER_IMPORT]["extra_config"]["max_number_of_rows_allowd"]
+        # ユーザーの取得 / get users
+        res = api_keycloak_users.user_get(
+            realm_name=self.organization_id,
+            user_name=None,
+            token=self.organization_sa_token.get(),
+            max=job_manager_config.JOBS[const.PROCESS_KIND_USER_IMPORT]["extra_config"]["max_number_of_rows_allowd"]
         )
 
-        if users.status_code != 201:
-            globals.logger.debug(f"response:{users.text}")
+        if res.status_code != 200:
+            globals.logger.debug(f"response:{res.text}")
             message_id = f"500-25002"
             message = multi_lang.get_text_spec(
                 self.language,
@@ -208,7 +215,36 @@ class UserExportJobExecutor(BaseJobExecutor):
                 )
 
             raise common.InternalErrorException(message_id=message_id, message=message)
-    
+        
+        users = json.loads(res.text)
+        # ロールの取得 / get roles
+        for user in users:
+            res = api_keycloak_roles.user_role_get(
+                realm_name=self.organization_id,
+                user_id=user["id"],
+                client_id=self.organization_private.user_token_client_id,
+                token=self.organization_sa_token.get()
+                )
+            
+            if res.status_code != 200:
+                globals.logger.debug(f"response:{res.text}")
+                message_id = f"500-25002"
+                message = multi_lang.get_text_spec(
+                    self.language,
+                    message_id,
+                    "ロール取得に失敗しました",
+                )
+
+                raise common.InternalErrorException(message_id=message_id, message=message)
+            
+            # カンマ区切りでユーザー情報に追加
+            roles = json.loads(res.text)
+            role_list = ",".join([role.get("name") for role in roles])
+            user["roles"] = role_list
+            
+            # 1JOBでリソースを占有しないようにsleepする / Sleep so that 1JOB does not occupy resources
+            time.sleep(job_manager_config.JOBS[const.PROCESS_KIND_USER_EXPORT]["extra_config"]["user_export_interval_millisecond"]/1000)
+                
         globals.logger.info(f'Get Users [OG:{self.organization_id}]')
         return users
 
@@ -222,23 +258,15 @@ class UserExportJobExecutor(BaseJobExecutor):
         """
         with conn.cursor() as cursor:
             cursor.execute(
-                queries_user_import.SQL_UPDATE_JOBS_USER,
+                queries_user_export.SQL_UPDATE_JOBS_USER,
                 {
                     "job_id": self.job_id,
                     "job_status": job_status,
-                    "count_register": self.count_register,
-                    "count_update": self.count_update,
-                    "count_delete": self.count_delete,
-                    "success_register": self.success_register,
-                    "success_update": self.success_update,
-                    "success_delete": self.success_delete,
-                    "failed_register": self.failed_register,
-                    "failed_update": self.failed_update,
-                    "failed_delete": self.failed_delete,
+                    "count_export": self.count_export,
                     "message": message,
                     "last_update_user": job_manager_const.SYSTEM_USER_ID,
                     "job_status_comp": const.JOB_USER_COMP,
-                    "job_status_failed": const.JOB_USER_FAILED,
+                    "job_status_failed": const.JOB_USER_FAILED
                 }
             )
 
@@ -285,7 +313,7 @@ class UserExportJobExecutor(BaseJobExecutor):
 
                             # 未完了状態で一定時間経過したものを対象とする / Targets items that have been incomplete for a certain period of time
                             cursor.execute(
-                                queries_user_import.SQL_QUERY_JOB_USER_TOO_OLD,
+                                queries_user_export.SQL_QUERY_JOB_USER_TOO_OLD,
                                 {"job_status_comp": const.JOB_USER_COMP, "job_status_failed": const.JOB_USER_FAILED, "last_update_timestamp": last_update_timestamp})
 
                             rows = cursor.fetchall()
@@ -298,7 +326,7 @@ class UserExportJobExecutor(BaseJobExecutor):
                                     try:
                                         message = multi_lang.get_text_spec(row["LANGUAGE"], "500-62002", "処理が正しく起動されず終了しました。")
                                         cursor.execute(
-                                            queries_user_import.SQL_UPDATE_JOBS_USER_FORCE_FAILD,
+                                            queries_user_export.SQL_UPDATE_JOBS_USER_FORCE_FAILD,
                                             {"job_id": row["JOB_ID"], "job_status": const.JOB_USER_FAILED, "message": message, "last_update_user": job_manager_const.SYSTEM_USER_ID}
                                         )
                                         conn.commit()
