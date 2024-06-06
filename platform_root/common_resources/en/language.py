@@ -123,6 +123,7 @@ class LanguageList:
     lang_array['000-00201'] = 'None'
     lang_array['000-00202'] = 'SSL'
     lang_array['000-00203'] = 'StartTLS'
+    lang_array['000-00204'] = 'Audit log'
     lang_array['000-62001'] = 'Processing type'
     lang_array['000-62002'] = 'Registration or Update or Delete'
     #

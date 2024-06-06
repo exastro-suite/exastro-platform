@@ -917,6 +917,7 @@ const RolesCommon =
     "ORG_AUTH_WS_ROLE_MAINTE":      "_og-ws-role-mt",
     "ORG_AUTH_WS_ROLE_USER":        "_og-ws-role-usr",
     "ORG_AUTH_WS_MAINTE":           "_og-ws-mt",
+    "ORG_AUTH_AUDIT_LOG":           "_og-audit-log",
 
     "isAlllowedCreateRole": function() {
         return CommonAuth.hasAuthority(RolesCommon.ORG_AUTH_WS_ROLE_MAINTE) || ( CommonAuth.getAdminWorkspaces().length > 0 );
@@ -1032,6 +1033,7 @@ const RolesCommon =
         orgAuthText[RolesCommon.ORG_AUTH_WS_ROLE_MAINTE]    = getText("000-00115", "ワークスペースロール管理");
         orgAuthText[RolesCommon.ORG_AUTH_WS_ROLE_USER]      = getText("000-00116", "ワークスペースロール付与");
         orgAuthText[RolesCommon.ORG_AUTH_WS_MAINTE]         = getText("000-00117", "ワークスペース管理");
+        orgAuthText[RolesCommon.ORG_AUTH_AUDIT_LOG]         = getText("000-00204", "監査ログ");
 
         switch(role.kind) {
             case 'organization':

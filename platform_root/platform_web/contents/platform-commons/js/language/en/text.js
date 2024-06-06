@@ -123,6 +123,7 @@ langArray['000-00200'] = 'Encryption method'
 langArray['000-00201'] = 'None'
 langArray['000-00202'] = 'SSL'
 langArray['000-00203'] = 'StartTLS'
+langArray['000-00204'] = 'Audit log'
 langArray['000-62001'] = 'Processing type'
 langArray['000-62002'] = 'Registration or Update or Delete'
 //
