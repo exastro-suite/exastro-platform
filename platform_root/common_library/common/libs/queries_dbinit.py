@@ -190,7 +190,7 @@ SQL_ORGANIZATION_CREATE_TABLES = [
         JOB_ID                          VARCHAR(26) NOT NULL,                       -- ジョブID
         JOB_TYPE                        VARCHAR(36),                                -- ジョブ種類
         JOB_STATUS                      VARCHAR(36),                                -- ジョブステータス
-        CONDITION                       TEXT,                                       -- 抽出条件
+        CONDITIONS                      TEXT,                                       -- 抽出条件
         COUNT_EXPORT                    INT,                                        -- 出力対象件数
         MESSAGE                         TEXT,                                       -- 処理結果メッセージ
         LANGUAGE                        VARCHAR(36),                                -- 依頼者の言語
