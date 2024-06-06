@@ -17,7 +17,7 @@ openapi: 3.0.3
 info:
   title: Exastro Platform API (System Management)
   description: Exastro Platform API for System Manager
-  version: 1.8.0
+  version: 1.8.2
 
 servers:
   - url: "https://{host}"
@@ -56,6 +56,8 @@ tags:
   description: システム管理者共通
 - name: MaintenanceModeService
   description: メンテナンスモードに関する操作
+- name: AuditLogService
+  description: 監査ログに関する操作
 
 paths:
   "/auth/realms/master/protocol/openid-connect/token":
@@ -87,6 +89,11 @@ paths:
 
   "/api/platform/maintenance-mode-setting":
       $ref: './paths/maintenance_mode_setting.yaml'
+
+  "/api/{organization_id}/platform/auditlog/download":
+      $ref: './paths/auditlog.download.yaml'
+  "/api/{organization_id}/platform/auditlog/download/{download_id}":
+      $ref: './paths/auditlog.download.download_id.yaml'
 
 components:
   schemas:
