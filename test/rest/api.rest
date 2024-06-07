@@ -162,3 +162,22 @@ content-type: application/json
 {
   "sslRequired": "none"
 }
+
+
+###
+
+# audit log download get
+GET {{base_org_url}}/api/{{org_id}}/platform/auditlog/download
+Authorization: Basic {{org-user-id}} {{org-user-pw}}
+
+###
+
+# audit log download post
+POST {{base_org_url}}/api/{{org_id}}/platform/auditlog/download
+Authorization: Basic {{sys-user-id}} {{sys-user-pw}}
+content-type: application/json
+
+{
+  "ts_from": "2024-06-01 00:00:00",
+  "ts_to": "2024-06-30 23:59:59"
+}

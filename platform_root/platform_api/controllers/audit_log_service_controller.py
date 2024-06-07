@@ -11,9 +11,17 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
-# import connexion
-from common_library.common import common
-# from common_library.common.db import DBconnector
+
+import connexion
+import ulid
+import globals
+import json
+
+from flask import request
+from contextlib import closing
+from common_library.common import common, multi_lang, const, validation
+from common_library.common.db import DBconnector
+from common_library.common.libs import queries_bl_audit_log, queries_bl_notification
 
 MSG_FUNCTION_ID = "40"
 
@@ -61,4 +69,89 @@ def auditlog_download_reserve(body, organization_id):  # noqa: E501
 
     :rtype: InlineResponse20025
     """
-    return common.response_200_ok(None)
+    r = connexion.request
+    user_id = r.headers.get("User-id")
+    language = r.headers.get("Language")
+    body = connexion.request.get_json()
+    data = None
+
+    # body validation check
+    if not body:
+        message_id = "400-000002"
+        message = multi_lang.get_text(
+            message_id,
+            "リクエストボディのパラメータ({0})が不正です。",
+            'Json',
+        )
+        raise common.BadRequestException(message_id=message_id, message=message)
+
+    validate = validation.validate_audit_log_conditions(body)
+    if not validate.ok:
+        return common.response_validation_error(validate)
+
+    conditions = json.dumps(body)
+
+    # write to JOBS AUDIT LOG DB
+    reg_flag = False
+    with closing(DBconnector().connect_orgdb(organization_id)) as conn:
+        with conn.cursor() as cursor:
+            try:
+                job_id = ulid.new().str
+                parameter = {
+                    "job_id": job_id,
+                    "job_type": const.PROCESS_KIND_AUDIT_LOG,
+                    "job_status": const.AUDIT_LOG_NOT_EXEC,
+                    "conditions": conditions,
+                    "count_export": None,
+                    "message": None,
+                    "language":language,
+                    "create_user": user_id,
+                    "last_update_user": user_id
+                }
+                cursor.execute(queries_bl_audit_log.SQL_INSERT_JOBS_AUDIT_LOG, parameter)
+
+                conn.commit()
+                reg_flag = True
+
+                data = {"download_id": job_id}
+
+            except Exception as e:
+                conn.rollback()
+                globals.logger.error(f"exception:{e.args}")
+                message_id = f"500-{MSG_FUNCTION_ID}001"
+                message = multi_lang.get_text(
+                    message_id,
+                    "ジョブの登録に失敗しました(job id:{0})",
+                    job_id,
+                )
+                raise common.InternalErrorException(message_id=message_id, message=message)
+
+    # write to PROCESS QUEUE DB
+    if reg_flag is True:
+        with closing(DBconnector().connect_platformdb()) as conn:
+            with conn.cursor() as cursor:
+                try:
+                    parameter = {
+                        "process_id": ulid.new().str,
+                        "process_kind": const.PROCESS_KIND_AUDIT_LOG,
+                        "process_exec_id": job_id,
+                        "organization_id": organization_id,
+                        "workspace_id": None,
+                        "last_update_user": user_id,
+                    }
+                    cursor.execute(queries_bl_notification.SQL_INSERT_PROCESS_QUEUE, parameter)
+                    conn.commit()
+
+                except Exception as e:
+                    conn.rollback()
+                    globals.logger.error(f"exception:{e.args}")
+                    message_id = f"500-{MSG_FUNCTION_ID}002"
+                    message = multi_lang.get_text(
+                        message_id,
+                        "処理キューの登録に失敗しました(process id:{0})",
+                        parameter['process_id'],
+                    )
+                    raise common.InternalErrorException(message_id=message_id, message=message)
+
+
+    return common.response_200_ok(data)

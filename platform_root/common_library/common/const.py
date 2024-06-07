@@ -176,11 +176,18 @@ JOB_USER_EXEC = "Executing"                     # 実行中
 JOB_USER_COMP = "Completion"                    # 完了
 JOB_USER_FAILED = "Failed"                      # 失敗
 
+# 監査ログダウンロードステータス
+AUDIT_LOG_NOT_EXEC = "NotExecuted"              # 未実行
+AUDIT_LOG_EXEC = "Executing"                    # 実行中
+AUDIT_LOG_COMP = "Completion"                   # 完了
+AUDIT_LOG_FAILED = "Failed"                     # 失敗
+
 # 処理区分
 # process kind
 PROCESS_KIND_NOTIFICATION = "NOTIFICATION"      # 通知処理
 PROCESS_KIND_USER_IMPORT = "USERIMPORT"         # ユーザー一括インポート
 PROCESS_KIND_USER_EXPORT = "USEREXPORT"         # ユーザー一括エクスポート
+PROCESS_KIND_AUDIT_LOG = "AUDITLOG"             # 監査ログ
 
 # smtp_idのデフォルト
 # Default when smtp_id
