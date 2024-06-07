@@ -1803,8 +1803,6 @@ def validate_audit_log_conditions(conditions):
             multi_lang.get_text('000-00206', "タイムスタンプ(To)")
         )
 
-    ts_from = conditions.get('ts_from')
-
     if not validate_datetime(ts_from):
         return result(
             False, 400, '400-{}020'.format(MSG_FUNCTION_ID), '日時形式以外が指定されています。({0})',

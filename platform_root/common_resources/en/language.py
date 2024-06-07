@@ -679,6 +679,8 @@ class LanguageList:
     lang_array['500-38001'] = 'Failed to register job (job id:{0})'
     lang_array['500-38002'] = 'Failed to register processing queue (process id:{0})'
     lang_array['500-39001'] = 'Health check failed.'
+    lang_array['500-40001'] = 'Audit log download reservation failed (download id:{0})'
+    lang_array['500-40002'] = 'Failed to register processing queue (process id:{0})'
     lang_array['500-62001'] = 'Failed to obtain record for processing (table: {0})'
     lang_array['500-62002'] = 'The process was not started correctly and ended.'
     lang_array['500-90001'] = 'Failed to get client (Target ID: {0} client: {1})'
