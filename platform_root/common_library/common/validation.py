@@ -1777,3 +1777,44 @@ def complex_validate_authentication_user_password(authentication_enable, authent
         )
 
     return result(True)
+
+
+def validate_audit_log_conditions(conditions):
+    """Validate audit log conditions
+
+    Args:
+        conditions (dict): conditions
+
+    Returns:
+        result: Validation result
+    """
+    ts_from = conditions.get('ts_from')
+    ts_to = conditions.get('ts_to')
+
+    if ts_from is None:
+        return result(
+            False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
+            multi_lang.get_text('000-00205', "タイムスタンプ(From)")
+        )
+
+    if ts_to is None:
+        return result(
+            False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
+            multi_lang.get_text('000-00206', "タイムスタンプ(To)")
+        )
+
+    ts_from = conditions.get('ts_from')
+
+    if not validate_datetime(ts_from):
+        return result(
+            False, 400, '400-{}020'.format(MSG_FUNCTION_ID), '日時形式以外が指定されています。({0})',
+            multi_lang.get_text('000-00205', "タイムスタンプ(From)")
+        )
+
+    if not validate_datetime(ts_to):
+        return result(
+            False, 400, '400-{}020'.format(MSG_FUNCTION_ID), '日時形式以外が指定されています。({0})',
+            multi_lang.get_text('000-00206', "タイムスタンプ(To)")
+        )
+
+    return result(True)
