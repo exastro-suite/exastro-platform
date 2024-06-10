@@ -119,7 +119,7 @@ def role_user_mapping_create(body, organization_id, role_name):
 
     body = connexion.request.get_json()
     if not body:
-        message_id = "400-000002"
+        message_id = "400-00002"
         message = multi_lang.get_text(
             message_id,
             "リクエストボディのパラメータ({0})が不正です。",
@@ -147,7 +147,7 @@ def role_user_mapping_create(body, organization_id, role_name):
     # process the number of cases
     for user in body:
         if not user.get("preferred_username"):
-            message_id = "400-000002"
+            message_id = "400-00002"
             message = multi_lang.get_text(
                 message_id,
                 "リクエストボディのパラメータ({0})が不正です。",
@@ -227,7 +227,7 @@ def role_user_mapping_delete(body, organization_id, role_name):
 
     body = connexion.request.get_json()
     if not body:
-        message_id = "400-000002"
+        message_id = "400-00002"
         message = multi_lang.get_text(
             message_id,
             "リクエストボディのパラメータ({0})が不正です。",

@@ -63,7 +63,7 @@ def role_create(body, organization_id):
 
     body = connexion.request.get_json()
     if not body:
-        message_id = "400-000002"
+        message_id = "400-00002"
         message = multi_lang.get_text(
             message_id,
             "リクエストボディのパラメータ({0})が不正です。",
@@ -440,7 +440,7 @@ def role_update(body, organization_id, role_name):
 
     body = connexion.request.get_json()
     if not body:
-        message_id = "400-000002"
+        message_id = "400-00002"
         message = multi_lang.get_text(
             message_id,
             "リクエストボディのパラメータ({0})が不正です。",

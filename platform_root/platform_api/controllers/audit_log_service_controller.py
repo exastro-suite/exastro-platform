@@ -77,7 +77,7 @@ def auditlog_download_reserve(body, organization_id):  # noqa: E501
 
     # body validation check
     if not body:
-        message_id = "400-000002"
+        message_id = "400-00002"
         message = multi_lang.get_text(
             message_id,
             "リクエストボディのパラメータ({0})が不正です。",
@@ -121,7 +121,7 @@ def auditlog_download_reserve(body, organization_id):  # noqa: E501
                 message_id = f"500-{MSG_FUNCTION_ID}001"
                 message = multi_lang.get_text(
                     message_id,
-                    "ジョブの登録に失敗しました(job id:{0})",
+                    "監査ログダウンロードの予約に失敗しました(download id:{0})",
                     job_id,
                 )
                 raise common.InternalErrorException(message_id=message_id, message=message)

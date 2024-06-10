@@ -21,9 +21,9 @@ from contextlib import closing
 import globals
 from common_library.common import const as common_const
 from common_library.common.db import DBconnector
-from common_library.common import common, api_keycloak_tokens, api_keycloak_realms, api_keycloak_users_profile, api_keycloak_roles, api_keycloak_clients
+from common_library.common import common, api_keycloak_tokens, api_keycloak_roles, api_keycloak_clients
 from common_library.common import multi_lang
-from .libs import queries_db_organizations
+from .libs import queries_db_organization
 
 # keycloak realm-managementロール 登録
 # keycloak realm-management role
@@ -46,12 +46,6 @@ class realm_update:
     # realm name
     realm = None
 
-    # add client name
-    platform_client_clientid = None
-    platform_api_clientid = None
-
-    realm_management_clientid = "realm-management"
-
     token_user = os.environ.get("KEYCLOAK_USER")
     token_pass = os.environ.get("KEYCLOAK_PASSWORD")
 
@@ -64,21 +58,6 @@ class realm_update:
     organization_count = 0
     step_count = 0
     step_max = 0
-
-    # realm update json
-    update_master_json = {
-        "loginTheme": "exastro",
-        "internationalizationEnabled": True,
-        "supportedLocales": [
-            "ja",
-            "en"
-        ],
-        "defaultLocale": "ja"
-    }
-
-    update_organization_json = {
-        "loginTheme": "exastro"
-    }
 
     def __init__(self, realm="master"):
         """初期化処理 initialize setting
@@ -97,7 +76,7 @@ class realm_update:
 
         try:
             self.step_count = 1
-            self.step_max = 4
+            self.step_max = 3
 
             # organization取得
             organizations = self.__get_organizations()
@@ -108,11 +87,6 @@ class realm_update:
             access_token = self.__access_token_get(self.realm, self.token_user, self.token_pass)
             self.step_count += 1
 
-            # master realm 更新 (loginTheme, supportedLocales, defaultLocale)
-            # master realm update (loginTheme, supportedLocales, defaultLocale)
-            self.__realm_update(MASTER_REALM_NAME, access_token, self.update_master_json)
-            self.step_count += 1
-
             # オーガナイゼーション数分処理する
             # Process for the number of organisations.
             for organization in organizations:
@@ -120,43 +94,6 @@ class realm_update:
                 self.organization_count += 1
                 organization_id = organization.get("ORGANIZATION_ID")
                 globals.logger.info(f"[{self.step_count}/{self.step_max}] ##### Organization iteration [{self.organization_count}/{len(organizations)}] Start - organization id [{organization_id}]")  # noqa: #E501
-
-                # organization realm 更新 (loginTheme)
-                # organization realm update (loginTheme)
-                self.__realm_update(organization_id, access_token, self.update_organization_json)
-
-                # users profilesを設定する
-                # get users profiles
-                response = api_keycloak_users_profile.get_users_profiles(organization_id, access_token)
-                if response.status_code != 200:
-                    globals.logger.error(f"get_users_profiles response.status_code:{response.status_code}")
-                    globals.logger.error(f"get_users_profiles response.text:{response.text}")
-                    message_id = f"500-{MSG_FUNCTION_ID}025"
-                    message = multi_lang.get_text(
-                        message_id,
-                        "User Profileの取得に失敗しました(対象ID:{0})",
-                        organization_id
-                    )
-                    raise common.InternalErrorException(message_id=message_id, message=message)
-
-                # users profilesを設定する
-                # Set user profiles
-                users_profiles = json.loads(response.text)
-                api_keycloak_users_profile.configure_realm_users_profiles(users_profiles)
-
-                # users profilesを更新する
-                # update users profiles
-                response = api_keycloak_users_profile.put_users_profiles(organization_id, users_profiles, access_token)
-                if response.status_code != 200:
-                    globals.logger.error(f"put_users_profiles response.status_code:{response.status_code}")
-                    globals.logger.error(f"put_users_profiles response.text:{response.text}")
-                    message_id = f"500-{MSG_FUNCTION_ID}026"
-                    message = multi_lang.get_text(
-                        message_id,
-                        "User Profileの更新に失敗しました(対象ID:{0})",
-                        organization_id
-                    )
-                    raise common.InternalErrorException(message_id=message_id, message=message)
 
                 # organization管理者用の権限を登録
                 # create a authority for organization admin
@@ -211,7 +148,7 @@ class realm_update:
         with closing(DBconnector().connect_platformdb()) as conn:
             with conn.cursor() as cursor:
                 cursor.execute(
-                    queries_db_organizations.SQL_QUERY_ORGANIZATIONS)
+                    queries_db_organization.SQL_SELECT_ORGANIZATION_DB)
                 result = cursor.fetchall()
 
         globals.logger.debug(f"result:{result}")
@@ -260,35 +197,6 @@ class realm_update:
         except Exception:
             raise
 
-    def __realm_update(self, realm_name, token, update_json):
-        """realm update
-
-        Args:
-            realm_name (str): realm name
-            token (str): keycloak access token
-            update_json(dict): update json
-        """
-        globals.logger.info(f"[{self.step_count}/{self.step_max}] ### Start func:{inspect.currentframe().f_code.co_name}")
-
-        # realm更新
-        # realm update to keycloak
-        response = api_keycloak_realms.realm_update(realm_name, update_json, token)
-        globals.logger.debug(f"realm_update response:{response}")
-        if response.status_code != 204:
-            globals.logger.error(f"response.status_code:{response.status_code}")
-            globals.logger.error(f"response.text:{response.text}")
-            message_id = f"500-{MSG_FUNCTION_ID}005"
-            message = multi_lang.get_text(
-                message_id,
-                "realmの更新に失敗しました。(対象ID:{0})",
-                realm_name
-            )
-            raise common.InternalErrorException(message_id=message_id, message=message)
-
-        globals.logger.info(f"[{self.step_count}/{self.step_max}] ### Succeed func:{inspect.currentframe().f_code.co_name}")
-
-        return
-
     def __role_update(self, organization_id, token):
         """role update
 
@@ -317,35 +225,32 @@ class realm_update:
         client_info = json.loads(response.text)
         organization_client_id = client_info[0].get("id")
 
-        # client取得(realm-management)
-        # client get to keycloak
-        realm_management_clientid = "realm-management"
-        response = api_keycloak_clients.clients_get(organization_id, realm_management_clientid, token)
-        if response.status_code != 200:
+        # オーガナイゼーションロール権限 登録
+        # Organization role authority registration
+        org_auth = common_const.ORG_AUTH_AUDIT_LOG
+        response = api_keycloak_roles.clients_role_create(organization_id, organization_client_id, org_auth, token)
+        if response.status_code not in [200, 201, 409]:    # 409 exists role
             globals.logger.error(f"response.status_code:{response.status_code}")
             globals.logger.error(f"response.text:{response.text}")
-            message_id = f"500-{MSG_FUNCTION_ID}001"
+            message_id = f"500-{MSG_FUNCTION_ID}011"
             message = multi_lang.get_text(
                 message_id,
-                "clientの取得に失敗しました(対象ID:{0} client:{1})",
+                "client roleの設定に失敗しました(対象ID:{0} client:{1})",
                 organization_id,
-                realm_management_clientid
+                client_clientid
             )
             raise common.InternalErrorException(message_id=message_id, message=message)
-
-        client_info = json.loads(response.text)
-        realm_management_client_id = client_info[0].get("id")
 
         # organization管理者用のロールを更新
         # update role for organization manager
         org_role = common_const.ORG_ROLE_ORG_MANAGER
-        arr_permissions = common_const.ORG_PERMISSION_IDP_MANAGER
+        arr_permissions = [common_const.ORG_AUTH_AUDIT_LOG, ]
 
         client_roles = []
         for permission in arr_permissions:
             # Clientからorganization管理者に付与するロールを取得
             # Get role want to grant to organization manager from client
-            response = api_keycloak_roles.clients_role_get(organization_id, realm_management_client_id, permission, token)
+            response = api_keycloak_roles.clients_role_get(organization_id, organization_client_id, permission, token)
             if response.status_code != 200:
                 globals.logger.error(f"response.status_code:{response.status_code}")
                 globals.logger.error(f"response.text:{response.text}")
@@ -354,7 +259,7 @@ class realm_update:
                     message_id,
                     "client roleの取得に失敗しました(対象ID:{0} client:{1})",
                     organization_id,
-                    realm_management_clientid
+                    organization_client_id
                 )
                 raise common.InternalErrorException(message_id=message_id, message=message)
 
@@ -369,11 +274,13 @@ class realm_update:
             message_id = f"500-{MSG_FUNCTION_ID}010"
             message = multi_lang.get_text(
                 message_id,
-                "client roleのrole設定に失敗しました(対象ID:{0} client:{1})",
+                "client roleへのrole設定に失敗しました(対象ID:{0} client:{1})",
                 organization_id,
                 client_clientid
             )
             raise common.InternalErrorException(message_id=message_id, message=message)
+
+        self.ok_count += 1
 
         globals.logger.info(f"[{self.step_count}/{self.step_max}] ### Succeed func:{inspect.currentframe().f_code.co_name}")
 
