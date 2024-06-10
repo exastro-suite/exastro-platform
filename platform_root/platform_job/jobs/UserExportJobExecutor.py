@@ -24,7 +24,7 @@ import random
 from common_library.common.db import DBconnector
 from common_library.common import const, common
 from common_library.common import multi_lang
-from common_library.common import user_export_file_common
+from common_library.common import user_import_file_common
 from common_library.common import api_keycloak_users
 from common_library.common import api_keycloak_roles
 from common_library.common import bl_plan_service
@@ -34,7 +34,7 @@ import job_manager_config
 import job_manager_const
 from jobs import jobs_common
 from libs.exceptions import JobTimeoutException
-from libs import queries_user_export 
+from libs import queries_user_export
 
 class UserExportJobExecutor(BaseJobExecutor):
     """ユーザ情報エクスポート / User Export Job
@@ -105,7 +105,7 @@ class UserExportJobExecutor(BaseJobExecutor):
 
                 # 結果雛形ファイルのOpen / Open result template file
                 globals.logger.debug('Get excel template')
-                self.result_wb = user_export_file_common.UserResultWorkbook(lang=self.language, error_column=True)
+                self.result_wb = user_import_file_common.UserResultWorkbook(lang=self.language, error_column=True)
 
                 # ユーザーの取得 / Add user
                 users = self.__get_users()
@@ -158,7 +158,10 @@ class UserExportJobExecutor(BaseJobExecutor):
                         # 結果ファイル保存
                         excel_bytes_image = self.result_wb.get_workbook_bytes_image()
                         with conn.cursor() as cursor:
-                            cursor.execute(queries_user_export.SQL_INSERT_JOBS_USER_RESULT, {"file_id": self.result_id, "job_id": self.job_id, "file_data": excel_bytes_image})
+                            cursor.execute(
+                                queries_user_export.SQL_INSERT_JOBS_USER_RESULT,
+                                {"file_id": self.result_id, "job_id": self.job_id, "file_data": excel_bytes_image}
+                                )
                         del excel_bytes_image
 
                 except Exception as ex:
@@ -167,10 +170,16 @@ class UserExportJobExecutor(BaseJobExecutor):
                 conn.commit()
 
         return True
-    
+
     def __get_user_affiliation(self, user):
         """ユーザ所属の取得
+
+        Args:
+            user (dict): user
+        Returns:
+            str: affiliation
         """
+        # 空で登録されているとキー自体が存在しないため
         if "attributes" in user:
             if "affiliation" in user["attributes"]:
                 return user["attributes"]["affiliation"][0]
@@ -178,10 +187,16 @@ class UserExportJobExecutor(BaseJobExecutor):
                 return ""
         else:
             return ""
-            
+
     def __get_user_description(self, user):
-        """ユーザ所属の取得
+        """ユーザ説明の取得
+
+        Args:
+            user (dict): user
+        Returns:
+            str: description
         """
+        # 空で登録されているとキー自体が存在しないため
         if "attributes" in user:
             if "description" in user["attributes"]:
                 return user["attributes"]["description"][0]
@@ -189,8 +204,8 @@ class UserExportJobExecutor(BaseJobExecutor):
                 return ""
         else:
             return ""
-            
-    
+
+
     def __get_users(self):
         """ユーザ一覧の取得 / get users
 
@@ -215,7 +230,7 @@ class UserExportJobExecutor(BaseJobExecutor):
                 )
 
             raise common.InternalErrorException(message_id=message_id, message=message)
-        
+
         users = json.loads(res.text)
         # ロールの取得 / get roles
         for user in users:
@@ -225,7 +240,7 @@ class UserExportJobExecutor(BaseJobExecutor):
                 client_id=self.organization_private.user_token_client_id,
                 token=self.organization_sa_token.get()
                 )
-            
+
             if res.status_code != 200:
                 globals.logger.debug(f"response:{res.text}")
                 message_id = f"500-25002"
@@ -236,15 +251,15 @@ class UserExportJobExecutor(BaseJobExecutor):
                 )
 
                 raise common.InternalErrorException(message_id=message_id, message=message)
-            
+
             # カンマ区切りでユーザー情報に追加
             roles = json.loads(res.text)
             role_list = ",".join([role.get("name") for role in roles])
             user["roles"] = role_list
-            
+
             # 1JOBでリソースを占有しないようにsleepする / Sleep so that 1JOB does not occupy resources
             time.sleep(job_manager_config.JOBS[const.PROCESS_KIND_USER_EXPORT]["extra_config"]["user_export_interval_millisecond"]/1000)
-                
+
         globals.logger.info(f'Get Users [OG:{self.organization_id}]')
         return users
 
@@ -307,7 +322,7 @@ class UserExportJobExecutor(BaseJobExecutor):
 
                     try:
                         with closing(DBconnector().connect_orgdb(organization['ORGANIZATION_ID'])) as conn, conn.cursor() as cursor:
-                                
+
                             last_update_timestamp = (datetime.datetime.now() - datetime.timedelta(
                                 seconds=job_manager_config.JOBS[job_manager_const.PROCESS_KIND_FORCE_UPDATE_STATUS]['extra_config']['prograss_seconds']))
 

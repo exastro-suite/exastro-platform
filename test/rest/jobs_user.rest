@@ -31,3 +31,8 @@ Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
 GET {{base_org_url}}/api/{{org_id}}/platform/jobs/users/import/status
 Authorization: Basic {{org-user-id}} {{org-user-pw}}
 
+
+### Jobs user export
+POST {{base_org_url}}/api/{{org_id}}/platform/jobs/users/export
+Authorization: Basic {{org-user-id}} {{org-user-pw}}
+Content-Type: application/json
