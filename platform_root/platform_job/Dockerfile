@@ -48,6 +48,7 @@ RUN --mount=type=secret,id=host_certificate_file,dst=/etc/pki/ca-trust/extracted
 #
 # config default
 #
+ENV TEMPORARY_DIR=/tmp
 
 # SUB PROCESSを再起動するインターバル / Interval for restarting SUB PROCESS
 # ※各JOBのタイムアウト時間より大きい数字とするとこ / Set the number to be larger than the timeout time of each JOB
@@ -118,6 +119,14 @@ ENV JOB_USER_IMPORT_WAIT_MILLISECONDS=10
 ENV JOB_USER_IMPORT_UPDATE_COUNT_INTERVAL=100
 #   Excelファイルバッファリング行数 / Excel file buffering row count
 ENV JOB_USER_IMPORT_XL_BUFFERED_ROWS=100
+
+# 監査ログファイル作成Jobの設定 / Audit log file creation job settings
+#   Jobタイムアウト / Job timeout
+ENV JOB_AUDITLOG_TIMEOUT_SECONDS=600
+#   プロセス毎に同時実行可能なJob数 / Number of jobs that can be executed simultaneously per process
+ENV JOB_AUDITLOG_MAX_JOB_PER_PROCESS=2
+#   処理中の件数を更新するインターバル / Interval for updating the number of items being processed
+ENV JOB_AUDITLOG_UPDATE_COUNT_INTERVAL=100
 
 #
 # Build for development
