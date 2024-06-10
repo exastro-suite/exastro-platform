@@ -134,7 +134,7 @@ def user_create(body, organization_id):
     body = connexion.request.get_json()
     if not body:
         raise common.BadRequestException(
-            message_id='400-000002', message='リクエストボディのパラメータ({})が不正です。'.format('Json')
+            message_id='400-00002', message='リクエストボディのパラメータ({})が不正です。'.format('Json')
         )
 
     user_name = body.get("username")
@@ -332,7 +332,7 @@ def user_update(body, organization_id, user_id):  # noqa: E501
     body = connexion.request.get_json()
     if not body:
         raise common.BadRequestException(
-            message_id='400-000002', message='リクエストボディのパラメータ({})が不正です。'.format('Json')
+            message_id='400-00002', message='リクエストボディのパラメータ({})が不正です。'.format('Json')
         )
 
     user_email = body.get("email")

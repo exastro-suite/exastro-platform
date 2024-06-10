@@ -216,7 +216,7 @@ def validate_workspace_informations(workspace_informations):
     """
     if not isinstance(workspace_informations.get('environments', []), list):
         return result(
-            False, 400, '400-000002', 'リクエストボディのパラメータ({})が不正です。'.format('informations.environments'),
+            False, 400, '400-00002', 'リクエストボディのパラメータ({})が不正です。'.format('informations.environments'),
             'informations.environments'
         )
 
@@ -229,13 +229,13 @@ def validate_workspace_informations(workspace_informations):
 
     if len([t for t in workspace_informations.get('environments', []) if not isinstance(t.get('name', None), str)]) > 0:
         return result(
-            False, 400, '400-000002', 'リクエストボディのパラメータ({})が不正です。'.format('informations.environments'),
+            False, 400, '400-00002', 'リクエストボディのパラメータ({})が不正です。'.format('informations.environments'),
             'informations.environments'
         )
 
     if len([t for t in workspace_informations.get('environments', []) if len(t.get('name', '')) == 0]) > 0:
         return result(
-            False, 400, '400-000002', 'リクエストボディのパラメータ({})が不正です。'.format('informations.environments'),
+            False, 400, '400-00002', 'リクエストボディのパラメータ({})が不正です。'.format('informations.environments'),
             'informations.environments'
         )
 
@@ -256,7 +256,7 @@ def validate_workspace_informations(workspace_informations):
 
     if not isinstance(workspace_informations.get('description', ''), str):
         return result(
-            False, 400, '400-000002', 'リクエストボディのパラメータ({})が不正です。'.format('informations.description'),
+            False, 400, '400-00002', 'リクエストボディのパラメータ({})が不正です。'.format('informations.description'),
             'informations.description'
         )
 
@@ -416,7 +416,7 @@ def validate_role_mapping_users(role_users):
     usernames = ([x.get('preferred_username', '') for x in role_users if x.get('preferred_username')])
     if len(usernames) < 1:
         return result(
-            False, 400, '400-000002', 'リクエストボディのパラメータ({})が不正です。'.format('preferred_username'),
+            False, 400, '400-00002', 'リクエストボディのパラメータ({})が不正です。'.format('preferred_username'),
             multi_lang.get_text('000-0010X', "preferred_username"),
         )
 
@@ -506,7 +506,7 @@ def validate_plan_informations(plan_informations):
     """
     if not isinstance(plan_informations.get('description', ''), str):
         return result(
-            False, 400, '400-000002', 'リクエストボディのパラメータ({})が不正です。'.format('informations.description'),
+            False, 400, '400-00002', 'リクエストボディのパラメータ({})が不正です。'.format('informations.description'),
             'informations.description'
         )
 

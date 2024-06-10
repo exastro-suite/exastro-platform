@@ -77,7 +77,7 @@ def auditlog_download_reserve(body, organization_id):  # noqa: E501
 
     # body validation check
     if not body:
-        message_id = "400-000002"
+        message_id = "400-00002"
         message = multi_lang.get_text(
             message_id,
             "リクエストボディのパラメータ({0})が不正です。",
