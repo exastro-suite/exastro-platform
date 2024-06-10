@@ -122,6 +122,20 @@ ENV JOB_USER_IMPORT_UPDATE_COUNT_INTERVAL=100
 #   Excelファイルバッファリング行数 / Excel file buffering row count
 ENV JOB_USER_IMPORT_XL_BUFFERED_ROWS=100
 
+# ユーザーエクスポートJobの設定 / User export job settings
+#   Jobタイムアウト / Job timeout
+ENV JOB_USER_EXPORT_TIMEOUT_SECONDS=3600
+#   プロセス毎に同時実行可能なJob数 / Number of jobs that can be executed simultaneously per process
+ENV JOB_USER_EXPORT_MAX_JOB_PER_PROCESS=2
+#   出力可能なExcelファイルの最大行数 / Maximum number of rows in an Excel file that can be read
+ENV JOB_USER_EXPORT_MAX_ROWS_ALLOWD=20000
+#   1件処理毎にwaitする時間(ミリ秒) / Wait time for each process (milliseconds)
+ENV JOB_USER_EXPORT_WAIT_MILLISECONDS=10
+#   処理中の件数を更新するインターバル / Interval for updating the number of items being processed
+ENV JOB_USER_EXPORT_UPDATE_COUNT_INTERVAL=100
+#   Excelファイルバッファリング行数 / Excel file buffering row count
+ENV JOB_USER_EXPORT_XL_BUFFERED_ROWS=100
+
 #
 # Build for development
 #   Specify options when creating this image: --target develop_build
