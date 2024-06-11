@@ -131,6 +131,9 @@ class AuditLogJobExecutor(BaseJobExecutor):
                                 self.__update_job_audit_log(conn, job_status=const.AUDIT_LOG_EXEC, message=None)
                                 conn.commit()
 
+                            # 1JOBでリソースを占有しないようにsleepする / Sleep so that 1JOB does not occupy resources
+                            time.sleep(job_manager_config.JOBS[const.PROCESS_KIND_AUDIT_LOG]["extra_config"]["output_interval_millisecond"]/1000)
+
                         fp_temp.close()
                         globals.logger.debug(f'Finish Write Temprary File: count_export={self.count_export}')
 
@@ -165,6 +168,10 @@ class AuditLogJobExecutor(BaseJobExecutor):
                                         "file_id": self.file_id,
                                         "file_data": zip_buf
                                     })
+
+                                    # 1JOBでリソースを占有しないようにsleepする / Sleep so that 1JOB does not occupy resources
+                                    time.sleep(job_manager_config.JOBS[const.PROCESS_KIND_AUDIT_LOG]["extra_config"]["output_interval_millisecond"]/1000)
+
                             globals.logger.debug(f'Finish Write T_JOBS_AUDIT_LOG_FILE.file_data');
                     finally:
                         try:
@@ -185,9 +192,10 @@ class AuditLogJobExecutor(BaseJobExecutor):
                 # タイムアウトエラー / timeout error
                 conn.rollback()
                 self.__update_job_audit_log(conn, job_status=const.JOB_USER_FAILED, message=multi_lang.get_text_spec(self.language, '401-00022', 'ファイル生成中にタイムアウトしました。'))
-                raise ex
+                return False
 
             except common.InternalErrorException as ex:
+                globals.logger.error(f'{ex.message}')
                 conn.rollback()
                 self.__update_job_audit_log(conn, job_status=const.JOB_USER_FAILED, message=ex.message)
                 raise ex

@@ -127,6 +127,8 @@ ENV JOB_AUDITLOG_TIMEOUT_SECONDS=600
 ENV JOB_AUDITLOG_MAX_JOB_PER_PROCESS=2
 #   処理中の件数を更新するインターバル / Interval for updating the number of items being processed
 ENV JOB_AUDITLOG_UPDATE_COUNT_INTERVAL=100
+#   1件処理毎にwaitする時間(ミリ秒) / Wait time for each process (milliseconds)
+ENV JOB_AUDIT_WAIT_MILLISECONDS=1
 
 #
 # Build for development

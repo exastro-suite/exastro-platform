@@ -134,6 +134,8 @@ JOBS = {
         "extra_config": {
             # 処理中の件数を更新するインターバル / Interval for updating the number of items being processed
             "status_update_interval": int(os.environ.get('JOB_AUDITLOG_UPDATE_COUNT_INTERVAL')),
+            # 1件処理毎にwaitする時間(ミリ秒) / Wait time for each process (milliseconds)
+            "output_interval_millisecond": float(os.environ.get('JOB_AUDIT_WAIT_MILLISECONDS')),
         }
     },
     job_manager_const.PROCESS_KIND_FORCE_UPDATE_STATUS: {
