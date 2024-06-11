@@ -125,6 +125,19 @@ JOBS = {
             "xl_buffered_rows": int(os.environ.get('JOB_USER_IMPORT_XL_BUFFERED_ROWS')),
         }
     },
+    const.PROCESS_KIND_AUDIT_LOG: {
+        "timeout_seconds": int(os.environ.get('JOB_AUDITLOG_TIMEOUT_SECONDS')),
+        "module": "jobs.AuditLogJobExecutor",
+        "class": "AuditLogJobExecutor",
+        "job_trigger": "queue",
+        "max_job_per_process": int(os.environ.get('JOB_AUDITLOG_MAX_JOB_PER_PROCESS')),
+        "extra_config": {
+            # 処理中の件数を更新するインターバル / Interval for updating the number of items being processed
+            "status_update_interval": int(os.environ.get('JOB_AUDITLOG_UPDATE_COUNT_INTERVAL')),
+            # 1件処理毎にwaitする時間(ミリ秒) / Wait time for each process (milliseconds)
+            "output_interval_millisecond": float(os.environ.get('JOB_AUDIT_WAIT_MILLISECONDS')),
+        }
+    },
     const.PROCESS_KIND_USER_EXPORT: {
         "timeout_seconds": int(os.environ.get('JOB_USER_EXPORT_TIMEOUT_SECONDS')),
         "module": "jobs.UserExportJobExecutor",

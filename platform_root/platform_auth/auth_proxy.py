@@ -267,7 +267,7 @@ class auth_proxy:
             "User-Id": self.token_decode.get("sub"),
             "Roles": roles_str,
             "Org-Roles": org_roles_str,
-            "Language": self.token_decode.get("locale"),
+            "Language": self.token_decode.get("locale") or "ja",
         }
         user_info = {
             "user_id": self.token_decode.get("sub"),

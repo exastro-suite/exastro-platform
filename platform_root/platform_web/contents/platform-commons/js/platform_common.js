@@ -270,6 +270,7 @@ function displayMenu(curent) {
             <li class="menuItem"><a class="menuLink" id="menu_settings_notifications" href="#">${getText("000-00183", "通知管理")}</a></li>
             <li class="menuItem"><a class="menuLink" id="menu_settings_mailserver" href="#" style="display: none;">${getText("000-88002", "メール送信サーバー設定")}</a></li>
             <li class="menuItem"><a class="menuLink" id="menu_identity_providers" href="#" style="display: none;">${getText("000-80051", "アイデンティティー・プロバイダー")}</a></li>
+            <li class="menuItem"><a class="menuLink" id="menu_auditlog" href="#" style="display: none;">${getText("000-80052", "監査ログ")}</a></li>
         `);
 
         $('#menu_workspace').attr('href', location_conf.href.workspaces.list.replace(/{organization_id}/g, CommonAuth.getRealm()));
@@ -278,6 +279,7 @@ function displayMenu(curent) {
         $('#menu_settings_notifications').attr('href', location_conf.href.workspaces.settings.notifications.workspaces.replace(/{organization_id}/g, CommonAuth.getRealm()));
         $('#menu_settings_mailserver').attr('href', location_conf.href.settings.mailserver.replace(/{organization_id}/g, CommonAuth.getRealm()));
         $('#menu_identity_providers').attr('href', location_conf.href.keycloak.identity_providers.replace(/{organization_id}/g, CommonAuth.getRealm()));
+        $('#menu_auditlog').attr('href', location_conf.href.auditlog.download.replace(/{organization_id}/g, CommonAuth.getRealm()));
 
         if (CommonAuth.hasAuthority(RolesCommon.ORG_AUTH_USER_MAINTE)) {
             $("#menu_account_management").css("display", "");
@@ -295,6 +297,9 @@ function displayMenu(curent) {
         }
         if (CommonAuth.hasRealmManagementAuthority("manage-identity-providers")) {
             $("#menu_identity_providers").css("display", "");
+        }
+        if (CommonAuth.hasAuthority(RolesCommon.ORG_AUTH_UPDATE)) {
+            $("#menu_auditlog").css("display", "");
         }
     }
 
@@ -917,6 +922,7 @@ const RolesCommon =
     "ORG_AUTH_WS_ROLE_MAINTE":      "_og-ws-role-mt",
     "ORG_AUTH_WS_ROLE_USER":        "_og-ws-role-usr",
     "ORG_AUTH_WS_MAINTE":           "_og-ws-mt",
+    "ORG_AUTH_AUDIT_LOG":           "_og-audit-log",
 
     "isAlllowedCreateRole": function() {
         return CommonAuth.hasAuthority(RolesCommon.ORG_AUTH_WS_ROLE_MAINTE) || ( CommonAuth.getAdminWorkspaces().length > 0 );
@@ -1032,6 +1038,7 @@ const RolesCommon =
         orgAuthText[RolesCommon.ORG_AUTH_WS_ROLE_MAINTE]    = getText("000-00115", "ワークスペースロール管理");
         orgAuthText[RolesCommon.ORG_AUTH_WS_ROLE_USER]      = getText("000-00116", "ワークスペースロール付与");
         orgAuthText[RolesCommon.ORG_AUTH_WS_MAINTE]         = getText("000-00117", "ワークスペース管理");
+        orgAuthText[RolesCommon.ORG_AUTH_AUDIT_LOG]         = getText("000-00204", "監査ログ");
 
         switch(role.kind) {
             case 'organization':

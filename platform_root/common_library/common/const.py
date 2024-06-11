@@ -81,6 +81,7 @@ ORG_AUTH_USER_MAINTE = "_og-usr-mt"
 ORG_AUTH_WS_ROLE_MAINTE = "_og-ws-role-mt"
 ORG_AUTH_WS_ROLE_USER = "_og-ws-role-usr"
 ORG_AUTH_WS_MAINTE = "_og-ws-mt"
+ORG_AUTH_AUDIT_LOG = "_og-audit-log"
 ORG_AUTH_MANAGE_IDP = "manage-identity-providers"
 ORG_AUTH_VIEW_IDP = "view-identity-providers"
 ORG_AUTH_VIEW_REALM = "view-realm"
@@ -94,7 +95,7 @@ WS_AUTH_ADMIN_ANY = "_.*-admin"
 # Associating Roles and Permissions
 ORG_PERMISSION_ORG_MANAGER = [ORG_AUTH_UPDATE, ORG_AUTH_OWNER_MAINTE, ORG_AUTH_ROLE_USER, ORG_AUTH_USAGE_SITUATION,
                               ORG_AUTH_USER_MAINTE, ORG_AUTH_WS_ROLE_MAINTE, ORG_AUTH_WS_ROLE_USER, ORG_AUTH_WS_MAINTE,
-                              ORG_AUTH_MANAGE_IDP, ORG_AUTH_VIEW_IDP, ORG_AUTH_VIEW_REALM]
+                              ORG_AUTH_AUDIT_LOG, ORG_AUTH_MANAGE_IDP, ORG_AUTH_VIEW_IDP, ORG_AUTH_VIEW_REALM]
 ORG_PERMISSION_USER_ROLE_MANAGER = [ORG_AUTH_USER_MAINTE, ORG_AUTH_WS_ROLE_MAINTE, ORG_AUTH_WS_ROLE_USER]
 ORG_PERMISSION_USER_MANAGER = [ORG_AUTH_USER_MAINTE, ORG_AUTH_WS_ROLE_USER]
 ORG_PERMISSION_IDP_MANAGER = [ORG_AUTH_MANAGE_IDP, ORG_AUTH_VIEW_IDP, ORG_AUTH_VIEW_REALM]
@@ -118,6 +119,7 @@ ALL_ORG_AUTHORITIES = [
     ORG_AUTH_WS_ROLE_MAINTE,
     ORG_AUTH_WS_ROLE_USER,
     ORG_AUTH_WS_MAINTE,
+    ORG_AUTH_AUDIT_LOG,
 ]
 
 # plan未設定時のデフォルト
@@ -174,11 +176,19 @@ JOB_USER_EXEC = "Executing"                     # 実行中
 JOB_USER_COMP = "Completion"                    # 完了
 JOB_USER_FAILED = "Failed"                      # 失敗
 
+# 監査ログダウンロードステータス
+AUDIT_LOG_NOT_EXEC = "NotExecuted"              # 未実行
+AUDIT_LOG_EXEC = "Executing"                    # 実行中
+AUDIT_LOG_COMP = "Completion"                   # 完了
+AUDIT_LOG_FAILED = "Failed"                     # 失敗
+AUDIT_LOG_NODATA = "NoData"                     # データなし
+
 # 処理区分
 # process kind
 PROCESS_KIND_NOTIFICATION = "NOTIFICATION"      # 通知処理
 PROCESS_KIND_USER_IMPORT = "USERIMPORT"         # ユーザー一括インポート
 PROCESS_KIND_USER_EXPORT = "USEREXPORT"         # ユーザー一括エクスポート
+PROCESS_KIND_AUDIT_LOG = "AUDITLOG"             # 監査ログ
 
 # smtp_idのデフォルト
 # Default when smtp_id
