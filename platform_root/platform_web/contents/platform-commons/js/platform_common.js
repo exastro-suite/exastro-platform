@@ -270,6 +270,7 @@ function displayMenu(curent) {
             <li class="menuItem"><a class="menuLink" id="menu_settings_notifications" href="#">${getText("000-00183", "通知管理")}</a></li>
             <li class="menuItem"><a class="menuLink" id="menu_settings_mailserver" href="#" style="display: none;">${getText("000-88002", "メール送信サーバー設定")}</a></li>
             <li class="menuItem"><a class="menuLink" id="menu_identity_providers" href="#" style="display: none;">${getText("000-80051", "アイデンティティー・プロバイダー")}</a></li>
+            <li class="menuItem"><a class="menuLink" id="menu_auditlog" href="#" style="display: none;">${getText("000-80052", "監査ログ")}</a></li>
         `);
 
         $('#menu_workspace').attr('href', location_conf.href.workspaces.list.replace(/{organization_id}/g, CommonAuth.getRealm()));
@@ -278,6 +279,7 @@ function displayMenu(curent) {
         $('#menu_settings_notifications').attr('href', location_conf.href.workspaces.settings.notifications.workspaces.replace(/{organization_id}/g, CommonAuth.getRealm()));
         $('#menu_settings_mailserver').attr('href', location_conf.href.settings.mailserver.replace(/{organization_id}/g, CommonAuth.getRealm()));
         $('#menu_identity_providers').attr('href', location_conf.href.keycloak.identity_providers.replace(/{organization_id}/g, CommonAuth.getRealm()));
+        $('#menu_auditlog').attr('href', location_conf.href.auditlog.download.replace(/{organization_id}/g, CommonAuth.getRealm()));
 
         if (CommonAuth.hasAuthority(RolesCommon.ORG_AUTH_USER_MAINTE)) {
             $("#menu_account_management").css("display", "");
@@ -295,6 +297,9 @@ function displayMenu(curent) {
         }
         if (CommonAuth.hasRealmManagementAuthority("manage-identity-providers")) {
             $("#menu_identity_providers").css("display", "");
+        }
+        if (CommonAuth.hasAuthority(RolesCommon.ORG_AUTH_UPDATE)) {
+            $("#menu_auditlog").css("display", "");
         }
     }
 
