@@ -128,6 +128,39 @@ SQL_ORGANIZATION_CREATE_TABLES = [
     )ENGINE = InnoDB, CHARSET = utf8mb4, COLLATE = utf8mb4_bin, ROW_FORMAT=COMPRESSED ,KEY_BLOCK_SIZE=8;
     """,
     """
+    -- ユーザー一覧出力ジョブ管理 / User list output job management
+    CREATE TABLE IF NOT EXISTS T_JOBS_USER_EXPORT
+    (
+        JOB_ID		                    VARCHAR(26) NOT NULL,                       -- ジョブID
+        JOB_TYPE		                VARCHAR(36),                                -- ジョブ種類
+        JOB_STATUS		                VARCHAR(36),                                -- ジョブステータス
+        QUERY_STRINGS	                VARCHAR(4000),	                            -- 抽出条件
+        COUNT_EXPORT	                INT,	                                    -- 出力対象件数
+        MESSAGE 	                    TEXT,	                                    -- 処理結果メッセージ
+        LANGUAGE	                    VARCHAR(36),                                -- 依頼者の言語
+        CREATE_TIMESTAMP		        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,    -- 作成日時
+        CREATE_USER		                VARCHAR(40),                                -- 作成者
+        LAST_UPDATE_TIMESTAMP		    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,    -- 最終更新日時
+        LAST_UPDATE_USER		        VARCHAR(40),                                -- 最終更新者
+        PRIMARY KEY (JOB_ID)
+    )ENGINE = InnoDB, CHARSET = utf8mb4, COLLATE = utf8mb4_bin, ROW_FORMAT=COMPRESSED ,KEY_BLOCK_SIZE=8;
+    """,
+    """
+    -- ユーザー一覧出力Excelファイル管理 / User list output Excel file management
+    CREATE TABLE IF NOT EXISTS T_JOBS_USER_FILE_EXPORT
+    (
+        FILE_ID		                    VARCHAR(26) NOT NULL,                       -- ファイルID
+        JOB_ID		                    VARCHAR(26) NOT NULL,                       -- ジョブID
+        FILE_DATA		                LONGBLOB,                                   -- ユーザー一覧Excelファイルデータ
+        CREATE_TIMESTAMP		        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,    -- 作成日時
+        CREATE_USER		                VARCHAR(40),                                -- 作成者
+        LAST_UPDATE_TIMESTAMP		    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,    -- 最終更新日時
+        LAST_UPDATE_USER		        VARCHAR(40),                                -- 最終更新者
+        PRIMARY KEY (FILE_ID),
+        INDEX IDX_FUNC_ID (JOB_ID)
+    )ENGINE = InnoDB, CHARSET = utf8mb4, COLLATE = utf8mb4_bin, ROW_FORMAT=COMPRESSED ,KEY_BLOCK_SIZE=8;
+    """,
+    """
     -- ワークスペースDB管理情報 / workspace database management infomation
     CREATE TABLE IF NOT EXISTS T_WORKSPACE_DB
     (

@@ -1224,6 +1224,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/runtimeError'
+
   '/api/{organization_id}/platform/auditlog/download':
     get:
       tags:
@@ -1288,6 +1289,15 @@ paths:
       summary: Reserve audit log download
       x-openapi-router-controller: controllers.audit_log_service_controller
       operationId: auditlog_download_reserve
+
+  '/api/{organization_id}/platform/jobs/users/export':
+    post:
+      tags:
+        - JobsService
+      summary: Export user list
+      x-openapi-router-controller: controllers.jobs_service_controller
+      operationId: jobs_users_export
+
       parameters:
         - name: organization_id
           in: path
@@ -1299,6 +1309,7 @@ paths:
           application/json:
             schema:
               type: object
+
               properties:
                 ts_from:
                   type: string
@@ -1306,6 +1317,8 @@ paths:
                 ts_to:
                   type: string
                   example: '2024-06-30 23:59:59'
+=======
+
         required: true
       responses:
         '200':
@@ -1319,6 +1332,7 @@ paths:
                     properties:
                       data:
                         type: object
+
                         example:
                           download_id: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
         default:
@@ -1353,6 +1367,9 @@ paths:
               schema:
                 type: string
                 format: binary
+
+                        example: null
+
         default:
           description: An unexpected error response.
           content:

@@ -21,6 +21,7 @@ import traceback
 import itertools
 import random
 import ulid
+import os
 from contextlib import closing
 from importlib import import_module
 import pymysql.err
@@ -241,9 +242,14 @@ def job_manager_sub_process(parameter: SubProcessParameter):
                         except Exception as err:
                             globals.logger.error(f'{err}\n---- stack trace ----\n{traceback.format_exc()}')
 
+                        # ハングアップ監視用に時刻を出力する
+                        with open(os.environ.get('FILE_PATH_LIVENESS'), 'w') as f:
+                            f.write(str(int(time.time())))
+                            
                     except Exception as err:
                         # 例外が発生しても処理は継続する / Processing continues even if an exception occurs
                         globals.logger.error(f'{err}\n---- stack trace ----\n{traceback.format_exc()}')
+
 
         except Exception as err:
             globals.logger.error(f'{err}\n---- stack trace ----\n{traceback.format_exc()}')

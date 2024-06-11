@@ -166,8 +166,8 @@ paths:
   # "/api/{organization_id}/platform/jobs/users/import/status/{job_id}/download":
   #     $ref: './paths/jobs.users.import.status.job_id.download.yaml'
 
-  # "/api/{organization_id}/platform/jobs/users/export":
-  #     $ref: './paths/jobs.users.export.yaml'
+  "/api/{organization_id}/platform/jobs/users/export":
+      $ref: './paths/jobs.users.export.yaml'
 
   # "/api/{organization_id}/platform/jobs/users/export/status":
   #     $ref: './paths/jobs.users.export.status.yaml'
