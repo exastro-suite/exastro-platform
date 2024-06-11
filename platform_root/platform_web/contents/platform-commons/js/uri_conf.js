@@ -121,7 +121,17 @@ var api_conf = {
                 }
             }
         },
-}
+        "auditlog": {
+            "download": {
+                "get": "/api/{organization_id}/platform/auditlog/download",
+                "post": "/api/{organization_id}/platform/auditlog/download",
+
+                "detail": {
+                    "get": "/api/{organization_id}/platform/auditlog/download/{download_id}",
+                }
+            }
+        }
+    }
 }
 
 var location_conf = {
@@ -196,5 +206,8 @@ var location_conf = {
         "settings": {
             "mailserver": "/{organization_id}/platform/settings/mailserver",
         },
+        "auditlog": {
+            "download": "/{organization_id}/platform/auditlog"
+        }
     }
 }
