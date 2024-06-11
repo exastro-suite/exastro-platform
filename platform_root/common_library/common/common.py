@@ -432,7 +432,7 @@ def str_to_datetime(p_datetime_str):
         return None
 
     aware_datetime = datetime.fromisoformat(p_datetime_str.replace('Z', '+00:00'))
-    return aware_datetime.astimezone(os.environ.get('TZ', 'UTC')).replace(tzinfo=None)
+    return aware_datetime.astimezone(pytz.timezone(os.environ.get('TZ', 'UTC'))).replace(tzinfo=None)
 
 
 def keycloak_timestamp_to_datetime(keycloak_timestamp):
