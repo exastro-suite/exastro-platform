@@ -181,6 +181,7 @@ AUDIT_LOG_NOT_EXEC = "NotExecuted"              # 未実行
 AUDIT_LOG_EXEC = "Executing"                    # 実行中
 AUDIT_LOG_COMP = "Completion"                   # 完了
 AUDIT_LOG_FAILED = "Failed"                     # 失敗
+AUDIT_LOG_NODATA = "NoData"                     # データなし
 
 # 処理区分
 # process kind

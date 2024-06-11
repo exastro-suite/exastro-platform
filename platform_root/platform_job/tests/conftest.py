@@ -38,6 +38,10 @@ import job_manager
 
 @pytest.fixture(scope="session", autouse=True)
 def tempfile_remove():
+    for p in glob.glob(f'{os.environ.get("TEMPORARY_DIR")}/exastro*'):
+        if os.path.isfile(p):
+            os.remove(p)
+
     for p in glob.glob(f'{os.environ.get("TEST_OUTPUT_PATH")}/*.xlsx'):
         if os.path.isfile(p):
             os.remove(p)
