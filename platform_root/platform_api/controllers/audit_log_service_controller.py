@@ -17,9 +17,10 @@ import ulid
 import globals
 import json
 
-from flask import request
+from flask import request, Response
 from contextlib import closing
 from common_library.common import common, multi_lang, const, validation
+from common_library.common import bl_auditlog_service
 from common_library.common.db import DBconnector
 from common_library.common.libs import queries_bl_audit_log, queries_bl_notification
 
@@ -27,19 +28,22 @@ MSG_FUNCTION_ID = "40"
 
 
 @common.platform_exception_handler
-def auditlog_download(organization_id, download_id):  # noqa: E501
-    """Audit log download
+def auditlog_download(organization_id, download_id):
+    """audit log file download
 
-     # noqa: E501
+    Args:
+        organization_id (str): organization id
+        download_id (str): download id
 
-    :param organization_id:
-    :type organization_id: str
-    :param download_id:
-    :type download_id: str
-
-    :rtype: str
+    Returns:
+        Response: http response
     """
-    return common.response_200_ok(None)
+
+    resp = Response(bl_auditlog_service.auditlog_file_download(organization_id, download_id))
+    resp.content_length = bl_auditlog_service.get_auditlog_file_download_filesize(organization_id, download_id)
+    resp.content_type = "application/octet-stream"
+
+    return resp
 
 
 @common.platform_exception_handler

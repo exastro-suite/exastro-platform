@@ -16,7 +16,7 @@
 WSGI main module
 """
 # from crypt import methods
-from flask import Flask, request, make_response
+from flask import Flask, request, make_response, Response
 import os
 import requests
 from datetime import datetime
@@ -28,6 +28,8 @@ import inspect
 import traceback
 from pathlib import Path
 import urllib.parse
+from contextlib import closing
+import re
 
 # User Imports
 import globals
@@ -36,6 +38,7 @@ import common_library.common.maintenancemode as maintenancemode
 from common_library.common.exastro_logging import ExastroLogRecordFactory, LOGGING
 from common_library.common.db import DBconnector
 from common_library.common import multi_lang
+from common_library.common import bl_common_service
 import auth_proxy
 
 from audit_logging import audit_getLogger
@@ -184,6 +187,22 @@ def platform_organization_api_call(subpath):
             globals.audit.info('audit: error.', extra=extra)
             raise common.InternalErrorException(message_id=message_id, message=message)
 
+        response_chank_byte = 0
+        with closing(DBconnector().connect_platformdb()) as conn:
+            # config list get by key
+            get_leng_json = bl_common_service.settings_system_config_list(conn, "test.test")
+            if get_leng_json:
+                response_chank_byte = get_leng_json.get("value", 0)
+            else:
+                message_id = "500-00011"
+                message = multi_lang.get_text(
+                    message_id,
+                    "システム設定値が取得できませんでした(key:{0})",
+                    "test.test",
+                )
+                raise common.InternalErrorException(message_id=message_id, message=message)
+        globals.audit.debug(f'{response_chank_byte=}')
+
         # realm名設定
         # Set realm name
         proxy = auth_proxy.auth_proxy(
@@ -200,19 +219,32 @@ def platform_organization_api_call(subpath):
         extra['username'] = response_json.get("user_info").get("username")
         extra['request_user_headers'] = response_json.get("data")
 
+        # デバッグとあるURLでstrem=True
+        if (re.search('download', dest_url)):
+            stream = True
+        else:
+            stream = False
+
         # api呼び出し call api
-        return_api = proxy.call_api(dest_url, response_json.get("data"))
+        return_api = proxy.call_api(dest_url, response_json.get("data"), stream=stream)
 
-        extra['status_code'] = return_api.status_code
+        if stream:
+            # stream形式の場合は、独自の返却を実施する
+            # In the case of stream format, implement your own return
+            response = Response(chunk_response(return_api, response_chank_byte))
+            response.content_length = int(return_api.headers.get('Content-Length'))
+            response.content_type = return_api.headers.get('Content-Type')
+        else:
+            extra['status_code'] = return_api.status_code
 
-        # 戻り値をそのまま返却
-        # Return the return value as it is
-        response = make_response()
-        response.status_code = return_api.status_code
-        response.data = return_api.content
-        for key, value in return_api.headers.items():
-            if key.lower().startswith('content-'):
-                response.headers[key] = value
+            # 戻り値をそのまま返却
+            # Return the return value as it is
+            response = make_response()
+            response.status_code = return_api.status_code
+            response.data = return_api.content
+            for key, value in return_api.headers.items():
+                if key.lower().startswith('content-'):
+                    response.headers[key] = value
 
         globals.audit.info(f'audit: response. {response.status_code}', extra=extra)
         globals.logger.info(f"### end func:{inspect.currentframe().f_code.co_name} {response.status_code=}")
@@ -244,6 +276,14 @@ def platform_organization_api_call(subpath):
         extra['status_code'] = 500
         globals.audit.error(f'audit: Exception error.[{e=}], [{type(e)=}]:', stack_info=''.join(list(traceback.TracebackException.from_exception(e).format())), extra=extra)
         return common.response_server_error(e)
+
+
+def chunk_response(req: Response, response_chank_byte):
+    try:
+        for chunk in req.iter_content(chunk_size=response_chank_byte):
+            yield chunk
+    finally:
+        req.close()
 
 
 def extra_init(organization_id='-', workspace_id='-'):
@@ -359,7 +399,7 @@ def ita_admin_api_call(subpath):
             extra['message_id'] = message_id
             extra['message_text'] = message
             globals.audit.info('audit: error.', extra=extra)
-            raise common.InternalErrorException(essage_id=message_id, message=message)
+            raise common.InternalErrorException(message_id=message_id, message=message)
 
         # realm名設定
         # Set realm name
@@ -465,7 +505,23 @@ def platform_api_call(organization_id, subpath):
             extra['message_id'] = message_id
             extra['message_text'] = message
             globals.audit.info('audit: error.', extra=extra)
-            raise common.InternalErrorException(essage_id=message_id, message=message)
+            raise common.InternalErrorException(message_id=message_id, message=message)
+
+        response_chank_byte = 0
+        with closing(DBconnector().connect_platformdb()) as conn:
+            # config list get by key
+            get_leng_json = bl_common_service.settings_system_config_list(conn, "test.test")
+            if get_leng_json:
+                response_chank_byte = get_leng_json.get("value", 0)
+            else:
+                message_id = "500-00011"
+                message = multi_lang.get_text(
+                    message_id,
+                    "システム設定値が取得できませんでした(key:{0})",
+                    "test.test",
+                )
+                raise common.InternalErrorException(message_id=message_id, message=message)
+        globals.audit.debug(f'{response_chank_byte=}')
 
         # organization idをrealm名として設定
         # Set organization id as realm name
@@ -482,24 +538,40 @@ def platform_api_call(organization_id, subpath):
         extra['username'] = response_json.get("user_info").get("username")
         extra['request_user_headers'] = response_json.get("data")
 
+        # デバッグとあるURLでstrem=True
+        if (re.search('download', dest_url)):
+            stream = True
+        else:
+            stream = False
+
         # api呼び出し call api
-        return_api = proxy.call_api(dest_url, response_json.get("data"))
+        return_api = proxy.call_api(dest_url, response_json.get("data"), stream=stream)
 
-        extra['status_code'] = return_api.status_code
+        if stream:
+            # stream形式の場合は、独自の返却を実施する
+            # In the case of stream format, implement your own return
+            response = Response(chunk_response(return_api, response_chank_byte))
+            response.content_length = int(return_api.headers.get('Content-Length'))
+            response.content_type = return_api.headers.get('Content-Type')
+        else:
+            extra['status_code'] = return_api.status_code
 
-        # 戻り値をそのまま返却
-        # Return the return value as it is
-        response = make_response()
-        response.status_code = return_api.status_code
-        response.data = return_api.content
-        for key, value in return_api.headers.items():
-            if key.lower().startswith('content-'):
-                response.headers[key] = value
+            # 戻り値をそのまま返却
+            # Return the return value as it is
+            response = make_response()
+            response.status_code = return_api.status_code
+            response.data = return_api.content
+            for key, value in return_api.headers.items():
+                if key.lower().startswith('content-'):
+                    response.headers[key] = value
 
         globals.audit.info(f'audit: response. {response.status_code}', extra=extra)
         globals.logger.info(f"### end func:{inspect.currentframe().f_code.co_name} {response.status_code=}")
 
         return response
+
+    except common.InternalErrorException:
+        raise
 
     except common.NotFoundException:
         raise
@@ -567,7 +639,7 @@ def ita_workspace_api_call(organization_id, workspace_id, subpath):
             extra['message_id'] = message_id
             extra['message_text'] = message
             globals.audit.info('audit: error.', extra=extra)
-            raise common.InternalErrorException(essage_id=message_id, message=message)
+            raise common.InternalErrorException(message_id=message_id, message=message)
 
         # organization idをrealm名として設定
         # Set organization id as realm name
@@ -602,6 +674,9 @@ def ita_workspace_api_call(organization_id, workspace_id, subpath):
         globals.logger.info(f"### end func:{inspect.currentframe().f_code.co_name} {response.status_code=}")
 
         return response
+
+    except common.InternalErrorException:
+        raise
 
     except common.NotFoundException:
         raise
@@ -669,7 +744,7 @@ def ita_oase_recever_api_call(organization_id, workspace_id, subpath):
             extra['message_id'] = message_id
             extra['message_text'] = message
             globals.audit.info('audit: error.', extra=extra)
-            raise common.InternalErrorException(essage_id=message_id, message=message)
+            raise common.InternalErrorException(message_id=message_id, message=message)
 
         # organization idをrealm名として設定
         # Set organization id as realm name
@@ -704,6 +779,9 @@ def ita_oase_recever_api_call(organization_id, workspace_id, subpath):
         globals.logger.info(f"### end func:{inspect.currentframe().f_code.co_name} {response.status_code=}")
 
         return response
+
+    except common.InternalErrorException:
+        raise
 
     except common.NotFoundException:
         raise

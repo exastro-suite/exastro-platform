@@ -314,7 +314,7 @@ class auth_proxy:
         except Exception:
             raise
 
-    def call_api(self, dest_url, info):
+    def call_api(self, dest_url, info, stream=False):
         """API呼び出し Call API
 
         Args:
@@ -385,7 +385,7 @@ class auth_proxy:
 
         # リクエストを実行
         # Execute request
-        ret = self.main_request(request_method, dest_url, post_headers, request_body, query_string, request_content_type, request_form, request_files)
+        ret = self.main_request(request_method, dest_url, post_headers, request_body, query_string, request_content_type, request_form, request_files, stream=stream)
         # ----ここまでAPサーバへのリクエスト処理---- #
         # Request processing to the AP server so far
 
@@ -421,7 +421,7 @@ class auth_proxy:
             globals.logger.error(''.join(list(traceback.TracebackException.from_exception(e).format())))
             raise
 
-    def main_request(self, method, url, post_headers, request_body, query_string, request_content_type=None, request_form={}, request_files={}):
+    def main_request(self, method, url, post_headers, request_body, query_string, request_content_type=None, request_form={}, request_files={}, stream=False):
         """
         APサーバへリクエストを実行
         Execute a request to the AP server
@@ -445,34 +445,34 @@ class auth_proxy:
         # method、request_content_typeによって、呼び出しの内容を変える
         # Change the content of the call depending on method and request_content_type
         if method == 'GET':
-            ret = requests.get(url, headers=post_headers, params=query_string)
+            ret = requests.get(url, headers=post_headers, params=query_string, stream=stream)
 
         elif method == 'POST':
             if 'application/json' in request_content_type:
-                ret = requests.post(url, headers=post_headers, json=request_body, params=query_string)
+                ret = requests.post(url, headers=post_headers, json=request_body, params=query_string, stream=stream)
             elif 'multipart/form-data' in request_content_type:
-                ret = requests.post(url, headers=post_headers, data=request_form, files=request_files, params=query_string)
+                ret = requests.post(url, headers=post_headers, data=request_form, files=request_files, params=query_string, stream=stream)
             else:
-                ret = requests.post(url, headers=post_headers, json=request_body, params=query_string)
+                ret = requests.post(url, headers=post_headers, json=request_body, params=query_string, stream=stream)
 
         elif method == 'PATCH':
             if 'application/json' in request_content_type:
-                ret = requests.patch(url, headers=post_headers, json=request_body, params=query_string)
+                ret = requests.patch(url, headers=post_headers, json=request_body, params=query_string, stream=stream)
             elif 'multipart/form-data' in request_content_type:
-                ret = requests.patch(url, headers=post_headers, data=request_form, files=request_files, params=query_string)
+                ret = requests.patch(url, headers=post_headers, data=request_form, files=request_files, params=query_string, stream=stream)
             else:
-                ret = requests.patch(url, headers=post_headers, json=request_body, params=query_string)
+                ret = requests.patch(url, headers=post_headers, json=request_body, params=query_string, stream=stream)
 
         elif method == 'PUT':
             if 'application/json' in request_content_type:
-                ret = requests.put(url, headers=post_headers, json=request_body, params=query_string)
+                ret = requests.put(url, headers=post_headers, json=request_body, params=query_string, stream=stream)
             elif 'multipart/form-data' in request_content_type:
-                ret = requests.put(url, headers=post_headers, data=request_form, files=request_files, params=query_string)
+                ret = requests.put(url, headers=post_headers, data=request_form, files=request_files, params=query_string, stream=stream)
             else:
-                ret = requests.put(url, headers=post_headers, json=request_body, params=query_string)
+                ret = requests.put(url, headers=post_headers, json=request_body, params=query_string, stream=stream)
 
         elif method == 'DELETE':
-            ret = requests.delete(url, headers=post_headers, params=query_string)
+            ret = requests.delete(url, headers=post_headers, params=query_string, stream=stream)
 
         # 取得したレスポンスの内容を退避
         # Save the contents of the acquired response
