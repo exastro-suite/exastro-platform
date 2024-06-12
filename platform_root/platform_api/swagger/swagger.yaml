@@ -2345,7 +2345,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/auditlog_download_body'
+              $ref: '#/components/schemas/AuditLogDownload'
         required: true
       responses:
         "200":
@@ -4256,6 +4256,22 @@ components:
         authentication_user:
           type: string
           description: Authentication users
+    AuditLogDownload:
+      type: object
+      properties:
+        ts_from:
+          type: string
+          example: 2024-06-01 00:00:00
+        ts_to:
+          type: string
+          example: 2024-06-30 23:59:59
+    AuditLogDownloadList:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditLogDownloadList_data'
     inline_response_200:
       allOf:
       - $ref: '#/components/schemas/responseOk'
@@ -4466,21 +4482,7 @@ components:
     inline_response_200_24:
       allOf:
       - $ref: '#/components/schemas/responseOk'
-      - type: object
-        properties:
-          data:
-            type: array
-            items:
-              $ref: '#/components/schemas/inline_response_200_24_data'
-    auditlog_download_body:
-      type: object
-      properties:
-        ts_from:
-          type: string
-          example: 2024-06-01 00:00:00
-        ts_to:
-          type: string
-          example: 2024-06-30 23:59:59
+      - $ref: '#/components/schemas/AuditLogDownloadList'
     inline_response_200_25:
       allOf:
       - $ref: '#/components/schemas/responseOk'
@@ -4730,7 +4732,16 @@ components:
         event_type:
           $ref: '#/components/schemas/settingsDestinationConditions_ita_event_type'
       description: Exastro IT Automation conditions
-    inline_response_200_24_data:
+    AuditLogDownloadList_conditions:
+      type: object
+      properties:
+        ts_from:
+          type: string
+          example: 2024-06-01 00:00:00
+        ts_to:
+          type: string
+          example: 2024-06-30 23:59:59
+    AuditLogDownloadList_data:
       type: object
       properties:
         download_id:
@@ -4739,7 +4750,7 @@ components:
         status:
           type: string
         conditions:
-          $ref: '#/components/schemas/auditlog_download_body'
+          $ref: '#/components/schemas/AuditLogDownloadList_conditions'
         message:
           type: string
         create_timestamp:
