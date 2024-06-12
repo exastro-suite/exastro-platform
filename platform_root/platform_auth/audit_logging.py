@@ -22,9 +22,10 @@ import logging
 import logging.handlers
 import datetime
 from pythonjsonlogger import jsonlogger
+import json
 
 import common_library.common.common as common
-import globals
+# import globals
 
 
 class JsonFormatter(jsonlogger.JsonFormatter):
@@ -153,130 +154,40 @@ class DBLogHandler(logging.Handler):
 
         # not system manager auditlog to database
         if organization_id:
-            ts = None
-            access_route = None
-            request_headers = None
-            request_user_headers = None
-            request_body = None
-            request_form = None
-            request_files = None
-            content_type = None
-
-            try:
-                if record.ts:
-                    ts = common.str_to_datetime(format(f"{record.ts}"))
-            except Exception as e:
-                globals.logger.debug(f"{e}")
-                pass
-            try:
-                if record.access_route:
-                    access_route = format(f"{record.access_route}")
-                    access_route = access_route.removeprefix("ImmutableList(")
-                    access_route = access_route.removesuffix(")")
-            except Exception as e:
-                globals.logger.debug(f"{e}")
-                pass
-            try:
-                if record.request_headers:
-                    request_headers = format(f"{record.request_headers}")
-            except Exception as e:
-                globals.logger.debug(f"{e}")
-                pass
-            try:
-                if record.request_user_headers:
-                    request_user_headers = format(f"{record.request_user_headers}")
-            except Exception as e:
-                globals.logger.debug(f"{e}")
-                pass
-            try:
-                if record.request_body:
-                    request_body = format(f"{record.request_body}")
-            except Exception as e:
-                globals.logger.debug(f"{e}")
-                pass
-            try:
-                if record.request_form:
-                    request_form = format(f"{record.request_form}")
-                    request_form = request_form.removeprefix("MultiDict(")
-                    request_form = request_form.removesuffix(")")
-            except Exception as e:
-                globals.logger.debug(f"{e}")
-                pass
-            try:
-                if record.request_files:
-                    request_files = format(f"{record.request_files}")
-                    request_files = request_files.removeprefix("MultiDict(")
-                    request_files = request_files.removesuffix(")")
-            except Exception as e:
-                globals.logger.debug(f"{e}")
-                pass
-            try:
-                if record.content_type:
-                    content_type = format(f"{record.content_type}")
-            except Exception as e:
-                globals.logger.debug(f"{e}")
-                pass
-
-            try:
-                globals.logger.debug(f"{ts=}")
-                globals.logger.debug(f"{record.user_id=}")
-                globals.logger.debug(f"{record.username=}")
-                globals.logger.debug(f"{record.org_id=}")
-                globals.logger.debug(f"{record.ws_id=}")
-                globals.logger.debug(f"{record.levelname=}")
-                globals.logger.debug(f"{record.full_path=}")
-                globals.logger.debug(f"{access_route=}")
-                globals.logger.debug(f"{record.remote_addr=}")
-                globals.logger.debug(f"{request_headers=}")
-                globals.logger.debug(f"{request_user_headers=}")
-                globals.logger.debug(f"{request_body=}")
-                globals.logger.debug(f"{request_form=}")
-                globals.logger.debug(f"{request_files=}")
-                globals.logger.debug(f"{record.status_code=}")
-                globals.logger.debug(f"{record.name=}")
-                globals.logger.debug(f"{record.message=}")
-                globals.logger.debug(f"{record.message_id=}")
-                globals.logger.debug(f"{record.message_text=}")
-                globals.logger.debug(f"{record.stack_info=}")
-                globals.logger.debug(f"{record.process=}")
-                globals.logger.debug(f"{record.userid=}")
-                globals.logger.debug(f"{record.method=}")
-                globals.logger.debug(f"{content_type=}")
-            except Exception:
-                pass
+            record_json = json.loads(self.format(record))
+            # globals.logger.debug(f"{record_json=}")
 
             try:
                 with closing(DBconnector().connect_orgdb(organization_id)) as conn:
                     with conn.cursor() as cursor:
                         parameter = {
-                            "ts": ts,
-                            "user_id": record.user_id,
-                            "username": record.username,
-                            "org_id": record.org_id,
-                            "ws_id": record.ws_id,
-                            "level": record.levelname,
-                            "full_path": record.full_path,
-                            "access_route": access_route,
-                            "remote_addr": record.remote_addr,
-                            "request_headers": request_headers,
-                            "request_user_headers": request_user_headers,
-                            "request_body": request_body,
-                            "request_form": request_form,
-                            "request_files": request_files,
-                            "status_code": record.status_code,
-                            "name": record.name,
-                            "message": record.message,
-                            "message_id": record.message_id,
-                            "message_text": record.message_text,
-                            "stack_info": record.stack_info,
-                            "process": record.process,
-                            "userid": record.userid,
-                            "method": record.method,
-                            "content_type": content_type,
-                            "create_user": record.user_id,
-                            "last_update_user": record.user_id,
+                            "ts": common.str_to_datetime(record_json.get("ts")),
+                            "user_id": record_json.get("user_id"),
+                            "username": record_json.get("username"),
+                            "org_id": record_json.get("org_id"),
+                            "ws_id": record_json.get("ws_id"),
+                            "level": record_json.get("level"),
+                            "full_path": record_json.get("full_path"),
+                            "access_route": format(f'{record_json.get("access_route")}'),
+                            "remote_addr": record_json.get("remote_addr"),
+                            "request_headers": record_json.get("request_headers"),
+                            "request_user_headers": json.dumps(record_json.get("request_user_headers")),
+                            "request_body": json.dumps(record_json.get("request_body")),
+                            "request_form": json.dumps(record_json.get("request_form")),
+                            "request_files": json.dumps(record_json.get("request_files")),
+                            "status_code": record_json.get("status_code"),
+                            "name": record_json.get("name"),
+                            "message": record_json.get("message"),
+                            "message_id": record_json.get("message_id"),
+                            "message_text": record_json.get("message_text"),
+                            "stack_info": record_json.get("stack_info"),
+                            "process": record_json.get("process"),
+                            "userid": record_json.get("userid"),
+                            "method": record_json.get("method"),
+                            "content_type": record_json.get("content_type"),
+                            "create_user": record_json.get("user_id"),
+                            "last_update_user": record_json.get("user_id"),
                         }
-                        # globals.logger.debug(f"{parameter=}")
 
                         cursor.execute(queries_auditlog.SQL_INSERT_AUDIT_LOG, parameter)
 
