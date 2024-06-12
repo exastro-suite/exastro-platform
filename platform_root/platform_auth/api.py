@@ -16,7 +16,7 @@
 WSGI main module
 """
 # from crypt import methods
-from flask import Flask, request, jsonify, make_response
+from flask import Flask, request, make_response
 import os
 import requests
 from datetime import datetime
@@ -27,6 +27,7 @@ from flask_log_request_id import RequestID
 import inspect
 import traceback
 from pathlib import Path
+import urllib.parse
 
 # User Imports
 import globals
@@ -111,10 +112,18 @@ def openid_connect_token(organization_id):
         # call keycloak
         proxy_location_origin = f"{os.environ['KEYCLOAK_PROTOCOL']}://{os.environ['KEYCLOAK_HOST']}:{os.environ['KEYCLOAK_PORT']}"
 
+    headers = {"Content-Type": request.content_type, "User-Id": "-"}
+    if organization_id == 'master':
+        headers["X-Forwarded-Host"] = urllib.parse.urlparse(os.environ.get('EXTERNAL_URL_MNG')).netloc
+        headers["X-Forwarded-Proto"] = urllib.parse.urlparse(os.environ.get('EXTERNAL_URL_MNG')).scheme
+    else:
+        headers["X-Forwarded-Host"] = urllib.parse.urlparse(os.environ.get('EXTERNAL_URL')).netloc
+        headers["X-Forwarded-Proto"] = urllib.parse.urlparse(os.environ.get('EXTERNAL_URL')).scheme
+
     redirect_response = requests.post(
         f"{proxy_location_origin}/auth/realms/{organization_id}/protocol/openid-connect/token",
         data=request.form,
-        headers={"Content-Type": request.content_type, "User-Id": "-"},
+        headers=headers,
     )
 
     # remake response header
