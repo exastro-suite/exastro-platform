@@ -1224,7 +1224,44 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/runtimeError'
-
+  '/api/{organization_id}/platform/jobs/users/export':
+    post:
+      tags:
+        - JobsService
+      summary: Export user list
+      x-openapi-router-controller: controllers.jobs_service_controller
+      operationId: jobs_users_export
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+        required: true
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        example: null
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
   '/api/{organization_id}/platform/auditlog/download':
     get:
       tags:
@@ -1246,37 +1283,7 @@ paths:
               schema:
                 allOf:
                   - $ref: '#/components/schemas/responseOk'
-                  - type: object
-                    properties:
-                      data:
-                        type: array
-                        items:
-                          type: object
-                          properties:
-                            download_id:
-                              type: string
-                              example: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-                            status:
-                              type: string
-                            conditions:
-                              type: object
-                              properties:
-                                ts_from:
-                                  type: string
-                                  example: '2024-06-01 00:00:00'
-                                ts_to:
-                                  type: string
-                                  example: '2024-06-30 23:59:59'
-                            message:
-                              type: string
-                            create_timestamp:
-                              type: string
-                              example: '2024-06-01 10:00:00'
-                            create_user:
-                              type: string
-                            last_update_timestamp:
-                              type: string
-                              example: '2024-06-01 10:30:00'
+                  - $ref: '#/components/schemas/AuditLogDownloadList'
         default:
           description: An unexpected error response.
           content:
@@ -1289,15 +1296,6 @@ paths:
       summary: Reserve audit log download
       x-openapi-router-controller: controllers.audit_log_service_controller
       operationId: auditlog_download_reserve
-
-  '/api/{organization_id}/platform/jobs/users/export':
-    post:
-      tags:
-        - JobsService
-      summary: Export user list
-      x-openapi-router-controller: controllers.jobs_service_controller
-      operationId: jobs_users_export
-
       parameters:
         - name: organization_id
           in: path
@@ -1308,17 +1306,7 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-
-              properties:
-                ts_from:
-                  type: string
-                  example: '2024-06-01 00:00:00'
-                ts_to:
-                  type: string
-                  example: '2024-06-30 23:59:59'
-=======
-
+              $ref: '#/components/schemas/AuditLogDownload'
         required: true
       responses:
         '200':
@@ -1332,7 +1320,6 @@ paths:
                     properties:
                       data:
                         type: object
-
                         example:
                           download_id: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
         default:
@@ -1367,9 +1354,6 @@ paths:
               schema:
                 type: string
                 format: binary
-
-                        example: null
-
         default:
           description: An unexpected error response.
           content:
@@ -2561,6 +2545,47 @@ components:
         authentication_user:
           type: string
           description: Authentication users
+    AuditLogDownload:
+      type: object
+      properties:
+        ts_from:
+          type: string
+          example: '2024-06-01 00:00:00'
+        ts_to:
+          type: string
+          example: '2024-06-30 23:59:59'
+    AuditLogDownloadList:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              download_id:
+                type: string
+                example: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+              status:
+                type: string
+              conditions:
+                type: object
+                properties:
+                  ts_from:
+                    type: string
+                    example: '2024-06-01 00:00:00'
+                  ts_to:
+                    type: string
+                    example: '2024-06-30 23:59:59'
+              message:
+                type: string
+              create_timestamp:
+                type: string
+                example: '2024-06-01 10:00:00'
+              create_user:
+                type: string
+              last_update_timestamp:
+                type: string
+                example: '2024-06-01 10:30:00'
   securitySchemes:
     BearerAuth:
       description: Credentials or access token for API
