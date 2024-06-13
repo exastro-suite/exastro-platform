@@ -201,3 +201,7 @@ CONFIG_KEY_AUDIT_LOG_RETENTION_DAYS = "platform.system.audit_log.retention_days"
 CONFIG_KEY_AUDIT_LOG_DOWNLOAD_EXP_DAYS = "platform.system.audit_log.download_exp_days"
 # 監査ログダウンロード制限
 CONFIG_KEY_AUDIT_LOG_DOWNLOAD_FILE_LIMIT = "platform.system.audit_log.download_file_limit"
+# 監査ログ削除時間
+CONFIG_KEY_AUDIT_LOG_CLEANUP_TIME = "platform.system.audit_log.cleanup_time"
+# chunk size for upload/download
+CONFIG_KEY_CHUNK_SIZE = "platform.system.chunk_size"
