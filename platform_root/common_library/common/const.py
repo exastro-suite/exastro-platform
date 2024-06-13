@@ -193,3 +193,11 @@ PROCESS_KIND_AUDIT_LOG = "AUDITLOG"             # 監査ログ
 # smtp_idのデフォルト
 # Default when smtp_id
 DEFAULT_SMTP_ID = "_default"
+
+# system config 用key
+# 監査ログ保持日数
+CONFIG_KEY_AUDIT_LOG_RETENTION_DAYS = "platform.system.audit_log.retention_days"
+# 監査ログダウンロード期限
+CONFIG_KEY_AUDIT_LOG_DOWNLOAD_EXP_DAYS = "platform.system.audit_log.download_exp_days"
+# 監査ログダウンロード制限
+CONFIG_KEY_AUDIT_LOG_DOWNLOAD_FILE_LIMIT = "platform.system.audit_log.download_file_limit"

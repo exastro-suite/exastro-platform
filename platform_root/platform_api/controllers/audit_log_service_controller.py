@@ -19,7 +19,7 @@ import json
 
 from flask import request
 from contextlib import closing
-from common_library.common import common, multi_lang, const, validation
+from common_library.common import common, multi_lang, const, validation, bl_common_service
 from common_library.common.db import DBconnector
 from common_library.common.libs import queries_bl_audit_log, queries_bl_notification
 
@@ -89,6 +89,36 @@ def auditlog_download_reserve(body, organization_id):  # noqa: E501
     if not validate.ok:
         return common.response_validation_error(validate)
 
+    # 上限チェック
+    limits = 100
+    with closing(DBconnector().connect_platformdb()) as conn:
+        system_config = bl_common_service.settings_system_config_list(conn, const.CONFIG_KEY_AUDIT_LOG_DOWNLOAD_FILE_LIMIT)
+        limits = int(system_config.get("value"))
+
+    with closing(DBconnector().connect_orgdb(organization_id)) as conn:
+        with conn.cursor() as cursor:
+            try:
+                cursor.execute(queries_bl_audit_log.SQL_QUERY_COUNT_JOBS_AUDIT_LOG)
+                result = cursor.fetchone()
+                count = int(result.get("COUNT"))
+            except Exception as e:
+                globals.logger.error(f"exception:{e.args}")
+                message_id = f"500-{MSG_FUNCTION_ID}003"
+                message = multi_lang.get_text(
+                    message_id,
+                    "監査ログダウンロードの上限数チェックに失敗しました",
+                )
+                raise common.InternalErrorException(message_id=message_id, message=message)
+
+    if count > limits:
+        globals.logger.error("audi tlog download limit exceeded. limits: {0}".format(limits))
+        message_id = f"400-{MSG_FUNCTION_ID}001"
+        message = multi_lang.get_text(
+            message_id,
+            "監査ログのダウンロード上限数を超えるため、新しい監査ログのダウンロードはできません",
+        )
+        raise common.BadRequestException(message_id=message_id, message=message)
+
     conditions = json.dumps(body)
 
     # write to JOBS AUDIT LOG DB
@@ -104,7 +134,7 @@ def auditlog_download_reserve(body, organization_id):  # noqa: E501
                     "conditions": conditions,
                     "count_export": None,
                     "message": None,
-                    "language":language,
+                    "language": language,
                     "create_user": user_id,
                     "last_update_user": user_id
                 }
@@ -152,6 +182,5 @@ def auditlog_download_reserve(body, organization_id):  # noqa: E501
                         parameter['process_id'],
                     )
                     raise common.InternalErrorException(message_id=message_id, message=message)
-
 
     return common.response_200_ok(data)
