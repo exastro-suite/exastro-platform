@@ -16,6 +16,7 @@ import traceback
 from contextlib import closing
 
 import globals
+from common_library.common import const as common_const
 from common_library.common.db import DBconnector
 from common_library.common import common
 from common_library.common import multi_lang
@@ -101,14 +102,19 @@ class system_config_update:
 
         system_configs = [
             {
-                "key": "platform.system.audit_log.retention_days",
+                "key": common_const.CONFIG_KEY_AUDIT_LOG_RETENTION_DAYS,
                 "value": 365,
                 "description": "Audit log retention days",
             },
             {
-                "key": "platform.system.audit_log.download_exp_days",
+                "key": common_const.CONFIG_KEY_AUDIT_LOG_DOWNLOAD_EXP_DAYS,
                 "value": 7,
                 "description": "Audit log download expiration days",
+            },
+            {
+                "key": common_const.CONFIG_KEY_AUDIT_LOG_DOWNLOAD_FILE_LIMIT,
+                "value": 100,
+                "description": "Audit log download limit",
             },
         ]
 
