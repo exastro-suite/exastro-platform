@@ -14,7 +14,7 @@
 
 from contextlib import closing
 
-from common_library.common import common, multi_lang
+from common_library.common import common, const, multi_lang
 from common_library.common.db import DBconnector
 from common_library.common.libs import queries_bl_audit_log
 from common_library.common import bl_common_service
@@ -27,26 +27,27 @@ def get_auditlog_file_download_filesize(organization_id, download_id):
 
     Args:
         organization_id (str): organization id
-        download_id (str): download id
+        download_id (str): download id (file id)
     """
 
     file_length = 0
 
     with closing(DBconnector().connect_orgdb(organization_id)) as conn:
         with conn.cursor() as cursor:
-            str_where = " WHERE download_id = %(download_id)s"
+            str_where = " WHERE FILE_ID = %(file_id)s"
 
             # ファイルサイズの取得
             # Get file size
             parameter = {
-                "download_id": download_id,
+                "file_id": download_id,
             }
 
             cursor.execute(queries_bl_audit_log.SQL_QUERY_JOBS_AUDIT_LOG_FILE_LENGTH + str_where, parameter)
             result = cursor.fetchone()
+            globals.logger.debug(f"{result=}")
 
-            if len(result) >= 1:
-                file_length = result[0].FILE_DATA_LENGTH
+            if result is not None:
+                file_length = result.get("FILE_DATA_LENGTH")
             else:
                 message_id = "404-40001"
                 message = multi_lang.get_text(
@@ -64,33 +65,33 @@ def auditlog_file_download(organization_id, download_id):
 
     Args:
         organization_id (str): organization id
-        download_id (str): download id
+        download_id (str): download id (file id)
     """
 
     with closing(DBconnector().connect_platformdb()) as conn:
         # config list get by key
-        get_leng_json = bl_common_service.settings_system_config_list(conn, "test.test")
+        get_leng_json = bl_common_service.settings_system_config_list(conn, const.CONFIG_KEY_CHANK_SIZE)
         if get_leng_json:
-            get_leng = get_leng_json.get("value")
+            get_leng = int(get_leng_json.get("value"))
         else:
             message_id = "500-00011"
             message = multi_lang.get_text(
                 message_id,
                 "システム設定値が取得できませんでした(key:{0})",
-                "test.test",
+                const.CONFIG_KEY_CHANK_SIZE,
             )
             raise common.InternalErrorException(message_id=message_id, message=message)
 
     with closing(DBconnector().connect_orgdb(organization_id)) as conn:
         with conn.cursor() as cursor:
-            str_where = " WHERE download_id = %(download_id)s"
+            str_where = " WHERE FILE_ID = %(file_id)s"
 
             # システム設定値の読み込み単位で、BLOBの情報を取得していく
             # Obtain BLOB information each time the system settings are read.
             start_pos = 1
             while True:
                 parameter = {
-                    "download_id": download_id,
+                    "file_id": download_id,
                     "start_pos": start_pos,
                     "len": get_leng,
                 }
@@ -100,8 +101,8 @@ def auditlog_file_download(organization_id, download_id):
 
                 start_pos += get_leng
 
-                if len(result) >= 1:
-                    yield result[0].FILE_DATA_SUBSTR
+                if result is not None:
+                    yield result.get("FILE_DATA_SUBSTR")
                 else:
                     break
 

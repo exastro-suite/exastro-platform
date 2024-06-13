@@ -34,6 +34,7 @@ import re
 # User Imports
 import globals
 import common_library.common.common as common
+import common_library.common.const as common_const
 import common_library.common.maintenancemode as maintenancemode
 from common_library.common.exastro_logging import ExastroLogRecordFactory, LOGGING
 from common_library.common.db import DBconnector
@@ -187,21 +188,8 @@ def platform_organization_api_call(subpath):
             globals.audit.info('audit: error.', extra=extra)
             raise common.InternalErrorException(message_id=message_id, message=message)
 
-        response_chank_byte = 0
-        with closing(DBconnector().connect_platformdb()) as conn:
-            # config list get by key
-            get_leng_json = bl_common_service.settings_system_config_list(conn, "test.test")
-            if get_leng_json:
-                response_chank_byte = get_leng_json.get("value", 0)
-            else:
-                message_id = "500-00011"
-                message = multi_lang.get_text(
-                    message_id,
-                    "システム設定値が取得できませんでした(key:{0})",
-                    "test.test",
-                )
-                raise common.InternalErrorException(message_id=message_id, message=message)
-        globals.audit.debug(f'{response_chank_byte=}')
+        # get chank byte
+        response_chank_byte = get_response_chank_byte(extra)
 
         # realm名設定
         # Set realm name
@@ -232,8 +220,9 @@ def platform_organization_api_call(subpath):
             # stream形式の場合は、独自の返却を実施する
             # In the case of stream format, implement your own return
             response = Response(chunk_response(return_api, response_chank_byte))
-            response.content_length = int(return_api.headers.get('Content-Length'))
-            response.content_type = return_api.headers.get('Content-Type')
+            for key, value in return_api.headers.items():
+                if key.lower().startswith('content-'):
+                    response.headers[key] = value
         else:
             extra['status_code'] = return_api.status_code
 
@@ -250,6 +239,9 @@ def platform_organization_api_call(subpath):
         globals.logger.info(f"### end func:{inspect.currentframe().f_code.co_name} {response.status_code=}")
 
         return response
+
+    except common.InternalErrorException:
+        raise
 
     except common.AuthException as e:
         globals.logger.info(f'authentication error:{e.args}')
@@ -279,11 +271,58 @@ def platform_organization_api_call(subpath):
 
 
 def chunk_response(req: Response, response_chank_byte):
+    """chunk_response process
+
+    Args:
+        req (Response): _description_
+        response_chank_byte (int): chank byte
+
+    Yields:
+        response: Yields return value
+    """
+
     try:
         for chunk in req.iter_content(chunk_size=response_chank_byte):
             yield chunk
     finally:
         req.close()
+
+
+def get_response_chank_byte(extra):
+    """get response_chank_byte
+
+    Args:
+        extra (dict): extra structure
+
+    Raises:
+        common.InternalErrorException: chank get error
+
+    Returns:
+        int: response_chank_byte
+    """
+
+    response_chank_byte = 0
+
+    with closing(DBconnector().connect_platformdb()) as conn:
+        # config list get by key
+        get_leng_json = bl_common_service.settings_system_config_list(conn, common_const.CONFIG_KEY_CHANK_SIZE)
+        if get_leng_json:
+            response_chank_byte = get_leng_json.get("value", 0)
+        else:
+            message_id = "500-00011"
+            message = multi_lang.get_text(
+                message_id,
+                "システム設定値が取得できませんでした(key:{0})",
+                common_const.CONFIG_KEY_CHANK_SIZE,
+            )
+            extra['status_code'] = 500
+            extra['message_id'] = message_id
+            extra['message_text'] = message
+            globals.audit.info('audit: error.', extra=extra)
+            raise common.InternalErrorException(message_id=message_id, message=message)
+    globals.logger.debug(f'{response_chank_byte=}')
+
+    return int(response_chank_byte)
 
 
 def extra_init(organization_id='-', workspace_id='-'):
@@ -401,6 +440,9 @@ def ita_admin_api_call(subpath):
             globals.audit.info('audit: error.', extra=extra)
             raise common.InternalErrorException(message_id=message_id, message=message)
 
+        # get chank byte
+        response_chank_byte = get_response_chank_byte(extra)
+
         # realm名設定
         # Set realm name
         proxy = auth_proxy.auth_proxy(
@@ -435,6 +477,9 @@ def ita_admin_api_call(subpath):
         globals.logger.info(f"### end func:{inspect.currentframe().f_code.co_name} {response.status_code=}")
 
         return response
+
+    except common.InternalErrorException:
+        raise
 
     except common.AuthException as e:
         globals.logger.error(f'authentication error:{e.args}')
@@ -507,21 +552,8 @@ def platform_api_call(organization_id, subpath):
             globals.audit.info('audit: error.', extra=extra)
             raise common.InternalErrorException(message_id=message_id, message=message)
 
-        response_chank_byte = 0
-        with closing(DBconnector().connect_platformdb()) as conn:
-            # config list get by key
-            get_leng_json = bl_common_service.settings_system_config_list(conn, "test.test")
-            if get_leng_json:
-                response_chank_byte = get_leng_json.get("value", 0)
-            else:
-                message_id = "500-00011"
-                message = multi_lang.get_text(
-                    message_id,
-                    "システム設定値が取得できませんでした(key:{0})",
-                    "test.test",
-                )
-                raise common.InternalErrorException(message_id=message_id, message=message)
-        globals.audit.debug(f'{response_chank_byte=}')
+        # get chank byte
+        response_chank_byte = get_response_chank_byte(extra)
 
         # organization idをrealm名として設定
         # Set organization id as realm name
@@ -551,8 +583,10 @@ def platform_api_call(organization_id, subpath):
             # stream形式の場合は、独自の返却を実施する
             # In the case of stream format, implement your own return
             response = Response(chunk_response(return_api, response_chank_byte))
-            response.content_length = int(return_api.headers.get('Content-Length'))
-            response.content_type = return_api.headers.get('Content-Type')
+            for key, value in return_api.headers.items():
+                if key.lower().startswith('content-'):
+                    response.headers[key] = value
+
         else:
             extra['status_code'] = return_api.status_code
 
@@ -640,6 +674,9 @@ def ita_workspace_api_call(organization_id, workspace_id, subpath):
             extra['message_text'] = message
             globals.audit.info('audit: error.', extra=extra)
             raise common.InternalErrorException(message_id=message_id, message=message)
+
+        # get chank byte
+        response_chank_byte = get_response_chank_byte(extra)
 
         # organization idをrealm名として設定
         # Set organization id as realm name
@@ -745,6 +782,9 @@ def ita_oase_recever_api_call(organization_id, workspace_id, subpath):
             extra['message_text'] = message
             globals.audit.info('audit: error.', extra=extra)
             raise common.InternalErrorException(message_id=message_id, message=message)
+
+        # get chank byte
+        response_chank_byte = get_response_chank_byte(extra)
 
         # organization idをrealm名として設定
         # Set organization id as realm name

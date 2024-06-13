@@ -393,19 +393,22 @@ class auth_proxy:
 
         # レスポンスをリターン
         # Return response
-        status_code = ret.status_code
-        try:
-            info = json.loads(ret.text)
-            result_dump = json.dumps(info)
-            result_encode = result_dump.encode('utf-8')
-            globals.logger.debug(f'SUCCESS call_api. status_code={status_code} info={result_encode}')
+        # status_code = ret.status_code
+        globals.logger.debug(f'SUCCESS call_api. {ret.status_code=}')
+        return ret
+        # json check to disabled
+        # try:
+        #     info = json.loads(ret.text)
+        #     result_dump = json.dumps(info)
+        #     result_encode = result_dump.encode('utf-8')
+        #     globals.logger.debug(f'SUCCESS call_api. status_code={status_code} info={result_encode}')
 
-            return ret
-        except json.JSONDecodeError:
-            info = ret.text
-            message_id = "500-00001"
-            globals.logger.debug(f'SUCCESS call_api. status_code={status_code} info={info}')
-        raise common.InternalErrorException(None, message_id, common.multi_lang.get_text(message_id, "システムエラー"))
+        #     return ret
+        # except json.JSONDecodeError:
+        #     info = ret.text
+        #     message_id = "500-00001"
+        #     globals.logger.debug(f'SUCCESS call_api. status_code={status_code} info={info}')
+        # raise common.InternalErrorException(None, message_id, common.multi_lang.get_text(message_id, "システムエラー"))
 
     def call_fnc(self, func, args):
         """Auth api call
