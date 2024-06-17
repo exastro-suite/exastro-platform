@@ -12,7 +12,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-get:
+post:
   tags:
   - AuditLogService
   summary: Audit log download
@@ -29,6 +29,12 @@ get:
     required: true
     schema:
       type: string
+  requestBody:
+    content:
+      multipart/form-data:
+        schema:
+          $ref: '../schemas/authorizationBody.yaml'
+    required: true
   responses:
     200:
       description: A successful response.
