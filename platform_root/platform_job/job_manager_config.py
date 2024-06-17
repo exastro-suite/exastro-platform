@@ -74,7 +74,7 @@ JOB_STATUS_WATCH_INTERVAL_SECONDS = float(os.environ.get('JOB_STATUS_WATCH_INTER
 JOB_CANCEL_TIMEOUT_SECONDS = float(os.environ.get('JOB_CANCEL_TIMEOUT_SECONDS'))
 
 #
-# keycloakのtokenを再取得するインターバル 
+# keycloakのtokenを再取得するインターバル
 #
 KEYCLOAK_TOKEN_REFRESH_INTERVAL_SECONDS = int(os.environ.get('KEYCLOAK_TOKEN_REFRESH_INTERVAL_SECONDS'))
 
@@ -166,5 +166,13 @@ JOBS = {
             # Replaces it with failure when it does not exist in the queue and the status does not change for the following time
             "prograss_seconds": int(os.environ.get('JOB_FORCE_UPDATE_STATUS_PROGRASS_SECONDS'))
         }
+    },
+    job_manager_const.PROCESS_KIND_AUDIT_LOG_CLEANUP: {
+        "timeout_seconds": int(os.environ.get('JOB_AUDIT_LOG_CLEANUP_TIMEOUT_SECONDS')),
+        "module": "jobs.AuditLogCleanupJobExecutor",
+        "class": "AuditLogCleanupJobExecutor",
+        "job_trigger": "daily",
+        "job_exec_time_key": const.CONFIG_KEY_AUDIT_LOG_CLEANUP_TIME,
+        "extra_config": {}
     }
 }

@@ -133,6 +133,10 @@ ENV JOB_AUDITLOG_UPDATE_COUNT_INTERVAL=100
 #   1件処理毎にwaitする時間(ミリ秒) / Wait time for each process (milliseconds)
 ENV JOB_AUDIT_WAIT_MILLISECONDS=1
 
+# 監査ログ削除Jobの設定 / Audit log cleanup job settings
+#   Jobタイムアウト / Job timeout
+ENV JOB_AUDIT_LOG_CLEANUP_TIMEOUT_SECONDS=600
+
 # ユーザーエクスポートJobの設定 / User export job settings
 #   Jobタイムアウト / Job timeout
 ENV JOB_USER_EXPORT_TIMEOUT_SECONDS=3600
