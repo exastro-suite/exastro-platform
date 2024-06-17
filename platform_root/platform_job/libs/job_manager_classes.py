@@ -21,7 +21,9 @@ import random
 import job_manager_config
 import globals
 from jobs.BaseJobExecutor import BaseJobExecutor
-
+from contextlib import closing
+from common_library.common.db import DBconnector
+from common_library.common import bl_common_service
 
 class Job():
     """job管理class / job management class
@@ -268,9 +270,26 @@ class SubProcessManager():
             job_kind (str): job kind
         """
         job_index = self.__interval_job_kinds.index(job_kind)
-        self.__interval_job_exec_times[job_index] = datetime.datetime.timestamp(
-            datetime.datetime.now() + datetime.timedelta(seconds=job_manager_config.JOBS[job_kind]['job_interval']))
+        # job_triggerがinterval_timerの場合
+        if job_manager_config.JOBS[job_kind]['job_trigger'] == "interval_timer":
+            self.__interval_job_exec_times[job_index] = datetime.datetime.timestamp(
+                datetime.datetime.now() + datetime.timedelta(seconds=job_manager_config.JOBS[job_kind]['job_interval']))
 
+        # job_triggerがdailyの場合
+        if job_manager_config.JOBS[job_kind]['job_trigger'] == "daily":
+            # M_SYSTEM_CONFIGから実行時間を取得
+            with closing(DBconnector().connect_platformdb()) as conn:
+                data = bl_common_service.settings_system_config_list(conn, job_manager_config.JOBS[job_kind]['job_exec_time_key'])
+                exec_time = data["value"]
+
+            str_exec_date = datetime.datetime.now().strftime('%Y-%m-%d') + " " + exec_time
+            exec_date = datetime.datetime.strptime(str_exec_date, '%Y-%m-%d %H:%M')
+
+            # 実施日時が現在時刻よりも過去である場合、翌日の日時にする
+            if exec_date <= datetime.datetime.now():
+                exec_date = exec_date + datetime.timedelta(days=1)
+
+            self.__interval_job_exec_times[job_index] = datetime.datetime.timestamp(exec_date)
 
 class SubProcessParameter():
     """sub process起動パラメータclass / sub process startup parameters class
@@ -354,7 +373,7 @@ class SubProcessesManager():
 
         # interval_timer job variables
         self.__interval_job_kinds = [
-            job_kind for job_kind, job_config in job_manager_config.JOBS.items() if job_config['job_trigger'] == "interval_timer"]
+            job_kind for job_kind, job_config in job_manager_config.JOBS.items() if job_config['job_trigger'] == "interval_timer" or job_config['job_trigger'] == "daily"]
         #   jobを実行するprocess id / process id to run the job
         self.__interval_job_exec_pids = multiprocessing.Array(ctypes.c_int, len(self.__interval_job_kinds))
         #   jobを実行する時間 / time to run job
@@ -362,9 +381,28 @@ class SubProcessesManager():
         #   initialize interval_timer job variables
         for i, job_kind in enumerate(self.__interval_job_kinds):
             self.__interval_job_exec_pids[i] = -1
-            self.__interval_job_exec_times[i] = (datetime.datetime.timestamp(
-                datetime.datetime.now() + datetime.timedelta(seconds=job_manager_config.JOBS[job_kind]['job_interval'])
-            ))
+
+            # job_triggerがinterval_timerの場合
+            if job_manager_config.JOBS[job_kind]['job_trigger'] == "interval_timer":
+                self.__interval_job_exec_times[i] = (datetime.datetime.timestamp(
+                    datetime.datetime.now() + datetime.timedelta(seconds=job_manager_config.JOBS[job_kind]['job_interval'])
+                ))
+
+            # job_triggerがdailyの場合
+            if job_manager_config.JOBS[job_kind]['job_trigger'] == "daily":
+                # M_SYSTEM_CONFIGから実行時間を取得
+                with closing(DBconnector().connect_platformdb()) as conn:
+                    data = bl_common_service.settings_system_config_list(conn, job_manager_config.JOBS[job_kind]['job_exec_time_key'])
+                    exec_time = data["value"]
+
+                str_exec_date = datetime.datetime.now().strftime('%Y-%m-%d') + " " + exec_time
+                exec_date = datetime.datetime.strptime(str_exec_date, '%Y-%m-%d %H:%M')
+
+                # 実施日時が現在時刻よりも過去である場合、翌日の日時にする
+                if exec_date <= datetime.datetime.now():
+                    exec_date = exec_date + datetime.timedelta(days=1)
+
+                self.__interval_job_exec_times[i] = datetime.datetime.timestamp(exec_date)
 
     def refresh_sub_process_status(self):
         """全sub processの状態を更新する / Update the status of all sub processes
