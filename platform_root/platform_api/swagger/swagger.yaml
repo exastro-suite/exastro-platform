@@ -2362,7 +2362,7 @@ paths:
                 $ref: '#/components/schemas/runtimeError'
       x-openapi-router-controller: controllers.audit_log_service_controller
   /api/{organization_id}/platform/auditlog/download/{download_id}:
-    get:
+    post:
       tags:
       - AuditLogService
       summary: Audit log download
@@ -2382,6 +2382,12 @@ paths:
         explode: false
         schema:
           type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/authorizationBody'
+        required: true
       responses:
         "200":
           description: A successful response.
@@ -4272,6 +4278,15 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/AuditLogDownloadList_data'
+    authorizationBody:
+      title: authorization of Requst form-data
+      required:
+      - authorization
+      type: object
+      properties:
+        authorization:
+          type: string
+          description: Credentials or access token for API
     inline_response_200:
       allOf:
       - $ref: '#/components/schemas/responseOk'
