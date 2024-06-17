@@ -82,8 +82,12 @@ class auth_proxy:
         self.user_token_client_id = user_token_client_id
         self.user_token_client_secret = user_token_client_secret
 
-    def check_authorization(self):  # noqa: C901
+    def check_authorization(self, stream_mode=False):  # noqa: C901
         """認証情報チェック Authorization check
+
+        Args:
+            stream_mode (bool) :    True is stream mode (submit form authorization)
+                                    False is not stream mode (header authorization)
 
         Returns:
             json :
@@ -111,7 +115,10 @@ class auth_proxy:
         # bearerを取得
         # Get bearer
         # bearer = environ.get('HTTP_AUTHORIZATION')
-        get_auth = request.headers.get('Authorization')
+        if stream_mode:
+            get_auth = request.form.get('authorization')
+        else:
+            get_auth = request.headers.get('Authorization')
         globals.logger.debug(f'auth={get_auth}')
         # アクセストークンチェックを実行
         # Extract only the token part
@@ -455,6 +462,8 @@ class auth_proxy:
                 ret = requests.post(url, headers=post_headers, json=request_body, params=query_string, stream=stream)
             elif 'multipart/form-data' in request_content_type:
                 ret = requests.post(url, headers=post_headers, data=request_form, files=request_files, params=query_string, stream=stream)
+            elif 'application/x-www-form-urlencoded' in request_content_type:
+                ret = requests.post(url, headers=post_headers, data=request_form, params=query_string, stream=stream)
             else:
                 ret = requests.post(url, headers=post_headers, json=request_body, params=query_string, stream=stream)
 
@@ -463,6 +472,8 @@ class auth_proxy:
                 ret = requests.patch(url, headers=post_headers, json=request_body, params=query_string, stream=stream)
             elif 'multipart/form-data' in request_content_type:
                 ret = requests.patch(url, headers=post_headers, data=request_form, files=request_files, params=query_string, stream=stream)
+            elif 'application/x-www-form-urlencoded' in request_content_type:
+                ret = requests.post(url, headers=post_headers, data=request_form, params=query_string, stream=stream)
             else:
                 ret = requests.patch(url, headers=post_headers, json=request_body, params=query_string, stream=stream)
 
@@ -471,6 +482,8 @@ class auth_proxy:
                 ret = requests.put(url, headers=post_headers, json=request_body, params=query_string, stream=stream)
             elif 'multipart/form-data' in request_content_type:
                 ret = requests.put(url, headers=post_headers, data=request_form, files=request_files, params=query_string, stream=stream)
+            elif 'application/x-www-form-urlencoded' in request_content_type:
+                ret = requests.post(url, headers=post_headers, data=request_form, params=query_string, stream=stream)
             else:
                 ret = requests.put(url, headers=post_headers, json=request_body, params=query_string, stream=stream)
 

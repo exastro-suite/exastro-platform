@@ -45,10 +45,7 @@ def auditlog_download(organization_id, download_id):
     resp = Response(bl_auditlog_service.auditlog_file_download(organization_id, download_id),
                     headers={"Content-Disposition": 'attachment; filename="audit-log.zip"'})
     resp.content_length = bl_auditlog_service.get_auditlog_file_download_filesize(organization_id, download_id)
-    # resp.content_type = "application/octet-stream"
     resp.content_type = "application/zip"
-    # resp.headers.add_header("Content-Disposition", "attachment", filename="audit-log.zip")
-    # resp.headers['Content-Disposition'] = 'attachment; filename="audit-log.zip"'
 
     return resp
 

@@ -48,6 +48,8 @@ def get_auditlog_file_download_filesize(organization_id, download_id):
 
             if result is not None:
                 file_length = result.get("FILE_DATA_LENGTH")
+                # Large download test example.
+                # file_length = result.get("FILE_DATA_LENGTH") + 1024000000
             else:
                 message_id = "404-40001"
                 message = multi_lang.get_text(
@@ -70,7 +72,7 @@ def auditlog_file_download(organization_id, download_id):
 
     with closing(DBconnector().connect_platformdb()) as conn:
         # config list get by key
-        get_leng_json = bl_common_service.settings_system_config_list(conn, const.CONFIG_KEY_CHANK_SIZE)
+        get_leng_json = bl_common_service.settings_system_config_list(conn, const.CONFIG_KEY_CHUNK_SIZE)
         if get_leng_json:
             get_leng = int(get_leng_json.get("value"))
         else:
@@ -78,7 +80,7 @@ def auditlog_file_download(organization_id, download_id):
             message = multi_lang.get_text(
                 message_id,
                 "システム設定値が取得できませんでした(key:{0})",
-                const.CONFIG_KEY_CHANK_SIZE,
+                const.CONFIG_KEY_CHUNK_SIZE,
             )
             raise common.InternalErrorException(message_id=message_id, message=message)
 
@@ -102,6 +104,9 @@ def auditlog_file_download(organization_id, download_id):
                 start_pos += get_leng
 
                 if result is not None:
+                    # Large download test example.
+                    # for i in range(1, 100000, 1):
+                    #     yield ("#" * get_leng)
                     yield result.get("FILE_DATA_SUBSTR")
                 else:
                     break
