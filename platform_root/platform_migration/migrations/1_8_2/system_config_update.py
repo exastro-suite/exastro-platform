@@ -116,6 +116,16 @@ class system_config_update:
                 "value": 100,
                 "description": "Audit log download limit",
             },
+            {
+                "key": common_const.CONFIG_KEY_AUDIT_LOG_CLEANUP_TIME,
+                "value": "04:00",
+                "description": "Audit log cleanup time",
+            },
+            {
+                "key": common_const.CONFIG_KEY_CHUNK_SIZE,
+                "value": 102400,
+                "description": "chunk size for upload/download",
+            },
         ]
 
         with closing(DBconnector().connect_platformdb()) as conn:

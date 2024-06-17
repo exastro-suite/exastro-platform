@@ -32,8 +32,6 @@ ALL_REALM_MANAGEMENT_ROLE = ["manage-users", "view-users"]
 # オーガナイゼーションロール
 # Organization role
 ORG_ROLE_ORG_MANAGER = "_organization-manager"
-ORG_ROLE_USER_ROLE_MANAGER = "_organization-user-role-manager"
-ORG_ROLE_USER_MANAGER = "_organization-user-manager"
 
 MSG_FUNCTION_ID = "90"
 
@@ -206,9 +204,51 @@ class realm_update:
         """
         globals.logger.info(f"[{self.step_count}/{self.step_max}] ### Start func:{inspect.currentframe().f_code.co_name}")
 
+        # organization管理者用の権限を登録
+        # create a authority for organization admin
+        client_clientid = common.get_platform_client_id(organization_id)
+
+        # client取得({organization_id}-workspaces)
+        # client get to keycloak
+        response = api_keycloak_clients.clients_get(organization_id, client_clientid, token)
+        if response.status_code != 200:
+            globals.logger.error(f"response.status_code:{response.status_code}")
+            globals.logger.error(f"response.text:{response.text}")
+            message_id = f"500-{MSG_FUNCTION_ID}004"
+            message = multi_lang.get_text(
+                message_id,
+                "clientの取得に失敗しました(対象ID:{0} client:{1})",
+                organization_id,
+                client_clientid
+            )
+            raise common.InternalErrorException(message_id=message_id, message=message)
+
+        client_info = json.loads(response.text)
+        client_id = client_info[0].get("id")
+        platform_client_id = client_id
+
+        # オーガナイゼーションロール権限 登録
+        # Organization role authority registration
+        org_auth = common_const.ORG_AUTH_AUDIT_LOG
+        response = api_keycloak_roles.clients_role_create(organization_id, platform_client_id, org_auth, token)
+        if response.status_code not in [200, 201, 409]:    # 409 exists role
+            globals.logger.error(f"response.status_code:{response.status_code}")
+            globals.logger.error(f"response.text:{response.text}")
+            message_id = f"500-{MSG_FUNCTION_ID}011"
+            message = multi_lang.get_text(
+                message_id,
+                "client roleの設定に失敗しました(対象ID:{0} client:{1})",
+                organization_id,
+                client_clientid
+            )
+            raise common.InternalErrorException(message_id=message_id, message=message)
+
+        # organization管理者用のロールを作成
+        # create a role for organization admin
+        client_clientid = common.get_user_token_client_id(organization_id)
+
         # client取得({organization_id})
         # client get to keycloak
-        client_clientid = common.get_user_token_client_id(organization_id)
         response = api_keycloak_clients.clients_get(organization_id, client_clientid, token)
         if response.status_code != 200:
             globals.logger.error(f"response.status_code:{response.status_code}")
@@ -225,22 +265,6 @@ class realm_update:
         client_info = json.loads(response.text)
         organization_client_id = client_info[0].get("id")
 
-        # オーガナイゼーションロール権限 登録
-        # Organization role authority registration
-        org_auth = common_const.ORG_AUTH_AUDIT_LOG
-        response = api_keycloak_roles.clients_role_create(organization_id, organization_client_id, org_auth, token)
-        if response.status_code not in [200, 201, 409]:    # 409 exists role
-            globals.logger.error(f"response.status_code:{response.status_code}")
-            globals.logger.error(f"response.text:{response.text}")
-            message_id = f"500-{MSG_FUNCTION_ID}011"
-            message = multi_lang.get_text(
-                message_id,
-                "client roleの設定に失敗しました(対象ID:{0} client:{1})",
-                organization_id,
-                client_clientid
-            )
-            raise common.InternalErrorException(message_id=message_id, message=message)
-
         # organization管理者用のロールを更新
         # update role for organization manager
         org_role = common_const.ORG_ROLE_ORG_MANAGER
@@ -250,7 +274,7 @@ class realm_update:
         for permission in arr_permissions:
             # Clientからorganization管理者に付与するロールを取得
             # Get role want to grant to organization manager from client
-            response = api_keycloak_roles.clients_role_get(organization_id, organization_client_id, permission, token)
+            response = api_keycloak_roles.clients_role_get(organization_id, platform_client_id, permission, token)
             if response.status_code != 200:
                 globals.logger.error(f"response.status_code:{response.status_code}")
                 globals.logger.error(f"response.text:{response.text}")
