@@ -87,7 +87,7 @@ class UserExportJobExecutor(BaseJobExecutor):
                 # Token発行用classのインスタンス化 / Instantiation of Token issuing class
                 self.organization_sa_token = jobs_common.organization_sa_token(self.organization_id, self.organization_private)
 
-                # SELECT T_JOBS_USER
+                # SELECT T_JOBS_USER_EXPORT
                 with conn.cursor() as cursor:
                     cursor.execute(queries_user_export.SQL_QUERY_JOBS_USER, {"job_id": self.job_id})
                     t_jobs_user = cursor.fetchone()
@@ -96,7 +96,7 @@ class UserExportJobExecutor(BaseJobExecutor):
                         message = multi_lang.get_text(
                             message_id,
                             "処理対象のレコードの取得に失敗しました(テーブル:{0})",
-                            "T_JOBS_USER"
+                            "T_JOBS_USER_EXPORT"
                         )
                         raise common.InternalErrorException(message_id=message_id, message=message)
 
@@ -105,31 +105,69 @@ class UserExportJobExecutor(BaseJobExecutor):
 
                 # 結果雛形ファイルのOpen / Open result template file
                 globals.logger.debug('Get excel template')
-                self.result_wb = user_import_file_common.UserResultWorkbook(lang=self.language, error_column=True)
+                self.result_wb = user_import_file_common.UserResultWorkbook(lang=self.language)
 
-                # ユーザーの取得 / Add user
-                users = self.__get_users()
+                loop_count = 0
+                max = 50
+                
+                while True:
+                    first = loop_count * max + 1
+                    # ユーザーの取得 / Add user
+                    users = self.__get_users(first=first, max=max)
 
-                #ファイル出力
-                for user in users:
-                    row = {
-                        "USERNAME": user["username"],
-                        "EMAIL": user["email"],
-                        "FIRSTNAME": user["firstName"],
-                        "LASTNAME": user["lastName"],
-                        "PASSWORD": "",
-                        "AFFILIATION": self.__get_user_affiliation(user),
-                        "DESCRIPTION": self.__get_user_description(user),
-                        "ENABLED": user["enabled"],
-                        "ROLES" : user["roles"],
-                        "USER_ID" : user["id"]
-                    }
-                    self.result_wb.write_row(row)
+                    #ファイル出力
+                    for user in users:
+                        row = {
+                            "USERNAME": user["username"],
+                            "EMAIL": user["email"],
+                            "FIRSTNAME": user["firstName"],
+                            "LASTNAME": user["lastName"],
+                            "PASSWORD": "",
+                            "AFFILIATION": self.__get_user_affiliation(user),
+                            "DESCRIPTION": self.__get_user_description(user),
+                            "ENABLED": user["enabled"],
+                            "ROLES" : user["roles"],
+                            "USER_ID" : user["id"]
+                        }
+                        self.result_wb.write_row(row)
+                        
+                    loop_count += 1
+                    self.count_export += len(users)
+                    
+                    if self.count_export > job_manager_config.JOBS[const.PROCESS_KIND_USER_IMPORT]["extra_config"]["max_number_of_rows_allowd"]:
+                        message_id = "400-00022"
+                        message = multi_lang.get_text_spec(
+                            self.language,
+                            message_id,
+                            "{0}の上限数({1})を超えるため、{0}は取得できません。",
+                            multi_lang.get_text_spec(self.language, '000-00135', "ユーザー"),
+                            job_manager_config.JOBS[const.PROCESS_KIND_USER_IMPORT]["extra_config"]["max_number_of_rows_allowd"]
+                        )
+                        raise common.BadRequestException(message_id=message_id, message=message)
+                    
+                    self.__update_t_jobs_user(conn, job_status=const.JOB_USER_EXEC, message=None)
+                    conn.commit()
+                        
+                    if len(users) < max:
+                        break
+                    
                     # 1JOBでリソースを占有しないようにsleepする / Sleep so that 1JOB does not occupy resources
                     time.sleep(job_manager_config.JOBS[const.PROCESS_KIND_USER_EXPORT]["extra_config"]["user_export_interval_millisecond"]/1000)
+                
+                globals.logger.info(f'User Export processed')
 
-                self.count_export = len(user)
-
+                # 結果ファイル保存
+                excel_bytes_image = self.result_wb.get_workbook_bytes_image()
+                with conn.cursor() as cursor:
+                    cursor.execute(
+                        queries_user_export.SQL_INSERT_JOBS_USER_RESULT,
+                        {"file_id": self.result_id, "job_id": self.job_id, "file_data": excel_bytes_image}
+                        )
+                del excel_bytes_image
+                
+                # 最終的なステータスに更新する / Update to final status
+                self.__update_t_jobs_user(conn, job_status=const.JOB_USER_COMP, message=None)
+                
             except JobTimeoutException as ex:
                 # タイムアウトエラー / timeout error
                 if self.imp_wb is not None:
@@ -151,21 +189,6 @@ class UserExportJobExecutor(BaseJobExecutor):
                 raise ex
 
             finally:
-                try:
-                    globals.logger.info(f'User Export processed')
-
-                    if self.count_export > 0:
-                        # 結果ファイル保存
-                        excel_bytes_image = self.result_wb.get_workbook_bytes_image()
-                        with conn.cursor() as cursor:
-                            cursor.execute(
-                                queries_user_export.SQL_INSERT_JOBS_USER_RESULT,
-                                {"file_id": self.result_id, "job_id": self.job_id, "file_data": excel_bytes_image}
-                                )
-                        del excel_bytes_image
-
-                except Exception as ex:
-                    globals.logger.debug(f'{ex}\n-- stack trace --\n{traceback.format_exc()}')
 
                 conn.commit()
 
@@ -206,7 +229,7 @@ class UserExportJobExecutor(BaseJobExecutor):
             return ""
 
 
-    def __get_users(self):
+    def __get_users(self, first, max):
         """ユーザ一覧の取得 / get users
 
         Returns:
@@ -217,7 +240,8 @@ class UserExportJobExecutor(BaseJobExecutor):
             realm_name=self.organization_id,
             user_name=None,
             token=self.organization_sa_token.get(),
-            max=job_manager_config.JOBS[const.PROCESS_KIND_USER_IMPORT]["extra_config"]["max_number_of_rows_allowd"]
+            first=first,
+            max=max
         )
 
         if res.status_code != 200:
@@ -256,9 +280,6 @@ class UserExportJobExecutor(BaseJobExecutor):
             roles = json.loads(res.text)
             role_list = ",".join([role.get("name") for role in roles])
             user["roles"] = role_list
-
-            # 1JOBでリソースを占有しないようにsleepする / Sleep so that 1JOB does not occupy resources
-            time.sleep(job_manager_config.JOBS[const.PROCESS_KIND_USER_EXPORT]["extra_config"]["user_export_interval_millisecond"]/1000)
 
         globals.logger.info(f'Get Users [OG:{self.organization_id}]')
         return users
