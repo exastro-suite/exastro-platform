@@ -162,7 +162,9 @@ def platform_organization_api_call(subpath):
         Response: HTTP Response
     """
     try:
-        extra = extra_init()
+        multipart_mode = is_multipart_mode()
+
+        extra = extra_init(multipart_mode=multipart_mode)
         globals.logger.info(f"### start func:{inspect.currentframe().f_code.co_name} {request.method=} {subpath=}")
 
         # Destination URL settings - 宛先URLの設定
@@ -217,7 +219,7 @@ def platform_organization_api_call(subpath):
         extra['request_user_headers'] = response_json.get("data")
 
         # api呼び出し call api
-        return_api = proxy.call_api(dest_url, response_json.get("data"), stream=stream)
+        return_api = proxy.call_api(dest_url, response_json.get("data"), stream=stream, multipart_mode=multipart_mode)
 
         if stream:
             # stream形式の場合は、独自の返却を実施する
@@ -329,12 +331,13 @@ def get_response_chunk_byte(extra):
     return int(response_chunk_byte)
 
 
-def extra_init(organization_id='-', workspace_id='-'):
+def extra_init(organization_id='-', workspace_id='-', multipart_mode=False):
     """extra fields initialize
 
     Args:
         organization_id(str) : organization id
         workspace_id(str) : workspace id
+        multipart_mode (bool): True: multipart/form-data mode call (default. False)
 
     Returns:
         extra(dict): extra items
@@ -357,26 +360,27 @@ def extra_init(organization_id='-', workspace_id='-'):
         'message_text': '-',
     }
 
-    # パラメータを形成
-    # Form parameters
-    if request.is_json:
-        try:
-            extra['request_body'] = request.json.copy()
-        except Exception:
-            pass
+    if not multipart_mode:
+        # パラメータを形成
+        # Form parameters
+        if request.is_json:
+            try:
+                extra['request_body'] = request.json.copy()
+            except Exception:
+                pass
 
-    # パラメータを形成(multipart/form-data)
-    # form parameters, files parameters
-    if request.form:
-        try:
-            extra['request_form'] = request.form.copy()
-        except Exception:
-            pass
-    if request.files:
-        try:
-            extra['request_files'] = request.files.copy()
-        except Exception:
-            pass
+        # パラメータを形成(multipart/form-data)
+        # form parameters, files parameters
+        if request.form:
+            try:
+                extra['request_form'] = request.form.copy()
+            except Exception:
+                pass
+        if request.files:
+            try:
+                extra['request_files'] = request.files.copy()
+            except Exception:
+                pass
 
     # content-type
     if request.content_type:
@@ -397,7 +401,9 @@ def ita_admin_api_call(subpath):
         Response: HTTP Response
     """
     try:
-        extra = extra_init()
+        multipart_mode = is_multipart_mode()
+
+        extra = extra_init(multipart_mode=multipart_mode)
         globals.logger.info(f"### start func:{inspect.currentframe().f_code.co_name} {request.method=} {subpath=}")
 
         # Destination URL settings - 宛先URLの設定
@@ -471,7 +477,7 @@ def ita_admin_api_call(subpath):
         extra['request_user_headers'] = response_json.get("data")
 
         # api呼び出し call api
-        return_api = proxy.call_api(dest_url, response_json.get("data"), stream=stream)
+        return_api = proxy.call_api(dest_url, response_json.get("data"), stream=stream, multipart_mode=multipart_mode)
 
         if stream:
             # stream形式の場合は、独自の返却を実施する
@@ -543,7 +549,9 @@ def platform_api_call(organization_id, subpath):
         Response: HTTP Response
     """
     try:
-        extra = extra_init(organization_id=organization_id)
+        multipart_mode = is_multipart_mode()
+
+        extra = extra_init(organization_id=organization_id, multipart_mode=multipart_mode)
         globals.logger.info(f"### start func:{inspect.currentframe().f_code.co_name} {request.method=} {subpath=} {organization_id=}")
 
         # Destination URL settings - 宛先URLの設定
@@ -597,7 +605,7 @@ def platform_api_call(organization_id, subpath):
         extra['request_user_headers'] = response_json.get("data")
 
         # api呼び出し call api
-        return_api = proxy.call_api(dest_url, response_json.get("data"), stream=stream)
+        return_api = proxy.call_api(dest_url, response_json.get("data"), stream=stream, multipart_mode=multipart_mode)
 
         if stream:
             # stream形式の場合は、独自の返却を実施する
@@ -670,7 +678,9 @@ def ita_workspace_api_call(organization_id, workspace_id, subpath):
         Response: HTTP Response
     """
     try:
-        extra = extra_init(organization_id=organization_id, workspace_id=workspace_id)
+        multipart_mode = is_multipart_mode()
+
+        extra = extra_init(organization_id=organization_id, workspace_id=workspace_id, multipart_mode=multipart_mode)
         globals.logger.info(f"### start func:{inspect.currentframe().f_code.co_name} {request.method=} {subpath=} {organization_id=} {workspace_id=}")
 
         # Destination URL settings - 宛先URLの設定
@@ -720,7 +730,7 @@ def ita_workspace_api_call(organization_id, workspace_id, subpath):
         extra['request_user_headers'] = response_json.get("data")
 
         # api呼び出し call api
-        return_api = proxy.call_api(dest_url, response_json.get("data"), stream=stream)
+        return_api = proxy.call_api(dest_url, response_json.get("data"), stream=stream, multipart_mode=multipart_mode)
 
         if stream:
             # stream形式の場合は、独自の返却を実施する
@@ -793,7 +803,9 @@ def ita_oase_recever_api_call(organization_id, workspace_id, subpath):
         Response: HTTP Response
     """
     try:
-        extra = extra_init(organization_id=organization_id, workspace_id=workspace_id)
+        multipart_mode = is_multipart_mode()
+
+        extra = extra_init(organization_id=organization_id, workspace_id=workspace_id, multipart_mode=multipart_mode)
         globals.logger.info(f"### start func:{inspect.currentframe().f_code.co_name} {request.method=} {subpath=} {organization_id=} {workspace_id=}")
 
         # Destination URL settings - 宛先URLの設定
@@ -843,7 +855,7 @@ def ita_oase_recever_api_call(organization_id, workspace_id, subpath):
         extra['request_user_headers'] = response_json.get("data")
 
         # api呼び出し call api
-        return_api = proxy.call_api(dest_url, response_json.get("data"), stream=stream)
+        return_api = proxy.call_api(dest_url, response_json.get("data"), stream=stream, multipart_mode=multipart_mode)
 
         if stream:
             # stream形式の場合は、独自の返却を実施する
@@ -932,6 +944,20 @@ def is_stream_mode(dest_url, method):
     # urlに一致するものが無いときは、ストリームモード以外とする
     # If there is nothing matching the url, use a mode other than stream mode.
     globals.logger.debug('SUCCEED Is not stream mode. pattern no match')
+    return False
+
+
+def is_multipart_mode():
+    """check if the request is multipart/form-data - リクエストのcontent_typeがmultipart/form-dataかどうかチェックします
+
+    Returns:
+        bool: True = multipart mode / False = not multipart mode
+    """
+
+    if request.content_type:
+        if request.content_type.lower() == "multipart/form-data":
+            return True
+
     return False
 
 

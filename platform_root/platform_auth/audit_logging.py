@@ -153,7 +153,7 @@ class DBLogHandler(logging.Handler):
             pass
 
         # not system manager auditlog to database
-        if organization_id:
+        if organization_id and not organization_id == "-":
             record_json = json.loads(self.format(record))
             # globals.logger.debug(f"{record_json=}")
 
