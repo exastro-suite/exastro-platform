@@ -126,7 +126,7 @@ def test_audit_log_download_file(connexion_client):
 
         parameter = {
             "FILE_ID": ulid.new().str,
-            "JOB_ID": "1",
+            "JOB_ID": ulid.new().str,
             "CREATE_USER": "TEST",
             "LAST_UPDATE_USER": "TEST",
         }
@@ -138,7 +138,7 @@ def test_audit_log_download_file(connexion_client):
             cursor.execute(queries_test_audit_log.SQL_SELECT_JOBS_AUDIT_LOG_FILE, parameter)
             result = cursor.fetchone()
 
-    download_id = result.get("FILE_ID")
+    download_id = result.get("JOB_ID")
 
     with test_common.requsts_mocker_default():
 
@@ -167,10 +167,10 @@ def test_audit_log_download_file(connexion_client):
             content_type='application/x-www-form-urlencoded',
             headers=request_parameters.request_headers(organization["user_id"]),
             data=req_data)
-        assert response.status_code != 200, "post audit log download response code error"
+        assert response.status_code == 404, "post audit log download response code not found error"
 
     with test_common.requsts_mocker_default(), \
-            test_common.pymysql_execute_raise_exception_mocker(queries_bl_audit_log.SQL_QUERY_JOBS_AUDIT_LOG_FILE_LENGTH + " WHERE FILE_ID = %(file_id)s", Exception("DB Error Test")):
+            test_common.pymysql_execute_raise_exception_mocker(queries_bl_audit_log.SQL_QUERY_JOBS_AUDIT_LOG_FILE_LENGTH + " WHERE JOB_ID = %(job_id)s", Exception("DB Error Test")):
         #
         # DB error route
         #
@@ -180,8 +180,22 @@ def test_audit_log_download_file(connexion_client):
             headers=request_parameters.request_headers(organization["user_id"]),
             data=req_data)
 
-        assert response.status_code == 404, "DB error route"
-        assert response.json["result"] == "404-40001"
+        assert response.status_code == 500, "DB error route"
+        assert response.json["result"] == "500-99999"
+
+    with test_common.requsts_mocker_default(), \
+            test_common.pymysql_execute_data_mocker(queries_bl_common.SQL_QUERY_SELECT_SYSTEM_CONFIG + ' WHERE CONFIG_KEY = %(config_key)s', []):
+        #
+        # data None route
+        #
+        response = connexion_client.post(
+            f"/api/{organization['organization_id']}/platform/auditlog/download/{download_id}",
+            content_type='application/x-www-form-urlencoded',
+            headers=request_parameters.request_headers(organization["user_id"]),
+            data=req_data)
+
+        assert response.status_code == 500, "DB error route"
+        assert response.json["result"] == "500-00011"
 
     with test_common.requsts_mocker_default(), \
             test_common.pymysql_execute_raise_exception_mocker(queries_bl_common.SQL_QUERY_SELECT_SYSTEM_CONFIG + ' WHERE CONFIG_KEY = %(config_key)s', Exception("DB Error Test")):
@@ -195,7 +209,7 @@ def test_audit_log_download_file(connexion_client):
             data=req_data)
 
         assert response.status_code == 500, "DB error route"
-        assert response.json["result"] == "500-00011"
+        assert response.json["result"] == "500-99999"
 
 
 def sample_conditions(key_list):

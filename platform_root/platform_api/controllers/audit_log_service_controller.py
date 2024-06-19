@@ -42,7 +42,22 @@ def auditlog_download(organization_id, download_id):
 
     globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
 
-    resp = Response(bl_auditlog_service.auditlog_file_download(organization_id, download_id),
+    get_leng = None
+    with closing(DBconnector().connect_platformdb()) as conn:
+        # config list get by key
+        get_leng_json = bl_common_service.settings_system_config_list(conn, const.CONFIG_KEY_CHUNK_SIZE)
+        if get_leng_json:
+            get_leng = int(get_leng_json.get("value"))
+        else:
+            message_id = "500-00011"
+            message = multi_lang.get_text(
+                message_id,
+                "システム設定値が取得できませんでした(key:{0})",
+                const.CONFIG_KEY_CHUNK_SIZE,
+            )
+            raise common.InternalErrorException(message_id=message_id, message=message)
+
+    resp = Response(bl_auditlog_service.auditlog_file_download(organization_id, download_id, get_leng),
                     headers={"Content-Disposition": 'attachment; filename="audit-log.zip"'})
     resp.content_length = bl_auditlog_service.get_auditlog_file_download_filesize(organization_id, download_id)
     resp.content_type = "application/zip"

@@ -34,12 +34,12 @@ def get_auditlog_file_download_filesize(organization_id, download_id):
 
     with closing(DBconnector().connect_orgdb(organization_id)) as conn:
         with conn.cursor() as cursor:
-            str_where = " WHERE FILE_ID = %(file_id)s"
+            str_where = " WHERE JOB_ID = %(job_id)s"
 
             # ファイルサイズの取得
             # Get file size
             parameter = {
-                "file_id": download_id,
+                "job_id": download_id,
             }
 
             cursor.execute(queries_bl_audit_log.SQL_QUERY_JOBS_AUDIT_LOG_FILE_LENGTH + str_where, parameter)
@@ -62,38 +62,25 @@ def get_auditlog_file_download_filesize(organization_id, download_id):
     return file_length
 
 
-def auditlog_file_download(organization_id, download_id):
+def auditlog_file_download(organization_id, download_id, get_leng):
     """audit log file downalod
 
     Args:
         organization_id (str): organization id
         download_id (str): download id (file id)
+        get_leng (int): chunk size
     """
-
-    with closing(DBconnector().connect_platformdb()) as conn:
-        # config list get by key
-        get_leng_json = bl_common_service.settings_system_config_list(conn, const.CONFIG_KEY_CHUNK_SIZE)
-        if get_leng_json:
-            get_leng = int(get_leng_json.get("value"))
-        else:
-            message_id = "500-00011"
-            message = multi_lang.get_text(
-                message_id,
-                "システム設定値が取得できませんでした(key:{0})",
-                const.CONFIG_KEY_CHUNK_SIZE,
-            )
-            raise common.InternalErrorException(message_id=message_id, message=message)
 
     with closing(DBconnector().connect_orgdb(organization_id)) as conn:
         with conn.cursor() as cursor:
-            str_where = " WHERE FILE_ID = %(file_id)s"
+            str_where = " WHERE JOB_ID = %(job_id)s"
 
             # システム設定値の読み込み単位で、BLOBの情報を取得していく
             # Obtain BLOB information each time the system settings are read.
             start_pos = 1
             while True:
                 parameter = {
-                    "file_id": download_id,
+                    "job_id": download_id,
                     "start_pos": start_pos,
                     "len": get_leng,
                 }
@@ -110,6 +97,3 @@ def auditlog_file_download(organization_id, download_id):
                     yield result.get("FILE_DATA_SUBSTR")
                 else:
                     break
-
-    return
-

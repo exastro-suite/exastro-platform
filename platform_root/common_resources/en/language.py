@@ -579,6 +579,7 @@ class LanguageList:
     lang_array['404-29001'] = 'Plan does not exist (id:{0})'
     lang_array['404-34001'] = 'Notification information does not exist (id:{0})'
     lang_array['404-35001'] = 'Notification information does not exist (id:{0})'
+    lang_array['404-40001'] = 'Audit log download file does not exist (id:{0})'
     lang_array['409-20001'] = 'The specified setting value already exists and cannot be created. (key: {0})'
     lang_array['409-22001'] = 'The specified workspace cannot be created because it already exists.'
     lang_array['409-24001'] = 'The specified role already exists and cannot be created.'
@@ -601,7 +602,7 @@ class LanguageList:
     lang_array['500-00008'] = 'Failed to acquire organization role composite (Target ID: {0} client: {1})'
     lang_array['500-00009'] = 'Failed to acquire workspace role composite (Target ID: {0} client: {1})'
     lang_array['500-00010'] = 'Failed to get role (Target ID: {0} client: {1})'
-    #
+    lang_array['500-00011'] = 'Failed to obtain system setting value (key:{0})'
     #
     #
     #
@@ -726,3 +727,4 @@ class LanguageList:
     #
     #
     #
+
