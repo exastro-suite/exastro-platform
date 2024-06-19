@@ -20,6 +20,7 @@ import json
 from flask import request
 from contextlib import closing
 from common_library.common import common, multi_lang, const, validation, bl_common_service
+from common_library.common import api_keycloak_tokens, api_keycloak_users
 from common_library.common.db import DBconnector
 from common_library.common.libs import queries_bl_audit_log, queries_bl_notification
 
@@ -53,7 +54,76 @@ def auditlog_download_list(organization_id):  # noqa: E501
 
     :rtype: InlineResponse20024
     """
-    return common.response_200_ok(None)
+
+    # Get a service account token
+    db = DBconnector()
+    private = db.get_organization_private(organization_id)
+
+    token_response = api_keycloak_tokens.service_account_get_token(
+        organization_id, private.internal_api_client_clientid, private.internal_api_client_secret,
+    )
+    if token_response.status_code != 200:
+        raise common.AuthException(
+            "client_user_get_token error status:{}, response:{}".format(token_response.status_code, token_response.text)
+        )
+
+    token = json.loads(token_response.text)["access_token"]
+
+    # Get T_JOBS_AUDIT_LOG
+    with closing(db.connect_orgdb(organization_id)) as conn:
+        with conn.cursor() as cursor:
+            order_by = " ORDER BY CREATE_TIMESTAMP DESC "
+            cursor.execute(queries_bl_audit_log.SQL_QUERY_JOBS_AUDIT_LOG + order_by)
+            result = cursor.fetchall()
+
+    # make response data
+    data = []
+    user_data = []
+    for row in result:
+        user_id = row["CREATE_USER"]
+        name = None
+
+        userid_exists = [u["name"] for u in user_data if u["user_id"] == user_id]
+        if len(userid_exists) > 0:
+            name = userid_exists[0]
+        else:
+            # get user from keycloak, None if 404
+            response = api_keycloak_users.user_get_by_id(realm_name=organization_id, user_id=user_id, token=token)
+            if response.status_code == 200:
+                user = json.loads(response.text)
+                globals.logger.debug(f"response user:{user}")
+
+                name = common.get_username(user.get("firstName"), user.get("lastName"), user.get("username"))
+            elif response.status_code == 404:
+                globals.logger.debug("response user:not found")
+
+                name = None
+            else:
+                globals.logger.error(f"response.status_code:{response.status_code}")
+                globals.logger.error(f"response.text:{response.text}")
+                message = multi_lang.get_text(
+                    "500-40004",
+                    "ユーザーの取得に失敗しました(対象ID:{0})",
+                    organization_id,
+                )
+                raise common.InternalErrorException(message_id="500-40004", message=message)
+
+            # Save user data and reduce get data from Keycloak
+            user_data.append({"user_id": user_id, "name": name, })
+
+        row = {
+            "download_id": row["JOB_ID"],
+            "status": row["JOB_STATUS"],
+            "conditions": row["CONDITIONS"],
+            "message": row["MESSAGE"],
+            "create_timestamp": common.datetime_to_str(row["CREATE_TIMESTAMP"]),
+            "create_user_id": user_id,
+            "create_user_name": name,
+            "last_update_timestamp": common.datetime_to_str(row["LAST_UPDATE_TIMESTAMP"]),
+        }
+        data.append(row)
+
+    return common.response_200_ok(data)
 
 
 @common.platform_exception_handler

@@ -4497,8 +4497,12 @@ components:
               create_timestamp:
                 type: string
                 example: '2024-06-01 10:00:00'
-              create_user:
+              create_user_id:
                 type: string
+                format: uuid
+              create_user_name:
+                type: string
+                example: firstname lastname
               last_update_timestamp:
                 type: string
                 example: '2024-06-01 10:30:00'
