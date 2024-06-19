@@ -1329,7 +1329,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/runtimeError'
   '/api/{organization_id}/platform/auditlog/download/{download_id}':
-    get:
+    post:
       tags:
         - AuditLogService
       summary: Audit log download
@@ -1346,6 +1346,12 @@ paths:
           required: true
           schema:
             type: string
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/authorizationBody'
+        required: true
       responses:
         '200':
           description: A successful response.
@@ -2586,6 +2592,15 @@ components:
               last_update_timestamp:
                 type: string
                 example: '2024-06-01 10:30:00'
+    authorizationBody:
+      title: authorization of Requst form-data
+      type: object
+      properties:
+        authorization:
+          type: string
+          description: Credentials or access token for API
+      required:
+        - authorization
   securitySchemes:
     BearerAuth:
       description: Credentials or access token for API

@@ -90,11 +90,6 @@ paths:
   "/api/platform/maintenance-mode-setting":
       $ref: './paths/maintenance_mode_setting.yaml'
 
-  "/api/{organization_id}/platform/auditlog/download":
-      $ref: './paths/auditlog.download.yaml'
-  "/api/{organization_id}/platform/auditlog/download/{download_id}":
-      $ref: './paths/auditlog.download.download_id.yaml'
-
 components:
   schemas:
     $ref: './schemas/_schemas.yaml'
