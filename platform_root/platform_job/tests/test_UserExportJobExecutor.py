@@ -62,13 +62,13 @@ mock_users_result_value1.text= '[' \
 mock_users_result_value2 = mock_users_result()
 mock_users_result_value2.status_code = 200
 mock_users_result_value2.text= '[' \
-    '{"id":"b833b84f-468b-4894-a2bd-f96248374918","username":"admin2","firstName":"test","lastName":"test","email":"test2@example.com","emailVerified":false,"attributes":{"affiliation":["testafff"],"description":["testdesc"]},"createdTimestamp":1715561734123,"enabled":true,"totp":false,"disableableCredentialTypes":[],"requiredActions":[],"notBefore":0,"access":{"manageGroupMembership":true,"view":true,"mapRoles":true,"impersonate":true,"manage":true}}' \
+    '{"id":"b833b84f-468b-4894-a2bd-f96248374918","username":"admin2","firstName":"test","lastName":"test","email":"test2@example.com","emailVerified":false,"createdTimestamp":1715561734123,"enabled":true,"totp":false,"disableableCredentialTypes":[],"requiredActions":[],"notBefore":0,"access":{"manageGroupMembership":true,"view":true,"mapRoles":true,"impersonate":true,"manage":true}}' \
     ']'
 
 mock_users_result_value3 = mock_users_result()
 mock_users_result_value3.status_code = 200
 mock_users_result_value3.text= '[' \
-    '{"id":"b833b84f-468b-4894-a2bd-f96248374917","username":"user1","firstName":"test","lastName":"test","email":"test3@example.com","emailVerified":false,"attributes":{"affiliation":["testafff"],"description":["testdesc"]},"createdTimestamp":1715561734123,"enabled":true,"totp":false,"disableableCredentialTypes":[],"requiredActions":[],"notBefore":0,"access":{"manageGroupMembership":true,"view":true,"mapRoles":true,"impersonate":true,"manage":true}}' \
+    '{"id":"b833b84f-468b-4894-a2bd-f96248374917","username":"user1","firstName":"test","lastName":"test","email":"test3@example.com","emailVerified":false,"createdTimestamp":1715561734123,"enabled":true,"totp":false,"disableableCredentialTypes":[],"requiredActions":[],"notBefore":0,"access":{"manageGroupMembership":true,"view":true,"mapRoles":true,"impersonate":true,"manage":true}}' \
     ']'
 
 mock_users_result_value4 = mock_users_result()
@@ -77,11 +77,7 @@ mock_users_result_value4.text= '[]'
 
 mock_users_result_value5 = mock_users_result()
 mock_users_result_value5.status_code = 200
-mock_users_result_value5.text= '[' \
-    '{"id":"b833b84f-468b-4894-a2bd-f96248374919","username":"admin1","firstName":"test","lastName":"test","email":"test1@example.com","emailVerified":false,"attributes":{"affiliation":["testafff"],"description":["testdesc"]},"createdTimestamp":1715561734123,"enabled":true,"totp":false,"disableableCredentialTypes":[],"requiredActions":[],"notBefore":0,"access":{"manageGroupMembership":true,"view":true,"mapRoles":true,"impersonate":true,"manage":true},}' \
-    '{"id":"b833b84f-468b-4894-a2bd-f96248374918","username":"admin2","firstName":"test","lastName":"test","email":"test2@example.com","emailVerified":false,"attributes":{"affiliation":["testafff"],"description":["testdesc"]},"createdTimestamp":1715561734123,"enabled":true,"totp":false,"disableableCredentialTypes":[],"requiredActions":[],"notBefore":0,"access":{"manageGroupMembership":true,"view":true,"mapRoles":true,"impersonate":true,"manage":true},}' \
-    '{"id":"b833b84f-468b-4894-a2bd-f96248374917","username":"user1","firstName":"test","lastName":"test","email":"test3@example.com","emailVerified":false,"attributes":{"affiliation":["testafff"],"description":["testdesc"]},"createdTimestamp":1715561734123,"enabled":true,"totp":false,"disableableCredentialTypes":[],"requiredActions":[],"notBefore":0,"access":{"manageGroupMembership":true,"view":true,"mapRoles":true,"impersonate":true,"manage":true}}' \
-    ']'
+mock_users_result_value5.text= '[{"id":"88e09eb4-3723-43f5-a786-c4439e86eaf8","username":"test5-1","firstName":"test5-","lastName":"1","email":"test5-1@example.com","emailVerified":false,"createdTimestamp":1718615936957,"enabled":true,"totp":false,"disableableCredentialTypes":[],"requiredActions":[],"notBefore":0,"access":{"manageGroupMembership":true,"view":true,"mapRoles":true,"impersonate":true,"manage":true}},{"id":"5e20cbd8-ab76-48a3-8c81-e75332ccd67b","username":"test5-10","firstName":"test5-","lastName":"10","email":"test5-10@example.com","emailVerified":false,"createdTimestamp":1718615937659,"enabled":true,"totp":false,"disableableCredentialTypes":[],"requiredActions":[],"notBefore":0,"access":{"manageGroupMembership":true,"view":true,"mapRoles":true,"impersonate":true,"manage":true}},{"id":"e93240cb-0e87-41f1-b23a-5fccda416739","username":"test5-100","firstName":"test5-","lastName":"100","email":"test5-100@example.com","emailVerified":false,"createdTimestamp":1718615972126,"enabled":true,"totp":false,"disableableCredentialTypes":[],"requiredActions":[],"notBefore":0,"access":{"manageGroupMembership":true,"view":true,"mapRoles":true,"impersonate":true,"manage":true}}]'
 
 class mock_roles_result():
     status_code : int
@@ -128,8 +124,11 @@ def test_execute_user_get_error_limits():
 
     # 上限数エラー
     limit_users = 2
+    process_kind=const.PROCESS_KIND_USER_EXPORT
+    job_config_jobs = dict(job_manager_config.JOBS)
+    job_config_jobs[process_kind]["extra_config"]["max_number_of_rows_allowd"] = limit_users
     with test_common.requsts_mocker_default(), \
-        mock.patch.object(bl_plan_service, "organization_limits_get", return_value={const.RESOURCE_COUNT_USERS: limit_users}), \
+        mock.patch.dict(f"job_manager_config.JOBS", job_config_jobs), \
         mock.patch("common_library.common.api_keycloak_users.user_get", side_effect=[mock_users_result_value5]), \
         mock.patch("common_library.common.api_keycloak_roles.user_role_get", return_value = mock_roles_result_value):
 
@@ -171,17 +170,18 @@ def test_execute_timeout():
 
     organization_id = list(testdata.ORGANIZATIONS.keys())[0]
 
-    timeout_sec = 5
+    timeout_sec = 2
 
     # Jobの設定を試験用に切り替え
     process_kind=const.PROCESS_KIND_USER_EXPORT
     job_config_jobs = dict(job_manager_config.JOBS)
     job_config_jobs[process_kind]["timeout_seconds"] = timeout_sec
-    job_config_jobs[process_kind]["extra_config"]["status_update_interval"] = 3
+    job_config_jobs[process_kind]["extra_config"]["user_export_interval_millisecond"] = 2500
 
     with test_common.requsts_mocker_default(), mock.patch.dict(f"job_manager_config.JOBS", job_config_jobs), \
-        mock.patch("common_library.common.api_keycloak_users.user_get", side_effect=[mock_users_result_value5]), \
-        mock.patch("common_library.common.api_keycloak_roles.user_role_get", return_value = mock_roles_result_value):
+        mock.patch("common_library.common.api_keycloak_users.user_get", side_effect=[mock_users_result_value1, mock_users_result_value2, mock_users_result_value3, mock_users_result_value4]), \
+        mock.patch("common_library.common.api_keycloak_roles.user_role_get", return_value = mock_roles_result_value), \
+        mock.patch("jobs.UserExportJobExecutor.USER_GET_ONCE", 1):
     
         # sub process起動用の情報生成
         sub_processes_mgr = SubProcessesManager()
@@ -206,10 +206,11 @@ def test_execute_timeout():
                 if t["JOB_STATUS"] != const.JOB_USER_EXEC:
                     break
                 time.sleep(1)
-
+            
+            t = select_t_jobs_user_export(organization_id, queue["PROCESS_EXEC_ID"])
             # タイムアウトエラーで終了していること
             assert t["JOB_STATUS"] == const.JOB_USER_FAILED
-            assert '初期処理中に想定外のエラーが発生し、処理を中断しました。' in t["MESSAGE"]
+            assert '行目の処理中にタイムアウトしました。' in t["MESSAGE"]
 
         finally:
             # sub processの終了要求

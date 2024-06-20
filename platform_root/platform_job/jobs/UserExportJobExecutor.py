@@ -63,8 +63,7 @@ class UserExportJobExecutor(BaseJobExecutor):
         self.language = None
 
         # Excel制御用class instance / Excel control class instance
-        self.imp_wb = None
-        self.err_wb = None
+        self.result_wb = None
 
         # 処理結果ファイルID / Processing result file ID
         self.result_id = ulid.new().str
@@ -159,7 +158,6 @@ class UserExportJobExecutor(BaseJobExecutor):
                     
                     except JobTimeoutException as ex:
                         # Timeout発生時はThrowして処理を中断する
-                        self.failed_register += 1
                         raise ex
                 
                 globals.logger.info(f'User Export processed')
@@ -179,7 +177,7 @@ class UserExportJobExecutor(BaseJobExecutor):
             except JobTimeoutException as ex:
                 # タイムアウトエラー / timeout error
                 if self.result_wb is not None:
-                    self.__update_t_jobs_user(conn, job_status=const.JOB_USER_FAILED, message=multi_lang.get_text_spec(self.language, '401-00011', '{0}行目の処理中にタイムアウトしました。', self.result_wb.get_row_idx()))
+                    self.__update_t_jobs_user(conn, job_status=const.JOB_USER_FAILED, message=multi_lang.get_text_spec(self.language, '401-00011', '{0}行目の処理中にタイムアウトしました。', self.count_export))
                 else:
                     self.__update_t_jobs_user(conn, job_status=const.JOB_USER_FAILED, message=multi_lang.get_text_spec(self.language, '401-00012', '初期処理中にタイムアウトしました。'))
                 raise ex
@@ -190,8 +188,8 @@ class UserExportJobExecutor(BaseJobExecutor):
 
             except Exception as ex:
                 globals.logger.error(f'{ex}\n-- stack trace --\n{traceback.format_exc()}')
-                if self.imp_wb is not None:
-                    self.__update_t_jobs_user(conn, job_status=const.JOB_USER_FAILED, message=multi_lang.get_text_spec(self.language, '401-00013', '{0}行目の処理中に想定外のエラーが発生し、処理を中断しました。({1})', self.imp_wb.get_row_idx()))
+                if self.result_wb is not None:
+                    self.__update_t_jobs_user(conn, job_status=const.JOB_USER_FAILED, message=multi_lang.get_text_spec(self.language, '401-00013', '{0}行目の処理中に想定外のエラーが発生し、処理を中断しました。({1})', self.count_export))
                 else:
                     self.__update_t_jobs_user(conn, job_status=const.JOB_USER_FAILED, message=multi_lang.get_text_spec(self.language, '401-00014', '初期処理中に想定外のエラーが発生し、処理を中断しました。({0})'))
                 raise ex
@@ -320,8 +318,8 @@ class UserExportJobExecutor(BaseJobExecutor):
         try:
             globals.logger.info(f'Cancel JOB [JOB_ID:{self.job_id}]')
             with closing(DBconnector().connect_orgdb(self.organization_id)) as conn:
-                if self.imp_wb is not None:
-                    self.__update_t_jobs_user(conn, job_status=const.JOB_USER_FAILED, message=multi_lang.get_text_spec(self.language, '401-00011', '{0}行目の処理中にタイムアウトしました。', self.imp_wb.get_row_idx()))
+                if self.result_wb is not None:
+                    self.__update_t_jobs_user(conn, job_status=const.JOB_USER_FAILED, message=multi_lang.get_text_spec(self.language, '401-00011', '{0}行目の処理中にタイムアウトしました。', self.count_export))
                 else:
                     self.__update_t_jobs_user(conn, job_status=const.JOB_USER_FAILED, message=multi_lang.get_text_spec(self.language, '401-00012', '初期処理中にタイムアウトしました。'))
 
