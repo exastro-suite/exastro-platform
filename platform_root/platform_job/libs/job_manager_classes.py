@@ -349,6 +349,13 @@ class SubProcessParameter():
             self.__interval_job_exec_times
         )
 
+    def set_interval_job_exec_times(self, interval_job_exec_times, target_job_kind):
+        """internal_job_exec_timesを設定する(pytest用) / set internal_job_exec_times(for pytest)
+        """
+        for i, job_kind in enumerate(self.__interval_job_kinds):
+            if target_job_kind == job_kind:
+                self.__interval_job_exec_times[i] = interval_job_exec_times
+
 class SubProcessesManager():
     """全sub process管理class / All sub process management classes
     """
