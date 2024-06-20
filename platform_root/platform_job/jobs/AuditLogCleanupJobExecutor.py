@@ -23,6 +23,8 @@ from jobs.BaseJobExecutor import BaseJobExecutor
 from libs import queries_auditlog
 from libs.exceptions import JobTimeoutException
 
+sleep_time = 0.1
+
 class AuditLogCleanupJobExecutor(BaseJobExecutor):
     """監査ログ削除Job / Audit log cleanup
 
@@ -54,7 +56,7 @@ class AuditLogCleanupJobExecutor(BaseJobExecutor):
         for organization in organizations:
             # 連続でconnectするとpymysql.err.OperationalError: (1040, 'Too many connections')が発生することがあるので、sleepする
             # If you connect continuously, pymysql.err.OperationalError: (1040, 'Too many connections') may occur, so sleep
-            time.sleep(0.1)
+            time.sleep(sleep_time)
             globals.logger.info(f"Start audit log cleanup : ORGANIZATION_ID:[{organization['ORGANIZATION_ID']}]")
 
             try:
@@ -79,6 +81,7 @@ class AuditLogCleanupJobExecutor(BaseJobExecutor):
             except JobTimeoutException as err:
                 raise err # TimeoutException時は即終了する
             except Exception as err:
+                globals.logger.debug(f'Failed audit log cleanup')
                 globals.logger.error(f'{err}\n-- stack trace --\n{traceback.format_exc()}')
             finally:
                 globals.logger.info(f"End audit log cleanup : ORGANIZATION_ID:[{organization['ORGANIZATION_ID']}]")
@@ -88,6 +91,7 @@ class AuditLogCleanupJobExecutor(BaseJobExecutor):
     def cancel(self):
         """job cancel (timeout)
         """
+        globals.logger.error(f'Cancel audit log cleanup (timeout)')
         pass
 
     @classmethod
