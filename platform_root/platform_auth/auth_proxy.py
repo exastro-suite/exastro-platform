@@ -321,7 +321,7 @@ class auth_proxy:
         except Exception:
             raise
 
-    def call_api(self, dest_url, info, stream=False):
+    def call_api(self, dest_url, info, stream=False, multipart_mode=False):
         """API呼び出し Call API
 
         Args:
@@ -330,6 +330,8 @@ class auth_proxy:
             {
                 "user_id": user id
             }
+            stream (bool): True: stream mode call (default. False)
+            multipart_mode (bool): True: multipart/form-data mode call (default. False)
 
         Returns:
             _type_: _description_
@@ -337,66 +339,76 @@ class auth_proxy:
 
         globals.logger.debug(f"### start func:{inspect.currentframe().f_code.co_name}")
 
+        globals.logger.debug(f'{dest_url=}')
+
         # ヘッダにuser_idの付与 addtional header user_id
         post_headers = {
             'organization_id': self.realm,
         }
         post_headers.update(info)
-        globals.logger.debug(f'post_headers: {post_headers}')
+        globals.logger.debug(f'{post_headers=}')
 
         # method
         request_method = request.method
-        globals.logger.debug(f'request_method: {request_method}')
-
-        request_body = {}
-        request_form = {}
-        request_files = {}
-
-        # パラメータを形成
-        # Form parameters
-        if request.is_json:
-            try:
-                request_body = request.json.copy()
-                globals.logger.debug(f'request_body: {request_body}')
-            except Exception:
-                request_body = {}
-
-        # パラメータを形成(multipart/form-data)
-        # form parameters, files parameters
-        if request.form:
-            try:
-                request_form = request.form.copy()
-                globals.logger.debug(f'request_form: {request_form}')
-            except Exception:
-                request_form = {}
-        if request.files:
-            try:
-                request_files = request.files.copy()
-                globals.logger.debug(f'request_files: {request_files}')
-            except Exception:
-                request_files = {}
-
-        # レスポンスContent-Type
-        if request.content_type:
-            request_content_type = request.content_type.lower()
-        else:
-            request_content_type = ""
-        globals.logger.debug(f'request_content_type: {request_content_type}')
+        globals.logger.debug(f'{request_method=}')
 
         # 引数
         # query_string
         query_string = request.query_string
-        globals.logger.debug(f'query_string: {query_string}')
+        globals.logger.debug(f'{query_string=}')
 
-        globals.logger.debug(f'CALL dest_url: {dest_url}')
+        # multipartモードの場合は、BODY系要素のアクセスは行わない(大容量ファイルにおいてもアクセスするとすべて送信されるまで待たされる)
+        # In multipart mode, BODY elements are not accessed (even if you access a large file, you will have to wait until all files are sent)
+        if not multipart_mode:
+            request_body = {}
+            request_form = {}
+            request_files = {}
 
-        # リクエストを実行
-        # Execute request
-        ret = self.main_request(request_method, dest_url, post_headers, request_body, query_string, request_content_type, request_form, request_files, stream=stream)
-        # ----ここまでAPサーバへのリクエスト処理---- #
-        # Request processing to the AP server so far
+            # パラメータを形成
+            # Form parameters
+            if request.is_json:
+                try:
+                    request_body = request.json.copy()
+                    globals.logger.debug(f'{request_body=}')
+                except Exception:
+                    request_body = {}
 
-        globals.logger.debug(f'return main_request ret={ret}')
+            # パラメータを形成(multipart/form-data)
+            # form parameters, files parameters
+            if request.form:
+                try:
+                    request_form = request.form.copy()
+                    globals.logger.debug(f'{request_form=}')
+                except Exception:
+                    request_form = {}
+            if request.files:
+                try:
+                    request_files = request.files.copy()
+                    globals.logger.debug(f'{request_files=}')
+                except Exception:
+                    request_files = {}
+
+            # レスポンスContent-Type
+            if request.content_type:
+                request_content_type = request.content_type.lower()
+            else:
+                request_content_type = ""
+            globals.logger.debug(f'{request_content_type=}')
+
+            # リクエストを実行
+            # Execute request
+            ret = self.main_request(request_method, dest_url, post_headers, request_body, query_string, request_content_type, request_form, request_files, stream=stream)
+            # ----ここまでAPサーバへのリクエスト処理---- #
+            # Request processing to the AP server so far
+        else:
+
+            # リクエストを実行
+            # Execute request
+            ret = self.prepared_request(request_method, dest_url, post_headers, query_string)
+            # ----ここまでAPサーバへのリクエスト処理---- #
+            # Request processing to the AP server so far
+
+        globals.logger.debug(f'return request {ret=}')
 
         # レスポンスをリターン
         # Return response
@@ -489,6 +501,44 @@ class auth_proxy:
 
         elif method == 'DELETE':
             ret = requests.delete(url, headers=post_headers, params=query_string, stream=stream)
+
+        # 取得したレスポンスの内容を退避
+        # Save the contents of the acquired response
+        self.response_original = ret
+
+        globals.logger.debug(f"### end func:{inspect.currentframe().f_code.co_name}")
+
+        # エンコードしたレスポンスをリターン
+        # Return the encoded response
+        return ret
+
+    def prepared_request(self, method, url, post_headers, query_string):
+        """
+        APサーバへリクエストを実行
+        Execute a request to the AP server
+
+        Arguments:
+            method (str): method
+            url (str): url
+            post_headers (dic): post headers
+            query_string (str): query_string
+        Returns:
+            esponse: HTTP Respose
+        """
+
+        globals.logger.debug(f'### start func:{inspect.currentframe().f_code.co_name} {method=} {url=}')
+
+        post_headers.update({
+            'Content-Type': request.headers.get("Content-Type"),
+            'Content-Length': request.headers.get("Content-Length")
+        })
+
+        req = requests.PreparedRequest()
+        req.prepare(method=method, url=url, params=query_string, data=request.stream)
+        req.prepare_headers(post_headers)
+
+        with requests.Session() as ses:
+            ret = ses.send(req)
 
         # 取得したレスポンスの内容を退避
         # Save the contents of the acquired response
