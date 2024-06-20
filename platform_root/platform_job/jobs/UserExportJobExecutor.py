@@ -36,6 +36,8 @@ from jobs import jobs_common
 from libs.exceptions import JobTimeoutException
 from libs import queries_user_export
 
+USER_GET_ONCE = 50
+
 class UserExportJobExecutor(BaseJobExecutor):
     """ユーザ情報エクスポート / User Export Job
 
@@ -108,51 +110,57 @@ class UserExportJobExecutor(BaseJobExecutor):
                 self.result_wb = user_import_file_common.UserResultWorkbook(lang=self.language)
 
                 loop_count = 0
-                max = 50
+                max = USER_GET_ONCE
                 
                 while True:
-                    first = loop_count * max + 1
-                    # ユーザーの取得 / Add user
-                    users = self.__get_users(first=first, max=max)
+                    try:
+                        first = loop_count * max + 1
+                        # ユーザーの取得 / Add user
+                        users = self.__get_users(first=first, max=max)
 
-                    #ファイル出力
-                    for user in users:
-                        row = {
-                            "USERNAME": user["username"],
-                            "EMAIL": user["email"],
-                            "FIRSTNAME": user["firstName"],
-                            "LASTNAME": user["lastName"],
-                            "PASSWORD": "",
-                            "AFFILIATION": self.__get_user_affiliation(user),
-                            "DESCRIPTION": self.__get_user_description(user),
-                            "ENABLED": user["enabled"],
-                            "ROLES" : user["roles"],
-                            "USER_ID" : user["id"]
-                        }
-                        self.result_wb.write_row(row)
+                        #ファイル出力
+                        for user in users:
+                            row = {
+                                "USERNAME": user["username"],
+                                "EMAIL": user["email"],
+                                "FIRSTNAME": user["firstName"],
+                                "LASTNAME": user["lastName"],
+                                "PASSWORD": "",
+                                "AFFILIATION": self.__get_user_affiliation(user),
+                                "DESCRIPTION": self.__get_user_description(user),
+                                "ENABLED": user["enabled"],
+                                "ROLES" : user["roles"],
+                                "USER_ID" : user["id"]
+                            }
+                            self.result_wb.write_row(row)
+                            
+                        loop_count += 1
+                        self.count_export += len(users)
                         
-                    loop_count += 1
-                    self.count_export += len(users)
-                    
-                    if self.count_export > job_manager_config.JOBS[const.PROCESS_KIND_USER_IMPORT]["extra_config"]["max_number_of_rows_allowd"]:
-                        message_id = "400-00022"
-                        message = multi_lang.get_text_spec(
-                            self.language,
-                            message_id,
-                            "{0}の上限数({1})を超えるため、{0}は取得できません。",
-                            multi_lang.get_text_spec(self.language, '000-00135', "ユーザー"),
-                            job_manager_config.JOBS[const.PROCESS_KIND_USER_IMPORT]["extra_config"]["max_number_of_rows_allowd"]
-                        )
-                        raise common.BadRequestException(message_id=message_id, message=message)
-                    
-                    self.__update_t_jobs_user(conn, job_status=const.JOB_USER_EXEC, message=None)
-                    conn.commit()
+                        if self.count_export > job_manager_config.JOBS[const.PROCESS_KIND_USER_EXPORT]["extra_config"]["max_number_of_rows_allowd"]:
+                            message_id = "400-00022"
+                            message = multi_lang.get_text_spec(
+                                self.language,
+                                message_id,
+                                "{0}の上限数({1})を超えるため、{0}は取得できません。",
+                                multi_lang.get_text_spec(self.language, '000-00135', "ユーザー"),
+                                job_manager_config.JOBS[const.PROCESS_KIND_USER_EXPORT]["extra_config"]["max_number_of_rows_allowd"]
+                            )
+                            raise common.BadRequestException(message_id=message_id, message=message)
                         
-                    if len(users) < max:
-                        break
+                        self.__update_t_jobs_user(conn, job_status=const.JOB_USER_EXEC, message=None)
+                        conn.commit()
+                            
+                        if len(users) < max:
+                            break
+                        
+                        # 1JOBでリソースを占有しないようにsleepする / Sleep so that 1JOB does not occupy resources
+                        time.sleep(job_manager_config.JOBS[const.PROCESS_KIND_USER_EXPORT]["extra_config"]["user_export_interval_millisecond"]/1000)
                     
-                    # 1JOBでリソースを占有しないようにsleepする / Sleep so that 1JOB does not occupy resources
-                    time.sleep(job_manager_config.JOBS[const.PROCESS_KIND_USER_EXPORT]["extra_config"]["user_export_interval_millisecond"]/1000)
+                    except JobTimeoutException as ex:
+                        # Timeout発生時はThrowして処理を中断する
+                        self.failed_register += 1
+                        raise ex
                 
                 globals.logger.info(f'User Export processed')
 
@@ -170,8 +178,8 @@ class UserExportJobExecutor(BaseJobExecutor):
                 
             except JobTimeoutException as ex:
                 # タイムアウトエラー / timeout error
-                if self.imp_wb is not None:
-                    self.__update_t_jobs_user(conn, job_status=const.JOB_USER_FAILED, message=multi_lang.get_text_spec(self.language, '401-00011', '{0}行目の処理中にタイムアウトしました。', self.imp_wb.get_row_idx()))
+                if self.result_wb is not None:
+                    self.__update_t_jobs_user(conn, job_status=const.JOB_USER_FAILED, message=multi_lang.get_text_spec(self.language, '401-00011', '{0}行目の処理中にタイムアウトしました。', self.result_wb.get_row_idx()))
                 else:
                     self.__update_t_jobs_user(conn, job_status=const.JOB_USER_FAILED, message=multi_lang.get_text_spec(self.language, '401-00012', '初期処理中にタイムアウトしました。'))
                 raise ex
