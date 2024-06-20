@@ -150,3 +150,5 @@ AuditLogDownload:
   $ref: "./auditLogDownload.yaml"
 AuditLogDownloadList:
   $ref: "./auditLogDownloadList.yaml"
+authorizationBody:
+  $ref: "./authorizationBody.yaml"

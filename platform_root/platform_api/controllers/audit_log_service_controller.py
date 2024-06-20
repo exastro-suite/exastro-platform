@@ -12,15 +12,17 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
+import inspect
 import connexion
 import ulid
 import globals
 import json
 
-from flask import request
+from flask import request, Response
 from contextlib import closing
 from common_library.common import common, multi_lang, const, validation, bl_common_service
 from common_library.common import api_keycloak_tokens, api_keycloak_users
+from common_library.common import bl_auditlog_service
 from common_library.common.db import DBconnector
 from common_library.common.libs import queries_bl_audit_log, queries_bl_notification
 
@@ -28,19 +30,40 @@ MSG_FUNCTION_ID = "40"
 
 
 @common.platform_exception_handler
-def auditlog_download(organization_id, download_id):  # noqa: E501
-    """Audit log download
+def auditlog_download(organization_id, download_id):
+    """audit log file download
 
-     # noqa: E501
+    Args:
+        organization_id (str): organization id
+        download_id (str): download id
 
-    :param organization_id:
-    :type organization_id: str
-    :param download_id:
-    :type download_id: str
-
-    :rtype: str
+    Returns:
+        Response: http response
     """
-    return common.response_200_ok(None)
+
+    globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
+
+    get_leng = None
+    with closing(DBconnector().connect_platformdb()) as conn:
+        # config list get by key
+        get_leng_json = bl_common_service.settings_system_config_list(conn, const.CONFIG_KEY_CHUNK_SIZE)
+        if get_leng_json:
+            get_leng = int(get_leng_json.get("value"))
+        else:
+            message_id = "500-00011"
+            message = multi_lang.get_text(
+                message_id,
+                "システム設定値が取得できませんでした(key:{0})",
+                const.CONFIG_KEY_CHUNK_SIZE,
+            )
+            raise common.InternalErrorException(message_id=message_id, message=message)
+
+    resp = Response(bl_auditlog_service.auditlog_file_download(organization_id, download_id, get_leng),
+                    headers={"Content-Disposition": 'attachment; filename="audit-log.zip"'})
+    resp.content_length = bl_auditlog_service.get_auditlog_file_download_filesize(organization_id, download_id)
+    resp.content_type = "application/zip"
+
+    return resp
 
 
 @common.platform_exception_handler

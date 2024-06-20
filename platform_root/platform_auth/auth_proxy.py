@@ -82,8 +82,12 @@ class auth_proxy:
         self.user_token_client_id = user_token_client_id
         self.user_token_client_secret = user_token_client_secret
 
-    def check_authorization(self):  # noqa: C901
+    def check_authorization(self, stream_mode=False):  # noqa: C901
         """認証情報チェック Authorization check
+
+        Args:
+            stream_mode (bool) :    True is stream mode (submit form authorization)
+                                    False is not stream mode (header authorization)
 
         Returns:
             json :
@@ -111,7 +115,10 @@ class auth_proxy:
         # bearerを取得
         # Get bearer
         # bearer = environ.get('HTTP_AUTHORIZATION')
-        get_auth = request.headers.get('Authorization')
+        if stream_mode:
+            get_auth = request.form.get('authorization')
+        else:
+            get_auth = request.headers.get('Authorization')
         globals.logger.debug(f'auth={get_auth}')
         # アクセストークンチェックを実行
         # Extract only the token part
@@ -314,7 +321,7 @@ class auth_proxy:
         except Exception:
             raise
 
-    def call_api(self, dest_url, info):
+    def call_api(self, dest_url, info, stream=False):
         """API呼び出し Call API
 
         Args:
@@ -385,7 +392,7 @@ class auth_proxy:
 
         # リクエストを実行
         # Execute request
-        ret = self.main_request(request_method, dest_url, post_headers, request_body, query_string, request_content_type, request_form, request_files)
+        ret = self.main_request(request_method, dest_url, post_headers, request_body, query_string, request_content_type, request_form, request_files, stream=stream)
         # ----ここまでAPサーバへのリクエスト処理---- #
         # Request processing to the AP server so far
 
@@ -393,19 +400,22 @@ class auth_proxy:
 
         # レスポンスをリターン
         # Return response
-        status_code = ret.status_code
-        try:
-            info = json.loads(ret.text)
-            result_dump = json.dumps(info)
-            result_encode = result_dump.encode('utf-8')
-            globals.logger.debug(f'SUCCESS call_api. status_code={status_code} info={result_encode}')
+        # status_code = ret.status_code
+        globals.logger.debug(f'SUCCESS call_api. {ret.status_code=}')
+        return ret
+        # json check to disabled
+        # try:
+        #     info = json.loads(ret.text)
+        #     result_dump = json.dumps(info)
+        #     result_encode = result_dump.encode('utf-8')
+        #     globals.logger.debug(f'SUCCESS call_api. status_code={status_code} info={result_encode}')
 
-            return ret
-        except json.JSONDecodeError:
-            info = ret.text
-            message_id = "500-00001"
-            globals.logger.debug(f'SUCCESS call_api. status_code={status_code} info={info}')
-        raise common.InternalErrorException(None, message_id, common.multi_lang.get_text(message_id, "システムエラー"))
+        #     return ret
+        # except json.JSONDecodeError:
+        #     info = ret.text
+        #     message_id = "500-00001"
+        #     globals.logger.debug(f'SUCCESS call_api. status_code={status_code} info={info}')
+        # raise common.InternalErrorException(None, message_id, common.multi_lang.get_text(message_id, "システムエラー"))
 
     def call_fnc(self, func, args):
         """Auth api call
@@ -421,7 +431,7 @@ class auth_proxy:
             globals.logger.error(''.join(list(traceback.TracebackException.from_exception(e).format())))
             raise
 
-    def main_request(self, method, url, post_headers, request_body, query_string, request_content_type=None, request_form={}, request_files={}):
+    def main_request(self, method, url, post_headers, request_body, query_string, request_content_type=None, request_form={}, request_files={}, stream=False):
         """
         APサーバへリクエストを実行
         Execute a request to the AP server
@@ -445,34 +455,40 @@ class auth_proxy:
         # method、request_content_typeによって、呼び出しの内容を変える
         # Change the content of the call depending on method and request_content_type
         if method == 'GET':
-            ret = requests.get(url, headers=post_headers, params=query_string)
+            ret = requests.get(url, headers=post_headers, params=query_string, stream=stream)
 
         elif method == 'POST':
             if 'application/json' in request_content_type:
-                ret = requests.post(url, headers=post_headers, json=request_body, params=query_string)
+                ret = requests.post(url, headers=post_headers, json=request_body, params=query_string, stream=stream)
             elif 'multipart/form-data' in request_content_type:
-                ret = requests.post(url, headers=post_headers, data=request_form, files=request_files, params=query_string)
+                ret = requests.post(url, headers=post_headers, data=request_form, files=request_files, params=query_string, stream=stream)
+            elif 'application/x-www-form-urlencoded' in request_content_type:
+                ret = requests.post(url, headers=post_headers, data=request_form, params=query_string, stream=stream)
             else:
-                ret = requests.post(url, headers=post_headers, json=request_body, params=query_string)
+                ret = requests.post(url, headers=post_headers, json=request_body, params=query_string, stream=stream)
 
         elif method == 'PATCH':
             if 'application/json' in request_content_type:
-                ret = requests.patch(url, headers=post_headers, json=request_body, params=query_string)
+                ret = requests.patch(url, headers=post_headers, json=request_body, params=query_string, stream=stream)
             elif 'multipart/form-data' in request_content_type:
-                ret = requests.patch(url, headers=post_headers, data=request_form, files=request_files, params=query_string)
+                ret = requests.patch(url, headers=post_headers, data=request_form, files=request_files, params=query_string, stream=stream)
+            elif 'application/x-www-form-urlencoded' in request_content_type:
+                ret = requests.post(url, headers=post_headers, data=request_form, params=query_string, stream=stream)
             else:
-                ret = requests.patch(url, headers=post_headers, json=request_body, params=query_string)
+                ret = requests.patch(url, headers=post_headers, json=request_body, params=query_string, stream=stream)
 
         elif method == 'PUT':
             if 'application/json' in request_content_type:
-                ret = requests.put(url, headers=post_headers, json=request_body, params=query_string)
+                ret = requests.put(url, headers=post_headers, json=request_body, params=query_string, stream=stream)
             elif 'multipart/form-data' in request_content_type:
-                ret = requests.put(url, headers=post_headers, data=request_form, files=request_files, params=query_string)
+                ret = requests.put(url, headers=post_headers, data=request_form, files=request_files, params=query_string, stream=stream)
+            elif 'application/x-www-form-urlencoded' in request_content_type:
+                ret = requests.post(url, headers=post_headers, data=request_form, params=query_string, stream=stream)
             else:
-                ret = requests.put(url, headers=post_headers, json=request_body, params=query_string)
+                ret = requests.put(url, headers=post_headers, json=request_body, params=query_string, stream=stream)
 
         elif method == 'DELETE':
-            ret = requests.delete(url, headers=post_headers, params=query_string)
+            ret = requests.delete(url, headers=post_headers, params=query_string, stream=stream)
 
         # 取得したレスポンスの内容を退避
         # Save the contents of the acquired response

@@ -634,104 +634,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/runtimeError'
       x-openapi-router-controller: controllers.maintenance_mode_setting_controller
-  '/api/{organization_id}/platform/auditlog/download':
-    get:
-      tags:
-        - AuditLogService
-      summary: Get audit log download list
-      x-openapi-router-controller: controllers.audit_log_service_controller
-      operationId: auditlog_download_list
-      parameters:
-        - name: organization_id
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: A successful response.
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: '#/components/schemas/responseOk'
-                  - $ref: '#/components/schemas/AuditLogDownloadList'
-        default:
-          description: An unexpected error response.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/runtimeError'
-    post:
-      tags:
-        - AuditLogService
-      summary: Reserve audit log download
-      x-openapi-router-controller: controllers.audit_log_service_controller
-      operationId: auditlog_download_reserve
-      parameters:
-        - name: organization_id
-          in: path
-          required: true
-          schema:
-            type: string
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/AuditLogDownload'
-        required: true
-      responses:
-        '200':
-          description: A successful response.
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: '#/components/schemas/responseOk'
-                  - type: object
-                    properties:
-                      data:
-                        type: object
-                        example:
-                          download_id: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-        default:
-          description: An unexpected error response.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/runtimeError'
-  '/api/{organization_id}/platform/auditlog/download/{download_id}':
-    get:
-      tags:
-        - AuditLogService
-      summary: Audit log download
-      x-openapi-router-controller: controllers.audit_log_service_controller
-      operationId: auditlog_download
-      parameters:
-        - name: organization_id
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: download_id
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: A successful response.
-          content:
-            application/zip:
-              schema:
-                type: string
-                format: binary
-        default:
-          description: An unexpected error response.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/runtimeError'
 components:
   schemas:
     responseOk:
@@ -1962,6 +1864,15 @@ components:
               last_update_timestamp:
                 type: string
                 example: '2024-06-01 10:30:00'
+    authorizationBody:
+      title: authorization of Requst form-data
+      type: object
+      properties:
+        authorization:
+          type: string
+          description: Credentials or access token for API
+      required:
+        - authorization
   securitySchemes:
     BearerAuth:
       description: Credentials or access token for API
