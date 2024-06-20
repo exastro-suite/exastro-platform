@@ -14,10 +14,12 @@
 # from unittest import mock
 from tests.common import request_parameters, test_common
 from contextlib import closing
+from common_library.common import const
 from common_library.common.db import DBconnector
 from common_library.common.libs import queries_bl_audit_log, queries_bl_common
 from tests.libs import queries_test_audit_log
 
+import time
 import datetime
 import logging
 import urllib.parse
@@ -210,6 +212,121 @@ def test_audit_log_download_file(connexion_client):
 
         assert response.status_code == 500, "DB error route"
         assert response.json["result"] == "500-99999"
+
+
+def test_audit_log_download_list(connexion_client):
+    """test audit_log_download_list
+
+    Args:
+        connexion_client (_type_): _description_
+    """
+    organization = test_common.create_organization(connexion_client)
+
+    # get audit_log_download_list
+    with test_common.requsts_mocker_default() as requests_mocker:
+
+        # 監査ログダウンロード一覧が0件であることを確認
+        response = connexion_client.get(
+            f"/api/{organization['organization_id']}/platform/auditlog/download",
+            headers=request_parameters.request_headers(organization["user_id"]))
+
+        assert response.status_code == 200, "get audit_log_download_list response code = 200"
+        assert len(response.json["data"]) == 0, "get audit_log_download_list count 0"
+
+        # 監査ログダウンロード一覧が1件であることを確認
+        response = connexion_client.post(
+            f"/api/{organization['organization_id']}/platform/auditlog/download",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization["user_id"]),
+            json=sample_conditions(["ts_from", "ts_to"]))
+
+        response = connexion_client.get(
+            f"/api/{organization['organization_id']}/platform/auditlog/download",
+            headers=request_parameters.request_headers(organization["user_id"]))
+
+        assert response.status_code == 200
+        assert len(response.json["data"]) == 1, "get audit_log_download_list count 1"
+
+        # 同一ユーザーでダウンロード予約した場合、keycloakからユーザー情報を取得しないことを確認
+        time.sleep(1)
+        response = connexion_client.post(
+            f"/api/{organization['organization_id']}/platform/auditlog/download",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization["user_id"]),
+            json=sample_conditions(["ts_from", "ts_to"]))
+
+        response = connexion_client.get(
+            f"/api/{organization['organization_id']}/platform/auditlog/download",
+            headers=request_parameters.request_headers(organization["user_id"]))
+
+        assert response.status_code == 200
+        assert len(response.json["data"]) == 2, "get audit_log_download_list count 2"
+
+        # 監査ログダウンロード予約者が削除された場合のcreate_user_nameを確認
+        user_name = "delete-user"
+        post_user = {
+            "username": user_name,
+            "email": f"{user_name}@example.com",
+            "firstName": f'first {user_name}',
+            "lastName": f'last {user_name}',
+            "password": "password",
+            "password_temporary": False,
+            "affiliation": f'affiliation {user_name}',
+            "description": f'description {user_name}',
+            "enabled": True
+        }
+        # Create User
+        response = connexion_client.post(
+            f"/api/{organization['organization_id']}/platform/users",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization["user_id"]),
+            json=post_user)
+        response = connexion_client.get(
+            f"/api/{organization['organization_id']}/platform/users?search={user_name}",
+            content_type='application/json',
+            headers=request_parameters.request_headers())
+        delete_user = response.json["data"][0]
+
+        # Role mappings
+        post_role_mappings = [{"id": delete_user["id"], "preferred_username": delete_user["preferred_username"]}]
+        response = connexion_client.post(
+            f"/api/{organization['organization_id']}/platform/roles/{const.ORG_ROLE_ORG_MANAGER}/users",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization["user_id"]),
+            json=post_role_mappings)
+
+        time.sleep(1)
+        response = connexion_client.post(
+            f"/api/{organization['organization_id']}/platform/auditlog/download",
+            content_type='application/json',
+            headers=request_parameters.request_headers(delete_user["id"]),
+            json=sample_conditions(["ts_from", "ts_to"]))
+
+        response = connexion_client.get(
+            f"/api/{organization['organization_id']}/platform/auditlog/download",
+            headers=request_parameters.request_headers(organization["user_id"]))
+
+        assert response.status_code == 200
+        assert len(response.json["data"]) == 3, "get audit_log_download_list count 3"
+        first_data = response.json["data"][0]
+        assert first_data["create_user_id"] == delete_user['id']
+        assert first_data["create_user_name"] == delete_user["name"]
+
+        # Delete user
+        response = connexion_client.delete(
+            f"/api/{organization['organization_id']}/platform/users/{delete_user['id']}",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization["user_id"]))
+
+        response = connexion_client.get(
+            f"/api/{organization['organization_id']}/platform/auditlog/download",
+            headers=request_parameters.request_headers(organization["user_id"]))
+
+        assert response.status_code == 200
+        assert len(response.json["data"]) == 3, "get audit_log_download_list count 3"
+        first_data = response.json["data"][0]
+        assert first_data["create_user_id"] == delete_user['id']
+        assert first_data["create_user_name"] is None
 
 
 def sample_conditions(key_list):
