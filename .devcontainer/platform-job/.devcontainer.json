@@ -20,7 +20,7 @@
 	"dockerComposeFile": [
 		"../docker-compose.yml",
 		"../docker-compose.devcontainer.yml",
-		"../../../exastro-it-automation/.devcontainer/docker-compose.yml",
+		"../../../exastro-it-automation-dev/.devcontainer/docker-compose.yml",
 		"../platform-api-with-ita/docker-compose.with-ita.yaml"
 	],
 	"service": "platform-job",
