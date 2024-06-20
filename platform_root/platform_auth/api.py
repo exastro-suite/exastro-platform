@@ -955,7 +955,7 @@ def is_multipart_mode():
     """
 
     if request.content_type:
-        if request.content_type.lower() == "multipart/form-data":
+        if request.content_type.lower().startswith("multipart/form-data"):
             return True
 
     return False

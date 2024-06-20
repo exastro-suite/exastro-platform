@@ -404,11 +404,11 @@ class auth_proxy:
 
             # リクエストを実行
             # Execute request
-            ret = self.prepared_request(request_method, dest_url, post_headers, query_string, request_content_type)
+            ret = self.prepared_request(request_method, dest_url, post_headers, query_string)
             # ----ここまでAPサーバへのリクエスト処理---- #
             # Request processing to the AP server so far
 
-        globals.logger.debug(f'return main_request {ret=}')
+        globals.logger.debug(f'return request {ret=}')
 
         # レスポンスをリターン
         # Return response
@@ -527,6 +527,11 @@ class auth_proxy:
         """
 
         globals.logger.debug(f'### start func:{inspect.currentframe().f_code.co_name} {method=} {url=}')
+
+        post_headers.update({
+            'Content-Type': request.headers.get("Content-Type"),
+            'Content-Length': request.headers.get("Content-Length")
+        })
 
         req = requests.PreparedRequest()
         req.prepare(method=method, url=url, params=query_string, data=request.stream)
