@@ -1182,13 +1182,51 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/runtimeError'
-  '/api/{organization_id}/platform/jobs/users/import':
+  '/api/{organization_id}/platform/jobs/users/bulk-import':
     post:
       tags:
         - JobsService
-      summary: Import user bulk registration
+      summary: Bulk import user job call
       x-openapi-router-controller: controllers.jobs_service_controller
       operationId: jobs_users_import
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/paths/~1api~1%7Borganization_id%7D~1platform~1jobs~1users~1bulk-delete/post/requestBody/content/multipart~1form-data/schema'
+        required: true
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        example: null
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+  '/api/{organization_id}/platform/jobs/users/bulk-delete':
+    post:
+      tags:
+        - JobsService
+      summary: Bulk delete user job call
+      x-openapi-router-controller: controllers.jobs_service_controller
+      operationId: jobs_users_bulk_delete
       parameters:
         - name: organization_id
           in: path
@@ -1204,6 +1242,9 @@ paths:
                 import_file:
                   type: string
                   format: binary
+                  description: The file image is in Excel format.
+              required:
+                - import_file
         required: true
       responses:
         '200':
@@ -2557,9 +2598,11 @@ components:
         ts_from:
           type: string
           example: '2024-06-01 00:00:00'
+          description: conditions scope of Audit log TS (start)
         ts_to:
           type: string
           example: '2024-06-30 23:59:59'
+          description: conditions scope of Audit log TS (end)
     AuditLogDownloadList:
       type: object
       properties:

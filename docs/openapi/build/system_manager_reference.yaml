@@ -1823,9 +1823,11 @@ components:
         ts_from:
           type: string
           example: '2024-06-01 00:00:00'
+          description: conditions scope of Audit log TS (start)
         ts_to:
           type: string
           example: '2024-06-30 23:59:59'
+          description: conditions scope of Audit log TS (end)
     AuditLogDownloadList:
       type: object
       properties:
