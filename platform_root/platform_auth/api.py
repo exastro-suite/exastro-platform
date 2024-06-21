@@ -209,7 +209,8 @@ def platform_organization_api_call(subpath):
             private.token_check_client_clientid,
             private.token_check_client_secret,
             private.token_check_client_clientid,
-            private.token_check_client_secret)
+            private.token_check_client_secret,
+            response_chunk_byte)
 
         # 各種チェック check
         response_json = proxy.check_authorization(stream)
@@ -228,7 +229,6 @@ def platform_organization_api_call(subpath):
             for key, value in return_api.headers.items():
                 if key.lower().startswith('content-'):
                     response.headers[key] = value
-
         else:
             # 戻り値をそのまま返却
             # Return the return value as it is
@@ -238,6 +238,12 @@ def platform_organization_api_call(subpath):
             for key, value in return_api.headers.items():
                 if key.lower().startswith('content-'):
                     response.headers[key] = value
+
+        if multipart_mode:
+            # BODY要素の項目を取得
+            # Get the BODY element item
+            extra['request_form'] = proxy.request_forms
+            extra['request_files'] = proxy.request_files
 
         extra['status_code'] = return_api.status_code
         globals.audit.info(f'audit: response. {response.status_code}', extra=extra)
@@ -470,7 +476,8 @@ def ita_admin_api_call(subpath):
             private.token_check_client_clientid,
             private.token_check_client_secret,
             private.token_check_client_clientid,
-            private.token_check_client_secret)
+            private.token_check_client_secret,
+            response_chunk_byte)
 
         # 各種チェック check
         response_json = proxy.check_authorization(stream)
@@ -489,7 +496,6 @@ def ita_admin_api_call(subpath):
             for key, value in return_api.headers.items():
                 if key.lower().startswith('content-'):
                     response.headers[key] = value
-
         else:
             # 戻り値をそのまま返却
             # Return the return value as it is
@@ -499,6 +505,12 @@ def ita_admin_api_call(subpath):
             for key, value in return_api.headers.items():
                 if key.lower().startswith('content-'):
                     response.headers[key] = value
+
+        if multipart_mode:
+            # BODY要素の項目を取得
+            # Get the BODY element item
+            extra['request_form'] = proxy.request_forms
+            extra['request_files'] = proxy.request_files
 
         extra['status_code'] = return_api.status_code
         globals.audit.info(f'audit: response. {response.status_code}', extra=extra)
@@ -597,11 +609,13 @@ def platform_api_call(organization_id, subpath):
 
         # organization idをrealm名として設定
         # Set organization id as realm name
-        proxy = auth_proxy.auth_proxy(organization_id,
-                                      private.token_check_client_clientid,
-                                      private.token_check_client_secret,
-                                      private.user_token_client_clientid,
-                                      None)
+        proxy = auth_proxy.auth_proxy(
+            organization_id,
+            private.token_check_client_clientid,
+            private.token_check_client_secret,
+            private.user_token_client_clientid,
+            None,
+            response_chunk_byte)
 
         # 各種チェック check
         response_json = proxy.check_authorization(stream)
@@ -620,7 +634,6 @@ def platform_api_call(organization_id, subpath):
             for key, value in return_api.headers.items():
                 if key.lower().startswith('content-'):
                     response.headers[key] = value
-
         else:
             # 戻り値をそのまま返却
             # Return the return value as it is
@@ -630,6 +643,12 @@ def platform_api_call(organization_id, subpath):
             for key, value in return_api.headers.items():
                 if key.lower().startswith('content-'):
                     response.headers[key] = value
+
+        if multipart_mode:
+            # BODY要素の項目を取得
+            # Get the BODY element item
+            extra['request_form'] = proxy.request_forms
+            extra['request_files'] = proxy.request_files
 
         extra['status_code'] = return_api.status_code
         globals.audit.info(f'audit: response. {response.status_code}', extra=extra)
@@ -725,11 +744,13 @@ def ita_workspace_api_call(organization_id, workspace_id, subpath):
 
         # organization idをrealm名として設定
         # Set organization id as realm name
-        proxy = auth_proxy.auth_proxy(organization_id,
-                                      private.token_check_client_clientid,
-                                      private.token_check_client_secret,
-                                      private.user_token_client_clientid,
-                                      None)
+        proxy = auth_proxy.auth_proxy(
+            organization_id,
+            private.token_check_client_clientid,
+            private.token_check_client_secret,
+            private.user_token_client_clientid,
+            None,
+            response_chunk_byte)
 
         # 各種チェック check
         response_json = proxy.check_authorization(stream)
@@ -748,7 +769,6 @@ def ita_workspace_api_call(organization_id, workspace_id, subpath):
             for key, value in return_api.headers.items():
                 if key.lower().startswith('content-'):
                     response.headers[key] = value
-
         else:
             # 戻り値をそのまま返却
             # Return the return value as it is
@@ -758,6 +778,12 @@ def ita_workspace_api_call(organization_id, workspace_id, subpath):
             for key, value in return_api.headers.items():
                 if key.lower().startswith('content-'):
                     response.headers[key] = value
+
+        if multipart_mode:
+            # BODY要素の項目を取得
+            # Get the BODY element item
+            extra['request_form'] = proxy.request_forms
+            extra['request_files'] = proxy.request_files
 
         extra['status_code'] = return_api.status_code
         globals.audit.info(f'audit: response. {response.status_code}', extra=extra)
@@ -853,11 +879,13 @@ def ita_oase_recever_api_call(organization_id, workspace_id, subpath):
 
         # organization idをrealm名として設定
         # Set organization id as realm name
-        proxy = auth_proxy.auth_proxy(organization_id,
-                                      private.token_check_client_clientid,
-                                      private.token_check_client_secret,
-                                      private.user_token_client_clientid,
-                                      None)
+        proxy = auth_proxy.auth_proxy(
+            organization_id,
+            private.token_check_client_clientid,
+            private.token_check_client_secret,
+            private.user_token_client_clientid,
+            None,
+            response_chunk_byte)
 
         # 各種チェック check
         response_json = proxy.check_authorization(stream)
@@ -876,7 +904,6 @@ def ita_oase_recever_api_call(organization_id, workspace_id, subpath):
             for key, value in return_api.headers.items():
                 if key.lower().startswith('content-'):
                     response.headers[key] = value
-
         else:
             # 戻り値をそのまま返却
             # Return the return value as it is
@@ -886,6 +913,12 @@ def ita_oase_recever_api_call(organization_id, workspace_id, subpath):
             for key, value in return_api.headers.items():
                 if key.lower().startswith('content-'):
                     response.headers[key] = value
+
+        if multipart_mode:
+            # BODY要素の項目を取得
+            # Get the BODY element item
+            extra['request_form'] = proxy.request_forms
+            extra['request_files'] = proxy.request_files
 
         extra['status_code'] = return_api.status_code
         globals.audit.info(f'audit: response. {response.status_code}', extra=extra)
