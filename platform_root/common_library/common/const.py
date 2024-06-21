@@ -190,6 +190,11 @@ PROCESS_KIND_USER_IMPORT = "USERIMPORT"         # ユーザー一括インポー
 PROCESS_KIND_USER_EXPORT = "USEREXPORT"         # ユーザー一括エクスポート
 PROCESS_KIND_AUDIT_LOG = "AUDITLOG"             # 監査ログ
 
+# JOB種別
+# job type
+JOB_TYPE_USER_BULK_IMPORT = "USER_BULK_IMPORT"  # ユーザー一括インポート(登録)
+JOB_TYPE_USER_BULK_DELETE = "USER_BULK_DELETE"  # ユーザー一括削除
+
 # smtp_idのデフォルト
 # Default when smtp_id
 DEFAULT_SMTP_ID = "_default"
