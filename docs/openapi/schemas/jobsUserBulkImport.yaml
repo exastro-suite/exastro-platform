@@ -17,3 +17,7 @@ properties:
   import_file:
     type: string
     format: binary
+    description: The file image is in Excel format.
+
+required:
+  - import_file
