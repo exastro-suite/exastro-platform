@@ -35,7 +35,8 @@ import job_manager_config
 import job_manager_const
 from jobs import jobs_common
 from libs.exceptions import JobTimeoutException, FileFormatErrorException
-from libs import queries_user_import 
+from libs import queries_user_import
+
 
 class UserImportJobExecutor(BaseJobExecutor):
     """ユーザ情報インポート / User Import Job
@@ -101,7 +102,7 @@ class UserImportJobExecutor(BaseJobExecutor):
                     cursor.execute(queries_user_import.SQL_QUERY_JOBS_USER, {"job_id": self.job_id})
                     t_jobs_user = cursor.fetchone()
                     if t_jobs_user is None:
-                        message_id = f"500-62001"
+                        message_id = "500-62001"
                         message = multi_lang.get_text(
                             message_id,
                             "処理対象のレコードの取得に失敗しました(テーブル:{0})",
@@ -114,7 +115,7 @@ class UserImportJobExecutor(BaseJobExecutor):
                     cursor.execute(queries_user_import.SQL_QUERY_JOBS_USER_FILE, {"job_id": self.job_id})
                     t_jobs_user_file = cursor.fetchone()
                     if t_jobs_user_file is None:
-                        message_id = f"500-62001"
+                        message_id = "500-62001"
                         message = multi_lang.get_text(
                             message_id,
                             "処理対象のレコードの取得に失敗しました(テーブル:{0})",
@@ -206,7 +207,7 @@ class UserImportJobExecutor(BaseJobExecutor):
                         conn.commit()
 
                     # 1JOBでリソースを占有しないようにsleepする / Sleep so that 1JOB does not occupy resources
-                    time.sleep(job_manager_config.JOBS[const.PROCESS_KIND_USER_IMPORT]["extra_config"]["user_import_interval_millisecond"]/1000)
+                    time.sleep(job_manager_config.JOBS[const.PROCESS_KIND_USER_IMPORT]["extra_config"]["user_import_interval_millisecond"] / 1000)
 
                 # 最終的なステータスに更新する / Update to final status
                 self.__update_t_jobs_user(conn, job_status=const.JOB_USER_COMP, message=None)
@@ -239,7 +240,7 @@ class UserImportJobExecutor(BaseJobExecutor):
 
             finally:
                 try:
-                    globals.logger.info(f'Count of records processed [success_register:{self.success_register}] [success_update:{self.success_update}] [success_delete:{self.success_delete}] [failed_register:{self.failed_register}] [failed_update:{self.failed_update}] [failed_delete:{self.failed_delete}]')
+                    globals.logger.info(f'Count of records processed [success_register:{self.success_register}] [success_update:{self.success_update}] [success_delete:{self.success_delete}] [failed_register:{self.failed_register}] [failed_update:{self.failed_update}] [failed_delete:{self.failed_delete}]')  # noqa: #E501
 
                     if self.failed_register > 0 or self.failed_update > 0 or self.failed_delete > 0:
                         # 結果ファイル保存
@@ -261,8 +262,8 @@ class UserImportJobExecutor(BaseJobExecutor):
         Returns:
             dict: ロール情報 / Role information
         """
-        first=0
-        max=50
+        first = 0
+        max = 50
         ret_roles = {}
 
         while True:
@@ -273,7 +274,7 @@ class UserImportJobExecutor(BaseJobExecutor):
             )
             if response.status_code != 200:
                 # keycloakから想定外の応答 / Unexpected response from keycloak
-                message_id = f"500-00010"
+                message_id = "500-00010"
                 message = multi_lang.get_text(
                     message_id,
                     "ロールの取得に失敗しました(対象ID:{0} client:{1})",
@@ -356,7 +357,7 @@ class UserImportJobExecutor(BaseJobExecutor):
                     user_import_file_common.COLUMN_IDS["PASSWORD"]["text"]
                 )
 
-        validate = validation.validate_user_affiliation(cell_values["AFFILIATION"] if cell_values["AFFILIATION"] is not None else "",lang=self.language)
+        validate = validation.validate_user_affiliation(cell_values["AFFILIATION"] if cell_values["AFFILIATION"] is not None else "", lang=self.language)
         if not validate.ok:
             return validate
         validate = validation.validate_user_description(cell_values["DESCRIPTION"] if cell_values["DESCRIPTION"] is not None else "", lang=self.language)
@@ -413,7 +414,7 @@ class UserImportJobExecutor(BaseJobExecutor):
         )
         if u_create.status_code == 409:
             globals.logger.debug(f"response:{u_create.text}")
-            message_id = f"409-25001"
+            message_id = "409-25001"
             message = multi_lang.get_text_spec(
                 self.language,
                 message_id,
@@ -423,7 +424,7 @@ class UserImportJobExecutor(BaseJobExecutor):
             raise common.BadRequestException(message_id=message_id, message=message)
         elif u_create.status_code == 400:
             globals.logger.debug(f"response:{u_create.text}")
-            message_id = f"400-25001"
+            message_id = "400-25001"
             message = multi_lang.get_text_spec(
                 self.language,
                 message_id,
@@ -433,7 +434,7 @@ class UserImportJobExecutor(BaseJobExecutor):
 
         elif u_create.status_code != 201:
             globals.logger.debug(f"response:{u_create.text}")
-            message_id = f"500-25002"
+            message_id = "500-25002"
             message = multi_lang.get_text_spec(
                 self.language,
                 message_id,
@@ -445,7 +446,7 @@ class UserImportJobExecutor(BaseJobExecutor):
         # 作成したユーザーを取得 / Get created user
         u_get = api_keycloak_users.user_get(realm_name=self.organization_id, user_name=cell_values["USERNAME"], token=self.organization_sa_token.get())
         if u_get.status_code != 200:
-            message_id = f"500-25002"
+            message_id = "500-25002"
             message = multi_lang.get_text_spec(
                 self.language,
                 message_id,
@@ -455,18 +456,17 @@ class UserImportJobExecutor(BaseJobExecutor):
 
         u_get_json = json.loads(u_get.text)
         if len(u_get_json) == 0:
-            message_id = f"500-25002"
+            message_id = "500-25002"
             message = multi_lang.get_text_spec(
                 self.language,
                 message_id,
                 "ユーザー作成に失敗しました({0})",
                 "Not Found Created User")
             raise common.InternalErrorException(message_id=message_id, message=message)
-            
+
         user_id = u_get_json[0]["id"]
         globals.logger.info(f'User Created [OG:{self.organization_id}] [UID:{user_id}] [USERNAME:{cell_values["USERNAME"]}]')
         return user_id
-
 
     def __add_roles(self, cell_values, user_id, specifiable_roles):
         """ロールの付与 / Grant role
@@ -487,7 +487,7 @@ class UserImportJobExecutor(BaseJobExecutor):
         )
 
         if response.status_code not in [200, 204]:
-            message_id = f"500-26002"
+            message_id = "500-26002"
             message = multi_lang.get_text(
                 message_id,
                 "ロール設定に失敗しました(対象ID:{0} client:{1} username:{2})",
@@ -564,7 +564,7 @@ class UserImportJobExecutor(BaseJobExecutor):
 
                     try:
                         with closing(DBconnector().connect_orgdb(organization['ORGANIZATION_ID'])) as conn, conn.cursor() as cursor:
-                                
+
                             last_update_timestamp = (datetime.datetime.now() - datetime.timedelta(
                                 seconds=job_manager_config.JOBS[job_manager_const.PROCESS_KIND_FORCE_UPDATE_STATUS]['extra_config']['prograss_seconds']))
 
@@ -591,13 +591,13 @@ class UserImportJobExecutor(BaseJobExecutor):
 
                                     except JobTimeoutException as err:
                                         conn.rollback()
-                                        raise err # TimeoutException時は即終了する
+                                        raise err  # TimeoutException時は即終了する
                                     except Exception as err:
                                         conn.rollback()
                                         globals.logger.error(f'{err}\n-- stack trace --\n{traceback.format_exc()}')
 
                     except JobTimeoutException as err:
-                        raise err # TimeoutException時は即終了する
+                        raise err  # TimeoutException時は即終了する
                     except Exception as err:
                         globals.logger.error(f'{err}\n-- stack trace --\n{traceback.format_exc()}')
 
