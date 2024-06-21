@@ -102,6 +102,9 @@ var api_conf = {
             "get": "/api/{organization_id}/platform/maintenance-mode-setting",
         },
         "settings": {
+            "common": {
+                "get": "/api/platform/settings/common"
+            },
             "mailserver": {
                 "get": "/api/{organization_id}/platform/settings/mailserver",
                 "post": "/api/{organization_id}/platform/settings/mailserver",
@@ -125,10 +128,7 @@ var api_conf = {
             "download": {
                 "get": "/api/{organization_id}/platform/auditlog/download",
                 "post": "/api/{organization_id}/platform/auditlog/download",
-
-                "detail": {
-                    "get": "/api/{organization_id}/platform/auditlog/download/{download_id}",
-                }
+                "postId": "/api/{organization_id}/platform/auditlog/download/{download_id}",
             }
         }
     }

@@ -20,7 +20,7 @@
         <meta name="format-detection" content="telephone=no,email=no,address=no">
         <meta name="theme-color" content="#002B62">
         <title text-id="000-88001">
-            予約 / 監査ログ / Exastro Platform
+            監査ログ / Exastro Platform
         </title>
         <link rel="stylesheet" href="/_/platform-commons/css/platform.css?ver=__BUILD_VERSION__">
 
@@ -75,24 +75,24 @@
                     <div id="content">
                         <div class="contentHeader">
                             <h1 class="contentTitle"><span class="contentTitleInner" text-id="000-88002">監査ログ</span></h1>
-                            <p class="contentMenuInfo" text-id="000-88002">監査ログのダウンロード予約とダウンロード結果を閲覧できます。</p>
+                            <p class="contentMenuInfo" text-id="000-88002">監査ログのダウンロードとダウンロード履歴を閲覧できます。</p>
                         </div>
                         <div class="contentBody">
                             <div class="contentMenu">
                                 <ul class="contentMenuList">
                                     <li class="contentMenuItem">
-                                        <a class="contentMenuLink tabOpen" href="#reserve" tabindex="-1">
-                                            <span class="inner" text-id="000-88002">予約</span>
+                                        <a class="contentMenuLink tabOpen" href="#download" tabindex="-1">
+                                            <span class="inner" text-id="000-88002">ダウンロード</span>
                                         </a>
                                     </li>
                                     <li class="contentMenuItem">
                                         <a class="contentMenuLink" href="#download_list" tabindex="-1">
-                                            <span class="inner" text-id="000-88002">結果</span>
+                                            <span class="inner" text-id="000-88002">履歴</span>
                                         </a>
                                     </li>
                                 </ul>
                             </div>
-                            <section class="section tabOpen" id="reserve">
+                            <section class="section tabOpen" id="download">
                                 <div class="sectionBody">
                                     <div id="MT" class="tableContainer viewTable">
                                         <div class="tableBody">
@@ -110,13 +110,13 @@
                                                         <td class="tBodyTd td" rowspan="1" colspan="1"><div class="ci">
                                                             <div class="filterInputFromToDate">
                                                                 <div class="filterInputFromDateWrap">
-                                                                    <input type="text" data-type="fromDate" data-rest="register_time" placeholder="From" value id="MT_TIME_REGISTER_from" name="MT_TIME_REGISTER_from" class="filterInput filterFromDate inputText input" autocomplete="off">
+                                                                    <input type="text" id="from_date" placeholder="From" class="filterInput filterFromDate inputText input" autocomplete="off">
                                                                 </div>
                                                                 <div class="filterInputToDateWrap">
-                                                                    <input type="text" data-type="toDate" data-rest="register_time" placeholder="To" value id="MT_TIME_REGISTER_to" name="MT_TIME_REGISTER_to" class="filterInput filterToDate inputText input" autocomplete="off">
+                                                                    <input type="text" id="to_date" placeholder="To" class="filterInput filterToDate inputText input" autocomplete="off">
                                                                 </div>
                                                                 <div class="filterInputDateCalendar">
-                                                                    <button data-type="dateTime" data-rest="register_time" data-action="normal" class="itaButton filterInputDatePicker button">
+                                                                    <button id="btn_target_time" data-action="normal" class="itaButton filterInputDatePicker button">
                                                                         <span class="inner">
                                                                             <span class="icon icon-cal"></span>
                                                                         </span>
@@ -132,8 +132,8 @@
                                         <div class="tableHeader">
                                             <ul class="tableHeaderMainMenuList">
                                                 <li class="tableHeaderMainMenuItem">
-                                                    <button data-action="positive" style="width:200px;" class="itaButton tableHeaderMainMenuButton button" id="button_register">
-                                                        <span class="inner"><span class="icon icon-edit"></span>
+                                                    <button data-action="positive" style="width:200px;" class="itaButton tableHeaderMainMenuButton button" id="btn_download">
+                                                        <span class="inner"><span class="icon icon-download"></span>
                                                         <span text-id="000-80025">ダウンロード</span></span>
                                                     </button>
                                                 </li>
@@ -145,57 +145,49 @@
                             <section class="section" id="download_list">
                                 <div class="sectionBody">
                                     <div id="MT" class="tableContainer viewTable">
+                                        <div class="tableHeader">
+                                            <ul class="tableHeaderMainMenuList">
+                                                <li id="exp_days"></li>
+                                                <li id="file_limit"></li>
+                                            </ul>
+                                        </div>
                                         <div class="tableBody">
                                             <table class="table" width="100%" id="auditlog_download_list">
                                                 <thead class="thead">
                                                     <tr class="tHeadTr tr">
-                                                        <th class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="ステータス" attr-text-id="title=000-84014"><div class="ci" text-id="000-84014">ステータス</div></th>
-                                                        <th class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="抽出条件" attr-text-id="title=000-00128"><div class="ci" text-id="000-00128">抽出条件</div></th>
-                                                        <th class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="出力対象件数" attr-text-id="title=000-00130"><div class="ci" text-id="000-00130">出力対象件数</div></th>
-                                                        <th class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="処理結果メッセージ" attr-text-id="title=000-00131"><div class="ci" text-id="000-00131">処理結果メッセージ</div></th>
-                                                        <th class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="作成者" attr-text-id="title=000-00143"><div class="ci" text-id="000-00143">作成者</div></th>
-                                                        <th class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="作成日時" attr-text-id="title=000-80031"><div class="ci" text-id="000-80031">作成日時</div></th>
+                                                        <th data-id="c1" class="tHeadTh popup th" rowspan="1" colspan="1" }=""><div class="ci"></div></th>
+                                                        <th data-id="c2" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="ダウンロード日時" attr-text-id="title=000-80031"><div class="ci" text-id="000-80031">ダウンロード日時</div></th>
+                                                        <th data-id="c3" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="ステータス" attr-text-id="title=000-84014"><div class="ci" text-id="000-84014">ステータス</div></th>
+                                                        <th data-id="c4" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="対象期間" attr-text-id="title=000-00128"><div class="ci" text-id="000-00128">対象期間</div></th>
+                                                        <th data-id="c5" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="出力対象件数" attr-text-id="title=000-00130"><div class="ci" text-id="000-00130">出力対象件数</div></th>
+                                                        <th data-id="c6" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="処理結果メッセージ" attr-text-id="title=000-00131"><div class="ci" text-id="000-00131">処理結果メッセージ</div></th>
+                                                        <th data-id="c7" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="ユーザー" attr-text-id="title=000-00143"><div class="ci" text-id="000-00143">ユーザー</div></th>
                                                     </tr>
                                                 </thead>
                                                 <tbody class="tbody">
-                                                    <tr class="tBodyTr tr datarow-template" style="display:none" data-id="${job_id}">
+                                                    <tr class="tBodyTr tr datarow-template" style="display:none">
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: center;">
+                                                            <button title="ダウンロード" attr-text-id="title=000-80026" data-action="positive" class="itaButton button button_re_download" data-id="${job_id}" style="width:200px;">
+                                                                <span class="inner">
+                                                                    <span class="iconButtonIcon icon icon-download"></span>
+                                                                    <span class="iconButtonBody" text-id="000-80026">ダウンロード</span>
+                                                                </span>
+                                                            </button>
+                                                        </div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }="" ><div class="ci textOverWrap">${create_timestamp}</div></td>
                                                         <td class="tBodyTd td" rowspan="1" colspan="1" }="" ><div class="ci textOverWrap">${job_status}</div></td>
                                                         <td class="tBodyTd td" rowspan="1" colspan="1" }="" ><div class="ci textOverWrap">${conditions}</div></td>
                                                         <td class="tBodyTd td" rowspan="1" colspan="1" }="" ><div class="ci textOverWrap">${count_export}</div></td>
                                                         <td class="tBodyTd td" rowspan="1" colspan="1" }="" ><div class="ci textOverWrap">${message}</div></td>
                                                         <td class="tBodyTd td" rowspan="1" colspan="1" }="" ><div class="ci textOverWrap">${create_user}</div></td>
-                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }="" ><div class="ci textOverWrap">${create_timestamp}</div></td>
                                                     </tr>
                                                     <tr class="tBodyTr tr notfound" style="display:none">
                                                         <td class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="6" }="" height="50px"><div class="ci" style="text-align: center;" text-id="000-84015">
-                                                            ダウンロード結果が存在しません
+                                                            ダウンロード履歴が存在しません
                                                         </div></td>
                                                     </tr>
                                                 </tbody>
                                             </table>
-                                        </div>
-                                        <div class="tableFooter">
-                                            <div class="tableFooterInner">
-                                                <div class="tableFooterBlock pagingMove" id="auditlog_download_list_pager">
-                                                    <ul class="tableFooterList">
-                                                        <li class="tableFooterItem">
-                                                            <button class="pagingMoveButton" data-type="first" disabled><span class=" icon icon-first"></span></button>
-                                                        </li>
-                                                        <li class="tableFooterItem">
-                                                            <button class="pagingMoveButton" data-type="prev" disabled><span class=" icon icon-prev"></span></button>
-                                                        </li>
-                                                        <li class="tableFooterItem">
-                                                            <div class="pagingPage">
-                                                                <span class="pagingCurrentPage">1</span>
-                                                                <span class="pagingPageJumpNumber" text-id="000-80027">ページ</span>
-                                                            </div>
-                                                        </li>
-                                                        <li class="tableFooterItem">
-                                                            <button class="pagingMoveButton" data-type="next"><span class=" icon icon-next"></span></button>
-                                                        </li>
-                                                    </ul>
-                                                </div>
-                                            </div>
                                         </div>
                                     </div>
                                 </div>

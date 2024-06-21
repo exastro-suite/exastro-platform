@@ -16,14 +16,6 @@
 
 $(function(){
 
-    const paging = {
-        display_page_no: 1,
-        move_to_page_no: 1,
-        rows_per_page: DEFAULT_ROWS_PER_PAGE,
-        enable_next_page: false,
-        filter: ""
-    }
-
     CommonAuth.onAuthSuccess(() => {
         let ui = new CommonUi(`#container`);
         ui.contentTabEvent();
@@ -34,6 +26,8 @@ $(function(){
         Promise.all([
             // Load Common Contents
             loadCommonContents(),
+            // get Setting Common
+            call_api_promise_settings_common(),
             // get Auditlog Download List
             call_api_promise_auditlog_download_list(),
 
@@ -45,7 +39,7 @@ $(function(){
                 {"text": getText("000-80052", "監査ログ"), "href": location_conf.href.auditlog.download.replace(/{organization_id}/g, CommonAuth.getRealm())}
             ]);
 
-            // display_main(results[1].data);
+            display_main(results[1].data,results[2].data);
             finish_onload_progress();
 
         }).catch((e) => {
@@ -53,6 +47,20 @@ $(function(){
             finish_onload_progress_at_error();
             if(typeof e != "undefined") console.log(e);
             return;
+        });
+    }
+
+
+    //
+    // get auditlog download list api call
+    //
+    function call_api_promise_settings_common() {
+        return  call_api_promise({
+            type: "GET",
+            url: api_conf.api.settings.common.get,
+            headers: {
+                Authorization: "Bearer " + CommonAuth.getToken(),
+            }
         });
     }
 
@@ -65,10 +73,6 @@ $(function(){
             url: api_conf.api.auditlog.download.get.replace(/{organization_id}/g, CommonAuth.getRealm()),
             headers: {
                 Authorization: "Bearer " + CommonAuth.getToken(),
-            },
-            data: {
-                "first": ( paging.move_to_page_no - 1) * paging.rows_per_page,
-                "max": paging.rows_per_page + 1     // 次ページがあるかの判別用に、ページ表示より1件多く取得する
             }
         });
     }
@@ -76,30 +80,30 @@ $(function(){
     //
     // onload display
     //
-    function display_main(auditlogs) {
+    function display_main(settings,auditlogs) {
         console.log("[CALL] display_main");
 
+        display_message(settings);
         //
         // 監査ログ一覧の表示 - auditlog download list display
         //
         display_auditlog_download_list(auditlogs);
-
-        //
-        // ボタンの有効化 - bottun enabled
-        //
-        disable_event_elements(false);
     }
 
-    //
-    // ボタンの制御（メイン画面） - button control (main window)
-    //
-    function disable_event_elements(desabled) {
-        if (desabled) {
-            $("#auditlog_download_list_pager .pagingMoveButton").prop("disabled", true);
-        } else {
-            $("#auditlog_download_list_pager .pagingMoveButton[data-type=first]").prop("disabled", (paging.display_page_no > 1? false: true));
-            $("#auditlog_download_list_pager .pagingMoveButton[data-type=prev]").prop("disabled", (paging.display_page_no > 1? false: true));
-            $("#auditlog_download_list_pager .pagingMoveButton[data-type=next]").prop("disabled", !paging.enable_next_page);
+    function display_message(settings) {
+        $exp_days = $("#exp_days");
+        $file_limit = $("#file_limit");
+
+        for(let i = 0; i < settings.length; ++i) {
+            const setting = settings[i];
+
+            if(setting.key == "platform.system.audit_log.download_exp_days"){
+                $exp_days.val(`監査ログのダウンロード履歴は${setting.value}日後に削除されます。`)
+            }
+
+            if(setting.key == "platform.system.audit_log.download_file_limit"){
+                $file_limit.val(`監査ログのダウンロード最大件数は${setting.value}件です。`)
+            }
         }
     }
 
@@ -107,9 +111,6 @@ $(function(){
     // 監査ログの一覧表示 - display auditlog download list
     //
     function display_auditlog_download_list(auditlogs) {
-        // ページング用変数を移動後のページに設定
-        paging.display_page_no = paging.move_to_page_no;
-        paging.enable_next_page = paging.rows_per_page < auditlogs.length;
 
         // 明細行を削除
         $('#auditlog_download_list .datarow').remove();
@@ -125,64 +126,112 @@ $(function(){
             const row_template = $('#auditlog_download_list .datarow-template').clone(true).removeClass('datarow-template').addClass('datarow').prop('outerHTML');
 
             // 明細にデータを埋め込み行を明細を作りこむ
-            for(let i = 0; i < Math.min(auditlogs.length, paging.rows_per_page); ++i) {
+            for(let i = 0; i < auditlogs.length; ++i) {
                 const auditlog = auditlogs[i];
+                let target_date = JSON.parse(auditlog.conditions)
                 row_html = row_template
-                    .replace(/\${job_id}/g, fn.cv(auditlog.job_id,'',true))
-                    .replace(/\${job_type}/g, fn.cv(auditlog.job_type,'',true))
-                    .replace(/\${job_status}/g, fn.cv(auditlog.job_status,'',true))
-                    .replace(/\${conditions}/g, fn.cv(auditlog.conditions,'',true))
+                    .replace(/\${job_id}/g, fn.cv(auditlog.download_id,'',true))
+                    .replace(/\${job_status}/g, fn.cv(auditlog.status,'',true))
+                    .replace(/\${conditions}/g, fn.cv(`${target_date.ts_from} ～ ${target_date.ts_to}`,'',true))
                     .replace(/\${count_export}/g, fn.cv(auditlog.count_export,'',true))
                     .replace(/\${message}/g, fn.cv(auditlog.message,'',true))
-                    .replace(/\${create_user}/g, fn.cv(auditlog.create_user,'',true))
+                    .replace(/\${create_user}/g, fn.cv(auditlog.create_user_name,'',true))
                     .replace(/\${create_timestamp}/g, fn.date(new Date(auditlog.create_timestamp),'yyyy/MM/dd HH:mm:ss'))
                 $("#auditlog_download_list tbody").append(row_html);
             }
+
+            $('#auditlog_download_list .button_re_download').on('click', function() {
+                let job_id = $(this).attr('data-id');
+                call_post_auditlog_re_download(job_id);
+            });
         }
         $('#auditlog_download_list .datarow').css('display','');
-        $("#auditlog_download_list .pagingCurrentPage").text(paging.display_page_no);
     }
 
-    //
-    // ページ遷移
-    //
-    function movePage() {
-        // 処理中の表示
-        show_progress();
-        // ボタンを非活性に設定
-        disable_event_elements(true);
-        // APIの呼出
-        call_api_promise_auditlog_download_list().then((result) => {
-            if(result.data.length == 0 && paging.move_to_page_no > 1) {
-                // 表示するデータが無くなってしまった時は１ページ前に移動する
-                paging.move_to_page_no -= 1;
-                movePage();
-                return;
+    // set event
+    $('#btn_target_time').on('click', function() {
+        const date = { from: '', to: ''};
+        $from_date = $("#from_date");
+        $to_date = $("#to_date");
+
+        fn.datePickerDialog('fromTo', true, getText("000-00125", "対象期間"), date ).then(function( result ){
+            if ( result !== 'cancel') {
+                $from_date.val( result.from ).change().focus().trigger('input');
+                $to_date.val( result.to ).change().focus().trigger('input');
             }
-            // 一覧の表示
-            display_auditlog_download_list(result.data);
-            // ボタンを活性化
-            disable_event_elements(false);
-            // 処理中表示を消す
+        });
+    });
+
+    //
+    // ダウンロードボタン
+    //
+    $('#btn_download').on('click',() => {
+        download_button();
+    });
+
+    function download_button() {
+        console.log("[CALL] download_button");
+
+        let reqbody =   {
+            "ts_from":$("#from_date").val().replaceAll( '/', '-' ),
+            "ts_to":$("#to_date").val().replaceAll( '/', '-' )
+        }
+
+        // CALL API
+        call_post_auditlog_download(reqbody);
+    }
+
+    function call_post_auditlog_download(reqbody) {
+        //
+        // CALL API
+        //
+        show_progress();
+        call_api_promise({
+            type: "POST",
+            url: api_conf.api.auditlog.download.post.replace(/{organization_id}/g, CommonAuth.getRealm()),
+            headers: {
+                Authorization: "Bearer " + CommonAuth.getToken(),
+            },
+            data: JSON.stringify(reqbody),
+            contentType: "application/json",
+            dataType: "json",
+        }).then(() => {
+            hide_progress();
+            alertMessage(getText("000-80018", "処理結果"), getText("000-84019", "ダウンロードを開始しました。"),
+            () => {
+                window.location = location_conf.href.auditlog.download.replace(/{organization_id}/g, CommonAuth.getRealm());
+            });
+        }).catch(() => {
             hide_progress();
         });
     }
-    // set event - paging　（main window)
-    $("#auditlog_download_list_pager .pagingMoveButton[data-type=first]").on('click', function () {
-        paging.move_to_page_no = 1;
-        movePage();
-    });
-    $("#auditlog_download_list_pager .pagingMoveButton[data-type=prev]").on('click', function () {
-        paging.move_to_page_no = paging.display_page_no - 1;
-        movePage();
-    });
-    $("#auditlog_download_list_pager .pagingMoveButton[data-type=next]").on('click', function () {
-        paging.move_to_page_no = paging.display_page_no + 1;
-        movePage();
-    });
 
+    function download2() {
+        $("#authorization").val("Bearer " + CommonAuth.getToken());
+        document.download2.submit();
+    }
 
-    function disabled_button() {
-        $('#button_register').prop('disabled', true);
+    function call_post_auditlog_re_download(job_id) {
+        console.log("[CALL] re_download_button");
+        //
+        // CALL API
+        //
+        show_progress();
+        call_api_promise({
+            type: "POST",
+            url: api_conf.api.auditlog.download.postId.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{download_id}/g, job_id),
+            headers: {
+                Authorization: "Bearer " + CommonAuth.getToken(),
+            },
+            contentType: "application/x-www-form-urlencoded"
+        }).then(() => {
+            hide_progress();
+            alertMessage(getText("000-80018", "処理結果"), getText("000-84019", "ダウンロードを開始しました。"),
+            () => {
+                window.location = location_conf.href.auditlog.download.replace(/{organization_id}/g, CommonAuth.getRealm());
+            });
+        }).catch(() => {
+            hide_progress();
+        });
     }
 });
