@@ -231,6 +231,22 @@ def jobs_users_import(import_file, organization_id):  # noqa: E501
 
 
 @common.platform_exception_handler
+def jobs_users_bulk_delete(import_file, organization_id):  # noqa: E501
+    """Bulk delete user job call
+
+     # noqa: E501
+
+    :param import_file:
+    :type import_file: strstr
+    :param organization_id:
+    :type organization_id: str
+
+    :rtype: InlineResponse2002
+    """
+    return 'do some magic!'
+
+
+@common.platform_exception_handler
 def jobs_users_import_status(organization_id):  # noqa: E501
     """Get all import status
 
