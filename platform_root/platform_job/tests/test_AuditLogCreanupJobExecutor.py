@@ -119,23 +119,25 @@ def test_execute_timeout(caplog: LogCaptureFixture):
         main_thread.start()
         time.sleep(1.0)
 
-        # sub processの状態更新(force_update_statusを行うprocessをどれにするかの情報を更新するため)
+        # sub processの状態更新(audit log cleanupを行うprocessをどれにするかの情報を更新するため)
         sub_processes_mgr.refresh_sub_process_status()
         sub_processes_mgr.set_interval_job_execute_process()
 
-        # timeout発生まで待つ
-        time.sleep(5)
+        try:
+            # timeout発生まで待つ
+            time.sleep(5)
 
-        # ログ出力の確認
-        assert ('root', logging.ERROR, 'Cancel audit log cleanup (timeout)') in caplog.record_tuples
+            # ログ出力の確認
+            assert ('root', logging.ERROR, 'Cancel audit log cleanup (timeout)') in caplog.record_tuples
 
-        # sub processの終了要求
-        sub_processes_mgr.set_sub_process_termination_request(force=True)
+        finally:
+            # sub processの終了要求
+            sub_processes_mgr.set_sub_process_termination_request(force=True)
 
-        # sub processの終了確認
-        assert test_common.check_state(timeout=5.0, conditions=lambda : not main_thread.is_alive())
+            # sub processの終了確認
+            assert test_common.check_state(timeout=5.0, conditions=lambda : not main_thread.is_alive())
 
-        main_thread.join()
+            main_thread.join()
 
 
 def test_execute_db_error(caplog: LogCaptureFixture):
