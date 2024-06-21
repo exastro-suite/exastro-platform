@@ -138,6 +138,7 @@ def auditlog_download_list(organization_id):  # noqa: E501
             "download_id": row["JOB_ID"],
             "status": row["JOB_STATUS"],
             "conditions": row["CONDITIONS"],
+            "count_export": row["COUNT_EXPORT"],
             "message": row["MESSAGE"],
             "create_timestamp": common.datetime_to_str(row["CREATE_TIMESTAMP"]),
             "create_user_id": user_id,

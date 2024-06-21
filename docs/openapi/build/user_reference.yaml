@@ -2613,9 +2613,15 @@ components:
             properties:
               download_id:
                 type: string
-                example: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+                example: XXXXXXXXXXXXXXXXXXXXXXXXXX
               status:
                 type: string
+                enum:
+                  - NotExecuted
+                  - Executing
+                  - Completion
+                  - Failed
+                  - NoData
               conditions:
                 type: object
                 properties:
@@ -2625,11 +2631,13 @@ components:
                   ts_to:
                     type: string
                     example: '2024-06-30 23:59:59'
+              count_export:
+                type: number
               message:
                 type: string
               create_timestamp:
                 type: string
-                example: '2024-06-01 10:00:00'
+                format: date-time
               create_user_id:
                 type: string
                 format: uuid
@@ -2638,7 +2646,7 @@ components:
                 example: firstname lastname
               last_update_timestamp:
                 type: string
-                example: '2024-06-01 10:30:00'
+                format: date-time
     authorizationBody:
       title: authorization of Requst form-data
       type: object
