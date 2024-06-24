@@ -68,8 +68,8 @@ def settings_system_config_update(body, config_key):  # noqa: E501
         data = bl_common_service.settings_system_config_list(conn, config_key)
         if data is None:
             raise common.NotFoundException(
-                message_id=f"404-{MSG_FUNCTION_ID}001",
-                message=multi_lang.get_text(f"404-{MSG_FUNCTION_ID}001", "設定が存在しません(key:{0})", config_key)
+                message_id="404-20001",
+                message=multi_lang.get_text("404-20001", "設定が存在しません(key:{0})", config_key)
             )
 
         # update config
