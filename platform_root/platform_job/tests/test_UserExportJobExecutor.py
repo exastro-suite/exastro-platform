@@ -40,66 +40,108 @@ import job_manager
 import job_manager_const
 import job_manager_config
 from jobs.UserExportJobExecutor import UserExportJobExecutor
+from jobs import jobs_common
 
 from tests.common import test_common
 
 from libs.job_manager_classes import SubProcessesManager
 from common_library.common import user_import_file_common
 
-USERNAME_COL_INDEX = 2
-ERROR_TEXT_COL_INDEX = 12
+user_json1 = {
+    "username": "admin1",
+    "email": "admin1@example.com",
+    "firstName": "admin1",
+    "lastName": "admin1",
+    "credentials": [
+        {
+            "type": "password",
+            "value": "password",
+            "temporary": True,
+        }
+    ],
+    "attributes":
+    {
+        "affiliation": "affi1",
+        "description": "desc1",
+    },
+    "enabled": True
+}
 
-class mock_users_result():
-    status_code : int
-    text : str
+user_json2 = {
+    "username": "admin2",
+    "email": "admin2@example.com",
+    "firstName": "admin2",
+    "lastName": "admin2",
+    "credentials": [
+        {
+            "type": "password",
+            "value": "password",
+            "temporary": True,
+        }
+    ],
+    "attributes":
+    {
+        "affiliation": "affi1",
+        "description": "desc1",
+    },
+    "enabled": True
+}
 
-mock_users_result_value1 = mock_users_result()
-mock_users_result_value1.status_code = 200
-mock_users_result_value1.text= '[' \
-    '{"id":"b833b84f-468b-4894-a2bd-f96248374919","username":"admin1","firstName":"test","lastName":"test","email":"test1@example.com","emailVerified":false,"attributes":{"affiliation":["testafff"],"description":["testdesc"]},"createdTimestamp":1715561734123,"enabled":true,"totp":false,"disableableCredentialTypes":[],"requiredActions":[],"notBefore":0,"access":{"manageGroupMembership":true,"view":true,"mapRoles":true,"impersonate":true,"manage":true}}' \
-    ']'
+user_json3 = {
+    "username": "user3",
+    "email": "user3@example.com",
+    "firstName": "user3",
+    "lastName": "user3",
+    "credentials": [
+        {
+            "type": "password",
+            "value": "password",
+            "temporary": True,
+        }
+    ],
+    "enabled": True
+}
 
-mock_users_result_value2 = mock_users_result()
-mock_users_result_value2.status_code = 200
-mock_users_result_value2.text= '[' \
-    '{"id":"b833b84f-468b-4894-a2bd-f96248374918","username":"admin2","firstName":"test","lastName":"test","email":"test2@example.com","emailVerified":false,"createdTimestamp":1715561734123,"enabled":true,"totp":false,"disableableCredentialTypes":[],"requiredActions":[],"notBefore":0,"access":{"manageGroupMembership":true,"view":true,"mapRoles":true,"impersonate":true,"manage":true}}' \
-    ']'
+user_json4 = {
+    "username": "user4",
+    "email": "user4@example.com",
+    "firstName": "user4",
+    "lastName": "user4",
+    "credentials": [
+        {
+            "type": "password",
+            "value": "password",
+            "temporary": True,
+        }
+    ],
+    "enabled": True
+}
 
-mock_users_result_value3 = mock_users_result()
-mock_users_result_value3.status_code = 200
-mock_users_result_value3.text= '[' \
-    '{"id":"b833b84f-468b-4894-a2bd-f96248374917","username":"user1","firstName":"test","lastName":"test","email":"test3@example.com","emailVerified":false,"createdTimestamp":1715561734123,"enabled":true,"totp":false,"disableableCredentialTypes":[],"requiredActions":[],"notBefore":0,"access":{"manageGroupMembership":true,"view":true,"mapRoles":true,"impersonate":true,"manage":true}}' \
-    ']'
-
-mock_users_result_value4 = mock_users_result()
-mock_users_result_value4.status_code = 200
-mock_users_result_value4.text= '[]'
-
-mock_users_result_value5 = mock_users_result()
-mock_users_result_value5.status_code = 200
-mock_users_result_value5.text= '[{"id":"88e09eb4-3723-43f5-a786-c4439e86eaf8","username":"test5-1","firstName":"test5-","lastName":"1","email":"test5-1@example.com","emailVerified":false,"createdTimestamp":1718615936957,"enabled":true,"totp":false,"disableableCredentialTypes":[],"requiredActions":[],"notBefore":0,"access":{"manageGroupMembership":true,"view":true,"mapRoles":true,"impersonate":true,"manage":true}},{"id":"5e20cbd8-ab76-48a3-8c81-e75332ccd67b","username":"test5-10","firstName":"test5-","lastName":"10","email":"test5-10@example.com","emailVerified":false,"createdTimestamp":1718615937659,"enabled":true,"totp":false,"disableableCredentialTypes":[],"requiredActions":[],"notBefore":0,"access":{"manageGroupMembership":true,"view":true,"mapRoles":true,"impersonate":true,"manage":true}},{"id":"e93240cb-0e87-41f1-b23a-5fccda416739","username":"test5-100","firstName":"test5-","lastName":"100","email":"test5-100@example.com","emailVerified":false,"createdTimestamp":1718615972126,"enabled":true,"totp":false,"disableableCredentialTypes":[],"requiredActions":[],"notBefore":0,"access":{"manageGroupMembership":true,"view":true,"mapRoles":true,"impersonate":true,"manage":true}}]'
-
-class mock_roles_result():
-    status_code : int
-    text : str
-
-mock_roles_result_value = mock_roles_result()
-mock_roles_result_value.status_code = 200
-mock_roles_result_value.text= '[' \
-    '{"id":"f4c90c36-4635-4a16-b4c6-eb90047f848e","name":"_organization-manager","composite":true,"clientRole":true,"containerId":"7fc92d71-0e92-4ea4-89a3-ff45b98448ab"},' \
-    '{"id":"71e4a26b-0d85-488b-bd5d-bf6e56d5c15f","name":"_test_workspace1-admin","composite":true,"clientRole":true,"containerId":"7fc92d71-0e92-4ea4-89a3-ff45b98448ab"}' \
-    ']'
-
-mock_users=[{'id': 'b833b84f-468b-4894-a2bd-f96248374919', 'username': 'admin', 'firstName': 'test', 'lastName': 'test', 'email': 'test@example.com', 'emailVerified': False, 'attributes': {'affiliation': ['testafff'], 'description': ['testdesc']}, 'createdTimestamp': 1715561734123, 'enabled': True, 'totp': False, 'notBefore': 0, 'roles': '_organization-manager,_test_workspace1-admin,_test_workspace2-admin'}]
+user_json5 = {
+    "username": "user5",
+    "email": "user5@example.com",
+    "firstName": "user5",
+    "lastName": "user5",
+    "credentials": [
+        {
+            "type": "password",
+            "value": "password",
+            "temporary": True,
+        }
+    ],
+    "enabled": True
+}
 
 def test_execute_user_get_nomally():
     """ユーザー取得正常系 / User registration normal pattern
     """
     testdata = import_module("tests.db.exports.testdata")
-
+ 
+    add_user(user=user_json1)
+    add_user(user=user_json2)
+    add_user(user=user_json3)
+    
     with test_common.requsts_mocker_default(), \
-        mock.patch("common_library.common.api_keycloak_users.user_get", side_effect=[mock_users_result_value1, mock_users_result_value2, mock_users_result_value3, mock_users_result_value4]), \
-        mock.patch("common_library.common.api_keycloak_roles.user_role_get", return_value = mock_roles_result_value), \
         mock.patch("jobs.UserExportJobExecutor.USER_GET_ONCE", 1):
 
         organization_id = list(testdata.ORGANIZATIONS.keys())[0]
@@ -127,11 +169,16 @@ def test_execute_user_get_error_limits():
     process_kind=const.PROCESS_KIND_USER_EXPORT
     job_config_jobs = dict(job_manager_config.JOBS)
     job_config_jobs[process_kind]["extra_config"]["max_number_of_rows_allowd"] = limit_users
-    with test_common.requsts_mocker_default(), \
-        mock.patch.dict(f"job_manager_config.JOBS", job_config_jobs), \
-        mock.patch("common_library.common.api_keycloak_users.user_get", side_effect=[mock_users_result_value5]), \
-        mock.patch("common_library.common.api_keycloak_roles.user_role_get", return_value = mock_roles_result_value):
 
+    add_user(user=user_json1)
+    add_user(user=user_json2)
+    add_user(user=user_json3)
+    add_user(user=user_json4)
+    add_user(user=user_json5)
+
+    with test_common.requsts_mocker_default(), \
+        mock.patch.dict(f"job_manager_config.JOBS", job_config_jobs):
+        
         organization_id = list(testdata.ORGANIZATIONS.keys())[0]
         queue = make_queue_export_user('ja', organization_id)
 
@@ -177,12 +224,15 @@ def test_execute_timeout():
     job_config_jobs = dict(job_manager_config.JOBS)
     job_config_jobs[process_kind]["timeout_seconds"] = timeout_sec
     job_config_jobs[process_kind]["extra_config"]["user_export_interval_millisecond"] = 2500
+    
+    add_user(user=user_json1)
+    add_user(user=user_json2)
+    add_user(user=user_json3)
+    add_user(user=user_json4)
+    add_user(user=user_json5)
 
     with test_common.requsts_mocker_default(), mock.patch.dict(f"job_manager_config.JOBS", job_config_jobs), \
-        mock.patch("common_library.common.api_keycloak_users.user_get", side_effect=[mock_users_result_value1, mock_users_result_value2, mock_users_result_value3, mock_users_result_value4]), \
-        mock.patch("common_library.common.api_keycloak_roles.user_role_get", return_value = mock_roles_result_value), \
         mock.patch("jobs.UserExportJobExecutor.USER_GET_ONCE", 1):
-    
         # sub process起動用の情報生成
         sub_processes_mgr = SubProcessesManager()
         sub_process_parameter = sub_processes_mgr.generate_sub_process_parameter()
@@ -296,6 +346,26 @@ def test_force_update_status_normally():
             # queueにデータがなく、日付が古い場合、エラーに更新していること
             assert t["JOB_STATUS"] == const.JOB_USER_FAILED
 
+def add_user(user):
+        """ユーザの追加 / add user
+
+        Args:
+            cell_values (dict): cellの値 / cell value
+
+        Returns:
+            str: user id
+        """
+        testdata = import_module("tests.db.exports.testdata")
+        
+        with closing(DBconnector().connect_orgdb(list(testdata.ORGANIZATIONS.keys())[0])) as conn:
+            organization_private = DBconnector().get_organization_private(list(testdata.ORGANIZATIONS.keys())[0])
+            organization_sa_token = jobs_common.organization_sa_token(list(testdata.ORGANIZATIONS.keys())[0], organization_private)
+        
+        # ユーザーの追加 / add user
+        u_create = api_keycloak_users.user_create(
+            realm_name=list(testdata.ORGANIZATIONS.keys())[0], user_json=user, token=organization_sa_token.get()
+        )
+        return True
 
 def make_queue_export_user(lang, organization_id, insert_queue=True):
     """テスト用共通:Queue情報生成
