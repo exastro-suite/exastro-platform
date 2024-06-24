@@ -60,7 +60,7 @@ tags:
   description: ロールに関する操作
 - name: RoleMappingsService
   description: ロール・マッピングに関する操作
-- name: JobService
+- name: JobsService
   description: ジョブに関する操作
 - name: MaintenanceModeService
   description: メンテナンスモードに関する操作
