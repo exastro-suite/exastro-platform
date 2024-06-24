@@ -63,7 +63,7 @@ tags:
 - name: JobsService
   description: ジョブに関する操作
 - name: CommonService
-  description: システム管理者共通
+  description: システム設定に関する操作
 - name: MaintenanceModeService
   description: メンテナンスモードに関する操作
 - name: NotificationService
@@ -121,6 +121,8 @@ paths:
       $ref: './paths/common.settings.common.yaml'
   "/api/platform/settings/common/{config_key}":
       $ref: './paths/common.settings.common.config.yaml'
+  "/api/{organization_id}/platform/settings/common/{config_key}":
+      $ref: './paths/common.settings.organizations.common.config.yaml'
 
   "/api/{organization_id}/platform/workspaces":
       $ref: './paths/workspaces.yaml'
