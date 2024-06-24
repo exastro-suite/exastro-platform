@@ -502,6 +502,8 @@ class LanguageList:
     lang_array['400-00031'] = 'SSL and StartTLS cannot be enabled simultaneously.'
     lang_array['400-00032'] = 'Authentication user and password are required to enable authentication.'
     lang_array['400-00033'] = 'The specified plan start date and time has already been registered. ({0})'
+    lang_array['400-11001'] = 'Request has been aborted.'
+    lang_array['400-11002'] = 'Request body is invalid.'
     lang_array['400-23001'] = 'The specified organization ({0}) has already been created and cannot be created.'
     lang_array['400-23002'] = 'The parameter (retry) must be specified if creation of the specified organization is to be resumed.'
     lang_array['400-24001'] = 'You do not have permission to specify the specified workspace as an operation target.'

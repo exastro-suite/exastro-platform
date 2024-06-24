@@ -15,9 +15,9 @@
 post:
   tags:
   - JobsService
-  summary: Import user bulk registration
+  summary: Bulk delete user job call
   x-openapi-router-controller: controllers.jobs_service_controller
-  operationId: jobs_users_import
+  operationId: jobs_users_bulk_delete
   parameters:
   - name: organization_id
     in: path
@@ -28,7 +28,7 @@ post:
     content:
       multipart/form-data:
         schema:
-          $ref: '../schemas/jobsUserImport.yaml'
+          $ref: '../schemas/jobsUserBulkImport.yaml'
     required: true
   responses:
     200:

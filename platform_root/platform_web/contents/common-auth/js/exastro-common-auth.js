@@ -72,6 +72,11 @@ const CommonAuth = {
     "_lastTimeToGetToken": (new Date()).getTime(),
 
     /**
+     * Token refresh permanently - トークンを永続的に更新
+     */
+    "_token_refresh_permanently": false,
+
+    /**
      * keycloak login
      */
     "_login": function() {
@@ -250,6 +255,14 @@ const CommonAuth = {
     },
 
     /**
+     * tokenRefreshPermanently - トークンを永続的に更新するか否かを設定します
+     * @param {boolean} permanently - true:permanently / false:not permanently
+     */
+    "tokenRefreshPermanently": function(permanently) {
+        CommonAuth._token_refresh_permanently = permanently;
+    },
+
+    /**
      * Force refresh the token - tokenを強制的にリフレッシュします
      * @returns {Promise}
      */
@@ -365,25 +378,30 @@ const CommonAuth = {
      * The process of calling token updates on a regular basis - トークンの更新を定期的に呼び出す処理
      */
     "_autoRefreshToken": function() {
-        try {
-            let nowTime = (new Date()).getTime();
-            if(CommonAuthConfig.TOKEN_AUTO_REFRESH === -1 || nowTime <= CommonAuth._lastTimeToGetToken + CommonAuthConfig.TOKEN_AUTO_REFRESH * 1000) {
-
-                // Renew the token indefinitely or until a certain amount of time has passed since the last request for the token.
-                // - 無制限またはトークンの最後の要求から一定の時間が経過するまで、トークンを更新します
-
-                DebugConsole.log("CommonAuth", "[CALL] keycloak.updateToken");
-                CommonAuth.keycloak.updateToken(CommonAuthConfig.TOKEN_REFRESH_TIMMING).then((refreshed)=>{
-                    if(refreshed) {
-                        DebugConsole.log("CommonAuth", "[INFO] keycloak.token refreshed");
-                    }
-                }).catch(() => {
-                    CommonAuth.keycloak.logout({redirectUri: location.href});
-                });
+        return new Promise((resolve, reject) => {
+            try {
+                let nowTime = (new Date()).getTime();
+                if(CommonAuthConfig.TOKEN_AUTO_REFRESH === -1 || CommonAuth._token_refresh_permanently || nowTime <= CommonAuth._lastTimeToGetToken + CommonAuthConfig.TOKEN_AUTO_REFRESH * 1000) {
+    
+                    // Renew the token indefinitely or until a certain amount of time has passed since the last request for the token.
+                    // - 無制限またはトークンの最後の要求から一定の時間が経過するまで、トークンを更新します
+    
+                    DebugConsole.log("CommonAuth", "[CALL] keycloak.updateToken");
+                    CommonAuth.keycloak.updateToken(CommonAuthConfig.TOKEN_REFRESH_TIMMING).then((refreshed)=>{
+                        if(refreshed) {
+                            DebugConsole.log("CommonAuth", "[INFO] keycloak.token refreshed");
+                        }
+                        resolve();
+                    }).catch(() => {
+                        CommonAuth.keycloak.logout({redirectUri: location.href});
+                    });
+                } else {
+                    resolve();
+                }
+            } catch(e) {
+                CommonAuth.keycloak.logout({redirectUri: location.href});
             }
-        } catch(e) {
-            CommonAuth.keycloak.logout({redirectUri: location.href});
-        }
+        });
     },
 
     /**
@@ -391,7 +409,13 @@ const CommonAuth = {
      */
     "_onTokenExpired": function() {
         DebugConsole.log("CommonAuth", "[INFO] keycloak.onTokenExpired");
-        CommonAuth.keycloak.logout({redirectUri: location.href});
+        // token更新の処理が遅れた場合を考慮し、tokenの延長ができるか更新メソッドを呼び出してみる
+        CommonAuth._autoRefreshToken().then(() => {
+            if (CommonAuth.keycloak.isTokenExpired()) {
+                // それでも有効期限切れの場合はログアウト
+                CommonAuth.keycloak.logout({redirectUri: location.href});
+            }
+        });
     },
 
     /**

@@ -30,6 +30,7 @@ from pathlib import Path
 import urllib.parse
 from contextlib import closing
 import re
+import json
 
 
 # User Imports
@@ -209,7 +210,8 @@ def platform_organization_api_call(subpath):
             private.token_check_client_clientid,
             private.token_check_client_secret,
             private.token_check_client_clientid,
-            private.token_check_client_secret)
+            private.token_check_client_secret,
+            response_chunk_byte)
 
         # 各種チェック check
         response_json = proxy.check_authorization(stream)
@@ -228,22 +230,38 @@ def platform_organization_api_call(subpath):
             for key, value in return_api.headers.items():
                 if key.lower().startswith('content-'):
                     response.headers[key] = value
-
         else:
             # 戻り値をそのまま返却
             # Return the return value as it is
             response = make_response()
             response.status_code = return_api.status_code
             response.data = return_api.content
+            try:
+                res_json = json.loads(return_api.text)
+
+                extra['message_id'] = res_json.get("result")
+                extra['message_text'] = res_json.get("message")
+            except Exception:
+                pass
+
             for key, value in return_api.headers.items():
                 if key.lower().startswith('content-'):
                     response.headers[key] = value
+
+        if multipart_mode:
+            # BODY要素の項目を取得
+            # Get the BODY element item
+            extra['request_form'] = proxy.request_forms
+            extra['request_files'] = proxy.request_files
 
         extra['status_code'] = return_api.status_code
         globals.audit.info(f'audit: response. {response.status_code}', extra=extra)
         globals.logger.info(f"### end func:{inspect.currentframe().f_code.co_name} {response.status_code=}")
 
         return response
+
+    except common.BadRequestException:
+        raise
 
     except common.InternalErrorException:
         raise
@@ -467,7 +485,8 @@ def ita_admin_api_call(subpath):
             private.token_check_client_clientid,
             private.token_check_client_secret,
             private.token_check_client_clientid,
-            private.token_check_client_secret)
+            private.token_check_client_secret,
+            response_chunk_byte)
 
         # 各種チェック check
         response_json = proxy.check_authorization(stream)
@@ -486,16 +505,29 @@ def ita_admin_api_call(subpath):
             for key, value in return_api.headers.items():
                 if key.lower().startswith('content-'):
                     response.headers[key] = value
-
         else:
             # 戻り値をそのまま返却
             # Return the return value as it is
             response = make_response()
             response.status_code = return_api.status_code
             response.data = return_api.content
+            try:
+                res_json = json.loads(return_api.text)
+
+                extra['message_id'] = res_json.get("result")
+                extra['message_text'] = res_json.get("message")
+            except Exception:
+                pass
+
             for key, value in return_api.headers.items():
                 if key.lower().startswith('content-'):
                     response.headers[key] = value
+
+        if multipart_mode:
+            # BODY要素の項目を取得
+            # Get the BODY element item
+            extra['request_form'] = proxy.request_forms
+            extra['request_files'] = proxy.request_files
 
         extra['status_code'] = return_api.status_code
         globals.audit.info(f'audit: response. {response.status_code}', extra=extra)
@@ -503,11 +535,14 @@ def ita_admin_api_call(subpath):
 
         return response
 
+    except common.BadRequestException:
+        raise
+
     except common.InternalErrorException:
         raise
 
     except common.AuthException as e:
-        globals.logger.error(f'authentication error:{e.args}')
+        globals.logger.info(f'authentication error:{e.args}')
         message_id = "401-00002"
         message = multi_lang.get_text(message_id, "認証に失敗しました。")
         extra['status_code'] = 401
@@ -591,11 +626,13 @@ def platform_api_call(organization_id, subpath):
 
         # organization idをrealm名として設定
         # Set organization id as realm name
-        proxy = auth_proxy.auth_proxy(organization_id,
-                                      private.token_check_client_clientid,
-                                      private.token_check_client_secret,
-                                      private.user_token_client_clientid,
-                                      None)
+        proxy = auth_proxy.auth_proxy(
+            organization_id,
+            private.token_check_client_clientid,
+            private.token_check_client_secret,
+            private.user_token_client_clientid,
+            None,
+            response_chunk_byte)
 
         # 各種チェック check
         response_json = proxy.check_authorization(stream)
@@ -614,22 +651,38 @@ def platform_api_call(organization_id, subpath):
             for key, value in return_api.headers.items():
                 if key.lower().startswith('content-'):
                     response.headers[key] = value
-
         else:
             # 戻り値をそのまま返却
             # Return the return value as it is
             response = make_response()
             response.status_code = return_api.status_code
             response.data = return_api.content
+            try:
+                res_json = json.loads(return_api.text)
+
+                extra['message_id'] = res_json.get("result")
+                extra['message_text'] = res_json.get("message")
+            except Exception:
+                pass
+
             for key, value in return_api.headers.items():
                 if key.lower().startswith('content-'):
                     response.headers[key] = value
+
+        if multipart_mode:
+            # BODY要素の項目を取得
+            # Get the BODY element item
+            extra['request_form'] = proxy.request_forms
+            extra['request_files'] = proxy.request_files
 
         extra['status_code'] = return_api.status_code
         globals.audit.info(f'audit: response. {response.status_code}', extra=extra)
         globals.logger.info(f"### end func:{inspect.currentframe().f_code.co_name} {response.status_code=}")
 
         return response
+
+    except common.BadRequestException:
+        raise
 
     except common.InternalErrorException:
         raise
@@ -638,7 +691,7 @@ def platform_api_call(organization_id, subpath):
         raise
 
     except common.AuthException as e:
-        globals.logger.error(f'authentication error:{e.args}')
+        globals.logger.info(f'authentication error:{e.args}')
         message_id = "401-00002"
         message = multi_lang.get_text(message_id, "認証に失敗しました。")
         extra['status_code'] = 401
@@ -716,11 +769,13 @@ def ita_workspace_api_call(organization_id, workspace_id, subpath):
 
         # organization idをrealm名として設定
         # Set organization id as realm name
-        proxy = auth_proxy.auth_proxy(organization_id,
-                                      private.token_check_client_clientid,
-                                      private.token_check_client_secret,
-                                      private.user_token_client_clientid,
-                                      None)
+        proxy = auth_proxy.auth_proxy(
+            organization_id,
+            private.token_check_client_clientid,
+            private.token_check_client_secret,
+            private.user_token_client_clientid,
+            None,
+            response_chunk_byte)
 
         # 各種チェック check
         response_json = proxy.check_authorization(stream)
@@ -739,22 +794,37 @@ def ita_workspace_api_call(organization_id, workspace_id, subpath):
             for key, value in return_api.headers.items():
                 if key.lower().startswith('content-'):
                     response.headers[key] = value
-
         else:
             # 戻り値をそのまま返却
             # Return the return value as it is
             response = make_response()
             response.status_code = return_api.status_code
             response.data = return_api.content
+            try:
+                res_json = json.loads(return_api.text)
+
+                extra['message_id'] = res_json.get("result")
+                extra['message_text'] = res_json.get("message")
+            except Exception:
+                pass
             for key, value in return_api.headers.items():
                 if key.lower().startswith('content-'):
                     response.headers[key] = value
+
+        if multipart_mode:
+            # BODY要素の項目を取得
+            # Get the BODY element item
+            extra['request_form'] = proxy.request_forms
+            extra['request_files'] = proxy.request_files
 
         extra['status_code'] = return_api.status_code
         globals.audit.info(f'audit: response. {response.status_code}', extra=extra)
         globals.logger.info(f"### end func:{inspect.currentframe().f_code.co_name} {response.status_code=}")
 
         return response
+
+    except common.BadRequestException:
+        raise
 
     except common.InternalErrorException:
         raise
@@ -763,7 +833,7 @@ def ita_workspace_api_call(organization_id, workspace_id, subpath):
         raise
 
     except common.AuthException as e:
-        globals.logger.error(f'authentication error:{e.args}')
+        globals.logger.info(f'authentication error:{e.args}')
         message_id = "401-00002"
         message = multi_lang.get_text(message_id, "認証に失敗しました。")
         extra['status_code'] = 401
@@ -841,11 +911,13 @@ def ita_oase_recever_api_call(organization_id, workspace_id, subpath):
 
         # organization idをrealm名として設定
         # Set organization id as realm name
-        proxy = auth_proxy.auth_proxy(organization_id,
-                                      private.token_check_client_clientid,
-                                      private.token_check_client_secret,
-                                      private.user_token_client_clientid,
-                                      None)
+        proxy = auth_proxy.auth_proxy(
+            organization_id,
+            private.token_check_client_clientid,
+            private.token_check_client_secret,
+            private.user_token_client_clientid,
+            None,
+            response_chunk_byte)
 
         # 各種チェック check
         response_json = proxy.check_authorization(stream)
@@ -864,22 +936,38 @@ def ita_oase_recever_api_call(organization_id, workspace_id, subpath):
             for key, value in return_api.headers.items():
                 if key.lower().startswith('content-'):
                     response.headers[key] = value
-
         else:
             # 戻り値をそのまま返却
             # Return the return value as it is
             response = make_response()
             response.status_code = return_api.status_code
             response.data = return_api.content
+            try:
+                res_json = json.loads(return_api.text)
+
+                extra['message_id'] = res_json.get("result")
+                extra['message_text'] = res_json.get("message")
+            except Exception:
+                pass
+
             for key, value in return_api.headers.items():
                 if key.lower().startswith('content-'):
                     response.headers[key] = value
+
+        if multipart_mode:
+            # BODY要素の項目を取得
+            # Get the BODY element item
+            extra['request_form'] = proxy.request_forms
+            extra['request_files'] = proxy.request_files
 
         extra['status_code'] = return_api.status_code
         globals.audit.info(f'audit: response. {response.status_code}', extra=extra)
         globals.logger.info(f"### end func:{inspect.currentframe().f_code.co_name} {response.status_code=}")
 
         return response
+
+    except common.BadRequestException:
+        raise
 
     except common.InternalErrorException:
         raise

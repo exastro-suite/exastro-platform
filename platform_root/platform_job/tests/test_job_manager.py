@@ -19,7 +19,9 @@ import psutil
 import logging
 import threading
 import time
+import datetime
 from unittest import mock
+from unittest.mock import MagicMock
 import ulid
 from importlib import import_module
 
@@ -61,7 +63,7 @@ def test_job_manager_main_sigterm_signal():
             # sub processの終了確認
             assert test_common.check_state(
                 timeout=5.0, conditions=lambda : len([p for p in psutil.Process(os.getpid()).children() if p.name().startswith('python') ]), conditions_value=0)
- 
+
             # main processの終了確認
             assert not main_thread.is_alive()
 
@@ -668,8 +670,63 @@ def test_job_manager_sub_force_update_status():
                 timeout=10.0, conditions=lambda : not main_thread.is_alive())
 
             main_thread.join()
-            
-            
+
+
+def test_job_manager_sub_job_trigger_daily():
+    """job_triggerがdailyのjob呼出確認
+    """
+    TestExecuteStocker.initalize()
+
+    process_kind = job_manager_const.PROCESS_KIND_AUDIT_LOG_CLEANUP
+
+    # Jobの実行classを試験用に切り替え
+    job_config_jobs = dict(job_manager_config.JOBS)
+    job_config_jobs[process_kind]["module"] = "tests.jobs.TestJobExecutor"
+    job_config_jobs[process_kind]["class"] = "TestNormalJobExecutor"
+
+    with mock.patch.dict(f"job_manager_config.JOBS", job_config_jobs):
+
+        # sub process起動用の情報生成
+        sub_processes_mgr = SubProcessesManager()
+        sub_process_parameter = sub_processes_mgr.generate_sub_process_parameter()
+
+        # 即時実行されるようにexec_timesを書き換える
+        ago_10s = datetime.datetime.now() + datetime.timedelta(seconds=-10)
+        interval_job_exec_times = datetime.datetime.timestamp(ago_10s)
+        sub_process_parameter.set_interval_job_exec_times(interval_job_exec_times, process_kind)
+
+        sub_processes_mgr.append_new_process(sub_process_parameter, test_common.get_main_process(os.getpid()))
+
+        # sub processの起動
+        main_thread = threading.Thread(
+            target=job_manager.job_manager_sub_process,
+            args=(sub_process_parameter,),
+            name="sub_process",
+            daemon=True
+        )
+        main_thread.start()
+        time.sleep(1.0)
+
+        # sub processの状態更新(audit log cleanupを行うprocessをどれにするかの情報を更新するため)
+        sub_processes_mgr.refresh_sub_process_status()
+        sub_processes_mgr.set_interval_job_execute_process()
+
+        try:
+            # executedに1件はいること
+            assert test_common.check_state(
+                timeout=10.0, conditions=lambda : len(TestExecuteStocker.executed_queue) == 1)
+
+        finally:
+            # sub processの終了
+            job_manager.job_manager_process_sigterm_handler(None, None)
+
+            # sub processの終了確認
+            assert test_common.check_state(
+                timeout=10.0, conditions=lambda : not main_thread.is_alive())
+
+            main_thread.join()
+
+
 def test_job_manager_sub_liveness_file():
     """ハングアップ監視用ファイルの確認
     """

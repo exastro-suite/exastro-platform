@@ -161,6 +161,7 @@ def jobs_users_import(import_file, organization_id):  # noqa: E501
     """
     r = connexion.request
     user_id = r.headers.get("User-id")
+    language = r.headers.get("Language")
 
     # write to JOBS USER DB
     reg_flag = False
@@ -170,8 +171,9 @@ def jobs_users_import(import_file, organization_id):  # noqa: E501
                 job_id = ulid.new().str
                 parameter = {
                     "job_id": job_id,
-                    "job_type": const.PROCESS_KIND_USER_IMPORT,
+                    "job_type": const.JOB_TYPE_USER_BULK_IMPORT,
                     "job_status": const.JOB_USER_NOT_EXEC,
+                    "language": language,
                     "create_user": user_id,
                     "last_update_user": user_id
                 }
@@ -228,6 +230,22 @@ def jobs_users_import(import_file, organization_id):  # noqa: E501
                     raise common.InternalErrorException(message_id=message_id, message=message)
 
     return common.response_200_ok(None)
+
+
+@common.platform_exception_handler
+def jobs_users_bulk_delete(import_file, organization_id):  # noqa: E501
+    """Bulk delete user job call
+
+     # noqa: E501
+
+    :param import_file:
+    :type import_file: strstr
+    :param organization_id:
+    :type organization_id: str
+
+    :rtype: InlineResponse2002
+    """
+    return 'do some magic!'
 
 
 @common.platform_exception_handler

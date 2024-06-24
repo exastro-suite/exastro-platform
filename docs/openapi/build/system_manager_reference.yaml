@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: Exastro Platform API (System Management)
   description: Exastro Platform API for System Manager
-  version: 1.8.2
+  version: 1.9.0
 servers:
   - url: 'https://{host}'
     description: API endpoint
@@ -39,8 +39,6 @@ tags:
     description: システム管理者共通
   - name: MaintenanceModeService
     description: メンテナンスモードに関する操作
-  - name: AuditLogService
-    description: 監査ログに関する操作
 paths:
   /auth/realms/master/protocol/openid-connect/token:
     post:
@@ -1825,9 +1823,11 @@ components:
         ts_from:
           type: string
           example: '2024-06-01 00:00:00'
+          description: conditions scope of Audit log TS (start)
         ts_to:
           type: string
           example: '2024-06-30 23:59:59'
+          description: conditions scope of Audit log TS (end)
     AuditLogDownloadList:
       type: object
       properties:
@@ -1838,9 +1838,15 @@ components:
             properties:
               download_id:
                 type: string
-                example: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+                example: XXXXXXXXXXXXXXXXXXXXXXXXXX
               status:
                 type: string
+                enum:
+                  - NotExecuted
+                  - Executing
+                  - Completion
+                  - Failed
+                  - NoData
               conditions:
                 type: object
                 properties:
@@ -1850,11 +1856,13 @@ components:
                   ts_to:
                     type: string
                     example: '2024-06-30 23:59:59'
+              count_export:
+                type: number
               message:
                 type: string
               create_timestamp:
                 type: string
-                example: '2024-06-01 10:00:00'
+                format: date-time
               create_user_id:
                 type: string
                 format: uuid
@@ -1863,7 +1871,7 @@ components:
                 example: firstname lastname
               last_update_timestamp:
                 type: string
-                example: '2024-06-01 10:30:00'
+                format: date-time
     authorizationBody:
       title: authorization of Requst form-data
       type: object

@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: Exastro Platform API
   description: Exastro Platform API
-  version: 1.8.2
+  version: 1.9.0
 servers:
 - url: "https://{host}"
   description: API endpoint
@@ -49,7 +49,7 @@ tags:
 - name: JobsService
   description: ジョブに関する操作
 - name: CommonService
-  description: システム管理者共通
+  description: システム設定に関する操作
 - name: MaintenanceModeService
   description: メンテナンスモードに関する操作
 - name: NotificationService
@@ -747,6 +747,41 @@ paths:
               schema:
                 $ref: '#/components/schemas/runtimeError'
       x-openapi-router-controller: controllers.common_service_controller
+  /api/{organization_id}/platform/settings/common/{config_key}:
+    get:
+      tags:
+      - CommonService
+      summary: Returns the current system config value
+      operationId: settings_system_config_get_for_organization_user
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: config_key
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_13'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+      x-openapi-router-controller: controllers.common_service_controller
   /api/{organization_id}/platform/workspaces:
     get:
       tags:
@@ -775,7 +810,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_13'
+                $ref: '#/components/schemas/inline_response_200_14'
         default:
           description: An unexpected error response.
           content:
@@ -843,7 +878,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_14'
+                $ref: '#/components/schemas/inline_response_200_15'
         default:
           description: An unexpected error response.
           content:
@@ -952,7 +987,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_15'
+                $ref: '#/components/schemas/inline_response_200_16'
         default:
           description: An unexpected error response.
           content:
@@ -1011,7 +1046,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_16'
+                $ref: '#/components/schemas/inline_response_200_17'
               examples:
                 mail settings:
                   value:
@@ -1179,7 +1214,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_17'
+                $ref: '#/components/schemas/inline_response_200_18'
               examples:
                 mail settings:
                   value:
@@ -1466,7 +1501,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_13'
+                $ref: '#/components/schemas/inline_response_200_14'
         default:
           description: An unexpected error response.
           content:
@@ -1586,7 +1621,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_18'
+                $ref: '#/components/schemas/inline_response_200_19'
         default:
           description: An unexpected error response.
           content:
@@ -1655,7 +1690,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_19'
+                $ref: '#/components/schemas/inline_response_200_20'
         default:
           description: An unexpected error response.
           content:
@@ -1771,7 +1806,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_20'
+                $ref: '#/components/schemas/inline_response_200_21'
         default:
           description: An unexpected error response.
           content:
@@ -1950,7 +1985,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_21'
+                $ref: '#/components/schemas/inline_response_200_22'
         default:
           description: An unexpected error response.
           content:
@@ -2038,11 +2073,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/runtimeError'
       x-openapi-router-controller: controllers.role_mappings_service_controller
-  /api/{organization_id}/platform/jobs/users/import:
+  /api/{organization_id}/platform/jobs/users/bulk-import:
     post:
       tags:
       - JobsService
-      summary: Import user bulk registration
+      summary: Bulk import user job call
       operationId: jobs_users_import
       parameters:
       - name: organization_id
@@ -2056,7 +2091,41 @@ paths:
         content:
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/users_import_body'
+              $ref: '#/paths/~1api~1%7Borganization_id%7D~1platform~1jobs~1users~1bulk-delete/post/requestBody/content/multipart~1form-data/schema'
+        required: true
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_2'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+      x-openapi-router-controller: controllers.jobs_service_controller
+  /api/{organization_id}/platform/jobs/users/bulk-delete:
+    post:
+      tags:
+      - JobsService
+      summary: Bulk delete user job call
+      operationId: jobs_users_bulk_delete
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/users_bulkdelete_body'
         required: true
       responses:
         "200":
@@ -2119,7 +2188,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_22'
+                $ref: '#/components/schemas/inline_response_200_23'
         default:
           description: An unexpected error response.
           content:
@@ -2172,7 +2241,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_22'
+                $ref: '#/components/schemas/inline_response_200_23'
         default:
           description: An unexpected error response.
           content:
@@ -2200,7 +2269,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_23'
+                $ref: '#/components/schemas/inline_response_200_24'
               example:
                 value:
                   result: 200
@@ -2320,7 +2389,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_24'
+                $ref: '#/components/schemas/inline_response_200_25'
         default:
           description: An unexpected error response.
           content:
@@ -2353,7 +2422,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_25'
+                $ref: '#/components/schemas/inline_response_200_26'
         default:
           description: An unexpected error response.
           content:
@@ -2476,7 +2545,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_26'
+                $ref: '#/components/schemas/inline_response_200_13'
         default:
           description: An unexpected error response.
           content:
@@ -2876,7 +2945,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_18'
+                $ref: '#/components/schemas/inline_response_200_19'
         default:
           description: An unexpected error response.
           content:
@@ -2953,7 +3022,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_22'
+                $ref: '#/components/schemas/inline_response_200_23'
         default:
           description: An unexpected error response.
           content:
@@ -3010,7 +3079,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_16'
+                $ref: '#/components/schemas/inline_response_200_17'
               examples:
                 mail settings:
                   $ref: '#/paths/~1api~1%7Borganization_id%7D~1platform~1workspaces~1%7Bworkspace_id%7D~1settings~1notifications/get/responses/200/content/application~1json/examples/mail%20settings'
@@ -3057,7 +3126,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_17'
+                $ref: '#/components/schemas/inline_response_200_18'
               examples:
                 mail settings:
                   $ref: '#/paths/~1api~1%7Borganization_id%7D~1platform~1workspaces~1%7Bworkspace_id%7D~1settings~1notifications~1%7Bdestination_id%7D/get/responses/200/content/application~1json/examples/mail%20settings'
@@ -3179,7 +3248,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_13'
+                $ref: '#/components/schemas/inline_response_200_14'
         default:
           description: An unexpected error response.
           content:
@@ -4267,9 +4336,11 @@ components:
       properties:
         ts_from:
           type: string
+          description: conditions scope of Audit log TS (start)
           example: 2024-06-01 00:00:00
         ts_to:
           type: string
+          description: conditions scope of Audit log TS (end)
           example: 2024-06-30 23:59:59
     AuditLogDownloadList:
       type: object
@@ -4416,8 +4487,15 @@ components:
     inline_response_200_13:
       allOf:
       - $ref: '#/components/schemas/responseOk'
-      - $ref: '#/components/schemas/workspaceList'
+      - type: object
+        properties:
+          data:
+            $ref: '#/components/schemas/systemConfig'
     inline_response_200_14:
+      allOf:
+      - $ref: '#/components/schemas/responseOk'
+      - $ref: '#/components/schemas/workspaceList'
+    inline_response_200_15:
       allOf:
       - $ref: '#/components/schemas/responseOk'
       - title: workspaceDetail is Workspace resources.
@@ -4427,31 +4505,31 @@ components:
             allOf:
             - $ref: '#/components/schemas/workspace'
             - $ref: '#/components/schemas/responseStat'
-    inline_response_200_15:
-      allOf:
-      - $ref: '#/components/schemas/responseOk'
-      - $ref: '#/components/schemas/memberList'
     inline_response_200_16:
       allOf:
       - $ref: '#/components/schemas/responseOk'
-      - $ref: '#/components/schemas/settingsDestinationList'
+      - $ref: '#/components/schemas/memberList'
     inline_response_200_17:
+      allOf:
+      - $ref: '#/components/schemas/responseOk'
+      - $ref: '#/components/schemas/settingsDestinationList'
+    inline_response_200_18:
       allOf:
       - $ref: '#/components/schemas/responseOk'
       - $ref: '#/components/schemas/settingsDestinationOne'
       - $ref: '#/components/schemas/responseStat'
-    inline_response_200_18:
+    inline_response_200_19:
       allOf:
       - $ref: '#/components/schemas/responseOk'
       - $ref: '#/components/schemas/userList'
-    inline_response_200_19:
+    inline_response_200_20:
       allOf:
       - $ref: '#/components/schemas/responseOk'
       - type: object
         properties:
           data:
             $ref: '#/components/schemas/user'
-    inline_response_200_20:
+    inline_response_200_21:
       allOf:
       - $ref: '#/components/schemas/responseOk'
       - $ref: '#/components/schemas/roleDetailList'
@@ -4461,7 +4539,7 @@ components:
     roles_role_name_body:
       oneOf:
       - $ref: '#/components/schemas/roleDetailWorkspacePut'
-    inline_response_200_21:
+    inline_response_200_22:
       allOf:
       - $ref: '#/components/schemas/responseOk'
       - title: roleList is list of Role resources.
@@ -4471,13 +4549,16 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/roleUser'
-    users_import_body:
+    users_bulkdelete_body:
+      required:
+      - import_file
       type: object
       properties:
         import_file:
           type: string
+          description: The file image is in Excel format.
           format: binary
-    inline_response_200_22:
+    inline_response_200_23:
       allOf:
       - $ref: '#/components/schemas/responseOk'
       - $ref: '#/components/schemas/maintenanceModeSettings'
@@ -4490,15 +4571,15 @@ components:
         data_update_stop:
           type: string
           example: "1"
-    inline_response_200_23:
-      allOf:
-      - $ref: '#/components/schemas/responseOk'
-      - $ref: '#/components/schemas/settingsMailserverList'
     inline_response_200_24:
       allOf:
       - $ref: '#/components/schemas/responseOk'
-      - $ref: '#/components/schemas/AuditLogDownloadList'
+      - $ref: '#/components/schemas/settingsMailserverList'
     inline_response_200_25:
+      allOf:
+      - $ref: '#/components/schemas/responseOk'
+      - $ref: '#/components/schemas/AuditLogDownloadList'
+    inline_response_200_26:
       allOf:
       - $ref: '#/components/schemas/responseOk'
       - type: object
@@ -4507,13 +4588,6 @@ components:
             type: object
             example:
               download_id: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-    inline_response_200_26:
-      allOf:
-      - $ref: '#/components/schemas/responseOk'
-      - type: object
-        properties:
-          data:
-            $ref: '#/components/schemas/systemConfig'
     inline_response_200_27:
       allOf:
       - $ref: '#/components/schemas/responseOk'
@@ -4761,16 +4835,24 @@ components:
       properties:
         download_id:
           type: string
-          example: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+          example: XXXXXXXXXXXXXXXXXXXXXXXXXX
         status:
           type: string
+          enum:
+          - NotExecuted
+          - Executing
+          - Completion
+          - Failed
+          - NoData
         conditions:
           $ref: '#/components/schemas/AuditLogDownloadList_conditions'
+        count_export:
+          type: number
         message:
           type: string
         create_timestamp:
           type: string
-          example: 2024-06-01 10:00:00
+          format: date-time
         create_user_id:
           type: string
           format: uuid
@@ -4779,7 +4861,7 @@ components:
           example: firstname lastname
         last_update_timestamp:
           type: string
-          example: 2024-06-01 10:30:00
+          format: date-time
   responses:
     UnauthorizedError:
       description: Access token is missing or invalid
