@@ -49,7 +49,12 @@
 					"--max-line-length=250",
 					"--max-complexity=20",
 				],
-		
+				"flake8.args": [
+					"--ignore=W293, W504",
+					"--max-line-length=150",
+					"--max-complexity=20",
+				],
+
 				"python.formatting.provider": "autopep8",
 		
 				"python.formatting.autopep8Args": [
