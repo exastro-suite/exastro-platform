@@ -30,6 +30,7 @@ from pathlib import Path
 import urllib.parse
 from contextlib import closing
 import re
+import json
 
 
 # User Imports
@@ -235,6 +236,14 @@ def platform_organization_api_call(subpath):
             response = make_response()
             response.status_code = return_api.status_code
             response.data = return_api.content
+            try:
+                res_json = json.loads(return_api.text)
+
+                extra['message_id'] = res_json.get("result")
+                extra['message_text'] = res_json.get("message")
+            except Exception:
+                pass
+
             for key, value in return_api.headers.items():
                 if key.lower().startswith('content-'):
                     response.headers[key] = value
@@ -502,6 +511,14 @@ def ita_admin_api_call(subpath):
             response = make_response()
             response.status_code = return_api.status_code
             response.data = return_api.content
+            try:
+                res_json = json.loads(return_api.text)
+
+                extra['message_id'] = res_json.get("result")
+                extra['message_text'] = res_json.get("message")
+            except Exception:
+                pass
+
             for key, value in return_api.headers.items():
                 if key.lower().startswith('content-'):
                     response.headers[key] = value
@@ -640,6 +657,14 @@ def platform_api_call(organization_id, subpath):
             response = make_response()
             response.status_code = return_api.status_code
             response.data = return_api.content
+            try:
+                res_json = json.loads(return_api.text)
+
+                extra['message_id'] = res_json.get("result")
+                extra['message_text'] = res_json.get("message")
+            except Exception:
+                pass
+
             for key, value in return_api.headers.items():
                 if key.lower().startswith('content-'):
                     response.headers[key] = value
@@ -775,6 +800,13 @@ def ita_workspace_api_call(organization_id, workspace_id, subpath):
             response = make_response()
             response.status_code = return_api.status_code
             response.data = return_api.content
+            try:
+                res_json = json.loads(return_api.text)
+
+                extra['message_id'] = res_json.get("result")
+                extra['message_text'] = res_json.get("message")
+            except Exception:
+                pass
             for key, value in return_api.headers.items():
                 if key.lower().startswith('content-'):
                     response.headers[key] = value
@@ -910,6 +942,14 @@ def ita_oase_recever_api_call(organization_id, workspace_id, subpath):
             response = make_response()
             response.status_code = return_api.status_code
             response.data = return_api.content
+            try:
+                res_json = json.loads(return_api.text)
+
+                extra['message_id'] = res_json.get("result")
+                extra['message_text'] = res_json.get("message")
+            except Exception:
+                pass
+
             for key, value in return_api.headers.items():
                 if key.lower().startswith('content-'):
                     response.headers[key] = value
