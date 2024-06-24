@@ -23,6 +23,7 @@ INTO T_JOBS_USER(
 JOB_ID,
 JOB_TYPE,
 JOB_STATUS,
+LANGUAGE,
 CREATE_USER,
 LAST_UPDATE_USER
 )
@@ -30,6 +31,7 @@ VALUES (
 %(job_id)s,
 %(job_type)s,
 %(job_status)s,
+%(language)s,
 %(create_user)s,
 %(last_update_user)s
 )
