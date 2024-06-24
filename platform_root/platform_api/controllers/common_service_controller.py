@@ -78,3 +78,19 @@ def settings_system_config_update(body, config_key):  # noqa: E501
         conn.commit()
 
     return common.response_200_ok(None)
+
+
+@common.platform_exception_handler
+def settings_system_config_get_for_organization_user(organization_id, config_key):  # noqa: E501
+    """Returns the current system config value
+
+    # noqa: E501
+
+    :param organization_id:
+    :type organization_id: str
+    :param config_key:
+    :type config_key: str
+
+    :rtype: InlineResponse20013
+    """
+    return 'do some magic!'

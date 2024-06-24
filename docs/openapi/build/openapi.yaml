@@ -46,7 +46,7 @@ tags:
   - name: JobsService
     description: ジョブに関する操作
   - name: CommonService
-    description: システム管理者共通
+    description: システム設定に関する操作
   - name: MaintenanceModeService
     description: メンテナンスモードに関する操作
   - name: NotificationService
@@ -797,6 +797,42 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/responseOk'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+  '/api/{organization_id}/platform/settings/common/{config_key}':
+    get:
+      tags:
+        - CommonService
+      summary: Returns the current system config value
+      x-openapi-router-controller: controllers.common_service_controller
+      operationId: settings_system_config_get_for_organization_user
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: config_key
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/systemConfig'
         default:
           description: An unexpected error response.
           content:

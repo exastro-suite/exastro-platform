@@ -68,6 +68,8 @@ tags:
   description: 通知機能に関する操作
 - name: AuditLogService
   description: 監査ログに関する操作
+- name: CommonService
+  description: システム設定に関する操作
 
 paths:
   "/auth/realms/{organization_id}/protocol/openid-connect/token":
@@ -141,6 +143,9 @@ paths:
       $ref: './paths/auditlog.download.yaml'
   "/api/{organization_id}/platform/auditlog/download/{download_id}":
       $ref: './paths/auditlog.download.download_id.yaml'
+
+  "/api/{organization_id}/platform/settings/common/{config_key}":
+      $ref: './paths/common.settings.organizations.common.config.yaml'
 
 components:
   schemas:
