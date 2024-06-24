@@ -82,15 +82,26 @@ def settings_system_config_update(body, config_key):  # noqa: E501
 
 @common.platform_exception_handler
 def settings_system_config_get_for_organization_user(organization_id, config_key):  # noqa: E501
-    """Returns the current system config value
+    """Returns the current system config value (for organization user)
 
-    # noqa: E501
+    Args:
+        organization_id (str): _description_
+        config_key (str): _description_
 
-    :param organization_id:
-    :type organization_id: str
-    :param config_key:
-    :type config_key: str
-
-    :rtype: InlineResponse20013
+    Returns:
+        response: HTTP Response
     """
-    return 'do some magic!'
+
+    globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
+
+    with closing(DBconnector().connect_platformdb()) as conn:
+        # config list get
+        data = bl_common_service.settings_system_config_list(conn, config_key)
+
+    if data is None:
+        raise common.NotFoundException(
+            message_id="404-20001",
+            message=multi_lang.get_text("404-20001", "設定が存在しません(key:{0})", config_key)
+        )
+
+    return common.response_200_ok(data)
