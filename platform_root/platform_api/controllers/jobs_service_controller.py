@@ -17,7 +17,7 @@ import ulid
 import globals
 
 from contextlib import closing
-from common_library.common import common, multi_lang, const
+from common_library.common import common, multi_lang, const, bl_job_service
 from common_library.common.db import DBconnector
 from common_library.common.libs import queries_bl_jobs, queries_bl_notification
 
@@ -160,75 +160,9 @@ def jobs_users_import(import_file, organization_id):  # noqa: E501
     :rtype: InlineResponse2002
     """
     r = connexion.request
-    user_id = r.headers.get("User-id")
 
     # write to JOBS USER DB
-    reg_flag = False
-    with closing(DBconnector().connect_orgdb(organization_id)) as conn:
-        with conn.cursor() as cursor:
-            try:
-                job_id = ulid.new().str
-                parameter = {
-                    "job_id": job_id,
-                    "job_type": const.JOB_TYPE_USER_BULK_IMPORT,
-                    "job_status": const.JOB_USER_NOT_EXEC,
-                    "create_user": user_id,
-                    "last_update_user": user_id
-                }
-                cursor.execute(queries_bl_jobs.SQL_INSERT_JOBS_USER, parameter)
-
-                file_id = ulid.new().str
-                file_data = import_file.stream.read()
-                parameter = {
-                    "file_id": file_id,
-                    "job_id": job_id,
-                    "file_data": file_data,
-                    "create_user": user_id,
-                    "last_update_user": user_id
-                }
-                cursor.execute(queries_bl_jobs.SQL_INSERT_JOBS_USER_FILE, parameter)
-                conn.commit()
-                reg_flag = True
-            except Exception as e:
-                conn.rollback()
-                globals.logger.error(f"exception:{e.args}")
-                message_id = f"500-{MSG_FUNCTION_ID}001"
-                message = multi_lang.get_text(
-                    message_id,
-                    "ジョブの登録に失敗しました(job id:{0})",
-                    job_id,
-                )
-                raise common.InternalErrorException(message_id=message_id, message=message)
-
-    # write to PROCESS QUEUE DB
-    if reg_flag is True:
-        with closing(DBconnector().connect_platformdb()) as conn:
-            with conn.cursor() as cursor:
-                try:
-                    parameter = {
-                        "process_id": ulid.new().str,
-                        "process_kind": const.PROCESS_KIND_USER_IMPORT,
-                        "process_exec_id": job_id,
-                        "organization_id": organization_id,
-                        "workspace_id": None,
-                        "last_update_user": user_id,
-                    }
-                    cursor.execute(queries_bl_notification.SQL_INSERT_PROCESS_QUEUE, parameter)
-                    conn.commit()
-
-                except Exception as e:
-                    conn.rollback()
-                    globals.logger.error(f"exception:{e.args}")
-                    message_id = f"500-{MSG_FUNCTION_ID}002"
-                    message = multi_lang.get_text(
-                        message_id,
-                        "処理キューの登録に失敗しました(process id:{0})",
-                        parameter['process_id'],
-                    )
-                    raise common.InternalErrorException(message_id=message_id, message=message)
-
-    return common.response_200_ok(None)
-
+    return bl_job_service.user_bulk_process(r, import_file, organization_id, const.JOB_TYPE_USER_BULK_IMPORT)
 
 @common.platform_exception_handler
 def jobs_users_bulk_delete(import_file, organization_id):  # noqa: E501
@@ -244,75 +178,9 @@ def jobs_users_bulk_delete(import_file, organization_id):  # noqa: E501
     :rtype: InlineResponse2002
     """
     r = connexion.request
-    user_id = r.headers.get("User-id")
 
     # write to JOBS USER DB
-    reg_flag = False
-    with closing(DBconnector().connect_orgdb(organization_id)) as conn:
-        with conn.cursor() as cursor:
-            try:
-                job_id = ulid.new().str
-                parameter = {
-                    "job_id": job_id,
-                    "job_type": const.JOB_TYPE_USER_BULK_DELETE,
-                    "job_status": const.JOB_USER_NOT_EXEC,
-                    "create_user": user_id,
-                    "last_update_user": user_id
-                }
-                cursor.execute(queries_bl_jobs.SQL_INSERT_JOBS_USER, parameter)
-
-                file_id = ulid.new().str
-                file_data = import_file.stream.read()
-                parameter = {
-                    "file_id": file_id,
-                    "job_id": job_id,
-                    "file_data": file_data,
-                    "create_user": user_id,
-                    "last_update_user": user_id
-                }
-                cursor.execute(queries_bl_jobs.SQL_INSERT_JOBS_USER_FILE, parameter)
-                conn.commit()
-                reg_flag = True
-            except Exception as e:
-                conn.rollback()
-                globals.logger.error(f"exception:{e.args}")
-                message_id = f"500-{MSG_FUNCTION_ID}001"
-                message = multi_lang.get_text(
-                    message_id,
-                    "ジョブの登録に失敗しました(job id:{0})",
-                    job_id,
-                )
-                raise common.InternalErrorException(message_id=message_id, message=message)
-
-    # write to PROCESS QUEUE DB
-    if reg_flag is True:
-        with closing(DBconnector().connect_platformdb()) as conn:
-            with conn.cursor() as cursor:
-                try:
-                    parameter = {
-                        "process_id": ulid.new().str,
-                        "process_kind": const.PROCESS_KIND_USER_IMPORT,
-                        "process_exec_id": job_id,
-                        "organization_id": organization_id,
-                        "workspace_id": None,
-                        "last_update_user": user_id,
-                    }
-                    cursor.execute(queries_bl_notification.SQL_INSERT_PROCESS_QUEUE, parameter)
-                    conn.commit()
-
-                except Exception as e:
-                    conn.rollback()
-                    globals.logger.error(f"exception:{e.args}")
-                    message_id = f"500-{MSG_FUNCTION_ID}002"
-                    message = multi_lang.get_text(
-                        message_id,
-                        "処理キューの登録に失敗しました(process id:{0})",
-                        parameter['process_id'],
-                    )
-                    raise common.InternalErrorException(message_id=message_id, message=message)
-
-    return common.response_200_ok(None)
-
+    return bl_job_service.user_bulk_process(r, import_file, organization_id, const.JOB_TYPE_USER_BULK_DELETE)
 
 @common.platform_exception_handler
 def jobs_users_import_status(organization_id):  # noqa: E501
