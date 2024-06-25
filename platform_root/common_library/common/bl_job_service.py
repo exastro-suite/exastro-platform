@@ -37,6 +37,7 @@ def user_bulk_process(request, import_file, organization_id, job_type):  # noqa:
     :rtype: InlineResponse2002
     """
     user_id = request.headers.get("User-id")
+    language = request.headers.get("Language")
 
     # write to JOBS USER DB
     reg_flag = False
@@ -48,6 +49,7 @@ def user_bulk_process(request, import_file, organization_id, job_type):  # noqa:
                     "job_id": job_id,
                     "job_type": job_type,
                     "job_status": const.JOB_USER_NOT_EXEC,
+                    "language": language,
                     "create_user": user_id,
                     "last_update_user": user_id
                 }
