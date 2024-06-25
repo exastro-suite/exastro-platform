@@ -2383,6 +2383,15 @@ paths:
         explode: false
         schema:
           type: string
+      - name: download_id
+        in: query
+        description: filter download id. (exact match)
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          example: XXXXXXXXXXXXXXXXXXXXXXXXXX
       responses:
         "200":
           description: A successful response.
