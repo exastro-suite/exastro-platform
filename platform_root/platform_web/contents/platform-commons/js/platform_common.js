@@ -270,7 +270,7 @@ function displayMenu(curent) {
             <li class="menuItem"><a class="menuLink" id="menu_settings_notifications" href="#">${getText("000-00183", "通知管理")}</a></li>
             <li class="menuItem"><a class="menuLink" id="menu_settings_mailserver" href="#" style="display: none;">${getText("000-88002", "メール送信サーバー設定")}</a></li>
             <li class="menuItem"><a class="menuLink" id="menu_identity_providers" href="#" style="display: none;">${getText("000-80051", "アイデンティティー・プロバイダー")}</a></li>
-            <li class="menuItem"><a class="menuLink" id="menu_auditlog" href="#" style="display: none;">${getText("000-80052", "監査ログ")}</a></li>
+            <li class="menuItem"><a class="menuLink" id="menu_auditlog" href="#" style="display: none;">${getText("000-91002", "監査ログ")}</a></li>
         `);
 
         $('#menu_workspace').attr('href', location_conf.href.workspaces.list.replace(/{organization_id}/g, CommonAuth.getRealm()));
@@ -298,7 +298,7 @@ function displayMenu(curent) {
         if (CommonAuth.hasRealmManagementAuthority("manage-identity-providers")) {
             $("#menu_identity_providers").css("display", "");
         }
-        if (CommonAuth.hasAuthority(RolesCommon.ORG_AUTH_UPDATE)) {
+        if (CommonAuth.hasAuthority(RolesCommon.ORG_AUTH_AUDIT_LOG)) {
             $("#menu_auditlog").css("display", "");
         }
     }
@@ -1526,5 +1526,57 @@ const settings_mailserver_common = {
                 }
             }
         },
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//   Auditlog Common
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+const AuditlogCommon = {
+    validate: {
+        //
+        // validate from date
+        //
+        from_date: function(from_date) {
+            if(from_date === "") {
+                return {
+                    "result": false,
+                    "message": getText("400-00011", "必須項目が不足しています。({0})", getText("000-91007", "From"))
+                }
+            } else if(isNaN(Date.parse(from_date))) {
+                return {
+                    "result": false,
+                    "message": getText("400-00020", "日時形式以外が指定されています。")
+                }
+            } else {
+                return {
+                    "result": true,
+                    "message": ""
+                }
+            }
+        },
+        //
+        // validate from date
+        //
+        to_date: function(to_date) {
+            if(to_date === "") {
+                return {
+                    "result": false,
+                    "message": getText("400-00011", "必須項目が不足しています。({0})", getText("000-91008", "To"))
+                }
+            } else if(isNaN(Date.parse(to_date))) {
+                return {
+                    "result": false,
+                    "message": getText("400-00020", "日時形式以外が指定されています。")
+                }
+            } else {
+                return {
+                    "result": true,
+                    "message": ""
+                }
+            }
+        }
     }
 }

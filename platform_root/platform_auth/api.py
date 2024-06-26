@@ -30,6 +30,7 @@ from pathlib import Path
 import urllib.parse
 from contextlib import closing
 import re
+import json
 
 
 # User Imports
@@ -186,10 +187,6 @@ def platform_organization_api_call(subpath):
             message_id = "500-11002"
             message = multi_lang.get_text(
                 message_id, "platform private情報の取得に失敗しました")
-            extra['status_code'] = 500
-            extra['message_id'] = message_id
-            extra['message_text'] = message
-            globals.audit.info('audit: error.', extra=extra)
             raise common.InternalErrorException(message_id=message_id, message=message)
 
         # ストリームモードのあるURLかチェックする
@@ -209,7 +206,8 @@ def platform_organization_api_call(subpath):
             private.token_check_client_clientid,
             private.token_check_client_secret,
             private.token_check_client_clientid,
-            private.token_check_client_secret)
+            private.token_check_client_secret,
+            response_chunk_byte)
 
         # 各種チェック check
         response_json = proxy.check_authorization(stream)
@@ -228,16 +226,29 @@ def platform_organization_api_call(subpath):
             for key, value in return_api.headers.items():
                 if key.lower().startswith('content-'):
                     response.headers[key] = value
-
         else:
             # 戻り値をそのまま返却
             # Return the return value as it is
             response = make_response()
             response.status_code = return_api.status_code
             response.data = return_api.content
+            try:
+                res_json = json.loads(return_api.text)
+
+                extra['message_id'] = res_json.get("result")
+                extra['message_text'] = res_json.get("message")
+            except Exception:
+                pass
+
             for key, value in return_api.headers.items():
                 if key.lower().startswith('content-'):
                     response.headers[key] = value
+
+        if multipart_mode:
+            # BODY要素の項目を取得
+            # Get the BODY element item
+            extra['request_form'] = proxy.request_forms
+            extra['request_files'] = proxy.request_files
 
         extra['status_code'] = return_api.status_code
         globals.audit.info(f'audit: response. {response.status_code}', extra=extra)
@@ -245,31 +256,42 @@ def platform_organization_api_call(subpath):
 
         return response
 
-    except common.BadRequestException:
-        raise
+    except common.BadRequestException as err:
+        globals.logger.info(f'exception handler:\n status_code:[{err.status_code}]\n message_id:[{err.message_id}]')
+        extra['status_code'] = err.status_code
+        extra['message_id'] = err.message_id
+        extra['message_text'] = err.message
+        globals.audit.info(f'audit: response. {err.status_code}', extra=extra)
+        return common.response_status(err.status_code, err.data, err.message_id, err.message)
 
-    except common.InternalErrorException:
-        raise
+    except common.InternalErrorException as err:
+        globals.logger.error(f'exception handler:\n status_code:[{err.status_code}]\n message_id:[{err.message_id}]')
+        globals.logger.error(''.join(list(traceback.TracebackException.from_exception(err).format())))
+        extra['status_code'] = err.status_code
+        extra['message_id'] = err.message_id
+        extra['message_text'] = err.message
+        globals.audit.info(f'audit: response. {err.status_code}', extra=extra)
+        return common.response_status(err.status_code, err.data, err.message_id, err.message)
 
     except common.AuthException as e:
         globals.logger.info(f'authentication error:{e.args}')
         message_id = "401-00002"
         message = multi_lang.get_text(message_id, "認証に失敗しました。")
-        extra['status_code'] = 401
+        extra['status_code'] = e.status_code
         extra['message_id'] = message_id
         extra['message_text'] = message
-        globals.audit.info(f'audit: authentication error. {e.args=}', extra=extra)
-        raise common.AuthException(message_id=message_id, message=message)
+        globals.audit.info(f'audit: response. {e.status_code} {e.args=}', extra=extra)
+        return common.response_status(e.status_code, e.data, message_id, message)
 
     except common.NotAllowedException as e:
         globals.logger.info(f'permission error:{e.args}')
         message_id = "403-00001"
-        info = common.multi_lang.get_text(message_id, "permission error")
-        extra['status_code'] = 403
+        message = common.multi_lang.get_text(message_id, "permission error")
+        extra['status_code'] = e.status_code
         extra['message_id'] = message_id
-        extra['message_text'] = info
-        globals.audit.info(f'audit: permission error. {e.args=}', extra=extra)
-        raise common.NotAllowedException(message_id=message_id, message=info)
+        extra['message_text'] = message
+        globals.audit.info(f'audit: response. {e.status_code} {e.args=}', extra=extra)
+        return common.response_status(e.status_code, e.data, message_id, message)
 
     except Exception as e:
         globals.logger.error(f'exception error:{e.args}')
@@ -324,10 +346,6 @@ def get_response_chunk_byte(extra):
                 "システム設定値が取得できませんでした(key:{0})",
                 common_const.CONFIG_KEY_CHUNK_SIZE,
             )
-            extra['status_code'] = 500
-            extra['message_id'] = message_id
-            extra['message_text'] = message
-            globals.audit.info('audit: error.', extra=extra)
             raise common.InternalErrorException(message_id=message_id, message=message)
     globals.logger.debug(f'{response_chunk_byte=}')
 
@@ -428,10 +446,6 @@ def ita_admin_api_call(subpath):
                 target_name, request.method, subpath
             )
             info = 'MaintenanceMode({}:{})'.format(mode_name, maintenance_mode)
-            extra['status_code'] = 498
-            extra['message_id'] = message_id
-            extra['message_text'] = message
-            globals.audit.info('audit: maintenance.', extra=extra)
             raise common.MaintenanceException(info, message_id=message_id, message=message)
 
         # Common authorization proxy processing call - 共通の認可proxy処理呼び出し
@@ -447,10 +461,6 @@ def ita_admin_api_call(subpath):
             message_id = "500-11002"
             message = multi_lang.get_text(
                 message_id, "platform private情報の取得に失敗しました")
-            extra['status_code'] = 500
-            extra['message_id'] = message_id
-            extra['message_text'] = message
-            globals.audit.info('audit: error.', extra=extra)
             raise common.InternalErrorException(message_id=message_id, message=message)
 
         # ストリームモードのあるURLかチェックする
@@ -470,7 +480,8 @@ def ita_admin_api_call(subpath):
             private.token_check_client_clientid,
             private.token_check_client_secret,
             private.token_check_client_clientid,
-            private.token_check_client_secret)
+            private.token_check_client_secret,
+            response_chunk_byte)
 
         # 各種チェック check
         response_json = proxy.check_authorization(stream)
@@ -489,16 +500,29 @@ def ita_admin_api_call(subpath):
             for key, value in return_api.headers.items():
                 if key.lower().startswith('content-'):
                     response.headers[key] = value
-
         else:
             # 戻り値をそのまま返却
             # Return the return value as it is
             response = make_response()
             response.status_code = return_api.status_code
             response.data = return_api.content
+            try:
+                res_json = json.loads(return_api.text)
+
+                extra['message_id'] = res_json.get("result")
+                extra['message_text'] = res_json.get("message")
+            except Exception:
+                pass
+
             for key, value in return_api.headers.items():
                 if key.lower().startswith('content-'):
                     response.headers[key] = value
+
+        if multipart_mode:
+            # BODY要素の項目を取得
+            # Get the BODY element item
+            extra['request_form'] = proxy.request_forms
+            extra['request_files'] = proxy.request_files
 
         extra['status_code'] = return_api.status_code
         globals.audit.info(f'audit: response. {response.status_code}', extra=extra)
@@ -506,35 +530,50 @@ def ita_admin_api_call(subpath):
 
         return response
 
-    except common.BadRequestException:
-        raise
+    except common.BadRequestException as err:
+        globals.logger.info(f'exception handler:\n status_code:[{err.status_code}]\n message_id:[{err.message_id}]')
+        extra['status_code'] = err.status_code
+        extra['message_id'] = err.message_id
+        extra['message_text'] = err.message
+        globals.audit.info(f'audit: response. {err.status_code}', extra=extra)
+        return common.response_status(err.status_code, err.data, err.message_id, err.message)
 
-    except common.InternalErrorException:
-        raise
+    except common.InternalErrorException as err:
+        globals.logger.error(f'exception handler:\n status_code:[{err.status_code}]\n message_id:[{err.message_id}]')
+        globals.logger.error(''.join(list(traceback.TracebackException.from_exception(err).format())))
+        extra['status_code'] = err.status_code
+        extra['message_id'] = err.message_id
+        extra['message_text'] = err.message
+        globals.audit.info(f'audit: response. {err.status_code}', extra=extra)
+        return common.response_status(err.status_code, err.data, err.message_id, err.message)
 
     except common.AuthException as e:
         globals.logger.info(f'authentication error:{e.args}')
         message_id = "401-00002"
         message = multi_lang.get_text(message_id, "認証に失敗しました。")
-        extra['status_code'] = 401
+        extra['status_code'] = e.status_code
         extra['message_id'] = message_id
         extra['message_text'] = message
-        globals.audit.info(f'audit: authentication error. {e.args=}', extra=extra)
-        raise common.AuthException(message_id=message_id, message=message)
+        globals.audit.info(f'audit: response. {e.status_code} {e.args=}', extra=extra)
+        return common.response_status(e.status_code, e.data, message_id, message)
 
     except common.NotAllowedException as e:
         globals.logger.info(f'permission error:{e.args}')
         message_id = "403-00001"
-        info = common.multi_lang.get_text(message_id, "permission error")
-        extra['status_code'] = 403
+        message = common.multi_lang.get_text(message_id, "permission error")
+        extra['status_code'] = e.status_code
         extra['message_id'] = message_id
-        extra['message_text'] = info
-        globals.audit.info(f'audit: permission error. {e.args=}', extra=extra)
-        raise common.NotAllowedException(message_id=message_id, message=info)
+        extra['message_text'] = message
+        globals.audit.info(f'audit: response. {e.status_code} {e.args=}', extra=extra)
+        return common.response_status(e.status_code, e.data, message_id, message)
 
     except common.MaintenanceException as e:
         globals.logger.info(f'under maintenance:{e.args}')
-        raise e
+        extra['status_code'] = e.status_code
+        extra['message_id'] = e.message_id
+        extra['message_text'] = e.message
+        globals.audit.info(f'audit: response. {e.status_code} {e.args=}', extra=extra)
+        return common.response_status(e.status_code, e.data, e.message_id, e.message)
 
     except Exception as e:
         globals.logger.error(f'exception error:{e.args}')
@@ -579,10 +618,6 @@ def platform_api_call(organization_id, subpath):
             message_id = "500-11001"
             message = multi_lang.get_text(message_id,
                                           "organization private情報の取得に失敗しました")
-            extra['status_code'] = 500
-            extra['message_id'] = message_id
-            extra['message_text'] = message
-            globals.audit.info('audit: error.', extra=extra)
             raise common.InternalErrorException(message_id=message_id, message=message)
 
         # ストリームモードのあるURLかチェックする
@@ -597,11 +632,13 @@ def platform_api_call(organization_id, subpath):
 
         # organization idをrealm名として設定
         # Set organization id as realm name
-        proxy = auth_proxy.auth_proxy(organization_id,
-                                      private.token_check_client_clientid,
-                                      private.token_check_client_secret,
-                                      private.user_token_client_clientid,
-                                      None)
+        proxy = auth_proxy.auth_proxy(
+            organization_id,
+            private.token_check_client_clientid,
+            private.token_check_client_secret,
+            private.user_token_client_clientid,
+            None,
+            response_chunk_byte)
 
         # 各種チェック check
         response_json = proxy.check_authorization(stream)
@@ -620,16 +657,29 @@ def platform_api_call(organization_id, subpath):
             for key, value in return_api.headers.items():
                 if key.lower().startswith('content-'):
                     response.headers[key] = value
-
         else:
             # 戻り値をそのまま返却
             # Return the return value as it is
             response = make_response()
             response.status_code = return_api.status_code
             response.data = return_api.content
+            try:
+                res_json = json.loads(return_api.text)
+
+                extra['message_id'] = res_json.get("result")
+                extra['message_text'] = res_json.get("message")
+            except Exception:
+                pass
+
             for key, value in return_api.headers.items():
                 if key.lower().startswith('content-'):
                     response.headers[key] = value
+
+        if multipart_mode:
+            # BODY要素の項目を取得
+            # Get the BODY element item
+            extra['request_form'] = proxy.request_forms
+            extra['request_files'] = proxy.request_files
 
         extra['status_code'] = return_api.status_code
         globals.audit.info(f'audit: response. {response.status_code}', extra=extra)
@@ -637,34 +687,42 @@ def platform_api_call(organization_id, subpath):
 
         return response
 
-    except common.BadRequestException:
-        raise
+    except (common.BadRequestException, common.NotFoundException) as err:
+        globals.logger.info(f'exception handler:\n status_code:[{err.status_code}]\n message_id:[{err.message_id}]')
+        extra['status_code'] = err.status_code
+        extra['message_id'] = err.message_id
+        extra['message_text'] = err.message
+        globals.audit.info(f'audit: response. {err.status_code}', extra=extra)
+        return common.response_status(err.status_code, err.data, err.message_id, err.message)
 
-    except common.InternalErrorException:
-        raise
-
-    except common.NotFoundException:
-        raise
+    except common.InternalErrorException as err:
+        globals.logger.error(f'exception handler:\n status_code:[{err.status_code}]\n message_id:[{err.message_id}]')
+        globals.logger.error(''.join(list(traceback.TracebackException.from_exception(err).format())))
+        extra['status_code'] = err.status_code
+        extra['message_id'] = err.message_id
+        extra['message_text'] = err.message
+        globals.audit.info(f'audit: response. {err.status_code}', extra=extra)
+        return common.response_status(err.status_code, err.data, err.message_id, err.message)
 
     except common.AuthException as e:
         globals.logger.info(f'authentication error:{e.args}')
         message_id = "401-00002"
         message = multi_lang.get_text(message_id, "認証に失敗しました。")
-        extra['status_code'] = 401
+        extra['status_code'] = e.status_code
         extra['message_id'] = message_id
         extra['message_text'] = message
-        globals.audit.info(f'audit: authentication error. {e.args=}', extra=extra)
-        raise common.AuthException(message_id=message_id, message=message)
+        globals.audit.info(f'audit: response. {e.status_code} {e.args=}', extra=extra)
+        return common.response_status(e.status_code, e.data, message_id, message)
 
     except common.NotAllowedException as e:
         globals.logger.info(f'permission error:{e.args}')
         message_id = "403-00001"
-        info = common.multi_lang.get_text(message_id, "permission error")
-        extra['status_code'] = 403
+        message = common.multi_lang.get_text(message_id, "permission error")
+        extra['status_code'] = e.status_code
         extra['message_id'] = message_id
-        extra['message_text'] = info
-        globals.audit.info(f'audit: permission error. {e.args=}', extra=extra)
-        raise common.NotAllowedException(message_id=message_id, message=info)
+        extra['message_text'] = message
+        globals.audit.info(f'audit: response. {e.status_code} {e.args=}', extra=extra)
+        return common.response_status(e.status_code, e.data, message_id, message)
 
     except Exception as e:
         globals.logger.error(f'exception error:{e.args}')
@@ -707,10 +765,6 @@ def ita_workspace_api_call(organization_id, workspace_id, subpath):
             message_id = "500-11001"
             message = multi_lang.get_text(message_id,
                                           "organization private情報の取得に失敗しました")
-            extra['status_code'] = 500
-            extra['message_id'] = message_id
-            extra['message_text'] = message
-            globals.audit.info('audit: error.', extra=extra)
             raise common.InternalErrorException(message_id=message_id, message=message)
 
         # ストリームモードのあるURLかチェックする
@@ -725,11 +779,13 @@ def ita_workspace_api_call(organization_id, workspace_id, subpath):
 
         # organization idをrealm名として設定
         # Set organization id as realm name
-        proxy = auth_proxy.auth_proxy(organization_id,
-                                      private.token_check_client_clientid,
-                                      private.token_check_client_secret,
-                                      private.user_token_client_clientid,
-                                      None)
+        proxy = auth_proxy.auth_proxy(
+            organization_id,
+            private.token_check_client_clientid,
+            private.token_check_client_secret,
+            private.user_token_client_clientid,
+            None,
+            response_chunk_byte)
 
         # 各種チェック check
         response_json = proxy.check_authorization(stream)
@@ -748,16 +804,28 @@ def ita_workspace_api_call(organization_id, workspace_id, subpath):
             for key, value in return_api.headers.items():
                 if key.lower().startswith('content-'):
                     response.headers[key] = value
-
         else:
             # 戻り値をそのまま返却
             # Return the return value as it is
             response = make_response()
             response.status_code = return_api.status_code
             response.data = return_api.content
+            try:
+                res_json = json.loads(return_api.text)
+
+                extra['message_id'] = res_json.get("result")
+                extra['message_text'] = res_json.get("message")
+            except Exception:
+                pass
             for key, value in return_api.headers.items():
                 if key.lower().startswith('content-'):
                     response.headers[key] = value
+
+        if multipart_mode:
+            # BODY要素の項目を取得
+            # Get the BODY element item
+            extra['request_form'] = proxy.request_forms
+            extra['request_files'] = proxy.request_files
 
         extra['status_code'] = return_api.status_code
         globals.audit.info(f'audit: response. {response.status_code}', extra=extra)
@@ -765,34 +833,42 @@ def ita_workspace_api_call(organization_id, workspace_id, subpath):
 
         return response
 
-    except common.BadRequestException:
-        raise
+    except (common.BadRequestException, common.NotFoundException) as err:
+        globals.logger.info(f'exception handler:\n status_code:[{err.status_code}]\n message_id:[{err.message_id}]')
+        extra['status_code'] = err.status_code
+        extra['message_id'] = err.message_id
+        extra['message_text'] = err.message
+        globals.audit.info(f'audit: response. {err.status_code}', extra=extra)
+        return common.response_status(err.status_code, err.data, err.message_id, err.message)
 
-    except common.InternalErrorException:
-        raise
-
-    except common.NotFoundException:
-        raise
+    except common.InternalErrorException as err:
+        globals.logger.error(f'exception handler:\n status_code:[{err.status_code}]\n message_id:[{err.message_id}]')
+        globals.logger.error(''.join(list(traceback.TracebackException.from_exception(err).format())))
+        extra['status_code'] = err.status_code
+        extra['message_id'] = err.message_id
+        extra['message_text'] = err.message
+        globals.audit.info(f'audit: response. {err.status_code}', extra=extra)
+        return common.response_status(err.status_code, err.data, err.message_id, err.message)
 
     except common.AuthException as e:
         globals.logger.info(f'authentication error:{e.args}')
         message_id = "401-00002"
         message = multi_lang.get_text(message_id, "認証に失敗しました。")
-        extra['status_code'] = 401
+        extra['status_code'] = e.status_code
         extra['message_id'] = message_id
         extra['message_text'] = message
-        globals.audit.info(f'audit: authentication error. {e.args=}', extra=extra)
-        raise common.AuthException(message_id=message_id, message=message)
+        globals.audit.info(f'audit: response. {e.status_code} {e.args=}', extra=extra)
+        return common.response_status(e.status_code, e.data, message_id, message)
 
     except common.NotAllowedException as e:
         globals.logger.info(f'permission error:{e.args}')
         message_id = "403-00001"
-        info = common.multi_lang.get_text(message_id, "permission error")
-        extra['status_code'] = 403
+        message = common.multi_lang.get_text(message_id, "permission error")
+        extra['status_code'] = e.status_code
         extra['message_id'] = message_id
-        extra['message_text'] = info
-        globals.audit.info(f'audit: permission error. {e.args=}', extra=extra)
-        raise common.NotAllowedException(message_id=message_id, message=info)
+        extra['message_text'] = message
+        globals.audit.info(f'audit: response. {e.status_code} {e.args=}', extra=extra)
+        return common.response_status(e.status_code, e.data, message_id, message)
 
     except Exception as e:
         globals.logger.error(f'exception error:{e.args}')
@@ -835,10 +911,6 @@ def ita_oase_recever_api_call(organization_id, workspace_id, subpath):
             message_id = "500-11001"
             message = multi_lang.get_text(message_id,
                                           "organization private情報の取得に失敗しました")
-            extra['status_code'] = 500
-            extra['message_id'] = message_id
-            extra['message_text'] = message
-            globals.audit.info('audit: error.', extra=extra)
             raise common.InternalErrorException(message_id=message_id, message=message)
 
         # ストリームモードのあるURLかチェックする
@@ -853,11 +925,13 @@ def ita_oase_recever_api_call(organization_id, workspace_id, subpath):
 
         # organization idをrealm名として設定
         # Set organization id as realm name
-        proxy = auth_proxy.auth_proxy(organization_id,
-                                      private.token_check_client_clientid,
-                                      private.token_check_client_secret,
-                                      private.user_token_client_clientid,
-                                      None)
+        proxy = auth_proxy.auth_proxy(
+            organization_id,
+            private.token_check_client_clientid,
+            private.token_check_client_secret,
+            private.user_token_client_clientid,
+            None,
+            response_chunk_byte)
 
         # 各種チェック check
         response_json = proxy.check_authorization(stream)
@@ -876,16 +950,29 @@ def ita_oase_recever_api_call(organization_id, workspace_id, subpath):
             for key, value in return_api.headers.items():
                 if key.lower().startswith('content-'):
                     response.headers[key] = value
-
         else:
             # 戻り値をそのまま返却
             # Return the return value as it is
             response = make_response()
             response.status_code = return_api.status_code
             response.data = return_api.content
+            try:
+                res_json = json.loads(return_api.text)
+
+                extra['message_id'] = res_json.get("result")
+                extra['message_text'] = res_json.get("message")
+            except Exception:
+                pass
+
             for key, value in return_api.headers.items():
                 if key.lower().startswith('content-'):
                     response.headers[key] = value
+
+        if multipart_mode:
+            # BODY要素の項目を取得
+            # Get the BODY element item
+            extra['request_form'] = proxy.request_forms
+            extra['request_files'] = proxy.request_files
 
         extra['status_code'] = return_api.status_code
         globals.audit.info(f'audit: response. {response.status_code}', extra=extra)
@@ -893,34 +980,42 @@ def ita_oase_recever_api_call(organization_id, workspace_id, subpath):
 
         return response
 
-    except common.BadRequestException:
-        raise
+    except (common.BadRequestException, common.NotFoundException) as err:
+        globals.logger.info(f'exception handler:\n status_code:[{err.status_code}]\n message_id:[{err.message_id}]')
+        extra['status_code'] = err.status_code
+        extra['message_id'] = err.message_id
+        extra['message_text'] = err.message
+        globals.audit.info(f'audit: response. {err.status_code}', extra=extra)
+        return common.response_status(err.status_code, err.data, err.message_id, err.message)
 
-    except common.InternalErrorException:
-        raise
-
-    except common.NotFoundException:
-        raise
+    except common.InternalErrorException as err:
+        globals.logger.error(f'exception handler:\n status_code:[{err.status_code}]\n message_id:[{err.message_id}]')
+        globals.logger.error(''.join(list(traceback.TracebackException.from_exception(err).format())))
+        extra['status_code'] = err.status_code
+        extra['message_id'] = err.message_id
+        extra['message_text'] = err.message
+        globals.audit.info(f'audit: response. {err.status_code}', extra=extra)
+        return common.response_status(err.status_code, err.data, err.message_id, err.message)
 
     except common.AuthException as e:
         globals.logger.info(f'authentication error:{e.args}')
         message_id = "401-00002"
         message = multi_lang.get_text(message_id, "認証に失敗しました。")
-        extra['status_code'] = 401
+        extra['status_code'] = e.status_code
         extra['message_id'] = message_id
         extra['message_text'] = message
-        globals.audit.info(f'audit: authentication error. {e.args=}', extra=extra)
-        raise common.AuthException(message_id=message_id, message=message)
+        globals.audit.info(f'audit: response. {e.status_code} {e.args=}', extra=extra)
+        return common.response_status(e.status_code, e.data, message_id, message)
 
     except common.NotAllowedException as e:
         globals.logger.info(f'permission error:{e.args}')
         message_id = "403-00001"
-        info = common.multi_lang.get_text(message_id, "permission error")
-        extra['status_code'] = 403
+        message = common.multi_lang.get_text(message_id, "permission error")
+        extra['status_code'] = e.status_code
         extra['message_id'] = message_id
-        extra['message_text'] = info
-        globals.audit.info(f'audit: permission error. {e.args=}', extra=extra)
-        raise common.NotAllowedException(message_id=message_id, message=info)
+        extra['message_text'] = message
+        globals.audit.info(f'audit: response. {e.status_code} {e.args=}', extra=extra)
+        return common.response_status(e.status_code, e.data, message_id, message)
 
     except Exception as e:
         globals.logger.error(f'exception error:{e.args}')

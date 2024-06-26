@@ -164,6 +164,7 @@ def jobs_users_import(import_file, organization_id):  # noqa: E501
     # write to JOBS USER DB
     return bl_job_service.user_bulk_process(r, import_file, organization_id, const.JOB_TYPE_USER_BULK_IMPORT)
 
+
 @common.platform_exception_handler
 def jobs_users_bulk_delete(import_file, organization_id):  # noqa: E501
     """Bulk delete user job call

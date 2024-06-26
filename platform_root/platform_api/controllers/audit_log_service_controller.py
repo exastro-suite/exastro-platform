@@ -67,13 +67,15 @@ def auditlog_download(organization_id, download_id):
 
 
 @common.platform_exception_handler
-def auditlog_download_list(organization_id):  # noqa: E501
+def auditlog_download_list(organization_id, download_id=None):  # noqa: E501
     """Get audit log download list
 
      # noqa: E501
 
     :param organization_id:
     :type organization_id: str
+    :param download_id: filter download id.
+    :type download_id: str
 
     :rtype: InlineResponse20024
     """
@@ -95,8 +97,9 @@ def auditlog_download_list(organization_id):  # noqa: E501
     # Get T_JOBS_AUDIT_LOG
     with closing(db.connect_orgdb(organization_id)) as conn:
         with conn.cursor() as cursor:
+            download_id_where = " WHERE JOB_ID = %(download_id)s " if download_id is not None else ""
             order_by = " ORDER BY CREATE_TIMESTAMP DESC "
-            cursor.execute(queries_bl_audit_log.SQL_QUERY_JOBS_AUDIT_LOG + order_by)
+            cursor.execute(queries_bl_audit_log.SQL_QUERY_JOBS_AUDIT_LOG + download_id_where + order_by, {"download_id": download_id})
             result = cursor.fetchall()
 
     # make response data

@@ -21,6 +21,8 @@ from urllib.parse import urlparse
 import traceback
 import re
 import inspect
+from multipart import multipart
+import werkzeug.exceptions
 
 # User Imports
 import globals
@@ -31,6 +33,7 @@ import common_library.common.const as common_const
 import config.auth.auth_pattern as auth_pattern
 # import api_keycloak_call
 import common_library.common.api_keycloak_tokens as api_keycloak_tokens
+from common_library.common import multi_lang
 
 
 class auth_proxy:
@@ -62,8 +65,13 @@ class auth_proxy:
     # Clisent Secret of Client ID for token check
     user_token_client_secret = None
 
+    # 監査ログ用の情報収集変数
+    # Information collection variables for audit logs
+    request_forms = {}
+    request_files = {}
+
     # def __init__(self):
-    def __init__(self, realm, token_check_client_id, token_check_client_secret, user_token_client_id, user_token_client_secret):
+    def __init__(self, realm, token_check_client_id, token_check_client_secret, user_token_client_id, user_token_client_secret, response_chunk_byte):
         """初期化処理 initialize setting
 
         Args:
@@ -71,6 +79,7 @@ class auth_proxy:
             token_check_client_id (str): token check client id
             token_check_client_secret (str): token check client secret
             user_token_client_id (str): user token check client id
+            response_chunk_byte (int): response chunk byte size
 
         """
         self.realm = realm
@@ -81,6 +90,10 @@ class auth_proxy:
         self.token_check_client_secret = token_check_client_secret
         self.user_token_client_id = user_token_client_id
         self.user_token_client_secret = user_token_client_secret
+        self.response_chunk_byte = response_chunk_byte
+
+        self.request_forms = {}
+        self.request_files = {}
 
     def check_authorization(self, stream_mode=False):  # noqa: C901
         """認証情報チェック Authorization check
@@ -534,7 +547,7 @@ class auth_proxy:
         })
 
         req = requests.PreparedRequest()
-        req.prepare(method=method, url=url, params=query_string, data=request.stream)
+        req.prepare(method=request.method, url=url, data=self.request_stream_processer())
         req.prepare_headers(post_headers)
 
         with requests.Session() as ses:
@@ -544,11 +557,107 @@ class auth_proxy:
         # Save the contents of the acquired response
         self.response_original = ret
 
+        globals.logger.debug(f"{self.request_forms=}")
+        globals.logger.debug(f"{self.request_files=}")
+
         globals.logger.debug(f"### end func:{inspect.currentframe().f_code.co_name}")
 
         # エンコードしたレスポンスをリターン
         # Return the encoded response
         return ret
+
+    def request_stream_processer(self):
+        """request streamを解析し、転送(yield)する
+
+        Yields:
+            bytes: request body chunk
+        """
+        chunk_size = self.response_chunk_byte
+        # request bodyの残bytes
+        content_remaining_length = int(request.headers.get('Content-Length'))
+        # multipart/form-dataのparser生成
+        form_parser = multipart.FormParser(
+            content_type=request.headers.get('Content-Type').split(';')[0],
+            boundary=request.headers.get('Content-Type').split('boundary=')[1],
+            on_field=self.on_field,
+            on_file=self.on_file,
+            FileClass=self.CustomFileClass,
+        )
+
+        try:
+            while True:
+                # request bodyの読み込み
+                buf = request.stream.read(min(chunk_size, content_remaining_length))
+
+                if len(buf) == 0:
+                    break
+                yield buf
+                # multipart/form-dataのparserに書き込み
+                form_parser.write(buf)
+                # request bodyの残bytesを減算
+                content_remaining_length -= len(buf)
+                # request bodyがContent-Lengthに達したら抜ける
+                if content_remaining_length <= 0:
+                    break
+            form_parser.finalize()
+
+        except werkzeug.exceptions.ClientDisconnected as e:
+            globals.logger.info(f'werkzeug.exceptions.ClientDisconnected:{e.args}')
+            message_id = "401-11001"
+            message = multi_lang.get_text(message_id, "要求が中断されました。")
+            raise common.BadRequestException(message_id=message_id, message=message)
+        except (multipart.FormParserError,
+                multipart.MultipartParseError,
+                multipart.QuerystringParseError) as e:
+            globals.logger.info(f'multipart ParserError:{e.args}')
+            message_id = "401-11002"
+            message = multi_lang.get_text(message_id, "request bodyが不正です。")
+            raise common.BadRequestException(message_id=message_id, message=message)
+        finally:
+            form_parser.close()
+
+    def on_field(self, field: multipart.Field):
+        """FormParserのon_fieldイベントハンドラ
+
+        Args:
+            field (Field): 項目情報
+        """
+        field_name = field.field_name.decode()
+        if field_name not in self.request_forms:
+            self.request_forms[field_name] = [field.value.decode()]
+        else:
+            self.request_forms[field_name].append(field.value.decode())
+
+    def on_file(self, file: multipart.File):
+        """FormParserのon_fileイベントハンドラ
+
+        Args:
+            file (File): 項目情報（ファイル）
+        """
+        field_name = file.field_name.decode()
+        file_item = {
+            "file_name": file.file_name.decode()
+        }
+        if field_name not in self.request_files:
+            self.request_files[field_name] = [file_item]
+        else:
+            self.request_files[field_name].append(file_item)
+
+    class CustomFileClass(multipart.File):
+        """FormParserのファイル処理のカスタムClass
+            （ファイル保存しないようにpassでoverrideする）
+
+        Args:
+            File (_type_): _description_
+        """
+        def write(self, data: bytes):
+            pass
+
+        def finalize(self) -> None:
+            pass
+
+        def close(self) -> None:
+            pass
 
     def access_token_get(self, realm, user_name, password):
         """アクセストークン取得 Get access token
