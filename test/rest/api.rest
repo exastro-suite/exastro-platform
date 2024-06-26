@@ -178,6 +178,7 @@ Authorization: Basic {{org-user-id}} {{org-user-pw}}
 ###
 
 # audit log download post
+# @name auditlog_download
 POST {{base_org_url}}/api/{{org_id}}/platform/auditlog/download
 Authorization: Basic {{sys-user-id}} {{sys-user-pw}}
 content-type: application/json
@@ -186,3 +187,15 @@ content-type: application/json
   "ts_from": "2024-06-01 00:00:00",
   "ts_to": "2024-06-30 23:59:59"
 }
+
+###
+
+# First, audit log download post
+@download_id =  {{auditlog_download.response.body.data.download_id}}
+
+# audit log download get by query
+GET {{base_org_url}}/api/{{org_id}}/platform/auditlog/download
+    ?download_id={{download_id}}
+Authorization: Basic {{org-user-id}} {{org-user-pw}}
+
+###
