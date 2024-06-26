@@ -73,6 +73,43 @@ def test_organization_api(connexion_client):
         assert response.json["data"]["name"] == json_create_01["name"], "created value check : name"
         assert response.json["data"]["enabled"] is True, "created value check : enabled"
 
+        # get organization managers
+        # オーガナイゼーション管理者 取得
+        response = connexion_client.get(
+            f"/api/{json_create_01['id']}/platform/users",
+            content_type='application/json',
+            headers=request_parameters.request_headers())
+
+        assert response.status_code == 200
+        assert len(response.json["data"]) == 1
+        organization_manager_1st = json_create_01["organization_managers"][0]
+        posted_user = [item for item in response.json["data"] if item["preferred_username"] == organization_manager_1st["username"]][0]
+        assert posted_user["firstName"] == organization_manager_1st["firstName"]
+        assert posted_user["lastName"] == organization_manager_1st["lastName"]
+        assert posted_user["email"] == organization_manager_1st["email"]
+        assert posted_user["enabled"] == organization_manager_1st["enabled"]
+
+        # get organization role
+        # オーガナイゼーションロール権限 取得
+        response = connexion_client.get(
+            f"/api/{json_create_01['id']}/platform/roles",
+            content_type='application/json',
+            headers=request_parameters.request_headers(posted_user["id"], organization_role=[const.ORG_ROLE_ORG_MANAGER]))
+
+        assert response.status_code == 200
+        role_list = response.json["data"]
+        role_list.sort(key=lambda x: x["name"])
+        assert len(role_list) == 3
+        i = 0
+        assert role_list[i]["name"] == const.ORG_ROLE_ORG_MANAGER
+        assert set([x["name"] for x in role_list[i]["authorities"]]) == set(const.ORG_PERMISSION_ORG_MANAGER)
+        i += 1
+        assert role_list[i]["name"] == const.ORG_ROLE_USER_MANAGER
+        assert set([x["name"] for x in role_list[i]["authorities"]]) == set(const.ORG_PERMISSION_USER_MANAGER)
+        i += 1
+        assert role_list[i]["name"] == const.ORG_ROLE_USER_ROLE_MANAGER
+        assert set([x["name"] for x in role_list[i]["authorities"]]) == set(const.ORG_PERMISSION_USER_ROLE_MANAGER)
+
         # get organizations
         # オーガナイゼーション一覧を取得し１件出来上がっているかチェックする
         response = connexion_client.get(
