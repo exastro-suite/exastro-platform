@@ -103,7 +103,7 @@ var api_conf = {
         },
         "settings": {
             "common": {
-                "get": "/api/platform/settings/common"
+                "get": "/api/{organization_id}/platform/settings/common/{config_key}"
             },
             "mailserver": {
                 "get": "/api/{organization_id}/platform/settings/mailserver",
