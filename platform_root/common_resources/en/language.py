@@ -469,6 +469,21 @@ class LanguageList:
     lang_array['000-90002'] = 'Keycloak console'
     lang_array['000-90003'] = 'You can change various settings of Keycloak.'
     lang_array['000-90004'] = 'Identity providers / Exastro Platform'
+    lang_array['000-91001'] = 'Audit log / Exastro Platform'
+    lang_array['000-91002'] = 'Audit log'
+    lang_array['000-91003'] = 'You can download audit logs and view download history.'
+    lang_array['000-91004'] = 'Download'
+    lang_array['000-91005'] = 'History'
+    lang_array['000-91006'] = 'Target period'
+    lang_array['000-91007'] = 'From'
+    lang_array['000-91008'] = 'To'
+    lang_array['000-91009'] = 'Specify the date and time range for the event invocation of the audit log.'
+    lang_array['000-91010'] = 'Download date and time'
+    lang_array['000-91011'] = 'Status'
+    lang_array['000-91012'] = 'Number of items to be output'
+    lang_array['000-91013'] = 'Processing result message'
+    lang_array['000-91014'] = 'There is no download history'
+    lang_array['000-91015'] = 'Audit log download history will be deleted after {0} days. The maximum number of audit log downloads is {1}.'
     lang_array['400-00001'] = 'Request-Header Paramater({}) is Invalid'
     lang_array['400-00002'] = 'Request-Body Paramater({}) is Invalid'
     #
@@ -706,6 +721,7 @@ class LanguageList:
     lang_array['500-90010'] = 'Failed to set role of client role (Target ID: {0} client: {1})'
     lang_array['500-90011'] = 'Failed to set client role (Target ID: {0} client: {1})'
     lang_array['500-90012'] = 'system config table setting failed. config_key:[{0}]'
+    lang_array['500-90013'] = 'change columns failed. table:[{0}]'
     lang_array['500-90025'] = 'Failed to get User Profile (Target ID:{0})'
     lang_array['500-90026'] = 'Failed to update User Profile (Target ID:{0})'
     lang_array['500-22001'] = 'Failed to create workspace role (Target ID: {})'
@@ -730,4 +746,9 @@ class LanguageList:
     #
     #
     #
+
+
+
+
+
 
