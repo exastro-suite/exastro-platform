@@ -67,7 +67,7 @@ def user_get(realm_name, user_name, token, first=0, max=100, search=None):
     Returns:
         Response: HTTP Respose (success : .status_code=200)
     """
-    globals.logger.info('Get keycloak user. realm_name={}, user_name={}'.format(realm_name, user_name))
+    globals.logger.debug('Get keycloak user. realm_name={}, user_name={}'.format(realm_name, user_name))
 
     # 呼び出し先設定
     # Call destination setting
@@ -103,7 +103,7 @@ def user_count_get(realm_name, token, user_name=None, search=None):
     Returns:
         Response: HTTP Respose (success : .status_code=200)
     """
-    globals.logger.info('Get keycloak users count. realm_name={}, user_name={}, search={}'.format(realm_name, user_name, search))
+    globals.logger.debug('Get keycloak users count. realm_name={}, user_name={}, search={}'.format(realm_name, user_name, search))
 
     # 呼び出し先設定
     # Call destination setting
@@ -138,7 +138,7 @@ def user_get_by_id(realm_name, user_id, token):
     Returns:
         Response: HTTP Respose (success : .status_code=200)
     """
-    globals.logger.info('Get keycloak user. realm_name={}, user_id={}'.format(realm_name, user_id))
+    globals.logger.debug('Get keycloak user. realm_name={}, user_id={}'.format(realm_name, user_id))
 
     # 呼び出し先設定
     # Call destination setting
@@ -234,7 +234,7 @@ def service_account_user_get(realm_name, client_id, token):
     Returns:
         Response: HTTP Respose (success : .status_code=200)
     """
-    globals.logger.info('Get keycloak user. realm_name={}, client_id={}'.format(realm_name, client_id))
+    globals.logger.debug('Get keycloak user. realm_name={}, client_id={}'.format(realm_name, client_id))
 
     # 呼び出し先設定
     # Call destination setting
@@ -278,6 +278,6 @@ def user_delete(realm_name, user_id, token):
     # User information deletetion
     request_response = requests.delete(f"{api_url}/auth/admin/realms/{realm_name}/users/{user_id}", headers=header_para)
 
-    globals.logger.info(f"### Succeed func:{inspect.currentframe().f_code.co_name}")
+    globals.logger.debug(f"### Succeed func:{inspect.currentframe().f_code.co_name}")
 
     return request_response

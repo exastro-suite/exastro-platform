@@ -85,7 +85,7 @@ def client_user_get_token(realm_name, client_id, client_secret, user_id, user_pa
     Returns:
         Response: HTTP Respose (success : .status_code=200, token=json.loads(.text)["access_token"])
     """
-    globals.logger.info('Get keycloak client user token. realm_name={}, client_id={}, user_id={}'.format(realm_name, client_id, user_id))
+    globals.logger.debug('Get keycloak client user token. realm_name={}, client_id={}, user_id={}'.format(realm_name, client_id, user_id))
 
     # 呼び出し先設定
     # Call destination setting
@@ -120,7 +120,7 @@ def service_account_get_token(realm_name, client_id, client_secret):
     Returns:
         Response: HTTP Respose (success : .status_code=200, token=json.loads(.text)["access_token"])
     """
-    globals.logger.info('Get keycloak service account token. realm_name={}'.format(realm_name))
+    globals.logger.debug('Get keycloak service account token. realm_name={}'.format(realm_name))
 
     # 呼び出し先設定
     # Call destination setting
@@ -148,7 +148,7 @@ def get_user_token(user_name, password, realm_name, client_id="admin-cli", clien
     Returns:
         Response: HTTP Respose (success : .status_code=200, token=json.loads(.text)["access_token"])
     """
-    globals.logger.info('Get keycloak client user token. realm_name={}, client_id={}, user_name={}'.format(realm_name, client_id, user_name))
+    globals.logger.debug('Get keycloak client user token. realm_name={}, client_id={}, user_name={}'.format(realm_name, client_id, user_name))
 
     # 下位の取得ロジックを呼びだし
     # Call the lower acquisition logic
@@ -167,7 +167,7 @@ def user_token_introspect(client_id, client_secret, realm_name, access_token, ke
     Returns:
         Response: HTTP Respose (success : .status_code=200, active=json.loads(.text).get("active"))
     """
-    globals.logger.info('introspect keycloak user token. realm_name={}, client_id={}'.format(realm_name, client_id))
+    globals.logger.debug('introspect keycloak user token. realm_name={}, client_id={}'.format(realm_name, client_id))
 
     data_para = {
         "client_id": client_id,
@@ -252,8 +252,8 @@ def offline_sessions_get(realm_name, user_id, client_id, token):
     Returns:
         Response: HTTP Respose (success : .status_code=200, token=json.loads(.text)["access_token"])
     """
-    globals.logger.info(f"# func:{inspect.currentframe().f_code.co_name}")
-    globals.logger.info(f' realm_name={realm_name}, user_id={user_id}, client_id={client_id}')
+    globals.logger.debug(f"# func:{inspect.currentframe().f_code.co_name}")
+    globals.logger.debug(f' realm_name={realm_name}, user_id={user_id}, client_id={client_id}')
 
     # 呼び出し先設定
     # Call destination setting
@@ -271,7 +271,7 @@ def offline_sessions_get(realm_name, user_id, client_id, token):
         headers=header_para
     )
 
-    globals.logger.info(f"# Succeed func:{inspect.currentframe().f_code.co_name}")
+    globals.logger.debug(f"# Succeed func:{inspect.currentframe().f_code.co_name}")
 
     # 下位の取得ロジックを呼びだし
     # Call the lower acquisition logic

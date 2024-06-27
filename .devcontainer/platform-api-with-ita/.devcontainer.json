@@ -53,6 +53,11 @@
 
 				"python.linting.lintOnSave": true,
 
+				"flake8.args": [
+					"--ignore=W293, W504",
+					"--max-line-length=250",
+					"--max-complexity=20",
+				],
 				"python.linting.flake8Args": [
 					"--ignore=W293, W504",
 					"--max-line-length=150",
