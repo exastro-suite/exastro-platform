@@ -37,7 +37,8 @@ def internal_settings_destination_get(organization_id, workspace_id, destination
         Response: http response
     """
 
-    globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
+    # internal-apiのget methodの呼び出しログはDEBUGとする
+    globals.logger.debug(f"### func:{inspect.currentframe().f_code.co_name}")
 
     data = bl_notification_service.settings_destination_get(organization_id, workspace_id, destination_id)
 
@@ -58,7 +59,8 @@ def internal_settings_notification_list(organization_id, workspace_id, event_typ
         Response: http response
     """
 
-    globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
+    # internal-apiのget methodの呼び出しログはDEBUGとする
+    globals.logger.debug(f"### func:{inspect.currentframe().f_code.co_name}")
 
     globals.logger.debug(f"event_type_true:{event_type_true} --- event_type_false:{event_type_false}")
 
@@ -125,7 +127,8 @@ def internal_notification_list(organization_id, workspace_id, page_size=None, cu
         Response: http response
     """
 
-    globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
+    # internal-apiのget methodの呼び出しログはDEBUGとする
+    globals.logger.debug(f"### func:{inspect.currentframe().f_code.co_name}")
 
     data = bl_notification_service.notification_list(organization_id, workspace_id, page_size, current_page, details_info, func_id, match, like_before, like_after, like_all)
 

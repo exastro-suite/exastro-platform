@@ -118,7 +118,8 @@ def internal_settings_system_config_item(config_key):
     Returns:
         response: HTTP Response
     """
-    globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
+    # internal-apiのget methodの呼び出しログはDEBUGとする
+    globals.logger.debug(f"### func:{inspect.currentframe().f_code.co_name}")
 
     # config list get
     with closing(DBconnector().connect_platformdb()) as conn:
@@ -140,7 +141,8 @@ def internal_settings_system_config_list():
     Returns:
         response: HTTP Response
     """
-    globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
+    # internal-apiのget methodの呼び出しログはDEBUGとする
+    globals.logger.debug(f"### func:{inspect.currentframe().f_code.co_name}")
 
     # config list get
     with closing(DBconnector().connect_platformdb()) as conn:
