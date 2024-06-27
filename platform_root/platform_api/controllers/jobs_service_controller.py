@@ -65,8 +65,7 @@ def jobs_users_export(body, organization_id):  # noqa: E501
                 message_id = f"500-{MSG_FUNCTION_ID}001"
                 message = multi_lang.get_text(
                     message_id,
-                    "ジョブの登録に失敗しました(job id:{0})",
-                    job_id,
+                    "ジョブの登録に失敗しました",
                 )
                 raise common.InternalErrorException(message_id=message_id, message=message)
 
@@ -92,8 +91,7 @@ def jobs_users_export(body, organization_id):  # noqa: E501
                     message_id = f"500-{MSG_FUNCTION_ID}002"
                     message = multi_lang.get_text(
                         message_id,
-                        "処理キューの登録に失敗しました(process id:{0})",
-                        parameter['process_id'],
+                        "処理キューの登録に失敗しました",
                     )
                     raise common.InternalErrorException(message_id=message_id, message=message)
 
