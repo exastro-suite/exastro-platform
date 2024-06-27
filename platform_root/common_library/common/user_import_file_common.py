@@ -13,6 +13,7 @@
 #   limitations under the License.
 import io
 import openpyxl
+import collections
 from zipfile import ZipFile, BadZipfile
 
 from common_library.common import const
@@ -255,7 +256,7 @@ class UserImportWorkbook():
                     self.lang, '401-00018', 'Excelファイルの列数が多すぎます。（列数:{0},列数最大:{1})',
                     self.ws.max_column,
                     job_manager_config.JOBS[const.PROCESS_KIND_USER_IMPORT]["extra_config"]["max_number_of_cols_allowd"]))
-            
+
         if self.ws.max_row > job_manager_config.JOBS[const.PROCESS_KIND_USER_IMPORT]["extra_config"]["max_number_of_rows_allowd"]:
             raise FileFormatErrorException(
                 multi_lang.get_text_spec(
@@ -304,6 +305,23 @@ class UserImportWorkbook():
 
         return count_register, count_update, count_delete
 
+    def check_duplicate_user_name(self):
+        """ユーザー名の重複チェック / Check for duplicate usernames
+
+        Returns:
+            list: 重複しているユーザー名 / list of duplicate users
+        """
+        user_list = []
+        # 一つ一つ読みだすと遅いのでiter_rowsで一気に読み取る / Reading them one by one is slow, so read them all at once with iter_rows
+        for row in self.ws.iter_rows(EXCEL_HEADER_ROWS + 1, self.ws.max_row, self.col_indexes["USERNAME"], self.col_indexes["USERNAME"]):
+            for cel in row:
+                user_list.append(cel.value)
+
+        # 重複しているユーザー名を抽出 / Extract duplicate usernames
+        duplicate_user_list = [k for k, v in collections.Counter(user_list).items() if v > 1]
+
+        return duplicate_user_list
+
     def read_row(self):
         """行の読み取り / reading row
 
@@ -325,10 +343,10 @@ class UserImportWorkbook():
 
             # バッファリングの対象行をiter_rowsで指定しバッファにため込む
             # Specify the rows to be buffered with iter_rows and store them in the buffer
-            for xl_row in self.ws.iter_rows(self.__buffered_row_idx + 1, max_row, 1, max(self.col_indexes.values()) + 1):
+            for xl_row in self.ws.iter_rows(self.__buffered_row_idx + 1, max_row, 1, max(self.col_indexes.values())):
                 cell_values = [xl_cel.value for xl_cel in xl_row]
                 self.__buff.append(
-                    {   cid: cell_values[col_idx]
+                    {   cid: cell_values[col_idx - 1]
                         for cid, col_idx in self.col_indexes.items()
                             if cid != "ERROR_TEXT"
                     }
@@ -382,6 +400,6 @@ def search_list_value(list, search_value):
         int: listの位置(存在しないときは-1を返す) / Position of list (returns -1 if it does not exist)
     """
     try:
-        return list.index(search_value)
+        return list.index(search_value) + 1
     except ValueError:
         return -1

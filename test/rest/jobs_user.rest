@@ -15,7 +15,19 @@
 # 1 api to ###
 
 ### Jobs user import
-POST {{base_org_url}}/api/{{org_id}}/platform/jobs/users/import
+POST {{base_org_url}}/api/{{org_id}}/platform/jobs/users/bulk-import
+Authorization: Basic {{org-user-id}} {{org-user-pw}}
+Content-Type: multipart/form-data; boundary=hogehoge
+
+--hogehoge
+Content-Disposition: form-data; name="import_file"; filename="test.xlsx"
+Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+
+< {{import_file}}
+--hogehoge--
+
+### Jobs user delete
+POST {{base_org_url}}/api/{{org_id}}/platform/jobs/users/bulk-delete
 Authorization: Basic {{org-user-id}} {{org-user-pw}}
 Content-Type: multipart/form-data; boundary=hogehoge
 

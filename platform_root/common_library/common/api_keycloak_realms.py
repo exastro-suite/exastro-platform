@@ -128,7 +128,7 @@ def realms_get(token):
     Returns:
         Response: HTTP Respose (success : .status_code=200)
     """
-    globals.logger.info('Get keycloak realms.')
+    globals.logger.debug('Get keycloak realms.')
 
     header_para = {
         "Content-Type": "application/json",
@@ -158,7 +158,7 @@ def realm_get(realm_name, token):
     Returns:
         Response: HTTP Respose (success : .status_code=200)
     """
-    globals.logger.info(f"# func:{inspect.currentframe().f_code.co_name}")
+    globals.logger.debug(f"# func:{inspect.currentframe().f_code.co_name}")
 
     header_para = {
         "Content-Type": "application/json",
@@ -171,7 +171,7 @@ def realm_get(realm_name, token):
     # Call destination setting
     request_response = requests.get(f"{api_url}/auth/admin/realms/{realm_name}", headers=header_para)
 
-    globals.logger.info(f"# Succeed func:{inspect.currentframe().f_code.co_name}")
+    globals.logger.debug(f"# Succeed func:{inspect.currentframe().f_code.co_name}")
 
     # 応答をそのまま返却
     # return response as is

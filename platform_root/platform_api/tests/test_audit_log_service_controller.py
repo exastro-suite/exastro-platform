@@ -24,6 +24,7 @@ import datetime
 import logging
 import urllib.parse
 import ulid
+import json
 
 logger = logging.getLogger(__name__)
 
@@ -223,7 +224,7 @@ def test_audit_log_download_list(connexion_client):
     organization = test_common.create_organization(connexion_client)
 
     # get audit_log_download_list
-    with test_common.requsts_mocker_default() as requests_mocker:
+    with test_common.requsts_mocker_default():
 
         # 監査ログダウンロード一覧が0件であることを確認
         response = connexion_client.get(
@@ -327,6 +328,27 @@ def test_audit_log_download_list(connexion_client):
         first_data = response.json["data"][0]
         assert first_data["create_user_id"] == delete_user['id']
         assert first_data["create_user_name"] is None
+
+        # 監査ログダウンロード一覧の抽出が出来ていることを確認
+        conditions = sample_conditions(["ts_from", "ts_to"])
+        response = connexion_client.post(
+            f"/api/{organization['organization_id']}/platform/auditlog/download",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization["user_id"]),
+            json=conditions)
+
+        post_download = response.json["data"]
+
+        response = connexion_client.get(
+            f"/api/{organization['organization_id']}/platform/auditlog/download?download_id={post_download['download_id']}",
+            headers=request_parameters.request_headers(organization["user_id"]))
+
+        assert response.status_code == 200
+        assert len(response.json["data"]) == 1, "get audit_log_download_list count 1"
+        first_data = response.json["data"][0]
+        assert first_data["download_id"] == post_download["download_id"]
+        assert first_data["create_user_id"] == organization["user_id"]
+        assert first_data["conditions"] == json.dumps(conditions)
 
 
 def sample_conditions(key_list):

@@ -126,6 +126,9 @@ class UserImportJobExecutor(BaseJobExecutor):
                 # 言語情報 / Language information
                 self.language = t_jobs_user["LANGUAGE"]
 
+                # jobのタイプ
+                job_type = t_jobs_user["JOB_TYPE"]
+
                 # 指定可能なロールの一覧を取得する / Get a list of available roles
                 specifiable_roles = self.__get_specifiable_roles()
                 globals.logger.debug(f'Role lists : {[key for key in specifiable_roles.keys()]}')
@@ -141,10 +144,44 @@ class UserImportJobExecutor(BaseJobExecutor):
                 globals.logger.debug('Load imports user excel')
                 self.imp_wb = user_import_file_common.UserImportWorkbook(self.language, t_jobs_user_file["FILE_DATA"])
 
+                # ユーザー名の重複チェック / Check for duplicate usernames
+                globals.logger.debug('Check for duplicate usernames')
+                duplicate_user_list = self.imp_wb.check_duplicate_user_name()
+                if 0 < len(duplicate_user_list):
+                    globals.logger.debug(f"Failed users bulk import or delete. Duplicate Username.")
+                    message_id = "409-62001"
+                    message = multi_lang.get_text_spec(
+                        self.language,
+                        message_id,
+                        "対象のユーザー名が重複しています(重複ユーザー名:[{0}])",
+                        ", ".join(duplicate_user_list)
+                        )
+                    raise common.BadRequestException(message_id=message_id, message=message)
+
                 # 全明細の件数をカウントする / Count the number of all items
                 globals.logger.debug('Count of records to process')
                 self.count_register, self.count_update, self.count_delete = self.imp_wb.count_proc_type()
                 globals.logger.info(f'Count of records to process [count_register:{self.count_register}] [count_update:{self.count_update}] [count_delete:{self.count_delete}]')
+
+                # ユーザー一括削除の場合「登録」「更新」がある場合はエラー判定
+                if (job_type == const.JOB_TYPE_USER_BULK_DELETE) and (0 < self.count_register or 0 < self.count_update):
+                    globals.logger.debug(f"Failed users bulk delete. When users bulk delete, cannot specify any type other than Delete.")
+                    message_id = "409-62002"
+                    message = multi_lang.get_text_spec(
+                        self.language,
+                        message_id,
+                        "ユーザー一括削除の場合、実行処理種別に「削除」以外は指定できません。")
+                    raise common.BadRequestException(message_id=message_id, message=message)
+
+                # ユーザー一括インポートの場合「削除」がある場合はエラー判定
+                if (job_type == const.JOB_TYPE_USER_BULK_IMPORT) and (0 < self.count_delete):
+                    globals.logger.debug(f"Failed users bulk import. When users bulk import, cannot specify any type other than Registration or Update.")
+                    message_id = "409-62003"
+                    message = multi_lang.get_text_spec(
+                        self.language,
+                        message_id,
+                        "ユーザー一括インポートの場合、実行処理種別に「登録」「更新」以外は指定できません。")
+                    raise common.BadRequestException(message_id=message_id, message=message)
 
                 # 全明細の件数を更新 / Update the number of all items
                 self.__update_t_jobs_user(conn, job_status=const.JOB_USER_EXEC, message=None)
@@ -177,17 +214,42 @@ class UserImportJobExecutor(BaseJobExecutor):
                                 self.err_wb.write_row(cell_values)
                                 globals.logger.debug(f'Failed User Registration(validate error) : [ROW:{self.imp_wb.get_row_idx()}] [USERNAME:{cell_values["USERNAME"]}] [ERROR_TEXT:{cell_values["ERROR_TEXT"]}]')
 
+                        if cell_values["PROC_TYPE"] in user_import_file_common.PROC_TYPE_DEL:
+                            # validationチェック / validation check
+                            validate = self.__validate_row(cell_values, specifiable_roles)
+                            if validate.ok:
+                                # ユーザーの削除 / Delete user
+                                self.__delete_user(cell_values)
+                                self.success_delete += 1
+                            else:
+                                self.failed_delete += 1
+                                # 処理結果ファイルへ情報出力 / Output information to processing result file
+                                cell_values["ERROR_TEXT"] = multi_lang.get_text_spec(self.language, validate.message_id, validate.base_message, *validate.args)
+                                self.err_wb.write_row(cell_values)
+                                globals.logger.debug(f'Failed User Delete(validate error) : [ROW:{self.imp_wb.get_row_idx()}] [USERNAME:{cell_values["USERNAME"]}] [ERROR_TEXT:{cell_values["ERROR_TEXT"]}]')
+
                     except JobTimeoutException as ex:
                         # Timeout発生時はThrowして処理を中断する
-                        self.failed_register += 1
+                        if cell_values["PROC_TYPE"] in user_import_file_common.PROC_TYPE_ADD:
+                            self.failed_register += 1
+
+                        if cell_values["PROC_TYPE"] in user_import_file_common.PROC_TYPE_DEL:
+                            self.failed_delete += 1
+
                         # 処理結果ファイルへ情報出力 / Output information to processing result file
                         cell_values["ERROR_TEXT"] = multi_lang.get_text_spec(self.language, '401-00021', 'タイムアウト発生のため、この行を処理中に中断しました。')
                         self.err_wb.write_row(cell_values)
                         raise ex
 
                     except (common.BadRequestException, common.InternalErrorException) as ex:
-                        # keycloakへの登録失敗
-                        self.failed_register += 1
+                        if cell_values["PROC_TYPE"] in user_import_file_common.PROC_TYPE_ADD:
+                            # keycloakへの登録失敗
+                            self.failed_register += 1
+
+                        if cell_values["PROC_TYPE"] in user_import_file_common.PROC_TYPE_DEL:
+                            # 削除の失敗
+                            self.failed_delete += 1
+
                         # 処理結果ファイルへ情報出力 / Output information to processing result file
                         cell_values["ERROR_TEXT"] = ex.message
                         self.err_wb.write_row(cell_values)
@@ -195,7 +257,12 @@ class UserImportJobExecutor(BaseJobExecutor):
 
                     except Exception as ex:
                         # その他何らかの失敗
-                        self.failed_register += 1
+                        if cell_values["PROC_TYPE"] in user_import_file_common.PROC_TYPE_ADD:
+                            self.failed_register += 1
+
+                        if cell_values["PROC_TYPE"] in user_import_file_common.PROC_TYPE_DEL:
+                            self.failed_delete += 1
+
                         # 処理結果ファイルへ情報出力 / Output information to processing result file
                         cell_values["ERROR_TEXT"] = multi_lang.get_text_spec(self.language, '401-00020', 'エラーのため処理できませんでした。({0})', ex)
                         self.err_wb.write_row(cell_values)
@@ -339,42 +406,45 @@ class UserImportJobExecutor(BaseJobExecutor):
         validate = validation.validate_user_name(cell_values["USERNAME"], lang=self.language)
         if not validate.ok:
             return validate
-        validate = validation.validate_user_email(cell_values["EMAIL"], lang=self.language)
-        if not validate.ok:
-            return validate
-        validate = validation.validate_user_firstName(cell_values["FIRSTNAME"], lang=self.language)
-        if not validate.ok:
-            return validate
-        validate = validation.validate_user_lastName(cell_values["LASTNAME"], lang=self.language)
-        if not validate.ok:
-            return validate
 
-        # 登録時のみPASSWORDを必須とする / Require PASSWORD only during registration
-        if cell_values["PROC_TYPE"] in user_import_file_common.PROC_TYPE_ADD:
-            if cell_values["PASSWORD"] is None or cell_values["PASSWORD"] == "":
-                return validation.result(
-                    False, 400, '400-00011', '必須項目が不足しています。({0})',
-                    user_import_file_common.COLUMN_IDS["PASSWORD"]["text"]
-                )
+        # USERNAME以外のチェックは削除以外の場合のみ
+        if cell_values["PROC_TYPE"] not in user_import_file_common.PROC_TYPE_DEL:
+            validate = validation.validate_user_email(cell_values["EMAIL"], lang=self.language)
+            if not validate.ok:
+                return validate
+            validate = validation.validate_user_firstName(cell_values["FIRSTNAME"], lang=self.language)
+            if not validate.ok:
+                return validate
+            validate = validation.validate_user_lastName(cell_values["LASTNAME"], lang=self.language)
+            if not validate.ok:
+                return validate
 
-        validate = validation.validate_user_affiliation(cell_values["AFFILIATION"] if cell_values["AFFILIATION"] is not None else "", lang=self.language)
-        if not validate.ok:
-            return validate
-        validate = validation.validate_user_description(cell_values["DESCRIPTION"] if cell_values["DESCRIPTION"] is not None else "", lang=self.language)
-        if not validate.ok:
-            return validate
-        validate = validation.validate_user_enabled(cell_values["ENABLED"], lang=self.language)
-        if not validate.ok:
-            return validate
+            # 登録時のみPASSWORDを必須とする / Require PASSWORD only during registration
+            if cell_values["PROC_TYPE"] in user_import_file_common.PROC_TYPE_ADD:
+                if cell_values["PASSWORD"] is None or cell_values["PASSWORD"] == "":
+                    return validation.result(
+                        False, 400, '400-00011', '必須項目が不足しています。({0})',
+                        user_import_file_common.COLUMN_IDS["PASSWORD"]["text"]
+                    )
 
-        # ロールのチェック（カンマ毎に分割して指定可能なロールに含まれているかチェック）
-        # Checking roles (divide by comma and check if it is included in the specifiable roles)
-        for role in cell_values["ROLES"].split(','):
-            if role != "" and role not in specifiable_roles:
-                return validation.result(
-                    False, 400, '400-62001', '指定されたロール({0})は存在しません',
-                    role
-                )
+            validate = validation.validate_user_affiliation(cell_values["AFFILIATION"] if cell_values["AFFILIATION"] is not None else "", lang=self.language)
+            if not validate.ok:
+                return validate
+            validate = validation.validate_user_description(cell_values["DESCRIPTION"] if cell_values["DESCRIPTION"] is not None else "", lang=self.language)
+            if not validate.ok:
+                return validate
+            validate = validation.validate_user_enabled(cell_values["ENABLED"], lang=self.language)
+            if not validate.ok:
+                return validate
+
+            # ロールのチェック（カンマ毎に分割して指定可能なロールに含まれているかチェック）
+            # Checking roles (divide by comma and check if it is included in the specifiable roles)
+            for role in cell_values["ROLES"].split(','):
+                if role != "" and role not in specifiable_roles:
+                    return validation.result(
+                        False, 400, '400-62001', '指定されたロール({0})は存在しません',
+                        role
+                    )
 
         return validate
 
@@ -467,6 +537,86 @@ class UserImportJobExecutor(BaseJobExecutor):
         user_id = u_get_json[0]["id"]
         globals.logger.info(f'User Created [OG:{self.organization_id}] [UID:{user_id}] [USERNAME:{cell_values["USERNAME"]}]')
         return user_id
+
+    def __delete_user(self, cell_values):
+        """ユーザの削除 / delete user
+
+        Args:
+            cell_values (dict): cellの値 / cell value
+        """
+        # 削除対象のユーザーを取得 / Get target user
+        u_get = api_keycloak_users.user_get(realm_name=self.organization_id, user_name=cell_values["USERNAME"], token=self.organization_sa_token.get())
+        if u_get.status_code != 200:
+            message_id = "500-62003"
+            message = multi_lang.get_text_spec(
+                self.language,
+                message_id,
+                "ユーザーの取得に失敗しました(対象ユーザー:{0})",
+                cell_values["USERNAME"])
+            raise common.InternalErrorException(message_id=message_id, message=message)
+
+        u_get_json = json.loads(u_get.text)
+        if len(u_get_json) == 0:
+            message_id = "404-62002"
+            message = multi_lang.get_text_spec(
+                self.language,
+                message_id,
+                "指定されたユーザーが存在しません")
+            raise common.InternalErrorException(message_id=message_id, message=message)
+
+        user_id = u_get_json[0]["id"]
+
+        # 削除対象のロールを取得 / Get target Role
+        res = api_keycloak_roles.user_role_get(
+            realm_name=self.organization_id,
+            user_id=user_id,
+            client_id=self.organization_private.user_token_client_id,
+            token=self.organization_sa_token.get()
+            )
+
+        if res.status_code != 200:
+            globals.logger.debug(f"response:{res.text}")
+            # keycloakから想定外の応答 / Unexpected response from keycloak
+            message_id = "500-00010"
+            message = multi_lang.get_text_spec(
+                self.language,
+                message_id,
+                "ロールの取得に失敗しました(対象ID:{0} client:{1})",
+                self.organization_id,
+                self.organization_private.user_token_client_clientid
+            )
+            raise common.InternalErrorException(message_id=message_id, message=message)
+
+        # カンマ区切りでユーザー情報に追加
+        roles = json.loads(res.text)
+        role_list = ",".join([role.get("name") for role in roles])
+
+        # オーガナイゼーション管理者ロールに所属している場合は削除不可
+        role_list = [role.get("name") for role in roles]
+        if const.ORG_ROLE_ORG_MANAGER in role_list:
+            globals.logger.debug(f"Users with the Organization manager role cannot be deleted")
+            message_id = "400-62003"
+            message = multi_lang.get_text_spec(
+                self.language,
+                message_id,
+                "オーガナイゼーション管理者ロールのユーザーは削除できません")
+            raise common.BadRequestException(message_id=message_id, message=message)
+
+        # ユーザーの削除 / add user
+        u_delete = api_keycloak_users.user_delete(
+            realm_name=self.organization_id, user_id=user_id, token=self.organization_sa_token.get()
+        )
+
+        if u_delete.status_code != 204:
+            globals.logger.debug(f"response:{u_delete.text}")
+            message_id = "500-62004"
+            message = multi_lang.get_text_spec(
+                self.language,
+                message_id,
+                "ユーザー削除に失敗しました(対象ユーザーID:{0})",
+                user_id)
+            raise common.InternalErrorException(message_id=message_id, message=message)
+
 
     def __add_roles(self, cell_values, user_id, specifiable_roles):
         """ロールの付与 / Grant role
