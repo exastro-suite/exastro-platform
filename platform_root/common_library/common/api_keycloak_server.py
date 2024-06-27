@@ -46,7 +46,7 @@ def serverinfo(token):
     Returns:
         Response: api call response
     """
-    globals.logger.info('Get keycloak serverinfo')
+    globals.logger.debug('Get keycloak serverinfo')
 
     api_url = "{}://{}:{}".format(os.environ['API_KEYCLOAK_PROTOCOL'], os.environ['API_KEYCLOAK_HOST'], os.environ['API_KEYCLOAK_PORT'])
 
