@@ -35,7 +35,7 @@ def clients_roles_get(realm_name, client_id, token, briefRepresentation=True, fi
     Returns:
         Response: HTTP Respose (success : .status_code=200)
     """
-    globals.logger.info(f'Get keycloak composite-roles. realm_name={realm_name}, client_id={client_id}')
+    globals.logger.debug(f'Get keycloak composite-roles. realm_name={realm_name}, client_id={client_id}')
 
     # 呼び出し先設定
     # Call destination setting
@@ -83,7 +83,7 @@ def clients_role_get(realm_name, client_id, role_name, token, briefRepresentatio
     Returns:
         Response: HTTP Respose (success : .status_code=200)
     """
-    globals.logger.info('Get keycloak client role. client_id={}, role_name={}'.format(client_id, role_name))
+    globals.logger.debug('Get keycloak client role. client_id={}, role_name={}'.format(client_id, role_name))
 
     header_para = {
         "Content-Type": "application/json",
@@ -248,7 +248,7 @@ def clients_role_composites_get(realm_name, client_uid, role_name, token):
     Returns:
         Response: HTTP Respose (success : .status_code=200)
     """
-    globals.logger.info('Get keycloak client role composites. client_uid={}, role_name={}'.format(client_uid, role_name))
+    globals.logger.debug('Get keycloak client role composites. client_uid={}, role_name={}'.format(client_uid, role_name))
 
     header_para = {
         "Content-Type": "application/json",
@@ -354,7 +354,7 @@ def realm_role_get(realm_name, role_name, token):
     Returns:
         Response: HTTP Respose (success : .status_code=200)
     """
-    globals.logger.info(f'Get keycloak realm role. realm_name={realm_name}, role_name={role_name}')
+    globals.logger.debug(f'Get keycloak realm role. realm_name={realm_name}, role_name={role_name}')
 
     header_para = {
         "Content-Type": "application/json",
@@ -386,7 +386,7 @@ def user_role_get(realm_name, user_id, client_id, token):
         Response: HTTP Respose (success : .status_code=200)
     """
 
-    globals.logger.info('Get keycloak user role. realm_name={}, user_id={}, client_id={}'.format(realm_name, user_id, client_id))
+    globals.logger.debug('Get keycloak user role. realm_name={}, user_id={}, client_id={}'.format(realm_name, user_id, client_id))
 
     header_para = {
         "Content-Type": "application/json",
@@ -417,7 +417,7 @@ def role_uesrs_get(realm_name, client_id, role_name, token, first=0, max=100):
     Returns:
         Response: HTTP Respose (success : .status_code=200 / notfound : .status_code=404)
     """
-    globals.logger.info(
+    globals.logger.debug(
         'Get keycloak user list for each role. realm_name={}, client_id={}, role_name={}'.format(realm_name, client_id, role_name)
     )
 
@@ -526,7 +526,7 @@ def get_user_role_mapping(realm_name, user_id, token):
     Returns:
         Response: HTTP Respose (success : .status_code=200)
     """
-    globals.logger.info('Get keycloak user role-mapping. realm_name={}, user_id={}'.format(realm_name, user_id))
+    globals.logger.debug('Get keycloak user role-mapping. realm_name={}, user_id={}'.format(realm_name, user_id))
 
     # 呼び出し先設定
     # Call destination setting

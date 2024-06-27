@@ -43,7 +43,7 @@ class counter():
             int: リソース数 count resources
 
         """
-        globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
+        globals.logger.debug(f"### func:{inspect.currentframe().f_code.co_name}")
 
         if kind_resource == const.RESOURCE_COUNT_WORKSPACES:
             ret = self.get_resource_count_workspaces(self.organization_id)
