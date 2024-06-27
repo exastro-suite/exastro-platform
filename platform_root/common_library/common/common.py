@@ -315,11 +315,11 @@ def platform_exception_handler(func):
         except (BadRequestException, AuthException, NotAllowedException, NotFoundException, MaintenanceException, OtherException) as err:
             globals.logger.info(f'exception handler:\n status_code:[{err.status_code}]\n message_id:[{err.message_id}]')
             globals.logger.info(''.join(list(traceback.TracebackException.from_exception(err).format())))
-            return response_status(err.status_code, err.data, err.message_id, err.message)
+            return response_status_direct(err.status_code, err.data, err.message_id, err.message)
         except InternalErrorException as err:
             globals.logger.error(f'exception handler:\n status_code:[{err.status_code}]\n message_id:[{err.message_id}]')
             globals.logger.error(''.join(list(traceback.TracebackException.from_exception(err).format())))
-            return response_status(err.status_code, err.data, err.message_id, err.message)
+            return response_status_direct(err.status_code, err.data, err.message_id, err.message)
         except CallException as err:
             globals.logger.error(f'exception handler:\n status_code:[{err.status_code}]\n message_id:[{err.message_id}]')
             globals.logger.error(''.join(list(traceback.TracebackException.from_exception(err).format())))

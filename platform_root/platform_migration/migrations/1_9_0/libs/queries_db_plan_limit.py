@@ -1,4 +1,4 @@
-#   Copyright 2022 NEC Corporation
+#   Copyright 2025 NEC Corporation
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -12,9 +12,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-services:
-  unittest-platform-db:
-    image: mysql:8.0
-  unittest-keycloak:
-    environment:
-      - KC_DB=mysql
+SQL_CHANGE_COLUMN_PLAN_LIMIT = """
+ALTER TABLE `T_PLAN_LIMIT`
+CHANGE COLUMN `LIMIT_VALUE` `LIMIT_VALUE` BIGINT NOT NULL ;
+"""

@@ -111,7 +111,7 @@ def test_audit_log_api(connexion_client):
 
         assert response.status_code == 500, "DB error route"
         assert response.json["result"] == "500-40001"
-        assert response.json["message"] == "Audit log download reservation failed (download id:{0})", "DB error route"
+        assert response.json["message"] == "Audit log download reservation failed", "DB error route"
 
 
 def test_audit_log_download_file(connexion_client):

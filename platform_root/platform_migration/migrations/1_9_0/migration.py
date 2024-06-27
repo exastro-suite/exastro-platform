@@ -1,5 +1,5 @@
 
-#   Copyright 2023 NEC Corporation
+#   Copyright 2025 NEC Corporation
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -13,18 +13,29 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
+from . import plan_limit_update
 from . import update_organization_db
 
 
 def main():
 
+    # エラーがあっても処理を継続する
+    # continue processing even if there is an error
+    result = []
+
+    # プランの項目上限の型変更
+    # Change the type of plan item limit
+    api = plan_limit_update.plan_limit_update()
+    result.append(api.start())
+
     # オーガナイゼーションデータベースの更新
     # Update organization database
     api = update_organization_db.update_organization_db()
-    result = api.start()
+    result.append(api.start())
 
-    if result != 0:
-        return result
+    for i in result:
+        if i != 0:
+            return i
 
     return 0
 
