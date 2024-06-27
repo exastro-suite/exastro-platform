@@ -248,8 +248,7 @@ def auditlog_download_reserve(body, organization_id):  # noqa: E501
                 message_id = f"500-{MSG_FUNCTION_ID}001"
                 message = multi_lang.get_text(
                     message_id,
-                    "監査ログダウンロードの予約に失敗しました(download id:{0})",
-                    job_id,
+                    "監査ログダウンロードの予約に失敗しました",
                 )
                 raise common.InternalErrorException(message_id=message_id, message=message)
 
