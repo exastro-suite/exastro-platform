@@ -135,3 +135,6 @@ def test_plan_validation(connexion_client):
 
     validate = validation.validate_plan_limits({"test": const.max_db_bigint_value + 1})
     assert not validate.ok
+
+    validate = validation.validate_plan_limits({"test": const.min_db_bigint_value - 1})
+    assert not validate.ok

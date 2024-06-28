@@ -112,6 +112,9 @@ def test_plan_item_validation(connexion_client):
     validate = validation.validate_plan_item_default(const.max_db_bigint_value, const.max_db_bigint_value)
     assert validate.ok
     
+    validate = validation.validate_plan_item_default(const.min_db_bigint_value - 1, const.max_db_bigint_value + 1)
+    assert not validate.ok
+    
     validate = validation.validate_plan_item_default(const.max_db_bigint_value + 1, const.max_db_bigint_value + 1)
     assert not validate.ok
     
