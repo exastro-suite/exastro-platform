@@ -437,11 +437,11 @@ function waitUntilJobCompletes(
 
 /**
  * JOB完了待ちの内部関数
- * @param {object} get_job_state_ajax_param 
- * @param {function} is_complete_function 
- * @param {int} polling_interval_sec 
- * @param {function} resolve 
- * @param {function} reject 
+ * @param {object} get_job_state_ajax_param
+ * @param {function} is_complete_function
+ * @param {int} polling_interval_sec
+ * @param {function} resolve
+ * @param {function} reject
  */
 function _waitUntilJobCompletes(
     get_job_state_ajax_param,
@@ -1589,8 +1589,8 @@ const AuditlogCommon = {
     "JOB_STATUS_NOT_EXEC":         "NotExecuted",
     "JOB_STATUS_EXEC":             "Executing",
     "JOB_STATUS_COMPLETION":       "Completion",
-    "JOB_STATUS_FAILD":             "Failed",
-    "JOB_STATUS_NO_DATA":           "NoData",
+    "JOB_STATUS_FAILD":            "Failed",
+    "JOB_STATUS_NO_DATA":          "NoData",
     "DOWNLOAD_EXP_DAYS":           "platform.system.audit_log.download_exp_days",
     "DOWNLOAD_FILE_LIMIT":         "platform.system.audit_log.download_file_limit",
     validate: {

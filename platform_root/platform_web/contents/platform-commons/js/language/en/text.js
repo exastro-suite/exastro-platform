@@ -484,6 +484,8 @@ langArray['000-91012'] = 'Number of items to be output'
 langArray['000-91013'] = 'Processing result message'
 langArray['000-91014'] = 'There is no download history'
 langArray['000-91015'] = 'Audit log download history will be deleted after {0} days. The maximum number of audit log downloads is {1}.'
+langArray['000-91016'] = 'Target record does not exist.'
+langArray['000-91017'] = 'Download failed. (download ID: {0})'
 langArray['400-00001'] = 'Request-Header Paramater({}) is Invalid'
 langArray['400-00002'] = 'Request-Body Paramater({}) is Invalid'
 //

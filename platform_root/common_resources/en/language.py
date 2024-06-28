@@ -485,6 +485,8 @@ class LanguageList:
     lang_array['000-91013'] = 'Processing result message'
     lang_array['000-91014'] = 'There is no download history'
     lang_array['000-91015'] = 'Audit log download history will be deleted after {0} days. The maximum number of audit log downloads is {1}.'
+    lang_array['000-91016'] = 'Target record does not exist.'
+    lang_array['000-91017'] = 'Download failed. (download ID: {0})'
     lang_array['400-00001'] = 'Request-Header Paramater({}) is Invalid'
     lang_array['400-00002'] = 'Request-Body Paramater({}) is Invalid'
     #
