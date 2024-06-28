@@ -417,6 +417,57 @@ function alertMessageApiError(jqXHR, textStatus, errorThrown) {
 
     alert(msg);
 }
+
+/**
+ * JOBが完了するまで待ちます
+ * @param {object} get_job_state_ajax_param     JOBの状態を取得するAPIを呼び出すajaxパラメータ
+ * @param {function} is_complete_function       JOBの状態の結果から、JOBが完了しているかを返すfunction（JOBの状態を取得するAPIの結果を引数に渡します）
+ * @param {int} polling_interval_sec            JOBの状態を取得するAPIを呼び出す間隔(秒)
+ * @returns                                     JOBの完了まで待つPromise（JOBの状態を取得するAPIの最終の結果をresolveします）
+ */
+function waitUntilJobCompletes(
+    get_job_state_ajax_param,
+    is_complete_function,
+    polling_interval_sec
+) {
+    return new Promise((resolve, reject) => {
+        _waitUntilJobCompletes(get_job_state_ajax_param, is_complete_function, polling_interval_sec, resolve, reject);
+    });
+}
+
+/**
+ * JOB完了待ちの内部関数
+ * @param {object} get_job_state_ajax_param 
+ * @param {function} is_complete_function 
+ * @param {int} polling_interval_sec 
+ * @param {function} resolve 
+ * @param {function} reject 
+ */
+function _waitUntilJobCompletes(
+    get_job_state_ajax_param,
+    is_complete_function,
+    polling_interval_sec,
+    resolve,
+    reject
+) {
+    call_api_promise(get_job_state_ajax_param).then((result) => {
+        if(is_complete_function(result)) {
+            console.log("waitUntilJobCompletes finish!!");
+            /* JOBが完了している場合、親関数(waitUntilJobCompletes)のresolveを実行する */
+            resolve(result);
+        } else {
+            console.log("waitUntilJobCompletes not finish!!");
+            /* JOBが未完了の場合、interval後に再実行 */
+            setTimeout(() => {
+                _waitUntilJobCompletes(get_job_state_ajax_param, is_complete_function, polling_interval_sec, resolve, reject)
+            }, polling_interval_sec * 1000);
+        }
+    }).catch((e) => {
+        /* エラーの場合、親関数(waitUntilJobCompletes)のrejectを実行する */
+        reject(e);
+    })
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //   Common Dialog
@@ -1535,7 +1586,11 @@ const settings_mailserver_common = {
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 const AuditlogCommon = {
+    "JOB_STATUS_NOT_EXEC":         "NotExecuted",
+    "JOB_STATUS_EXEC":             "Executing",
     "JOB_STATUS_COMPLETION":       "Completion",
+    "JOB_STATUS_FAILD":             "Failed",
+    "JOB_STATUS_NO_DATA":           "NoData",
     "DOWNLOAD_EXP_DAYS":           "platform.system.audit_log.download_exp_days",
     "DOWNLOAD_FILE_LIMIT":         "platform.system.audit_log.download_file_limit",
     validate: {

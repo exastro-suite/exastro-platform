@@ -75,6 +75,7 @@ $(function(){
         });
     }
 
+
     //
     // post auditlog download reserve api call
     //
@@ -82,7 +83,7 @@ $(function(){
         //
         // CALL API
         //
-        show_progress();
+        // show_progress();
         return call_api_promise({
             type: "POST",
             url: api_conf.api.auditlog.download.post.replace(/{organization_id}/g, CommonAuth.getRealm()),
@@ -203,18 +204,79 @@ $(function(){
             return;
         }
 
+        show_progress();
+
         let reqbody = {
             "ts_from": $("#from_date").val().replaceAll( '/', '-' ),
             "ts_to": $("#to_date").val().replaceAll( '/', '-' )
         }
+        // call_post_auditlog_download_reserve(reqbody).then((result) => {
+        //     return wait_job_complete(result.data.download_id);
+        // }).then((download_id) => {
+        //     call_post_auditlog_download(download_id);
+        //     hide_progress();
+        // }).catch(() => {
+        //     hide_progress();
+        // })
+
         call_post_auditlog_download_reserve(reqbody).then((result) => {
-            return wait_job_complete(result.data.download_id);
-        }).then((download_id) => {
-            call_post_auditlog_download(download_id);
+            return waitUntilJobCompletes(
+                // APIを呼び出すAjaxパラメータ
+                {
+                    type: "GET",
+                    url: api_conf.api.auditlog.download.get.replace(/{organization_id}/g, CommonAuth.getRealm()) + `?download_id=${result.data.download_id}`,
+                    headers: {
+                        Authorization: "Bearer " + CommonAuth.getToken(),
+                    }
+                },
+                // APIの応答でJOBが完了したか判定する
+                (result) => {
+                    console.log("CHECK STATUS!!");
+                    switch(result.data[0].status) {
+                        case AuditlogCommon.JOB_STATUS_NOT_EXEC:
+                        case AuditlogCommon.JOB_STATUS_EXEC:
+                            return false;
+                        default:
+                            return true;
+                    }
+                },
+                // ポーリング間隔
+                3
+            )
+        }).then((result) => {
+            switch(result.data[0].status) {
+                case AuditlogCommon.JOB_STATUS_COMPLETION:
+                    // JOBが成功
+                    call_post_auditlog_download(result.data[0].download_id);
+                    break;
+                case AuditlogCommon.JOB_STATUS_NO_DATA:
+                    // データなし
+                    alertMessage("エラー", "でーたがない");
+                    break;
+                case AuditlogCommon.JOB_STATUS_FAILD:
+                    // JOB失敗
+                    alertMessage("エラー", "JOBが失敗");
+                    break;
+                default:
+                    // 不明なステータス
+                    alertMessage("エラー", "JOBのステータスが不正");
+                    throw new Error('undefined status');
+            }
             hide_progress();
-        }).catch(() => {
+        }).catch((e) => {
             hide_progress();
         })
+    }
+    //
+    // post auditlog download api call
+    //
+    function call_post_auditlog_download(job_id) {
+        console.log("[CALL] call_post_auditlog_download");
+
+        const organization_id = CommonAuth.getRealm();
+        $("#authorization").val("Bearer " + CommonAuth.getToken());
+        document.download.action = `/api/${organization_id}/platform/auditlog/download/${job_id}`
+        document.download.submit();
     }
 
     function wait_job_complete(download_id) {
