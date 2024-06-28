@@ -538,15 +538,17 @@ def validate_plan_limits(plan_limits):
     no_int = [i for i, v in plan_limits.items() if not validate_int(v)]
     if len(no_int) > 0:
         return result(
-            False, 400, '400-{}012'.format(MSG_FUNCTION_ID), '指定された値が数値ではありません。',
+            False, 400, '400-{}034'.format(MSG_FUNCTION_ID), '指定された値が数値ではありません。({0})',
             multi_lang.get_text('000-00124', "リミット値"),
         )
 
     range_out_mysql_int = [i for i, v in plan_limits.items() if int(v) > const.max_db_bigint_value or int(v) < const.min_db_bigint_value]
     if len(range_out_mysql_int) > 0:
         return result(
-            False, 400, '400-{}012'.format(MSG_FUNCTION_ID), '指定可能な数値ではありません。',
+            False, 400, '400-{}035'.format(MSG_FUNCTION_ID), '指定された値が指定できる範囲を超えています。({0},最小値:{1},最大値:{2})',
             multi_lang.get_text('000-00124', "リミット値"),
+            const.min_db_bigint_value,
+            const.max_db_bigint_value,
         )
 
     return result(True)
@@ -985,6 +987,14 @@ def validate_plan_item_default(default, max):
         return result(
             False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
             multi_lang.get_text('000-00140', "プラン項目デフォルト値")
+        )
+
+    if default > const.max_db_bigint_value or default < const.min_db_bigint_value:
+        return result(
+            False, 400, '400-{}035'.format(MSG_FUNCTION_ID), '指定された値が指定できる範囲を超えています。({0},最小値:{1},最大値:{2})',
+            multi_lang.get_text('000-00140', "プラン項目デフォルト値"),
+            const.min_db_bigint_value,
+            const.max_db_bigint_value,
         )
 
     if max is not None and default > max:
