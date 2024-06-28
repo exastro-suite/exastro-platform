@@ -1535,6 +1535,9 @@ const settings_mailserver_common = {
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 const AuditlogCommon = {
+    "JOB_STATUS_COMPLETION":       "Completion",
+    "DOWNLOAD_EXP_DAYS":           "platform.system.audit_log.download_exp_days",
+    "DOWNLOAD_FILE_LIMIT":         "platform.system.audit_log.download_file_limit",
     validate: {
         //
         // validate from date
