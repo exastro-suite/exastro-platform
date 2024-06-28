@@ -29,8 +29,12 @@ length_plan_name = 255
 length_plan_description = 4000
 max_db_int_value = 2147483647
 min_db_int_value = -2147483648
-max_db_bigint_value = 9223372036854775807
-min_db_bigint_value = -9223372036854775808
+max_db_bigint_value = 99999999999999
+min_db_bigint_value = -99999999999999
+# JavaScriptの上限値2^53 (9,007,199,254,740,992)を考慮し、上限値を上記に変更
+# Considering JavaScript's upper limit of 2^53 (9,007,199,254,740,992), change the upper limit to the above value.
+# max_db_bigint_value = 9223372036854775807
+# min_db_bigint_value = -9223372036854775808
 length_user_name = 255
 length_user_email = 255
 length_user_firstName = 100

@@ -126,6 +126,7 @@ class LanguageList:
     lang_array['000-00204'] = 'Audit log'
     lang_array['000-00205'] = 'Time stamp(From)'
     lang_array['000-00206'] = 'Time stamp(To)'
+    lang_array['000-00207'] = 'Plan item max value'
     lang_array['000-62001'] = 'Processing type'
     lang_array['000-62002'] = 'Registration or Update or Delete'
     #
