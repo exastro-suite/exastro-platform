@@ -987,6 +987,12 @@ def validate_plan_item_default(default, max):
             multi_lang.get_text('000-00140', "プラン項目デフォルト値")
         )
 
+    if default > const.max_db_bigint_value:
+        return result(
+            False, 400, '400-{}012'.format(MSG_FUNCTION_ID), '指定可能な数値ではありません。',
+            multi_lang.get_text('000-00140', "プラン項目デフォルト値"),
+        )
+
     if max is not None and default > max:
         return result(
             False, 400, '400-{}025'.format(MSG_FUNCTION_ID), '指定した最大値を超えるデフォルト値を指定することはできません。'

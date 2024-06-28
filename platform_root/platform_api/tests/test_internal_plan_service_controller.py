@@ -12,6 +12,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 from tests.common import request_parameters, test_common
+from common_library.common import const, validation
 
 import logging
 
@@ -94,3 +95,25 @@ def test_plan_item_create(connexion_client):
         assert response.json["data"].get("informations").get("default") == new_plan_item_2[0]['informations']['default'], "get values check"
         assert response.json["data"].get("informations").get("max") == new_plan_item_2[0]['informations']['max'], "get values check"
 
+
+def test_plan_item_validation(connexion_client):
+    """test user validation
+
+    Args:
+        connexion_client (_type_): _description_
+    """
+    
+    # 適応した試験項目分ずつ追加
+    # Add adapted test items one by one
+    
+    validate = validation.validate_plan_item_default(None, None)
+    assert not validate.ok
+    
+    validate = validation.validate_plan_item_default(const.max_db_bigint_value, const.max_db_bigint_value)
+    assert validate.ok
+    
+    validate = validation.validate_plan_item_default(const.max_db_bigint_value + 1, const.max_db_bigint_value + 1)
+    assert not validate.ok
+    
+    validate = validation.validate_plan_item_default(const.max_db_bigint_value, const.max_db_bigint_value - 1)
+    assert not validate.ok
