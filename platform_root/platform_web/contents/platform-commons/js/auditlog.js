@@ -60,10 +60,15 @@ $(function(){
     //
     // get auditlog download list api call
     //
-    function call_api_promise_auditlog_download_list() {
+    function call_api_promise_auditlog_download_list(download_id='') {
+        let url = api_conf.api.auditlog.download.get.replace(/{organization_id}/g, CommonAuth.getRealm());
+
+        if(download_id !== ''){
+            url = api_conf.api.auditlog.download.get.replace(/{organization_id}/g, CommonAuth.getRealm()) + `?download_id=${download_id}`;
+        }
         return  call_api_promise({
             type: "GET",
-            url: api_conf.api.auditlog.download.get.replace(/{organization_id}/g, CommonAuth.getRealm()),
+            url: url,
             headers: {
                 Authorization: "Bearer " + CommonAuth.getToken(),
             }
@@ -78,7 +83,7 @@ $(function(){
         // CALL API
         //
         show_progress();
-        call_api_promise({
+        return call_api_promise({
             type: "POST",
             url: api_conf.api.auditlog.download.post.replace(/{organization_id}/g, CommonAuth.getRealm()),
             headers: {
@@ -86,11 +91,7 @@ $(function(){
             },
             data: JSON.stringify(reqbody),
             contentType: "application/json",
-            dataType: "json",
-        }).then(() => {
-            hide_progress();
-        }).catch(() => {
-            hide_progress();
+            dataType: "json"
         });
     }
 
@@ -100,9 +101,8 @@ $(function(){
     function call_post_auditlog_download(job_id) {
         console.log("[CALL] call_post_auditlog_download");
 
-        const organization_id = CommonAuth.getRealm();
         $("#authorization").val("Bearer " + CommonAuth.getToken());
-        document.download.action = `/api/${organization_id}/platform/auditlog/download/${job_id}`
+        document.download.action = api_conf.api.auditlog.download.postId.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{download_id}/g, job_id);
         document.download.submit();
     }
 
@@ -158,8 +158,8 @@ $(function(){
     $('#tab_list').on('click',() => {
         Promise.all([
             // get Setting Common
-            call_api_promise_settings_common('platform.system.audit_log.download_exp_days'),
-            call_api_promise_settings_common('platform.system.audit_log.download_file_limit'),
+            call_api_promise_settings_common(AuditlogCommon.DOWNLOAD_EXP_DAYS),
+            call_api_promise_settings_common(AuditlogCommon.DOWNLOAD_FILE_LIMIT),
             // get Auditlog Download List
             call_api_promise_auditlog_download_list()
 
@@ -183,8 +183,8 @@ $(function(){
 
         fn.datePickerDialog('fromTo', true, getText("000-91006", "対象期間"), date ).then(function( result ){
             if ( result !== 'cancel') {
-                $from_date.val( result.from ).change().focus().trigger('input');
-                $to_date.val( result.to ).change().focus().trigger('input');
+                $from_date.val(result.from).change().focus().trigger('input');
+                $to_date.val(result.to).change().focus().trigger('input');
             }
         });
     });
@@ -204,12 +204,75 @@ $(function(){
         }
 
         let reqbody = {
-            "ts_from":$("#from_date").val().replaceAll( '/', '-' ),
-            "ts_to":$("#to_date").val().replaceAll( '/', '-' )
+            "ts_from": $("#from_date").val().replaceAll( '/', '-' ),
+            "ts_to": $("#to_date").val().replaceAll( '/', '-' )
         }
+        call_post_auditlog_download_reserve(reqbody).then((result) => {
+            return wait_job_complete(result.data.download_id);
+        }).then((download_id) => {
+            call_post_auditlog_download(download_id);
+            hide_progress();
+        }).catch(() => {
+            hide_progress();
+        })
+    }
 
-        // CALL API
-        call_post_auditlog_download_reserve(reqbody);
+    function wait_job_complete(download_id) {
+        return new Promise((resolve, reject) => {
+            is_job_complite(download_id).then((data) => {
+                if(data.status === AuditlogCommon.JOB_STATUS_COMPLETION) {
+                    resolve(download_id);
+                } else if(data.result !== "200") {
+                    reject();
+                } else {
+                    setTimeout(() => {
+                        wait_job_complete(download_id).then(() => {
+                            resolve(download_id);
+                        }).catch(() => {
+                            reject();
+                        })}, 3000)
+                }
+            })
+        })
+    }
+
+    /// apiでステータス取ってくるPromise
+    function is_job_complite(download_id) {
+        return new Promise((resolve) => {
+            call_api_promise_auditlog_download_list(download_id).then((result) => {
+                resolve(result.data[0]);
+            })
+        })
+    }
+
+    function download(reserve){
+        const download_id = reserve.download_id;
+
+        new Promise((resolve) => {
+            let data = is_job_complite(download_id);
+            resolve(data);
+        }).then((result)=>{
+            let status = result.status;
+
+            if(status == AuditlogCommon.JOB_STATUS_COMPLETION){
+                call_post_auditlog_download(download_id);
+                return;
+            }
+
+            const intervalId = setInterval(()=>{
+                new Promise((resolve) => {
+                    let data = is_job_complite(download_id);
+                    resolve(data);
+                }).then((result)=>{
+                    let status = result.status;
+                    if(status !== AuditlogCommon.JOB_STATUS_COMPLETION){
+                        return;
+                    }
+                })
+                clearInterval(intervalId);
+                call_post_auditlog_download(download_id);
+            }, 1000)
+        })
     }
 
     //
