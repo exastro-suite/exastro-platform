@@ -28,12 +28,12 @@ UPDATE T_JOBS_AUDIT_LOG
     ,   MESSAGE = %(message)s
     ,   LAST_UPDATE_USER = %(last_update_user)s
     WHERE   JOB_ID = %(job_id)s
-    AND     JOB_STATUS  NOT IN  (%(job_status_comp)s, %(job_status_failed)s)
+    AND     JOB_STATUS  NOT IN  (%(job_status_comp)s, %(job_status_failed)s, %(job_status_nodata)s)
 """
 
 SQL_QUERY_JOBS_AUDIT_LOG_TOO_OLD = """
 SELECT * FROM T_JOBS_AUDIT_LOG
-    WHERE   JOB_STATUS NOT IN  (%(job_status_comp)s, %(job_status_failed)s)
+    WHERE   JOB_STATUS NOT IN  (%(job_status_comp)s, %(job_status_failed)s, %(job_status_nodata)s)
     AND     LAST_UPDATE_TIMESTAMP   <   %(last_update_timestamp)s
 """
 

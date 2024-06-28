@@ -34,7 +34,7 @@ import job_manager_config
 import job_manager_const
 from jobs import jobs_common
 from libs.exceptions import JobTimeoutException
-from libs import queries_auditlog 
+from libs import queries_auditlog
 
 TEMP_FILENAME_PREFIX = "exastro_auditlog_"
 TEMPORARY_DIR = os.environ.get('TEMPORARY_DIR')
@@ -139,7 +139,7 @@ class AuditLogJobExecutor(BaseJobExecutor):
 
                         if self.count_export is not None and self.count_export > 0:
                             # データがある場合のみファイル生成を行う / Generate file only if data exists
-                            
+
                             # ZIPファイルの生成 / Generate ZIP file
                             globals.logger.debug(f'Start Write Zip File: file={os.path.join(TEMPORARY_DIR, fp_zip.name)}')
                             with zipfile.ZipFile(fp_zip, mode='w') as zipfl:
@@ -229,6 +229,7 @@ class AuditLogJobExecutor(BaseJobExecutor):
                     "last_update_user": job_manager_const.SYSTEM_USER_ID,
                     "job_status_comp": const.AUDIT_LOG_COMP,
                     "job_status_failed": const.AUDIT_LOG_FAILED,
+                    "job_status_nodata": const.AUDIT_LOG_NODATA,
                 }
             )
 
@@ -287,14 +288,18 @@ class AuditLogJobExecutor(BaseJobExecutor):
 
                     try:
                         with closing(DBconnector().connect_orgdb(organization['ORGANIZATION_ID'])) as conn, conn.cursor() as cursor:
-                                
+
                             last_update_timestamp = (datetime.datetime.now() - datetime.timedelta(
                                 seconds=job_manager_config.JOBS[job_manager_const.PROCESS_KIND_FORCE_UPDATE_STATUS]['extra_config']['prograss_seconds']))
 
                             # 未完了状態で一定時間経過したものを対象とする / Targets items that have been incomplete for a certain period of time
                             cursor.execute(
                                 queries_auditlog.SQL_QUERY_JOBS_AUDIT_LOG_TOO_OLD,
-                                {"job_status_comp": const.AUDIT_LOG_COMP, "job_status_failed": const.AUDIT_LOG_FAILED, "last_update_timestamp": last_update_timestamp})
+                                {
+                                    "job_status_comp": const.AUDIT_LOG_COMP, "job_status_failed": const.AUDIT_LOG_FAILED, "job_status_nodata": const.AUDIT_LOG_NODATA,
+                                    "last_update_timestamp": last_update_timestamp
+                                }
+                            )
 
                             rows = cursor.fetchall()
                             for row in rows:
