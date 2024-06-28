@@ -64,7 +64,7 @@ $(function(){
         let url = api_conf.api.auditlog.download.get.replace(/{organization_id}/g, CommonAuth.getRealm());
 
         if(download_id !== ''){
-            url = api_conf.api.auditlog.download.get.replace(/{organization_id}/g, CommonAuth.getRealm()) + `?download_id=${download_id}`;
+            url += `?download_id=${download_id}`;
         }
         return  call_api_promise({
             type: "GET",
@@ -80,10 +80,6 @@ $(function(){
     // post auditlog download reserve api call
     //
     function call_post_auditlog_download_reserve(reqbody) {
-        //
-        // CALL API
-        //
-        // show_progress();
         return call_api_promise({
             type: "POST",
             url: api_conf.api.auditlog.download.post.replace(/{organization_id}/g, CommonAuth.getRealm()),
@@ -166,7 +162,7 @@ $(function(){
 
         ]).then(function(results) {
             display_auditlog_download_list(results[0].data, results[1].data, results[2].data);
-            enabled_button();
+            enabled_download_list_button();
 
         }).catch((e) => {
             console.log('[ERROR] display_auditlog_download_list catch');
@@ -200,7 +196,9 @@ $(function(){
     function download_button() {
         console.log("[CALL] download_button");
 
+        disabled_button();
         if(!validate_download()){
+            enabled_button();
             return;
         }
 
@@ -210,14 +208,6 @@ $(function(){
             "ts_from": $("#from_date").val().replaceAll( '/', '-' ),
             "ts_to": $("#to_date").val().replaceAll( '/', '-' )
         }
-        // call_post_auditlog_download_reserve(reqbody).then((result) => {
-        //     return wait_job_complete(result.data.download_id);
-        // }).then((download_id) => {
-        //     call_post_auditlog_download(download_id);
-        //     hide_progress();
-        // }).catch(() => {
-        //     hide_progress();
-        // })
 
         call_post_auditlog_download_reserve(reqbody).then((result) => {
             return waitUntilJobCompletes(
@@ -252,89 +242,26 @@ $(function(){
                 case AuditlogCommon.JOB_STATUS_NO_DATA:
                     // データなし
                     alertMessage("エラー", "でーたがない");
+                    alertMessage(getText("000-80029", "エラー"), getText("000-91016", "対象のレコードが存在しません。"));
                     break;
                 case AuditlogCommon.JOB_STATUS_FAILD:
                     // JOB失敗
-                    alertMessage("エラー", "JOBが失敗");
+                    alertMessage(getText("000-80029", "エラー"), getText("000-91017", "ダウンロードに失敗しました。 (対象ID:{0})", result.data[0].download_id));
                     break;
                 default:
                     // 不明なステータス
-                    alertMessage("エラー", "JOBのステータスが不正");
+                    alertMessage(getText("000-80029", "エラー"), getText("000-91017", "ダウンロードに失敗しました。 (対象ID:{0})", result.data[0].download_id));
                     throw new Error('undefined status');
             }
+
             hide_progress();
+            enabled_button();
         }).catch((e) => {
+            console.log("catch:on_click_btn_download");
+            console.log(e);
             hide_progress();
-        })
-    }
-    //
-    // post auditlog download api call
-    //
-    function call_post_auditlog_download(job_id) {
-        console.log("[CALL] call_post_auditlog_download");
-
-        const organization_id = CommonAuth.getRealm();
-        $("#authorization").val("Bearer " + CommonAuth.getToken());
-        document.download.action = `/api/${organization_id}/platform/auditlog/download/${job_id}`
-        document.download.submit();
-    }
-
-    function wait_job_complete(download_id) {
-        return new Promise((resolve, reject) => {
-            is_job_complite(download_id).then((data) => {
-                if(data.status === AuditlogCommon.JOB_STATUS_COMPLETION) {
-                    resolve(download_id);
-                } else if(data.result !== "200") {
-                    reject();
-                } else {
-                    setTimeout(() => {
-                        wait_job_complete(download_id).then(() => {
-                            resolve(download_id);
-                        }).catch(() => {
-                            reject();
-                        })}, 3000)
-                }
-            })
-        })
-    }
-
-    /// apiでステータス取ってくるPromise
-    function is_job_complite(download_id) {
-        return new Promise((resolve) => {
-            call_api_promise_auditlog_download_list(download_id).then((result) => {
-                resolve(result.data[0]);
-            })
-        })
-    }
-
-    function download(reserve){
-        const download_id = reserve.download_id;
-
-        new Promise((resolve) => {
-            let data = is_job_complite(download_id);
-            resolve(data);
-        }).then((result)=>{
-            let status = result.status;
-
-            if(status == AuditlogCommon.JOB_STATUS_COMPLETION){
-                call_post_auditlog_download(download_id);
-                return;
-            }
-
-            const intervalId = setInterval(()=>{
-                new Promise((resolve) => {
-                    let data = is_job_complite(download_id);
-                    resolve(data);
-                }).then((result)=>{
-                    let status = result.status;
-                    if(status !== AuditlogCommon.JOB_STATUS_COMPLETION){
-                        return;
-                    }
-                })
-                clearInterval(intervalId);
-                call_post_auditlog_download(download_id);
-            }, 1000)
-        })
+            enabled_button();
+        });
     }
 
     //
@@ -359,10 +286,13 @@ $(function(){
         return result;
     }
 
-    //
-    // enabled button
-    //
+    function disabled_button() {
+        $('#btn_download').prop('disabled',true);
+    }
     function enabled_button(){
+        $('#btn_download').prop('disabled',false);
+    }
+    function enabled_download_list_button(){
         $('#auditlog_download_list .button_re_download').each(function(index, element) {
             let $element = $(element);
             if($element.attr('data-status') == 'Completion') {
