@@ -557,7 +557,7 @@ class UserImportJobExecutor(BaseJobExecutor):
 
         u_get_json = json.loads(u_get.text)
         if len(u_get_json) == 0:
-            message_id = "404-62002"
+            message_id = "400-62002"
             message = multi_lang.get_text_spec(
                 self.language,
                 message_id,
@@ -583,7 +583,7 @@ class UserImportJobExecutor(BaseJobExecutor):
                 message_id,
                 "ロールの取得に失敗しました(対象ID:{0} client:{1})",
                 self.organization_id,
-                self.organization_private.user_token_client_clientid
+                self.organization_private.user_token_client_id
             )
             raise common.InternalErrorException(message_id=message_id, message=message)
 
