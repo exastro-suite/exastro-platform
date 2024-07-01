@@ -316,7 +316,7 @@ class UserImportWorkbook():
         for row in self.ws.iter_rows(EXCEL_HEADER_ROWS + 1, self.ws.max_row, self.col_indexes["USERNAME"], self.col_indexes["USERNAME"]):
             for cel in row:
                 # 空欄行の場合スキップ
-                if not cel:
+                if not cel.value:
                     continue
                 user_list.append(cel.value)
 
