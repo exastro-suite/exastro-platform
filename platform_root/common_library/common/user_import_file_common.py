@@ -315,6 +315,9 @@ class UserImportWorkbook():
         # 一つ一つ読みだすと遅いのでiter_rowsで一気に読み取る / Reading them one by one is slow, so read them all at once with iter_rows
         for row in self.ws.iter_rows(EXCEL_HEADER_ROWS + 1, self.ws.max_row, self.col_indexes["USERNAME"], self.col_indexes["USERNAME"]):
             for cel in row:
+                # 空欄行の場合スキップ
+                if not cel:
+                    continue
                 user_list.append(cel.value)
 
         # 重複しているユーザー名を抽出 / Extract duplicate usernames
