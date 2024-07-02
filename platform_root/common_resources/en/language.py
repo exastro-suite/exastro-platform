@@ -586,6 +586,7 @@ class LanguageList:
     lang_array['401-00021'] = 'Processing of this line was interrupted because a timeout occurred.'
     lang_array['401-00022'] = 'A timeout occurred while generating the file.'
     lang_array['401-00023'] = 'An unexpected error occurred during file generation and processing was interrupted.'
+    lang_array['401-00024'] = 'File size is too large. Please review the extraction conditions and try again. (File size:{0}byte / Maximum size:{1}byte)'
     lang_array['403-00001'] = 'Permission error'
     lang_array['404-00001'] = 'Organization not found id:{0}'
     lang_array['404-00002'] = 'Workspace not found organization id:{0} workspace id:{1}'

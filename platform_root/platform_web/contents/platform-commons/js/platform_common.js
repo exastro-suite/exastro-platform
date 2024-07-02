@@ -450,13 +450,14 @@ function _waitUntilJobCompletes(
     resolve,
     reject
 ) {
+    // tokenの書き換え
+    get_job_state_ajax_param.headers.Authorization = "Bearer " + CommonAuth.getToken();
+
     call_api_promise(get_job_state_ajax_param).then((result) => {
         if(is_complete_function(result)) {
-            // console.log("waitUntilJobCompletes finish!!");
             /* JOBが完了している場合、親関数(waitUntilJobCompletes)のresolveを実行する */
             resolve(result);
         } else {
-            // console.log("waitUntilJobCompletes not finish!!");
             /* JOBが未完了の場合、interval後に再実行 */
             setTimeout(() => {
                 _waitUntilJobCompletes(get_job_state_ajax_param, is_complete_function, polling_interval_sec, resolve, reject)

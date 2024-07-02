@@ -132,6 +132,8 @@ JOBS = {
         "job_trigger": "queue",
         "max_job_per_process": int(os.environ.get('JOB_AUDITLOG_MAX_JOB_PER_PROCESS')),
         "extra_config": {
+            # 最大ファイルサイズ（本パラメータを上げる場合はDBのmax_allowed_packetおよびconnection時のmax_allowed_packetの変更が必要です）
+            "max_file_size": int(os.environ.get('JOB_AUDITLOG_MAX_FILE_SIZE')),
             # 処理中の件数を更新するインターバル / Interval for updating the number of items being processed
             "status_update_interval": int(os.environ.get('JOB_AUDITLOG_UPDATE_COUNT_INTERVAL')),
             # 1件処理毎にwaitする時間(ミリ秒) / Wait time for each process (milliseconds)

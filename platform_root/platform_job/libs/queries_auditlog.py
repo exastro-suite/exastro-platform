@@ -16,10 +16,22 @@ SQL_QUERY_JOBS_AUDIT_LOG = """
 SELECT * FROM T_JOBS_AUDIT_LOG WHERE JOB_ID = %(job_id)s
 """
 
+
+SQL_QUERY_AUDIT_LOG_SUMMARY = """
+    SELECT  MIN(ID)     as  MIN_ID
+        ,   MAX(ID)     as  MAX_ID
+        ,   COUNT(*)    as  COUNT_ROWS
+        FROM    T_AUDIT_LOG
+        WHERE   TS  BETWEEN %(ts_from)s AND %(ts_to)s
+"""
+
 SQL_QUERY_AUDIT_LOG = """
 SELECT * FROM T_AUDIT_LOG
-    WHERE   TS  BETWEEN %(ts_from)s AND %(ts_to)s
+    WHERE   ID  BETWEEN %(id_from)s AND %(id_to)s
+    AND     TS  BETWEEN %(ts_from)s AND %(ts_to)s
 """
+
+
 
 SQL_UPDATE_JOBS_AUDIT_LOG = """
 UPDATE T_JOBS_AUDIT_LOG
@@ -44,7 +56,6 @@ UPDATE T_JOBS_AUDIT_LOG
     ,   LAST_UPDATE_USER = %(last_update_user)s
     WHERE   JOB_ID = %(job_id)s
 """
-
 SQL_INSERT_JOBS_AUDIT_LOG_FILE = """
 INSERT INTO T_JOBS_AUDIT_LOG_FILE
     (

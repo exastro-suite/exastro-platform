@@ -90,7 +90,7 @@ def auditlog_file_download(organization_id, download_id, get_leng):
 
                 start_pos += get_leng
 
-                if result is not None:
+                if result is not None and result.get("FILE_DATA_SUBSTR") is not None and len(result.get("FILE_DATA_SUBSTR")) > 0:
                     # Large download test example.
                     # for i in range(1, 100000, 1):
                     #     yield ("#" * get_leng)
