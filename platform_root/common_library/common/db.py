@@ -208,6 +208,7 @@ class DBconnector:
             charset='utf8mb4',
             collation='utf8mb4_general_ci',
             cursorclass=pymysql.cursors.DictCursor,
+            max_allowed_packet=536_870_912  # 512MB
         )
         return conn
 
