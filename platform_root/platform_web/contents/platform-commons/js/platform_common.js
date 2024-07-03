@@ -265,7 +265,13 @@ function displayMenu(curent) {
     } else {
         $('.menuList').empty().append(`
             <li class="menuItem"><a class="menuLink" id="menu_workspace" href="#" tabindex="-1">${getText("000-80005", "ワークスペース管理")}</a></li>
-            <li class="menuItem"><a class="menuLink" id="menu_account_management" href="#" style="display: none;">${getText("000-80006", "ユーザー管理")}</a></li>
+            <li class="menuItem">
+              <a class="menuLink menuItemContent" id="menu_account_management" type="button" aria-expanded="false" aria-controls="accordion-panel-1" href="#" style="display: none;">${getText("000-80006", "ユーザー管理")}</a>
+              <ul id="accordion-panel-1" class="menuItem--subGroup" aria-hidden="true">
+                <li><a class="menuLink ActionList--subGroup" id="menu_account_list" href="#">${getText("000-80006", "ユーザー一覧")}</a></li>
+                <li><a class="menuLink ActionList--subGroup" id="menu_account_bulk" href="#">${getText("000-80006", "ユーザー一括登録・更新")}</a></li>
+              </ul>
+            </li>
             <li class="menuItem"><a class="menuLink" id="menu_role_management" href="#" style="display: none;">${getText("000-80007", "ロール管理")}</a></li>
             <li class="menuItem"><a class="menuLink" id="menu_settings_notifications" href="#">${getText("000-00183", "通知管理")}</a></li>
             <li class="menuItem"><a class="menuLink" id="menu_settings_mailserver" href="#" style="display: none;">${getText("000-88002", "メール送信サーバー設定")}</a></li>
@@ -274,7 +280,7 @@ function displayMenu(curent) {
         `);
 
         $('#menu_workspace').attr('href', location_conf.href.workspaces.list.replace(/{organization_id}/g, CommonAuth.getRealm()));
-        $('#menu_account_management').attr('href', location_conf.href.users.list.replace(/{organization_id}/g, CommonAuth.getRealm()));
+        $('#menu_account_list').attr('href', location_conf.href.users.list.replace(/{organization_id}/g, CommonAuth.getRealm()));
         $('#menu_role_management').attr('href', location_conf.href.roles.list.replace(/{organization_id}/g, CommonAuth.getRealm()));
         $('#menu_settings_notifications').attr('href', location_conf.href.workspaces.settings.notifications.workspaces.replace(/{organization_id}/g, CommonAuth.getRealm()));
         $('#menu_settings_mailserver').attr('href', location_conf.href.settings.mailserver.replace(/{organization_id}/g, CommonAuth.getRealm()));
@@ -304,10 +310,44 @@ function displayMenu(curent) {
     }
 
     if(curent != null) {
-        $(`#${curent}`).addClass("current");
-    }
-}
+        const target = document.getElementById(curent);
+        target.classList.add("current");
 
+        // アコーディオンメニュー内であった場合、メニューを開く
+        if (target.classList.contains("ActionList--subGroup")) {
+            const parentMenu = target.closest(".menuItem");
+            for (const child of parentMenu.children) {
+                if (child.classList.contains("menuItemContent")) {
+                    child.setAttribute("aria-expanded", "true");
+                }
+                if (child.classList.contains("menuItem--subGroup")) {
+                    child.setAttribute("aria-hidden", "false");
+                }
+            }
+        }
+    }
+
+    // アコーディオンメニューの開閉
+    const triggers = document.querySelectorAll(".menuItemContent");
+    triggers.forEach((trigger) => {
+        const controls = trigger.getAttribute("aria-controls");
+        const panel = document.getElementById(controls);
+        trigger.addEventListener("click", (e) => {
+            const target = e.currentTarget;
+            const isOpen = target.getAttribute("aria-expanded") === "true";
+
+            if (isOpen) {
+                // アコーディオンを閉じる
+                target.setAttribute("aria-expanded", "false");
+                panel.setAttribute("aria-hidden", "true");
+            } else {
+                // アコーディオンを開く
+                target.setAttribute("aria-expanded", "true");
+                panel.setAttribute("aria-hidden", "false");
+            }
+        });
+    });
+}
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //   Finish Onload Progress
