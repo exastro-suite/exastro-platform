@@ -22,6 +22,7 @@ from contextlib import closing
 from _pytest.logging import LogCaptureFixture
 from unittest import mock
 from importlib import import_module
+import copy
 
 from common_library.common import const, bl_common_service
 from common_library.common.db import DBconnector
@@ -93,7 +94,7 @@ def test_execute_timeout(caplog: LogCaptureFixture):
 
     # Jobの設定を試験用に切り替え
     process_kind=job_manager_const.PROCESS_KIND_AUDIT_LOG_CLEANUP
-    job_config_jobs = dict(job_manager_config.JOBS)
+    job_config_jobs = copy.deepcopy(job_manager_config.JOBS)
     job_config_jobs[process_kind]["timeout_seconds"] = timeout_sec
 
     with test_common.requsts_mocker_default(), mock.patch.dict(f"job_manager_config.JOBS", job_config_jobs), mock.patch.object(testdata, 'sleep_time', new=3):

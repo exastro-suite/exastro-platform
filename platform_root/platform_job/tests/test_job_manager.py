@@ -24,6 +24,7 @@ from unittest import mock
 from unittest.mock import MagicMock
 import ulid
 from importlib import import_module
+import copy
 
 from common_library.common import const
 
@@ -188,7 +189,7 @@ def test_job_manager_sub_execute_normal_job():
 
     # Jobの実行classを試験用に切り替え
     process_kind=const.PROCESS_KIND_NOTIFICATION
-    job_config_jobs = dict(job_manager_config.JOBS)
+    job_config_jobs = copy.deepcopy(job_manager_config.JOBS)
     job_config_jobs[process_kind]["timeout_seconds"] = 3
     job_config_jobs[process_kind]["max_job_per_process"] = 1
     job_config_jobs[process_kind]["module"] = "tests.jobs.TestJobExecutor"
@@ -249,7 +250,7 @@ def test_job_manager_sub_execute_timeout_job():
 
     # Jobの実行classを試験用に切り替え
     process_kind=const.PROCESS_KIND_NOTIFICATION
-    job_config_jobs = dict(job_manager_config.JOBS)
+    job_config_jobs = copy.deepcopy(job_manager_config.JOBS)
     job_config_jobs[process_kind]["timeout_seconds"] = 1
     job_config_jobs[process_kind]["max_job_per_process"] = 1
     job_config_jobs[process_kind]["module"] = "tests.jobs.TestJobExecutor"
@@ -348,7 +349,7 @@ def test_job_manager_sub_temminate_job_running():
 
     # Jobの実行classを試験用に切り替え
     process_kind=const.PROCESS_KIND_NOTIFICATION
-    job_config_jobs = dict(job_manager_config.JOBS)
+    job_config_jobs = copy.deepcopy(job_manager_config.JOBS)
     job_config_jobs[process_kind]["timeout_seconds"] = 3
     job_config_jobs[process_kind]["max_job_per_process"] = 1
     job_config_jobs[process_kind]["module"] = "tests.jobs.TestJobExecutor"
@@ -408,7 +409,7 @@ def test_job_manager_sub_db_reconnect(caplog: LogCaptureFixture):
 
     # Jobの実行classを試験用に切り替え
     process_kind=const.PROCESS_KIND_NOTIFICATION
-    job_config_jobs = dict(job_manager_config.JOBS)
+    job_config_jobs = copy.deepcopy(job_manager_config.JOBS)
     job_config_jobs[process_kind]["timeout_seconds"] = 3
     job_config_jobs[process_kind]["max_job_per_process"] = 1
     job_config_jobs[process_kind]["module"] = "tests.jobs.TestJobExecutor"
@@ -473,7 +474,7 @@ def test_job_manager_sub_db_helthcheck_error():
 
     # Jobの実行classを試験用に切り替え
     process_kind=const.PROCESS_KIND_NOTIFICATION
-    job_config_jobs = dict(job_manager_config.JOBS)
+    job_config_jobs = copy.deepcopy(job_manager_config.JOBS)
     job_config_jobs[process_kind]["timeout_seconds"] = 3
     job_config_jobs[process_kind]["max_job_per_process"] = 1
     job_config_jobs[process_kind]["module"] = "tests.jobs.TestJobExecutor"
@@ -539,7 +540,7 @@ def test_job_manager_sub_job_limit_over():
 
     # Jobの実行classを試験用に切り替え
     process_kind=const.PROCESS_KIND_NOTIFICATION
-    job_config_jobs = dict(job_manager_config.JOBS)
+    job_config_jobs = copy.deepcopy(job_manager_config.JOBS)
     job_config_jobs[process_kind]["timeout_seconds"] = 4
     job_config_jobs[process_kind]["max_job_per_process"] = max_job_per_process
     job_config_jobs[process_kind]["module"] = "tests.jobs.TestJobExecutor"
@@ -629,7 +630,7 @@ def test_job_manager_sub_force_update_status():
     TestExecuteStocker.initalize()
 
     # Jobの実行classを試験用に切り替え
-    job_config_jobs = dict(job_manager_config.JOBS)
+    job_config_jobs = copy.deepcopy(job_manager_config.JOBS)
     job_config_jobs[const.PROCESS_KIND_NOTIFICATION]["module"] = "tests.jobs.TestJobExecutor"
     job_config_jobs[const.PROCESS_KIND_NOTIFICATION]["class"] = "TestNormalJobExecutor"
 
@@ -680,7 +681,7 @@ def test_job_manager_sub_job_trigger_daily():
     process_kind = job_manager_const.PROCESS_KIND_AUDIT_LOG_CLEANUP
 
     # Jobの実行classを試験用に切り替え
-    job_config_jobs = dict(job_manager_config.JOBS)
+    job_config_jobs = copy.deepcopy(job_manager_config.JOBS)
     job_config_jobs[process_kind]["module"] = "tests.jobs.TestJobExecutor"
     job_config_jobs[process_kind]["class"] = "TestNormalJobExecutor"
 

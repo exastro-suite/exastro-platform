@@ -28,6 +28,7 @@ from contextlib import closing
 from unittest import mock
 import threading
 from importlib import import_module
+import copy
 
 from common_library.common import const
 from common_library.common import encrypt
@@ -957,7 +958,7 @@ def test_execute_timeout():
 
     # Jobの設定を試験用に切り替え
     process_kind=const.PROCESS_KIND_USER_IMPORT
-    job_config_jobs = dict(job_manager_config.JOBS)
+    job_config_jobs = copy.deepcopy(job_manager_config.JOBS)
     job_config_jobs[process_kind]["timeout_seconds"] = timeout_sec
     job_config_jobs[process_kind]["extra_config"]["status_update_interval"] = 3
 
