@@ -28,7 +28,7 @@ import inspect
 import traceback
 from pathlib import Path
 import urllib.parse
-from requests.structures import CaseInsensitiveDict
+import json
 
 # User Imports
 import globals
@@ -258,7 +258,6 @@ def extra_init(organization_id='-', workspace_id='-'):
         extra(dict): extra items
     """
     
-    import json
     # request.headersより機微情報を除いた情報をauditlogに設定する
     # Set information in auditlog excluding sensitive information from request.headers
     save_headers = {}
