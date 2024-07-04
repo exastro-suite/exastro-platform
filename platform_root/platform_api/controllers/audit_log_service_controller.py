@@ -207,8 +207,8 @@ def auditlog_download_reserve(body, organization_id):  # noqa: E501
                 )
                 raise common.InternalErrorException(message_id=message_id, message=message)
 
-    if count > limits:
-        globals.logger.error("audi tlog download limit exceeded. limits: {0}".format(limits))
+    if count >= limits:
+        globals.logger.error("audit log download limit exceeded. limits: {0}".format(limits))
         message_id = f"400-{MSG_FUNCTION_ID}001"
         message = multi_lang.get_text(
             message_id,

@@ -241,7 +241,6 @@ $(function(){
                     break;
                 case AuditlogCommon.JOB_STATUS_NO_DATA:
                     // データなし
-                    alertMessage("エラー", "でーたがない");
                     alertMessage(getText("000-80029", "エラー"), getText("000-91016", "対象のレコードが存在しません。"));
                     break;
                 case AuditlogCommon.JOB_STATUS_FAILD:

@@ -14,10 +14,11 @@
 # from unittest import mock
 from tests.common import request_parameters, test_common
 from contextlib import closing
-from common_library.common import const
+from common_library.common import const, bl_common_service
 from common_library.common.db import DBconnector
-from common_library.common.libs import queries_bl_audit_log, queries_bl_common
+from common_library.common.libs import queries_bl_audit_log, queries_bl_common, queries_bl_notification
 from tests.libs import queries_test_audit_log
+from unittest import mock
 
 import time
 import datetime
@@ -30,7 +31,49 @@ logger = logging.getLogger(__name__)
 
 
 def test_audit_log_api(connexion_client):
-    """audit log service api test
+    """_summary_
+
+    Args:
+        connexion_client (_type_): _description_
+    """
+    organization = test_common.create_organization(connexion_client)
+
+    with test_common.requsts_mocker_default():
+        # 監査ログダウンロード一覧が0件であることを確認
+        response = connexion_client.get(
+            f"/api/{organization['organization_id']}/platform/auditlog/download",
+            headers=request_parameters.request_headers(organization["user_id"]))
+
+        assert response.status_code == 200, "get audit_log_download_list response code = 200"
+        assert len(response.json["data"]) == 0, "get audit_log_download_list count 0"
+
+        # 予約する条件
+        post_conditions = sample_conditions(["ts_from", "ts_to"])
+
+        # 監査ログダウンロード予約（正常）
+        response = connexion_client.post(
+            f"/api/{organization['organization_id']}/platform/auditlog/download",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization["user_id"]),
+            json=post_conditions)
+        assert response.status_code == 200, "post audit log download response code"
+
+        # 監査ログダウンロード一覧が1件であることを確認
+        response = connexion_client.get(
+            f"/api/{organization['organization_id']}/platform/auditlog/download",
+            headers=request_parameters.request_headers(organization["user_id"]))
+
+        assert response.status_code == 200, "get audit_log_download_list response code = 200"
+        assert len(response.json["data"]) == 1
+
+        # 登録したものと等しいかを確認
+        assert json.loads(response.json["data"][0]["conditions"]) == post_conditions
+        assert response.json["data"][0]["create_user_id"] == organization["user_id"]
+        assert response.json["data"][0]["status"] == const.AUDIT_LOG_NOT_EXEC
+
+
+def test_auditlog_download_reserve(connexion_client):
+    """auditlog_download_reserve test
 
     Args:
         connexion_client (_type_): _description_
@@ -99,10 +142,20 @@ def test_audit_log_api(connexion_client):
         assert response.json["message"] == "A format other than the date and time format is specified. (Time stamp(To))", "post audit log download the timestamp(To) is not in datetime format response code"
 
     with test_common.requsts_mocker_default(), \
-            test_common.pymysql_execute_raise_exception_mocker(queries_bl_audit_log.SQL_INSERT_JOBS_AUDIT_LOG, Exception("DB Error Test")):
-        #
+            test_common.pymysql_execute_raise_exception_mocker(queries_bl_audit_log.SQL_QUERY_COUNT_JOBS_AUDIT_LOG, Exception("DB Error Test")):
         # DB error route
-        #
+        response = connexion_client.post(
+            f"/api/{organization['organization_id']}/platform/auditlog/download",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization["user_id"]),
+            json=sample_conditions(["ts_from", "ts_to"]))
+
+        assert response.status_code == 500, "DB error route"
+        assert response.json["result"] == "500-40003"
+
+    with test_common.requsts_mocker_default(), \
+            test_common.pymysql_execute_raise_exception_mocker(queries_bl_audit_log.SQL_INSERT_JOBS_AUDIT_LOG, Exception("DB Error Test")):
+        # DB error route
         response = connexion_client.post(
             f"/api/{organization['organization_id']}/platform/auditlog/download",
             content_type='application/json',
@@ -111,7 +164,49 @@ def test_audit_log_api(connexion_client):
 
         assert response.status_code == 500, "DB error route"
         assert response.json["result"] == "500-40001"
-        assert response.json["message"] == "Audit log download reservation failed", "DB error route"
+
+    with test_common.requsts_mocker_default(), \
+            test_common.pymysql_execute_raise_exception_mocker(queries_bl_notification.SQL_INSERT_PROCESS_QUEUE, Exception("DB Error Test")):
+        # DB error route
+        response = connexion_client.post(
+            f"/api/{organization['organization_id']}/platform/auditlog/download",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization["user_id"]),
+            json=sample_conditions(["ts_from", "ts_to"]))
+
+        assert response.status_code == 500, "DB error route"
+        assert response.json["result"] == "500-40002"
+
+
+def test_auditlog_download_reserve_max(connexion_client):
+    """auditlog_download_reserve test(max reserve)
+
+    Args:
+        connexion_client (_type_): _description_
+    """
+    organization = test_common.create_organization(connexion_client)
+
+    # 最大の予約数のチェック
+    with test_common.requsts_mocker_default(), \
+            mock.patch.object(bl_common_service, 'settings_system_config_list', return_value={"value": "1"}):
+
+        # 監査ログダウンロード予約（上限値到達）
+        response = connexion_client.post(
+            f"/api/{organization['organization_id']}/platform/auditlog/download",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization["user_id"]),
+            json=sample_conditions(["ts_from", "ts_to"]))
+        assert response.status_code == 200, "post audit log download response code"
+
+        # 監査ログダウンロード予約（上限超過）
+        response = connexion_client.post(
+            f"/api/{organization['organization_id']}/platform/auditlog/download",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization["user_id"]),
+            json=sample_conditions(["ts_from", "ts_to"]))
+
+        assert response.status_code == 400
+        assert json.loads(response.text)["result"] == "400-40001"
 
 
 def test_audit_log_download_file(connexion_client):
@@ -130,6 +225,7 @@ def test_audit_log_download_file(connexion_client):
         parameter = {
             "FILE_ID": ulid.new().str,
             "JOB_ID": ulid.new().str,
+            "FILE_DATA": bytes.fromhex('ABCDEF0123456789'),
             "CREATE_USER": "TEST",
             "LAST_UPDATE_USER": "TEST",
         }
@@ -138,7 +234,7 @@ def test_audit_log_download_file(connexion_client):
             cursor.execute(queries_test_audit_log.SQL_INSERT_JOBS_AUDIT_LOG_FILE, parameter)
             conn.commit()
 
-            cursor.execute(queries_test_audit_log.SQL_SELECT_JOBS_AUDIT_LOG_FILE, parameter)
+            cursor.execute(queries_test_audit_log.SQL_SELECT_JOBS_AUDIT_LOG_FILE)
             result = cursor.fetchone()
 
     download_id = result.get("JOB_ID")
