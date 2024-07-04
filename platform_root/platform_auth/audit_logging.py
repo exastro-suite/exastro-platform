@@ -170,7 +170,7 @@ class DBLogHandler(logging.Handler):
                             "full_path": record_json.get("full_path"),
                             "access_route": format(f'{record_json.get("access_route")}'),
                             "remote_addr": record_json.get("remote_addr"),
-                            "request_headers": record_json.get("request_headers"),
+                            "request_headers": json.dumps(record_json.get("request_headers")),
                             "request_user_headers": json.dumps(record_json.get("request_user_headers")),
                             "request_body": json.dumps(record_json.get("request_body")),
                             "request_form": json.dumps(record_json.get("request_form")),
