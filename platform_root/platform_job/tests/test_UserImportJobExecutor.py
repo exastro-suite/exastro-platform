@@ -784,7 +784,7 @@ def test_execute_delete_error_user_delete():
 
         ws = get_result_worksheet(organization_id, queue["PROCESS_EXEC_ID"])
         assert ws.max_row == user_import_file_common.EXCEL_HEADER_ROWS + 1
-        assert ws.cell(user_import_file_common.EXCEL_HEADER_ROWS + 1, ERROR_TEXT_COL_INDEX).value == "オーガナイゼーション管理者ロールのユーザーは削除できません"
+        assert ws.cell(user_import_file_common.EXCEL_HEADER_ROWS + 1, ERROR_TEXT_COL_INDEX).value == "オーガナイゼーション管理者は削除できません"
 
     # keycloak HTTP-500応答(ユーザー削除に失敗)
     with test_common.requsts_mocker_default() as requests_mocker:

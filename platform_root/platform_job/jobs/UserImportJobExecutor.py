@@ -195,6 +195,7 @@ class UserImportJobExecutor(BaseJobExecutor):
                         break
 
                     try:
+                        # 実行処理種別「登録」
                         if cell_values["PROC_TYPE"] in user_import_file_common.PROC_TYPE_ADD:
                             # ユーザ数がLimit値になっていないかチェックする / Check if the number of users is at the limit value
                             self.__check_users_limit(limits)
@@ -214,12 +215,48 @@ class UserImportJobExecutor(BaseJobExecutor):
                                 self.err_wb.write_row(cell_values)
                                 globals.logger.debug(f'Failed User Registration(validate error) : [ROW:{self.imp_wb.get_row_idx()}] [USERNAME:{cell_values["USERNAME"]}] [ERROR_TEXT:{cell_values["ERROR_TEXT"]}]')
 
+                        # 実行処理種別「更新」
+                        if cell_values["PROC_TYPE"] in user_import_file_common.PROC_TYPE_UPD:
+                            # ユーザ数がLimit値になっていないかチェックする / Check if the number of users is at the limit value
+                            self.__check_users_limit(limits)
+
+                            # validationチェック / validation check
+                            validate = self.__validate_row(cell_values, specifiable_roles)
+                            if validate.ok:
+                                # ユーザーIDを取得
+                                user_id = self.__get_user_id(cell_values["USERNAME"])
+
+                                # 所属しているロールを取得
+                                current_role_list = self.__get_role_list(user_id)
+
+                                # ユーザーの更新 / Update user
+                                self.__update_user(cell_values, user_id, current_role_list)
+
+                                # ロールの更新 / Update role
+                                self.__update_roles(cell_values, user_id, current_role_list, specifiable_roles)
+
+                                self.success_update += 1
+                            else:
+                                self.failed_update += 1
+                                # 処理結果ファイルへ情報出力 / Output information to processing result file
+                                cell_values["ERROR_TEXT"] = multi_lang.get_text_spec(self.language, validate.message_id, validate.base_message, *validate.args)
+                                self.err_wb.write_row(cell_values)
+                                globals.logger.debug(f'Failed User Update(validate error) : [ROW:{self.imp_wb.get_row_idx()}] [USERNAME:{cell_values["USERNAME"]}] [ERROR_TEXT:{cell_values["ERROR_TEXT"]}]')
+
+                        # 実行処理種別「削除」
                         if cell_values["PROC_TYPE"] in user_import_file_common.PROC_TYPE_DEL:
                             # validationチェック / validation check
                             validate = self.__validate_row(cell_values, specifiable_roles)
                             if validate.ok:
+                                # ユーザーIDを取得
+                                user_name = cell_values["USERNAME"]
+                                user_id = self.__get_user_id(cell_values["USERNAME"])
+
+                                # 所属しているロールを取得
+                                current_role_list = self.__get_role_list(user_id)
+
                                 # ユーザーの削除 / Delete user
-                                self.__delete_user(cell_values)
+                                self.__delete_user(user_id, user_name, current_role_list)
                                 self.success_delete += 1
                             else:
                                 self.failed_delete += 1
@@ -233,6 +270,9 @@ class UserImportJobExecutor(BaseJobExecutor):
                         if cell_values["PROC_TYPE"] in user_import_file_common.PROC_TYPE_ADD:
                             self.failed_register += 1
 
+                        if cell_values["PROC_TYPE"] in user_import_file_common.PROC_TYPE_UPD:
+                            self.failed_update += 1
+
                         if cell_values["PROC_TYPE"] in user_import_file_common.PROC_TYPE_DEL:
                             self.failed_delete += 1
 
@@ -245,6 +285,10 @@ class UserImportJobExecutor(BaseJobExecutor):
                         if cell_values["PROC_TYPE"] in user_import_file_common.PROC_TYPE_ADD:
                             # keycloakへの登録失敗
                             self.failed_register += 1
+
+                        if cell_values["PROC_TYPE"] in user_import_file_common.PROC_TYPE_UPD:
+                            # 更新失敗
+                            self.failed_update += 1
 
                         if cell_values["PROC_TYPE"] in user_import_file_common.PROC_TYPE_DEL:
                             # 削除の失敗
@@ -538,68 +582,80 @@ class UserImportJobExecutor(BaseJobExecutor):
         globals.logger.info(f'User Created [OG:{self.organization_id}] [UID:{user_id}] [USERNAME:{cell_values["USERNAME"]}]')
         return user_id
 
-    def __delete_user(self, cell_values):
-        """ユーザの削除 / delete user
+    def __update_user(self, cell_values, user_id, current_role_list):
+        """ユーザの更新 / update user
 
         Args:
             cell_values (dict): cellの値 / cell value
+            user_id(str): user id
+            current_role_list(list): current role list
         """
-        # 削除対象のユーザーを取得 / Get target user
-        u_get = api_keycloak_users.user_get(realm_name=self.organization_id, user_name=cell_values["USERNAME"], token=self.organization_sa_token.get())
-        if u_get.status_code != 200:
-            message_id = "500-62003"
+        # オーガナイゼーション管理者ロールに所属し、ENABLEDをFALSEに設定する場合はエラー判定
+        if const.ORG_ROLE_ORG_MANAGER in current_role_list and cell_values["ENABLED"] is False:
+            globals.logger.debug(f"Users with the Organization manager role cannot be disbled")
+            message_id = "400-62004"
             message = multi_lang.get_text_spec(
                 self.language,
                 message_id,
-                "ユーザーの取得に失敗しました(対象ユーザー:{0})",
-                cell_values["USERNAME"])
-            raise common.InternalErrorException(message_id=message_id, message=message)
+                "オーガナイゼーション管理者は無効にできません")
+            raise common.BadRequestException(message_id=message_id, message=message)
 
-        u_get_json = json.loads(u_get.text)
-        if len(u_get_json) == 0:
-            message_id = "400-62002"
-            message = multi_lang.get_text_spec(
-                self.language,
+        # keycloakに渡すBODYの生成 / Generate BODY to pass to keycloak
+        user_json = {
+            "username": cell_values["USERNAME"],
+            "email": cell_values["EMAIL"],
+            "firstName": cell_values["FIRSTNAME"],
+            "lastName": cell_values["LASTNAME"],
+            "attributes":
+            {
+                "affiliation": [cell_values["AFFILIATION"]],
+                "description": [cell_values["DESCRIPTION"]],
+            },
+            "enabled": cell_values["ENABLED"]
+        }
+
+        # ユーザーの更新 / update user
+        u_update = api_keycloak_users.user_update(
+            realm_name=self.organization_id, user_id=user_id, user_json=user_json, token=self.organization_sa_token.get()
+        )
+
+        if u_update.status_code == 400:
+            globals.logger.debug(f"response:{u_update.text}")
+            message_id = f"400-25004"
+            message = multi_lang.get_text(
                 message_id,
-                "指定されたユーザーが存在しません")
-            raise common.InternalErrorException(message_id=message_id, message=message)
+                "ユーザー更新に失敗しました({0})",
+                common.get_response_error_message(u_update.text))
+            raise common.BadRequestException(message_id=message_id, message=message)
 
-        user_id = u_get_json[0]["id"]
-
-        # 削除対象のロールを取得 / Get target Role
-        res = api_keycloak_roles.user_role_get(
-            realm_name=self.organization_id,
-            user_id=user_id,
-            client_id=self.organization_private.user_token_client_id,
-            token=self.organization_sa_token.get()
-            )
-
-        if res.status_code != 200:
-            globals.logger.debug(f"response:{res.text}")
-            # keycloakから想定外の応答 / Unexpected response from keycloak
-            message_id = "500-00010"
-            message = multi_lang.get_text_spec(
-                self.language,
+        elif u_update.status_code not in [200, 204]:
+            globals.logger.debug(f"response:{u_update.text}")
+            message_id = f"500-25004"
+            message = multi_lang.get_text(
                 message_id,
-                "ロールの取得に失敗しました(対象ID:{0} client:{1})",
-                self.organization_id,
-                self.organization_private.user_token_client_id
-            )
+                "ユーザー更新に失敗しました(対象ユーザーID:{0})[{1}]",
+                user_id,
+                json.loads(u_update.text)["errorMessage"])
+
             raise common.InternalErrorException(message_id=message_id, message=message)
 
-        # カンマ区切りでユーザー情報に追加
-        roles = json.loads(res.text)
-        role_list = ",".join([role.get("name") for role in roles])
+        globals.logger.info(f'User Updated [OG:{self.organization_id}] [UID:{user_id}] [USERNAME:{cell_values["USERNAME"]}]')
 
+    def __delete_user(self, user_id, user_name, current_role_list):
+        """ユーザの削除 / delete user
+
+        Args:
+            user_id(str): user id
+            user_name(str): user name
+        """
         # オーガナイゼーション管理者ロールに所属している場合は削除不可
-        role_list = [role.get("name") for role in roles]
-        if const.ORG_ROLE_ORG_MANAGER in role_list:
+        if const.ORG_ROLE_ORG_MANAGER in current_role_list:
             globals.logger.debug(f"Users with the Organization manager role cannot be deleted")
             message_id = "400-62003"
             message = multi_lang.get_text_spec(
                 self.language,
                 message_id,
-                "オーガナイゼーション管理者ロールのユーザーは削除できません")
+                "オーガナイゼーション管理者は削除できません")
             raise common.BadRequestException(message_id=message_id, message=message)
 
         # ユーザーの削除 / add user
@@ -617,6 +673,7 @@ class UserImportJobExecutor(BaseJobExecutor):
                 user_id)
             raise common.InternalErrorException(message_id=message_id, message=message)
 
+        globals.logger.info(f'User Deleted [OG:{self.organization_id}] [UID:{user_id}] [USERNAME:{user_name}]')
 
     def __add_roles(self, cell_values, user_id, specifiable_roles):
         """ロールの付与 / Grant role
@@ -646,6 +703,139 @@ class UserImportJobExecutor(BaseJobExecutor):
                 cell_values["USERNAME"]
             )
             raise common.InternalErrorException(message_id=message_id, message=message)
+
+    def __update_roles(self, cell_values, user_id, current_role_list, specifiable_roles):
+        """ロールの更新 / Update role
+
+        Args:
+            cell_values (dict): cellの値 / cell value
+            user_id (str): user id
+            specifiable_roles (dict): ロール情報 / Role information
+        """
+        # 指定のロールをリスト化
+        if cell_values["ROLES"]:
+            select_role_list = cell_values["ROLES"].split(',')
+        else:
+            select_role_list = []
+
+        # 新たに付与するロールと削除するロールの一覧を生成 / Generate a list of roles to grant or remove to pass to keycloak
+        # select_role_listにあり、current_role_listにないロールを追加対象とする
+        add_role_list = list(set(select_role_list) - set(current_role_list))
+        # select_role_listになく、current_role_listにあるロールを削除対象とする
+        remove_role_list = list(set(current_role_list) - set(select_role_list))
+
+        # オーガナイゼーション管理者ロールが削除するロールに含まれている場合はエラー判定
+        if const.ORG_ROLE_ORG_MANAGER in remove_role_list:
+            globals.logger.debug(f"The Organization manager role cannot be deleted")
+            message_id = "409-62004"
+            message = multi_lang.get_text_spec(
+                self.language,
+                message_id,
+                "ユーザー一括更新ではオーガナイゼーション管理者ロールを解除できません")
+            raise common.BadRequestException(message_id=message_id, message=message)
+
+        # ロールの付与 / Grant role
+        add_client_roles = [specifiable_roles[role] for role in add_role_list if role != ""]
+        response = api_keycloak_roles.user_client_role_mapping_create(
+            realm_name=self.organization_id, user_id=user_id, client_id=self.organization_private.user_token_client_id,
+            client_roles=add_client_roles, token=self.organization_sa_token.get()
+        )
+
+        if response.status_code not in [200, 204]:
+            message_id = "500-26002"
+            message = multi_lang.get_text(
+                message_id,
+                "ロール設定に失敗しました(対象ID:{0} client:{1} username:{2})",
+                self.organization_id,
+                self.organization_private.user_token_client_clientid,
+                cell_values["USERNAME"]
+            )
+            raise common.InternalErrorException(message_id=message_id, message=message)
+
+        # ロールの削除 / Remove role
+        remove_client_roles = [specifiable_roles[role] for role in remove_role_list if role != ""]
+        response = api_keycloak_roles.user_client_role_mapping_delete(
+            realm_name=self.organization_id, user_id=user_id, client_id=self.organization_private.user_token_client_id,
+            client_roles=remove_client_roles, token=self.organization_sa_token.get(),
+        )
+
+        if response.status_code not in [200, 204]:
+            message_id = f"500-26003"
+            message = multi_lang.get_text(
+                message_id,
+                "ロールとユーザーの紐づけ削除に失敗しました(対象ID:{0} username:{1})",
+                self.organization_id,
+                cell_values["USERNAME"]
+            )
+            raise common.InternalErrorException(message_id=message_id, message=message)
+
+    def __get_user_id(self, user_name):
+        """usernameからuseridを取得 / Get userid from username
+
+        Args:
+            user_id (str): user id
+
+        Returns:
+            current_role_list(list)
+        """
+        # 対象のユーザーを取得 / Get target user
+        u_get = api_keycloak_users.user_get(realm_name=self.organization_id, user_name=user_name, token=self.organization_sa_token.get())
+        if u_get.status_code != 200:
+            message_id = "500-62003"
+            message = multi_lang.get_text_spec(
+                self.language,
+                message_id,
+                "ユーザーの取得に失敗しました(対象ユーザー:{0})",
+                user_name)
+            raise common.InternalErrorException(message_id=message_id, message=message)
+
+        u_get_json = json.loads(u_get.text)
+        if len(u_get_json) == 0:
+            message_id = "400-62002"
+            message = multi_lang.get_text_spec(
+                self.language,
+                message_id,
+                "指定されたユーザーが存在しません")
+            raise common.InternalErrorException(message_id=message_id, message=message)
+
+        user_id = u_get_json[0]["id"]
+
+        return user_id
+
+    def __get_role_list(self, user_id):
+        """useridから所属しているロール一覧を取得 / Get a list of roles that a user belongs to from the userid
+
+        Args:
+            user_id (str): user id
+
+        Returns:
+            current_role_list(list)
+        """
+        # 現在所属しているロールを取得
+        res = api_keycloak_roles.user_role_get(
+            realm_name=self.organization_id,
+            user_id=user_id,
+            client_id=self.organization_private.user_token_client_id,
+            token=self.organization_sa_token.get()
+            )
+
+        if res.status_code != 200:
+            globals.logger.debug(f"response:{res.text}")
+            # keycloakから想定外の応答 / Unexpected response from keycloak
+            message_id = "500-00010"
+            message = multi_lang.get_text_spec(
+                self.language,
+                message_id,
+                "ロールの取得に失敗しました(対象ID:{0} client:{1})",
+                self.organization_id,
+                self.organization_private.user_token_client_id
+            )
+            raise common.InternalErrorException(message_id=message_id, message=message)
+
+        # 所属しているロール名をリスト化
+        current_role_list = [role.get("name") for role in json.loads(res.text)]
+
+        return current_role_list
 
     def __update_t_jobs_user(self, conn, job_status, message):
         """JOBの状態、件数の更新 / Update of JOB status and number of jobs
