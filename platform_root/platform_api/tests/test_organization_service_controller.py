@@ -1229,9 +1229,10 @@ def sample_data_organization(id, update={}):
                         "temporary": False
                     }
                 ],
-                "requiredActions": [
-                    "UPDATE_PROFILE"
-                ],
+                "requiredActions": [],
+                # "requiredActions": [
+                #     "UPDATE_PROFILE"
+                # ],
                 "enabled": True
             }
         ],
