@@ -198,7 +198,7 @@ PROCESS_KIND_AUDIT_LOG = "AUDITLOG"             # 監査ログ
 
 # JOB種別
 # job type
-JOB_TYPE_USER_BULK_IMPORT = "USER_BULK_IMPORT"  # ユーザー一括インポート(登録)
+JOB_TYPE_USER_BULK_IMPORT = "USER_BULK_IMPORT"  # ユーザー一括インポート(登録/更新)
 JOB_TYPE_USER_BULK_DELETE = "USER_BULK_DELETE"  # ユーザー一括削除
 
 # smtp_idのデフォルト
