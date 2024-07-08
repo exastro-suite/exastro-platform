@@ -280,7 +280,8 @@ def create_organization(connexion_client):
 
     return {
         "organization_id": organization_id,
-        "user_id": json.loads(resp_get_users.text)['data'][0]['id']
+        "user_id": json.loads(resp_get_users.text)['data'][0]['id'],
+        "preferred_username": json.loads(resp_get_users.text)['data'][0]['preferred_username']
     }
 
 
