@@ -568,8 +568,9 @@ def user_delete(organization_id, user_id):
         message_id = f"500-{MSG_FUNCTION_ID}003"
         message = multi_lang.get_text(
             message_id,
-            "ユーザー削除に失敗しました(対象ユーザーID:{0})",
-            user_id)
+            "ユーザー削除に失敗しました(対象ユーザーID:{0})[{1}]",
+            user_id,
+            json.loads(response.text)["errorMessage"])
 
         raise common.InternalErrorException(message_id=message_id, message=message)
 
