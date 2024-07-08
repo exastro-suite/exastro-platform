@@ -217,9 +217,6 @@ class UserImportJobExecutor(BaseJobExecutor):
 
                         # 実行処理種別「更新」
                         if cell_values["PROC_TYPE"] in user_import_file_common.PROC_TYPE_UPD:
-                            # ユーザ数がLimit値になっていないかチェックする / Check if the number of users is at the limit value
-                            self.__check_users_limit(limits)
-
                             # validationチェック / validation check
                             validate = self.__validate_row(cell_values, specifiable_roles)
                             if validate.ok:
@@ -636,7 +633,6 @@ class UserImportJobExecutor(BaseJobExecutor):
                 "ユーザー更新に失敗しました(対象ユーザーID:{0})[{1}]",
                 user_id,
                 json.loads(u_update.text)["errorMessage"])
-
             raise common.InternalErrorException(message_id=message_id, message=message)
 
         globals.logger.info(f'User Updated [OG:{self.organization_id}] [UID:{user_id}] [USERNAME:{cell_values["USERNAME"]}]')
@@ -669,8 +665,9 @@ class UserImportJobExecutor(BaseJobExecutor):
             message = multi_lang.get_text_spec(
                 self.language,
                 message_id,
-                "ユーザー削除に失敗しました(対象ユーザーID:{0})",
-                user_id)
+                "ユーザー削除に失敗しました(対象ユーザーID:{0})[{1}]",
+                user_id,
+                json.loads(u_delete.text)["errorMessage"])
             raise common.InternalErrorException(message_id=message_id, message=message)
 
         globals.logger.info(f'User Deleted [OG:{self.organization_id}] [UID:{user_id}] [USERNAME:{user_name}]')
