@@ -866,6 +866,7 @@ components:
               maximum: 10080
               minimum: 1
     planMappingOrganization:
+      title: plan item resources.
       type: object
       required:
         - id
@@ -1881,6 +1882,137 @@ components:
           description: Credentials or access token for API
       required:
         - authorization
+    jobsUserBulkImport:
+      type: object
+      properties:
+        import_file:
+          type: string
+          format: binary
+          description: The file image is in Excel format.
+      required:
+        - import_file
+    jobsUserBulkStatusList:
+      title: Jobs user bulk processing results list.
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/jobsUserBulkStatus'
+    jobsUserBulkStatus:
+      title: Jobs user bulk processing results.
+      type: object
+      properties:
+        job_id:
+          type: string
+          description: ID automatically assigned when registering
+        job_type:
+          type: string
+          enum:
+            - USER_BULK_IMPORT
+            - USER_BULK_DELETE
+          example: USER_BULK_IMPORT
+          description: \"USER_BULK_IMPORT\" or \"USER_BULK_DELETE\"
+        job_status:
+          type: string
+          description: Bulk registration and bulk deletion import status
+        count_register:
+          type: number
+          description: Number of items to be registered
+        count_update:
+          type: number
+          description: Number of items to be updated
+        count_delete:
+          type: number
+          description: Number of items to be deleted
+        success_register:
+          type: number
+          description: Number of successful registrations
+        success_update:
+          type: number
+          description: Number of successful updates
+        success_delete:
+          type: number
+          description: Number of successful deletions
+        failed_register:
+          type: number
+          description: Number of registration failures
+        failed_update:
+          type: number
+          description: Number of update failures
+        failed_delete:
+          type: number
+          description: Number of failed deletions
+        message:
+          type: string
+          description: Results message of bulk registration and deletion
+        language:
+          type: string
+          example: ja
+          description: requester's language
+        create_timestamp:
+          type: string
+          format: date-time
+          description: Request date and time
+        create_user_id:
+          type: string
+          format: uuid
+          description: Requester ID
+        create_user_name:
+          type: string
+          description: Requester's username
+        last_update_timestamp:
+          type: string
+          format: date-time
+          description: Last Modified
+    jobsUserExport:
+      type: object
+    jobsUserExportStatusList:
+      title: Jobs user export processing results list.
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/jobsUserExportStatus'
+    jobsUserExportStatus:
+      title: Jobs user export processing results.
+      type: object
+      properties:
+        job_id:
+          type: string
+          description: ID automatically assigned when registering
+        job_status:
+          type: string
+          description: Bulk registration and bulk deletion import status
+        query_strings:
+          type: string
+          description: Output conditions
+        count_export:
+          type: number
+          description: null
+        message:
+          type: string
+          description: Results message of bulk registration and deletion
+        language:
+          type: string
+          example: ja
+          description: requester's language
+        create_timestamp:
+          type: string
+          format: date-time
+          description: Request date and time
+        create_user_id:
+          type: string
+          format: uuid
+          description: Requester ID
+        create_user_name:
+          type: string
+          description: Requester's username
+        last_update_timestamp:
+          type: string
+          format: date-time
+          description: Last Modified
   securitySchemes:
     BearerAuth:
       description: Credentials or access token for API

@@ -112,32 +112,32 @@ paths:
   "/api/{organization_id}/platform/roles/{role_name}/users":
       $ref: './paths/roles.role_name.users.yaml'
 
-  "/api/{organization_id}/platform/jobs/users/bulk-import":
-      $ref: './paths/jobs.users.bulk-import.yaml'
+  "/api/{organization_id}/platform/jobs/users/bulk/import":
+      $ref: './paths/jobs.users.bulk.import.yaml'
 
-  "/api/{organization_id}/platform/jobs/users/bulk-delete":
-      $ref: './paths/jobs.users.bulk-delete.yaml'
+  "/api/{organization_id}/platform/jobs/users/bulk/delete":
+      $ref: './paths/jobs.users.bulk.delete.yaml'
 
-  # "/api/{organization_id}/platform/jobs/users/import/status":
-  #     $ref: './paths/jobs.users.bulk-import.status.yaml'
+  "/api/{organization_id}/platform/jobs/users/bulk/status":
+      $ref: './paths/jobs.users.bulk.status.yaml'
 
-  # "/api/{organization_id}/platform/jobs/users/import/status/{job_id}":
-  #     $ref: './paths/jobs.users.bulk-import.status.job_id.yaml'
+  # "/api/{organization_id}/platform/jobs/users/bulk/status/{job_id}":
+  #     $ref: './paths/jobs.users.bulk-status.job_id.yaml'
 
-  # "/api/{organization_id}/platform/jobs/users/import/status/{job_id}/download":
-  #     $ref: './paths/jobs.users.bulk-import.status.job_id.download.yaml'
+  "/api/{organization_id}/platform/jobs/users/bulk/status/{job_id}/download":
+      $ref: './paths/jobs.users.bulk.status.job_id.download.yaml'
 
   "/api/{organization_id}/platform/jobs/users/export":
       $ref: './paths/jobs.users.export.yaml'
 
-  # "/api/{organization_id}/platform/jobs/users/export/status":
-  #     $ref: './paths/jobs.users.export.status.yaml'
+  "/api/{organization_id}/platform/jobs/users/export/status":
+      $ref: './paths/jobs.users.export.status.yaml'
 
   # "/api/{organization_id}/platform/jobs/users/export/status/{job_id}":
-  #     $ref: './paths/jobs.users.export.status.job_id.yaml'
+  #     $ref: './paths/jobs.users.export-status.job_id.yaml'
 
-  # "/api/{organization_id}/platform/jobs/users/export/status/{job_id}/download":
-  #     $ref: './paths/jobs.users.export.status.job_id.download.yaml'
+  "/api/{organization_id}/platform/jobs/users/export/status/{job_id}/download":
+      $ref: './paths/jobs.users.export.status.job_id.download.yaml'
 
   "/api/{organization_id}/platform/auditlog/download":
       $ref: './paths/auditlog.download.yaml'

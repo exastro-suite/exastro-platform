@@ -12,24 +12,23 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-post:
+get:
   tags:
   - JobsService
-  summary: Bulk delete user job call
+  summary: Get import status
   x-openapi-router-controller: controllers.jobs_service_controller
-  operationId: jobs_users_bulk_delete
+  operationId: jobs_users_import_status_job_id
   parameters:
   - name: organization_id
     in: path
     required: true
     schema:
       type: string
-  requestBody:
-    content:
-      multipart/form-data:
-        schema:
-          $ref: '../schemas/jobsUserBulkImport.yaml'
+  - name: job_id
+    in: path
     required: true
+    schema:
+      type: string
   responses:
     200:
       description: A successful response.
@@ -38,11 +37,7 @@ post:
           schema:
             allOf:
               - $ref: '../schemas/responseOk.yaml'
-              - type: object
-                properties:
-                  data:
-                    type: object
-                    example: null
+              - $ref: '../schemas/jobs.user.bulk.status.yaml'
     default:
       description: An unexpected error response.
       content:

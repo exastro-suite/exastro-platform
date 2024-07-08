@@ -15,34 +15,34 @@
 post:
   tags:
   - JobsService
-  summary: Bulk import user job call
+  summary: Download import status
   x-openapi-router-controller: controllers.jobs_service_controller
-  operationId: jobs_users_import
+  operationId: jobs_users_import_status_job_id_download
   parameters:
   - name: organization_id
     in: path
     required: true
     schema:
       type: string
+  - name: job_id
+    in: path
+    required: true
+    schema:
+      type: string
   requestBody:
     content:
-      multipart/form-data:
+      application/x-www-form-urlencoded:
         schema:
-          $ref: '../schemas/jobsUserBulkImport.yaml'
+          $ref: '../schemas/authorization.body.yaml'
     required: true
   responses:
     200:
       description: A successful response.
       content:
-        application/json:
+        application/zip:
           schema:
-            allOf:
-              - $ref: '../schemas/responseOk.yaml'
-              - type: object
-                properties:
-                  data:
-                    type: object
-                    example: null
+            type: string
+            format: binary
     default:
       description: An unexpected error response.
       content:
