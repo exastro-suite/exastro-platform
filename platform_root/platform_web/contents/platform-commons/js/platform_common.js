@@ -269,7 +269,7 @@ function displayMenu(curent) {
               <a class="menuLink menuItemContent" id="menu_account_management" type="button" aria-expanded="false" aria-controls="accordion-panel-1" href="#" style="display: none;">${getText("000-80006", "ユーザー管理")}</a>
               <ul id="accordion-panel-1" class="menuItem--subGroup" aria-hidden="true">
                 <li><a class="menuLink ActionList--subGroup" id="menu_account_list" href="#">${getText("000-80006", "ユーザー一覧")}</a></li>
-                <li><a class="menuLink ActionList--subGroup" id="menu_account_bulk" href="#">${getText("000-80006", "ユーザー一括登録・更新")}</a></li>
+                <li><a class="menuLink ActionList--subGroup" id="menu_account_bulk_actions" href="#">${getText("000-80006", "ユーザー一括登録・更新")}</a></li>
               </ul>
             </li>
             <li class="menuItem"><a class="menuLink" id="menu_role_management" href="#" style="display: none;">${getText("000-80007", "ロール管理")}</a></li>
@@ -281,6 +281,7 @@ function displayMenu(curent) {
 
         $('#menu_workspace').attr('href', location_conf.href.workspaces.list.replace(/{organization_id}/g, CommonAuth.getRealm()));
         $('#menu_account_list').attr('href', location_conf.href.users.list.replace(/{organization_id}/g, CommonAuth.getRealm()));
+        $('#menu_account_bulk_actions').attr('href', location_conf.href.users.bulk_actions.replace(/{organization_id}/g, CommonAuth.getRealm()));
         $('#menu_role_management').attr('href', location_conf.href.roles.list.replace(/{organization_id}/g, CommonAuth.getRealm()));
         $('#menu_settings_notifications').attr('href', location_conf.href.workspaces.settings.notifications.workspaces.replace(/{organization_id}/g, CommonAuth.getRealm()));
         $('#menu_settings_mailserver').attr('href', location_conf.href.settings.mailserver.replace(/{organization_id}/g, CommonAuth.getRealm()));

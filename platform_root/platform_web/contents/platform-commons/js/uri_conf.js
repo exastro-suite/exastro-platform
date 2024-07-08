@@ -163,6 +163,7 @@ var location_conf = {
             "list": "/{organization_id}/platform/users",
             "detail": "/{organization_id}/platform/users/{user_id}",
             "edit": "/{organization_id}/platform/users/{user_id}/edit",
+            "bulk_actions": "/{organization_id}/platform/users/_bulk_actions",
         },
         "menu": {
             "platform_admin_site": {
