@@ -12,14 +12,18 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
+import inspect
 import connexion
 import ulid
 import globals
-
+import json
 from contextlib import closing
+
+from common_library.common import api_keycloak_tokens, api_keycloak_users
 from common_library.common import common, multi_lang, const, bl_job_service
 from common_library.common.db import DBconnector
 from common_library.common.libs import queries_bl_jobs, queries_bl_notification
+from libs import queries_jobs
 
 MSG_FUNCTION_ID = "38"
 
@@ -181,23 +185,103 @@ def jobs_users_bulk_delete(import_file, organization_id):  # noqa: E501
     # write to JOBS USER DB
     return bl_job_service.user_bulk_process(r, import_file, organization_id, const.JOB_TYPE_USER_BULK_DELETE)
 
+
 @common.platform_exception_handler
-def jobs_users_import_status(organization_id):  # noqa: E501
-    """Get all import status
+def jobs_users_bulk_status(organization_id):
+    """ユーザー一括登録削除処理状態一覧 / User bulk registration deletion processing status list
 
-     # noqa: E501
+    Args:
+        organization_id (str): organization id
 
-    :param organization_id:
-    :type organization_id: str
-
-    :rtype: InlineResponse2002
+    Returns:
+        Response: http response
     """
-    return common.response_200_ok(None)
+
+    globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
+
+    # Get a service account token
+    db = DBconnector()
+    private = db.get_organization_private(organization_id)
+
+    token_response = api_keycloak_tokens.service_account_get_token(
+        organization_id, private.internal_api_client_clientid, private.internal_api_client_secret,
+    )
+    if token_response.status_code != 200:
+        raise common.AuthException(
+            "client_user_get_token error status:{}, response:{}".format(token_response.status_code, token_response.text)
+        )
+
+    token = json.loads(token_response.text)["access_token"]
+
+    # jobs users bulk status get
+    with closing(DBconnector().connect_orgdb(organization_id)) as conn:
+        with conn.cursor() as cursor:
+
+            cursor.execute(queries_jobs.SQL_QUERY_JOBS_USERS_BULK_STATUS)
+            result = cursor.fetchall()
+
+    data = []
+    user_data = []
+    for row in result:
+        user_id = row["CREATE_USER"]
+        name = None
+
+        # ユーザーIDをusernameに変換
+        # Convert user ID to username
+        userid_exists = [u["name"] for u in user_data if u["user_id"] == user_id]
+        if len(userid_exists) > 0:
+            name = userid_exists[0]
+        else:
+            # get user from keycloak, None if 404
+            response = api_keycloak_users.user_get_by_id(realm_name=organization_id, user_id=user_id, token=token)
+            if response.status_code == 200:
+                user = json.loads(response.text)
+                globals.logger.debug(f"response user:{user}")
+
+                name = common.get_username(user.get("firstName"), user.get("lastName"), user.get("username"))
+            elif response.status_code == 404:
+                globals.logger.debug("response user:not found")
+
+                name = None
+            else:
+                globals.logger.error(f"response.status_code:{response.status_code}")
+                globals.logger.error(f"response.text:{response.text}")
+                message_id = "500-38003"
+                message = multi_lang.get_text(
+                    message_id,
+                    "ユーザーの取得に失敗しました(対象ID:{0})",
+                    user_id,
+                )
+                raise common.InternalErrorException(message_id=message_id, message=message)
+
+        row = {
+            "id": row["JOB_ID"],
+            "job_type": row["JOB_TYPE"],
+            "job_status": row["JOB_STATUS"],
+            "count_register": row["COUNT_REGISTER"],
+            "count_update": row["COUNT_UPDATE"],
+            "count_delete": row["COUNT_DELETE"],
+            "success_register": row["SUCCESS_REGISTER"],
+            "success_update": row["SUCCESS_UPDATE"],
+            "success_delete": row["SUCCESS_DELETE"],
+            "failed_register": row["FAILED_REGISTER"],
+            "failed_update": row["FAILED_UPDATE"],
+            "failed_delete": row["FAILED_DELETE"],
+            "message": row["MESSAGE"],
+            "language": row["LANGUAGE"],
+            "create_timestamp": common.datetime_to_str(row["CREATE_TIMESTAMP"]),
+            "create_user_id": user_id,
+            "create_user_name": name,
+            "last_update_timestamp": common.datetime_to_str(row["LAST_UPDATE_TIMESTAMP"]),
+        }
+        data.append(row)
+
+    return common.response_200_ok(data)
 
 
 @common.platform_exception_handler
-def jobs_users_import_status_job_id(organization_id, job_id):  # noqa: E501
-    """Get import status
+def jobs_users_bulk_status_job_id(organization_id, job_id):  # noqa: E501
+    """Get bulk-import and bulk-delete status
 
      # noqa: E501
 

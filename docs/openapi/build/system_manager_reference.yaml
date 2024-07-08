@@ -1903,7 +1903,7 @@ components:
       title: Jobs user bulk processing results.
       type: object
       properties:
-        job_id:
+        id:
           type: string
           description: ID automatically assigned when registering
         job_type:
@@ -1979,7 +1979,7 @@ components:
       title: Jobs user export processing results.
       type: object
       properties:
-        job_id:
+        id:
           type: string
           description: ID automatically assigned when registering
         job_status:

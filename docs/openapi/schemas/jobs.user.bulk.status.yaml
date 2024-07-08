@@ -15,7 +15,7 @@
 title: Jobs user bulk processing results.
 type: object
 properties:
-  job_id:
+  id:
     type: string
     description: ID automatically assigned when registering
   job_type:

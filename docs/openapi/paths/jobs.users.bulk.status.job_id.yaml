@@ -15,9 +15,9 @@
 get:
   tags:
   - JobsService
-  summary: Get import status
+  summary: Get bulk-import and bulk-delete status
   x-openapi-router-controller: controllers.jobs_service_controller
-  operationId: jobs_users_import_status_job_id
+  operationId: jobs_users_bulk_status_job_id
   parameters:
   - name: organization_id
     in: path
