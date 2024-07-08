@@ -1,4 +1,4 @@
-#   Copyright 2022 NEC Corporation
+#   Copyright 2024 NEC Corporation
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -12,16 +12,8 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-title: plan item resources.
-type: object
-required:
-- id
-- start_datetime
-properties:
-  id:
-    type: string
-    example: plan-1
-
-  start_datetime:
-    type: string
-    example: '2022-12-01 00:00:00'
+SQL_QUERY_JOBS_USERS_BULK_STATUS = """
+SELECT *
+FROM T_JOBS_USER
+ORDER BY CREATE_TIMESTAMP DESC
+"""

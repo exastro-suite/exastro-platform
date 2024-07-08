@@ -15,11 +15,16 @@
 get:
   tags:
   - JobsService
-  summary: Get all import status
+  summary: Get bulk-import and bulk-delete status
   x-openapi-router-controller: controllers.jobs_service_controller
-  operationId: jobs_users_import_status
+  operationId: jobs_users_bulk_status_job_id
   parameters:
   - name: organization_id
+    in: path
+    required: true
+    schema:
+      type: string
+  - name: job_id
     in: path
     required: true
     schema:
@@ -32,11 +37,7 @@ get:
           schema:
             allOf:
               - $ref: '../schemas/responseOk.yaml'
-              - type: object
-                properties:
-                  data:
-                    type: object
-                    example: null
+              - $ref: '../schemas/jobs.user.bulk.status.yaml'
     default:
       description: An unexpected error response.
       content:

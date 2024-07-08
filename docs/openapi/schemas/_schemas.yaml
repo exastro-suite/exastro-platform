@@ -151,4 +151,16 @@ AuditLogDownload:
 AuditLogDownloadList:
   $ref: "./auditLogDownloadList.yaml"
 authorizationBody:
-  $ref: "./authorizationBody.yaml"
+  $ref: "./authorization.body.yaml"
+jobsUserBulkImport:
+  $ref: "./jobs.user.bulk.import.yaml"
+jobsUserBulkStatusList:
+  $ref: "./jobs.user.bulk.status.list.yaml"
+jobsUserBulkStatus:
+  $ref: "./jobs.user.bulk.status.yaml"
+jobsUserExport:
+  $ref: "./jobs.user.export.yaml"
+jobsUserExportStatusList:
+  $ref: "./jobs.user.export.status.list.yaml"
+jobsUserExportStatus:
+  $ref: "./jobs.user.export.status.yaml"

@@ -2073,7 +2073,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/runtimeError'
       x-openapi-router-controller: controllers.role_mappings_service_controller
-  /api/{organization_id}/platform/jobs/users/bulk-import:
+  /api/{organization_id}/platform/jobs/users/bulk/import:
     post:
       tags:
       - JobsService
@@ -2091,7 +2091,7 @@ paths:
         content:
           multipart/form-data:
             schema:
-              $ref: '#/paths/~1api~1%7Borganization_id%7D~1platform~1jobs~1users~1bulk-delete/post/requestBody/content/multipart~1form-data/schema'
+              $ref: '#/components/schemas/jobsUserBulkImport'
         required: true
       responses:
         "200":
@@ -2107,7 +2107,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/runtimeError'
       x-openapi-router-controller: controllers.jobs_service_controller
-  /api/{organization_id}/platform/jobs/users/bulk-delete:
+  /api/{organization_id}/platform/jobs/users/bulk/delete:
     post:
       tags:
       - JobsService
@@ -2125,7 +2125,7 @@ paths:
         content:
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/users_bulkdelete_body'
+              $ref: '#/components/schemas/jobsUserBulkImport'
         required: true
       responses:
         "200":
@@ -2134,6 +2134,77 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/inline_response_200_2'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+      x-openapi-router-controller: controllers.jobs_service_controller
+  /api/{organization_id}/platform/jobs/users/bulk/status:
+    get:
+      tags:
+      - JobsService
+      summary: Get all bulk-import and bulk-delete status
+      operationId: jobs_users_bulk_status
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_23'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+      x-openapi-router-controller: controllers.jobs_service_controller
+  /api/{organization_id}/platform/jobs/users/bulk/status/{job_id}/download:
+    post:
+      tags:
+      - JobsService
+      summary: Download import status
+      operationId: jobs_users_import_status_job_id_download
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: job_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/authorizationBody'
+        required: true
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/zip:
+              schema:
+                type: string
+                format: binary
+                x-content-type: application/zip
         default:
           description: An unexpected error response.
           content:
@@ -2159,7 +2230,7 @@ paths:
         content:
           application/json:
             schema:
-              type: object
+              $ref: '#/components/schemas/jobsUserExport'
         required: true
       responses:
         "200":
@@ -2168,6 +2239,77 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/inline_response_200_2'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+      x-openapi-router-controller: controllers.jobs_service_controller
+  /api/{organization_id}/platform/jobs/users/export/status:
+    get:
+      tags:
+      - JobsService
+      summary: Get all export status
+      operationId: jobs_users_export_status
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_24'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+      x-openapi-router-controller: controllers.jobs_service_controller
+  /api/{organization_id}/platform/jobs/users/export/status/{job_id}/download:
+    post:
+      tags:
+      - JobsService
+      summary: Download user export file
+      operationId: jobs_users_export_status_job_id_download
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: job_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/authorizationBody'
+        required: true
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/zip:
+              schema:
+                type: string
+                format: binary
+                x-content-type: application/zip
         default:
           description: An unexpected error response.
           content:
@@ -2188,7 +2330,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_23'
+                $ref: '#/components/schemas/inline_response_200_25'
         default:
           description: An unexpected error response.
           content:
@@ -2241,7 +2383,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_23'
+                $ref: '#/components/schemas/inline_response_200_25'
         default:
           description: An unexpected error response.
           content:
@@ -2269,7 +2411,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_24'
+                $ref: '#/components/schemas/inline_response_200_26'
               example:
                 value:
                   result: 200
@@ -2398,7 +2540,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_25'
+                $ref: '#/components/schemas/inline_response_200_27'
         default:
           description: An unexpected error response.
           content:
@@ -2431,7 +2573,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_26'
+                $ref: '#/components/schemas/inline_response_200_28'
         default:
           description: An unexpected error response.
           content:
@@ -2725,7 +2867,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_27'
+                $ref: '#/components/schemas/inline_response_200_29'
         default:
           description: An unexpected error response.
           content:
@@ -2780,7 +2922,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_28'
+                $ref: '#/components/schemas/inline_response_200_30'
         default:
           description: An unexpected error response.
           content:
@@ -2898,7 +3040,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_29'
+                $ref: '#/components/schemas/inline_response_200_31'
         default:
           description: An unexpected error response.
           content:
@@ -3010,7 +3152,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_30'
+                $ref: '#/components/schemas/inline_response_200_32'
         default:
           description: An unexpected error response.
           content:
@@ -3031,7 +3173,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_23'
+                $ref: '#/components/schemas/inline_response_200_25'
         default:
           description: An unexpected error response.
           content:
@@ -3505,6 +3647,7 @@ components:
         token:
           $ref: '#/components/schemas/organizationSetting_token'
     planMappingOrganization:
+      title: plan item resources.
       required:
       - id
       - start_datetime
@@ -4367,6 +4510,136 @@ components:
         authorization:
           type: string
           description: Credentials or access token for API
+    jobsUserBulkImport:
+      required:
+      - import_file
+      type: object
+      properties:
+        import_file:
+          type: string
+          description: The file image is in Excel format.
+          format: binary
+    jobsUserBulkStatusList:
+      title: Jobs user bulk processing results list.
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/jobsUserBulkStatus'
+    jobsUserBulkStatus:
+      title: Jobs user bulk processing results.
+      type: object
+      properties:
+        id:
+          type: string
+          description: ID automatically assigned when registering
+        job_type:
+          type: string
+          description: \"USER_BULK_IMPORT\" or \"USER_BULK_DELETE\"
+          example: USER_BULK_IMPORT
+          enum:
+          - USER_BULK_IMPORT
+          - USER_BULK_DELETE
+        job_status:
+          type: string
+          description: Bulk registration and bulk deletion import status
+        count_register:
+          type: number
+          description: Number of items to be registered
+        count_update:
+          type: number
+          description: Number of items to be updated
+        count_delete:
+          type: number
+          description: Number of items to be deleted
+        success_register:
+          type: number
+          description: Number of successful registrations
+        success_update:
+          type: number
+          description: Number of successful updates
+        success_delete:
+          type: number
+          description: Number of successful deletions
+        failed_register:
+          type: number
+          description: Number of registration failures
+        failed_update:
+          type: number
+          description: Number of update failures
+        failed_delete:
+          type: number
+          description: Number of failed deletions
+        message:
+          type: string
+          description: Results message of bulk registration and deletion
+        language:
+          type: string
+          description: requester's language
+          example: ja
+        create_timestamp:
+          type: string
+          description: Request date and time
+          format: date-time
+        create_user_id:
+          type: string
+          description: Requester ID
+          format: uuid
+        create_user_name:
+          type: string
+          description: Requester's username
+        last_update_timestamp:
+          type: string
+          description: Last Modified
+          format: date-time
+    jobsUserExport:
+      type: object
+    jobsUserExportStatusList:
+      title: Jobs user export processing results list.
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/jobsUserExportStatus'
+    jobsUserExportStatus:
+      title: Jobs user export processing results.
+      type: object
+      properties:
+        id:
+          type: string
+          description: ID automatically assigned when registering
+        job_status:
+          type: string
+          description: Bulk registration and bulk deletion import status
+        query_strings:
+          type: string
+          description: Output conditions
+        count_export:
+          type: number
+        message:
+          type: string
+          description: Results message of bulk registration and deletion
+        language:
+          type: string
+          description: requester's language
+          example: ja
+        create_timestamp:
+          type: string
+          description: Request date and time
+          format: date-time
+        create_user_id:
+          type: string
+          description: Requester ID
+          format: uuid
+        create_user_name:
+          type: string
+          description: Requester's username
+        last_update_timestamp:
+          type: string
+          description: Last Modified
+          format: date-time
     inline_response_200:
       allOf:
       - $ref: '#/components/schemas/responseOk'
@@ -4558,16 +4831,15 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/roleUser'
-    users_bulkdelete_body:
-      required:
-      - import_file
-      type: object
-      properties:
-        import_file:
-          type: string
-          description: The file image is in Excel format.
-          format: binary
     inline_response_200_23:
+      allOf:
+      - $ref: '#/components/schemas/responseOk'
+      - $ref: '#/components/schemas/jobsUserBulkStatusList'
+    inline_response_200_24:
+      allOf:
+      - $ref: '#/components/schemas/responseOk'
+      - $ref: '#/components/schemas/jobsUserExportStatusList'
+    inline_response_200_25:
       allOf:
       - $ref: '#/components/schemas/responseOk'
       - $ref: '#/components/schemas/maintenanceModeSettings'
@@ -4580,15 +4852,15 @@ components:
         data_update_stop:
           type: string
           example: "1"
-    inline_response_200_24:
+    inline_response_200_26:
       allOf:
       - $ref: '#/components/schemas/responseOk'
       - $ref: '#/components/schemas/settingsMailserverList'
-    inline_response_200_25:
+    inline_response_200_27:
       allOf:
       - $ref: '#/components/schemas/responseOk'
       - $ref: '#/components/schemas/AuditLogDownloadList'
-    inline_response_200_26:
+    inline_response_200_28:
       allOf:
       - $ref: '#/components/schemas/responseOk'
       - type: object
@@ -4597,22 +4869,22 @@ components:
             type: object
             example:
               download_id: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-    inline_response_200_27:
+    inline_response_200_29:
       allOf:
       - $ref: '#/components/schemas/responseOk'
       - $ref: '#/components/schemas/limitsList'
-    inline_response_200_28:
+    inline_response_200_30:
       allOf:
       - $ref: '#/components/schemas/responseOk'
       - type: object
         properties:
           data:
             $ref: '#/components/schemas/planItem'
-    inline_response_200_29:
+    inline_response_200_31:
       allOf:
       - $ref: '#/components/schemas/responseOk'
       - $ref: '#/components/schemas/roleList'
-    inline_response_200_30:
+    inline_response_200_32:
       allOf:
       - $ref: '#/components/schemas/responseOk'
       - $ref: '#/components/schemas/userWorkspaceList'

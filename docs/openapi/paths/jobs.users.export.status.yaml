@@ -32,11 +32,7 @@ get:
           schema:
             allOf:
               - $ref: '../schemas/responseOk.yaml'
-              - type: object
-                properties:
-                  data:
-                    type: object
-                    example: null
+              - $ref: '../schemas/jobs.user.export.status.list.yaml'
     default:
       description: An unexpected error response.
       content:

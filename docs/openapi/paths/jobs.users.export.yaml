@@ -28,7 +28,7 @@ post:
     content:
       application/json:
         schema:
-          $ref: '../schemas/jobsUserExport.yaml'
+          $ref: '../schemas/jobs.user.export.yaml'
     required: true
   responses:
     200:

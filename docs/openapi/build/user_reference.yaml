@@ -1184,7 +1184,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/runtimeError'
-  '/api/{organization_id}/platform/jobs/users/bulk-import':
+  '/api/{organization_id}/platform/jobs/users/bulk/import':
     post:
       tags:
         - JobsService
@@ -1201,7 +1201,7 @@ paths:
         content:
           multipart/form-data:
             schema:
-              $ref: '#/paths/~1api~1%7Borganization_id%7D~1platform~1jobs~1users~1bulk-delete/post/requestBody/content/multipart~1form-data/schema'
+              $ref: '#/components/schemas/jobsUserBulkImport'
         required: true
       responses:
         '200':
@@ -1222,7 +1222,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/runtimeError'
-  '/api/{organization_id}/platform/jobs/users/bulk-delete':
+  '/api/{organization_id}/platform/jobs/users/bulk/delete':
     post:
       tags:
         - JobsService
@@ -1239,14 +1239,7 @@ paths:
         content:
           multipart/form-data:
             schema:
-              type: object
-              properties:
-                import_file:
-                  type: string
-                  format: binary
-                  description: The file image is in Excel format.
-              required:
-                - import_file
+              $ref: '#/components/schemas/jobsUserBulkImport'
         required: true
       responses:
         '200':
@@ -1261,6 +1254,72 @@ paths:
                       data:
                         type: object
                         example: null
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+  '/api/{organization_id}/platform/jobs/users/bulk/status':
+    get:
+      tags:
+        - JobsService
+      summary: Get all bulk-import and bulk-delete status
+      x-openapi-router-controller: controllers.jobs_service_controller
+      operationId: jobs_users_bulk_status
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - $ref: '#/components/schemas/jobsUserBulkStatusList'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+  '/api/{organization_id}/platform/jobs/users/bulk/status/{job_id}/download':
+    post:
+      tags:
+        - JobsService
+      summary: Download import status
+      x-openapi-router-controller: controllers.jobs_service_controller
+      operationId: jobs_users_import_status_job_id_download
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: job_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/authorizationBody'
+        required: true
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/zip:
+              schema:
+                type: string
+                format: binary
         default:
           description: An unexpected error response.
           content:
@@ -1284,7 +1343,7 @@ paths:
         content:
           application/json:
             schema:
-              type: object
+              $ref: '#/components/schemas/jobsUserExport'
         required: true
       responses:
         '200':
@@ -1299,6 +1358,72 @@ paths:
                       data:
                         type: object
                         example: null
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+  '/api/{organization_id}/platform/jobs/users/export/status':
+    get:
+      tags:
+        - JobsService
+      summary: Get all export status
+      x-openapi-router-controller: controllers.jobs_service_controller
+      operationId: jobs_users_export_status
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - $ref: '#/components/schemas/jobsUserExportStatusList'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+  '/api/{organization_id}/platform/jobs/users/export/status/{job_id}/download':
+    post:
+      tags:
+        - JobsService
+      summary: Download user export file
+      x-openapi-router-controller: controllers.jobs_service_controller
+      operationId: jobs_users_export_status_job_id_download
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: job_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/authorizationBody'
+        required: true
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/zip:
+              schema:
+                type: string
+                format: binary
         default:
           description: An unexpected error response.
           content:
@@ -1685,6 +1810,7 @@ components:
               maximum: 10080
               minimum: 1
     planMappingOrganization:
+      title: plan item resources.
       type: object
       required:
         - id
@@ -2700,6 +2826,137 @@ components:
           description: Credentials or access token for API
       required:
         - authorization
+    jobsUserBulkImport:
+      type: object
+      properties:
+        import_file:
+          type: string
+          format: binary
+          description: The file image is in Excel format.
+      required:
+        - import_file
+    jobsUserBulkStatusList:
+      title: Jobs user bulk processing results list.
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/jobsUserBulkStatus'
+    jobsUserBulkStatus:
+      title: Jobs user bulk processing results.
+      type: object
+      properties:
+        id:
+          type: string
+          description: ID automatically assigned when registering
+        job_type:
+          type: string
+          enum:
+            - USER_BULK_IMPORT
+            - USER_BULK_DELETE
+          example: USER_BULK_IMPORT
+          description: \"USER_BULK_IMPORT\" or \"USER_BULK_DELETE\"
+        job_status:
+          type: string
+          description: Bulk registration and bulk deletion import status
+        count_register:
+          type: number
+          description: Number of items to be registered
+        count_update:
+          type: number
+          description: Number of items to be updated
+        count_delete:
+          type: number
+          description: Number of items to be deleted
+        success_register:
+          type: number
+          description: Number of successful registrations
+        success_update:
+          type: number
+          description: Number of successful updates
+        success_delete:
+          type: number
+          description: Number of successful deletions
+        failed_register:
+          type: number
+          description: Number of registration failures
+        failed_update:
+          type: number
+          description: Number of update failures
+        failed_delete:
+          type: number
+          description: Number of failed deletions
+        message:
+          type: string
+          description: Results message of bulk registration and deletion
+        language:
+          type: string
+          example: ja
+          description: requester's language
+        create_timestamp:
+          type: string
+          format: date-time
+          description: Request date and time
+        create_user_id:
+          type: string
+          format: uuid
+          description: Requester ID
+        create_user_name:
+          type: string
+          description: Requester's username
+        last_update_timestamp:
+          type: string
+          format: date-time
+          description: Last Modified
+    jobsUserExport:
+      type: object
+    jobsUserExportStatusList:
+      title: Jobs user export processing results list.
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/jobsUserExportStatus'
+    jobsUserExportStatus:
+      title: Jobs user export processing results.
+      type: object
+      properties:
+        id:
+          type: string
+          description: ID automatically assigned when registering
+        job_status:
+          type: string
+          description: Bulk registration and bulk deletion import status
+        query_strings:
+          type: string
+          description: Output conditions
+        count_export:
+          type: number
+          description: null
+        message:
+          type: string
+          description: Results message of bulk registration and deletion
+        language:
+          type: string
+          example: ja
+          description: requester's language
+        create_timestamp:
+          type: string
+          format: date-time
+          description: Request date and time
+        create_user_id:
+          type: string
+          format: uuid
+          description: Requester ID
+        create_user_name:
+          type: string
+          description: Requester's username
+        last_update_timestamp:
+          type: string
+          format: date-time
+          description: Last Modified
   securitySchemes:
     BearerAuth:
       description: Credentials or access token for API
