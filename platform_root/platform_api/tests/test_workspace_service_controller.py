@@ -46,7 +46,7 @@ def test_workspace_api(connexion_client):
 
         assert response.status_code == 200, "create workspace response code"
 
-        # workspace role setting
+        # add data
         ws_role = [f"_{json_create_01['id']}-admin"]
         # workspace get情報(作成したworkspaceをgetした時の情報)
         json_created_01 = copy.deepcopy(json_create_01)

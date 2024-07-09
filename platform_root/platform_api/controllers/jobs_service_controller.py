@@ -254,6 +254,9 @@ def jobs_users_bulk_status(organization_id):
                 )
                 raise common.InternalErrorException(message_id=message_id, message=message)
 
+            # Save user data and reduce get data from Keycloak
+            user_data.append({"user_id": user_id, "name": name, })
+
         row = {
             "id": row["JOB_ID"],
             "job_type": row["JOB_TYPE"],
