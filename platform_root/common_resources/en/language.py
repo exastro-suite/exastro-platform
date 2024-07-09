@@ -127,6 +127,7 @@ class LanguageList:
     lang_array['000-00205'] = 'Time stamp(From)'
     lang_array['000-00206'] = 'Time stamp(To)'
     lang_array['000-00207'] = 'Plan item max value'
+    lang_array['000-00208'] = 'Download'
     lang_array['000-62001'] = 'Processing type'
     lang_array['000-62002'] = 'Registration or Update or Delete'
     #
@@ -500,6 +501,13 @@ class LanguageList:
     lang_array['000-92011'] = 'Excel sheets downloaded can be edited and uploaded from here to be added or edited in batches.'
     lang_array['000-92012'] = 'Bulk deletion'
     lang_array['000-92013'] = 'Excel sheets downloaded can be edited and uploaded from here to be deleted in batches.'
+    lang_array['000-92014'] = 'Execution date/time'
+    lang_array['000-92015'] = 'Execution type'
+    lang_array['000-92016'] = 'Status'
+    lang_array['000-92017'] = 'Total'
+    lang_array['000-92018'] = 'Success'
+    lang_array['000-92019'] = 'Error'
+    lang_array['000-92020'] = 'Processing result message'
 
     lang_array['400-00001'] = 'Request-Header Paramater({}) is Invalid'
     lang_array['400-00002'] = 'Request-Body Paramater({}) is Invalid'

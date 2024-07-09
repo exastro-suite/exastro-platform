@@ -87,7 +87,7 @@
                                     </a>
                                 </li>
                                 <li class="contentMenuItem" id="tab_list">
-                                    <a class="contentMenuLink" href="#bulkActionHistory" tabindex="-1">
+                                    <a class="contentMenuLink" href="#bulkActionResults" tabindex="-1">
                                         <span class="inner" text-id="000-92005">一括処理結果</span>
                                     </a>
                                 </li>
@@ -130,7 +130,7 @@
                             </div>
                         </section>
 
-                        <section class="section" id="bulkActionHistory">
+                        <section class="section" id="bulkActionResults">
                             <div class="sectionBody">
                                 <div id="MT" class="tableContainer viewTable">
                                     <div class="tableHeader">
@@ -147,20 +147,26 @@
                                                     <th data-id="c1" class="tHeadTh popup th" rowspan="1" colspan="1">
                                                         <div class="ci"></div>
                                                     </th>
-                                                    <th data-id="c2" class="tHeadTh popup th" rowspan="1" colspan="1" title="ダウンロード日時" attr-text-id="title=000-91010">
-                                                        <div class="ci" text-id="000-91010">ダウンロード日時</div>
+                                                    <th data-id="c2" class="tHeadTh popup th" rowspan="1" colspan="1" title="実行日時" attr-text-id="title=000-92014">
+                                                        <div class="ci" text-id="000-92014">実行日時</div>
                                                     </th>
-                                                    <th data-id="c3" class="tHeadTh popup th" rowspan="1" colspan="1" title="ステータス" attr-text-id="title=000-91011">
-                                                        <div class="ci" text-id="000-91011">ステータス</div>
+                                                    <th data-id="c3" class="tHeadTh popup th" rowspan="1" colspan="1" title="実行区分" attr-text-id="title=000-92015">
+                                                        <div class="ci" text-id="000-92015">実行区分</div>
                                                     </th>
-                                                    <th data-id="c4" class="tHeadTh popup th" rowspan="1" colspan="1" title="対象期間" attr-text-id="title=000-91006">
-                                                        <div class="ci" text-id="000-91006">対象期間</div>
+                                                    <th data-id="c3" class="tHeadTh popup th" rowspan="1" colspan="1" title="ステータス" attr-text-id="title=000-92016">
+                                                        <div class="ci" text-id="000-92016">ステータス</div>
                                                     </th>
-                                                    <th data-id="c5" class="tHeadTh popup th" rowspan="1" colspan="1" title="出力対象件数" attr-text-id="title=000-91012">
-                                                        <div class="ci" text-id="000-91012">出力対象件数</div>
+                                                    <th data-id="c5" class="tHeadTh popup th" rowspan="1" colspan="1" title="対象件数" attr-text-id="title=000-92017">
+                                                        <div class="ci" text-id="000-92017">対象件数</div>
                                                     </th>
-                                                    <th data-id="c6" class="tHeadTh popup th" rowspan="1" colspan="1" title="処理結果メッセージ" attr-text-id="title=000-91013">
-                                                        <div class="ci" text-id="000-91013">処理結果メッセージ</div>
+                                                    <th data-id="c5" class="tHeadTh popup th" rowspan="1" colspan="1" title="成功件数" attr-text-id="title=000-92018">
+                                                        <div class="ci" text-id="000-92018">成功件数</div>
+                                                    </th>
+                                                    <th data-id="c5" class="tHeadTh popup th" rowspan="1" colspan="1" title="エラー件数" attr-text-id="title=000-92019">
+                                                        <div class="ci" text-id="000-92019">エラー件数</div>
+                                                    </th>
+                                                    <th data-id="c6" class="tHeadTh popup th" rowspan="1" colspan="1" title="処理結果メッセージ" attr-text-id="title=000-92020">
+                                                        <div class="ci" text-id="000-92020">処理結果メッセージ</div>
                                                     </th>
                                                     <th data-id="c7" class="tHeadTh popup th" rowspan="1" colspan="1" title="ユーザー" attr-text-id="title=000-00135">
                                                         <div class="ci" text-id="000-00135">ユーザー</div>
@@ -171,10 +177,10 @@
                                                 <tr class="tBodyTr tr datarow-template" style="display:none">
                                                     <td class="tBodyTh tBodyTd td" rowspan="1" colspan="1">
                                                         <div class="ci" style="text-align: center;">
-                                                            <button title="ダウンロード" attr-text-id="title=000-91004" class="itaButton button button_re_download" data-id="${job_id}" data-status="${job_status}" style="width:200px;" disabled>
+                                                            <button title="ダウンロード" attr-text-id="title=000-00208" class="itaButton button button_re_download" data-id="${job_id}" data-status="${job_status}" style="width:200px;" disabled>
                                                                 <span class="inner">
                                                                     <span class="iconButtonIcon icon icon-download"></span>
-                                                                    <span class="iconButtonBody" text-id="000-91004">ダウンロード</span>
+                                                                    <span class="iconButtonBody" text-id="000-00208">ダウンロード</span>
                                                                 </span>
                                                             </button>
                                                         </div>
