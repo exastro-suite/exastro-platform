@@ -555,6 +555,7 @@ langArray['400-34004'] = 'The specified destination name already exists and cann
 langArray['400-35001'] = 'The specified notification destination is in use and cannot be deleted (destination id:{0})'
 langArray['400-36001'] = 'Mail server does not exist (id:{0})'
 langArray['400-36002'] = 'Failed to unblock mail server(id:{0})'
+langArray['400-38001'] = 'Job ID does not exist (job_id:{0})'
 langArray['400-40001'] = 'Audit log download limit has been reached, please try again later.'
 langArray['400-62001'] = 'The specified role ({0}) does not exist'
 langArray['400-62002'] = 'Specified user does not exist'
