@@ -63,6 +63,29 @@ var api_conf = {
             "put": "/api/{organization_id}/platform/users/{user_id}",
             "delete": "/api/{organization_id}/platform/users/{user_id}",
         },
+        "jobs_users": {
+            "bulk_import": {
+                "post": "/api/{organization_id}/platform/jobs/users/bulk/import",
+            },
+            "bulk_delete": {
+                "post": "/api/{organization_id}/platform/jobs/users/bulk/delete",
+            },
+            "bulk_status": {
+                "get": "/api/{organization_id}/platform/jobs/users/bulk/status",
+                "detail": {
+                    "get": "/api/{organization_id}/platform/jobs/users/bulk/status/{job_id}",
+                    "post": "/api/{organization_id}/platform/jobs/users/bulk/status/{job_id}/download",
+                },
+            },
+            "export": {
+                "post": "/api/{organization_id}/platform/jobs/users/export",
+                "get": "/api/{organization_id}/platform/jobs/users/export/status",
+                "detail": {
+                    "get": "/api/{organization_id}/platform/jobs/users/export/status/{job_id}",
+                    "post": "/api/{organization_id}/platform/jobs/users/export/status/{job_id}/download",
+                },
+            },
+        },
         "token": {
             "post": "/auth/realms/{realm_name}/protocol/openid-connect/token",
             "platform_admin_site": {

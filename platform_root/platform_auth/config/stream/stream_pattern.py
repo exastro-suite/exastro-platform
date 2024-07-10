@@ -18,4 +18,12 @@ STREAM_PATTERN = [
         "url": r"^/api/(?P<org_id>[^/][^/]*)/platform/auditlog/download/(?P<download_id>[^/][^/]*)($|/.*$)",
         "method": ["POST"],
     },
+    {
+        "url": r"^/api/(?P<org_id>[^/][^/]*)/platform/jobs/users/bulk/status/(?P<job_id>[^/][^/]*)/download($|/.*$)",
+        "method": ["POST"],
+    },
+    {
+        "url": r"^/api/(?P<org_id>[^/][^/]*)/platform/jobs/users/export/status/(?P<job_id>[^/][^/]*)/download($|/.*$)",
+        "method": ["POST"],
+    },
 ]

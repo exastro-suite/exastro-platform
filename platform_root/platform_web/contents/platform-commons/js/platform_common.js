@@ -266,10 +266,10 @@ function displayMenu(curent) {
         $('.menuList').empty().append(`
             <li class="menuItem"><a class="menuLink" id="menu_workspace" href="#" tabindex="-1">${getText("000-80005", "ワークスペース管理")}</a></li>
             <li class="menuItem">
-              <a class="menuLink menuItemContent" id="menu_account_management" type="button" aria-expanded="false" aria-controls="accordion-panel-1" href="#" style="display: none;">${getText("000-80006", "ユーザー管理")}</a>
-              <ul id="accordion-panel-1" class="menuItem--subGroup" aria-hidden="true">
-                <li><a class="menuLink ActionList--subGroup" id="menu_account_list" href="#">${getText("000-80006", "ユーザー一覧")}</a></li>
-                <li><a class="menuLink ActionList--subGroup" id="menu_account_bulk_actions" href="#">${getText("000-80006", "ユーザー一括登録・更新")}</a></li>
+              <a class="menuLink menuItemContent" id="menu_account_management" type="button" aria-expanded="false" aria-controls="menu_account_management_accordion_panel" href="#" style="display: none;">${getText("000-80006", "ユーザー管理")}</a>
+              <ul id="menu_account_management_accordion_panel" class="menuItem--subGroup" aria-hidden="true">
+                <li><a class="menuLink ActionList--subGroup" id="menu_account_list" href="#">${getText("000-83001", "ユーザー一覧")}</a></li>
+                <li><a class="menuLink ActionList--subGroup" id="menu_account_bulk_actions" href="#">${getText("000-92002", "ユーザー一括登録・更新")}</a></li>
               </ul>
             </li>
             <li class="menuItem"><a class="menuLink" id="menu_role_management" href="#" style="display: none;">${getText("000-80007", "ロール管理")}</a></li>
@@ -290,6 +290,8 @@ function displayMenu(curent) {
 
         if (CommonAuth.hasAuthority(RolesCommon.ORG_AUTH_USER_MAINTE)) {
             $("#menu_account_management").css("display", "");
+            $("#menu_account_management").attr("aria-expanded", "true");
+            $("#menu_account_management_accordion_panel").attr("aria-hidden", "false");
         }
         let adminWorkspaces = CommonAuth.getAdminWorkspaces();
         if (CommonAuth.hasAuthority(RolesCommon.ORG_AUTH_OWNER_MAINTE)
@@ -1679,4 +1681,21 @@ const AuditlogCommon = {
             }
         }
     }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//   Auditlog Common
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+const UserBulkActionsCommon = {
+    "JOB_STATUS_NOT_EXEC":         "NotExecuted",
+    "JOB_STATUS_EXEC":             "Executing",
+    "JOB_STATUS_COMPLETION":       "Completion",
+    "JOB_STATUS_FAILD":            "Failed",
+    "JOB_STATUS_NO_DATA":          "NoData",
+    "JOB_TYPE_USER_BULK_IMPORT":   "USER_BULK_IMPORT",
+    "JOB_TYPE_USER_BULK_DELETE":   "USER_BULK_DELETE",
+    "DOWNLOAD_EXP_DAYS":           "platform.system.audit_log.download_exp_days",
+    "DOWNLOAD_FILE_LIMIT":         "platform.system.audit_log.download_file_limit",
 }

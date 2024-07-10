@@ -97,7 +97,7 @@
                             <div class="sectionBody">
                                 <div class="operationBlock">
                                     <div class="operationTitle">
-                                        <button data-type="newDwonloadExcel" class="operationButton itaButton button">
+                                        <button id="newDwonloadExcel" data-type="newDwonloadExcel" class="operationButton itaButton button" id="btn_download">
                                             <span class="inner" text-id="000-92006">新規登録用ダウンロード</span>
                                         </button>
                                     </div>
@@ -105,7 +105,7 @@
                                 </div>
                                 <div class="operationBlock">
                                     <div class="operationTitle">
-                                        <button data-type="allDwonloadExcel" class="operationButton itaButton button">
+                                        <button id="allDwonloadExcel" data-type="allDwonloadExcel" class="operationButton itaButton button">
                                             <span class="inner" text-id="000-92008">全件ダウンロード</span>
                                         </button>
                                     </div>
@@ -113,7 +113,7 @@
                                 </div>
                                 <div class="operationBlock">
                                     <div class="operationTitle">
-                                        <button data-type="excelUpload" data-action="positive" class="operationButton itaButton button">
+                                        <button id="excelUploadImport" data-type="excelUploadImport" data-action="positive" class="operationButton itaButton button">
                                             <span class="inner" text-id="000-92010">ファイル一括登録</span>
                                         </button>
                                     </div>
@@ -121,7 +121,7 @@
                                 </div>
                                 <div class="operationBlock">
                                     <div class="operationTitle">
-                                        <button data-type="excelUpload" data-action="danger" class="operationButton itaButton button">
+                                        <button id="excelUploadDelete" data-type="excelUploadDelete" data-action="danger" class="operationButton itaButton button">
                                             <span class="inner" text-id="000-92012">ファイル一括削除</span>
                                         </button>
                                     </div>
@@ -136,12 +136,12 @@
                                     <div class="tableHeader">
                                         <ul>
                                             <li>
-                                                <span class="ci" id="auditlog_message"></span>
+                                                <span class="ci" id="bulk_action_results_message"></span>
                                             </li>
                                         </ul>
                                     </div>
                                     <div class="tableBody">
-                                        <table class="table" width="100%" id="auditlog_download_list">
+                                        <table class="table" width="100%" id="bulk_action_results">
                                             <thead class="thead">
                                                 <tr class="tHeadTr tr">
                                                     <th data-id="c1" class="tHeadTh popup th" rowspan="1" colspan="1">
@@ -153,22 +153,22 @@
                                                     <th data-id="c3" class="tHeadTh popup th" rowspan="1" colspan="1" title="実行区分" attr-text-id="title=000-92015">
                                                         <div class="ci" text-id="000-92015">実行区分</div>
                                                     </th>
-                                                    <th data-id="c3" class="tHeadTh popup th" rowspan="1" colspan="1" title="ステータス" attr-text-id="title=000-92016">
+                                                    <th data-id="c4" class="tHeadTh popup th" rowspan="1" colspan="1" title="ステータス" attr-text-id="title=000-92016">
                                                         <div class="ci" text-id="000-92016">ステータス</div>
                                                     </th>
                                                     <th data-id="c5" class="tHeadTh popup th" rowspan="1" colspan="1" title="対象件数" attr-text-id="title=000-92017">
                                                         <div class="ci" text-id="000-92017">対象件数</div>
                                                     </th>
-                                                    <th data-id="c5" class="tHeadTh popup th" rowspan="1" colspan="1" title="成功件数" attr-text-id="title=000-92018">
+                                                    <th data-id="c6" class="tHeadTh popup th" rowspan="1" colspan="1" title="成功件数" attr-text-id="title=000-92018">
                                                         <div class="ci" text-id="000-92018">成功件数</div>
                                                     </th>
-                                                    <th data-id="c5" class="tHeadTh popup th" rowspan="1" colspan="1" title="エラー件数" attr-text-id="title=000-92019">
+                                                    <th data-id="c7" class="tHeadTh popup th" rowspan="1" colspan="1" title="エラー件数" attr-text-id="title=000-92019">
                                                         <div class="ci" text-id="000-92019">エラー件数</div>
                                                     </th>
-                                                    <th data-id="c6" class="tHeadTh popup th" rowspan="1" colspan="1" title="処理結果メッセージ" attr-text-id="title=000-92020">
+                                                    <th data-id="c8" class="tHeadTh popup th" rowspan="1" colspan="1" title="処理結果メッセージ" attr-text-id="title=000-92020">
                                                         <div class="ci" text-id="000-92020">処理結果メッセージ</div>
                                                     </th>
-                                                    <th data-id="c7" class="tHeadTh popup th" rowspan="1" colspan="1" title="ユーザー" attr-text-id="title=000-00135">
+                                                    <th data-id="c9" class="tHeadTh popup th" rowspan="1" colspan="1" title="ユーザー" attr-text-id="title=000-00135">
                                                         <div class="ci" text-id="000-00135">ユーザー</div>
                                                     </th>
                                                 </tr>
@@ -189,13 +189,19 @@
                                                         <div class="ci textOverWrap" style="text-align: center;">${create_timestamp}</div>
                                                     </td>
                                                     <td class="tBodyTd td" rowspan="1" colspan="1">
+                                                        <div class="ci textOverWrap">${job_type}</div>
+                                                    </td>
+                                                    <td class="tBodyTd td" rowspan="1" colspan="1">
                                                         <div class="ci textOverWrap">${job_status}</div>
                                                     </td>
                                                     <td class="tBodyTd td" rowspan="1" colspan="1">
-                                                        <div class="ci textOverWrap" style="text-align: center;">${conditions}</div>
+                                                        <div class="ci textOverWrap" style="text-align: right;">${count_total}</div>
                                                     </td>
                                                     <td class="tBodyTd td" rowspan="1" colspan="1">
-                                                        <div class="ci textOverWrap" style="text-align: right;">${count_export}</div>
+                                                        <div class="ci textOverWrap" style="text-align: right;">${count_success}</div>
+                                                    </td>
+                                                    <td class="tBodyTd td" rowspan="1" colspan="1">
+                                                        <div class="ci textOverWrap" style="text-align: right;">${count_failed}</div>
                                                     </td>
                                                     <td class="tBodyTd td" rowspan="1" colspan="1">
                                                         <div class="ci textOverWrap">${message}</div>
@@ -205,8 +211,8 @@
                                                     </td>
                                                 </tr>
                                                 <tr class="tBodyTr tr notfound" style="display:none">
-                                                    <td class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="6" height="50px">
-                                                        <div class="ci" style="text-align: center;" text-id="000-91014">ダウンロード履歴が存在しません</div>
+                                                    <td class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="9" height="50px">
+                                                        <div class="ci" style="text-align: center;" text-id="000-92021">一括処理の結果はありません</div>
                                                     </td>
                                                 </tr>
                                             </tbody>

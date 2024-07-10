@@ -508,7 +508,8 @@ langArray['000-92017'] = 'Total'
 langArray['000-92018'] = 'Success'
 langArray['000-92019'] = 'Error'
 langArray['000-92020'] = 'Processing result message'
-
+langArray['000-92021'] = 'There are No results for bulk processing'
+//
 langArray['400-00001'] = 'Request-Header Paramater({}) is Invalid'
 langArray['400-00002'] = 'Request-Body Paramater({}) is Invalid'
 //

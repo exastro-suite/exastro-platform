@@ -508,7 +508,7 @@ class LanguageList:
     lang_array['000-92018'] = 'Success'
     lang_array['000-92019'] = 'Error'
     lang_array['000-92020'] = 'Processing result message'
-    #
+    lang_array['000-92021'] = 'There are No results for bulk processing'
     #
     #
     lang_array['400-00001'] = 'Request-Header Paramater({}) is Invalid'
