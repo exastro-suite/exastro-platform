@@ -34,7 +34,7 @@ def get_maintenance_mode_setting():  # noqa: E501
 
     :rtype: InlineResponse20024
     """
-    globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
+    globals.logger.debug(f"### func:{inspect.currentframe().f_code.co_name}")
 
     data = {}
     data = maintenancemode.maintenace_mode_get_all()
@@ -112,7 +112,7 @@ def get_maintenance_mode_setting_organization(organization_id):  # noqa: E501
 
     :rtype: InlineResponse20019
     """
-    globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
+    globals.logger.debug(f"### func:{inspect.currentframe().f_code.co_name}")
 
     # check organization
     DBconnector().get_organization_private(organization_id)

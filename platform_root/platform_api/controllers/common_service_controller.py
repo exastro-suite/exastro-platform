@@ -29,7 +29,7 @@ def settings_system_config_list():  # noqa: E501
     Returns:
         response: HTTP Response
     """
-    globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
+    globals.logger.debug(f"### func:{inspect.currentframe().f_code.co_name}")
 
     with closing(DBconnector().connect_platformdb()) as conn:
         # config list get

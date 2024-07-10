@@ -38,7 +38,8 @@ def internal_organization_limits_get(organization_id, limit_id=None):
     Returns:
         response: HTTP Response
     """
-    globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
+    # internal-apiのget methodの呼び出しログはDEBUGとする
+    globals.logger.debug(f"### func:{inspect.currentframe().f_code.co_name}")
 
     # check organization
     DBconnector().get_organization_private(organization_id)
@@ -59,7 +60,8 @@ def limits_get(limit_id=None):
     Returns:
         response: HTTP Response
     """
-    globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
+    # internal-apiのget methodの呼び出しログはDEBUGとする
+    globals.logger.debug(f"### func:{inspect.currentframe().f_code.co_name}")
 
     # plan and plan_limit list get
     with closing(DBconnector().connect_platformdb()) as conn:
@@ -164,7 +166,8 @@ def internal_plan_item_get(limit_id):  # noqa: E501
         response: HTTP Response
     """
 
-    globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
+    # internal-apiのget methodの呼び出しログはDEBUGとする
+    globals.logger.debug(f"### func:{inspect.currentframe().f_code.co_name}")
 
     # limit_id informations get
     with closing(DBconnector().connect_platformdb()) as conn:

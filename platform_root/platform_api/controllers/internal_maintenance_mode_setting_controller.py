@@ -34,7 +34,8 @@ def internal_get_maintenance_mode_setting():  # noqa: E501
 
     :rtype: InlineResponse20024
     """
-    globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
+    # internal-apiのget methodの呼び出しログはDEBUGとする
+    globals.logger.debug(f"### func:{inspect.currentframe().f_code.co_name}")
 
     data = {}
     data = maintenancemode.maintenace_mode_get_all()
