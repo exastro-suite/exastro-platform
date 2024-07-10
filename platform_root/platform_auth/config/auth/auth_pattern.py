@@ -111,6 +111,17 @@ AUTH_PATTERN = [
         ],
     },
     {
+        "url": r"^/api/(?P<org_id>[^/][^/]*)/platform/jobs/users($|/.*$)",
+        "auth": [
+            {
+                "method": ["GET", "POST"],
+                "roles": [
+                    {"client": "{org_id}-workspaces", "role": const.ORG_AUTH_USER_MAINTE},
+                ]
+            },
+        ],
+    },
+    {
         "url": r"^/api/(?P<org_id>[^/][^/]*)/platform/users/_current/refresh_tokens$",
         # do not regulate - 規制しない
         "auth": []
