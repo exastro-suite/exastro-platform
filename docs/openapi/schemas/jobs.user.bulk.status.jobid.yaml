@@ -12,26 +12,8 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-SQL_QUERY_JOBS_USERS_BULK_STATUS = """
-SELECT *
-FROM T_JOBS_USER
-ORDER BY CREATE_TIMESTAMP DESC
-"""
-
-SQL_QUERY_JOBS_USERS_BULK_STATUS_JOB_ID = """
-SELECT *
-FROM T_JOBS_USER
-WHERE JOB_ID = %(job_id)s
-"""
-
-SQL_QUERY_JOBS_USERS_EXPORT_STATUS = """
-SELECT *
-FROM T_JOBS_USER_EXPORT
-ORDER BY CREATE_TIMESTAMP DESC
-"""
-
-SQL_QUERY_JOBS_USERS_EXPORT_STATUS_JOB_ID = """
-SELECT *
-FROM T_JOBS_USER_EXPORT
-WHERE JOB_ID = %(job_id)s
-"""
+title: Jobs user bulk processing result.
+type: object
+properties:
+  data:
+    $ref: './jobs.user.bulk.status.yaml'

@@ -2209,6 +2209,43 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/runtimeError'
+  '/api/{organization_id}/platform/jobs/users/bulk/status/{job_id}':
+    get:
+      tags:
+        - JobsService
+      summary: Get bulk-import and bulk-delete status
+      x-openapi-router-controller: controllers.jobs_service_controller
+      operationId: jobs_users_bulk_status_job_id
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: job_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - title: Jobs user bulk processing result.
+                    type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/jobsUserBulkStatus'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
   '/api/{organization_id}/platform/jobs/users/bulk/status/{job_id}/download':
     post:
       tags:
@@ -2278,7 +2315,8 @@ paths:
                     properties:
                       data:
                         type: object
-                        example: null
+                        example:
+                          job_id: XXXXXXXXXXXXXXXXXXXXXXXXXX
         default:
           description: An unexpected error response.
           content:
@@ -2307,6 +2345,43 @@ paths:
                 allOf:
                   - $ref: '#/components/schemas/responseOk'
                   - $ref: '#/components/schemas/jobsUserExportStatusList'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+  '/api/{organization_id}/platform/jobs/users/export/status/{job_id}':
+    get:
+      tags:
+        - JobsService
+      summary: Get export status
+      x-openapi-router-controller: controllers.jobs_service_controller
+      operationId: jobs_users_export_status_job_id
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: job_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - title: Jobs user export processing result.
+                    type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/jobsUserExportStatus'
         default:
           description: An unexpected error response.
           content:
@@ -4848,7 +4923,7 @@ components:
           description: Output conditions
         count_export:
           type: number
-          description: null
+          description: Number to export
         message:
           type: string
           description: Results message of bulk registration and deletion

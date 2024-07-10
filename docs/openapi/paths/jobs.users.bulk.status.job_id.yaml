@@ -37,7 +37,7 @@ get:
           schema:
             allOf:
               - $ref: '../schemas/responseOk.yaml'
-              - $ref: '../schemas/jobs.user.bulk.status.yaml'
+              - $ref: '../schemas/jobs.user.bulk.status.jobid.yaml'
     default:
       description: An unexpected error response.
       content:

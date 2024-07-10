@@ -165,8 +165,8 @@ paths:
   "/api/{organization_id}/platform/jobs/users/bulk/status":
       $ref: './paths/jobs.users.bulk.status.yaml'
 
-  # "/api/{organization_id}/platform/jobs/users/bulk/status/{job_id}":
-  #     $ref: './paths/jobs.users.bulk.status.job_id.yaml'
+  "/api/{organization_id}/platform/jobs/users/bulk/status/{job_id}":
+      $ref: './paths/jobs.users.bulk.status.job_id.yaml'
 
   "/api/{organization_id}/platform/jobs/users/bulk/status/{job_id}/download":
       $ref: './paths/jobs.users.bulk.status.job_id.download.yaml'
@@ -177,8 +177,8 @@ paths:
   "/api/{organization_id}/platform/jobs/users/export/status":
       $ref: './paths/jobs.users.export.status.yaml'
 
-  # "/api/{organization_id}/platform/jobs/users/export/status/{job_id}":
-  #     $ref: './paths/jobs.users.export.status.job_id.yaml'
+  "/api/{organization_id}/platform/jobs/users/export/status/{job_id}":
+      $ref: './paths/jobs.users.export.status.job_id.yaml'
 
   "/api/{organization_id}/platform/jobs/users/export/status/{job_id}/download":
       $ref: './paths/jobs.users.export.status.job_id.download.yaml'

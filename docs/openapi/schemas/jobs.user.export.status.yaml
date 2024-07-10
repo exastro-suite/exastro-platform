@@ -26,7 +26,7 @@ properties:
     description: Output conditions
   count_export:
     type: number
-    description: 
+    description: Number to export
   message:
     type: string
     description: Results message of bulk registration and deletion
