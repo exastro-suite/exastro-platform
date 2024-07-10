@@ -28,6 +28,7 @@ import inspect
 import traceback
 from pathlib import Path
 import urllib.parse
+import json
 
 # User Imports
 import globals
@@ -256,6 +257,19 @@ def extra_init(organization_id='-', workspace_id='-'):
     Returns:
         extra(dict): extra items
     """
+    
+    # request.headersより機微情報を除いた情報をauditlogに設定する
+    # Set information in auditlog excluding sensitive information from request.headers
+    save_headers = {}
+    try:
+        save_headers_str = json.dumps(dict(request.headers))
+        save_headers = json.loads(save_headers_str)
+        del save_headers['Authorization']
+        globals.logger.debug(f'{save_headers=}')
+    except Exception as e:
+        globals.logger.debug(f'extra_init exception:{e.args}')
+        pass
+
     extra = {
         'ts': common.datetime_to_str(datetime.now()),
         'user_id': '-',
@@ -266,7 +280,7 @@ def extra_init(organization_id='-', workspace_id='-'):
         'full_path': request.full_path,
         'access_route': request.access_route,
         'remote_addr': request.remote_addr,
-        'request_headers': request.headers,
+        'request_headers': save_headers,
         'request_user_headers': '-',
         'content_type': '-',
         'status_code': '-',
