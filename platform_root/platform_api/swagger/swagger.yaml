@@ -2169,6 +2169,41 @@ paths:
               schema:
                 $ref: '#/components/schemas/runtimeError'
       x-openapi-router-controller: controllers.jobs_service_controller
+  /api/{organization_id}/platform/jobs/users/bulk/status/{job_id}:
+    get:
+      tags:
+      - JobsService
+      summary: Get bulk-import and bulk-delete status
+      operationId: jobs_users_bulk_status_job_id
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: job_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_24'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+      x-openapi-router-controller: controllers.jobs_service_controller
   /api/{organization_id}/platform/jobs/users/bulk/status/{job_id}/download:
     post:
       tags:
@@ -2238,7 +2273,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_2'
+                $ref: '#/components/schemas/inline_response_200_25'
         default:
           description: An unexpected error response.
           content:
@@ -2266,7 +2301,42 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_24'
+                $ref: '#/components/schemas/inline_response_200_26'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+      x-openapi-router-controller: controllers.jobs_service_controller
+  /api/{organization_id}/platform/jobs/users/export/status/{job_id}:
+    get:
+      tags:
+      - JobsService
+      summary: Get export status
+      operationId: jobs_users_export_status_job_id
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: job_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_27'
         default:
           description: An unexpected error response.
           content:
@@ -2330,7 +2400,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_25'
+                $ref: '#/components/schemas/inline_response_200_28'
         default:
           description: An unexpected error response.
           content:
@@ -2383,7 +2453,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_25'
+                $ref: '#/components/schemas/inline_response_200_28'
         default:
           description: An unexpected error response.
           content:
@@ -2411,7 +2481,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_26'
+                $ref: '#/components/schemas/inline_response_200_29'
               example:
                 value:
                   result: 200
@@ -2540,7 +2610,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_27'
+                $ref: '#/components/schemas/inline_response_200_30'
         default:
           description: An unexpected error response.
           content:
@@ -2573,7 +2643,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_28'
+                $ref: '#/components/schemas/inline_response_200_31'
         default:
           description: An unexpected error response.
           content:
@@ -2867,7 +2937,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_29'
+                $ref: '#/components/schemas/inline_response_200_32'
         default:
           description: An unexpected error response.
           content:
@@ -2922,7 +2992,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_30'
+                $ref: '#/components/schemas/inline_response_200_33'
         default:
           description: An unexpected error response.
           content:
@@ -3040,7 +3110,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_31'
+                $ref: '#/components/schemas/inline_response_200_34'
         default:
           description: An unexpected error response.
           content:
@@ -3152,7 +3222,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_32'
+                $ref: '#/components/schemas/inline_response_200_35'
         default:
           description: An unexpected error response.
           content:
@@ -3173,7 +3243,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_25'
+                $ref: '#/components/schemas/inline_response_200_28'
         default:
           description: An unexpected error response.
           content:
@@ -4618,6 +4688,7 @@ components:
           description: Output conditions
         count_export:
           type: number
+          description: Number to export
         message:
           type: string
           description: Results message of bulk registration and deletion
@@ -4838,8 +4909,33 @@ components:
     inline_response_200_24:
       allOf:
       - $ref: '#/components/schemas/responseOk'
-      - $ref: '#/components/schemas/jobsUserExportStatusList'
+      - title: Jobs user bulk processing result.
+        type: object
+        properties:
+          data:
+            $ref: '#/components/schemas/jobsUserBulkStatus'
     inline_response_200_25:
+      allOf:
+      - $ref: '#/components/schemas/responseOk'
+      - type: object
+        properties:
+          data:
+            type: object
+            example:
+              job_id: XXXXXXXXXXXXXXXXXXXXXXXXXX
+    inline_response_200_26:
+      allOf:
+      - $ref: '#/components/schemas/responseOk'
+      - $ref: '#/components/schemas/jobsUserExportStatusList'
+    inline_response_200_27:
+      allOf:
+      - $ref: '#/components/schemas/responseOk'
+      - title: Jobs user export processing result.
+        type: object
+        properties:
+          data:
+            $ref: '#/components/schemas/jobsUserExportStatus'
+    inline_response_200_28:
       allOf:
       - $ref: '#/components/schemas/responseOk'
       - $ref: '#/components/schemas/maintenanceModeSettings'
@@ -4852,15 +4948,15 @@ components:
         data_update_stop:
           type: string
           example: "1"
-    inline_response_200_26:
+    inline_response_200_29:
       allOf:
       - $ref: '#/components/schemas/responseOk'
       - $ref: '#/components/schemas/settingsMailserverList'
-    inline_response_200_27:
+    inline_response_200_30:
       allOf:
       - $ref: '#/components/schemas/responseOk'
       - $ref: '#/components/schemas/AuditLogDownloadList'
-    inline_response_200_28:
+    inline_response_200_31:
       allOf:
       - $ref: '#/components/schemas/responseOk'
       - type: object
@@ -4869,22 +4965,22 @@ components:
             type: object
             example:
               download_id: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-    inline_response_200_29:
+    inline_response_200_32:
       allOf:
       - $ref: '#/components/schemas/responseOk'
       - $ref: '#/components/schemas/limitsList'
-    inline_response_200_30:
+    inline_response_200_33:
       allOf:
       - $ref: '#/components/schemas/responseOk'
       - type: object
         properties:
           data:
             $ref: '#/components/schemas/planItem'
-    inline_response_200_31:
+    inline_response_200_34:
       allOf:
       - $ref: '#/components/schemas/responseOk'
       - $ref: '#/components/schemas/roleList'
-    inline_response_200_32:
+    inline_response_200_35:
       allOf:
       - $ref: '#/components/schemas/responseOk'
       - $ref: '#/components/schemas/userWorkspaceList'
