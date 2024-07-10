@@ -11,26 +11,11 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
-# from unittest import mock
 
-
-SQL_INSERT_JOBS_AUDIT_LOG_FILE = """
-INSERT INTO `T_JOBS_AUDIT_LOG_FILE`
-(`FILE_ID`,
-`JOB_ID`,
-`FILE_DATA`,
-`CREATE_USER`,
-`LAST_UPDATE_USER`)
-VALUES
-(%(FILE_ID)s,
-%(JOB_ID)s,
-%(FILE_DATA)s,
-%(CREATE_USER)s,
-%(LAST_UPDATE_USER)s);
-"""
-
-
-SQL_SELECT_JOBS_AUDIT_LOG_FILE = """
-SELECT * FROM `T_JOBS_AUDIT_LOG_FILE`
-ORDER BY LAST_UPDATE_TIMESTAMP DESC;
-"""
+title: Jobs user export processing results list.
+type: object
+properties:
+  data:
+    type: array
+    items:
+      $ref: './jobs.user.export.status.yaml'

@@ -28,6 +28,7 @@ from contextlib import closing
 from unittest import mock
 import threading
 from importlib import import_module
+import copy
 
 from common_library.common import const
 from common_library.common import encrypt
@@ -167,7 +168,7 @@ def test_execute_user_get_error_limits():
     # 上限数エラー
     limit_users = 2
     process_kind=const.PROCESS_KIND_USER_EXPORT
-    job_config_jobs = dict(job_manager_config.JOBS)
+    job_config_jobs = copy.deepcopy(job_manager_config.JOBS)
     job_config_jobs[process_kind]["extra_config"]["max_number_of_rows_allowd"] = limit_users
 
     add_user(user=user_json1)
@@ -221,7 +222,7 @@ def test_execute_timeout():
 
     # Jobの設定を試験用に切り替え
     process_kind=const.PROCESS_KIND_USER_EXPORT
-    job_config_jobs = dict(job_manager_config.JOBS)
+    job_config_jobs = copy.deepcopy(job_manager_config.JOBS)
     job_config_jobs[process_kind]["timeout_seconds"] = timeout_sec
     job_config_jobs[process_kind]["extra_config"]["user_export_interval_millisecond"] = 2500
     

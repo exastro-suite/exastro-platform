@@ -335,9 +335,7 @@ class AuditLogJobExecutor(BaseJobExecutor):
 
                             # T_JOBS_AUDIT_LOG_FILE出力中は更新日時を更新できないので、TIMEOUT時間も含める
                             last_update_timestamp = (datetime.datetime.now() - datetime.timedelta(
-                                seconds=
-                                    job_manager_config.JOBS[job_manager_const.PROCESS_KIND_FORCE_UPDATE_STATUS]['extra_config']['prograss_seconds'] +
-                                    job_manager_config.JOBS[const.PROCESS_KIND_AUDIT_LOG]['timeout_seconds']
+                                seconds=job_manager_config.JOBS[job_manager_const.PROCESS_KIND_FORCE_UPDATE_STATUS]['extra_config']['prograss_seconds']
                             ))
 
                             # 未完了状態で一定時間経過したものを対象とする / Targets items that have been incomplete for a certain period of time

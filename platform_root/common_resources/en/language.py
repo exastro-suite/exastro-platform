@@ -508,7 +508,9 @@ class LanguageList:
     lang_array['000-92018'] = 'Success'
     lang_array['000-92019'] = 'Error'
     lang_array['000-92020'] = 'Processing result message'
-
+    #
+    #
+    #
     lang_array['400-00001'] = 'Request-Header Paramater({}) is Invalid'
     lang_array['400-00002'] = 'Request-Body Paramater({}) is Invalid'
     #
@@ -583,7 +585,8 @@ class LanguageList:
     lang_array['400-40001'] = 'Audit log download limit has been reached, please try again later.'
     lang_array['400-62001'] = 'The specified role ({0}) does not exist'
     lang_array['400-62002'] = 'Specified user does not exist'
-    lang_array['400-62003'] = 'Users who belong to the Organization manager role cannot be deleted.'
+    lang_array['400-62003'] = 'Organization managers cannot be deleted'
+    lang_array['400-62004'] = 'Organization managers cannot disable'
     lang_array['400-87001'] = 'More than {0} email addresses have been specified. ({1})'
     lang_array['401-00001'] = 'Failed to get token. realm:[{0}] client:[{1}]'
     lang_array['401-00002'] = 'Certification failed.'
@@ -635,6 +638,7 @@ class LanguageList:
     lang_array['409-62001'] = 'The target user name is duplicated (duplicate user name: [{0}])'
     lang_array['409-62002'] = 'When users bulk delete, you cannot specify any Processing type other than Delete.'
     lang_array['409-62003'] = 'When users bulk import, you cannot specify any Processing type other than Registration or Update.'
+    lang_array['409-62004'] = 'When users bulk update cannot remove the organization manager role.'
     lang_array['498-00001'] = 'Due to maintenance, Exastro IT Automation API (System Management) is not available. ({0}:/api/ita/{1})'
     lang_array['498-22001'] = 'Workspace cannot be created because it is under maintenance. ({0})'
     lang_array['498-22002'] = 'Workspace cannot be deleted because it is under maintenance. ({0})'
@@ -709,8 +713,8 @@ class LanguageList:
     lang_array['500-24008'] = 'Failed to delete role (target role: {0})'
     lang_array['500-25001'] = 'Failed to get user (Target ID: {0})'
     lang_array['500-25002'] = 'User creation failed (target user: {0})'
-    lang_array['500-25003'] = 'Failed to delete user (target user ID: {0})'
-    lang_array['500-25004'] = 'Failed to update user (target user ID: {0})'
+    lang_array['500-25003'] = 'Failed to delete user (target user ID: {0})[{1}]'
+    lang_array['500-25004'] = 'Failed to update user (target user ID: {0})[{1}]'
     lang_array['500-25005'] = 'Unable to get user information for organization manager role'
     lang_array['500-26001'] = 'Failed to get the user associated with the role (Role: {0})'
     lang_array['500-26002'] = 'Failed to set role (Target ID: {0} client: {1} username: {2})'
@@ -735,6 +739,7 @@ class LanguageList:
     lang_array['500-37001'] = 'Failed to register or update mailserver settings'
     lang_array['500-38001'] = 'Failed to register job'
     lang_array['500-38002'] = 'Failed to register processing queue'
+    lang_array['500-38003'] = 'Failed to get user (Target ID: {0})'
     lang_array['500-39001'] = 'Health check failed.'
     lang_array['500-40001'] = 'Audit log download reservation failed'
     lang_array['500-40002'] = 'Failed to register processing queue'

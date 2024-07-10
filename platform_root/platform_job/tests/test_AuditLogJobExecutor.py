@@ -24,6 +24,7 @@ import datetime
 import re
 from contextlib import closing
 import pathlib
+import copy
 
 from unittest import mock
 import threading
@@ -36,6 +37,7 @@ from common_library.common.db import DBconnector
 import job_manager
 import job_manager_const
 import job_manager_config
+import jobs.AuditLogJobExecutor
 from jobs.AuditLogJobExecutor import AuditLogJobExecutor
 from libs import queries_auditlog
 from tests.common import test_common
@@ -47,11 +49,6 @@ def test_execute_nomally():
     """正常系 / normal pattern
     """
     testdata = import_module("tests.db.exports.testdata")
-
-    # Jobの設定を試験用に切り替え
-    process_kind=const.PROCESS_KIND_AUDIT_LOG
-    job_config_jobs = dict(job_manager_config.JOBS)
-    job_config_jobs[process_kind]["extra_config"]["status_update_interval"] = 1
 
     with test_common.requsts_mocker_default():
         # 抽出情報の設定
@@ -104,7 +101,7 @@ def test_execute_notfound():
     with test_common.requsts_mocker_default():
         # 抽出情報の設定
         organization_id = list(testdata.ORGANIZATIONS.keys())[0]
-        conditions = {"ts_from": "2024-05-01 00:00:00", "ts_to": "2024-05-31 23:59:59"}
+        conditions = {"ts_from": "2024-05-01 00:00:01", "ts_to": "2024-05-01 00:00:00"}
         auditlog_all = auditlog_sample_data1()
 
         # 要求情報の作成
@@ -125,6 +122,46 @@ def test_execute_notfound():
 
         # Temporary fileが残ってないこと
         assert len([p for p in glob.glob(f'{os.environ.get("TEMPORARY_DIR")}/exastro*') if os.path.isfile(p)]) == 0
+
+
+def test_execute_too_large():
+    """ファイル最大値超過
+    """
+    testdata = import_module("tests.db.exports.testdata")
+
+    # Jobの設定を試験用に切り替え
+    process_kind=const.PROCESS_KIND_AUDIT_LOG
+    job_config_jobs = copy.deepcopy(job_manager_config.JOBS)
+    job_config_jobs[process_kind]["extra_config"]["max_file_size"] = 1
+
+    with test_common.requsts_mocker_default(), \
+        mock.patch.dict(f"job_manager_config.JOBS", job_config_jobs):
+
+        # 抽出情報の設定
+        organization_id = list(testdata.ORGANIZATIONS.keys())[0]
+        conditions = {"ts_from": "2024-06-05 00:00:00", "ts_to": "2024-06-09 23:59:59"}
+        auditlog_all = auditlog_sample_data1()
+
+        # 要求情報の作成
+        queue = make_queue_auditlog('ja', organization_id, conditions, auditlog_all)
+
+        # JOBの実行
+        executor = AuditLogJobExecutor(queue)
+        result = executor.execute_base()
+
+        # 失敗を返すこと
+        assert not result
+        t_jobs_audit_log = select_t_jobs_audit_log(organization_id, queue["PROCESS_EXEC_ID"])
+        assert t_jobs_audit_log["JOB_STATUS"] == const.AUDIT_LOG_FAILED
+        assert 'ファイルサイズ' in t_jobs_audit_log["MESSAGE"]
+
+        # 出力ファイルの確認
+        t_jobs_audit_log_file = select_t_jobs_audit_log_file(organization_id, queue["PROCESS_EXEC_ID"])
+        assert t_jobs_audit_log_file is None
+
+        # Temporary fileが残ってないこと
+        assert len([p for p in glob.glob(f'{os.environ.get("TEMPORARY_DIR")}/exastro*') if os.path.isfile(p)]) == 0
+
 
 def test_execute_job_notfound():
     """JOBレコード無し
@@ -170,12 +207,14 @@ def test_execute_timeout():
 
     # Jobの設定を試験用に切り替え
     process_kind=const.PROCESS_KIND_AUDIT_LOG
-    job_config_jobs = dict(job_manager_config.JOBS)
+    job_config_jobs = copy.deepcopy(job_manager_config.JOBS)
     job_config_jobs[process_kind]["timeout_seconds"] = timeout_sec
     job_config_jobs[process_kind]["extra_config"]["status_update_interval"] = 1
     job_config_jobs[process_kind]["extra_config"]["output_interval_millisecond"] = 1000
 
-    with test_common.requsts_mocker_default(), mock.patch.dict(f"job_manager_config.JOBS", job_config_jobs):
+    with test_common.requsts_mocker_default(), \
+        mock.patch.dict(f"job_manager_config.JOBS", job_config_jobs), \
+        mock.patch.object(jobs.AuditLogJobExecutor, 'GET_ROWS_LIMIT', new=1):
 
         # 抽出情報の設定
         organization_id = list(testdata.ORGANIZATIONS.keys())[0]
@@ -232,11 +271,13 @@ def test_execute_db_error():
 
     # Jobの設定を試験用に切り替え
     process_kind=const.PROCESS_KIND_AUDIT_LOG
-    job_config_jobs = dict(job_manager_config.JOBS)
+    job_config_jobs = copy.deepcopy(job_manager_config.JOBS)
     job_config_jobs[process_kind]["extra_config"]["status_update_interval"] = 1
 
     with test_common.requsts_mocker_default(), \
+        mock.patch.dict(f"job_manager_config.JOBS", job_config_jobs), \
         test_common.pymysql_execute_raise_exception_mocker(queries_auditlog.SQL_INSERT_JOBS_AUDIT_LOG_FILE, Exception("DB Error Test")):
+
         # 抽出情報の設定
         organization_id = list(testdata.ORGANIZATIONS.keys())[0]
         conditions = {"ts_from": "2024-06-05 00:00:00", "ts_to": "2024-06-09 23:59:59"}

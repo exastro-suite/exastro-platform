@@ -28,7 +28,7 @@ post:
     content:
       multipart/form-data:
         schema:
-          $ref: '../schemas/jobsUserBulkImport.yaml'
+          $ref: '../schemas/jobs.user.bulk.import.yaml'
     required: true
   responses:
     200:
