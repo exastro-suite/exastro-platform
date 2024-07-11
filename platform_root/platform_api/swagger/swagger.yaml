@@ -2235,11 +2235,11 @@ paths:
         "200":
           description: A successful response.
           content:
-            application/zip:
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
               schema:
                 type: string
                 format: binary
-                x-content-type: application/zip
+                x-content-type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
         default:
           description: An unexpected error response.
           content:
@@ -2375,11 +2375,11 @@ paths:
         "200":
           description: A successful response.
           content:
-            application/zip:
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
               schema:
                 type: string
                 format: binary
-                x-content-type: application/zip
+                x-content-type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
         default:
           description: An unexpected error response.
           content:

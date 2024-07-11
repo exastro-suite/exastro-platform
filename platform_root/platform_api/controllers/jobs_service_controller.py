@@ -18,9 +18,10 @@ import ulid
 import globals
 import json
 from contextlib import closing
+from flask import Response
 
 from common_library.common import api_keycloak_tokens, api_keycloak_users
-from common_library.common import common, multi_lang, const, bl_job_service
+from common_library.common import common, multi_lang, const, bl_job_service, bl_common_service
 from common_library.common.db import DBconnector
 from common_library.common.libs import queries_bl_jobs, queries_bl_notification
 from libs import queries_jobs
@@ -299,7 +300,33 @@ def jobs_users_export_status_job_id_download(organization_id, job_id):  # noqa: 
 
     :rtype: InlineResponse2002
     """
-    return common.response_200_ok(None)
+
+    globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
+
+    get_leng = None
+    with closing(DBconnector().connect_platformdb()) as conn:
+        # config list get by key
+        get_leng_json = bl_common_service.settings_system_config_list(conn, const.CONFIG_KEY_CHUNK_SIZE)
+        if get_leng_json:
+            get_leng = int(get_leng_json.get("value"))
+        else:
+            message_id = "500-00011"
+            message = multi_lang.get_text(
+                message_id,
+                "システム設定値が取得できませんでした(key:{0})",
+                const.CONFIG_KEY_CHUNK_SIZE,
+            )
+            raise common.InternalErrorException(message_id=message_id, message=message)
+
+    download_query_string = queries_bl_jobs.SQL_QUERY_JOBS_USER_FILE_EXPORT_SUBSTR
+    resp = Response(bl_job_service.user_file_download(organization_id, job_id, get_leng, download_query_string),
+                    headers={"Content-Disposition": 'attachment; filename="user_export.xlsx"'})
+
+    download_length_query_string = queries_bl_jobs.SQL_QUERY_JOBS_USER_FILE_EXPORT_LENGTH
+    resp.content_length = bl_job_service.get_file_download_filesize(organization_id, job_id, download_length_query_string)
+    resp.content_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+
+    return resp
 
 
 @common.platform_exception_handler
@@ -548,4 +575,30 @@ def jobs_users_import_status_job_id_download(organization_id, job_id):  # noqa: 
 
     :rtype: InlineResponse2002
     """
-    return common.response_200_ok(None)
+
+    globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
+
+    get_leng = None
+    with closing(DBconnector().connect_platformdb()) as conn:
+        # config list get by key
+        get_leng_json = bl_common_service.settings_system_config_list(conn, const.CONFIG_KEY_CHUNK_SIZE)
+        if get_leng_json:
+            get_leng = int(get_leng_json.get("value"))
+        else:
+            message_id = "500-00011"
+            message = multi_lang.get_text(
+                message_id,
+                "システム設定値が取得できませんでした(key:{0})",
+                const.CONFIG_KEY_CHUNK_SIZE,
+            )
+            raise common.InternalErrorException(message_id=message_id, message=message)
+
+    download_query_string = queries_bl_jobs.SQL_QUERY_JOBS_USER_RESULT_FILE_SUBSTR
+    resp = Response(bl_job_service.user_file_download(organization_id, job_id, get_leng, download_query_string),
+                    headers={"Content-Disposition": 'attachment; filename="bulk_import_result.xlsx"'})
+
+    download_length_query_string = queries_bl_jobs.SQL_QUERY_JOBS_USER_RESULT_FILE_LENGTH
+    resp.content_length = bl_job_service.get_file_download_filesize(organization_id, job_id, download_length_query_string)
+    resp.content_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+
+    return resp

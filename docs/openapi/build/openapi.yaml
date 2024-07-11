@@ -2274,7 +2274,7 @@ paths:
         '200':
           description: A successful response.
           content:
-            application/zip:
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
               schema:
                 type: string
                 format: binary
@@ -2416,7 +2416,7 @@ paths:
         '200':
           description: A successful response.
           content:
-            application/zip:
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
               schema:
                 type: string
                 format: binary

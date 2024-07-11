@@ -632,6 +632,7 @@ class LanguageList:
     lang_array['404-29001'] = 'Plan does not exist (id:{0})'
     lang_array['404-34001'] = 'Notification information does not exist (id:{0})'
     lang_array['404-35001'] = 'Notification information does not exist (id:{0})'
+    lang_array['404-38001'] = 'File does not exist (id:{0})'
     lang_array['404-40001'] = 'Audit log download file does not exist (id:{0})'
     lang_array['409-20001'] = 'The specified setting value already exists and cannot be created. (key: {0})'
     lang_array['409-22001'] = 'The specified workspace cannot be created because it already exists.'
