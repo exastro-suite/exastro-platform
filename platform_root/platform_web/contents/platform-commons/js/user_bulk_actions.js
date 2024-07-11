@@ -45,7 +45,7 @@ $(function () {
     }
 
     //
-    // get auditlog setting common api call
+    // get setting common api call
     //
     function call_api_promise_settings_common(config_key) {
         return call_api_promise({
@@ -79,7 +79,7 @@ $(function () {
     }
 
     //
-    // post auditlog download reserve api call
+    // post export reserve api call
     //
     function call_post_export_reserve() {
         return call_api_promise({
@@ -114,7 +114,7 @@ $(function () {
     }
 
     //
-    // display auditlog download list
+    // display bulk_action_results
     //
     function display_bulk_action_results(exp_days, file_limit, bulk_status) {
         console.log("[CALL] display_bulk_action_results");
@@ -140,8 +140,8 @@ $(function () {
             for (let i = 0; i < bulk_status.length; ++i) {
                 const status = bulk_status[i];
                 const job_type = status.job_type === UserBulkActionsCommon.JOB_TYPE_USER_BULK_IMPORT ? bulk_import
-                                : status.job_type === UserBulkActionsCommon.JOB_TYPE_USER_BULK_IMPORT ? bulk_delete
-                                : status.job_type;
+                    : status.job_type === UserBulkActionsCommon.JOB_TYPE_USER_BULK_IMPORT ? bulk_delete
+                        : status.job_type;
                 const count_total = Number(fn.cv(status.count_register, 0, true)) + Number(fn.cv(status.count_update, 0, true)) + Number(fn.cv(status.count_delete, 0, true));
                 const count_success = Number(fn.cv(status.success_register, 0, true)) + Number(fn.cv(status.success_update, 0, true)) + Number(fn.cv(status.success_delete, 0, true));
                 const count_failed = Number(fn.cv(status.failed_register, 0, true)) + Number(fn.cv(status.failed_update, 0, true)) + Number(fn.cv(status.failed_delete, 0, true));
@@ -156,7 +156,7 @@ $(function () {
                     .replace(/\${message}/g, fn.cv(status.message, '', true))
                     .replace(/\${create_user}/g, fn.cv(status.create_user_name, '', true))
                     .replace(/\${create_timestamp}/g, fn.date(new Date(status.create_timestamp), 'yyyy/MM/dd HH:mm:ss'))
-                ;
+                    ;
                 $("#bulk_action_results tbody").append(row_html);
             }
 
@@ -236,27 +236,123 @@ $(function () {
                     break;
                 case UserBulkActionsCommon.JOB_STATUS_NO_DATA:
                     // データなし
-                    alertMessage(getText("000-80029", "エラー"), getText("000-92022", "対象のレコードが存在しません。"));
+                    alertMessage(getText("000-80029", "エラー"), getText("000-92023", "対象のレコードが存在しません。"));
                     break;
                 case UserBulkActionsCommon.JOB_STATUS_FAILD:
                     // JOB失敗
-                    alertMessage(getText("000-80029", "エラー"), getText("000-92023", "ダウンロードに失敗しました。 (対象ID:{0})", result.data.job_id));
+                    alertMessage(getText("000-80029", "エラー"), getText("000-92024", "ダウンロードに失敗しました。 (対象ID:{0})", result.data.job_id));
                     break;
                 default:
                     // 不明なステータス
-                    alertMessage(getText("000-80029", "エラー"), getText("000-92023", "ダウンロードに失敗しました。 (対象ID:{0})", result.data.job_id));
+                    alertMessage(getText("000-80029", "エラー"), getText("000-92024", "ダウンロードに失敗しました。 (対象ID:{0})", result.data.job_id));
                     throw new Error('undefined status');
             }
 
             hide_progress();
             enabled_button();
         }).catch((e) => {
-            console.log("catch:on_click_btn_download");
+            console.log("catch:on_click_allDwonloadExcel");
             console.log(e);
             hide_progress();
             enabled_button();
         });
     }
+
+
+    //
+    // post bulk_import api call
+    //
+    function call_post_bulk_import(reqbody) {
+        return call_api_promise({
+            type: "POST",
+            url: api_conf.api.jobs_users.bulk_import.post.replace(/{organization_id}/g, CommonAuth.getRealm()),
+            headers: {
+                Authorization: "Bearer " + CommonAuth.getToken(),
+            },
+            contentType: false,
+            processData: false,
+            data: reqbody
+        });
+    }
+
+    //
+    // post bulk_delete api call
+    //
+    function call_post_bulk_delete(reqbody) {
+        return call_api_promise({
+            type: "POST",
+            url: api_conf.api.jobs_users.bulk_delete.post.replace(/{organization_id}/g, CommonAuth.getRealm()),
+            headers: {
+                Authorization: "Bearer " + CommonAuth.getToken(),
+            },
+            contentType: false,
+            processData: false,
+            data: reqbody
+        });
+    }
+
+    //
+    // excelUploadImport button
+    //
+    $('#excelUploadImport').on('click', () => {
+        bulk_action(UserBulkActionsCommon.JOB_TYPE_USER_BULK_IMPORT);
+    });
+
+    //
+    // excelUploadDelete button
+    //
+    $('#excelUploadDelete').on('click', () => {
+        bulk_action(UserBulkActionsCommon.JOB_TYPE_USER_BULK_DELETE);
+    });
+
+    function bulk_action(job_type) {
+        console.log("[CALL] bulk_action");
+
+        disabled_button();
+        show_progress();
+
+        const fileType = 'file',
+            fileMime = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            restUrl = `excel/maintenance/`,
+            confirm_title = (job_type === UserBulkActionsCommon.JOB_TYPE_USER_BULK_IMPORT) ? getText("000-92025", "一括登録確認") : getText("000-92026", "一括削除確認");
+
+        // ファイル選択
+        fn.fileSelect(fileType, null, fileMime).then(function (selectFile) {
+            let postData = new FormData();
+            postData.append('import_file ', selectFile);
+
+            // 登録するか確認する
+            const table = { tbody: [] };
+            table.tbody.push([getText("000-00209", "ファイルネーム"), selectFile.name]);
+            table.tbody.push([getText("000-00210", "ファイルサイズ"), selectFile.size.toLocaleString() + ' byte']);
+
+            const buttons = {
+                ok: { text: getText("000-80012", "ＯＫ"), action: 'positive' },
+                cancel: { text: getText("000-80013", "キャンセル"), action: 'normal' }
+            };
+            fn.alert(confirm_title, fn.html.table(table, 'fileSelectTable', 1), 'confirm', buttons).then(function (flag) {
+                if (flag) {
+                    // OK
+                    if (job_type === UserBulkActionsCommon.JOB_TYPE_USER_BULK_IMPORT) {
+                        return call_post_bulk_import(postData);
+                    } else {
+                        return call_post_bulk_delete(postData);
+                    }
+                } else {
+                    // キャンセル
+                    a = 0;
+                }
+            });
+        }).catch(function (error) {
+            if (error !== 'cancel') {
+                alert(error);
+            }
+        });
+
+        hide_progress();
+        enabled_button();
+    }
+
 
     function disabled_button() {
         $('#newDwonloadExcel').prop('disabled', true);
@@ -273,7 +369,7 @@ $(function () {
     function enabled_download_list_button() {
         $('#bulk_action_results .button_re_download').each(function (index, element) {
             let $element = $(element);
-            if ($element.attr('data-status') == 'Completion') {
+            if ($element.attr('data-status') == UserBulkActionsCommon.JOB_STATUS_FAILD) {
                 $element.prop('disabled', false);
             }
         });
