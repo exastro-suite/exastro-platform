@@ -102,7 +102,6 @@ $(function () {
         document.download.submit();
     }
 
-
     //
     // post export download api call
     //
@@ -192,20 +191,6 @@ $(function () {
         });
     });
 
-    // target date button
-    $('#btn_target_date').on('click', function () {
-        const date = { from: '', to: '' };
-        $from_date = $("#from_date");
-        $to_date = $("#to_date");
-
-        fn.datePickerDialog('fromTo', true, getText("000-91006", "対象期間"), date).then(function (result) {
-            if (result !== 'cancel') {
-                $from_date.val(result.from).change().focus().trigger('input');
-                $to_date.val(result.to).change().focus().trigger('input');
-            }
-        });
-    });
-
     //
     // allDwonloadExcel button
     //
@@ -224,7 +209,7 @@ $(function () {
                 // APIを呼び出すAjaxパラメータ
                 {
                     type: "GET",
-                    url: api_conf.api.export.detail.get.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{job_id}/g, job_id),
+                    url: api_conf.api.jobs_users.export.detail.get.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{job_id}/g, result.data.job_id),
                     headers: {
                         Authorization: "Bearer " + CommonAuth.getToken(),
                     }
@@ -232,7 +217,7 @@ $(function () {
                 // APIの応答でJOBが完了したか判定する
                 (result) => {
                     console.log("CHECK STATUS!!");
-                    switch (result.data.status) {
+                    switch (result.data.job_status) {
                         case UserBulkActionsCommon.JOB_STATUS_NOT_EXEC:
                         case UserBulkActionsCommon.JOB_STATUS_EXEC:
                             return false;
@@ -244,22 +229,22 @@ $(function () {
                 3
             )
         }).then((result) => {
-            switch (result.data.status) {
+            switch (result.data.job_status) {
                 case UserBulkActionsCommon.JOB_STATUS_COMPLETION:
                     // JOBが成功
-                    call_post_export_download(result.data.download_id);
+                    call_post_export_download(result.data.job_id);
                     break;
                 case UserBulkActionsCommon.JOB_STATUS_NO_DATA:
                     // データなし
-                    alertMessage(getText("000-80029", "エラー"), getText("000-91016", "対象のレコードが存在しません。"));
+                    alertMessage(getText("000-80029", "エラー"), getText("000-92022", "対象のレコードが存在しません。"));
                     break;
                 case UserBulkActionsCommon.JOB_STATUS_FAILD:
                     // JOB失敗
-                    alertMessage(getText("000-80029", "エラー"), getText("000-91017", "ダウンロードに失敗しました。 (対象ID:{0})", result.data.download_id));
+                    alertMessage(getText("000-80029", "エラー"), getText("000-92023", "ダウンロードに失敗しました。 (対象ID:{0})", result.data.job_id));
                     break;
                 default:
                     // 不明なステータス
-                    alertMessage(getText("000-80029", "エラー"), getText("000-91017", "ダウンロードに失敗しました。 (対象ID:{0})", result.data.download_id));
+                    alertMessage(getText("000-80029", "エラー"), getText("000-92023", "ダウンロードに失敗しました。 (対象ID:{0})", result.data.job_id));
                     throw new Error('undefined status');
             }
 
@@ -273,20 +258,17 @@ $(function () {
         });
     }
 
-    //
-    // validate download
-    //
-    function validate_download() {
-        console.log("--- validate check start ----");
-        let result = true;
-        return result;
-    }
-
     function disabled_button() {
-        $('#btn_download').prop('disabled', true);
+        $('#newDwonloadExcel').prop('disabled', true);
+        $('#allDwonloadExcel').prop('disabled', true);
+        $('#excelUploadImport').prop('disabled', true);
+        $('#excelUploadDelete').prop('disabled', true);
     }
     function enabled_button() {
-        $('#btn_download').prop('disabled', false);
+        $('#newDwonloadExcel').prop('disabled', false);
+        $('#allDwonloadExcel').prop('disabled', false);
+        $('#excelUploadImport').prop('disabled', false);
+        $('#excelUploadDelete').prop('disabled', false);
     }
     function enabled_download_list_button() {
         $('#bulk_action_results .button_re_download').each(function (index, element) {
