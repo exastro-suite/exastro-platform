@@ -106,3 +106,79 @@ def user_bulk_process(request, import_file, organization_id, job_type):  # noqa:
                     raise common.InternalErrorException(message_id=message_id, message=message)
 
     return common.response_200_ok(None)
+
+
+def user_file_download(organization_id, job_id, get_leng, query_string):
+    """user file downalod
+
+    Args:
+        organization_id (str): organization id
+        job_id (str): job id
+        get_leng (int): chunk size
+        query_string (str): download file query string
+    """
+
+    with closing(DBconnector().connect_orgdb(organization_id)) as conn:
+        with conn.cursor() as cursor:
+            str_where = " WHERE JOB_ID = %(job_id)s"
+
+            # システム設定値の読み込み単位で、BLOBの情報を取得していく
+            # Obtain BLOB information each time the system settings are read.
+            start_pos = 1
+            while True:
+                parameter = {
+                    "job_id": job_id,
+                    "start_pos": start_pos,
+                    "len": get_leng,
+                }
+
+                cursor.execute(query_string + str_where, parameter)
+                result = cursor.fetchone()
+
+                start_pos += get_leng
+
+                if result is not None and result.get("FILE_DATA_SUBSTR") is not None and len(result.get("FILE_DATA_SUBSTR")) > 0:
+                    # Large download test example.
+                    # for i in range(1, 100000, 1):
+                    #     yield ("#" * get_leng)
+                    yield result.get("FILE_DATA_SUBSTR")
+                else:
+                    break
+
+
+def get_file_download_filesize(organization_id, job_id, query_string):
+    """get file downalod file size
+
+    Args:
+        organization_id (str): organization id
+        job_id (str): job id
+        query_string (str): download length query string
+    """
+    file_length = 0
+
+    with closing(DBconnector().connect_orgdb(organization_id)) as conn:
+        with conn.cursor() as cursor:
+            str_where = " WHERE JOB_ID = %(job_id)s"
+            # ファイルサイズの取得
+            # Get file size
+            parameter = {
+                "job_id": job_id,
+            }
+            print(parameter)
+            cursor.execute(query_string + str_where, parameter)
+            result = cursor.fetchone()
+            globals.logger.debug(f"{result=}")
+            if result is not None:
+                file_length = result.get("FILE_DATA_LENGTH")
+                # Large download test example.
+                # file_length = result.get("FILE_DATA_LENGTH") + 1024000000
+            else:
+                message_id = f"404-{MSG_FUNCTION_ID}001"
+                message = multi_lang.get_text(
+                    message_id,
+                    "ファイルが存在しません(id:{0})",
+                    job_id,
+                )
+                raise common.NotFoundException(message_id=message_id, message=message)
+
+    return file_length
