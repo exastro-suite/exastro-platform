@@ -72,12 +72,33 @@ VALUES (
 ;
 """
 
+SQL_SELECT_JOBS_USER_RESULT = """
+SELECT * FROM T_JOBS_USER_RESULT
+"""
+
+SQL_INSERT_JOBS_USER_RESULT = """
+INSERT
+INTO T_JOBS_USER_RESULT(
+RESULT_ID,
+JOB_ID,
+FILE_DATA
+)
+VALUES (
+%(result_id)s,
+%(job_id)s,
+%(file_data)s
+)
+;
+"""
+
 SQL_INSERT_JOBS_USER_EXPORT = """
 INSERT
 INTO T_JOBS_USER_EXPORT(
 JOB_ID,
 JOB_TYPE,
 JOB_STATUS,
+COUNT_EXPORT,
+MESSAGE,
 LANGUAGE,
 CREATE_USER,
 LAST_UPDATE_USER
@@ -86,7 +107,33 @@ VALUES (
 %(job_id)s,
 %(job_type)s,
 %(job_status)s,
+%(count_export)s,
+%(message)s,
 %(language)s,
+%(create_user)s,
+%(last_update_user)s
+)
+;
+"""
+
+SQL_SELECT_JOBS_USER_FILE_EXPORT = """
+SELECT * FROM T_JOBS_USER_FILE_EXPORT
+ORDER BY LAST_UPDATE_TIMESTAMP DESC;
+"""
+
+SQL_INSERT_JOBS_USER_FILE_EXPORT = """
+INSERT
+INTO T_JOBS_USER_FILE_EXPORT(
+FILE_ID,
+JOB_ID,
+FILE_DATA,
+CREATE_USER,
+LAST_UPDATE_USER
+)
+VALUES (
+%(file_id)s,
+%(job_id)s,
+%(file_data)s,
 %(create_user)s,
 %(last_update_user)s
 )
