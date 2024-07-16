@@ -153,6 +153,10 @@ ENV JOB_USER_EXPORT_UPDATE_COUNT_INTERVAL=100
 #   Excelファイルバッファリング行数 / Excel file buffering row count
 ENV JOB_USER_EXPORT_XL_BUFFERED_ROWS=100
 
+# ユーザーエクスポート・インポート削除Jobの設定 / User export import cleanup job settings
+#   Jobタイムアウト / Job timeout
+ENV JOB_USER_EXPORT_IMPORT_CLEANUP_TIMEOUT_SECONDS=600
+
 #
 # Build for development
 #   Specify options when creating this image: --target develop_build

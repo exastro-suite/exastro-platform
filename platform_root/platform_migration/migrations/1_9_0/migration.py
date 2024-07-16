@@ -14,6 +14,7 @@
 #   limitations under the License.
 
 from . import plan_limit_update
+from . import system_config_update
 from . import update_organization_db
 
 
@@ -26,6 +27,11 @@ def main():
     # プランの項目上限の型変更
     # Change the type of plan item limit
     api = plan_limit_update.plan_limit_update()
+    result.append(api.start())
+
+    # ユーザー一括インポート・エクスポート用の設定レコード追加
+    # add audit log recode to system config
+    api = system_config_update.system_config_update()
     result.append(api.start())
 
     # オーガナイゼーションデータベースの更新
