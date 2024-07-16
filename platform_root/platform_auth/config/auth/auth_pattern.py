@@ -258,4 +258,15 @@ AUTH_PATTERN = [
             }
         ]
     },
+    {
+        "url": r"^/api/(?P<org_id>[^/][^/]*)/platform/settings/common/platform.system.user_export_import.(exp_days)$",
+        "auth": [
+            {
+                "method": ["*"],
+                "roles": [
+                    {"client": "{org_id}-workspaces", "role": const.ORG_AUTH_USER_MAINTE},
+                ]
+            }
+        ]
+    },
 ]

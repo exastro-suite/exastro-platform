@@ -176,5 +176,13 @@ JOBS = {
         "job_trigger": "daily",
         "job_exec_time_key": const.CONFIG_KEY_AUDIT_LOG_CLEANUP_TIME,
         "extra_config": {}
+    },
+    job_manager_const.PROCESS_KIND_USER_EXPORT_IMPORT_CLEANUP: {
+        "timeout_seconds": int(os.environ.get('JOB_USER_EXPORT_IMPORT_CLEANUP_TIMEOUT_SECONDS')),
+        "module": "jobs.UserExportImportCleanupJobExecutor",
+        "class": "UserExportImportCleanupJobExecutor",
+        "job_trigger": "daily",
+        "job_exec_time_key": const.CONFIG_KEY_USER_EXPORT_IMPORT_CLEANUP_TIME,
+        "extra_config": {}
     }
 }
