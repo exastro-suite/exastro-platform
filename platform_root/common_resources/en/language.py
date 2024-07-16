@@ -516,8 +516,8 @@ class LanguageList:
     lang_array['000-92024'] = 'Download failed. (download ID: {0})'
     lang_array['000-92025'] = 'Bulk registration confirmation'
     lang_array['000-92026'] = 'Bulk deletion confirmation'
-    #
-    #
+    lang_array['000-92027'] = 'Bulk registration is being processed.'
+    lang_array['000-92028'] = 'Bulk deletion is being processed.'
     lang_array['400-00001'] = 'Request-Header Paramater({}) is Invalid'
     lang_array['400-00002'] = 'Request-Body Paramater({}) is Invalid'
     #

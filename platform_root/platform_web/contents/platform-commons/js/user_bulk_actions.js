@@ -32,7 +32,7 @@ $(function () {
             displayMenu('menu_account_bulk_actions');
             // Display Topic Path
             displayTopicPath([
-                { "text": getText("000-92002", "ユーザー一括登録・更新"), "href": location_conf.href.users.bulk_actions.replace(/{organization_id}/g, CommonAuth.getRealm()) }
+                { "text": getText("000-92002", "ユーザー一括登録・削除"), "href": location_conf.href.users.bulk_actions.replace(/{organization_id}/g, CommonAuth.getRealm()) }
             ]);
 
             finish_onload_progress();
@@ -114,9 +114,44 @@ $(function () {
     }
 
     //
+    // download list tab
+    //
+    $('#tab_list').on('click', () => {
+        display_bulk_action_results();
+    });
+
+    //
     // display bulk_action_results
     //
-    function display_bulk_action_results(exp_days, file_limit, bulk_status) {
+    function display_bulk_action_results() {
+        console.log("[CALL] display_bulk_action_results");
+
+        Promise.all([
+            // get Setting Common
+            call_api_promise_settings_common(UserBulkActionsCommon.DOWNLOAD_EXP_DAYS),
+            call_api_promise_settings_common(UserBulkActionsCommon.DOWNLOAD_FILE_LIMIT),
+            // get bulk_status
+            call_api_promise_bulk_status()
+        ]).then(function (results) {
+            let exp_days = results[0].data;
+            let file_limit = results[1].data;
+            let bulk_status = results[2].data;
+            create_bulk_action_results(exp_days, file_limit, bulk_status);
+
+            enabled_download_list_button();
+
+        }).catch((e) => {
+            console.log('[ERROR] display_bulk_action_results catch');
+            finish_onload_progress_at_error();
+            if (typeof e != "undefined") console.log(e);
+            return;
+        });
+    }
+
+    //
+    // display bulk_action_results
+    //
+    function create_bulk_action_results(exp_days, file_limit, bulk_status) {
         console.log("[CALL] display_bulk_action_results");
 
         $('#bulk_action_results_message').text(getText("000-91015", "監査ログのダウンロード履歴は{0}日後に削除されます。監査ログのダウンロード最大件数は{1}件です。", exp_days.value, file_limit.value));
@@ -140,7 +175,7 @@ $(function () {
             for (let i = 0; i < bulk_status.length; ++i) {
                 const status = bulk_status[i];
                 const job_type = status.job_type === UserBulkActionsCommon.JOB_TYPE_USER_BULK_IMPORT ? bulk_import
-                    : status.job_type === UserBulkActionsCommon.JOB_TYPE_USER_BULK_IMPORT ? bulk_delete
+                    : status.job_type === UserBulkActionsCommon.JOB_TYPE_USER_BULK_DELETE ? bulk_delete
                         : status.job_type;
                 const count_total = Number(fn.cv(status.count_register, 0, true)) + Number(fn.cv(status.count_update, 0, true)) + Number(fn.cv(status.count_delete, 0, true));
                 const count_success = Number(fn.cv(status.success_register, 0, true)) + Number(fn.cv(status.success_update, 0, true)) + Number(fn.cv(status.success_delete, 0, true));
@@ -167,29 +202,6 @@ $(function () {
         }
         $('#bulk_action_results .datarow').css('display', '');
     }
-
-    //
-    // download list tab
-    //
-    $('#tab_list').on('click', () => {
-        Promise.all([
-            // get Setting Common
-            call_api_promise_settings_common(UserBulkActionsCommon.DOWNLOAD_EXP_DAYS),
-            call_api_promise_settings_common(UserBulkActionsCommon.DOWNLOAD_FILE_LIMIT),
-            // get bulk_status
-            call_api_promise_bulk_status()
-
-        ]).then(function (results) {
-            display_bulk_action_results(results[0].data, results[1].data, results[2].data);
-            enabled_download_list_button();
-
-        }).catch((e) => {
-            console.log('[ERROR] display_bulk_action_results catch');
-            finish_onload_progress_at_error();
-            if (typeof e != "undefined") console.log(e);
-            return;
-        });
-    });
 
     //
     // allDwonloadExcel button
@@ -229,10 +241,11 @@ $(function () {
                 3
             )
         }).then((result) => {
+            let job_id = result.data.id;
             switch (result.data.job_status) {
                 case UserBulkActionsCommon.JOB_STATUS_COMPLETION:
                     // JOBが成功
-                    call_post_export_download(result.data.job_id);
+                    call_post_export_download(job_id);
                     break;
                 case UserBulkActionsCommon.JOB_STATUS_NO_DATA:
                     // データなし
@@ -240,11 +253,11 @@ $(function () {
                     break;
                 case UserBulkActionsCommon.JOB_STATUS_FAILD:
                     // JOB失敗
-                    alertMessage(getText("000-80029", "エラー"), getText("000-92024", "ダウンロードに失敗しました。 (対象ID:{0})", result.data.job_id));
+                    alertMessage(getText("000-80029", "エラー"), getText("000-92024", "ダウンロードに失敗しました。 (対象ID:{0})", job_id));
                     break;
                 default:
                     // 不明なステータス
-                    alertMessage(getText("000-80029", "エラー"), getText("000-92024", "ダウンロードに失敗しました。 (対象ID:{0})", result.data.job_id));
+                    alertMessage(getText("000-80029", "エラー"), getText("000-92024", "ダウンロードに失敗しました。 (対象ID:{0})", job_id));
                     throw new Error('undefined status');
             }
 
@@ -255,39 +268,6 @@ $(function () {
             console.log(e);
             hide_progress();
             enabled_button();
-        });
-    }
-
-
-    //
-    // post bulk_import api call
-    //
-    function call_post_bulk_import(reqbody) {
-        return call_api_promise({
-            type: "POST",
-            url: api_conf.api.jobs_users.bulk_import.post.replace(/{organization_id}/g, CommonAuth.getRealm()),
-            headers: {
-                Authorization: "Bearer " + CommonAuth.getToken(),
-            },
-            contentType: false,
-            processData: false,
-            data: reqbody
-        });
-    }
-
-    //
-    // post bulk_delete api call
-    //
-    function call_post_bulk_delete(reqbody) {
-        return call_api_promise({
-            type: "POST",
-            url: api_conf.api.jobs_users.bulk_delete.post.replace(/{organization_id}/g, CommonAuth.getRealm()),
-            headers: {
-                Authorization: "Bearer " + CommonAuth.getToken(),
-            },
-            contentType: false,
-            processData: false,
-            data: reqbody
         });
     }
 
@@ -306,51 +286,88 @@ $(function () {
     });
 
     function bulk_action(job_type) {
-        console.log("[CALL] bulk_action");
+        console.log(`[CALL] bulk_action ${job_type}`);
 
         disabled_button();
-        show_progress();
+
+        let execute = false;
+        let selectFile = null;
 
         const fileType = 'file',
             fileMime = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-            restUrl = `excel/maintenance/`,
-            confirm_title = (job_type === UserBulkActionsCommon.JOB_TYPE_USER_BULK_IMPORT) ? getText("000-92025", "一括登録確認") : getText("000-92026", "一括削除確認");
+            restUrl = `excel/maintenance/`;
 
         // ファイル選択
-        fn.fileSelect(fileType, null, fileMime).then(function (selectFile) {
-            let postData = new FormData();
-            postData.append('import_file ', selectFile);
+        fn.fileSelect(fileType, null, fileMime)
+            .then(function (file) {
+                selectFile = file;
 
-            // 登録するか確認する
-            const table = { tbody: [] };
-            table.tbody.push([getText("000-00209", "ファイルネーム"), selectFile.name]);
-            table.tbody.push([getText("000-00210", "ファイルサイズ"), selectFile.size.toLocaleString() + ' byte']);
+                // 登録するか確認する
+                const confirm_title = (job_type === UserBulkActionsCommon.JOB_TYPE_USER_BULK_IMPORT) ? getText("000-92025", "一括登録確認") : getText("000-92026", "一括削除確認");
 
-            const buttons = {
-                ok: { text: getText("000-80012", "ＯＫ"), action: 'positive' },
-                cancel: { text: getText("000-80013", "キャンセル"), action: 'normal' }
-            };
-            fn.alert(confirm_title, fn.html.table(table, 'fileSelectTable', 1), 'confirm', buttons).then(function (flag) {
+                const table = { tbody: [] };
+                table.tbody.push([getText("000-00209", "ファイルネーム"), selectFile.name]);
+                table.tbody.push([getText("000-00210", "ファイルサイズ"), selectFile.size.toLocaleString() + ' byte']);
+
+                const buttons = {
+                    ok: { text: getText("000-80012", "ＯＫ"), action: 'positive' },
+                    cancel: { text: getText("000-80013", "キャンセル"), action: 'normal' }
+                };
+                return fn.alert(confirm_title, fn.html.table(table, 'fileSelectTable', 1), 'confirm', buttons);
+            }).then(function (flag) {
                 if (flag) {
                     // OK
-                    if (job_type === UserBulkActionsCommon.JOB_TYPE_USER_BULK_IMPORT) {
-                        return call_post_bulk_import(postData);
-                    } else {
-                        return call_post_bulk_delete(postData);
-                    }
-                } else {
-                    // キャンセル
-                    a = 0;
+                    execute = true;
+                    show_progress();
+                    call_post_bulk_action(job_type, selectFile);
                 }
-            });
-        }).catch(function (error) {
-            if (error !== 'cancel') {
-                alert(error);
-            }
-        });
+            }).then(function () {
+                hide_progress();
+                enabled_button();
 
-        hide_progress();
-        enabled_button();
+                if (execute) {
+                    let ui = new CommonUi(`#container`);
+                    ui.contentTabOpen(`#bulkActionResults`);
+                    $('#tab_list').click();
+
+                    const msg = (job_type === UserBulkActionsCommon.JOB_TYPE_USER_BULK_IMPORT) ? getText("000-92027", "一括登録を処理中です。") : getText("000-92028", "一括削除を処理中です。");
+                    alertMessage(getText("000-80018", "処理結果"), msg);
+                }
+            }).catch(function (e) {
+                if (e !== 'cancel') {
+                    console.log(`[catch] bulk_action ${job_type}`);
+                    console.log(e);
+                }
+                hide_progress();
+                enabled_button();
+            });
+    }
+
+    //
+    // post bulk_import api call
+    //
+    function call_post_bulk_action(job_type, selectFile) {
+        let url = null;
+        if (job_type === UserBulkActionsCommon.JOB_TYPE_USER_BULK_IMPORT) {
+            url = api_conf.api.jobs_users.bulk_import.post.replace(/{organization_id}/g, CommonAuth.getRealm());
+
+        } else if (job_type === UserBulkActionsCommon.JOB_TYPE_USER_BULK_DELETE) {
+            url = api_conf.api.jobs_users.bulk_delete.post.replace(/{organization_id}/g, CommonAuth.getRealm());
+        }
+
+        let postData = new FormData();
+        postData.append('import_file', selectFile);
+
+        return call_api_promise({
+            type: "POST",
+            url: url,
+            headers: {
+                Authorization: "Bearer " + CommonAuth.getToken(),
+            },
+            contentType: false,
+            processData: false,
+            data: postData
+        });
     }
 
 
