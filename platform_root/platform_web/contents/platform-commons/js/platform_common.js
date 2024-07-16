@@ -269,7 +269,7 @@ function displayMenu(curent) {
               <a class="menuLink menuItemContent" id="menu_account_management" type="button" aria-expanded="false" aria-controls="menu_account_management_accordion_panel" href="#" style="display: none;">${getText("000-80006", "ユーザー管理")}</a>
               <ul id="menu_account_management_accordion_panel" class="menuItem--subGroup" aria-hidden="true">
                 <li><a class="menuLink ActionList--subGroup" id="menu_account_list" href="#">${getText("000-83001", "ユーザー一覧")}</a></li>
-                <li><a class="menuLink ActionList--subGroup" id="menu_account_bulk_actions" href="#">${getText("000-92002", "ユーザー一括登録・更新")}</a></li>
+                <li><a class="menuLink ActionList--subGroup" id="menu_account_bulk_actions" href="#">${getText("000-92002", "ユーザー一括登録・削除")}</a></li>
               </ul>
             </li>
             <li class="menuItem"><a class="menuLink" id="menu_role_management" href="#" style="display: none;">${getText("000-80007", "ロール管理")}</a></li>

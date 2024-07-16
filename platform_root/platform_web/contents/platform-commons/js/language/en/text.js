@@ -516,8 +516,8 @@ langArray['000-92023'] = 'Target record does not exist.'
 langArray['000-92024'] = 'Download failed. (download ID: {0})'
 langArray['000-92025'] = 'Bulk registration confirmation'
 langArray['000-92026'] = 'Bulk deletion confirmation'
-//
-//
+langArray['000-92027'] = 'Bulk registration is being processed.'
+langArray['000-92028'] = 'Bulk deletion is being processed.'
 langArray['400-00001'] = 'Request-Header Paramater({}) is Invalid'
 langArray['400-00002'] = 'Request-Body Paramater({}) is Invalid'
 //
