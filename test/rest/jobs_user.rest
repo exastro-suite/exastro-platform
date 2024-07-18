@@ -14,6 +14,30 @@
 
 # 1 api to ###
 
+###
+
+# @name org_login
+
+POST {{base_org_url}}/auth/realms/{{org_id}}/protocol/openid-connect/token
+content-type: application/x-www-form-urlencoded
+
+client_id=admin-cli
+&username={{org-user-id}}
+&password={{org-user-pw}}
+&grant_type=password
+
+###
+
+### Download template file for bulk import/delete user
+# please sendRquest org_login execution
+@authToken = Bearer {{org_login.response.body.access_token}}
+
+POST {{base_org_url}}/api/{{org_id}}/platform/jobs/users/bulk/format
+Content-Type: application/x-www-form-urlencoded
+
+authorization={{authToken}}
+
+
 ### Jobs user import
 POST {{base_org_url}}/api/{{org_id}}/platform/jobs/users/bulk/import
 Authorization: Basic {{org-user-id}} {{org-user-pw}}
@@ -50,10 +74,19 @@ Authorization: Basic {{org-user-id}} {{org-user-pw}}
 
 
 ### Jobs user export
+# @name jobs_users_export
 POST {{base_org_url}}/api/{{org_id}}/platform/jobs/users/export
 Authorization: Basic {{org-user-id}} {{org-user-pw}}
 Content-Type: application/json
 
+### Jobs user export status job id
+
+# First, Post Jobs user export
+@export_job_id =  {{jobs_users_export.response.body.data.job_id}}
+
+GET {{base_org_url}}/api/{{org_id}}/platform/jobs/users/export/status/{{export_job_id}}
+Authorization: Basic {{org-user-id}} {{org-user-pw}}
+Content-Type: application/json
 
 ### Jobs user export status
 GET {{base_org_url}}/api/{{org_id}}/platform/jobs/users/export/status
@@ -61,7 +94,3 @@ Authorization: Basic {{org-user-id}} {{org-user-pw}}
 Content-Type: application/json
 
 
-### Jobs user export status job id
-GET {{base_org_url}}/api/{{org_id}}/platform/jobs/users/export/status/{{job_id}}
-Authorization: Basic {{org-user-id}} {{org-user-pw}}
-Content-Type: application/json

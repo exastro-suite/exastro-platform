@@ -27,7 +27,6 @@ from common_library.common import multi_lang
 from common_library.common import user_import_file_common
 from common_library.common import api_keycloak_users
 from common_library.common import api_keycloak_roles
-from common_library.common import bl_plan_service
 
 import globals
 import job_manager_config
@@ -37,6 +36,7 @@ from libs.exceptions import JobTimeoutException
 from libs import queries_user_export
 
 USER_GET_ONCE = 50
+
 
 class UserExportJobExecutor(BaseJobExecutor):
     """ユーザ情報エクスポート / User Export Job
@@ -93,7 +93,7 @@ class UserExportJobExecutor(BaseJobExecutor):
                     cursor.execute(queries_user_export.SQL_QUERY_JOBS_USER, {"job_id": self.job_id})
                     t_jobs_user = cursor.fetchone()
                     if t_jobs_user is None:
-                        message_id = f"500-62001"
+                        message_id = "500-62001"
                         message = multi_lang.get_text(
                             message_id,
                             "処理対象のレコードの取得に失敗しました(テーブル:{0})",
@@ -110,14 +110,14 @@ class UserExportJobExecutor(BaseJobExecutor):
 
                 loop_count = 0
                 max = USER_GET_ONCE
-                
+
                 while True:
                     try:
                         first = loop_count * max + 1
                         # ユーザーの取得 / Add user
                         users = self.__get_users(first=first, max=max)
 
-                        #ファイル出力
+                        # ファイル出力
                         for user in users:
                             row = {
                                 "USERNAME": user["username"],
@@ -128,14 +128,14 @@ class UserExportJobExecutor(BaseJobExecutor):
                                 "AFFILIATION": self.__get_user_affiliation(user),
                                 "DESCRIPTION": self.__get_user_description(user),
                                 "ENABLED": user["enabled"],
-                                "ROLES" : user["roles"],
-                                "USER_ID" : user["id"]
+                                "ROLES": user["roles"],
+                                "USER_ID": user["id"]
                             }
                             self.result_wb.write_row(row)
-                            
+
                         loop_count += 1
                         self.count_export += len(users)
-                        
+
                         if self.count_export > job_manager_config.JOBS[const.PROCESS_KIND_USER_EXPORT]["extra_config"]["max_number_of_rows_allowd"]:
                             message_id = "400-00022"
                             message = multi_lang.get_text_spec(
@@ -146,21 +146,21 @@ class UserExportJobExecutor(BaseJobExecutor):
                                 job_manager_config.JOBS[const.PROCESS_KIND_USER_EXPORT]["extra_config"]["max_number_of_rows_allowd"]
                             )
                             raise common.BadRequestException(message_id=message_id, message=message)
-                        
+
                         self.__update_t_jobs_user(conn, job_status=const.JOB_USER_EXEC, message=None)
                         conn.commit()
-                            
+
                         if len(users) < max:
                             break
-                        
+
                         # 1JOBでリソースを占有しないようにsleepする / Sleep so that 1JOB does not occupy resources
-                        time.sleep(job_manager_config.JOBS[const.PROCESS_KIND_USER_EXPORT]["extra_config"]["user_export_interval_millisecond"]/1000)
-                    
+                        time.sleep(job_manager_config.JOBS[const.PROCESS_KIND_USER_EXPORT]["extra_config"]["user_export_interval_millisecond"] / 1000)
+
                     except JobTimeoutException as ex:
                         # Timeout発生時はThrowして処理を中断する
                         raise ex
-                
-                globals.logger.info(f'User Export processed')
+
+                globals.logger.info('User Export processed')
 
                 # 結果ファイル保存
                 excel_bytes_image = self.result_wb.get_workbook_bytes_image()
@@ -168,12 +168,12 @@ class UserExportJobExecutor(BaseJobExecutor):
                     cursor.execute(
                         queries_user_export.SQL_INSERT_JOBS_USER_RESULT,
                         {"file_id": self.result_id, "job_id": self.job_id, "file_data": excel_bytes_image}
-                        )
+                    )
                 del excel_bytes_image
-                
+
                 # 最終的なステータスに更新する / Update to final status
                 self.__update_t_jobs_user(conn, job_status=const.JOB_USER_COMP, message=None)
-                
+
             except JobTimeoutException as ex:
                 # タイムアウトエラー / timeout error
                 if self.result_wb is not None:
@@ -234,7 +234,6 @@ class UserExportJobExecutor(BaseJobExecutor):
         else:
             return ""
 
-
     def __get_users(self, first, max):
         """ユーザ一覧の取得 / get users
 
@@ -252,12 +251,12 @@ class UserExportJobExecutor(BaseJobExecutor):
 
         if res.status_code != 200:
             globals.logger.debug(f"response:{res.text}")
-            message_id = f"500-25002"
+            message_id = "500-25002"
             message = multi_lang.get_text_spec(
                 self.language,
                 message_id,
                 "ユーザー取得に失敗しました",
-                )
+            )
 
             raise common.InternalErrorException(message_id=message_id, message=message)
 
@@ -269,11 +268,11 @@ class UserExportJobExecutor(BaseJobExecutor):
                 user_id=user["id"],
                 client_id=self.organization_private.user_token_client_id,
                 token=self.organization_sa_token.get()
-                )
+            )
 
             if res.status_code != 200:
                 globals.logger.debug(f"response:{res.text}")
-                message_id = f"500-25002"
+                message_id = "500-25002"
                 message = multi_lang.get_text_spec(
                     self.language,
                     message_id,
@@ -376,13 +375,13 @@ class UserExportJobExecutor(BaseJobExecutor):
 
                                     except JobTimeoutException as err:
                                         conn.rollback()
-                                        raise err # TimeoutException時は即終了する
+                                        raise err  # TimeoutException時は即終了する
                                     except Exception as err:
                                         conn.rollback()
                                         globals.logger.error(f'{err}\n-- stack trace --\n{traceback.format_exc()}')
 
                     except JobTimeoutException as err:
-                        raise err # TimeoutException時は即終了する
+                        raise err  # TimeoutException時は即終了する
                     except Exception as err:
                         globals.logger.error(f'{err}\n-- stack trace --\n{traceback.format_exc()}')
 

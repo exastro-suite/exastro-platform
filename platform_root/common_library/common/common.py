@@ -145,6 +145,11 @@ class UserException(Exception):
     pass
 
 
+class FileFormatErrorException(Exception):
+    def __init__(self, message):
+        self.message = message
+
+
 def delete_dict_key(dictobj, key):
     """Dictionary Key delete
 

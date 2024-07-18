@@ -19,9 +19,11 @@ import globals
 import json
 from contextlib import closing
 from flask import Response
+import sys
 
 from common_library.common import api_keycloak_tokens, api_keycloak_users
 from common_library.common import common, multi_lang, const, bl_job_service, bl_common_service
+from common_library.common import user_import_file_common
 from common_library.common.db import DBconnector
 from common_library.common.libs import queries_bl_jobs, queries_bl_notification
 from libs import queries_jobs
@@ -599,6 +601,31 @@ def jobs_users_import_status_job_id_download(organization_id, job_id):  # noqa: 
 
     download_length_query_string = queries_bl_jobs.SQL_QUERY_JOBS_USER_RESULT_FILE_LENGTH
     resp.content_length = bl_job_service.get_file_download_filesize(organization_id, job_id, download_length_query_string)
+    resp.content_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+
+    return resp
+
+@common.platform_exception_handler
+def jobs_users_format(organization_id):  # noqa: E501
+    """Download file for bulk import/delete user
+
+     # noqa: E501
+
+    :param organization_id:
+    :type organization_id: str
+
+    :rtype: str
+    """
+    r = connexion.request
+    language = r.headers.get("Language")
+
+    result_wb = user_import_file_common.UserResultWorkbook(lang=language)
+    excel_bytes_image = result_wb.get_workbook_bytes_image()
+
+    resp = Response(excel_bytes_image,
+                    headers={"Content-Disposition": 'attachment; filename="user_import_format.xlsx"'})
+
+    resp.content_length = len(excel_bytes_image)
     resp.content_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 
     return resp

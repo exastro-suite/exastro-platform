@@ -79,41 +79,6 @@ $(function () {
     }
 
     //
-    // post export reserve api call
-    //
-    function call_post_export_reserve() {
-        return call_api_promise({
-            type: "POST",
-            url: api_conf.api.jobs_users.export.post.replace(/{organization_id}/g, CommonAuth.getRealm()),
-            headers: {
-                Authorization: "Bearer " + CommonAuth.getToken(),
-            }
-        });
-    }
-
-    //
-    // post bulk_status download api call
-    //
-    function call_post_bulk_status_download(job_id) {
-        console.log("[CALL] call_post_bulk_status_download");
-
-        $("#authorization").val("Bearer " + CommonAuth.getToken());
-        document.download.action = api_conf.api.jobs_users.bulk_status.detail.post.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{job_id}/g, job_id);
-        document.download.submit();
-    }
-
-    //
-    // post export download api call
-    //
-    function call_post_export_download(job_id) {
-        console.log("[CALL] call_post_export_download");
-
-        $("#authorization").val("Bearer " + CommonAuth.getToken());
-        document.download.action = api_conf.api.jobs_users.export.detail.post.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{job_id}/g, job_id);
-        document.download.submit();
-    }
-
-    //
     // download list tab
     //
     $('#tab_list').on('click', () => {
@@ -128,15 +93,13 @@ $(function () {
 
         Promise.all([
             // get Setting Common
-            call_api_promise_settings_common(UserBulkActionsCommon.DOWNLOAD_EXP_DAYS),
-            call_api_promise_settings_common(UserBulkActionsCommon.DOWNLOAD_FILE_LIMIT),
+            call_api_promise_settings_common(UserBulkActionsCommon.USER_EXPORT_IMPORT_EXP_DAYS),
             // get bulk_status
             call_api_promise_bulk_status()
         ]).then(function (results) {
             let exp_days = results[0].data;
-            let file_limit = results[1].data;
-            let bulk_status = results[2].data;
-            create_bulk_action_results(exp_days, file_limit, bulk_status);
+            let bulk_status = results[1].data;
+            create_bulk_action_results(exp_days, bulk_status);
 
             enabled_download_list_button();
 
@@ -151,10 +114,10 @@ $(function () {
     //
     // display bulk_action_results
     //
-    function create_bulk_action_results(exp_days, file_limit, bulk_status) {
+    function create_bulk_action_results(exp_days, bulk_status) {
         console.log("[CALL] display_bulk_action_results");
 
-        $('#bulk_action_results_message').text(getText("000-91015", "監査ログのダウンロード履歴は{0}日後に削除されます。監査ログのダウンロード最大件数は{1}件です。", exp_days.value, file_limit.value));
+        $('#bulk_action_results_message').text(getText("000-92029", "ユーザー一括登録・削除の処理結果は{0}日後に削除されます。", exp_days.value));
         // 明細行を削除
         $('#bulk_action_results .datarow').remove();
 
@@ -201,6 +164,35 @@ $(function () {
             });
         }
         $('#bulk_action_results .datarow').css('display', '');
+    }
+
+    //
+    // post bulk_status download api call
+    //
+    function call_post_bulk_status_download(job_id) {
+        console.log("[CALL] call_post_bulk_status_download");
+
+        $("#authorization").val("Bearer " + CommonAuth.getToken());
+        document.download.action = api_conf.api.jobs_users.bulk_status.detail.post.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{job_id}/g, job_id);
+        document.download.submit();
+    }
+
+    //
+    // newDwonloadExcel
+    //
+    $('#newDwonloadExcel').on('click', function () {
+        call_post_bulk_format_download();
+    });
+
+    //
+    // post export download api call
+    //
+    function call_post_bulk_format_download() {
+        console.log("[CALL] call_post_bulk_format_download");
+
+        $("#authorization").val("Bearer " + CommonAuth.getToken());
+        document.download.action = api_conf.api.jobs_users.bulk_format.post.replace(/{organization_id}/g, CommonAuth.getRealm());
+        document.download.submit();
     }
 
     //
@@ -269,6 +261,30 @@ $(function () {
             hide_progress();
             enabled_button();
         });
+    }
+
+    //
+    // post export reserve api call
+    //
+    function call_post_export_reserve() {
+        return call_api_promise({
+            type: "POST",
+            url: api_conf.api.jobs_users.export.post.replace(/{organization_id}/g, CommonAuth.getRealm()),
+            headers: {
+                Authorization: "Bearer " + CommonAuth.getToken(),
+            }
+        });
+    }
+
+    //
+    // post export download api call
+    //
+    function call_post_export_download(job_id) {
+        console.log("[CALL] call_post_export_download");
+
+        $("#authorization").val("Bearer " + CommonAuth.getToken());
+        document.download.action = api_conf.api.jobs_users.export.detail.post.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{job_id}/g, job_id);
+        document.download.submit();
     }
 
     //
@@ -386,7 +402,7 @@ $(function () {
     function enabled_download_list_button() {
         $('#bulk_action_results .button_re_download').each(function (index, element) {
             let $element = $(element);
-            if ($element.attr('data-status') == UserBulkActionsCommon.JOB_STATUS_FAILD) {
+            if ($element.attr('data-status') == UserBulkActionsCommon.JOB_STATUS_COMPLETION  && $element.attr('count_failed') > 0) {
                 $element.prop('disabled', false);
             }
         });

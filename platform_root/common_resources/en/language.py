@@ -157,6 +157,7 @@ class LanguageList:
     lang_array['000-62025'] = 'List separated by commas'
     lang_array['000-62026'] = 'Cause of failure'
     lang_array['000-62027'] = ' '
+    lang_array['000-62028'] = 'There were {0} errors. Please check the processing result file.'
     lang_array['000-31001'] = 'Single-byte alphanumeric characters, hyphens, underscores'
     lang_array['000-31002'] = 'Single-byte alphanumeric characters, hyphens, periods'
     lang_array['000-31003'] = 'Single-byte numbers'
@@ -518,6 +519,7 @@ class LanguageList:
     lang_array['000-92026'] = 'Bulk deletion confirmation'
     lang_array['000-92027'] = 'Bulk registration is being processed.'
     lang_array['000-92028'] = 'Bulk deletion is being processed.'
+    lang_array['000-92029'] = 'User bulk registration/deletion results will be deleted after {0} days. '
     lang_array['400-00001'] = 'Request-Header Paramater({}) is Invalid'
     lang_array['400-00002'] = 'Request-Body Paramater({}) is Invalid'
     #
