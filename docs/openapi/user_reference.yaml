@@ -112,6 +112,9 @@ paths:
   "/api/{organization_id}/platform/roles/{role_name}/users":
       $ref: './paths/roles.role_name.users.yaml'
 
+  "/api/{organization_id}/platform/jobs/users/bulk/format":
+      $ref: './paths/jobs.users.bulk.format.yaml'
+
   "/api/{organization_id}/platform/jobs/users/bulk/import":
       $ref: './paths/jobs.users.bulk.import.yaml'
 

@@ -34,7 +34,8 @@ import globals
 import job_manager_config
 import job_manager_const
 from jobs import jobs_common
-from libs.exceptions import JobTimeoutException, FileFormatErrorException
+from libs.exceptions import JobTimeoutException
+from common_library.common.common import FileFormatErrorException
 from libs import queries_user_import
 
 
@@ -142,20 +143,25 @@ class UserImportJobExecutor(BaseJobExecutor):
 
                 # import Excelファイルイメージ取り込み / import Excel file image import
                 globals.logger.debug('Load imports user excel')
-                self.imp_wb = user_import_file_common.UserImportWorkbook(self.language, t_jobs_user_file["FILE_DATA"])
+                self.imp_wb = user_import_file_common.UserImportWorkbook(
+                    self.language, t_jobs_user_file["FILE_DATA"],
+                    job_manager_config.JOBS[const.PROCESS_KIND_USER_IMPORT]["extra_config"]["max_number_of_cols_allowd"],
+                    job_manager_config.JOBS[const.PROCESS_KIND_USER_IMPORT]["extra_config"]["max_number_of_rows_allowd"],
+                    job_manager_config.JOBS[const.PROCESS_KIND_USER_IMPORT]["extra_config"]["xl_buffered_rows"],
+                )
 
                 # ユーザー名の重複チェック / Check for duplicate usernames
                 globals.logger.debug('Check for duplicate usernames')
                 duplicate_user_list = self.imp_wb.check_duplicate_user_name()
                 if 0 < len(duplicate_user_list):
-                    globals.logger.debug(f"Failed users bulk import or delete. Duplicate Username.")
+                    globals.logger.debug("Failed users bulk import or delete. Duplicate Username.")
                     message_id = "409-62001"
                     message = multi_lang.get_text_spec(
                         self.language,
                         message_id,
                         "対象のユーザー名が重複しています(重複ユーザー名:[{0}])",
                         ", ".join(duplicate_user_list)
-                        )
+                    )
                     raise common.BadRequestException(message_id=message_id, message=message)
 
                 # 全明細の件数をカウントする / Count the number of all items
@@ -165,7 +171,7 @@ class UserImportJobExecutor(BaseJobExecutor):
 
                 # ユーザー一括削除の場合「登録」「更新」がある場合はエラー判定
                 if (job_type == const.JOB_TYPE_USER_BULK_DELETE) and (0 < self.count_register or 0 < self.count_update):
-                    globals.logger.debug(f"Failed users bulk delete. When users bulk delete, cannot specify any type other than Delete.")
+                    globals.logger.debug("Failed users bulk delete. When users bulk delete, cannot specify any type other than Delete.")
                     message_id = "409-62002"
                     message = multi_lang.get_text_spec(
                         self.language,
@@ -175,7 +181,7 @@ class UserImportJobExecutor(BaseJobExecutor):
 
                 # ユーザー一括インポートの場合「削除」がある場合はエラー判定
                 if (job_type == const.JOB_TYPE_USER_BULK_IMPORT) and (0 < self.count_delete):
-                    globals.logger.debug(f"Failed users bulk import. When users bulk import, cannot specify any type other than Registration or Update.")
+                    globals.logger.debug("Failed users bulk import. When users bulk import, cannot specify any type other than Registration or Update.")
                     message_id = "409-62003"
                     message = multi_lang.get_text_spec(
                         self.language,
@@ -301,6 +307,9 @@ class UserImportJobExecutor(BaseJobExecutor):
                         if cell_values["PROC_TYPE"] in user_import_file_common.PROC_TYPE_ADD:
                             self.failed_register += 1
 
+                        if cell_values["PROC_TYPE"] in user_import_file_common.PROC_TYPE_UPD:
+                            self.failed_update += 1
+
                         if cell_values["PROC_TYPE"] in user_import_file_common.PROC_TYPE_DEL:
                             self.failed_delete += 1
 
@@ -318,7 +327,10 @@ class UserImportJobExecutor(BaseJobExecutor):
                     time.sleep(job_manager_config.JOBS[const.PROCESS_KIND_USER_IMPORT]["extra_config"]["user_import_interval_millisecond"] / 1000)
 
                 # 最終的なステータスに更新する / Update to final status
-                self.__update_t_jobs_user(conn, job_status=const.JOB_USER_COMP, message=None)
+                msg = None
+                if (self.failed_register + self.failed_update+ self.failed_delete  > 0):
+                    msg = multi_lang.get_text('000-62028', "{0}件エラーがありました。 処理結果ファイルを確認してください。", self.failed_register + self.failed_update+ self.failed_delete)
+                self.__update_t_jobs_user(conn, job_status=const.JOB_USER_COMP, message=msg)
                 conn.commit()
 
             except FileFormatErrorException as ex:
@@ -480,12 +492,13 @@ class UserImportJobExecutor(BaseJobExecutor):
 
             # ロールのチェック（カンマ毎に分割して指定可能なロールに含まれているかチェック）
             # Checking roles (divide by comma and check if it is included in the specifiable roles)
-            for role in cell_values["ROLES"].split(','):
-                if role != "" and role not in specifiable_roles:
-                    return validation.result(
-                        False, 400, '400-62001', '指定されたロール({0})は存在しません',
-                        role
-                    )
+            if cell_values["ROLES"]:
+                for role in cell_values["ROLES"].split(','):
+                    if role != "" and role not in specifiable_roles:
+                        return validation.result(
+                            False, 400, '400-62001', '指定されたロール({0})は存在しません',
+                            role
+                        )
 
         return validate
 
@@ -589,7 +602,7 @@ class UserImportJobExecutor(BaseJobExecutor):
         """
         # オーガナイゼーション管理者ロールに所属し、ENABLEDをFALSEに設定する場合はエラー判定
         if const.ORG_ROLE_ORG_MANAGER in current_role_list and cell_values["ENABLED"] is False:
-            globals.logger.debug(f"Users with the Organization manager role cannot be disbled")
+            globals.logger.debug("Users with the Organization manager role cannot be disbled")
             message_id = "400-62004"
             message = multi_lang.get_text_spec(
                 self.language,
@@ -618,7 +631,7 @@ class UserImportJobExecutor(BaseJobExecutor):
 
         if u_update.status_code == 400:
             globals.logger.debug(f"response:{u_update.text}")
-            message_id = f"400-25004"
+            message_id = "400-25004"
             message = multi_lang.get_text(
                 message_id,
                 "ユーザー更新に失敗しました({0})",
@@ -627,7 +640,7 @@ class UserImportJobExecutor(BaseJobExecutor):
 
         elif u_update.status_code not in [200, 204]:
             globals.logger.debug(f"response:{u_update.text}")
-            message_id = f"500-25004"
+            message_id = "500-25004"
             message = multi_lang.get_text(
                 message_id,
                 "ユーザー更新に失敗しました(対象ユーザーID:{0})[{1}]",
@@ -646,7 +659,7 @@ class UserImportJobExecutor(BaseJobExecutor):
         """
         # オーガナイゼーション管理者ロールに所属している場合は削除不可
         if const.ORG_ROLE_ORG_MANAGER in current_role_list:
-            globals.logger.debug(f"Users with the Organization manager role cannot be deleted")
+            globals.logger.debug("Users with the Organization manager role cannot be deleted")
             message_id = "400-62003"
             message = multi_lang.get_text_spec(
                 self.language,
@@ -723,7 +736,7 @@ class UserImportJobExecutor(BaseJobExecutor):
 
         # オーガナイゼーション管理者ロールが削除するロールに含まれている場合はエラー判定
         if const.ORG_ROLE_ORG_MANAGER in remove_role_list:
-            globals.logger.debug(f"The Organization manager role cannot be deleted")
+            globals.logger.debug("The Organization manager role cannot be deleted")
             message_id = "409-62004"
             message = multi_lang.get_text_spec(
                 self.language,
@@ -757,7 +770,7 @@ class UserImportJobExecutor(BaseJobExecutor):
         )
 
         if response.status_code not in [200, 204]:
-            message_id = f"500-26003"
+            message_id = "500-26003"
             message = multi_lang.get_text(
                 message_id,
                 "ロールとユーザーの紐づけ削除に失敗しました(対象ID:{0} username:{1})",
@@ -814,7 +827,7 @@ class UserImportJobExecutor(BaseJobExecutor):
             user_id=user_id,
             client_id=self.organization_private.user_token_client_id,
             token=self.organization_sa_token.get()
-            )
+        )
 
         if res.status_code != 200:
             globals.logger.debug(f"response:{res.text}")

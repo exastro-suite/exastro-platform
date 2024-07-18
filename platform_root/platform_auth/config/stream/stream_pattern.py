@@ -19,6 +19,10 @@ STREAM_PATTERN = [
         "method": ["POST"],
     },
     {
+        "url": r"^/api/(?P<org_id>[^/][^/]*)/platform/jobs/users/bulk/format($|/.*$)",
+        "method": ["POST"],
+    },
+    {
         "url": r"^/api/(?P<org_id>[^/][^/]*)/platform/jobs/users/bulk/status/(?P<job_id>[^/][^/]*)/download($|/.*$)",
         "method": ["POST"],
     },

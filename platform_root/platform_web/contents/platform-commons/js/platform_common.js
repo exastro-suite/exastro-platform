@@ -1696,6 +1696,5 @@ const UserBulkActionsCommon = {
     "JOB_STATUS_NO_DATA":          "NoData",
     "JOB_TYPE_USER_BULK_IMPORT":   "USER_BULK_IMPORT",
     "JOB_TYPE_USER_BULK_DELETE":   "USER_BULK_DELETE",
-    "DOWNLOAD_EXP_DAYS":           "platform.system.audit_log.download_exp_days",
-    "DOWNLOAD_FILE_LIMIT":         "platform.system.audit_log.download_file_limit",
+    "USER_EXPORT_IMPORT_EXP_DAYS": "platform.system.user_export_import.exp_days",
 }

@@ -14,13 +14,11 @@
 import io
 import openpyxl
 import collections
-from zipfile import ZipFile, BadZipfile
+from zipfile import ZipFile
 
-from common_library.common import const
 from common_library.common import multi_lang
-from libs.exceptions import FileFormatErrorException
+from common_library.common.common import FileFormatErrorException
 
-import job_manager_config
 
 # Excelのヘッダーの行数 / Number of rows in Excel header
 EXCEL_HEADER_ROWS = 2
@@ -148,24 +146,24 @@ class UserResultWorkbook():
         header_row2_fill = openpyxl.styles.PatternFill(patternType='solid', fgColor='D9D9D9')
         header_side = openpyxl.styles.borders.Side(style='thin', color='FFFFFF')
         header_border = openpyxl.styles.borders.Border(top=header_side, bottom=header_side, left=header_side, right=header_side)
-        header_row1_alignment = openpyxl.styles.Alignment(wrapText=True, vertical = "center")
-        header_row2_alignment = openpyxl.styles.Alignment(wrapText=True, vertical = "top")
+        header_row1_alignment = openpyxl.styles.Alignment(wrapText=True, vertical="center")
+        header_row2_alignment = openpyxl.styles.Alignment(wrapText=True, vertical="top")
         header_row1_font = openpyxl.styles.fonts.Font(color='FFFFFF')
         header_row2_font = openpyxl.styles.fonts.Font(color='000000')
 
         # ヘッダ行の生成 / Generate header row
         for idx, key in enumerate(column_ids):
-            self.ws.column_dimensions[chr(ord('A')+idx)].width = column_ids[key]["width"]
-            self.ws.cell(row = 1, column=idx+1).value = multi_lang.get_text_spec(lang, column_ids[key]["text-id"], column_ids[key]["text"])
-            self.ws.cell(row = 1, column=idx+1).fill = header_row1_fill
-            self.ws.cell(row = 1, column=idx+1).border = header_border
-            self.ws.cell(row = 1, column=idx+1).alignment = header_row1_alignment
-            self.ws.cell(row = 1, column=idx+1).font = header_row1_font
-            self.ws.cell(row = 2, column=idx+1).value = multi_lang.get_text_spec(lang, column_ids[key]["description-id"], column_ids[key]["description"])
-            self.ws.cell(row = 2, column=idx+1).fill = header_row2_fill
-            self.ws.cell(row = 2, column=idx+1).border = header_border
-            self.ws.cell(row = 2, column=idx+1).alignment = header_row2_alignment
-            self.ws.cell(row = 2, column=idx+1).font = header_row2_font
+            self.ws.column_dimensions[chr(ord('A') + idx)].width = column_ids[key]["width"]
+            self.ws.cell(row=1, column=idx + 1).value = multi_lang.get_text_spec(lang, column_ids[key]["text-id"], column_ids[key]["text"])
+            self.ws.cell(row=1, column=idx + 1).fill = header_row1_fill
+            self.ws.cell(row=1, column=idx + 1).border = header_border
+            self.ws.cell(row=1, column=idx + 1).alignment = header_row1_alignment
+            self.ws.cell(row=1, column=idx + 1).font = header_row1_font
+            self.ws.cell(row=2, column=idx + 1).value = multi_lang.get_text_spec(lang, column_ids[key]["description-id"], column_ids[key]["description"])
+            self.ws.cell(row=2, column=idx + 1).fill = header_row2_fill
+            self.ws.cell(row=2, column=idx + 1).border = header_border
+            self.ws.cell(row=2, column=idx + 1).alignment = header_row2_alignment
+            self.ws.cell(row=2, column=idx + 1).font = header_row2_font
             self.col_indexes[key] = idx
 
         # ヘッダ行の高さ設定 / Header row height setting
@@ -207,15 +205,15 @@ class UserResultWorkbook():
             type="list",
             allow_blank=True,
             errorStyle="warning",
-            formula1=f'"TRUE,FALSE"'
+            formula1='"TRUE,FALSE"'
         )
 
         # PROC_TYPEのcellの入力選択肢設定 / PROC_TYPE cell input option settings
-        proc_type_col = chr(ord('A')+self.col_indexes["PROC_TYPE"])
+        proc_type_col = chr(ord('A') + self.col_indexes["PROC_TYPE"])
         proc_type_col_validation.add(f"{proc_type_col}{EXCEL_HEADER_ROWS+1}:{proc_type_col}{self.ws.max_row + EXCEL_FORMAT_SET_ROWS}")
         self.ws.add_data_validation(proc_type_col_validation)
         # ENABLEDのcellの入力選択肢設定 / ENABLED cell input option settings
-        enabled_col = chr(ord('A')+self.col_indexes["ENABLED"])
+        enabled_col = chr(ord('A') + self.col_indexes["ENABLED"])
         enabled_col_validation.add(f"{enabled_col}{EXCEL_HEADER_ROWS+1}:{enabled_col}{self.ws.max_row + EXCEL_FORMAT_SET_ROWS}")
         self.ws.add_data_validation(enabled_col_validation)
 
@@ -225,14 +223,20 @@ class UserResultWorkbook():
 class UserImportWorkbook():
     """User Import用読み込みclass / Reading class for User Import
     """
-    def __init__(self, lang, file_image):
+    def __init__(self, lang, file_image, max_number_of_cols_allowd, max_number_of_rows_allowd, xl_buffered_rows):
         """constructor
 
         Args:
             lang (str): Language
             file_image (byte[]): Excel file image
+            max_number_of_cols_allowd (int): Maximum number of columns in an Excel file that can be read
+            max_number_of_rows_allowd (int): Maximum number of rows in an Excel file that can be read
+            xl_buffered_rows (int): Excel file buffering row count
         """
         self.lang = lang
+        self.max_number_of_cols_allowd = max_number_of_cols_allowd
+        self.max_number_of_rows_allowd = max_number_of_rows_allowd
+        self.xl_buffered_rows = xl_buffered_rows
 
         # Excelファイルイメージ取り込み / Excel file image import
         try:
@@ -250,30 +254,30 @@ class UserImportWorkbook():
             raise FileFormatErrorException(multi_lang.get_text_spec(self.lang, '401-00017', 'Excelファイルにワークシートが存在しません。'))
 
         # Excelの行列の最大数のチェック / Checking maximum number of columns in Excel
-        if self.ws.max_column > job_manager_config.JOBS[const.PROCESS_KIND_USER_IMPORT]["extra_config"]["max_number_of_cols_allowd"]:
+        if self.ws.max_column > self.max_number_of_cols_allowd:
             raise FileFormatErrorException(
                 multi_lang.get_text_spec(
                     self.lang, '401-00018', 'Excelファイルの列数が多すぎます。（列数:{0},列数最大:{1})',
                     self.ws.max_column,
-                    job_manager_config.JOBS[const.PROCESS_KIND_USER_IMPORT]["extra_config"]["max_number_of_cols_allowd"]))
+                    self.max_number_of_cols_allowd))
 
-        if self.ws.max_row > job_manager_config.JOBS[const.PROCESS_KIND_USER_IMPORT]["extra_config"]["max_number_of_rows_allowd"]:
+        if self.ws.max_row > self.max_number_of_rows_allowd:
             raise FileFormatErrorException(
                 multi_lang.get_text_spec(
                     self.lang, '401-00019', 'Excelファイルの行数が多すぎます。（行数:{0},行数最大:{1})',
                     self.ws.max_column,
-                    job_manager_config.JOBS[const.PROCESS_KIND_USER_IMPORT]["extra_config"]["max_number_of_rows_allowd"]))
+                    self.max_number_of_rows_allowd))
 
         # 先頭行を取得する / get first row
         ws_header = [self.ws.cell(row=1, column=col_idx).value for col_idx in range(1, self.ws.max_column + 1)]
 
         # ヘッダーのテキストよりidと位置をdictionary化する / Convert id and position into dictionary from header text
-        self.col_indexes = { cid: search_list_value(ws_header, multi_lang.get_text_spec(lang, citem["text-id"], citem["text"]))
-                            for cid, citem in COLUMN_IDS.items() }
+        self.col_indexes = {cid: search_list_value(ws_header, multi_lang.get_text_spec(lang, citem["text-id"], citem["text"]))
+                            for cid, citem in COLUMN_IDS.items()}
 
         # ヘッダーの必須項目チェック / Check required items in header
         not_found_columns = [multi_lang.get_text_spec(lang, COLUMN_IDS[cid]["text-id"], COLUMN_IDS[cid]["text"])
-                                for cid, index in self.col_indexes.items() if index == -1 and cid != "ERROR_TEXT"]
+                             for cid, index in self.col_indexes.items() if index == -1 and cid != "ERROR_TEXT"]
         if len(not_found_columns) > 0:
             raise FileFormatErrorException(multi_lang.get_text_spec(self.lang, '401-00016', 'Excelファイルに必須の項目がありません。({0})', ",".join(not_found_columns)))
 
@@ -340,7 +344,7 @@ class UserImportWorkbook():
                 return None
 
             # バッファリングする最終行を決定する / Determine the last line to buffer
-            max_row = self.__buffered_row_idx + job_manager_config.JOBS[const.PROCESS_KIND_USER_IMPORT]["extra_config"]["xl_buffered_rows"]
+            max_row = self.__buffered_row_idx + self.xl_buffered_rows
             if max_row > self.ws.max_row:
                 max_row = self.ws.max_row
 
@@ -349,9 +353,10 @@ class UserImportWorkbook():
             for xl_row in self.ws.iter_rows(self.__buffered_row_idx + 1, max_row, 1, max(self.col_indexes.values())):
                 cell_values = [xl_cel.value for xl_cel in xl_row]
                 self.__buff.append(
-                    {   cid: cell_values[col_idx - 1]
+                    {
+                        cid: cell_values[col_idx - 1]
                         for cid, col_idx in self.col_indexes.items()
-                            if cid != "ERROR_TEXT"
+                        if cid != "ERROR_TEXT"
                     }
                 )
 
