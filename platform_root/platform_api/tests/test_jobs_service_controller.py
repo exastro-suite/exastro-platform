@@ -522,6 +522,35 @@ def test_users_bulk_import_result_download_file(connexion_client):
         assert response.json["result"] == "500-99999"
 
 
+def test_jobs_users_bulk_format(connexion_client):
+    """users bulk format download api test
+
+    Args:
+        connexion_client (_type_): _description_
+    """
+    organization = test_common.create_organization(connexion_client)
+
+    with test_common.requsts_mocker_default():
+
+        # 直呼び出しなので認証情報はヴァリデーションチェックのみに使用
+        # Since it is a direct call, the authentication information is used only for validation check.
+        req = {
+            'authorization': "dummy",
+        }
+        req_data = urllib.parse.urlencode(req)
+
+        # フォーマットファイルダウンロード（正常）
+        # users bulk format download (normal)
+        response = connexion_client.post(
+            f"/api/{organization['organization_id']}/platform/jobs/users/bulk/format",
+            content_type='application/x-www-form-urlencoded',
+            headers=request_parameters.request_headers(organization["user_id"]),
+            data=req_data)
+        assert response.status_code == 200, "post users bulk format download response code normal"
+        assert response.content_type == 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', "post users bulk format download response content_type check"
+        assert response.content_length > 0, "post users bulk format download response content_length check"
+
+
 def test_jobs_users_export_status(connexion_client):
     """jobs service api test
 
@@ -796,3 +825,4 @@ def test_users_export_download_file(connexion_client):
 
         assert response.status_code == 500, "DB error route"
         assert response.json["result"] == "500-99999"
+
