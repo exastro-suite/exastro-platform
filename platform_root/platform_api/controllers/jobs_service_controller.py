@@ -19,7 +19,6 @@ import globals
 import json
 from contextlib import closing
 from flask import Response
-import sys
 
 from common_library.common import api_keycloak_tokens, api_keycloak_users
 from common_library.common import common, multi_lang, const, bl_job_service, bl_common_service
@@ -604,6 +603,7 @@ def jobs_users_import_status_job_id_download(organization_id, job_id):  # noqa: 
     resp.content_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 
     return resp
+
 
 @common.platform_exception_handler
 def jobs_users_format(organization_id):  # noqa: E501
