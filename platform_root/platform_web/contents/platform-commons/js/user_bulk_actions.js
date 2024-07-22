@@ -346,7 +346,7 @@ $(function () {
                     ui.contentTabOpen(`#bulkActionResults`);
                     $('#tab_list').click();
 
-                    const msg = (job_type === UserBulkActionsCommon.JOB_TYPE_USER_BULK_IMPORT) ? getText("000-92027", "一括登録を処理中です。") : getText("000-92028", "一括削除を処理中です。");
+                    const msg = (job_type === UserBulkActionsCommon.JOB_TYPE_USER_BULK_IMPORT) ? getText("000-92027", "一括登録を受け付けました。<br>結果については、一括処理結果を確認してください。") : getText("000-92028", "一括削除を受け付けました。<br>結果については、一括処理結果を確認してください。");
                     alertMessage(getText("000-80018", "処理結果"), msg);
                 }
             }).catch(function (e) {

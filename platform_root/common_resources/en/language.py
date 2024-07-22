@@ -152,7 +152,7 @@ class LanguageList:
     lang_array['000-62020'] = 'Description'
     lang_array['000-62021'] = ' '
     lang_array['000-62022'] = 'User Id'
-    lang_array['000-62023'] = 'Not required when Registration'
+    lang_array['000-62023'] = 'Read only item.\nNot used in bulk processing.'
     lang_array['000-62024'] = 'Roles'
     lang_array['000-62025'] = 'List separated by commas'
     lang_array['000-62026'] = 'Cause of failure'

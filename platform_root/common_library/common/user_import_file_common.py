@@ -106,7 +106,7 @@ COLUMN_IDS = {
     "USER_ID": {
         "text": "ユーザーID",
         "text-id": "000-62022",
-        "description": "追加時は不要",
+        "description": "参照のみ項目。\n一括処理では使用されません。",
         "description-id": "000-62023",
         "width": 38,
     },
