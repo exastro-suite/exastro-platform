@@ -185,6 +185,7 @@ $(function(){
             let $element = $(element);
             if(accessibleWorkspaces.indexOf($element.attr('data-id')) !== -1) {
                 $element.prop('disabled', false);
+                $element.css('cursor', '');
             } else {
                 $element.prop('disabled', true);
                 $element.css('cursor', 'not-allowed');
