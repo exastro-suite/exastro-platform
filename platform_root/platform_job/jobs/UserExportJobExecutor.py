@@ -120,14 +120,14 @@ class UserExportJobExecutor(BaseJobExecutor):
                         # ファイル出力
                         for user in users:
                             row = {
-                                "USERNAME": user["username"],
-                                "EMAIL": user["email"],
-                                "FIRSTNAME": user["firstName"],
-                                "LASTNAME": user["lastName"],
+                                "USERNAME": user.get("username", ""),
+                                "EMAIL": user.get("email", ""),
+                                "FIRSTNAME": user.get("firstName", ""),
+                                "LASTNAME": user.get("lastName", ""),
                                 "PASSWORD": "",
                                 "AFFILIATION": self.__get_user_affiliation(user),
                                 "DESCRIPTION": self.__get_user_description(user),
-                                "ENABLED": user["enabled"],
+                                "ENABLED": user.get("enabled", False),
                                 "ROLES": user["roles"],
                                 "USER_ID": user["id"]
                             }

@@ -693,6 +693,8 @@ class UserImportJobExecutor(BaseJobExecutor):
             user_id (str): user id
             specifiable_roles (dict): ロール情報 / Role information
         """
+        if not cell_values["ROLES"]:
+            return
 
         # keycloakに渡す付与するロールの一覧を生成 / Generate a list of roles to grant to pass to keycloak
         client_roles = [specifiable_roles[role] for role in cell_values["ROLES"].split(',') if role != ""]

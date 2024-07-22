@@ -1287,6 +1287,10 @@ display: none;
 display: block;
 }
 
+.ActionList--subGroup {
+  text-indent: 24px;
+}
+
 /*
 ##################################################
    Main
