@@ -117,7 +117,7 @@
                                             <span class="inner" text-id="000-92010">ファイル一括登録</span>
                                         </button>
                                     </div>
-                                    <div class="operationDescription" text-id="000-92011">ダウンロードしたエクセルシートを編集し、ここからアップロードすることで一括して追加・編集ができます。</div>
+                                    <div class="operationDescription" text-id="000-92011">ダウンロードしたエクセルシートを編集し、ここからアップロードすることで一括して登録・更新ができます。</div>
                                 </div>
                                 <div class="operationBlock">
                                     <div class="operationTitle">
@@ -134,10 +134,18 @@
                             <div class="sectionBody">
                                 <div id="MT" class="tableContainer viewTable">
                                     <div class="tableHeader">
-                                        <ul>
-                                            <li>
+                                        <ul class="tableHeaderMainMenuList">
+                                            <li class="tableHeaderMainMenuItem">
+                                                <button id="dataRefresh" data-type="dataRefresh" data-action="positive" style="width:120px;" class="itaButton tableHeaderMainMenuButton button">
+                                                    <span class="inner"><span class="icon icon-update02"></span>
+                                                    <span text-id="000-80052">更新</span>
+                                                </button>
+                                            </li>
+                                            <li class="tableHeaderMainMenuItem">
                                                 <span class="ci" id="bulk_action_results_message"></span>
                                             </li>
+                                        </ul>
+                                        <ul>
                                         </ul>
                                     </div>
                                     <div class="tableBody">
@@ -186,22 +194,22 @@
                                                         </div>
                                                     </td>
                                                     <td class="tBodyTd td" rowspan="1" colspan="1">
-                                                        <div class="ci textOverWrap" style="text-align: center;">${create_timestamp}</div>
+                                                        <div class="ci" style="text-align: center;">${create_timestamp}</div>
                                                     </td>
                                                     <td class="tBodyTd td" rowspan="1" colspan="1">
-                                                        <div class="ci textOverWrap">${job_type}</div>
+                                                        <div class="ci">${job_type}</div>
                                                     </td>
                                                     <td class="tBodyTd td" rowspan="1" colspan="1">
-                                                        <div class="ci textOverWrap">${job_status}</div>
+                                                        <div class="ci">${job_status}</div>
                                                     </td>
                                                     <td class="tBodyTd td" rowspan="1" colspan="1">
-                                                        <div class="ci textOverWrap" style="text-align: right;">${count_total}</div>
+                                                        <div class="ci" style="text-align: right;">${count_total}</div>
                                                     </td>
                                                     <td class="tBodyTd td" rowspan="1" colspan="1">
-                                                        <div class="ci textOverWrap" style="text-align: right;">${count_success}</div>
+                                                        <div class="ci" style="text-align: right;">${count_success}</div>
                                                     </td>
                                                     <td class="tBodyTd td" rowspan="1" colspan="1">
-                                                        <div class="ci textOverWrap" style="text-align: right;">${count_failed}</div>
+                                                        <div class="ci" style="text-align: right;">${count_failed}</div>
                                                     </td>
                                                     <td class="tBodyTd td" rowspan="1" colspan="1">
                                                         <div class="ci textOverWrap">${message}</div>

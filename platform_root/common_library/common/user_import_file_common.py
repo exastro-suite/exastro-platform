@@ -36,7 +36,7 @@ COLUMN_IDS = {
     "PROC_TYPE": {
         "text": "実行処理種別",
         "text-id": "000-62001",
-        "description": "追加/変更/削除",
+        "description": "追加/更新/削除",
         "description-id": "000-62002",
         "width": 14,
     },
