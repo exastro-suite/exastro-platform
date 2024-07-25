@@ -212,6 +212,7 @@ class LanguageList:
     lang_array['000-80049'] = 'Unable to display because information acquisition failed'
     lang_array['000-80050'] = 'Unable to edit because information acquisition failed'
     lang_array['000-80051'] = 'Identity providers'
+    lang_array['000-80052'] = 'Refresh'
     lang_array['000-81001'] = 'Edit accouont'
     lang_array['000-81002'] = 'Change password'
     lang_array['000-81003'] = 'Two-factor authentication settings'

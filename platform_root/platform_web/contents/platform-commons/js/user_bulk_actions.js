@@ -79,9 +79,16 @@ $(function () {
     }
 
     //
-    // download list tab
+    // results tab
     //
     $('#tab_list').on('click', () => {
+        display_bulk_action_results();
+    });
+
+    //
+    // dataRefresh
+    //
+    $('#dataRefresh').on('click', () => {
         display_bulk_action_results();
     });
 

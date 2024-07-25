@@ -175,6 +175,7 @@ $(function(){
     function disabled_button() {
         $("#new_workspace").prop('disabled', true);
         $("#workspace_list button").prop('disabled', true);
+        $("#workspace_list .btn_ita").css('cursor', 'not-allowed');
     }
 
     function enabled_button() {

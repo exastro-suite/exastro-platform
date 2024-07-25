@@ -113,7 +113,7 @@ class UserExportJobExecutor(BaseJobExecutor):
 
                 while True:
                     try:
-                        first = loop_count * max + 1
+                        first = loop_count * max
                         # ユーザーの取得 / Add user
                         users = self.__get_users(first=first, max=max)
 
