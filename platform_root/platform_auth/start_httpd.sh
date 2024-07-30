@@ -61,6 +61,10 @@ if [ -n "${EXTERNAL_URL_MNG}" ]; then
     fi
 fi
 
+if [ ${EXASTRO_HTTPS,,} = "true" ]; then
+    HTTPD_ARGS+=("-D" "EXASTRO_HTTPS")
+fi
+
 echo "* EXTERNAL_URL_PARAMETER"
 env | grep "^EXTERNAL_URL"
 
