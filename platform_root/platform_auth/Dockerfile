@@ -111,6 +111,7 @@ WORKDIR $APP_PATH
 COPY ./platform_root/platform_auth/config/httpd.conf/httpd.conf /etc/httpd/conf/httpd.conf
 COPY ./platform_root/platform_auth/config/httpd.conf/reverse-proxy.conf /etc/httpd/conf.d/reverse-proxy.conf
 COPY ./platform_root/platform_auth/config/httpd.conf/wsgi.conf /etc/httpd/conf.d/wsgi.conf
+COPY ./platform_root/platform_auth/config/httpd.conf/exastro-ssl.conf /etc/httpd/conf.d/exastro-ssl.conf
 
 COPY ./platform_root/version $APP_PATH/
 COPY ./platform_root/platform_auth/ $APP_PATH/
@@ -133,6 +134,7 @@ WORKDIR $APP_PATH
 COPY ./platform_root/platform_auth/config/httpd.conf/httpd.conf /etc/httpd/conf/httpd.conf
 COPY ./platform_root/platform_auth/config/httpd.conf/reverse-proxy.conf /etc/httpd/conf.d/reverse-proxy.conf
 COPY ./platform_root/platform_auth/config/httpd.conf/wsgi.conf /etc/httpd/conf.d/wsgi.conf
+COPY ./platform_root/platform_auth/config/httpd.conf/exastro-ssl.conf /etc/httpd/conf.d/exastro-ssl.conf
 
 COPY ./platform_root/version $APP_PATH/
 COPY ./platform_root/platform_auth/ $APP_PATH/
