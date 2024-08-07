@@ -30,4 +30,36 @@ STREAM_PATTERN = [
         "url": r"^/api/(?P<org_id>[^/][^/]*)/platform/jobs/users/export/status/(?P<job_id>[^/][^/]*)/download($|/.*$)",
         "method": ["POST"],
     },
+    {
+        "url": r"^/api/(?P<org_id>[^/][^/]*)/workspaces/(?P<workspace_id>[^/][^/]*)/ita/menu/(?P<menu>[^/][^/]*)/(?P<uuid>[^/][^/]*)/(?P<column>[^/][^/]*)/file($|/.*$)",
+        "method": ["GET"],
+    },
+    {
+        "url": r"^/api/(?P<org_id>[^/][^/]*)/workspaces/(?P<workspace_id>[^/][^/]*)/ita/menu/(?P<menu>[^/][^/]*)/excel/format($|/.*$)",
+        "method": ["GET"],
+    },
+    {
+        "url": r"^/api/(?P<org_id>[^/][^/]*)/workspaces/(?P<workspace_id>[^/][^/]*)/ita/menu/(?P<menu>[^/][^/]*)/excel($|/.*$)",
+        "method": ["GET", "POST"],
+    },
+    {
+        "url": r"^/api/(?P<org_id>[^/][^/]*)/workspaces/(?P<workspace_id>[^/][^/]*)/ita/menu/(?P<menu>[^/][^/]*)/excel/journal($|/.*$)",
+        "method": ["GET"],
+    },
+    {
+        "url": r"^/api/(?P<org_id>[^/][^/]*)/workspaces/(?P<workspace_id>[^/][^/]*)/ita/menu/(?P<menu>[^/][^/]*)/compare/execute/output($|/.*$)",
+        "method": ["POST"],
+    },
+    {
+        "url": r"^/api/(?P<org_id>[^/][^/]*)/workspaces/(?P<workspace_id>[^/][^/]*)/ita/menu/(?P<menu>[^/][^/]*)/conductor/(?P<conductor_instance_id>[^/][^/]*)/input_data($|/.*$)",
+        "method": ["GET"],
+    },
+    {
+        "url": r"^/api/(?P<org_id>[^/][^/]*)/workspaces/(?P<workspace_id>[^/][^/]*)/ita/menu/(?P<menu>[^/][^/]*)/conductor/(?P<conductor_instance_id>[^/][^/]*)/result_data($|/.*$)",
+        "method": ["GET"],
+    },
+    {
+        "url": r"^/api/(?P<org_id>[^/][^/]*)/workspaces/(?P<workspace_id>[^/][^/]*)/ansible_execution_agent/populated_data($|/.*$)",
+        "method": ["GET"],
+    },
 ]
