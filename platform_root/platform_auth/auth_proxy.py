@@ -129,7 +129,11 @@ class auth_proxy:
         # Get bearer
         # bearer = environ.get('HTTP_AUTHORIZATION')
         if stream_mode:
-            get_auth = request.form.get('authorization')
+            get_auth = request.headers.get('Authorization')
+            # ヘッダーがあれば、ヘッダー優先、なければformの値から取得する
+            # If there is a header, give priority to the header, otherwise get it from the form value
+            if not get_auth:
+                get_auth = request.form.get('authorization')
         else:
             get_auth = request.headers.get('Authorization')
         globals.logger.debug(f'auth={get_auth}')
