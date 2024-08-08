@@ -744,14 +744,15 @@ def platform_api_call(organization_id, subpath):
         return common.response_server_error(e)
 
 
-@app.route('/api/<string:organization_id>/workspaces/<string:workspace_id>/ita/<path:subpath>', methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTION"])  # noqa: E501
+@app.route('/api/<string:organization_id>/workspaces/<string:workspace_id>/<string:function>/<path:subpath>', methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTION"])  # noqa: E501
 # @common.platform_exception_handler
-def ita_workspace_api_call(organization_id, workspace_id, subpath):
+def ita_workspace_api_call(organization_id, workspace_id, function, subpath):
     """Call the IT-automation API after authorization - 認可後にIT-automation APIを呼び出します
 
     Args:
         organization_id (str): organization id
         workspace_id (str): workspace id
+        function (str): call function
         subpath (str): subpath
 
     Returns:
@@ -761,11 +762,24 @@ def ita_workspace_api_call(organization_id, workspace_id, subpath):
         multipart_mode = is_multipart_mode()
 
         extra = extra_init(organization_id=organization_id, workspace_id=workspace_id, multipart_mode=multipart_mode)
-        globals.logger.info(f"### start func:{inspect.currentframe().f_code.co_name} {request.method=} {subpath=} {organization_id=} {workspace_id=}")
+        globals.logger.info(f"### start func:{inspect.currentframe().f_code.co_name} {request.method=} {function=} {subpath=} {organization_id=} {workspace_id=}")
 
         # Destination URL settings - 宛先URLの設定
-        dest_url = "{}://{}:{}/api/{}/workspaces/{}/ita/{}".format(
-            os.environ['ITA_API_PROTOCOL'], os.environ['ITA_API_HOST'], os.environ['ITA_API_PORT'], organization_id, workspace_id, subpath)
+        if function == "ita":
+            # ITA Call
+            dest_url = "{}://{}:{}/api/{}/workspaces/{}/ita/{}".format(
+                os.environ['ITA_API_PROTOCOL'], os.environ['ITA_API_HOST'], os.environ['ITA_API_PORT'], organization_id, workspace_id, subpath)
+        elif function == "oase_agent":
+            # Oase Agent Call
+            dest_url = "{}://{}:{}/api/{}/workspaces/{}/oase_agent/{}".format(
+                os.environ['ITA_API_OASE_RECEIVER_PROTOCOL'], os.environ['ITA_API_OASE_RECEIVER_HOST'], os.environ['ITA_API_OASE_RECEIVER_PORT'], organization_id, workspace_id, subpath)
+        elif function == "ansible_execution_agent":
+            # Ansible Execution Agent Call
+            dest_url = "{}://{}:{}/api/{}/workspaces/{}/ansible_execution_agent/{}".format(
+                os.environ['ITA_API_ANSE_RECEIVER_PROTOCOL'], os.environ['ITA_API_ANSE_RECEIVER_HOST'], os.environ['ITA_API_ANSE_RECEIVER_PORT'], organization_id, workspace_id, subpath)
+        else:
+            # Page Not Found
+            return common.response_status_direct(404, None, None, None)
 
         # サービスアカウントを使うためにClientのSercretを取得
         # Get Client Sercret to use service account
@@ -830,153 +844,6 @@ def ita_workspace_api_call(organization_id, workspace_id, subpath):
                 extra['message_text'] = res_json.get("message")
             except Exception:
                 pass
-            for key, value in return_api.headers.items():
-                if key.lower().startswith('content-'):
-                    response.headers[key] = value
-
-        if multipart_mode:
-            # BODY要素の項目を取得
-            # Get the BODY element item
-            extra['request_form'] = proxy.request_forms
-            extra['request_files'] = proxy.request_files
-
-        extra['status_code'] = return_api.status_code
-        globals.audit.info(f'audit: response. {response.status_code}', extra=extra)
-        globals.logger.info(f"### end func:{inspect.currentframe().f_code.co_name} {response.status_code=}")
-
-        return response
-
-    except (common.BadRequestException, common.NotFoundException) as err:
-        globals.logger.info(f'exception handler:\n status_code:[{err.status_code}]\n message_id:[{err.message_id}]')
-        extra['status_code'] = err.status_code
-        extra['message_id'] = err.message_id
-        extra['message_text'] = err.message
-        globals.audit.info(f'audit: response. {err.status_code}', extra=extra)
-        return common.response_status(err.status_code, err.data, err.message_id, err.message)
-
-    except common.InternalErrorException as err:
-        globals.logger.error(f'exception handler:\n status_code:[{err.status_code}]\n message_id:[{err.message_id}]')
-        globals.logger.error(''.join(list(traceback.TracebackException.from_exception(err).format())))
-        extra['status_code'] = err.status_code
-        extra['message_id'] = err.message_id
-        extra['message_text'] = err.message
-        globals.audit.info(f'audit: response. {err.status_code}', extra=extra)
-        return common.response_status(err.status_code, err.data, err.message_id, err.message)
-
-    except common.AuthException as e:
-        globals.logger.info(f'authentication error:{e.args}')
-        message_id = "401-00002"
-        message = multi_lang.get_text(message_id, "認証に失敗しました。")
-        extra['status_code'] = e.status_code
-        extra['message_id'] = message_id
-        extra['message_text'] = message
-        globals.audit.info(f'audit: response. {e.status_code} {e.args=}', extra=extra)
-        return common.response_status(e.status_code, e.data, message_id, message)
-
-    except common.NotAllowedException as e:
-        globals.logger.info(f'permission error:{e.args}')
-        message_id = "403-00001"
-        message = common.multi_lang.get_text(message_id, "permission error")
-        extra['status_code'] = e.status_code
-        extra['message_id'] = message_id
-        extra['message_text'] = message
-        globals.audit.info(f'audit: response. {e.status_code} {e.args=}', extra=extra)
-        return common.response_status(e.status_code, e.data, message_id, message)
-
-    except Exception as e:
-        globals.logger.error(f'exception error:{e.args}')
-        extra['status_code'] = 500
-        globals.audit.error(f'audit: Exception error.[{e=}], [{type(e)=}]:', stack_info=''.join(list(traceback.TracebackException.from_exception(e).format())), extra=extra)
-        return common.response_server_error(e)
-
-
-@app.route('/api/<string:organization_id>/workspaces/<string:workspace_id>/oase_agent/<path:subpath>', methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTION"])  # noqa: E501
-# @common.platform_exception_handler
-def ita_oase_recever_api_call(organization_id, workspace_id, subpath):
-    """Call the IT-automation OASE RECIVER API after authorization - 認可後にIT-automation OASE RECIVER APIを呼び出します
-
-    Args:
-        organization_id (str): organization id
-        workspace_id (str): workspace id
-        subpath (str): subpath
-
-    Returns:
-        Response: HTTP Response
-    """
-    try:
-        multipart_mode = is_multipart_mode()
-
-        extra = extra_init(organization_id=organization_id, workspace_id=workspace_id, multipart_mode=multipart_mode)
-        globals.logger.info(f"### start func:{inspect.currentframe().f_code.co_name} {request.method=} {subpath=} {organization_id=} {workspace_id=}")
-
-        # Destination URL settings - 宛先URLの設定
-        dest_url = "{}://{}:{}/api/{}/workspaces/{}/oase_agent/{}".format(
-            os.environ['ITA_API_OASE_RECEIVER_PROTOCOL'], os.environ['ITA_API_OASE_RECEIVER_HOST'], os.environ['ITA_API_OASE_RECEIVER_PORT'], organization_id, workspace_id, subpath)
-
-        # サービスアカウントを使うためにClientのSercretを取得
-        # Get Client Sercret to use service account
-        db = DBconnector()
-        private = db.get_organization_private(organization_id)
-
-        # 取得できない場合は、エラー
-        # If you cannot get it, an error
-        if not private:
-            message_id = "500-11001"
-            message = multi_lang.get_text(message_id,
-                                          "organization private情報の取得に失敗しました")
-            raise common.InternalErrorException(message_id=message_id, message=message)
-
-        # ストリームモードのあるURLかチェックする
-        # Check if the URL has stream mode
-        if is_stream_mode(dest_url, request.method):
-            stream = True
-        else:
-            stream = False
-
-        # get chunk byte
-        response_chunk_byte = get_response_chunk_byte(extra)
-
-        # organization idをrealm名として設定
-        # Set organization id as realm name
-        proxy = auth_proxy.auth_proxy(
-            organization_id,
-            private.token_check_client_clientid,
-            private.token_check_client_secret,
-            private.user_token_client_clientid,
-            None,
-            response_chunk_byte)
-
-        # 各種チェック check
-        response_json = proxy.check_authorization(stream)
-
-        extra['user_id'] = response_json.get("user_info").get("user_id")
-        extra['username'] = response_json.get("user_info").get("username")
-        extra['request_user_headers'] = response_json.get("data")
-
-        # api呼び出し call api
-        return_api = proxy.call_api(dest_url, response_json.get("data"), stream=stream, multipart_mode=multipart_mode)
-
-        if stream:
-            # stream形式の場合は、独自の返却を実施する
-            # In the case of stream format, implement your own return
-            response = Response(chunk_response(return_api, response_chunk_byte))
-            for key, value in return_api.headers.items():
-                if key.lower().startswith('content-'):
-                    response.headers[key] = value
-        else:
-            # 戻り値をそのまま返却
-            # Return the return value as it is
-            response = make_response()
-            response.status_code = return_api.status_code
-            response.data = return_api.content
-            try:
-                res_json = json.loads(return_api.text)
-
-                extra['message_id'] = res_json.get("result")
-                extra['message_text'] = res_json.get("message")
-            except Exception:
-                pass
-
             for key, value in return_api.headers.items():
                 if key.lower().startswith('content-'):
                     response.headers[key] = value
