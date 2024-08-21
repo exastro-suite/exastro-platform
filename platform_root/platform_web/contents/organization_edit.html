@@ -159,18 +159,16 @@
                                                     <tr class="tBodyTr tr">
                                                         <th class="tBodyTh th" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: left;" text-id="000-85020">インストールドライバ</div></td>
                                                         <td class="tBodyTd td ita-option-drivers" rowspan="1" colspan="1" }="">
-                                                            <div class="ci datarow-template" style="display:none">
-                                                                <span style="${readonly_display};">
-                                                                    <span class="icon icon-check" style="margin-left:5px;"></span>${name}
+                                                            <div class="ci datarow-template ita-option-driver-select" style="display:none">
+                                                                <span class="switchArea switchArea-driver">
+                                                                    <input type="checkbox" id="ita-option-driver-${id}" class="ita-option-driver ${installed}" value="${id}" ${checked} ${disabled}><label for="ita-option-driver-${id}"><span></span></label>
+                                                                    <div id="switchImg"></div>
                                                                 </span>
-                                                                <span style="${edit_display};">
-                                                                    <input type="checkbox" class="ita-option-driver" id="ita-option-driver-${id}" value="${id}" ${checked} ${disabled}>
-                                                                    <label for="ita-option-driver-${id}" class="itaOptionsDriversLabel">${name}</label>
-                                                                </span>
+                                                                <label for="ita-option-driver-${id}" class="itaOptionsDriversLabel">${name}</label>
                                                                 <span class="icon icon-circle_question popup question-icon" title="${description-text}" style="${description-display}"></span>
                                                             </div>
                                                         </td>
-                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci textOverWrap" text-id="000-85049">インストール済みのドライバの削除はできません</div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci textOverWrap" text-id="000-85049">インストール済みのドライバを削除した場合、関連するデータはすべて削除されます。削除後にデータを元に戻すことはできません。</div></td>
                                                     </tr>
                                                 </tbody>
                                             </table>
