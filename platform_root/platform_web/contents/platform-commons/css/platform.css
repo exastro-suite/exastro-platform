@@ -36,6 +36,8 @@ html {
 
 .itaOptionsDriversLabel {
     cursor: hand;
+    display: inline-block;
+    padding: 6px 0 0 8px;
 }
 
 input[type=checkbox]:disabled+.itaOptionsDriversLabel  {
@@ -175,6 +177,10 @@ input[type=checkbox]:disabled+.itaOptionsDriversLabel  {
     margin: auto;
     width: 78px;
     background: transparent;
+}
+
+.switchArea-driver {
+    float: left;
 }
 
 /* チェックボックス / checkbox */

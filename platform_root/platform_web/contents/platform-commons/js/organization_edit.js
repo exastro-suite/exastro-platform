@@ -333,8 +333,7 @@ $(function(){
                 .replace(/\${id}/g, fn.cv(row.id,'',true))
                 .replace(/\${name}/g, fn.cv(row.name,'',true))
                 .replace(/\${checked}/g, optionsIta.drivers[row.id]? "checked": "")
-                .replace(/\${readonly_display}/g, optionsIta.drivers[row.id]? "": "display: none")
-                .replace(/\${edit_display}/g, optionsIta.drivers[row.id]? "display: none": "")
+                .replace(/\${installed}/g, optionsIta.drivers[row.id]? "installed": "")
                 .replace(/\${description-text}/g, typeof row.description === "undefined"? "" : fn.cv(row.description,'',true))
                 .replace(/\${description-display}/g, typeof row.description === "undefined"? "display: none;" : "")
 
@@ -537,6 +536,48 @@ $(function(){
             return;
         }
 
+        // ドライバの削除がある場合は確認モーダル画面を表示
+        delete_modal_flag = false;
+        delete_driver_list = [];
+
+        $(".ita-option-driver-select").each(function(){
+            $input = $(this).find(".ita-option-driver");
+            if ($input.hasClass("installed") && !$input.prop("checked")){
+                delete_modal_flag = true;
+                driver_name = $(this).find(".itaOptionsDriversLabel").text();
+                delete_driver_list.push(driver_name)
+            }
+        });
+
+        if(delete_modal_flag){
+            check_delete_driver();
+        }else{
+            edit_register_organizaton();
+        }
+    }
+
+    function check_delete_driver() {
+        console.log("[CALL] confirm_delete");
+
+        deleteConfirmMessage(
+            getText("000-80017", "実行確認"),
+            getText("000-85061", "インストール済みの以下のドライバが削除されます。"),
+            delete_driver_list,
+            getText("000-85060", "削除したドライバに関連するデータはすべて削除されます。削除後にデータを元に戻すことはできません。"),
+            'delete',
+            () => {
+                show_progress();
+
+                // APIを呼出す
+                edit_register_organizaton();
+            },
+            () => {
+                enabled_button();
+            }
+        );
+    }
+
+    function edit_register_organizaton() {
         new Promise((resolve, reject) => {
             show_progress();
             resolve();
@@ -637,7 +678,7 @@ $(function(){
             }
         }
 
-        let reqbody =   {
+        let reqbody = {
             "name": $('#form_organization_name').val(),
             "enabled": ($('#form_organization_enabled').prop('checked') ? true : false),
             "optionsIta": {
