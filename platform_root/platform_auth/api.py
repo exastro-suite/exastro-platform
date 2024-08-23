@@ -776,7 +776,7 @@ def ita_workspace_api_call(organization_id, workspace_id, function, subpath):
         elif function == "ansible_execution_agent":
             # Ansible Execution Agent Call
             dest_url = "{}://{}:{}/api/{}/workspaces/{}/ansible_execution_agent/{}".format(
-                os.environ['ITA_API_ANSE_RECEIVER_PROTOCOL'], os.environ['ITA_API_ANSE_RECEIVER_HOST'], os.environ['ITA_API_ANSE_RECEIVER_PORT'], organization_id, workspace_id, subpath)
+                os.environ['ITA_API_ANSIBLE_EXECUTION_RECEIVER_PROTOCOL'], os.environ['ITA_API_ANSIBLE_EXECUTION_RECEIVER_HOST'], os.environ['ITA_API_ANSIBLE_EXECUTION_RECEIVER_PORT'], organization_id, workspace_id, subpath)
         else:
             # Page Not Found
             return common.response_status_direct(404, None, None, None)

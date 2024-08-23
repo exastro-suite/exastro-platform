@@ -14,9 +14,9 @@ services:
       - ITA_API_OASE_RECEIVER_PROTOCOL=http
       - ITA_API_OASE_RECEIVER_HOST=ita-api-oase-receiver
       - ITA_API_OASE_RECEIVER_PORT=8000
-      - ITA_API_ANSE_RECEIVER_PROTOCOL=http
-      - ITA_API_ANSE_RECEIVER_HOST=ita-api-ansible-execution-receiver
-      - ITA_API_ANSE_RECEIVER_PORT=8000
+      - ITA_API_ANSIBLE_EXECUTION_RECEIVER_PROTOCOL=http
+      - ITA_API_ANSIBLE_EXECUTION_RECEIVER_HOST=ita-api-ansible-execution-receiver
+      - ITA_API_ANSIBLE_EXECUTION_RECEIVER_PORT=8000
       - NO_PROXY=localhost,127.0.0.1,keycloak,platform-auth,platform-api,platform-web,ita-web,ita-api,ita-api-organization,ita-api-admin,ita-api-oase-receiver,ita-api-ansible-execution-receiver
       - no_proxy=localhost,127.0.0.1,keycloak,platform-auth,platform-api,platform-web,ita-web,ita-api,ita-api-organization,ita-api-admin,ita-api-oase-receiver,ita-api-ansible-execution-receiver
   platform-api:
