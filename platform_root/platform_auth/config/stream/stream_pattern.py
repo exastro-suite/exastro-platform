@@ -59,6 +59,10 @@ STREAM_PATTERN = [
         "method": ["GET"],
     },
     {
+        "url": r"^/api/(?P<org_id>[^/][^/]*)/workspaces/(?P<workspace_id>[^/][^/]*)/ita/terraform/policy/(?P<tf_organization_name>[^/][^/]*)/download/(?P<policy_name>[^/][^/]*)($|/.*$)",
+        "method": ["POST"],
+    },
+    {
         "url": r"^/api/(?P<org_id>[^/][^/]*)/workspaces/(?P<workspace_id>[^/][^/]*)/ansible_execution_agent/populated_data($|/.*$)",
         "method": ["GET"],
     },
