@@ -192,6 +192,11 @@ def workspace_create(body, organization_id):
                 # 201 Created 以外に、409 already exists は許容する
                 globals.logger.error(f"response.status_code:{r_create_wsadmin.status_code}")
                 globals.logger.error(f"response.text:{r_create_wsadmin.text}")
+
+                # 一度コミットし、ワークスペース削除ロジックの実行
+                conn.commit()
+                __workspace_delete_main(organization_id, workspace_id, user_id, encode_roles, language)
+
                 message_id = f"500-{MSG_FUNCTION_ID}002"
                 message = multi_lang.get_text(
                     message_id,
@@ -210,6 +215,11 @@ def workspace_create(body, organization_id):
                 if r_get_role_ws.status_code != 200:
                     globals.logger.error(f"response.status_code:{r_get_role_ws.status_code}")
                     globals.logger.error(f"response.text:{r_get_role_ws.text}")
+
+                    # 一度コミットし、ワークスペース削除ロジックの実行
+                    conn.commit()
+                    __workspace_delete_main(organization_id, workspace_id, user_id, encode_roles, language)
+
                     message_id = f"500-{MSG_FUNCTION_ID}003"
                     message = multi_lang.get_text(
                         message_id,
@@ -226,6 +236,11 @@ def workspace_create(body, organization_id):
             if r_create_composite.status_code != 204:
                 globals.logger.error(f"response.status_code:{r_create_composite.status_code}")
                 globals.logger.error(f"response.text:{r_create_composite.text}")
+
+                # 一度コミットし、ワークスペース削除ロジックの実行
+                conn.commit()
+                __workspace_delete_main(organization_id, workspace_id, user_id, encode_roles, language)
+
                 message_id = f"500-{MSG_FUNCTION_ID}004"
                 message = multi_lang.get_text(
                     message_id,
@@ -245,6 +260,11 @@ def workspace_create(body, organization_id):
             if r_get_role_admin.status_code != 200:
                 globals.logger.error(f"response.status_code:{r_get_role_admin.status_code}")
                 globals.logger.error(f"response.text:{r_get_role_admin.text}")
+
+                # 一度コミットし、ワークスペース削除ロジックの実行
+                conn.commit()
+                __workspace_delete_main(organization_id, workspace_id, user_id, encode_roles, language)
+
                 message_id = f"500-{MSG_FUNCTION_ID}005"
                 message = multi_lang.get_text(
                     message_id,
@@ -270,6 +290,11 @@ def workspace_create(body, organization_id):
                 if r_create_mapping.status_code != 204:
                     globals.logger.error(f"response.status_code:{r_create_mapping.status_code}")
                     globals.logger.error(f"response.text:{r_create_mapping.text}")
+
+                    # 一度コミットし、ワークスペース削除ロジックの実行
+                    conn.commit()
+                    __workspace_delete_main(organization_id, workspace_id, user_id, encode_roles, language)
+
                     message_id = f"500-{MSG_FUNCTION_ID}006"
                     message = multi_lang.get_text(
                         message_id,
@@ -288,6 +313,11 @@ def workspace_create(body, organization_id):
             if r_create_ita_workspace.status_code != 200:
                 globals.logger.error(f"response.status_code:{r_create_ita_workspace.status_code}")
                 globals.logger.error(f"response.text:{r_create_ita_workspace.text}")
+
+                # 一度コミットし、ワークスペース削除ロジックの実行
+                conn.commit()
+                __workspace_delete_main(organization_id, workspace_id, user_id, encode_roles, language)
+
                 message_id = f"500-{MSG_FUNCTION_ID}007"
                 message = multi_lang.get_text(
                     message_id,
@@ -407,6 +437,24 @@ def workspace_delete(organization_id, workspace_id):  # noqa: E501
     encode_roles = r.headers.get("Roles")
     language = r.headers.get("Language")
 
+    __workspace_delete_main(organization_id, workspace_id, user_id, encode_roles, language)
+
+    return common.response_200_ok(data=None)
+
+
+def __workspace_delete_main(organization_id, workspace_id, user_id, encode_roles, language):
+    """workspace delete main logic
+
+    Args:
+        organization_id (str): organization id
+        workspace_id (str): workspace id
+        user_id (str): user id
+        encode_roles (str): encode roles
+        language (str): language
+
+    Raises:
+        common.InternalErrorException: _description_
+    """
     db = DBconnector()
     private = db.get_organization_private(organization_id)
     with closing(db.connect_orgdb(organization_id)) as conn:
@@ -498,14 +546,18 @@ def workspace_delete(organization_id, workspace_id):  # noqa: E501
     dbinit = DBinit()
 
     # Delete Platform Workspace Database
-    globals.logger.info(f"Delete Platform Workspace Database : organization_id={organization_id} workspace_id={workspace_id}")
-    dbinit.drop_database(DBconnector().get_dbinfo_workspace(organization_id, workspace_id))
+    try:
+        globals.logger.info(f"Delete Platform Workspace Database : organization_id={organization_id} workspace_id={workspace_id}")
+        dbinit.drop_database(DBconnector().get_dbinfo_workspace(organization_id, workspace_id))
+    except Exception:
+        pass
 
     # Delete Platform Workspace db info
-    globals.logger.info(f"Delete Platform Workspace db info : organization_id={organization_id} workspace_id={workspace_id}")
-    dbinit.delete_workspace_dbinfo(organization_id, workspace_id)
-
-    return common.response_200_ok(data=None)
+    try:
+        globals.logger.info(f"Delete Platform Workspace db info : organization_id={organization_id} workspace_id={workspace_id}")
+        dbinit.delete_workspace_dbinfo(organization_id, workspace_id)
+    except Exception:
+        pass
 
 
 @common.platform_exception_handler
