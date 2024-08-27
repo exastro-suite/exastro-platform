@@ -328,7 +328,7 @@ class UserImportJobExecutor(BaseJobExecutor):
 
                 # 最終的なステータスに更新する / Update to final status
                 msg = None
-                if (self.failed_register + self.failed_update+ self.failed_delete  > 0):
+                if (self.failed_register + self.failed_update + self.failed_delete > 0):
                     msg = multi_lang.get_text('000-62028', "{0}件エラーがありました。 処理結果ファイルを確認してください。", self.failed_register + self.failed_update+ self.failed_delete)
                 self.__update_t_jobs_user(conn, job_status=const.JOB_USER_COMP, message=msg)
                 conn.commit()

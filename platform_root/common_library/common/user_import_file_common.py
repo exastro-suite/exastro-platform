@@ -21,7 +21,7 @@ from common_library.common.common import FileFormatErrorException
 
 
 # Excelのヘッダーの行数 / Number of rows in Excel header
-EXCEL_HEADER_ROWS = 2
+EXCEL_HEADER_ROWS = 6
 # 明細の作成行 / Detail creation line
 EXCEL_FORMAT_SET_ROWS = 100
 
@@ -31,11 +31,58 @@ PROC_TYPE_UPD = ["更新", "Update"]
 PROC_TYPE_DEL = ["削除", "Delete"]
 PROC_TYPES = PROC_TYPE_ADD + PROC_TYPE_UPD + PROC_TYPE_DEL
 
+
+class HeaderNotesType:
+    REQUIRED: str = "●"
+    OPTIONAL: str = "○"
+    CANNOT: str = "×"
+    OK: str = "OK"
+    NG: str = "NG"
+
+
 # COLUMN情報 / COLUMN information
 COLUMN_IDS = {
+    "NOTES_1": {
+        "text": "注意事項",
+        "text-id": "000-62029",
+        "add": "●:必須",
+        "add-id": "000-62030",
+        "upd": "○:任意",
+        "upd-id": "000-62031",
+        "del": "×:編集不可",
+        "del-id": "000-62032",
+        "multiline": "OK:改行OK/NG:改行不可",
+        "multiline-id": "000-62033",
+        "description": "その他注意事項",
+        "description-id": "000-62034",
+        "width": 12,
+    },
+    "NOTES_2": {
+        "text": None,
+        "text-id": None,
+        "add": PROC_TYPE_ADD[0],
+        "add-id": "000-62035",
+        "upd": PROC_TYPE_UPD[0],
+        "upd-id": "000-62036",
+        "del": PROC_TYPE_DEL[0],
+        "del-id": "000-62037",
+        "multiline": None,
+        "multiline-id": None,
+        "description": None,
+        "description-id": None,
+        "width": 10,
+    },
     "PROC_TYPE": {
         "text": "実行処理種別",
         "text-id": "000-62001",
+        "add": None,
+        "add-id": None,
+        "upd": None,
+        "upd-id": None,
+        "del": None,
+        "del-id": None,
+        "multiline": HeaderNotesType.NG,
+        "multiline-id": None,
         "description": "追加/更新/削除",
         "description-id": "000-62002",
         "width": 14,
@@ -43,6 +90,14 @@ COLUMN_IDS = {
     "USERNAME": {
         "text": "ユーザー名",
         "text-id": "000-62006",
+        "add": HeaderNotesType.REQUIRED,
+        "add-id": None,
+        "upd": HeaderNotesType.REQUIRED,
+        "upd-id": None,
+        "del": HeaderNotesType.REQUIRED,
+        "del-id": None,
+        "multiline": HeaderNotesType.NG,
+        "multiline-id": None,
         "description": None,
         "description-id": "000-62007",
         "width": 18,
@@ -50,6 +105,14 @@ COLUMN_IDS = {
     "PASSWORD": {
         "text": "初期パスワード",
         "text-id": "000-62008",
+        "add": HeaderNotesType.REQUIRED,
+        "add-id": None,
+        "upd": HeaderNotesType.CANNOT,
+        "upd-id": None,
+        "del": HeaderNotesType.CANNOT,
+        "del-id": None,
+        "multiline": HeaderNotesType.NG,
+        "multiline-id": None,
         "description": "追加のみ有効",
         "description-id": "000-62009",
         "width": 16,
@@ -57,6 +120,14 @@ COLUMN_IDS = {
     "EMAIL": {
         "text": "email",
         "text-id": "000-62010",
+        "add": HeaderNotesType.OPTIONAL,
+        "add-id": None,
+        "upd": HeaderNotesType.OPTIONAL,
+        "upd-id": None,
+        "del": HeaderNotesType.CANNOT,
+        "del-id": None,
+        "multiline": HeaderNotesType.NG,
+        "multiline-id": None,
         "description": "他のユーザーと重複できません",
         "description-id": "000-62011",
         "width": 30,
@@ -64,6 +135,14 @@ COLUMN_IDS = {
     "LASTNAME": {
         "text": "姓",
         "text-id": "000-62012",
+        "add": HeaderNotesType.OPTIONAL,
+        "add-id": None,
+        "upd": HeaderNotesType.OPTIONAL,
+        "upd-id": None,
+        "del": HeaderNotesType.CANNOT,
+        "del-id": None,
+        "multiline": HeaderNotesType.NG,
+        "multiline-id": None,
         "description": None,
         "description-id": "000-62013",
         "width": 12,
@@ -71,6 +150,14 @@ COLUMN_IDS = {
     "FIRSTNAME": {
         "text": "名",
         "text-id": "000-62014",
+        "add": HeaderNotesType.OPTIONAL,
+        "add-id": None,
+        "upd": HeaderNotesType.OPTIONAL,
+        "upd-id": None,
+        "del": HeaderNotesType.CANNOT,
+        "del-id": None,
+        "multiline": HeaderNotesType.NG,
+        "multiline-id": None,
         "description": None,
         "description-id": "000-62015",
         "width": 12,
@@ -78,6 +165,14 @@ COLUMN_IDS = {
     "ENABLED": {
         "text": "有効",
         "text-id": "000-62016",
+        "add": HeaderNotesType.REQUIRED,
+        "add-id": None,
+        "upd": HeaderNotesType.REQUIRED,
+        "upd-id": None,
+        "del": HeaderNotesType.CANNOT,
+        "del-id": None,
+        "multiline": HeaderNotesType.NG,
+        "multiline-id": None,
         "description": "TRUE/FALSE",
         "description-id": "000-62017",
         "width": 9,
@@ -85,6 +180,14 @@ COLUMN_IDS = {
     "AFFILIATION": {
         "text": "所属",
         "text-id": "000-62018",
+        "add": HeaderNotesType.OPTIONAL,
+        "add-id": None,
+        "upd": HeaderNotesType.OPTIONAL,
+        "upd-id": None,
+        "del": HeaderNotesType.CANNOT,
+        "del-id": None,
+        "multiline": HeaderNotesType.NG,
+        "multiline-id": None,
         "description": None,
         "description-id": "000-62019",
         "width": 16,
@@ -92,6 +195,14 @@ COLUMN_IDS = {
     "DESCRIPTION": {
         "text": "説明",
         "text-id": "000-62020",
+        "add": HeaderNotesType.OPTIONAL,
+        "add-id": None,
+        "upd": HeaderNotesType.OPTIONAL,
+        "upd-id": None,
+        "del": HeaderNotesType.CANNOT,
+        "del-id": None,
+        "multiline": HeaderNotesType.NG,
+        "multiline-id": None,
         "description": None,
         "description-id": "000-62021",
         "width": 16,
@@ -99,6 +210,14 @@ COLUMN_IDS = {
     "ROLES": {
         "text": "ロール",
         "text-id": "000-62024",
+        "add": HeaderNotesType.OPTIONAL,
+        "add-id": None,
+        "upd": HeaderNotesType.OPTIONAL,
+        "upd-id": None,
+        "del": HeaderNotesType.CANNOT,
+        "del-id": None,
+        "multiline": HeaderNotesType.NG,
+        "multiline-id": None,
         "description": "カンマ区切りで列挙",
         "description-id": "000-62025",
         "width": 28,
@@ -106,6 +225,14 @@ COLUMN_IDS = {
     "USER_ID": {
         "text": "ユーザーID",
         "text-id": "000-62022",
+        "add": HeaderNotesType.CANNOT,
+        "add-id": None,
+        "upd": HeaderNotesType.CANNOT,
+        "upd-id": None,
+        "del": HeaderNotesType.CANNOT,
+        "del-id": None,
+        "multiline": HeaderNotesType.NG,
+        "multiline-id": None,
         "description": "参照のみ項目。\n一括処理では使用されません。",
         "description-id": "000-62023",
         "width": 38,
@@ -113,6 +240,14 @@ COLUMN_IDS = {
     "ERROR_TEXT": {
         "text": "エラー内容",
         "text-id": "000-62026",
+        "add": HeaderNotesType.CANNOT,
+        "add-id": None,
+        "upd": HeaderNotesType.CANNOT,
+        "upd-id": None,
+        "del": HeaderNotesType.CANNOT,
+        "del-id": None,
+        "multiline": HeaderNotesType.NG,
+        "multiline-id": None,
         "description": None,
         "description-id": "000-62027",
         "width": 80,
@@ -146,34 +281,91 @@ class UserResultWorkbook():
         header_row2_fill = openpyxl.styles.PatternFill(patternType='solid', fgColor='D9D9D9')
         header_side = openpyxl.styles.borders.Side(style='thin', color='FFFFFF')
         header_border = openpyxl.styles.borders.Border(top=header_side, bottom=header_side, left=header_side, right=header_side)
+        header_border_right_none = openpyxl.styles.borders.Border(top=header_side, bottom=header_side, left=header_side, right=None)
+        header_border_left_none = openpyxl.styles.borders.Border(top=header_side, bottom=header_side, left=None, right=header_side)
         header_row1_alignment = openpyxl.styles.Alignment(wrapText=True, vertical="center")
         header_row2_alignment = openpyxl.styles.Alignment(wrapText=True, vertical="top")
-        header_row1_font = openpyxl.styles.fonts.Font(color='FFFFFF')
-        header_row2_font = openpyxl.styles.fonts.Font(color='000000')
+        header_row2_alignment_nowrap = openpyxl.styles.Alignment(wrapText=False, vertical="top")
+        header_row1_font = openpyxl.styles.fonts.Font(name="Meiryo", size=8, color='FFFFFF')
+        header_row2_font = openpyxl.styles.fonts.Font(name="Meiryo", size=8, color='000000')
 
         # ヘッダ行の生成 / Generate header row
         for idx, key in enumerate(column_ids):
             self.ws.column_dimensions[chr(ord('A') + idx)].width = column_ids[key]["width"]
-            self.ws.cell(row=1, column=idx + 1).value = multi_lang.get_text_spec(lang, column_ids[key]["text-id"], column_ids[key]["text"])
-            self.ws.cell(row=1, column=idx + 1).fill = header_row1_fill
-            self.ws.cell(row=1, column=idx + 1).border = header_border
-            self.ws.cell(row=1, column=idx + 1).alignment = header_row1_alignment
-            self.ws.cell(row=1, column=idx + 1).font = header_row1_font
-            self.ws.cell(row=2, column=idx + 1).value = multi_lang.get_text_spec(lang, column_ids[key]["description-id"], column_ids[key]["description"])
-            self.ws.cell(row=2, column=idx + 1).fill = header_row2_fill
-            self.ws.cell(row=2, column=idx + 1).border = header_border
-            self.ws.cell(row=2, column=idx + 1).alignment = header_row2_alignment
-            self.ws.cell(row=2, column=idx + 1).font = header_row2_font
+            target_row = 1
+            self.ws.cell(row=target_row, column=idx + 1).value = self.__get_text_spec(column_ids[key]["text-id"], column_ids[key]["text"])
+            self.ws.cell(row=target_row, column=idx + 1).fill = header_row1_fill
+            self.ws.cell(row=target_row, column=idx + 1).border = header_border
+            self.ws.cell(row=target_row, column=idx + 1).alignment = header_row1_alignment
+            self.ws.cell(row=target_row, column=idx + 1).font = header_row1_font
+            # ヘッダ行のスタイル調整 / Header row style adjustment
+            if (key == "NOTES_1"):
+                self.ws.cell(row=target_row, column=idx + 1).border = header_border_right_none
+            if (key == "NOTES_2"):
+                self.ws.cell(row=target_row, column=idx + 1).border = header_border_left_none
+            target_row = 2
+            self.ws.cell(row=target_row, column=idx + 1).value = self.__get_text_spec(column_ids[key]["add-id"], column_ids[key]["add"])
+            self.ws.cell(row=target_row, column=idx + 1).fill = header_row2_fill
+            self.ws.cell(row=target_row, column=idx + 1).border = header_border
+            self.ws.cell(row=target_row, column=idx + 1).alignment = header_row2_alignment
+            self.ws.cell(row=target_row, column=idx + 1).font = header_row2_font
+            target_row = 3
+            self.ws.cell(row=target_row, column=idx + 1).value = self.__get_text_spec(column_ids[key]["upd-id"], column_ids[key]["upd"])
+            self.ws.cell(row=target_row, column=idx + 1).fill = header_row2_fill
+            self.ws.cell(row=target_row, column=idx + 1).border = header_border
+            self.ws.cell(row=target_row, column=idx + 1).alignment = header_row2_alignment
+            self.ws.cell(row=target_row, column=idx + 1).font = header_row2_font
+            target_row = 4
+            self.ws.cell(row=target_row, column=idx + 1).value = self.__get_text_spec(column_ids[key]["del-id"], column_ids[key]["del"])
+            self.ws.cell(row=target_row, column=idx + 1).fill = header_row2_fill
+            self.ws.cell(row=target_row, column=idx + 1).border = header_border
+            self.ws.cell(row=target_row, column=idx + 1).alignment = header_row2_alignment
+            self.ws.cell(row=target_row, column=idx + 1).font = header_row2_font
+            target_row = 5
+            self.ws.cell(row=target_row, column=idx + 1).value = self.__get_text_spec(column_ids[key]["multiline-id"], column_ids[key]["multiline"])
+            self.ws.cell(row=target_row, column=idx + 1).fill = header_row2_fill
+            self.ws.cell(row=target_row, column=idx + 1).border = header_border
+            self.ws.cell(row=target_row, column=idx + 1).alignment = header_row2_alignment
+            self.ws.cell(row=target_row, column=idx + 1).font = header_row2_font
+            # ヘッダ行のスタイル調整 / Header row style adjustment
+            if (key == "NOTES_1"):
+                self.ws.cell(row=target_row, column=idx + 1).border = header_border_right_none
+                self.ws.cell(row=target_row, column=idx + 1).alignment = header_row2_alignment_nowrap
+            if (key == "NOTES_2"):
+                self.ws.cell(row=target_row, column=idx + 1).border = header_border_left_none
+            target_row = 6
+            self.ws.cell(row=target_row, column=idx + 1).value = self.__get_text_spec(column_ids[key]["description-id"], column_ids[key]["description"])
+            self.ws.cell(row=target_row, column=idx + 1).fill = header_row2_fill
+            self.ws.cell(row=target_row, column=idx + 1).border = header_border
+            self.ws.cell(row=target_row, column=idx + 1).alignment = header_row2_alignment
+            self.ws.cell(row=target_row, column=idx + 1).font = header_row2_font
+            # ヘッダ行のスタイル調整 / Header row style adjustment
+            if (key == "NOTES_1"):
+                self.ws.cell(row=target_row, column=idx + 1).border = header_border_right_none
+            if (key == "NOTES_2"):
+                self.ws.cell(row=target_row, column=idx + 1).border = header_border_left_none
             self.col_indexes[key] = idx
 
         # ヘッダ行の高さ設定 / Header row height setting
-        self.ws.row_dimensions[1].height = 18
-        self.ws.row_dimensions[2].height = 42
+        self.ws.row_dimensions[1].height = 15
+        self.ws.row_dimensions[2].height = 15
+        self.ws.row_dimensions[3].height = 15
+        self.ws.row_dimensions[4].height = 15
+        self.ws.row_dimensions[5].height = 15
+        self.ws.row_dimensions[6].height = 30
         # スクロール固定の設定 / Fixed scroll setting
         self.ws.freeze_panes = f'{chr(ord("A")+self.col_indexes["USERNAME"]+1)}{EXCEL_HEADER_ROWS+1}'
 
         # 書き込み行の初期設定 / Initial setting of write line
         self.__writed_row_idx = EXCEL_HEADER_ROWS
+
+    def __get_text_spec(self, text_id, origin_text):
+        ret = ""
+        if text_id:
+            ret = multi_lang.get_text_spec(self.lang, text_id, origin_text)
+        else:
+            ret = origin_text
+        return ret
 
     def write_row(self, cell_values):
         """行の書き込み / writing a line
@@ -242,7 +434,7 @@ class UserImportWorkbook():
         try:
             excel_zipfile = ZipFile(io.BytesIO(file_image)).fp
             self.wb = openpyxl.load_workbook(excel_zipfile, read_only=True, data_only=True, keep_links=False, rich_text=False)
-        except Exception as ex:
+        except Exception:
             raise FileFormatErrorException(multi_lang.get_text_spec(self.lang, '401-00015', 'Excelファイルの読み込みに失敗しました。'))
 
         # 先頭シートを対象とする / Target the first sheet
@@ -250,7 +442,7 @@ class UserImportWorkbook():
             self.ws = self.wb.worksheets[0]
             if self.ws is None:
                 raise Exception('no sheet')
-        except Exception as ex:
+        except Exception:
             raise FileFormatErrorException(multi_lang.get_text_spec(self.lang, '401-00017', 'Excelファイルにワークシートが存在しません。'))
 
         # Excelの行列の最大数のチェック / Checking maximum number of columns in Excel
