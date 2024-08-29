@@ -558,12 +558,12 @@ $(function(){
 
     function check_delete_driver() {
         console.log("[CALL] confirm_delete");
-
+        caution_message = [getText("000-85060", "削除したドライバに関連するデータはすべて削除されます。"), getText("000-85061", "削除後にデータを元に戻すことはできません。")]
         deleteConfirmMessage(
             getText("000-80017", "実行確認"),
-            getText("000-85061", "インストール済みの以下のドライバが削除されます。"),
+            getText("000-85062", "インストール済みの以下のドライバが削除されます。"),
             delete_driver_list,
-            getText("000-85060", "削除したドライバに関連するデータはすべて削除されます。削除後にデータを元に戻すことはできません。"),
+            caution_message,
             'delete',
             () => {
                 show_progress();

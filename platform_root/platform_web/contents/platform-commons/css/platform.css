@@ -118,16 +118,22 @@ input[type=checkbox]:disabled+.itaOptionsDriversLabel  {
 
 }
 
-.caution_message {
+.caution_head {
     color: red;
     font-weight: bold;
+    font-size: 22px;
 }
-.caution_message:before {
+.caution_head:before {
     font-family: 'exastro-ui-icons' !important;
     color: orangered;
     content: "\e94b";
     font-size: 26px;
     margin-right: 5px;
+}
+
+.caution_message {
+    color: red;
+    font-weight: bold;
 }
 
 .ci.pre_ht100 {
