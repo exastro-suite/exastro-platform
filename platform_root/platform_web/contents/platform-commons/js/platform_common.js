@@ -621,7 +621,16 @@ function deleteConfirmMessage(title, message, deleteResources, cautionMessage, i
         content += '</div>'
     }
     if(cautionMessage != null && cautionMessage != "" ) {
-        content += '<span class="caution_message">' + cautionMessage+ '</span><br>'
+        cautionHead = getText("000-80053", "注意")
+        content += '<span class="caution_head">' + cautionHead+ '</span><br>'
+
+        if((typeof cautionMessage) == "string") {
+            content += '<ul style="list-style-type:disc; padding-left:30px; background-color: #FFFFEE;"><li class="caution_message">' + fn.cv(cautionMessage, "", true) + '</li></ul>'
+        } else {
+            content += '<div style="max-height: 200px; overflow: auto;">'
+            content += '<ul style="list-style-type:disc; padding-left:30px; background-color: #FFFFEE;">' + cautionMessage.map((value, i) => { return '<li class="caution_message">' + fn.cv(value, "", true) + '</li>'; }).join("") + '</ul>'
+            content += '</div>'
+        }
     }
     content += '<hr>' + getText("000-80015", '続行する場合は <span style="font-weight: bold;">{0}</span> と入力してください。', fn.cv(input, "", true)) + '<br>'
     content += '<input class="confirm_yes inputText input" type="text" maxlength="' + input.length + '">'
@@ -1248,7 +1257,7 @@ const settings_notifications_common = {
             .replace(/\${conditions_key}/g, 'ita_event_type_new')
             .replace(/\${conditions_remarks}/g, getText("000-87023", "OASEで利用されるイベントの種別ごとに通知の有無を選択します。") + "<br>" +
             getText("000-87024", "　新規：OASEエージェントから収集、あるいは、外部システムから受け取った直後のイベント") + "<br>" +
-            getText("000-87025", "　既知（判定済）：いずれかのルールにマッチしたイベント") + "<br>" +
+            getText("000-87025", "　既知（判定済み）：いずれかのルールにマッチしたイベント") + "<br>" +
             getText("000-87026", "　既知（時間切れ）：一部の条件には当てはまったものの、全ての条件に当てはまらないまま、有効期限が切れたイベント") + "<br>" +
             getText("000-87027", "　未知：ルールやルール内の条件の一切にあてはまらなかったイベント"));
         html += row_template_3rd
