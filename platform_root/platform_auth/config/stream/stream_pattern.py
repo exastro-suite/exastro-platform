@@ -31,39 +31,39 @@ STREAM_PATTERN = [
         "method": ["POST"],
     },
     {
-        "url": r"^/api/(?P<org_id>[^/][^/]*)/workspaces/(?P<workspace_id>[^/][^/]*)/ita/menu/(?P<menu>[^/][^/]*)/(?P<uuid>[^/][^/]*)/(?P<column>[^/][^/]*)/file($|/.*$)",
+        "url": r"^/api/(?P<org_id>[^/][^/]*)/workspaces/(?P<workspace_id>[^/][^/]*)/ita/menu/(?P<menu>[^/][^/]*)/(?P<uuid>[^/][^/]*)/(?P<column>[^/][^/]*)/file($|/$)",
         "method": ["GET"],
     },
     {
-        "url": r"^/api/(?P<org_id>[^/][^/]*)/workspaces/(?P<workspace_id>[^/][^/]*)/ita/menu/(?P<menu>[^/][^/]*)/excel/format($|/.*$)",
+        "url": r"^/api/(?P<org_id>[^/][^/]*)/workspaces/(?P<workspace_id>[^/][^/]*)/ita/menu/(?P<menu>[^/][^/]*)/excel/format($|/$)",
         "method": ["GET"],
     },
     {
-        "url": r"^/api/(?P<org_id>[^/][^/]*)/workspaces/(?P<workspace_id>[^/][^/]*)/ita/menu/(?P<menu>[^/][^/]*)/excel($|/.*$)",
+        "url": r"^/api/(?P<org_id>[^/][^/]*)/workspaces/(?P<workspace_id>[^/][^/]*)/ita/menu/(?P<menu>[^/][^/]*)/excel($|/$)",
         "method": ["GET", "POST"],
     },
     {
-        "url": r"^/api/(?P<org_id>[^/][^/]*)/workspaces/(?P<workspace_id>[^/][^/]*)/ita/menu/(?P<menu>[^/][^/]*)/excel/journal($|/.*$)",
+        "url": r"^/api/(?P<org_id>[^/][^/]*)/workspaces/(?P<workspace_id>[^/][^/]*)/ita/menu/(?P<menu>[^/][^/]*)/excel/journal($|/$)",
         "method": ["GET"],
     },
     {
-        "url": r"^/api/(?P<org_id>[^/][^/]*)/workspaces/(?P<workspace_id>[^/][^/]*)/ita/menu/(?P<menu>[^/][^/]*)/compare/execute/output($|/.*$)",
+        "url": r"^/api/(?P<org_id>[^/][^/]*)/workspaces/(?P<workspace_id>[^/][^/]*)/ita/menu/(?P<menu>[^/][^/]*)/compare/execute/output($|/$)",
         "method": ["POST"],
     },
     {
-        "url": r"^/api/(?P<org_id>[^/][^/]*)/workspaces/(?P<workspace_id>[^/][^/]*)/ita/menu/(?P<menu>[^/][^/]*)/conductor/(?P<conductor_instance_id>[^/][^/]*)/input_data($|/.*$)",
+        "url": r"^/api/(?P<org_id>[^/][^/]*)/workspaces/(?P<workspace_id>[^/][^/]*)/ita/menu/(?P<menu>[^/][^/]*)/conductor/(?P<conductor_instance_id>[^/][^/]*)/input_data($|/$)",
         "method": ["GET"],
     },
     {
-        "url": r"^/api/(?P<org_id>[^/][^/]*)/workspaces/(?P<workspace_id>[^/][^/]*)/ita/menu/(?P<menu>[^/][^/]*)/conductor/(?P<conductor_instance_id>[^/][^/]*)/result_data($|/.*$)",
+        "url": r"^/api/(?P<org_id>[^/][^/]*)/workspaces/(?P<workspace_id>[^/][^/]*)/ita/menu/(?P<menu>[^/][^/]*)/conductor/(?P<conductor_instance_id>[^/][^/]*)/result_data($|/$)",
         "method": ["GET"],
     },
     {
-        "url": r"^/api/(?P<org_id>[^/][^/]*)/workspaces/(?P<workspace_id>[^/][^/]*)/ita/terraform/policy/(?P<tf_organization_name>[^/][^/]*)/download/(?P<policy_name>[^/][^/]*)($|/.*$)",
+        "url": r"^/api/(?P<org_id>[^/][^/]*)/workspaces/(?P<workspace_id>[^/][^/]*)/ita/terraform/policy/(?P<tf_organization_name>[^/][^/]*)/download/(?P<policy_name>[^/][^/]*)($|/$)",
         "method": ["POST"],
     },
     {
-        "url": r"^/api/(?P<org_id>[^/][^/]*)/workspaces/(?P<workspace_id>[^/][^/]*)/ansible_execution_agent/populated_data($|/.*$)",
+        "url": r"^/api/(?P<org_id>[^/][^/]*)/workspaces/(?P<workspace_id>[^/][^/]*)/ansible_execution_agent/populated_data($|/$)",
         "method": ["GET"],
     },
 ]
