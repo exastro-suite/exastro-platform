@@ -473,7 +473,7 @@ def __workspace_delete_main(organization_id, workspace_id, user_id, encode_roles
             # Delete ITA workspace
             globals.logger.info(f"Delete ITA Workspace : organization_id={organization_id} / workspace_id={workspace_id}")
             r_delete_ita_workspace = api_ita_admin_call.ita_workspace_delete(organization_id, workspace_id, user_id, encode_roles, language)
-            if r_delete_ita_workspace.status_code not in [200, 404, 499]:
+            if r_delete_ita_workspace.status_code not in [200, 404, 490]:
                 globals.logger.error(f"response.status_code:{r_delete_ita_workspace.status_code}")
                 globals.logger.error(f"response.text:{r_delete_ita_workspace.text}")
                 message_id = f"500-{MSG_FUNCTION_ID}008"
@@ -484,14 +484,14 @@ def __workspace_delete_main(organization_id, workspace_id, user_id, encode_roles
                 )
                 raise common.InternalErrorException(message_id=message_id, message=message)
 
-            # Alredy Deleted : status_code = 499 and response body result = '499-00002'
-            if r_delete_ita_workspace.status_code == 499:
+            # Alredy Deleted : status_code = 490 and response body result = '490-02009'
+            if r_delete_ita_workspace.status_code == 490:
                 try:
                     r_delete_ita_workspace_body = json.loads(r_delete_ita_workspace.text)
                 except Exception:
                     r_delete_ita_workspace_body = {}
 
-                if r_delete_ita_workspace_body.get("result", "") != '499-00002':  # Alredy Deleted
+                if r_delete_ita_workspace_body.get("result", "") != '490-02009':  # Alredy Deleted
                     globals.logger.error(f"response.status_code:{r_delete_ita_workspace.status_code}")
                     globals.logger.error(f"response.text:{r_delete_ita_workspace.text}")
                     message_id = f"500-{MSG_FUNCTION_ID}008"

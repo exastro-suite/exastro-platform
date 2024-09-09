@@ -1762,7 +1762,7 @@ def __ita_delete(organization_id):
     api_url = "{}://{}:{}".format(os.environ['ITA_API_ADMIN_PROTOCOL'], os.environ['ITA_API_ADMIN_HOST'], os.environ['ITA_API_ADMIN_PORT'])
     response = requests.delete(f"{api_url}/api/organizations/{organization_id}/ita/", headers=header_para)
 
-    if response.status_code not in [200, 404, 499]:
+    if response.status_code not in [200, 404, 490]:
         globals.logger.error(f"response.status_code:{response.status_code}")
         globals.logger.error(f"response.text:{response.text}")
         message_id = f"500-{MSG_FUNCTION_ID}013"
@@ -1773,13 +1773,13 @@ def __ita_delete(organization_id):
         )
         raise common.InternalErrorException(message_id=message_id, message=message)
 
-    if response.status_code == 499:
+    if response.status_code == 490:
         try:
             r_delete_ita_body = json.loads(response.text)
         except Exception:
             r_delete_ita_body = {}
 
-        if r_delete_ita_body.get("result", "") != '499-00002':  # Alredy Deleted
+        if r_delete_ita_body.get("result", "") != '490-02009':  # Alredy Deleted
             globals.logger.error(f"response.status_code:{response.status_code}")
             globals.logger.error(f"response.text:{response.text}")
 

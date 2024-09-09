@@ -556,7 +556,7 @@ def test_user_update(connexion_client):
             data="dummy-data")
 
         # connexionでhttp-415応答
-        assert response.status_code >= 400 or response.status_code <= 499
+        assert response.status_code >= 400 or response.status_code <= 490
 
     with test_common.requsts_mocker_default() as requests_mocker:
         # Validation Error Route
