@@ -44,9 +44,6 @@ class realm_update:
     # realm name
     realm = None
 
-    token_user = os.environ.get("KEYCLOAK_USER")
-    token_pass = os.environ.get("KEYCLOAK_PASSWORD")
-
     failed_count = 0
     complete = 0
     skip_count = 0
@@ -82,7 +79,8 @@ class realm_update:
 
             # アクセストークンを取得
             # Get an access token
-            access_token = self.__access_token_get(self.realm, self.token_user, self.token_pass)
+            private = DBconnector().get_platform_private()
+            access_token = self.__access_token_get(self.realm, private.token_check_client_clientid, private.token_check_client_secret)
             self.step_count += 1
 
             # オーガナイゼーション数分処理する
@@ -155,13 +153,13 @@ class realm_update:
 
         return result
 
-    def __access_token_get(self, realm, user_name, password):
+    def __access_token_get(self, realm, token_check_client_clientid, token_check_client_secret):
         """アクセストークン取得 Get access token
 
         Args:
             realm (str): realm
-            user_name (str): user_name
-            password (str): password
+            token_check_client_clientid (str): token_check_client_clientid
+            token_check_client_secret (str): token_check_client_secret
 
         Returns:
             str: access_token
@@ -172,7 +170,7 @@ class realm_update:
             globals.logger.info(f"[{self.step_count}/{self.step_max}] - get token:")
             # アクセストークン取得
             # get access token
-            access_token_response = api_keycloak_tokens.get_user_token(user_name, password, realm)
+            access_token_response = api_keycloak_tokens.service_account_get_token(realm, token_check_client_clientid, token_check_client_secret)
 
             if access_token_response.status_code not in [200]:
                 globals.logger.info(f"[{self.step_count}/{self.step_max}] -- NG: get token:")
