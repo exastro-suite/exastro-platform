@@ -61,6 +61,9 @@ class platform_init:
     platform_client_clientid = None
     platform_api_clientid = None
 
+    token_user = os.environ.get("KEYCLOAK_USER")
+    token_pass = os.environ.get("KEYCLOAK_PASSWORD")
+
     failed_count = 0
     complete = 0
     skip_count = 0
@@ -91,8 +94,7 @@ class platform_init:
 
             # アクセストークンを取得
             # Get an access token
-            private = DBconnector().get_platform_private()
-            access_token = self.__access_token_get(self.realm, private.token_check_client_clientid, private.token_check_client_secret)
+            access_token = self.__access_token_get(self.realm, self.token_user, self.token_pass)
 
             self.step_count += 1
 
@@ -166,13 +168,13 @@ class platform_init:
         else:
             return 0
 
-    def __access_token_get(self, realm, token_check_client_clientid, token_check_client_secret):
+    def __access_token_get(self, realm, user_name, password):
         """アクセストークン取得 Get access token
 
         Args:
             realm (str): realm
-            token_check_client_clientid (str): token_check_client_clientid
-            token_check_client_secret (str): token_check_client_secret
+            user_name (str): user_name
+            password (str): password
 
         Returns:
             str: access_token
@@ -183,7 +185,7 @@ class platform_init:
             globals.logger.info(f"[{self.step_count}/{self.step_max}] - get token:")
             # アクセストークン取得
             # get access token
-            access_token_response = api_keycloak_tokens.service_account_get_token(realm, token_check_client_clientid, token_check_client_secret)
+            access_token_response = api_keycloak_tokens.get_user_token(user_name, password, realm)
 
             if access_token_response.status_code not in [200]:
                 globals.logger.info(f"[{self.step_count}/{self.step_max}] -- NG: get token:")

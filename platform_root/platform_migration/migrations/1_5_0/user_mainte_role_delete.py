@@ -48,9 +48,6 @@ class user_mainte_role_delete:
 
     realm_management_clientid = "realm-management"
 
-    token_user = os.environ.get("KEYCLOAK_USER")
-    token_pass = os.environ.get("KEYCLOAK_PASSWORD")
-
     failed_count = 0
     complete = 0
     skip_count = 0
@@ -86,21 +83,22 @@ class user_mainte_role_delete:
 
             # アクセストークンを取得
             # Get an access token
-            access_token = self.__access_token_get(self.realm, self.token_user, self.token_pass)
+            private = DBconnector().get_platform_private()
+            access_token = self.__access_token_get(self.realm, private.token_check_client_clientid, private.token_check_client_secret)
             self.step_count += 1
 
             # オーガナイゼーション数分処理する
             # Process for the number of organisations.
             for organization in organizations:
-                
+
                 self.organization_count += 1
                 organization_id = organization.get("ORGANIZATION_ID")
                 globals.logger.info(f"[{self.step_count}/{self.step_max}] ##### Organization iteration [{self.organization_count}/{len(organizations)}] Start - organization id [{organization_id}]")  # noqa: #E501
-                
+
                 # organization client取得
                 # get organization client
                 organization_client_id = self.__get_organization_client_id(organization_id, access_token)
-                
+
                 # realm management client取得
                 # get realm management client
                 realm_management_client_id = self.__get_realm_management_client_id(organization_id, access_token)
@@ -148,14 +146,14 @@ class user_mainte_role_delete:
             return -1
         else:
             return 0
-        
+
     def __get_organizations(self):
         """ get organizations
 
         Raises:
             common.NotFoundException: _description_
         """
-        
+
         globals.logger.info(f"[{self.step_count}/{self.step_max}] ### func:{inspect.currentframe().f_code.co_name}")
 
         # exists organization
@@ -171,13 +169,13 @@ class user_mainte_role_delete:
 
         return result
 
-    def __access_token_get(self, realm, user_name, password):
+    def __access_token_get(self, realm, token_check_client_clientid, token_check_client_secret):
         """アクセストークン取得 Get access token
 
         Args:
             realm (str): realm
-            user_name (str): user_name
-            password (str): password
+            token_check_client_clientid (str): token_check_client_clientid
+            token_check_client_secret (str): token_check_client_secret
 
         Returns:
             str: access_token
@@ -188,7 +186,7 @@ class user_mainte_role_delete:
             globals.logger.info(f"[{self.step_count}/{self.step_max}] - get token:")
             # アクセストークン取得
             # get access token
-            access_token_response = api_keycloak_tokens.get_user_token(user_name, password, realm)
+            access_token_response = api_keycloak_tokens.service_account_get_token(realm, token_check_client_clientid, token_check_client_secret)
 
             if access_token_response.status_code not in [200]:
                 globals.logger.info(f"[{self.step_count}/{self.step_max}] -- NG: get token:")
@@ -226,7 +224,7 @@ class user_mainte_role_delete:
         """
 
         globals.logger.info(f"[{self.step_count}/{self.step_max}] ### Start func:{inspect.currentframe().f_code.co_name} - organization_id: [{organization_id}]")  # noqa: E501
-        
+
         client_clientid = common.get_user_token_client_id(organization_id)
 
         # client取得
@@ -249,7 +247,7 @@ class user_mainte_role_delete:
 
         globals.logger.info(f"[{self.step_count}/{self.step_max}] ### Succeed func:{inspect.currentframe().f_code.co_name}")
 
-        return client_id 
+        return client_id
 
     def __get_realm_management_client_id(self, organization_id, token):
         """get realm management client id
@@ -348,7 +346,7 @@ class user_mainte_role_delete:
             response = api_keycloak_roles.clients_role_composites_delete(organization_id, client_id, target, client_roles, token)
             if response.status_code not in [200, 204]:
                 globals.logger.info(f"[{self.step_count}/{self.step_max}] - role [{target}] delete status:{response.status_code}")  # noqa: E501
-        
+
         globals.logger.info(f"[{self.step_count}/{self.step_max}] ### Succeed func:{inspect.currentframe().f_code.co_name}")
 
         return
