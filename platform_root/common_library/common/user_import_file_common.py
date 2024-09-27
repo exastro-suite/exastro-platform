@@ -26,7 +26,7 @@ EXCEL_HEADER_ROWS = 6
 EXCEL_FORMAT_SET_ROWS = 100
 
 # 実行処理種別 / Execution processing type
-PROC_TYPE_ADD = ["追加", "Registration"]
+PROC_TYPE_ADD = ["登録", "Registration"]
 PROC_TYPE_UPD = ["更新", "Update"]
 PROC_TYPE_DEL = ["削除", "Delete"]
 PROC_TYPES = PROC_TYPE_ADD + PROC_TYPE_UPD + PROC_TYPE_DEL
@@ -83,7 +83,7 @@ COLUMN_IDS = {
         "del-id": None,
         "multiline": HeaderNotesType.NG,
         "multiline-id": None,
-        "description": "追加/更新/削除",
+        "description": "登録/更新/削除",
         "description-id": "000-62002",
         "width": 14,
     },
@@ -113,7 +113,7 @@ COLUMN_IDS = {
         "del-id": None,
         "multiline": HeaderNotesType.NG,
         "multiline-id": None,
-        "description": "追加のみ有効",
+        "description": "登録のみ有効",
         "description-id": "000-62009",
         "width": 16,
     },
