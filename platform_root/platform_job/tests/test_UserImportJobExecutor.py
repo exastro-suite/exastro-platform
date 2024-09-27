@@ -1544,9 +1544,9 @@ def get_user(user_name):
         return u_get
 
 
-# サンプルデータ（追加用）
+# サンプルデータ（登録用）
 data_sample_registration = {
-    "PROC_TYPE": "追加",
+    "PROC_TYPE": "登録",
     "USERNAME": "testuser-01",
     "PASSWORD": "password",
     "EMAIL": "testuser-01@example.com",
@@ -1560,7 +1560,7 @@ data_sample_registration = {
 }
 
 data_sample_registration2 = {
-    "PROC_TYPE": "追加",
+    "PROC_TYPE": "登録",
     "USERNAME": "testuser-02",
     "PASSWORD": "password",
     "EMAIL": "testuser-02@example.com",
@@ -1574,7 +1574,7 @@ data_sample_registration2 = {
 }
 
 data_sample_registration_org_manager = {
-    "PROC_TYPE": "追加",
+    "PROC_TYPE": "登録",
     "USERNAME": "testuser-org-mng",
     "PASSWORD": "password",
     "EMAIL": "testuser-org-mng@example.com",
