@@ -474,11 +474,9 @@ class UserImportJobExecutor(BaseJobExecutor):
 
             # 登録時のみPASSWORDを必須とする / Require PASSWORD only during registration
             if cell_values["PROC_TYPE"] in user_import_file_common.PROC_TYPE_ADD:
-                if cell_values["PASSWORD"] is None or cell_values["PASSWORD"] == "":
-                    return validation.result(
-                        False, 400, '400-00011', '必須項目が不足しています。({0})',
-                        user_import_file_common.COLUMN_IDS["PASSWORD"]["text"]
-                    )
+                validate = validation.validate_password(cell_values["PASSWORD"], lang=self.language)
+                if not validate.ok:
+                    return validate
 
             validate = validation.validate_user_affiliation(cell_values["AFFILIATION"] if cell_values["AFFILIATION"] is not None else "", lang=self.language)
             if not validate.ok:
