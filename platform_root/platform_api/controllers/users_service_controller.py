@@ -141,6 +141,7 @@ def user_create(body, organization_id):
     user_email = body.get("email")
     user_firstName = body.get("firstName")
     user_lastName = body.get("lastName")
+    password = body.get("password")
     password_temporary = body.get("password_temporary", "True")
     user_affiliation = body.get("affiliation")
     user_description = body.get("description")
@@ -157,6 +158,9 @@ def user_create(body, organization_id):
     if not validate.ok:
         return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
     validate = validation.validate_user_lastName(user_lastName)
+    if not validate.ok:
+        return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
+    validate = validation.validate_password(password)
     if not validate.ok:
         return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
     validate = validation.validate_password_temporary(password_temporary)
@@ -338,6 +342,7 @@ def user_update(body, organization_id, user_id):  # noqa: E501
     user_email = body.get("email")
     user_firstName = body.get("firstName")
     user_lastName = body.get("lastName")
+    password = body.get("password")
     password_temporary = body.get("password_temporary", "True")
     user_affiliation = body.get("affiliation")
     user_description = body.get("description")
@@ -356,6 +361,10 @@ def user_update(body, organization_id, user_id):  # noqa: E501
     validate = validation.validate_password_temporary(password_temporary)
     if not validate.ok:
         return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
+    if password is not None:
+        validate = validation.validate_password(password)
+        if not validate.ok:
+            return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
     validate = validation.validate_user_affiliation(user_affiliation)
     if not validate.ok:
         return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)

@@ -744,6 +744,31 @@ def validate_user_lastName(user_lastName, lang=None):
     return result(True)
 
 
+def validate_password(password, lang=None):
+    """Validate password temporary
+
+    Args:
+        password (str): password
+
+    Returns:
+        result: Validation result
+    """
+    if password is None or password == "":
+        return result(
+            False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
+            multi_lang.get_text('000-00132', "パスワード") if lang is None else multi_lang.get_text_spec(lang, '000-00132', "パスワード")
+        )
+
+    if len(password) > const.length_user_password:
+        return result(
+            False, 400, '400-{}012'.format(MSG_FUNCTION_ID), '指定可能な文字数を超えています。(項目:{0},最大文字数:{1})',
+            multi_lang.get_text('000-00132', "パスワード") if lang is None else multi_lang.get_text_spec(lang, '000-00132', "パスワード"),
+            str(const.length_user_password)
+        )
+
+    return result(True)
+
+
 def validate_password_temporary(password_temporary):
     """Validate password temporary
 
