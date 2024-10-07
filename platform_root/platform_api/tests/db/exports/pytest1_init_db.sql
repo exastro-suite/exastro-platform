@@ -1,4 +1,4 @@
--- MySQL dump 10.13  Distrib 8.0.38, for Linux (x86_64)
+-- MySQL dump 10.13  Distrib 8.0.39, for Linux (x86_64)
 --
 -- Host: platform-db    Database: keycloak
 -- ------------------------------------------------------
@@ -2085,4 +2085,4 @@ CREATE TABLE `T_REFRESH_TOKEN` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-07-16 17:02:04
+-- Dump completed on 2024-10-07 11:16:33
