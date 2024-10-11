@@ -26,7 +26,7 @@ $(function(){
             loadCommonContents()
         ]).then(function(results) {
             // Display Menu
-            displayMenu('menu_account_management');
+            displayMenu('menu_account_list');
             // Display Topic Path
             displayTopicPath([
                 {"text": getText("000-83001", "ユーザー一覧"), "href": location_conf.href.users.list.replace(/{organization_id}/g, CommonAuth.getRealm()) },

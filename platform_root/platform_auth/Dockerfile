@@ -35,6 +35,7 @@ ENV AUDIT_LOG_ENABLED       True
 ENV AUDIT_LOG_PATH          exastro-audit.log
 ENV AUDIT_LOG_FILE_MAX_BYTE 100000000
 ENV AUDIT_LOG_BACKUP_COUNT  30
+ENV EXASTRO_HTTPS           false
 
 RUN --mount=type=secret,id=host_certificate_file,dst=/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem \
     dnf install -y \
@@ -47,6 +48,9 @@ RUN --mount=type=secret,id=host_certificate_file,dst=/etc/pki/ca-trust/extracted
     python39 \
     python39-devel \
     python39-mod_wsgi \
+    mod_ssl \
+# does not use mod_ssl's default ssl configuration file.
+&&  mv /etc/httpd/conf.d/ssl.conf /etc/httpd/conf.d/ssl.conf_bk \
 &&  pip3.9 install poetry==1.6.0 \
 &&  poetry config virtualenvs.create false \
 &&  groupadd $GROUPNAME \
@@ -107,6 +111,7 @@ WORKDIR $APP_PATH
 COPY ./platform_root/platform_auth/config/httpd.conf/httpd.conf /etc/httpd/conf/httpd.conf
 COPY ./platform_root/platform_auth/config/httpd.conf/reverse-proxy.conf /etc/httpd/conf.d/reverse-proxy.conf
 COPY ./platform_root/platform_auth/config/httpd.conf/wsgi.conf /etc/httpd/conf.d/wsgi.conf
+COPY ./platform_root/platform_auth/config/httpd.conf/exastro-ssl.conf /etc/httpd/conf.d/exastro-ssl.conf
 
 COPY ./platform_root/version $APP_PATH/
 COPY ./platform_root/platform_auth/ $APP_PATH/
@@ -129,6 +134,7 @@ WORKDIR $APP_PATH
 COPY ./platform_root/platform_auth/config/httpd.conf/httpd.conf /etc/httpd/conf/httpd.conf
 COPY ./platform_root/platform_auth/config/httpd.conf/reverse-proxy.conf /etc/httpd/conf.d/reverse-proxy.conf
 COPY ./platform_root/platform_auth/config/httpd.conf/wsgi.conf /etc/httpd/conf.d/wsgi.conf
+COPY ./platform_root/platform_auth/config/httpd.conf/exastro-ssl.conf /etc/httpd/conf.d/exastro-ssl.conf
 
 COPY ./platform_root/version $APP_PATH/
 COPY ./platform_root/platform_auth/ $APP_PATH/

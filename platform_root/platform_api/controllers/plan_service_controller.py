@@ -75,7 +75,7 @@ def plan_create(body):
 
     body = connexion.request.get_json()
     if not body:
-        message_id = "400-000002"
+        message_id = "400-00002"
         message = multi_lang.get_text(
             message_id,
             "リクエストボディのパラメータ({0})が不正です。",
@@ -290,7 +290,7 @@ def organization_plan_create(body, organization_id):
 
     body = connexion.request.get_json()
     if not body:
-        message_id = "400-000002"
+        message_id = "400-00002"
         message = multi_lang.get_text(
             message_id,
             "リクエストボディのパラメータ({0})が不正です。",

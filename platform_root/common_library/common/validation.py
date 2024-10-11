@@ -216,7 +216,7 @@ def validate_workspace_informations(workspace_informations):
     """
     if not isinstance(workspace_informations.get('environments', []), list):
         return result(
-            False, 400, '400-000002', 'リクエストボディのパラメータ({})が不正です。'.format('informations.environments'),
+            False, 400, '400-00002', 'リクエストボディのパラメータ({})が不正です。'.format('informations.environments'),
             'informations.environments'
         )
 
@@ -229,13 +229,13 @@ def validate_workspace_informations(workspace_informations):
 
     if len([t for t in workspace_informations.get('environments', []) if not isinstance(t.get('name', None), str)]) > 0:
         return result(
-            False, 400, '400-000002', 'リクエストボディのパラメータ({})が不正です。'.format('informations.environments'),
+            False, 400, '400-00002', 'リクエストボディのパラメータ({})が不正です。'.format('informations.environments'),
             'informations.environments'
         )
 
     if len([t for t in workspace_informations.get('environments', []) if len(t.get('name', '')) == 0]) > 0:
         return result(
-            False, 400, '400-000002', 'リクエストボディのパラメータ({})が不正です。'.format('informations.environments'),
+            False, 400, '400-00002', 'リクエストボディのパラメータ({})が不正です。'.format('informations.environments'),
             'informations.environments'
         )
 
@@ -256,7 +256,7 @@ def validate_workspace_informations(workspace_informations):
 
     if not isinstance(workspace_informations.get('description', ''), str):
         return result(
-            False, 400, '400-000002', 'リクエストボディのパラメータ({})が不正です。'.format('informations.description'),
+            False, 400, '400-00002', 'リクエストボディのパラメータ({})が不正です。'.format('informations.description'),
             'informations.description'
         )
 
@@ -416,7 +416,7 @@ def validate_role_mapping_users(role_users):
     usernames = ([x.get('preferred_username', '') for x in role_users if x.get('preferred_username')])
     if len(usernames) < 1:
         return result(
-            False, 400, '400-000002', 'リクエストボディのパラメータ({})が不正です。'.format('preferred_username'),
+            False, 400, '400-00002', 'リクエストボディのパラメータ({})が不正です。'.format('preferred_username'),
             multi_lang.get_text('000-0010X', "preferred_username"),
         )
 
@@ -506,7 +506,7 @@ def validate_plan_informations(plan_informations):
     """
     if not isinstance(plan_informations.get('description', ''), str):
         return result(
-            False, 400, '400-000002', 'リクエストボディのパラメータ({})が不正です。'.format('informations.description'),
+            False, 400, '400-00002', 'リクエストボディのパラメータ({})が不正です。'.format('informations.description'),
             'informations.description'
         )
 
@@ -538,15 +538,17 @@ def validate_plan_limits(plan_limits):
     no_int = [i for i, v in plan_limits.items() if not validate_int(v)]
     if len(no_int) > 0:
         return result(
-            False, 400, '400-{}012'.format(MSG_FUNCTION_ID), '指定された値が数値ではありません。',
+            False, 400, '400-{}034'.format(MSG_FUNCTION_ID), '指定された値が数値ではありません。({0})',
             multi_lang.get_text('000-00124', "リミット値"),
         )
 
-    range_out_mysql_int = [i for i, v in plan_limits.items() if int(v) > const.max_db_int_value or int(v) < const.min_db_int_value]
+    range_out_mysql_int = [i for i, v in plan_limits.items() if int(v) > const.max_db_bigint_value or int(v) < const.min_db_bigint_value]
     if len(range_out_mysql_int) > 0:
         return result(
-            False, 400, '400-{}012'.format(MSG_FUNCTION_ID), '指定可能な数値ではありません。',
+            False, 400, '400-{}035'.format(MSG_FUNCTION_ID), '指定された値が指定できる範囲を超えています。({0},最小値:{1},最大値:{2})',
             multi_lang.get_text('000-00124', "リミット値"),
+            const.min_db_bigint_value,
+            const.max_db_bigint_value,
         )
 
     return result(True)
@@ -737,6 +739,31 @@ def validate_user_lastName(user_lastName, lang=None):
             False, 400, '400-{}012'.format(MSG_FUNCTION_ID), '指定可能な文字数を超えています。(項目:{0},最大文字数:{1})',
             multi_lang.get_text('000-00131', "姓") if lang is None else multi_lang.get_text_spec(lang, '000-00131', "姓"),
             str(const.length_user_lastName)
+        )
+
+    return result(True)
+
+
+def validate_password(password, lang=None):
+    """Validate password temporary
+
+    Args:
+        password (str): password
+
+    Returns:
+        result: Validation result
+    """
+    if password is None or password == "":
+        return result(
+            False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
+            multi_lang.get_text('000-00132', "パスワード") if lang is None else multi_lang.get_text_spec(lang, '000-00132', "パスワード")
+        )
+
+    if len(password) > const.length_user_password:
+        return result(
+            False, 400, '400-{}012'.format(MSG_FUNCTION_ID), '指定可能な文字数を超えています。(項目:{0},最大文字数:{1})',
+            multi_lang.get_text('000-00132', "パスワード") if lang is None else multi_lang.get_text_spec(lang, '000-00132', "パスワード"),
+            str(const.length_user_password)
         )
 
     return result(True)
@@ -985,6 +1012,22 @@ def validate_plan_item_default(default, max):
         return result(
             False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
             multi_lang.get_text('000-00140', "プラン項目デフォルト値")
+        )
+
+    if default > const.max_db_bigint_value or default < const.min_db_bigint_value:
+        return result(
+            False, 400, '400-{}035'.format(MSG_FUNCTION_ID), '指定された値が指定できる範囲を超えています。({0},最小値:{1},最大値:{2})',
+            multi_lang.get_text('000-00140', "プラン項目デフォルト値"),
+            const.min_db_bigint_value,
+            const.max_db_bigint_value,
+        )
+
+    if max is not None and max > const.max_db_bigint_value or default < const.min_db_bigint_value:
+        return result(
+            False, 400, '400-{}035'.format(MSG_FUNCTION_ID), '指定された値が指定できる範囲を超えています。({0},最小値:{1},最大値:{2})',
+            multi_lang.get_text('000-00207', "プラン項目最大値"),
+            const.min_db_bigint_value,
+            const.max_db_bigint_value,
         )
 
     if max is not None and default > max:
@@ -1774,6 +1817,45 @@ def complex_validate_authentication_user_password(authentication_enable, authent
     if authentication_enable and (authentication_user_check_condition or authentication_password_check_condition):
         return result(
             False, 400, '400-{}032'.format(MSG_FUNCTION_ID), '認証を有効にする場合、認証ユーザーおよび認証パスワードは必須となります。'
+        )
+
+    return result(True)
+
+
+def validate_audit_log_conditions(conditions):
+    """Validate audit log conditions
+
+    Args:
+        conditions (dict): conditions
+
+    Returns:
+        result: Validation result
+    """
+    ts_from = conditions.get('ts_from')
+    ts_to = conditions.get('ts_to')
+
+    if ts_from is None:
+        return result(
+            False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
+            multi_lang.get_text('000-00205', "タイムスタンプ(From)")
+        )
+
+    if ts_to is None:
+        return result(
+            False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
+            multi_lang.get_text('000-00206', "タイムスタンプ(To)")
+        )
+
+    if not validate_datetime(ts_from):
+        return result(
+            False, 400, '400-{}020'.format(MSG_FUNCTION_ID), '日時形式以外が指定されています。({0})',
+            multi_lang.get_text('000-00205', "タイムスタンプ(From)")
+        )
+
+    if not validate_datetime(ts_to):
+        return result(
+            False, 400, '400-{}020'.format(MSG_FUNCTION_ID), '日時形式以外が指定されています。({0})',
+            multi_lang.get_text('000-00206', "タイムスタンプ(To)")
         )
 
     return result(True)

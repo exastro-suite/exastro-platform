@@ -145,6 +145,11 @@ class UserException(Exception):
     pass
 
 
+class FileFormatErrorException(Exception):
+    def __init__(self, message):
+        self.message = message
+
+
 def delete_dict_key(dictobj, key):
     """Dictionary Key delete
 
@@ -315,11 +320,11 @@ def platform_exception_handler(func):
         except (BadRequestException, AuthException, NotAllowedException, NotFoundException, MaintenanceException, OtherException) as err:
             globals.logger.info(f'exception handler:\n status_code:[{err.status_code}]\n message_id:[{err.message_id}]')
             globals.logger.info(''.join(list(traceback.TracebackException.from_exception(err).format())))
-            return response_status(err.status_code, err.data, err.message_id, err.message)
+            return response_status_direct(err.status_code, err.data, err.message_id, err.message)
         except InternalErrorException as err:
             globals.logger.error(f'exception handler:\n status_code:[{err.status_code}]\n message_id:[{err.message_id}]')
             globals.logger.error(''.join(list(traceback.TracebackException.from_exception(err).format())))
-            return response_status(err.status_code, err.data, err.message_id, err.message)
+            return response_status_direct(err.status_code, err.data, err.message_id, err.message)
         except CallException as err:
             globals.logger.error(f'exception handler:\n status_code:[{err.status_code}]\n message_id:[{err.message_id}]')
             globals.logger.error(''.join(list(traceback.TracebackException.from_exception(err).format())))
@@ -436,7 +441,7 @@ def str_to_datetime(p_datetime_str):
         return None
 
     aware_datetime = datetime.fromisoformat(p_datetime_str.replace('Z', '+00:00'))
-    return aware_datetime.astimezone(os.environ.get('TZ', 'UTC')).replace(tzinfo=None)
+    return aware_datetime.astimezone(pytz.timezone(os.environ.get('TZ', 'UTC'))).replace(tzinfo=None)
 
 
 def keycloak_timestamp_to_datetime(keycloak_timestamp):

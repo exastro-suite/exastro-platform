@@ -179,6 +179,15 @@ def test_user_validation(connexion_client):
     validate = validation.validate_user_lastName("t".ljust(const.length_user_lastName + 1, "_"))
     assert not validate.ok
 
+    validate = validation.validate_password(None)
+    assert not validate.ok
+
+    validate = validation.validate_password("t".ljust(const.length_user_password, "_"))
+    assert validate.ok
+
+    validate = validation.validate_password("t".ljust(const.length_user_password + 1, "_"))
+    assert not validate.ok
+
     validate = validation.validate_password_temporary(True)
     assert validate.ok
 
@@ -556,7 +565,7 @@ def test_user_update(connexion_client):
             data="dummy-data")
 
         # connexionでhttp-415応答
-        assert response.status_code >= 400 or response.status_code <= 499
+        assert response.status_code >= 400 or response.status_code <= 490
 
     with test_common.requsts_mocker_default() as requests_mocker:
         # Validation Error Route

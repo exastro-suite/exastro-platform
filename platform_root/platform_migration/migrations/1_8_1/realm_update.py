@@ -52,9 +52,6 @@ class realm_update:
 
     realm_management_clientid = "realm-management"
 
-    token_user = os.environ.get("KEYCLOAK_USER")
-    token_pass = os.environ.get("KEYCLOAK_PASSWORD")
-
     failed_count = 0
     complete = 0
     skip_count = 0
@@ -105,7 +102,8 @@ class realm_update:
 
             # アクセストークンを取得
             # Get an access token
-            access_token = self.__access_token_get(self.realm, self.token_user, self.token_pass)
+            private = DBconnector().get_platform_private()
+            access_token = self.__access_token_get(self.realm, private.token_check_client_clientid, private.token_check_client_secret)
             self.step_count += 1
 
             # master realm 更新 (loginTheme, supportedLocales, defaultLocale)
@@ -220,13 +218,13 @@ class realm_update:
 
         return result
 
-    def __access_token_get(self, realm, user_name, password):
+    def __access_token_get(self, realm, token_check_client_clientid, token_check_client_secret):
         """アクセストークン取得 Get access token
 
         Args:
             realm (str): realm
-            user_name (str): user_name
-            password (str): password
+            token_check_client_clientid (str): token_check_client_clientid
+            token_check_client_secret (str): token_check_client_secret
 
         Returns:
             str: access_token
@@ -237,7 +235,7 @@ class realm_update:
             globals.logger.info(f"[{self.step_count}/{self.step_max}] - get token:")
             # アクセストークン取得
             # get access token
-            access_token_response = api_keycloak_tokens.get_user_token(user_name, password, realm)
+            access_token_response = api_keycloak_tokens.service_account_get_token(realm, token_check_client_clientid, token_check_client_secret)
 
             if access_token_response.status_code not in [200]:
                 globals.logger.info(f"[{self.step_count}/{self.step_max}] -- NG: get token:")
@@ -305,7 +303,7 @@ class realm_update:
         if response.status_code != 200:
             globals.logger.error(f"response.status_code:{response.status_code}")
             globals.logger.error(f"response.text:{response.text}")
-            message_id = f"500-{MSG_FUNCTION_ID}004"
+            message_id = f"500-{MSG_FUNCTION_ID}001"
             message = multi_lang.get_text(
                 message_id,
                 "clientの取得に失敗しました(対象ID:{0} client:{1})",
@@ -324,7 +322,7 @@ class realm_update:
         if response.status_code != 200:
             globals.logger.error(f"response.status_code:{response.status_code}")
             globals.logger.error(f"response.text:{response.text}")
-            message_id = f"500-{MSG_FUNCTION_ID}004"
+            message_id = f"500-{MSG_FUNCTION_ID}001"
             message = multi_lang.get_text(
                 message_id,
                 "clientの取得に失敗しました(対象ID:{0} client:{1})",
@@ -349,7 +347,7 @@ class realm_update:
             if response.status_code != 200:
                 globals.logger.error(f"response.status_code:{response.status_code}")
                 globals.logger.error(f"response.text:{response.text}")
-                message_id = f"500-{MSG_FUNCTION_ID}011"
+                message_id = f"500-{MSG_FUNCTION_ID}002"
                 message = multi_lang.get_text(
                     message_id,
                     "client roleの取得に失敗しました(対象ID:{0} client:{1})",
@@ -366,7 +364,7 @@ class realm_update:
         if response.status_code not in [200, 204]:
             globals.logger.error(f"response.status_code:{response.status_code}")
             globals.logger.error(f"response.text:{response.text}")
-            message_id = f"500-{MSG_FUNCTION_ID}007"
+            message_id = f"500-{MSG_FUNCTION_ID}010"
             message = multi_lang.get_text(
                 message_id,
                 "client roleのrole設定に失敗しました(対象ID:{0} client:{1})",

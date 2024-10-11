@@ -146,3 +146,21 @@ settingsMailserverList:
   $ref: "./settings.mailserverList.yaml"
 settingsMailserverGet:
   $ref: "./settings.mailserver.yaml"
+AuditLogDownload:
+  $ref: "./auditLogDownload.yaml"
+AuditLogDownloadList:
+  $ref: "./auditLogDownloadList.yaml"
+authorizationBody:
+  $ref: "./authorization.body.yaml"
+jobsUserBulkImport:
+  $ref: "./jobs.user.bulk.import.yaml"
+jobsUserBulkStatusList:
+  $ref: "./jobs.user.bulk.status.list.yaml"
+jobsUserBulkStatus:
+  $ref: "./jobs.user.bulk.status.yaml"
+jobsUserExport:
+  $ref: "./jobs.user.export.yaml"
+jobsUserExportStatusList:
+  $ref: "./jobs.user.export.status.list.yaml"
+jobsUserExportStatus:
+  $ref: "./jobs.user.export.status.yaml"

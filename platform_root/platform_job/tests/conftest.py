@@ -25,12 +25,14 @@ import multiprocessing
 from contextlib import closing
 import signal
 import inspect
+import base64
 
 from importlib import import_module
 
 from tests.common import test_common
 import globals
 from common_library.common.db import DBconnector
+from common_library.common import encrypt
 from common_library.common import api_keycloak_tokens, api_keycloak_realms, multi_lang
 from common_resources.en import language
 
@@ -38,6 +40,10 @@ import job_manager
 
 @pytest.fixture(scope="session", autouse=True)
 def tempfile_remove():
+    for p in glob.glob(f'{os.environ.get("TEMPORARY_DIR")}/exastro*'):
+        if os.path.isfile(p):
+            os.remove(p)
+
     for p in glob.glob(f'{os.environ.get("TEST_OUTPUT_PATH")}/*.xlsx'):
         if os.path.isfile(p):
             os.remove(p)
@@ -102,6 +108,18 @@ def is_responsive(url):
             return True
     except Exception:
         return False
+
+
+@pytest.fixture(autouse=True)
+def encrypt_key(mocker):
+    """unit test用のencrypt key設定
+        Encrypt key settings for unit test
+
+    Args:
+        mocker (_type_): _description_
+    """
+    testdata = import_module("tests.db.exports.testdata")
+    mocker.patch.object(encrypt, 'ENCRYPT_KEY', new=base64.b64decode(testdata.ENCRYPT_KEY))
 
 
 @pytest.fixture(scope='function', autouse=True)
@@ -220,18 +238,6 @@ def multi_lang_get_text_spec(mocker):
         return multi_lang_get_text(lang, text_id, origin_text, *args)
 
     mocker.patch.object(multi_lang, 'get_text_spec', side_effect=mocked_function)
-
-
-@pytest.fixture(autouse=True)
-def encrypt_key(mocker):
-    """unit test用のencrypt key設定
-        Encrypt key settings for unit test
-
-    Args:
-        mocker (_type_): _description_
-    """
-    testdata = import_module("tests.db.exports.testdata")
-    mocker.patch.dict(os.environ, {"ENCRYPT_KEY": testdata.ENCRYPT_KEY})
 
 
 @pytest.fixture(autouse=True)

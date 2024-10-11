@@ -26,7 +26,7 @@
 ##################################################
 */
 const fn = ( function() {
-    
+
     'use strict';
 
     // windowオブジェクトがあるかどうか
@@ -39,14 +39,14 @@ const fn = ( function() {
         }
     };
     const windowFlag = windowCheck();
-    
+
     const organization_id = ( windowFlag )? CommonAuth.getRealm(): null,
           workspace_id =  ( windowFlag )? window.location.pathname.split('/')[3]: null;
-    
+
     const typeofValue = function( value ) {
         return Object.prototype.toString.call( value ).slice( 8, -1 ).toLowerCase();
     };
-    
+
     const classNameCheck = function( className, type ) {
         if ( fn.typeof( className ) === 'array') {
             className.push( type );
@@ -55,10 +55,10 @@ const fn = ( function() {
         }
         return className;
     };
-    
+
     const bindAttrs = function( attrs ) {
         const attr = [];
-        
+
         for ( const key in attrs ) {
             const attrName = ['checked', 'disabled', 'title', 'placeholder', 'style']; // dataをつけない
             if ( attrName.indexOf( key ) !== -1) {
@@ -69,19 +69,19 @@ const fn = ( function() {
         }
         return attr;
     };
-    
+
     const inputCommon = function( value, name, attrs ) {
         const attr = bindAttrs( attrs );
-        
+
         if ( value !== undefined && value !== null ) {
             attr.push(`value="${value}"`);
         }
-        
+
         if ( name ) {
             attr.push(`id="${name}"`);
             attr.push(`name="${name}"`);
         }
-        
+
         return attr;
     };
 
@@ -96,10 +96,10 @@ loadAssets: function( assets ){
     const f = function( type, url ){
         return new Promise(function( resolve, reject ){
             type = ( type === 'css')? 'link': 'script';
-            
+
             const body = document.body,
                   asset = document.createElement( type );
-            
+
             switch ( type ) {
                 case 'script':
                     asset.src = url;
@@ -108,14 +108,14 @@ loadAssets: function( assets ){
                     asset.href = url;
                     asset.rel = 'stylesheet';
                 break;
-            }            
-            
+            }
+
             body.appendChild( asset );
-            
+
             asset.onload = function() {
                 resolve();
             };
-            
+
             asset.onerror = function( e ) {
                 reject( e )
             };
@@ -151,18 +151,18 @@ getRestApiUrl: function( url, orgId = organization_id, wsId = workspace_id ) {
 ##################################################
 */
 fetch: function( url, token, method = 'GET', json ) {
-    
+
     if ( !token ) {
         token = CommonAuth.getToken();
     }
-    
+
     let errorCount = 0;
-    
+
     const f = function( u ){
         return new Promise(function( resolve, reject ){
-            
+
             if ( windowFlag ) u = cmn.getRestApiUrl( u );
-            
+
             const init = {
                 method: method,
                 headers: {
@@ -191,11 +191,11 @@ fetch: function( url, token, method = 'GET', json ) {
                         errorCount++;
                         if( response.status === 499 ) {
                             //バリデーションエラーは呼び出し元に返す
-                             response.json().then(function( result ){ console.log( result );
+                            response.json().then(function( result ){ console.log( result );
                                 reject( result );
                             }).catch(function( e ) {
                                 cmn.systemErrorAlert();
-                            }); 
+                            });
                         } else if ( response.status === 401 ){
                             //権限無しの場合、トップページに戻す
                             response.json().then(function( result ){ console.log( result );
@@ -244,13 +244,13 @@ editFlag: function( menuInfo ) {
     flag.filter = ( menuInfo.initial_filter_flg === '1')? true: false;
     flag.autoFilter = ( menuInfo.auto_filter_flg === '1')? true: false;
     flag.history = ( menuInfo.history_table_flag === '1')? true: false;
-    
+
     flag.insert = ( menuInfo.row_insert_flag === '1')? true: false;
     flag.update = ( menuInfo.row_update_flag === '1')? true: false;
     flag.disuse = ( menuInfo.row_disuse_flag === '1')? true: false;
     flag.reuse = ( menuInfo.row_reuse_flag === '1')? true: false;
     flag.edit = ( menuInfo.row_insert_flag === '1' && menuInfo.row_update_flag === '1')? true: false;
-    
+
     return flag;
 },
 /*
@@ -378,7 +378,7 @@ deselection: function() {
 date: function( date, format ) {
     if ( date ) {
         const d = new Date(date);
-        
+
         format = format.replace(/yyyy/g, d.getFullYear());
         format = format.replace(/MM/g, ('0' + (d.getMonth() + 1)).slice(-2));
         format = format.replace(/dd/g, ('0' + d.getDate()).slice(-2));
@@ -431,56 +431,56 @@ clipboard: {
 ##################################################
 */
 download: function( type, data, fileName = 'noname') {
-    
+
     let url;
-    
+
     // URL形式に変換
     try {
         switch ( type ) {
-        
+
             // エクセル
             case 'excel': {
                 // BASE64 > Binary > Unicode変換
                 const binary = window.atob( data ),
                       decode = new Uint8Array( Array.prototype.map.call( binary, function( c ){ return c.charCodeAt(); }));
-                
+
                 const blob = new Blob([ decode ], {
                     type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
                 });
                 fileName += '.xlsx';
                 url = URL.createObjectURL( blob );
             } break;
-            
+
             // テキスト
             case 'text': {
                 const blob = new Blob([ data ], {'type': 'text/plain'});
                 fileName += '.txt';
                 url = URL.createObjectURL( blob );
             } break;
-            
+
             // JSON
             case 'json': {
                 const blob = new Blob([ JSON.stringify( data, null, '\t') ], {'type': 'application/json'});
                 fileName += '.json';
                 url = URL.createObjectURL( blob );
             } break;
-            
+
             // BASE64
             case 'base64': {
                 url = 'data:;base64,' + data;
             } break;
-                
+
         }
     } catch ( e ) {
         window.console.error( e );
     }
-    
+
     const a = document.createElement('a');
 
     a.href = url;
     a.download = fileName;
     a.click();
-    
+
     if ( type !== 'base64') URL.revokeObjectURL( url );
 
 },
@@ -493,26 +493,35 @@ fileSelect: function( type = 'base64', limitFileSize, accept ){
     return new Promise( function( resolve, reject ) {
         const file = document.createElement('input');
         let cancelFlag = true;
-        
-        file.type = 'file'; 
+
+        file.type = 'file';
         if ( accept !== undefined ) file.accept = accept;
-        
+
         file.addEventListener('change', function(){
             const file = this.files[0],
                   reader = new FileReader();
-            
+
             cancelFlag = false;
 
-            if ( limitFileSize && file.size >= limitFileSize ) {
+            if ( limitFileSize && file.size > limitFileSize ) {
                 reject('File size limit over.');
+                return false;
             }
-            
+
             if ( type === 'base64') {
                 reader.readAsDataURL( file );
 
                 reader.onload = function(){
+                    let resultText = reader.result;
+                    if ( resultText !== '' ) {
+                        if ( resultText === 'data:') {
+                            resultText = '';
+                        } else {
+                            resultText = resultText.split(';base64,')[1];
+                        }
+                    }
                     resolve({
-                        base64: reader.result.replace(/^data:.*\/.*;base64,/, ''),
+                        base64: resultText,
                         name: file.name,
                         size: file.size
                     });
@@ -522,12 +531,10 @@ fileSelect: function( type = 'base64', limitFileSize, accept ){
                     reject( reader.error );
                 };
             } else if ( type === 'file') {
-                const formData = new FormData();
-                formData.append('file', file );
-                resolve( formData );
+                resolve( file );
             } else if ( type === 'json') {
                 reader.readAsText( file );
-                
+
                 reader.onload = function(){
                     try {
                         const json = JSON.parse( reader.result );
@@ -537,18 +544,18 @@ fileSelect: function( type = 'base64', limitFileSize, accept ){
                             size: file.size
                         });
                     } catch( e ) {
-                        reject('JSONの形式が正しくありません。');
-                    }                    
+                        reject('The JSON format is incorrect.');
+                    }
                 };
 
                 reader.onerror = function(){
                     reject( reader.error );
-                };                
+                };
             }
         });
 
         file.click();
-        
+
         // bodyフォーカスでダイアログを閉じたか判定
         document.body.onfocus = function(){
             setTimeout( function(){
@@ -602,7 +609,7 @@ storage: {
             e.name === 'NS_ERROR_DOM_QUOTA_REACHED') &&
             // acknowledge QuotaExceededError only if there's something already stored
             storage.length !== 0;
-        }    
+        }
     },
     'set': function( key, value, type ) {
         if ( type === undefined ) type = 'local';
@@ -659,7 +666,7 @@ storage: {
 alert: function( title, elements, type = 'alert', buttons = { ok: { text: '閉じる', action: 'normal'}} ) {
     return new Promise(function( resolve ){
         const funcs = {};
-        
+
         funcs.ok = function(){
             dialog.close();
             resolve( true );
@@ -1241,7 +1248,7 @@ faderEvent: function( $item ) {
             },
             'mousemove.faderKnob': function( mme ){
               const moveX = mme.pageX - mde.pageX;
-              ratio = ( positionX + moveX ) / width;                  
+              ratio = ( positionX + moveX ) / width;
               ratioVal();
             }
           });
@@ -1304,9 +1311,9 @@ html: {
         const attr = inputCommon( null, null, attrs );
         className = classNameCheck( className, 'button');
         if ( toggle !== undefined ) className.push('toggleButton');
-        
+
         attr.push(`class="${className.join(' ')}"`);
-        
+
         if ( toggle !== undefined ) {
             attr.push(`data-toggle="${toggle.init}"`);
             const toggleSwitch = `<span class="toggleButtonSwitch">`
@@ -1314,31 +1321,31 @@ html: {
                 + `<span class="toggleButtonSwitchOff">${toggle.off}</span>`
             + `</span>`;
             return `<button ${attr.join(' ')}><span class="inner">${element}${toggleSwitch}</span></button>`;
-        } else { 
+        } else {
             return `<button ${attr.join(' ')}><span class="inner">${element}</span></button>`;
         }
     },
     inputHidden: function( className, value, name, attrs = {}) {
         const attr = inputCommon( value, name, attrs );
         attr.push(`class="${classNameCheck( className, 'inputHidden input').join(' ')}"`);
-        
+
         return `<input type="hidden" ${attr.join(' ')}>`;
     },
     span: function( className, value, name, attrs = {}) {
         const attr = inputCommon( null, name, attrs );
         attr.push(`class="${classNameCheck( className, 'inputSpan').join(' ')}"`);
-        
+
         return `<span ${attr.join(' ')}>${value}</span>`;
     },
     inputText: function( className, value, name, attrs = {}, option = {} ) {
         const attr = inputCommon( value, name, attrs );
-        
+
         className = classNameCheck( className, 'inputText input');
         if ( option.widthAdjustment ) className.push('inputTextWidthAdjustment')
         attr.push(`class="${className.join(' ')}"` );
-        
+
         let input = `<input type="text" ${attr.join(' ')}>`;
-        
+
         if ( option.widthAdjustment ) {
             input = ``
             + `<div class="inputTextWidthAdjustmentWrap">`
@@ -1346,11 +1353,11 @@ html: {
                 + `<div class="inputTextWidthAdjustmentText">${value}</div>`
             + `</div>`
         }
-        
+
         if ( option.before || option.after ) {
           const before = ( option.before )? `<div class="inputTextBefore">${option.before}</div>`: '',
                 after =  ( option.after )? `<div class="inputTextAfter">${option.after}</div>`: '';
-        
+
           input = `<div class="inputTextWrap">${before}<div class="inputTextBody">${input}</div>${after}</div>`;
         }
         return  input;
@@ -1358,7 +1365,7 @@ html: {
     inputPassword: function( className, value, name, attrs = {}) {
         const attr = inputCommon( value, name, attrs );
         attr.push(`class="${classNameCheck( className, 'inputPassword input').join(' ')}"`);
-        
+
         return `<div class="inputPasswordWrap">`
             + `<div class="inputPasswordBody"><input type="password" ${attr.join(' ')}></div>`
             + `<div class="inputPasswordToggle"><button type="button" class="button inputPasswordToggleButton"></button></div>`
@@ -1367,7 +1374,7 @@ html: {
     inputNumber: function( className, value, name, attrs = {}) {
         const attr = inputCommon( value, name, attrs );
         attr.push(`class="${classNameCheck( className, 'inputNumber input').join(' ')}"`);
-        
+
         return `<input type="number" ${attr.join(' ')}>`;
     },
     inputFader: function( className, value, name, attrs = {}, option = {}) {
@@ -1376,20 +1383,20 @@ html: {
         className = classNameCheck( className, 'inputFader inputNumber input');
         if ( option.before ) bodyClass += ' inputFaderBeforeWrap';
         if ( option.after ) bodyClass += ' inputFaderAfterWrap';
-        
+
         attr.push(`class="${className.join(' ')}"`);
-        
+
         let input = `<div class="${bodyClass}">`
             + `<input type="number" ${attr.join(' ')}>`
         + `</div>`;
-        
+
         if ( option.before || option.after ) {
           const before = ( option.before )? `<div class="inputFaderBefore">${option.before}</div>`: '',
                 after =  ( option.after )? `<div class="inputFaderAfter">${option.after}</div>`: '';
-        
+
           input = `${before}${input}${after}`;
         }
-        
+
         return `<div class="inputFaderWrap">`
             + input
             + `<div class="inputFaderRange">`
@@ -1397,15 +1404,15 @@ html: {
                 + `<div class="inputFaderRangeLower"></div>`
                 + `<div class="inputFaderRangeTooltip"></div>`
             + `</div>`
-        + `</div>`;    
+        + `</div>`;
     },
     textarea: function( className, value, name, attrs = {}, widthAdjustmentFlag ) {
         const attr = inputCommon( null, name, attrs );
-        
+
         className = classNameCheck( className, 'textarea input');
         if ( widthAdjustmentFlag ) className.push('textareaAdjustment')
         attr.push(`class="${className.join(' ')}"` );
-        
+
         if ( widthAdjustmentFlag ) {
             return ``
             + `<div class="textareaAdjustmentWrap">`
@@ -1420,7 +1427,7 @@ html: {
     check: function( className, value, name, attrs = {}) {
         const attr = inputCommon( value, name, attrs );
         attr.push(`class="${classNameCheck( className, 'checkbox').join(' ')}"`);
-        
+
         return ``
         + `<div class="checkboxWrap">`
             + `<input type="checkbox" ${attr.join(' ')}>`
@@ -1430,7 +1437,7 @@ html: {
     checkboxText: function( className, value, name, attrs = {}) {
         const attr = inputCommon( value, name, attrs );
         attr.push(`class="${classNameCheck( className, 'checkboxText').join(' ')}"`);
-        
+
         return ``
         + `<div class="checkboxTextWrap">`
             + `<input type="checkbox" ${attr.join(' ')}>`
@@ -1441,19 +1448,19 @@ html: {
         const option = [],
               attr = inputCommon( null, name, attrs );
         attr.push(`class="${classNameCheck( className, 'select input').join(' ')}"`);
-        
+
         // 必須じゃない場合空白を追加
         if ( attrs.required === '0') {
             option.push(`<option value=""></option>`);
         }
-        
+
         for ( const key in list ) {
             const val = cmn.escape( list[ key ] ),
                   optAttr = [`value="${val}"`];
             if ( value === val ) optAttr.push('selected', 'selected');
             option.push(`<option ${optAttr.join(' ')}>${val}</option>`);
         }
-        
+
         return ``
         + `<select ${attr.join(' ')}>`
             + option.join('')
@@ -1475,7 +1482,7 @@ html: {
     },
     table: function( tableData, className, thNumber ) {
         className = classNameCheck( className, 'table');
- 
+
         const table = [];
         for ( const type in tableData ) {
             table.push(`<${type}>`);
@@ -1501,15 +1508,15 @@ html: {
             table.push( row.join('') );
             table.push(`</${type}>`);
         }
-        
+
         return `<table class="${className.join(' ')}">${table.join('')}</table>`;
     },
     dateInput: function( timeFlag, className, value, name, attrs = {} ) {
         className = classNameCheck( className, 'inputDate');
-        
+
         const placeholder = ( timeFlag )? 'yyyy-MM-dd HH:mm:ss': 'yyyy-MM-dd';
         attrs.placeholder = placeholder;
-                
+
         return `<div class="inputDateContainer">`
             + `<div class="inputDateBody">`
                 + fn.html.inputText( className, value, name, attrs )
@@ -1534,10 +1541,10 @@ processingModal: function( title ) {
         },
         width: '320px'
     };
-    
+
     const dialog = new Dialog( config );
     dialog.open(`<div class="processingContainer"></div>`);
-    
+
     return dialog;
 },
 /*
@@ -1564,15 +1571,15 @@ resultModal: function( result ) {
             }
         };
         const html = []
-    
+
         const listOrder = ['Register', 'Update', 'Discard', 'Restore'];
         for ( const key of listOrder ) {
               html.push(`<dl class="resultList resultType${key}">`
                   + `<dt class="resultType">${key}</dt>`
                   + `<dd class="resultNumber">${result[key]}</dd>`
               + `</dl>`);
-        }    
-        
+        }
+
         const dialog = new Dialog( config, funcs );
         dialog.open(`<div class="resultContainer">${html.join('')}</div>`);
     });
@@ -1621,7 +1628,7 @@ errorModal: function( error, pageName ) {
                 </tbody>
             </table>
         </div>`;
-        
+
         const funcs = {};
         funcs.ok = function() {
             dialog.close();
@@ -1644,11 +1651,11 @@ errorModal: function( error, pageName ) {
               }
             }
         };
-        
+
         const dialog = new Dialog( config, funcs );
         dialog.open(`<div class="errorContainer">${html}</div>`);
     });
-    
+
 },
 /*
 ##################################################
@@ -1658,14 +1665,14 @@ errorModal: function( error, pageName ) {
 setCommonEvents: function() {
     const $window = $( window ),
           $body = $('body');
-    
+
     // input text, textarea の幅を入力に合わせる
     $body.on('input.textWidthAdjustment', '.inputTextWidthAdjustment', function(){
         const $text = $( this ),
               value = $text.val();
         $text.next('.inputTextWidthAdjustmentText').text( value );
     });
-    
+
     // 切替ボタン
     $body.on('click', '.toggleButton', function(){
         const $button = $( this ),
@@ -1674,7 +1681,7 @@ setCommonEvents: function() {
             $button.attr('data-toggle', flag );
         }
     });
-    
+
     // titel の内容をポップアップ
     $body.on('pointerenter.popup', '.popup', function(){
         const $t = $( this ),
@@ -1686,7 +1693,7 @@ setCommonEvents: function() {
                 'class': 'popupBlock',
                 'html': fn.escape( ttl, true )
             }).append('<div class="popupArrow"><span></span></div>');
-            
+
             const $arrow = $p.find('.popupArrow');
 
             $body.append( $p );
@@ -1720,7 +1727,7 @@ setCommonEvents: function() {
                 'left': l,
                 'top': t
             });
-            
+
             // 矢印の位置
             let aL = 0;
             if ( tL - wsL + tW > wW ) {
@@ -1730,7 +1737,7 @@ setCommonEvents: function() {
                 } else {
                     aL = pW - ( twW / 2 );
                     if ( pW - aL < 20 ) aL = pW - 20;
-                }    
+                }
             } else if ( tL < wsL ) {
                 const twW = tL + tW - wsL;
                 if ( twW > pW ) {
@@ -1773,7 +1780,7 @@ setCommonEvents: function() {
                     }
                 } else {
                     $p.remove();
-                }              
+                }
             };
             targetCheck();
         }

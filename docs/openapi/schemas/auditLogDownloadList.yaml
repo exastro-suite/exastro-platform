@@ -1,0 +1,58 @@
+#   Copyright 2024 NEC Corporation
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+
+type: object
+properties:
+  data:
+    type: array
+    items:
+      type: object
+      properties:
+        download_id:
+          type: string
+          example: "XXXXXXXXXXXXXXXXXXXXXXXXXX"
+        status:
+          type: string
+          enum: [
+            NotExecuted,
+            Executing,
+            Completion,
+            Failed,
+            NoData
+          ]
+        conditions:
+          type: object
+          properties:
+            ts_from:
+              type: string
+              example: "2024-06-01 00:00:00"
+            ts_to:
+              type: string
+              example: "2024-06-30 23:59:59"
+        count_export:
+          type: number
+        message:
+          type: string
+        create_timestamp:
+          type: string
+          format: date-time
+        create_user_id:
+          type: string
+          format: uuid
+        create_user_name:
+          type: string
+          example: firstname lastname
+        last_update_timestamp:
+          type: string
+          format: date-time

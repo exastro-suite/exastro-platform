@@ -28,7 +28,7 @@ post:
     content:
       application/json:
         schema:
-          $ref: '../schemas/jobsUserExport.yaml'
+          $ref: '../schemas/jobs.user.export.yaml'
     required: true
   responses:
     200:
@@ -42,7 +42,7 @@ post:
                 properties:
                   data:
                     type: object
-                    example: null
+                    example: {"job_id": "XXXXXXXXXXXXXXXXXXXXXXXXXX"}
     default:
       description: An unexpected error response.
       content:

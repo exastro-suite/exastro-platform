@@ -58,10 +58,35 @@ var api_conf = {
         "users": {
             "get": "/api/{organization_id}/platform/users",
             "post": "/api/{organization_id}/platform/users",
-            "get": "/api/{organization_id}/platform/users",
             "getId": "/api/{organization_id}/platform/users/{user_id}",
             "put": "/api/{organization_id}/platform/users/{user_id}",
             "delete": "/api/{organization_id}/platform/users/{user_id}",
+        },
+        "jobs_users": {
+            "bulk_format": {
+                "post": "/api/{organization_id}/platform/jobs/users/bulk/format",
+            },
+            "bulk_import": {
+                "post": "/api/{organization_id}/platform/jobs/users/bulk/import",
+            },
+            "bulk_delete": {
+                "post": "/api/{organization_id}/platform/jobs/users/bulk/delete",
+            },
+            "bulk_status": {
+                "get": "/api/{organization_id}/platform/jobs/users/bulk/status",
+                "detail": {
+                    "get": "/api/{organization_id}/platform/jobs/users/bulk/status/{job_id}",
+                    "post": "/api/{organization_id}/platform/jobs/users/bulk/status/{job_id}/download",
+                },
+            },
+            "export": {
+                "post": "/api/{organization_id}/platform/jobs/users/export",
+                "get": "/api/{organization_id}/platform/jobs/users/export/status",
+                "detail": {
+                    "get": "/api/{organization_id}/platform/jobs/users/export/status/{job_id}",
+                    "post": "/api/{organization_id}/platform/jobs/users/export/status/{job_id}/download",
+                },
+            },
         },
         "token": {
             "post": "/auth/realms/{realm_name}/protocol/openid-connect/token",
@@ -102,6 +127,9 @@ var api_conf = {
             "get": "/api/{organization_id}/platform/maintenance-mode-setting",
         },
         "settings": {
+            "common": {
+                "get": "/api/{organization_id}/platform/settings/common/{config_key}"
+            },
             "mailserver": {
                 "get": "/api/{organization_id}/platform/settings/mailserver",
                 "post": "/api/{organization_id}/platform/settings/mailserver",
@@ -121,7 +149,14 @@ var api_conf = {
                 }
             }
         },
-}
+        "auditlog": {
+            "download": {
+                "get": "/api/{organization_id}/platform/auditlog/download",
+                "post": "/api/{organization_id}/platform/auditlog/download",
+                "postId": "/api/{organization_id}/platform/auditlog/download/{download_id}",
+            }
+        }
+    }
 }
 
 var location_conf = {
@@ -153,6 +188,7 @@ var location_conf = {
             "list": "/{organization_id}/platform/users",
             "detail": "/{organization_id}/platform/users/{user_id}",
             "edit": "/{organization_id}/platform/users/{user_id}/edit",
+            "bulk_actions": "/{organization_id}/platform/users/_bulk_actions",
         },
         "menu": {
             "platform_admin_site": {
@@ -196,5 +232,8 @@ var location_conf = {
         "settings": {
             "mailserver": "/{organization_id}/platform/settings/mailserver",
         },
+        "auditlog": {
+            "download": "/{organization_id}/platform/auditlog"
+        }
     }
 }

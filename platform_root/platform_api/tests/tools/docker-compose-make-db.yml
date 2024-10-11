@@ -1,0 +1,163 @@
+#   Copyright 2025 NEC Corporation
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+services:
+  makedb-platform-db:
+    image: mariadb:10.4.8
+    healthcheck:
+      test: mysql -u keycloak -ppassword -e 'select 1;'
+      interval: 3s
+      retries: 200
+    volumes:
+      - ${PLATFORM_REPO_ROOT}/platform_root/platform_db/conf/my.cnf:/etc/mysql/conf.d/my.cnf
+    environment:
+      - TZ=Asia/Tokyo
+      - MYSQL_ROOT_PASSWORD=password
+    networks:
+      - exastro
+    ports:
+      - "0.0.0.0:3310:3306"
+
+  makedb-keycloak:
+    build:
+      dockerfile: ./platform_root/keycloak/Dockerfile
+      context: ../../../../.
+      args:
+        - HTTP_PROXY=${HTTP_PROXY}
+        - http_proxy=${HTTP_PROXY}
+        - HTTPS_PROXY=${HTTPS_PROXY}
+        - https_proxy=${HTTPS_PROXY}
+    environment:
+      - TZ=Asia/Tokyo
+      - HTTP_PROXY=${HTTP_PROXY}
+      - http_proxy=${HTTP_PROXY}
+      - HTTPS_PROXY=${HTTPS_PROXY}
+      - https_proxy=${HTTPS_PROXY}
+      - NO_PROXY=127.0.0.1,localhost,${NO_PROXY}
+      - no_proxy=127.0.0.1,localhost,${NO_PROXY}
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=password
+      - KC_DB=mariadb
+      - KC_DB_URL_HOST=makedb-platform-db
+      - KC_DB_URL_DATABASE=keycloak
+      - KC_DB_USERNAME=keycloak
+      - KC_DB_PASSWORD=password
+      - JAVA_OPTS_APPEND=-Xms256m -Xmx256m
+    networks:
+      - exastro
+    command:
+      - start
+    depends_on:
+      makedb-platform-migration-1:
+        condition: service_completed_successfully
+
+  makedb-platform-migration-1:
+    build:
+      dockerfile: ./platform_root/platform_migration/Dockerfile
+      context: ../../../../.
+      args:
+        - HTTP_PROXY=${HTTP_PROXY}
+        - http_proxy=${HTTP_PROXY}
+        - HTTPS_PROXY=${HTTPS_PROXY}
+        - https_proxy=${HTTPS_PROXY}
+    command: python3 /app/initialize_db_main.py
+    environment:
+      - TZ=Asia/Tokyo
+      - PYTHONIOENCODING=utf-8
+      - DB_HOST=makedb-platform-db
+      - DB_DATABASE=platform
+      - DB_USER=app_user
+      - DB_PASSWORD=password
+      - DB_ADMIN_USER=root
+      - DB_ADMIN_PASSWORD=password
+      - KEYCLOAK_DB_DATABASE=keycloak
+      - KEYCLOAK_DB_USER=keycloak
+      - KEYCLOAK_DB_PASSWORD=password
+      # - TIMEOUT_SECONDS_CONNECT_DB=600
+      # - TIMEOUT_SECONDS_KEYCLOAK_START=600
+      - ENCRYPT_KEY=${ENCRYPT_KEY}
+    networks:
+      - exastro
+
+  makedb-platform-migration-2:
+    build:
+      dockerfile: ./platform_root/platform_migration/Dockerfile
+      context: ../../../../.
+      args:
+        - HTTP_PROXY=${HTTP_PROXY}
+        - http_proxy=${HTTP_PROXY}
+        - HTTPS_PROXY=${HTTPS_PROXY}
+        - https_proxy=${HTTPS_PROXY}
+    command: python3 /app/migration_main.py
+    environment:
+      - TZ=Asia/Tokyo
+      - PYTHONIOENCODING=utf-8
+      - KEYCLOAK_USER=admin
+      - KEYCLOAK_PASSWORD=password
+      - API_KEYCLOAK_HOST=makedb-keycloak
+      - API_KEYCLOAK_PROTOCOL=http
+      - API_KEYCLOAK_PORT=8080
+      - DB_HOST=makedb-platform-db
+      - DB_DATABASE=platform
+      - DB_USER=app_user
+      - DB_PASSWORD=password
+      - DB_ADMIN_USER=root
+      - DB_ADMIN_PASSWORD=password
+      - KEYCLOAK_DB_DATABASE=keycloak
+      - KEYCLOAK_DB_USER=keycloak
+      - KEYCLOAK_DB_PASSWORD=password
+      # - TIMEOUT_SECONDS_CONNECT_DB=600
+      # - TIMEOUT_SECONDS_KEYCLOAK_START=600
+      - ENCRYPT_KEY=${ENCRYPT_KEY}
+    networks:
+      - exastro
+    depends_on:
+      makedb-platform-migration-1:
+        condition: service_completed_successfully
+
+  makedb-db-exports:
+    image: mariadb:10.4.8
+    # command: "echo 'Y' | bash -c '/tools/make_tests_db_exports.sh; while(true) do sleep 600; done'"
+    command: "bash -c '/tools/make_tests_db_exports.sh'"
+    environment:
+      - TZ=Asia/Tokyo
+      - PYTHONIOENCODING=utf-8
+      - KEYCLOAK_USER=admin
+      - KEYCLOAK_PASSWORD=password
+      - API_KEYCLOAK_HOST=makedb-keycloak
+      - API_KEYCLOAK_PROTOCOL=http
+      - API_KEYCLOAK_PORT=8080
+      - DB_HOST=makedb-platform-db
+      - DB_DATABASE=platform
+      - DB_USER=app_user
+      - DB_PASSWORD=password
+      - DB_ADMIN_USER=root
+      - DB_ADMIN_PASSWORD=password
+      - KEYCLOAK_DB_DATABASE=keycloak
+      - KEYCLOAK_DB_USER=keycloak
+      - KEYCLOAK_DB_PASSWORD=password
+      # - TIMEOUT_SECONDS_CONNECT_DB=600
+      # - TIMEOUT_SECONDS_KEYCLOAK_START=600
+      - ENCRYPT_KEY=${ENCRYPT_KEY}
+    volumes:
+      - ../db/:/db/:cached
+      - ../tools/:/tools/:cached
+    networks:
+      - exastro
+    depends_on:
+      makedb-platform-migration-2:
+        condition: service_completed_successfully
+
+networks:
+  exastro:
+    name: "exastro_${NETWORK_ID}"

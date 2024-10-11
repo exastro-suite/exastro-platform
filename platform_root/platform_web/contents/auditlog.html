@@ -1,0 +1,217 @@
+<!--
+#   Copyright 2022 NEC Corporation
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+-->
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="format-detection" content="telephone=no,email=no,address=no">
+        <meta name="theme-color" content="#002B62">
+        <title text-id="000-91001">
+            監査ログ / Exastro Platform
+        </title>
+        <link rel="stylesheet" href="/_/platform-commons/css/platform.css?ver=__BUILD_VERSION__">
+
+        <script type="text/javascript" src="/auth/js/keycloak.js?ver=__BUILD_VERSION__"></script>
+        <script type="text/javascript" src="/_/common-auth/js/exastro-common-auth-config.js?ver=__BUILD_VERSION__"></script>
+        <script type="text/javascript" src="/_/common-auth/js/exastro-common-auth.js?ver=__BUILD_VERSION__"></script>
+        <script src="/_/platform-commons/common/js/jquery.js?ver=__BUILD_VERSION__"></script>
+
+        <link rel="stylesheet" href="/_/platform-commons/css/custom_properties.css?ver=__BUILD_VERSION__">
+        <link rel="stylesheet" href="/_/platform-commons/css/common.css?ver=__BUILD_VERSION__">
+        <link rel="stylesheet" href="/_/platform-commons/css/dialog.css?ver=__BUILD_VERSION__">
+
+        <script src="/_/platform-commons/common/js/words.js?ver=__BUILD_VERSION__"></script>
+        <script src="/_/platform-commons/common/js/common.js?ver=__BUILD_VERSION__"></script>
+        <script src="/_/platform-commons/common/js/dialog.js?ver=__BUILD_VERSION__"></script>
+        <script src="/_/platform-commons/common/js/ui.js?ver=__BUILD_VERSION__"></script>
+
+        <script src="/_/platform-commons/js/platform_common.js?ver=__BUILD_VERSION__"></script>
+        <script src="/_/platform-commons/js/uri_conf.js?ver=__BUILD_VERSION__"></script>
+        <script src="/_/platform-commons/js/auditlog.js?ver=__BUILD_VERSION__"></script>
+
+    </head>
+    <body>
+        <div id="container">
+            <div class="containerHeader">
+                <header id="header">
+                    <div class="logo">
+                        <img class="logoImage" src="/_/platform-commons/img/Exastro-logo2-white-rgb.svg?ver=__BUILD_VERSION__" alt="Exastro" style="height:32px; margin:5px 18px;">
+                    </div>
+                    <div class="topicPath">
+                        <ol class="topichPathList" style="visibility:hidden;">
+                        </ol>
+                    </div>
+                    <div class="headerMenu">
+                        <ul class="headerMenuList">
+                            <li class="userInfomation headerMenuItem">
+                            </li>
+                        </ul>
+                    </div>
+                </header>
+            </div>
+            <div class="containerBody">
+                <aside id="menu" class="">
+                    <div class="menuBody">
+                        <nav class="menuNavi">
+                            <ul class="menuList" style="display:none;">
+                            </ul>
+                        </nav>
+                    </div>
+                </aside>
+                <main id="main" style="visibility:hidden;">
+                    <div id="content">
+                        <div class="contentHeader">
+                            <h1 class="contentTitle"><span class="contentTitleInner" text-id="000-91002">監査ログ</span></h1>
+                            <p class="contentMenuInfo" text-id="000-91003">監査ログのダウンロードとダウンロード履歴を閲覧できます。</p>
+                        </div>
+                        <div class="contentBody">
+                            <div class="contentMenu">
+                                <ul class="contentMenuList">
+                                    <li class="contentMenuItem">
+                                        <a class="contentMenuLink tabOpen" href="#download" tabindex="-1">
+                                            <span class="inner" text-id="000-91004">ダウンロード</span>
+                                        </a>
+                                    </li>
+                                    <li class="contentMenuItem" id="tab_list">
+                                        <a class="contentMenuLink" href="#download_list" tabindex="-1">
+                                            <span class="inner" text-id="000-91005">履歴</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <section class="section tabOpen" id="download">
+                                <div class="sectionBody">
+                                    <div id="MT" class="tableContainer viewTable">
+                                        <div class="tableBody">
+                                            <table class="table" width="100%">
+                                                <thead class="thead">
+                                                    <tr class="tHeadTr tr">
+                                                        <th data-id="c1" data-rest="id" class="tHeadTh popup th" rowspan="1" colspan="1" title="項目名" attr-text-id="title=000-80020" width="250px;"><div class="ci" text-id="000-80020">項目名</div></th>
+                                                        <th data-id="c2" data-rest="name" class="tHeadTh popup th" rowspan="1" colspan="1" title="設定値" attr-text-id="title=000-80021" style="min-width:400px;"><div class="ci" text-id="000-80021">設定値</div></th>
+                                                        <th data-id="c3" data-rest="name" class="tHeadTh popup th" rowspan="1" colspan="1" title="備考" attr-text-id="title=000-80023"><div class="ci" text-id="000-80023">備考</div></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody class="tbody">
+                                                    <tr class="tBodyTr tr">
+                                                        <th class="tBodyTh th" rowspan="1" colspan="1"><div class="ci" style="text-align: left;"><span text-id="000-91006">対象期間</span><span class="tHeadRequired" text-id="000-80024">必須</span></div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1"><div class="ci">
+                                                            <div class="filterInputFromToDate">
+                                                                <div class="filterInputFromDateWrap">
+                                                                    <input type="text" id="from_date" placeholder="From" attr-text-id="placeholder=000-91007" class="filterInput filterFromDate inputText input" autocomplete="off">
+                                                                </div>
+                                                                <div class="filterInputToDateWrap">
+                                                                    <input type="text" id="to_date" placeholder="To" attr-text-id="placeholder=000-91008" class="filterInput filterToDate inputText input" autocomplete="off">
+                                                                </div>
+                                                                <div class="filterInputDateCalendar">
+                                                                    <button id="btn_target_date" data-action="normal" class="itaButton filterInputDatePicker button">
+                                                                        <span class="inner">
+                                                                            <span class="icon icon-cal"></span>
+                                                                        </span>
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                            <ul>
+                                                                <li>
+                                                                    <span class="validate_error" id="message_from_date"></span>
+                                                                </li>
+                                                                <li>
+                                                                    <span class="validate_error" id="message_to_date"></span>
+                                                                </li>
+                                                            </ul>
+                                                        </div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1"><div class="ci textOverWrap" text-id="000-91009">監査ログのイベント呼び出し日時の範囲を指定してください。</div></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <div class="tableHeader">
+                                            <ul class="tableHeaderMainMenuList">
+                                                <li class="tableHeaderMainMenuItem">
+                                                    <button style="width:200px;" class="itaButton tableHeaderMainMenuButton button" id="btn_download">
+                                                        <span class="inner"><span class="icon icon-download"></span>
+                                                        <span text-id="000-91004">ダウンロード</span></span>
+                                                    </button>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+                            <section class="section" id="download_list">
+                                <div class="sectionBody">
+                                    <div id="MT" class="tableContainer viewTable">
+                                        <div class="tableHeader">
+                                            <ul>
+                                                <li>
+                                                    <span class="ci" id="auditlog_message"></span>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div class="tableBody">
+                                            <table class="table" width="100%" id="auditlog_download_list">
+                                                <thead class="thead">
+                                                    <tr class="tHeadTr tr">
+                                                        <th data-id="c1" class="tHeadTh popup th" rowspan="1" colspan="1" }=""><div class="ci"></div></th>
+                                                        <th data-id="c2" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="ダウンロード日時" attr-text-id="title=000-91010"><div class="ci" text-id="000-91010">ダウンロード日時</div></th>
+                                                        <th data-id="c3" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="ステータス" attr-text-id="title=000-91011"><div class="ci" text-id="000-91011">ステータス</div></th>
+                                                        <th data-id="c4" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="対象期間" attr-text-id="title=000-91006"><div class="ci" text-id="000-91006">対象期間</div></th>
+                                                        <th data-id="c5" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="出力対象件数" attr-text-id="title=000-91012"><div class="ci" text-id="000-91012">出力対象件数</div></th>
+                                                        <th data-id="c6" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="処理結果メッセージ" attr-text-id="title=000-91013"><div class="ci" text-id="000-91013">処理結果メッセージ</div></th>
+                                                        <th data-id="c7" class="tHeadTh popup th" rowspan="1" colspan="1" }="" title="ユーザー" attr-text-id="title=000-00135"><div class="ci" text-id="000-00135">ユーザー</div></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody class="tbody">
+                                                    <tr class="tBodyTr tr datarow-template" style="display:none">
+                                                        <td class="tBodyTh tBodyTd td" rowspan="1" colspan="1" }="">
+                                                            <div class="ci" style="text-align: center;">
+                                                                <button title="ダウンロード" attr-text-id="title=000-91004" class="itaButton button button_re_download" data-id="${job_id}" data-status="${job_status}" style="width:200px;" disabled>
+                                                                    <span class="inner">
+                                                                        <span class="iconButtonIcon icon icon-download"></span>
+                                                                        <span class="iconButtonBody" text-id="000-91004">ダウンロード</span>
+                                                                    </span>
+                                                                </button>
+                                                            </div>
+                                                        </td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }="" ><div class="ci" style="text-align: center;">${create_timestamp}</div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }="" ><div class="ci">${job_status}</div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }="" ><div class="ci textOverWrap" style="text-align: center;">${conditions}</div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }="" ><div class="ci" style="text-align: right;">${count_export}</div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }="" ><div class="ci textOverWrap">${message}</div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }="" ><div class="ci textOverWrap">${create_user}</div></td>
+                                                    </tr>
+                                                    <tr class="tBodyTr tr notfound" style="display:none">
+                                                        <td class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="6" }="" height="50px"><div class="ci" style="text-align: center;" text-id="000-91014">
+                                                            ダウンロード履歴が存在しません
+                                                        </div></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+                            <form name="download" target="download_target" method="POST" action="">
+                                <input type="hidden" id="authorization" name="authorization" value="">
+                            </form>
+                            <iframe name="download_target" style="display:none;"></iframe>
+                        </div>
+                    </div>
+                </main>
+            </div>
+            <div class="containerLoading"></div>
+        </div>
+    </body>
+</html>

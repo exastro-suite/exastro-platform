@@ -1,4 +1,4 @@
--- MySQL dump 10.13  Distrib 8.0.36, for Linux (x86_64)
+-- MySQL dump 10.13  Distrib 8.0.39, for Linux (x86_64)
 --
 -- Host: platform-db    Database: keycloak
 -- ------------------------------------------------------
@@ -1973,7 +1973,7 @@ DROP TABLE IF EXISTS `T_PLAN_LIMIT`;
 CREATE TABLE `T_PLAN_LIMIT` (
   `PLAN_ID` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
   `LIMIT_ID` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `LIMIT_VALUE` int(11) NOT NULL,
+  `LIMIT_VALUE` bigint(20) NOT NULL,
   `CREATE_TIMESTAMP` datetime NOT NULL DEFAULT current_timestamp(),
   `CREATE_USER` varchar(40) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `LAST_UPDATE_TIMESTAMP` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
@@ -1999,7 +1999,7 @@ CREATE TABLE `T_PLATFORM_MIGRATION_HISTORY` (
   `LAST_UPDATE_TIMESTAMP` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `LAST_UPDATE_USER` varchar(40) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2085,4 +2085,4 @@ CREATE TABLE `T_REFRESH_TOKEN` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-04-19 13:44:03
+-- Dump completed on 2024-10-07 11:16:33

@@ -17,12 +17,38 @@ SQL_QUERY_JOBS_USER = """
     FROM T_JOBS_USER
 """
 
+SQL_QUERY_JOBS_USER_RESULT = """
+    SELECT *
+    FROM T_JOBS_USER
+"""
+
+SQL_QUERY_JOBS_USER_RESULT_FILE_SUBSTR = """
+    SELECT SUBSTR(FILE_DATA, %(start_pos)s, %(len)s) FILE_DATA_SUBSTR
+    FROM T_JOBS_USER_RESULT
+"""
+
+SQL_QUERY_JOBS_USER_RESULT_FILE_LENGTH = """
+    SELECT LENGTH(FILE_DATA) FILE_DATA_LENGTH
+    FROM T_JOBS_USER_RESULT
+"""
+
+SQL_QUERY_JOBS_USER_FILE_EXPORT_SUBSTR = """
+    SELECT SUBSTR(FILE_DATA, %(start_pos)s, %(len)s) FILE_DATA_SUBSTR
+    FROM T_JOBS_USER_FILE_EXPORT
+"""
+
+SQL_QUERY_JOBS_USER_FILE_EXPORT_LENGTH = """
+    SELECT LENGTH(FILE_DATA) FILE_DATA_LENGTH
+    FROM T_JOBS_USER_FILE_EXPORT
+"""
+
 SQL_INSERT_JOBS_USER = """
 INSERT
 INTO T_JOBS_USER(
 JOB_ID,
 JOB_TYPE,
 JOB_STATUS,
+LANGUAGE,
 CREATE_USER,
 LAST_UPDATE_USER
 )
@@ -30,6 +56,7 @@ VALUES (
 %(job_id)s,
 %(job_type)s,
 %(job_status)s,
+%(language)s,
 %(create_user)s,
 %(last_update_user)s
 )
@@ -49,6 +76,27 @@ VALUES (
 %(file_id)s,
 %(job_id)s,
 %(file_data)s,
+%(create_user)s,
+%(last_update_user)s
+)
+;
+"""
+
+SQL_INSERT_JOBS_USER_EXPORT = """
+INSERT
+INTO T_JOBS_USER_EXPORT(
+JOB_ID,
+JOB_TYPE,
+JOB_STATUS,
+LANGUAGE,
+CREATE_USER,
+LAST_UPDATE_USER
+)
+VALUES (
+%(job_id)s,
+%(job_type)s,
+%(job_status)s,
+%(language)s,
 %(create_user)s,
 %(last_update_user)s
 )

@@ -16,7 +16,7 @@
 GET {{base_sys_url}}/api/platform/organizations
 Authorization: Basic {{sys-user-id}} {{sys-user-pw}}
 
-###
+### OrganizationService POST
 
 POST {{base_sys_url}}/api/platform/organizations?retry=1
 Authorization: Basic {{sys-user-id}} {{sys-user-pw}}
@@ -27,15 +27,15 @@ content-type: application/json
   "name": "organization of org1",
   "organization_managers": [
     {
-      "username": "user-id",
-      "email": "user e-mail address",
-      "firstName": "string",
-      "lastName": "string",
+      "username": "admin",
+      "email": "org1@example.com",
+      "firstName": "org1",
+      "lastName": "administrator",
       "credentials": [
         {
           "type": "password",
           "value": "password",
-          "temporary": true
+          "temporary": false
         }
       ],
       "requiredActions": [
@@ -44,14 +44,14 @@ content-type: application/json
       "enabled": true
     }
   ],
-  "plan": {
-    "id": "plan-1"
-  },
-  "options": {},
+  "plan": {},
   "optionsIta": {
-    "no_install_driver": [
-      "terraform_cli"
-    ]
+    "drivers": {
+      "ci_cd": true,
+      "oase": false,
+      "terraform_cli": true,
+      "terraform_cloud_ep": true
+    }
   }
 }
 
@@ -72,6 +72,11 @@ content-type: application/json
     }
   }
 }
+
+### OrganizationService DELETE
+
+DELETE {{base_sys_url}}/api/platform/organizations/{{org_id}}
+Authorization: Basic {{sys-user-id}} {{sys-user-pw}}
 
 ###
 
@@ -162,3 +167,35 @@ content-type: application/json
 {
   "sslRequired": "none"
 }
+
+
+###
+
+# audit log download get
+GET {{base_org_url}}/api/{{org_id}}/platform/auditlog/download
+Authorization: Basic {{org-user-id}} {{org-user-pw}}
+
+###
+
+# audit log download post
+# @name auditlog_download
+POST {{base_org_url}}/api/{{org_id}}/platform/auditlog/download
+Authorization: Basic {{sys-user-id}} {{sys-user-pw}}
+content-type: application/json
+
+{
+  "ts_from": "2024-06-01 00:00:00",
+  "ts_to": "2024-06-30 23:59:59"
+}
+
+###
+
+# First, audit log download post
+@download_id =  {{auditlog_download.response.body.data.download_id}}
+
+# audit log download get by query
+GET {{base_org_url}}/api/{{org_id}}/platform/auditlog/download
+    ?download_id={{download_id}}
+Authorization: Basic {{org-user-id}} {{org-user-pw}}
+
+###

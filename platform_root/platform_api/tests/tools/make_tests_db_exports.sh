@@ -13,12 +13,13 @@ echo "※注意※"
 echo "本scriptはDBを初期化(migration直後)した状態で実行してください"
 echo "exportファイルはmariadb, mysql共通ですので、mariadbでmigration直後に実施してください"
 
-read -p "実行しますか? (Y/other):" CONFIRM
-if [ "${CONFIRM}" != "Y" ]; then
-    exit 1
-fi
+# read -p "実行しますか? (Y/other):" CONFIRM
+# if [ "${CONFIRM}" != "Y" ]; then
+#     exit 1
+# fi
 
-sudo rm ${DESTPATH}/${DUMPFILE_INIT} ${DESTPATH}/${DUMPFILE_DATA}
+# sudo rm ${DESTPATH}/${DUMPFILE_INIT} ${DESTPATH}/${DUMPFILE_DATA}
+rm -f ${DESTPATH}/${DUMPFILE_INIT} ${DESTPATH}/${DUMPFILE_DATA}
 
 echo "[INFO] export DATABASES"
 mysqldump ${MYSQL_LOGIN_INFO} --result-file ${DESTPATH}/${DUMPFILE_INIT} --no-data --databases keycloak platform

@@ -29,6 +29,7 @@ services:
       - ../platform_root/platform_auth/config/httpd.conf/httpd.conf:/etc/httpd/conf/httpd.conf:cached
       - ../platform_root/platform_auth/config/httpd.conf/reverse-proxy.conf:/etc/httpd/conf.d/reverse-proxy.conf:cached
       - ../platform_root/platform_auth/config/httpd.conf/wsgi.conf:/etc/httpd/conf.d/wsgi.conf:cached
+      - ../platform_root/platform_auth/config/httpd.conf/exastro-ssl.conf:/etc/httpd/conf.d/exastro-ssl.conf:cached
       - ~/.netrc:/home/app_user/.netrc
       - ~/.gitconfig:/home/app_user/.gitconfig
       - ./platform-auth/.vscode/launch.json:/workspace/.vscode/launch.json

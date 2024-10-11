@@ -747,7 +747,7 @@ def test_settings_notification_destination_delete(connexion_client):
 
         assert response.status_code == 400, "destination_id in use"
         assert response.json["result"] == "400-35001", "destination_id in use"
-        assert response.json["message"] == "The specified notification destination is in use and cannot be deleted (destination id:{0})", "destination_id in use"
+        assert response.json["message"] == f"The specified notification destination is in use and cannot be deleted (destination id:{setting_notifications[0]['id']})", "destination_id in use"
 
         mock_obj.return_value = MockResponse({'data': '[]'}, 500)
         # ITA API Error
@@ -758,7 +758,7 @@ def test_settings_notification_destination_delete(connexion_client):
 
         assert response.status_code == 500, "ITA API Error"
         assert response.json["result"] == "500-35002", "ITA API Error"
-        assert response.json["message"] == "Failed to get notification destination in use (menu:{0} column:{1})", "ITA API Error"
+        assert response.json["message"] == "Failed to get notification destination in use (menu:rule column:before_notification_destination)", "ITA API Error"
 
         mock_obj.return_value = MockResponse({'data': '[]'}, 200)
         # normal route 1
@@ -785,7 +785,7 @@ def test_settings_notification_destination_delete(connexion_client):
 
         assert response.status_code == 500, "DB error route"
         assert response.json["result"] == "500-35001"
-        assert response.json["message"] == "Failed to delete notification destination (destination id:{0})", "DB error route"
+        assert response.json["message"] == f"Failed to delete notification destination (destination id:{setting_notifications[1]['id']})", "DB error route"
 
 
 def sample_data_mail(id, update={}):
