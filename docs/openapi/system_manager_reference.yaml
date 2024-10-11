@@ -17,7 +17,7 @@ openapi: 3.0.3
 info:
   title: Exastro Platform API (System Management)
   description: Exastro Platform API for System Manager
-  version: 1.8.0
+  version: 1.9.0
 
 servers:
   - url: "https://{host}"

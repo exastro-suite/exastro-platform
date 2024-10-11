@@ -12,8 +12,11 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 import copy
+import re
+import requests_mock
 
 from tests.common import request_parameters, test_common
+from common_library.common import const
 
 
 def test_workspace_api(connexion_client):
@@ -46,7 +49,7 @@ def test_workspace_api(connexion_client):
 
         assert response.status_code == 200, "create workspace response code"
 
-        # workspace role setting
+        # add data
         ws_role = [f"_{json_create_01['id']}-admin"]
         # workspace get情報(作成したworkspaceをgetした時の情報)
         json_created_01 = copy.deepcopy(json_create_01)
@@ -145,6 +148,43 @@ def test_workspace_api(connexion_client):
 
         assert response.status_code == 404, "get organization response code"
 
+    with test_common.requsts_mocker_default() as requests_mocker:
+
+        # create workspace
+        # ワークスペースを作成する（ITA側で異常）
+        json_create_01 = sample_data_workspace('workspace-01', organization['user_id'])
+        ws_role = [f"_{json_create_01['id']}-admin"]
+
+        requests_mocker.register_uri(
+            requests_mock.POST,
+            re.compile(rf'^{test_common.ita_api_admin_origin()}/api/{organization["organization_id"]}/workspaces/{json_create_01["id"]}/ita/'),
+            status_code=500,
+            json={})
+
+        response = connexion_client.post(
+            f"/api/{organization['organization_id']}/platform/workspaces",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization['user_id']),
+            json=json_create_01)
+
+        assert response.status_code == 500, "create workspace response code"
+
+        # workspace role 取得（削除されていて、0件であること）
+        response = connexion_client.get(
+            f"/api/{organization['organization_id']}/platform/roles?kind={const.ROLE_KIND_WORKSPACE}",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization["user_id"], organization_role=[const.ORG_ROLE_ORG_MANAGER]))
+
+        assert response.status_code == 200
+        assert len(response.json["data"]) == 0
+
+        # Workspace DB 取得（削除されていること）
+        response = connexion_client.get(
+            f"/api/{organization['organization_id']}/platform/workspaces/{json_create_01['id']}",
+            headers=request_parameters.request_headers(organization['user_id'], workspace_role=ws_role))
+
+        assert response.status_code == 404, "get organization response code"
+
 
 def sample_data_workspace(id, admin_user_id, update={}):
     """create workspace parameter
@@ -170,3 +210,7 @@ def sample_data_workspace(id, admin_user_id, update={}):
             ]
         }
     }, **update)
+
+
+def fillter_role_from_list(role_list: list, role_name: str):
+    return [role for role in role_list if role["name"] == role_name]

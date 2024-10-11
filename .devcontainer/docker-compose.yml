@@ -53,6 +53,9 @@ services:
       - ITA_API_OASE_RECEIVER_PROTOCOL=http
       - ITA_API_OASE_RECEIVER_HOST=ita-api
       - ITA_API_OASE_RECEIVER_PORT=8000
+      - ITA_API_ANSIBLE_EXECUTION_RECEIVER_PROTOCOL=http
+      - ITA_API_ANSIBLE_EXECUTION_RECEIVER_HOST=ita-api
+      - ITA_API_ANSIBLE_EXECUTION_RECEIVER_PORT=8000
       #- PLATFORM_WEB_LOCATION=/*/platform/
       - PLATFORM_WEB_PROTOCOL=http
       - PLATFORM_WEB_HOST=platform-web
@@ -67,6 +70,9 @@ services:
       - ENCRYPT_KEY=${ENCRYPT_KEY}
       - EXTERNAL_URL=${EXTERNAL_URL:-}
       - EXTERNAL_URL_MNG=${EXTERNAL_URL_MNG:-}
+      - EXASTRO_HTTPS=${EXASTRO_HTTPS:-false}
+      - CERTIFICATE_FILE=${CERTIFICATE_FILE:-exastro.crt}
+      - PRIVATE_KEY_FILE=${PRIVATE_KEY_FILE:-exastro.key}
       # AuditLogの設定は、いずれも既定値あるため、環境変数から渡すのはオプション
       # All AuditLog settings have default values, so passing them from environment variables is optional.
       # - AUDIT_LOG_ENABLED=${AUDIT_LOG_ENABLED:-True}
@@ -75,6 +81,7 @@ services:
       # - AUDIT_LOG_BACKUP_COUNT=${AUDIT_LOG_BACKUP_COUNT}
     volumes:
       - ../.volumes/exastro/log:/var/log/exastro
+      - ../.volumes/exastro/ssl:/etc/ssl/certs/exastro
     ports:
       - "0.0.0.0:8000:8000"
       - "0.0.0.0:8001:8001"

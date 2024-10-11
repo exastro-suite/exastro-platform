@@ -1021,7 +1021,7 @@ def __client_role_setting(organization_id, user_id):
     for org_auth in org_auths:
         # client role追加
         # client role added
-        response = api_keycloak_roles.clients_role_create(organization_id, client_id, org_auth, token)
+        response = api_keycloak_roles.clients_role_create(organization_id, platform_client_id, org_auth, token)
         if response.status_code not in [200, 201, 409]:    # 409 exists role
             globals.logger.error(f"response.status_code:{response.status_code}")
             globals.logger.error(f"response.text:{response.text}")
@@ -1121,7 +1121,7 @@ def __client_role_setting(organization_id, user_id):
                 client_id_permission = realm_management_client_id
             else:
                 client_id_permission = platform_client_id
-            
+
             response = api_keycloak_roles.clients_role_get(organization_id, client_id_permission, permission, token)
             if response.status_code != 200:
                 globals.logger.error(f"response.status_code:{response.status_code}")
@@ -1762,7 +1762,7 @@ def __ita_delete(organization_id):
     api_url = "{}://{}:{}".format(os.environ['ITA_API_ADMIN_PROTOCOL'], os.environ['ITA_API_ADMIN_HOST'], os.environ['ITA_API_ADMIN_PORT'])
     response = requests.delete(f"{api_url}/api/organizations/{organization_id}/ita/", headers=header_para)
 
-    if response.status_code not in [200, 404, 499]:
+    if response.status_code not in [200, 404, 490]:
         globals.logger.error(f"response.status_code:{response.status_code}")
         globals.logger.error(f"response.text:{response.text}")
         message_id = f"500-{MSG_FUNCTION_ID}013"
@@ -1773,13 +1773,13 @@ def __ita_delete(organization_id):
         )
         raise common.InternalErrorException(message_id=message_id, message=message)
 
-    if response.status_code == 499:
+    if response.status_code == 490:
         try:
             r_delete_ita_body = json.loads(response.text)
         except Exception:
             r_delete_ita_body = {}
 
-        if r_delete_ita_body.get("result", "") != '499-00002':  # Alredy Deleted
+        if r_delete_ita_body.get("result", "") != '490-02009':  # Alredy Deleted
             globals.logger.error(f"response.status_code:{response.status_code}")
             globals.logger.error(f"response.text:{response.text}")
 

@@ -14,17 +14,17 @@
 
 get:
   tags:
-  - JobsService
-  summary: Download import status
-  x-openapi-router-controller: controllers.jobs_service_controller
-  operationId: jobs_users_import_status_job_id_download
+  - CommonService
+  summary: Returns the current system config value
+  x-openapi-router-controller: controllers.common_service_controller
+  operationId: settings_system_config_get_for_organization_user
   parameters:
   - name: organization_id
     in: path
     required: true
     schema:
       type: string
-  - name: job_id
+  - name: config_key
     in: path
     required: true
     schema:
@@ -40,8 +40,7 @@ get:
               - type: object
                 properties:
                   data:
-                    type: object
-                    example: null
+                    $ref: '../schemas/systemConfig.yaml'
     default:
       description: An unexpected error response.
       content:

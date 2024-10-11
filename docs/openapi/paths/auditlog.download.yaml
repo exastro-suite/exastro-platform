@@ -12,12 +12,46 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
+get:
+  tags:
+  - AuditLogService
+  summary: Get audit log download list
+  x-openapi-router-controller: controllers.audit_log_service_controller
+  operationId: auditlog_download_list
+  parameters:
+  - name: organization_id
+    in: path
+    required: true
+    schema:
+      type: string
+  - name: download_id
+    in: query
+    description: filter download id. (exact match)
+    schema:
+      type: string
+      example: XXXXXXXXXXXXXXXXXXXXXXXXXX
+  responses:
+    200:
+      description: A successful response.
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '../schemas/responseOk.yaml'
+              - $ref: '../schemas/auditLogDownloadList.yaml'
+    default:
+      description: An unexpected error response.
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'
+
 post:
   tags:
-  - JobsService
-  summary: Import user bulk registration
-  x-openapi-router-controller: controllers.jobs_service_controller
-  operationId: jobs_users_import
+  - AuditLogService
+  summary: Reserve audit log download
+  x-openapi-router-controller: controllers.audit_log_service_controller
+  operationId: auditlog_download_reserve
   parameters:
   - name: organization_id
     in: path
@@ -26,9 +60,9 @@ post:
       type: string
   requestBody:
     content:
-      multipart/form-data:
+      application/json:
         schema:
-          $ref: '../schemas/jobsUserImport.yaml'
+          $ref: '../schemas/auditLogDownload.yaml'
     required: true
   responses:
     200:
@@ -42,7 +76,7 @@ post:
                 properties:
                   data:
                     type: object
-                    example: null
+                    example: {"download_id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"}
     default:
       description: An unexpected error response.
       content:

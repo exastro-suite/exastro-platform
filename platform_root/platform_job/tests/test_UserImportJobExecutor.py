@@ -28,15 +28,17 @@ from contextlib import closing
 from unittest import mock
 import threading
 from importlib import import_module
+import copy
 
 from common_library.common import const
 from common_library.common import encrypt
 from common_library.common.db import DBconnector
-from common_library.common import bl_plan_service
+from common_library.common import bl_plan_service, api_keycloak_users
 
 import job_manager
 import job_manager_const
 import job_manager_config
+from jobs import jobs_common
 from jobs.UserImportJobExecutor import UserImportJobExecutor
 
 from tests.common import test_common
@@ -69,6 +71,76 @@ def test_execute_registration_nomally():
         assert t["JOB_STATUS"] == const.JOB_USER_COMP
         assert t["COUNT_REGISTER"] == 1 and t["COUNT_UPDATE"] == 0 and t["COUNT_DELETE"] == 0
         assert t["SUCCESS_REGISTER"] == 1 and t["SUCCESS_UPDATE"] == 0 and t["SUCCESS_DELETE"] == 0
+        assert t["FAILED_REGISTER"] == 0 and t["FAILED_UPDATE"] == 0 and t["FAILED_DELETE"] == 0
+
+
+def test_execute_update_nomally():
+    """ユーザー更新正常系 / User update normal pattern
+    """
+    testdata = import_module("tests.db.exports.testdata")
+
+    with test_common.requsts_mocker_default():
+
+        organization_id = list(testdata.ORGANIZATIONS.keys())[0]
+
+        # 登録
+        queue = make_queue_import_user('ja', organization_id, user_import_data=[data_sample_registration])
+        executor = UserImportJobExecutor(queue)
+        result = executor.execute_base()
+        save_result_file(organization_id, queue["PROCESS_EXEC_ID"])
+
+        # 成功を返すこと
+        assert result
+
+        # 更新
+        queue = make_queue_import_user('ja', organization_id, user_import_data=[data_sample_update])
+        executor = UserImportJobExecutor(queue)
+        result = executor.execute_base()
+        save_result_file(organization_id, queue["PROCESS_EXEC_ID"])
+
+        # 成功を返すこと
+        assert result
+
+        # 状態が完了で、更新成功件数が１であること
+        t = select_t_jobs_user(organization_id, queue["PROCESS_EXEC_ID"])
+        assert t["JOB_STATUS"] == const.JOB_USER_COMP
+        assert t["COUNT_REGISTER"] == 0 and t["COUNT_UPDATE"] == 1 and t["COUNT_DELETE"] == 0
+        assert t["SUCCESS_REGISTER"] == 0 and t["SUCCESS_UPDATE"] == 1 and t["SUCCESS_DELETE"] == 0
+        assert t["FAILED_REGISTER"] == 0 and t["FAILED_UPDATE"] == 0 and t["FAILED_DELETE"] == 0
+
+
+def test_execute_delete_nomally():
+    """ユーザー削除正常系 / User delete normal pattern
+    """
+    testdata = import_module("tests.db.exports.testdata")
+
+    with test_common.requsts_mocker_default():
+
+        organization_id = list(testdata.ORGANIZATIONS.keys())[0]
+
+        # 登録
+        queue = make_queue_import_user('ja', organization_id, user_import_data=[data_sample_registration])
+        executor = UserImportJobExecutor(queue)
+        result = executor.execute_base()
+        save_result_file(organization_id, queue["PROCESS_EXEC_ID"])
+
+        # 成功を返すこと
+        assert result
+
+        # 削除
+        queue = make_queue_import_user('ja', organization_id, user_import_data=[data_sample_delete], job_type=const.JOB_TYPE_USER_BULK_DELETE)
+        executor = UserImportJobExecutor(queue)
+        result = executor.execute_base()
+        save_result_file(organization_id, queue["PROCESS_EXEC_ID"])
+
+        # 成功を返すこと
+        assert result
+
+        # 状態が完了で、削除成功件数が１であること
+        t = select_t_jobs_user(organization_id, queue["PROCESS_EXEC_ID"])
+        assert t["JOB_STATUS"] == const.JOB_USER_COMP
+        assert t["COUNT_REGISTER"] == 0 and t["COUNT_UPDATE"] == 0 and t["COUNT_DELETE"] == 1
+        assert t["SUCCESS_REGISTER"] == 0 and t["SUCCESS_UPDATE"] == 0 and t["SUCCESS_DELETE"] == 1
         assert t["FAILED_REGISTER"] == 0 and t["FAILED_UPDATE"] == 0 and t["FAILED_DELETE"] == 0
 
 
@@ -396,7 +468,7 @@ def test_execute_registration_error_limits():
         mock.patch.object(bl_plan_service, "organization_limits_get", return_value={const.RESOURCE_COUNT_USERS: limit_users}): # limit値を設定
 
         organization_id = list(testdata.ORGANIZATIONS.keys())[0]
-        queue = make_queue_import_user('ja', organization_id, 
+        queue = make_queue_import_user('ja', organization_id,
                     user_import_data=[
                         {**data_sample_registration, **{"USERNAME": "limit-test01", "EMAIL": "limit-test01@example.com"}},
                         {**data_sample_registration, **{"USERNAME": "limit-test02", "EMAIL": "limit-test02@example.com"}},
@@ -432,7 +504,7 @@ def test_execute_registration_error_duplicate():
     # 重複エラー（ユーザー名）
     with test_common.requsts_mocker_default():
         organization_id = list(testdata.ORGANIZATIONS.keys())[0]
-        queue = make_queue_import_user('ja', organization_id, 
+        queue = make_queue_import_user('ja', organization_id,
                     user_import_data=[
                         {**data_sample_registration, **{"USERNAME": "duplicate-name-test01", "EMAIL": "duplicate-name-test01@example.com"}},
                         {**data_sample_registration, **{"USERNAME": "duplicate-name-test01", "EMAIL": "duplicate-name-test02@example.com"}},
@@ -442,25 +514,18 @@ def test_execute_registration_error_duplicate():
         result = executor.execute_base()
         save_result_file(organization_id, queue["PROCESS_EXEC_ID"])
 
-        # 成功を返すこと
-        assert result
+        # 失敗を返すこと
+        assert not result
 
-        # 状態が完了で、登録成功・登録失敗件数が１であること
+        # 状態が異常であること
         t = select_t_jobs_user(organization_id, queue["PROCESS_EXEC_ID"])
-        assert t["JOB_STATUS"] == const.JOB_USER_COMP
-        assert t["COUNT_REGISTER"] == 2 and t["COUNT_UPDATE"] == 0 and t["COUNT_DELETE"] == 0
-        assert t["SUCCESS_REGISTER"] == 1 and t["SUCCESS_UPDATE"] == 0 and t["SUCCESS_DELETE"] == 0
-        assert t["FAILED_REGISTER"] == 1 and t["FAILED_UPDATE"] == 0 and t["FAILED_DELETE"] == 0
-
-        ws = get_result_worksheet(organization_id, queue["PROCESS_EXEC_ID"])
-        assert ws.max_row == user_import_file_common.EXCEL_HEADER_ROWS + 1
-        assert ws.cell(user_import_file_common.EXCEL_HEADER_ROWS + 1, USERNAME_COL_INDEX).value == "duplicate-name-test01"
-        assert ws.cell(user_import_file_common.EXCEL_HEADER_ROWS + 1, ERROR_TEXT_COL_INDEX).value.startswith("指定されたユーザーはすでに存在しているため作成できません。")
+        assert t["JOB_STATUS"] == const.JOB_USER_FAILED
+        assert t["MESSAGE"] == '対象のユーザー名が重複しています(重複ユーザー名:[{0}])'.format('duplicate-name-test01')
 
     # 重複エラー（email）
     with test_common.requsts_mocker_default():
         organization_id = list(testdata.ORGANIZATIONS.keys())[0]
-        queue = make_queue_import_user('ja', organization_id, 
+        queue = make_queue_import_user('ja', organization_id,
                     user_import_data=[
                         {**data_sample_registration, **{"USERNAME": "duplicate-email-test01", "EMAIL": "duplicate-email-test01@example.com"}},
                         {**data_sample_registration, **{"USERNAME": "duplicate-email-test02", "EMAIL": "duplicate-email-test01@example.com"}},
@@ -581,7 +646,6 @@ def test_execute_registration_error_user_create():
         assert ws.max_row == user_import_file_common.EXCEL_HEADER_ROWS + 1
         assert ws.cell(user_import_file_common.EXCEL_HEADER_ROWS + 1, ERROR_TEXT_COL_INDEX).value.startswith("ユーザー作成に失敗しました")
 
-
     # keycloak user作成後、user取得失敗(Userなし)
     with test_common.requsts_mocker_default() as requests_mocker:
         organization_id = list(testdata.ORGANIZATIONS.keys())[0]
@@ -610,6 +674,442 @@ def test_execute_registration_error_user_create():
         ws = get_result_worksheet(organization_id, queue["PROCESS_EXEC_ID"])
         assert ws.max_row == user_import_file_common.EXCEL_HEADER_ROWS + 1
         assert ws.cell(user_import_file_common.EXCEL_HEADER_ROWS + 1, ERROR_TEXT_COL_INDEX).value.startswith("ユーザー作成に失敗しました")
+
+    # 登録と削除が混在の場合
+    with test_common.requsts_mocker_default():
+        organization_id = list(testdata.ORGANIZATIONS.keys())[0]
+
+        # ユーザー削除処理
+        queue = make_queue_import_user('ja', organization_id, user_import_data=[data_sample_registration2, data_sample_delete])
+
+        executor = UserImportJobExecutor(queue)
+        result = executor.execute_base()
+        save_result_file(organization_id, queue["PROCESS_EXEC_ID"])
+
+        # 失敗を返すこと
+        assert not result
+
+        # 状態が異常であること
+        t = select_t_jobs_user(organization_id, queue["PROCESS_EXEC_ID"])
+        assert t["JOB_STATUS"] == const.JOB_USER_FAILED
+        assert t["MESSAGE"] == 'ユーザー一括インポートの場合、実行処理種別に「登録」「更新」以外は指定できません。'
+
+def test_execute_update_error_user_update():
+    """ユーザー更新失敗
+    """
+    testdata = import_module("tests.db.exports.testdata")
+
+    # keycloak HTTP-500応答(ユーザー情報取得に失敗)
+    with test_common.requsts_mocker_default() as requests_mocker:
+        organization_id = list(testdata.ORGANIZATIONS.keys())[0]
+        keycloak_error_msg = "http-500 error"
+        requests_mocker.register_uri(
+            requests_mock.GET,
+            re.compile(rf'^{test_common.keycloak_origin()}/auth/admin/realms/{organization_id}/users'),
+            status_code=500,
+            json={"errorMessage": keycloak_error_msg})
+
+        queue = make_queue_import_user('ja', organization_id, user_import_data=[data_sample_update])
+
+        executor = UserImportJobExecutor(queue)
+        result = executor.execute_base()
+        save_result_file(organization_id, queue["PROCESS_EXEC_ID"])
+
+        # 成功を返すこと
+        assert result
+
+        # 状態が完了で、更新失敗件数が１であること
+        t = select_t_jobs_user(organization_id, queue["PROCESS_EXEC_ID"])
+        assert t["JOB_STATUS"] == const.JOB_USER_COMP
+        assert t["COUNT_REGISTER"] == 0 and t["COUNT_UPDATE"] == 1 and t["COUNT_DELETE"] == 0
+        assert t["SUCCESS_REGISTER"] == 0 and t["SUCCESS_UPDATE"] == 0 and t["SUCCESS_DELETE"] == 0
+        assert t["FAILED_REGISTER"] == 0 and t["FAILED_UPDATE"] == 1 and t["FAILED_DELETE"] == 0
+
+        ws = get_result_worksheet(organization_id, queue["PROCESS_EXEC_ID"])
+        assert ws.max_row == user_import_file_common.EXCEL_HEADER_ROWS + 1
+        assert ws.cell(user_import_file_common.EXCEL_HEADER_ROWS + 1, ERROR_TEXT_COL_INDEX).value == "ユーザーの取得に失敗しました(対象ユーザー:{0})".format(data_sample_registration["USERNAME"])
+
+    # keycloak HTTP-500応答(ロール情報情報取得に失敗)
+    with test_common.requsts_mocker_default() as requests_mocker:
+        organization_id = list(testdata.ORGANIZATIONS.keys())[0]
+        # ユーザー作成登録
+        add_user(user=user_json1)
+
+        # 更新対象のユーザーを取得 / Get target user
+        u_get = get_user(user_json1["username"])
+        u_get_json = json.loads(u_get.text)
+        user_id = u_get_json[0]["id"]
+
+        # ユーザー更新処理
+        organization_private = DBconnector().get_organization_private(organization_id)
+        keycloak_error_msg = "http-500 error"
+        client_id = organization_private.user_token_client_id
+        requests_mocker.register_uri(
+            requests_mock.GET,
+            re.compile(rf'^{test_common.keycloak_origin()}/auth/admin/realms/{organization_id}/users/{user_id}/role-mappings/clients/{client_id}/composite'),
+            status_code=500,
+            json={"errorMessage": keycloak_error_msg})
+
+        queue = make_queue_import_user('ja', organization_id, user_import_data=[data_sample_update])
+
+        executor = UserImportJobExecutor(queue)
+        result = executor.execute_base()
+        save_result_file(organization_id, queue["PROCESS_EXEC_ID"])
+
+        # 成功を返すこと
+        assert result
+
+        # 状態が完了で、更新失敗件数が１であること
+        t = select_t_jobs_user(organization_id, queue["PROCESS_EXEC_ID"])
+        assert t["JOB_STATUS"] == const.JOB_USER_COMP
+        assert t["COUNT_REGISTER"] == 0 and t["COUNT_UPDATE"] == 1 and t["COUNT_DELETE"] == 0
+        assert t["SUCCESS_REGISTER"] == 0 and t["SUCCESS_UPDATE"] == 0 and t["SUCCESS_DELETE"] == 0
+        assert t["FAILED_REGISTER"] == 0 and t["FAILED_UPDATE"] == 1 and t["FAILED_DELETE"] == 0
+
+        ws = get_result_worksheet(organization_id, queue["PROCESS_EXEC_ID"])
+        assert ws.max_row == user_import_file_common.EXCEL_HEADER_ROWS + 1
+        assert ws.cell(user_import_file_common.EXCEL_HEADER_ROWS + 1, ERROR_TEXT_COL_INDEX).value == "ロールの取得に失敗しました(対象ID:{0} client:{1})".format(organization_id, client_id)
+
+    # 存在しないユーザーを更新
+    with test_common.requsts_mocker_default():
+        organization_id = list(testdata.ORGANIZATIONS.keys())[0]
+
+        # ユーザー更新処理
+        queue = make_queue_import_user('ja', organization_id, user_import_data=[data_sample_update_unknown])
+
+        executor = UserImportJobExecutor(queue)
+        result = executor.execute_base()
+        save_result_file(organization_id, queue["PROCESS_EXEC_ID"])
+
+        # 成功を返すこと
+        assert result
+
+        # 状態が完了で、更新失敗件数が１であること
+        t = select_t_jobs_user(organization_id, queue["PROCESS_EXEC_ID"])
+        assert t["JOB_STATUS"] == const.JOB_USER_COMP
+        assert t["COUNT_REGISTER"] == 0 and t["COUNT_UPDATE"] == 1 and t["COUNT_DELETE"] == 0
+        assert t["SUCCESS_REGISTER"] == 0 and t["SUCCESS_UPDATE"] == 0 and t["SUCCESS_DELETE"] == 0
+        assert t["FAILED_REGISTER"] == 0 and t["FAILED_UPDATE"] == 1 and t["FAILED_DELETE"] == 0
+
+        ws = get_result_worksheet(organization_id, queue["PROCESS_EXEC_ID"])
+        assert ws.max_row == user_import_file_common.EXCEL_HEADER_ROWS + 1
+        assert ws.cell(user_import_file_common.EXCEL_HEADER_ROWS + 1, ERROR_TEXT_COL_INDEX).value == "指定されたユーザーが存在しません"
+
+    # e-mailが他のユーザーと重複する
+    with test_common.requsts_mocker_default():
+        organization_id = list(testdata.ORGANIZATIONS.keys())[0]
+
+        # ユーザー作成登録
+        add_user(user=user_json2)
+
+        # 更新対象のユーザーを取得 / Get target user
+        u_get = get_user(user_json2["username"])
+        u_get_json = json.loads(u_get.text)
+        user_id = u_get_json[0]["id"]
+
+        # ユーザー更新処理
+        queue = make_queue_import_user('ja', organization_id, user_import_data=[data_sample_update_2])
+
+        executor = UserImportJobExecutor(queue)
+        result = executor.execute_base()
+        save_result_file(organization_id, queue["PROCESS_EXEC_ID"])
+
+        # 成功を返すこと
+        assert result
+
+        # 状態が完了で、更新失敗件数が１であること
+        t = select_t_jobs_user(organization_id, queue["PROCESS_EXEC_ID"])
+        assert t["JOB_STATUS"] == const.JOB_USER_COMP
+        assert t["COUNT_REGISTER"] == 0 and t["COUNT_UPDATE"] == 1 and t["COUNT_DELETE"] == 0
+        assert t["SUCCESS_REGISTER"] == 0 and t["SUCCESS_UPDATE"] == 0 and t["SUCCESS_DELETE"] == 0
+        assert t["FAILED_REGISTER"] == 0 and t["FAILED_UPDATE"] == 1 and t["FAILED_DELETE"] == 0
+
+        ws = get_result_worksheet(organization_id, queue["PROCESS_EXEC_ID"])
+        assert ws.max_row == user_import_file_common.EXCEL_HEADER_ROWS + 1
+        assert ws.cell(user_import_file_common.EXCEL_HEADER_ROWS + 1, ERROR_TEXT_COL_INDEX).value == "ユーザー更新に失敗しました(対象ユーザーID:{})[User exists with same email]".format(user_id)
+
+    # オーガナイゼーション管理者ロールのユーザーを無効
+    with test_common.requsts_mocker_default():
+        organization_id = list(testdata.ORGANIZATIONS.keys())[0]
+
+        # オーガナイゼーション管理者ロールに所属したユーザーを作成
+        queue = make_queue_import_user('ja', organization_id, user_import_data=[data_sample_registration_org_manager])
+        executor = UserImportJobExecutor(queue)
+        result = executor.execute_base()
+        save_result_file(organization_id, queue["PROCESS_EXEC_ID"])
+
+        # 成功を返すこと
+        assert result
+
+        # ユーザー更新処理
+        queue = make_queue_import_user('ja', organization_id, user_import_data=[data_sample_update_org_mng])
+
+        executor = UserImportJobExecutor(queue)
+        result = executor.execute_base()
+        save_result_file(organization_id, queue["PROCESS_EXEC_ID"])
+
+        # 成功を返すこと
+        assert result
+
+        # 状態が完了で、更新失敗件数が１であること
+        t = select_t_jobs_user(organization_id, queue["PROCESS_EXEC_ID"])
+        assert t["JOB_STATUS"] == const.JOB_USER_COMP
+        assert t["COUNT_REGISTER"] == 0 and t["COUNT_UPDATE"] == 1 and t["COUNT_DELETE"] == 0
+        assert t["SUCCESS_REGISTER"] == 0 and t["SUCCESS_UPDATE"] == 0 and t["SUCCESS_DELETE"] == 0
+        assert t["FAILED_REGISTER"] == 0 and t["FAILED_UPDATE"] == 1 and t["FAILED_DELETE"] == 0
+
+        ws = get_result_worksheet(organization_id, queue["PROCESS_EXEC_ID"])
+        assert ws.max_row == user_import_file_common.EXCEL_HEADER_ROWS + 1
+        assert ws.cell(user_import_file_common.EXCEL_HEADER_ROWS + 1, ERROR_TEXT_COL_INDEX).value == "オーガナイゼーション管理者は無効にできません"
+
+    # オーガナイゼーション管理者ロールを解除
+    with test_common.requsts_mocker_default():
+        organization_id = list(testdata.ORGANIZATIONS.keys())[0]
+
+        # ユーザー更新処理
+        queue = make_queue_import_user('ja', organization_id, user_import_data=[data_sample_update_org_mng_2])
+
+        executor = UserImportJobExecutor(queue)
+        result = executor.execute_base()
+        save_result_file(organization_id, queue["PROCESS_EXEC_ID"])
+
+        # 成功を返すこと
+        assert result
+
+        # 状態が完了で、更新失敗件数が１であること
+        t = select_t_jobs_user(organization_id, queue["PROCESS_EXEC_ID"])
+        assert t["JOB_STATUS"] == const.JOB_USER_COMP
+        assert t["COUNT_REGISTER"] == 0 and t["COUNT_UPDATE"] == 1 and t["COUNT_DELETE"] == 0
+        assert t["SUCCESS_REGISTER"] == 0 and t["SUCCESS_UPDATE"] == 0 and t["SUCCESS_DELETE"] == 0
+        assert t["FAILED_REGISTER"] == 0 and t["FAILED_UPDATE"] == 1 and t["FAILED_DELETE"] == 0
+
+        ws = get_result_worksheet(organization_id, queue["PROCESS_EXEC_ID"])
+        assert ws.max_row == user_import_file_common.EXCEL_HEADER_ROWS + 1
+        assert ws.cell(user_import_file_common.EXCEL_HEADER_ROWS + 1, ERROR_TEXT_COL_INDEX).value == "ユーザー一括更新ではオーガナイゼーション管理者ロールを解除できません"
+
+    # keycloak HTTP-500応答(ユーザー更新に失敗)
+    with test_common.requsts_mocker_default() as requests_mocker:
+        organization_id = list(testdata.ORGANIZATIONS.keys())[0]
+
+        # 更新対象のユーザーを取得 / Get target user
+        u_get = get_user(user_json1["username"])
+        u_get_json = json.loads(u_get.text)
+        user_id = u_get_json[0]["id"]
+
+        # ユーザー更新処理
+        organization_private = DBconnector().get_organization_private(organization_id)
+        keycloak_error_msg = "http-500 error"
+        requests_mocker.register_uri(
+            requests_mock.PUT,
+            re.compile(rf'^{test_common.keycloak_origin()}/auth/admin/realms/{organization_id}/users/{user_id}'),
+            status_code=500,
+            json={"errorMessage": keycloak_error_msg})
+
+        queue = make_queue_import_user('ja', organization_id, user_import_data=[data_sample_update])
+
+        executor = UserImportJobExecutor(queue)
+        result = executor.execute_base()
+        save_result_file(organization_id, queue["PROCESS_EXEC_ID"])
+
+        # 成功を返すこと
+        assert result
+
+        # 状態が完了で、削除失敗件数が１であること
+        t = select_t_jobs_user(organization_id, queue["PROCESS_EXEC_ID"])
+        assert t["JOB_STATUS"] == const.JOB_USER_COMP
+        assert t["COUNT_REGISTER"] == 0 and t["COUNT_UPDATE"] == 1 and t["COUNT_DELETE"] == 0
+        assert t["SUCCESS_REGISTER"] == 0 and t["SUCCESS_UPDATE"] == 0 and t["SUCCESS_DELETE"] == 0
+        assert t["FAILED_REGISTER"] == 0 and t["FAILED_UPDATE"] == 1 and t["FAILED_DELETE"] == 0
+
+        ws = get_result_worksheet(organization_id, queue["PROCESS_EXEC_ID"])
+        assert ws.max_row == user_import_file_common.EXCEL_HEADER_ROWS + 1
+        assert ws.cell(user_import_file_common.EXCEL_HEADER_ROWS + 1, ERROR_TEXT_COL_INDEX).value == "ユーザー更新に失敗しました(対象ユーザーID:{0})[http-500 error]".format(user_id)
+
+
+def test_execute_delete_error_user_delete():
+    """ユーザー削除失敗
+    """
+    testdata = import_module("tests.db.exports.testdata")
+
+    # keycloak HTTP-500応答(ユーザー情報取得に失敗)
+    with test_common.requsts_mocker_default() as requests_mocker:
+        organization_id = list(testdata.ORGANIZATIONS.keys())[0]
+        keycloak_error_msg = "http-500 error"
+        requests_mocker.register_uri(
+            requests_mock.GET,
+            re.compile(rf'^{test_common.keycloak_origin()}/auth/admin/realms/{organization_id}/users'),
+            status_code=500,
+            json={"errorMessage": keycloak_error_msg})
+
+        queue = make_queue_import_user('ja', organization_id, user_import_data=[data_sample_delete], job_type=const.JOB_TYPE_USER_BULK_DELETE)
+
+        executor = UserImportJobExecutor(queue)
+        result = executor.execute_base()
+        save_result_file(organization_id, queue["PROCESS_EXEC_ID"])
+
+        # 成功を返すこと
+        assert result
+
+        # 状態が完了で、削除失敗件数が１であること
+        t = select_t_jobs_user(organization_id, queue["PROCESS_EXEC_ID"])
+        assert t["JOB_STATUS"] == const.JOB_USER_COMP
+        assert t["COUNT_REGISTER"] == 0 and t["COUNT_UPDATE"] == 0 and t["COUNT_DELETE"] == 1
+        assert t["SUCCESS_REGISTER"] == 0 and t["SUCCESS_UPDATE"] == 0 and t["SUCCESS_DELETE"] == 0
+        assert t["FAILED_REGISTER"] == 0 and t["FAILED_UPDATE"] == 0 and t["FAILED_DELETE"] == 1
+
+        ws = get_result_worksheet(organization_id, queue["PROCESS_EXEC_ID"])
+        assert ws.max_row == user_import_file_common.EXCEL_HEADER_ROWS + 1
+        assert ws.cell(user_import_file_common.EXCEL_HEADER_ROWS + 1, ERROR_TEXT_COL_INDEX).value == "ユーザーの取得に失敗しました(対象ユーザー:{0})".format(data_sample_registration["USERNAME"])
+
+    # 存在しないユーザーを削除
+    with test_common.requsts_mocker_default():
+        organization_id = list(testdata.ORGANIZATIONS.keys())[0]
+
+        # ユーザー削除処理
+        queue = make_queue_import_user('ja', organization_id, user_import_data=[data_sample_delete], job_type=const.JOB_TYPE_USER_BULK_DELETE)
+
+        executor = UserImportJobExecutor(queue)
+        result = executor.execute_base()
+        save_result_file(organization_id, queue["PROCESS_EXEC_ID"])
+
+        # 成功を返すこと
+        assert result
+
+        # 状態が完了で、削除失敗件数が１であること
+        t = select_t_jobs_user(organization_id, queue["PROCESS_EXEC_ID"])
+        assert t["JOB_STATUS"] == const.JOB_USER_COMP
+        assert t["COUNT_REGISTER"] == 0 and t["COUNT_UPDATE"] == 0 and t["COUNT_DELETE"] == 1
+        assert t["SUCCESS_REGISTER"] == 0 and t["SUCCESS_UPDATE"] == 0 and t["SUCCESS_DELETE"] == 0
+        assert t["FAILED_REGISTER"] == 0 and t["FAILED_UPDATE"] == 0 and t["FAILED_DELETE"] == 1
+
+        ws = get_result_worksheet(organization_id, queue["PROCESS_EXEC_ID"])
+        assert ws.max_row == user_import_file_common.EXCEL_HEADER_ROWS + 1
+        assert ws.cell(user_import_file_common.EXCEL_HEADER_ROWS + 1, ERROR_TEXT_COL_INDEX).value == "指定されたユーザーが存在しません"
+
+    # keycloak HTTP-500応答(ロール情報情報取得に失敗)
+    with test_common.requsts_mocker_default() as requests_mocker:
+        organization_id = list(testdata.ORGANIZATIONS.keys())[0]
+        # ユーザー作成登録
+        add_user(user=user_json1)
+
+        # 削除対象のユーザーを取得 / Get target user
+        u_get = get_user(user_json1["username"])
+        u_get_json = json.loads(u_get.text)
+        user_id = u_get_json[0]["id"]
+
+        # ユーザー削除処理
+        organization_private = DBconnector().get_organization_private(organization_id)
+        keycloak_error_msg = "http-500 error"
+        client_id = organization_private.user_token_client_id
+        requests_mocker.register_uri(
+            requests_mock.GET,
+            re.compile(rf'^{test_common.keycloak_origin()}/auth/admin/realms/{organization_id}/users/{user_id}/role-mappings/clients/{client_id}/composite'),
+            status_code=500,
+            json={"errorMessage": keycloak_error_msg})
+
+        queue = make_queue_import_user('ja', organization_id, user_import_data=[data_sample_delete], job_type=const.JOB_TYPE_USER_BULK_DELETE)
+
+        executor = UserImportJobExecutor(queue)
+        result = executor.execute_base()
+        save_result_file(organization_id, queue["PROCESS_EXEC_ID"])
+
+        # 成功を返すこと
+        assert result
+
+        # 状態が完了で、削除失敗件数が１であること
+        t = select_t_jobs_user(organization_id, queue["PROCESS_EXEC_ID"])
+        assert t["JOB_STATUS"] == const.JOB_USER_COMP
+        assert t["COUNT_REGISTER"] == 0 and t["COUNT_UPDATE"] == 0 and t["COUNT_DELETE"] == 1
+        assert t["SUCCESS_REGISTER"] == 0 and t["SUCCESS_UPDATE"] == 0 and t["SUCCESS_DELETE"] == 0
+        assert t["FAILED_REGISTER"] == 0 and t["FAILED_UPDATE"] == 0 and t["FAILED_DELETE"] == 1
+
+        ws = get_result_worksheet(organization_id, queue["PROCESS_EXEC_ID"])
+        assert ws.max_row == user_import_file_common.EXCEL_HEADER_ROWS + 1
+        assert ws.cell(user_import_file_common.EXCEL_HEADER_ROWS + 1, ERROR_TEXT_COL_INDEX).value == "ロールの取得に失敗しました(対象ID:{0} client:{1})".format(organization_id, client_id)
+
+    # オーガナイゼーション管理者ロールのユーザーを削除
+    with test_common.requsts_mocker_default():
+        organization_id = list(testdata.ORGANIZATIONS.keys())[0]
+
+        # ユーザー削除処理
+        queue = make_queue_import_user('ja', organization_id, user_import_data=[data_sample_delete_admin], job_type=const.JOB_TYPE_USER_BULK_DELETE)
+
+        executor = UserImportJobExecutor(queue)
+        result = executor.execute_base()
+        save_result_file(organization_id, queue["PROCESS_EXEC_ID"])
+
+        # 成功を返すこと
+        assert result
+
+        # 状態が完了で、削除失敗件数が１であること
+        t = select_t_jobs_user(organization_id, queue["PROCESS_EXEC_ID"])
+        assert t["JOB_STATUS"] == const.JOB_USER_COMP
+        assert t["COUNT_REGISTER"] == 0 and t["COUNT_UPDATE"] == 0 and t["COUNT_DELETE"] == 1
+        assert t["SUCCESS_REGISTER"] == 0 and t["SUCCESS_UPDATE"] == 0 and t["SUCCESS_DELETE"] == 0
+        assert t["FAILED_REGISTER"] == 0 and t["FAILED_UPDATE"] == 0 and t["FAILED_DELETE"] == 1
+
+        ws = get_result_worksheet(organization_id, queue["PROCESS_EXEC_ID"])
+        assert ws.max_row == user_import_file_common.EXCEL_HEADER_ROWS + 1
+        assert ws.cell(user_import_file_common.EXCEL_HEADER_ROWS + 1, ERROR_TEXT_COL_INDEX).value == "オーガナイゼーション管理者は削除できません"
+
+    # keycloak HTTP-500応答(ユーザー削除に失敗)
+    with test_common.requsts_mocker_default() as requests_mocker:
+        organization_id = list(testdata.ORGANIZATIONS.keys())[0]
+        # ユーザー作成登録
+        add_user(user=user_json1)
+
+        # 削除対象のユーザーを取得 / Get target user
+        u_get = get_user(user_json1["username"])
+        u_get_json = json.loads(u_get.text)
+        user_id = u_get_json[0]["id"]
+
+        # ユーザー削除処理
+        organization_private = DBconnector().get_organization_private(organization_id)
+        keycloak_error_msg = "http-500 error"
+        requests_mocker.register_uri(
+            requests_mock.DELETE,
+            re.compile(rf'^{test_common.keycloak_origin()}/auth/admin/realms/{organization_id}/users/{user_id}'),
+            status_code=500,
+            json={"errorMessage": keycloak_error_msg})
+
+        queue = make_queue_import_user('ja', organization_id, user_import_data=[data_sample_delete], job_type=const.JOB_TYPE_USER_BULK_DELETE)
+
+        executor = UserImportJobExecutor(queue)
+        result = executor.execute_base()
+        save_result_file(organization_id, queue["PROCESS_EXEC_ID"])
+
+        # 成功を返すこと
+        assert result
+
+        # 状態が完了で、削除失敗件数が１であること
+        t = select_t_jobs_user(organization_id, queue["PROCESS_EXEC_ID"])
+        assert t["JOB_STATUS"] == const.JOB_USER_COMP
+        assert t["COUNT_REGISTER"] == 0 and t["COUNT_UPDATE"] == 0 and t["COUNT_DELETE"] == 1
+        assert t["SUCCESS_REGISTER"] == 0 and t["SUCCESS_UPDATE"] == 0 and t["SUCCESS_DELETE"] == 0
+        assert t["FAILED_REGISTER"] == 0 and t["FAILED_UPDATE"] == 0 and t["FAILED_DELETE"] == 1
+
+        ws = get_result_worksheet(organization_id, queue["PROCESS_EXEC_ID"])
+        assert ws.max_row == user_import_file_common.EXCEL_HEADER_ROWS + 1
+        assert ws.cell(user_import_file_common.EXCEL_HEADER_ROWS + 1, ERROR_TEXT_COL_INDEX).value == "ユーザー削除に失敗しました(対象ユーザーID:{0})[http-500 error]".format(user_id)
+
+    # 削除と登録が混在の場合
+    with test_common.requsts_mocker_default():
+        organization_id = list(testdata.ORGANIZATIONS.keys())[0]
+
+        # ユーザー削除処理
+        queue = make_queue_import_user('ja', organization_id, user_import_data=[data_sample_registration, data_sample_delete2], job_type=const.JOB_TYPE_USER_BULK_DELETE)
+
+        executor = UserImportJobExecutor(queue)
+        result = executor.execute_base()
+        save_result_file(organization_id, queue["PROCESS_EXEC_ID"])
+
+        # 失敗を返すこと
+        assert not result
+
+        # 状態が異常であること
+        t = select_t_jobs_user(organization_id, queue["PROCESS_EXEC_ID"])
+        assert t["JOB_STATUS"] == const.JOB_USER_FAILED
+        assert t["MESSAGE"] == 'ユーザー一括削除の場合、実行処理種別に「削除」以外は指定できません。'
 
 def test_execute_registration_error_role_mapping():
     """ロール付与失敗
@@ -724,12 +1224,12 @@ def test_execute_timeout():
 
     # Jobの設定を試験用に切り替え
     process_kind=const.PROCESS_KIND_USER_IMPORT
-    job_config_jobs = dict(job_manager_config.JOBS)
+    job_config_jobs = copy.deepcopy(job_manager_config.JOBS)
     job_config_jobs[process_kind]["timeout_seconds"] = timeout_sec
     job_config_jobs[process_kind]["extra_config"]["status_update_interval"] = 3
 
     with test_common.requsts_mocker_default(), mock.patch.dict(f"job_manager_config.JOBS", job_config_jobs):
-    
+
         # sub process起動用の情報生成
         sub_processes_mgr = SubProcessesManager()
         sub_process_parameter = sub_processes_mgr.generate_sub_process_parameter()
@@ -851,7 +1351,7 @@ def test_force_update_status_normally():
             assert t["JOB_STATUS"] == const.JOB_USER_FAILED
 
 
-def make_queue_import_user(lang, organization_id, user_import_data=None, user_import_data_image=None, insert_queue=True):
+def make_queue_import_user(lang, organization_id, user_import_data=None, user_import_data_image=None, insert_queue=True, job_type=const.JOB_TYPE_USER_BULK_IMPORT):
     """テスト用共通:Queue情報生成
 
     Args:
@@ -884,7 +1384,7 @@ def make_queue_import_user(lang, organization_id, user_import_data=None, user_im
 
     with closing(DBconnector().connect_orgdb(organization_id)) as conn,\
         conn.cursor() as cursor:
-    
+
         cursor.execute('''
             INSERT INTO T_JOBS_USER
             (JOB_ID,
@@ -898,7 +1398,7 @@ def make_queue_import_user(lang, organization_id, user_import_data=None, user_im
             %(LANGUAGE)s)
             ''',
             {"JOB_ID": process_exec_id,
-            "JOB_TYPE": const.PROCESS_KIND_USER_IMPORT,
+            "JOB_TYPE": job_type,
             "JOB_STATUS": const.JOB_USER_NOT_EXEC,
             "LANGUAGE": lang}
         )
@@ -1002,17 +1502,210 @@ def select_t_jobs_user(organization_id, job_id):
         return cursor.fetchone()
 
 
-# サンプルデータ（追加用）
+def add_user(user):
+        """ユーザの追加 / add user
+
+        Args:
+            cell_values (dict): cellの値 / cell value
+
+        Returns:
+            str: user id
+        """
+        testdata = import_module("tests.db.exports.testdata")
+
+        with closing(DBconnector().connect_orgdb(list(testdata.ORGANIZATIONS.keys())[0])) as conn:
+            organization_private = DBconnector().get_organization_private(list(testdata.ORGANIZATIONS.keys())[0])
+            organization_sa_token = jobs_common.organization_sa_token(list(testdata.ORGANIZATIONS.keys())[0], organization_private)
+
+        # ユーザーの追加 / add user
+        u_create = api_keycloak_users.user_create(
+            realm_name=list(testdata.ORGANIZATIONS.keys())[0], user_json=user, token=organization_sa_token.get()
+        )
+        return u_create
+
+def get_user(user_name):
+        """ユーザ情報取得 / get user
+
+        Args:
+            user_name (str): ユーザー名 / user name
+
+        Returns:
+            dict: u_get
+        """
+        testdata = import_module("tests.db.exports.testdata")
+
+        with closing(DBconnector().connect_orgdb(list(testdata.ORGANIZATIONS.keys())[0])) as conn:
+            organization_private = DBconnector().get_organization_private(list(testdata.ORGANIZATIONS.keys())[0])
+            organization_sa_token = jobs_common.organization_sa_token(list(testdata.ORGANIZATIONS.keys())[0], organization_private)
+
+        # ユーザーの取得 / get user
+        u_get = api_keycloak_users.user_get(realm_name=list(testdata.ORGANIZATIONS.keys())[0], user_name=user_name, token=organization_sa_token.get())
+
+        return u_get
+
+
+# サンプルデータ（登録用）
 data_sample_registration = {
-    "PROC_TYPE": "追加",
+    "PROC_TYPE": "登録",
     "USERNAME": "testuser-01",
     "PASSWORD": "password",
     "EMAIL": "testuser-01@example.com",
     "LASTNAME": "testuser",
     "FIRSTNAME": "01",
-    "ENABLED": "TRUE",
+    "ENABLED": True,
     "AFFILIATION": "所属01",
     "DESCRIPTION": "説明01",
     "USER_ID": None,
     "ROLES": "_ws1-admin",
+}
+
+data_sample_registration2 = {
+    "PROC_TYPE": "登録",
+    "USERNAME": "testuser-02",
+    "PASSWORD": "password",
+    "EMAIL": "testuser-02@example.com",
+    "LASTNAME": "testuser",
+    "FIRSTNAME": "02",
+    "ENABLED": True,
+    "AFFILIATION": "所属01",
+    "DESCRIPTION": "説明01",
+    "USER_ID": None,
+    "ROLES": "_ws1-admin",
+}
+
+data_sample_registration_org_manager = {
+    "PROC_TYPE": "登録",
+    "USERNAME": "testuser-org-mng",
+    "PASSWORD": "password",
+    "EMAIL": "testuser-org-mng@example.com",
+    "LASTNAME": "testuser",
+    "FIRSTNAME": "org-mng",
+    "ENABLED": True,
+    "AFFILIATION": "所属org-mng",
+    "DESCRIPTION": "説明org-mng",
+    "USER_ID": None,
+    "ROLES": "{},_ws1-admin".format(const.ORG_ROLE_ORG_MANAGER),
+}
+
+# サンプルデータ（更新用）
+data_sample_update = {
+    "PROC_TYPE": "更新",
+    "USERNAME": "testuser-01",
+    "EMAIL": "testuser-01-upd@example.com",
+    "LASTNAME": "testuser-upd",
+    "FIRSTNAME": "01-upd",
+    "ENABLED": False,
+    "AFFILIATION": "所属01-upd",
+    "DESCRIPTION": "説明01-upd",
+    "USER_ID": None,
+    "ROLES": "_ws1-admin,_ws2-admin",
+}
+
+data_sample_update_2 = {
+    "PROC_TYPE": "更新",
+    "USERNAME": "testuser-02",
+    "EMAIL": "testuser-01@example.com",
+    "LASTNAME": "testuser-upd",
+    "FIRSTNAME": "02-upd",
+    "ENABLED": False,
+    "AFFILIATION": "所属02-upd",
+    "DESCRIPTION": "説明02-upd",
+    "USER_ID": None,
+    "ROLES": "_ws1-admin,_ws2-admin",
+}
+
+data_sample_update_unknown = {
+    "PROC_TYPE": "更新",
+    "USERNAME": "testuser-unknown",
+    "EMAIL": "testuser-unknown-upd@example.com",
+    "LASTNAME": "testuser-upd",
+    "FIRSTNAME": "unknown-upd",
+    "ENABLED": False,
+    "AFFILIATION": "所属unknown-upd",
+    "DESCRIPTION": "説明unknown-upd",
+    "USER_ID": None,
+    "ROLES": "_ws1-admin,_ws2-admin",
+}
+
+data_sample_update_org_mng = {
+    "PROC_TYPE": "更新",
+    "USERNAME": "testuser-org-mng",
+    "EMAIL": "testuser-org-mng-upd@example.com",
+    "LASTNAME": "testuser-upd",
+    "FIRSTNAME": "org-mng-upd",
+    "ENABLED": False,
+    "AFFILIATION": "所属org-mng-upd",
+    "DESCRIPTION": "説明org-mng-upd",
+    "USER_ID": None,
+    "ROLES": "{},_ws1-admin".format(const.ORG_ROLE_ORG_MANAGER),
+}
+
+data_sample_update_org_mng_2 = {
+    "PROC_TYPE": "更新",
+    "USERNAME": "testuser-org-mng",
+    "EMAIL": "testuser-org-mng-upd@example.com",
+    "LASTNAME": "testuser-upd",
+    "FIRSTNAME": "org-mng-upd",
+    "ENABLED": True,
+    "AFFILIATION": "所属org-mng-upd",
+    "DESCRIPTION": "説明org-mng-upd",
+    "USER_ID": None,
+    "ROLES": "_ws1-admin",
+}
+
+# サンプルデータ（削除用）
+data_sample_delete = {
+    "PROC_TYPE": "削除",
+    "USERNAME": "testuser-01",
+}
+data_sample_delete2 = {
+    "PROC_TYPE": "削除",
+    "USERNAME": "testuser-02",
+}
+
+data_sample_delete_admin = {
+    "PROC_TYPE": "削除",
+    "USERNAME": "admin",
+}
+
+
+# サンプルユーザーデータ
+user_json1 = {
+    "username": "testuser-01",
+    "email": "testuser-01@example.com",
+    "firstName": "01",
+    "lastName": "testuser",
+    "credentials": [
+        {
+            "type": "password",
+            "value": "password",
+            "temporary": True,
+        }
+    ],
+    "attributes":
+    {
+        "affiliation": "所属01",
+        "description": "説明01",
+    },
+    "enabled": True
+}
+
+user_json2 = {
+    "username": "testuser-02",
+    "email": "testuser-02@example.com",
+    "firstName": "02",
+    "lastName": "testuser",
+    "credentials": [
+        {
+            "type": "password",
+            "value": "password",
+            "temporary": True,
+        }
+    ],
+    "attributes":
+    {
+        "affiliation": "所属02",
+        "description": "説明02",
+    },
+    "enabled": True
 }

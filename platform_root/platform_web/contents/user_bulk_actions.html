@@ -1,0 +1,244 @@
+<!--
+#   Copyright 2022 NEC Corporation
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+-->
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="format-detection" content="telephone=no,email=no,address=no">
+    <meta name="theme-color" content="#002B62">
+    <title text-id="000-92001">
+        ユーザー一括登録・削除 / Exastro Platform
+    </title>
+    <link rel="stylesheet" href="/_/platform-commons/css/platform.css?ver=__BUILD_VERSION__">
+
+    <script type="text/javascript" src="/auth/js/keycloak.js?ver=__BUILD_VERSION__"></script>
+    <script type="text/javascript" src="/_/common-auth/js/exastro-common-auth-config.js?ver=__BUILD_VERSION__"></script>
+    <script type="text/javascript" src="/_/common-auth/js/exastro-common-auth.js?ver=__BUILD_VERSION__"></script>
+    <script src="/_/platform-commons/common/js/jquery.js?ver=__BUILD_VERSION__"></script>
+
+    <link rel="stylesheet" href="/_/platform-commons/css/custom_properties.css?ver=__BUILD_VERSION__">
+    <link rel="stylesheet" href="/_/platform-commons/css/common.css?ver=__BUILD_VERSION__">
+    <link rel="stylesheet" href="/_/platform-commons/css/dialog.css?ver=__BUILD_VERSION__">
+
+    <script src="/_/platform-commons/common/js/words.js?ver=__BUILD_VERSION__"></script>
+    <script src="/_/platform-commons/common/js/common.js?ver=__BUILD_VERSION__"></script>
+    <script src="/_/platform-commons/common/js/dialog.js?ver=__BUILD_VERSION__"></script>
+    <script src="/_/platform-commons/common/js/ui.js?ver=__BUILD_VERSION__"></script>
+
+    <script src="/_/platform-commons/js/platform_common.js?ver=__BUILD_VERSION__"></script>
+    <script src="/_/platform-commons/js/uri_conf.js?ver=__BUILD_VERSION__"></script>
+    <script src="/_/platform-commons/js/user_bulk_actions.js?ver=__BUILD_VERSION__"></script>
+</head>
+
+<body>
+    <div id="container">
+        <div class="containerHeader">
+            <header id="header">
+                <div class="logo">
+                    <img class="logoImage" src="/_/platform-commons/img/Exastro-logo2-white-rgb.svg?ver=__BUILD_VERSION__" alt="Exastro" style="height:32px; margin:5px 18px;">
+                </div>
+                <div class="topicPath">
+                    <ol class="topichPathList" style="visibility:hidden;">
+                    </ol>
+                </div>
+                <div class="headerMenu">
+                    <ul class="headerMenuList">
+                        <li class="userInfomation headerMenuItem">
+                        </li>
+                    </ul>
+                </div>
+            </header>
+        </div>
+        <div class="containerBody">
+            <aside id="menu" class="">
+                <div class="menuBody">
+                    <nav class="menuNavi">
+                        <ul class="menuList" style="display:none;">
+                        </ul>
+                    </nav>
+                </div>
+            </aside>
+            <main id="main" style="visibility:hidden;">
+                <div id="content">
+                    <div class="contentHeader">
+                        <h1 class="contentTitle"><span class="contentTitleInner" text-id="000-92002">ユーザー一括登録・削除</span></h1>
+                        <p class="contentMenuInfo" text-id="000-92003">ユーザーのメンテナンス（登録・更新・削除）を行うことができます。</p>
+                    </div>
+                    <div class="contentBody">
+                        <div class="contentMenu">
+                            <ul class="contentMenuList">
+                                <li class="contentMenuItem">
+                                    <a class="contentMenuLink tabOpen" href="#dataDownload" tabindex="-1">
+                                        <span class="inner" text-id="000-92004">全件ダウンロード・ファイル一括登録</span>
+                                    </a>
+                                </li>
+                                <li class="contentMenuItem" id="tab_list">
+                                    <a class="contentMenuLink" href="#bulkActionResults" tabindex="-1">
+                                        <span class="inner" text-id="000-92005">一括処理結果</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                        <section class="section tabOpen" id="dataDownload">
+                            <div class="sectionBody">
+                                <div class="operationBlock">
+                                    <div class="operationTitle">
+                                        <button id="newDwonloadExcel" data-type="newDwonloadExcel" class="operationButton itaButton button">
+                                            <span class="inner" text-id="000-92006">新規登録用ダウンロード</span>
+                                        </button>
+                                    </div>
+                                    <div class="operationDescription" text-id="000-92007">新規登録用のエクセルシートをダウンロードします。</div>
+                                </div>
+                                <div class="operationBlock">
+                                    <div class="operationTitle">
+                                        <button id="allDwonloadExcel" data-type="allDwonloadExcel" class="operationButton itaButton button">
+                                            <span class="inner" text-id="000-92008">全件ダウンロード</span>
+                                        </button>
+                                    </div>
+                                    <div class="operationDescription" text-id="000-92009">登録している項目の一覧をエクセルシートでダウンロードします。</div>
+                                </div>
+                                <div class="operationBlock">
+                                    <div class="operationTitle">
+                                        <button id="excelUploadImport" data-type="excelUploadImport" data-action="positive" class="operationButton itaButton button">
+                                            <span class="inner" text-id="000-92010">ファイル一括登録</span>
+                                        </button>
+                                    </div>
+                                    <div class="operationDescription" text-id="000-92011">ダウンロードしたエクセルシートを編集し、ここからアップロードすることで一括して登録・更新ができます。</div>
+                                </div>
+                                <div class="operationBlock">
+                                    <div class="operationTitle">
+                                        <button id="excelUploadDelete" data-type="excelUploadDelete" data-action="danger" class="operationButton itaButton button">
+                                            <span class="inner" text-id="000-92012">ファイル一括削除</span>
+                                        </button>
+                                    </div>
+                                    <div class="operationDescription" text-id="000-92013">ダウンロードしたエクセルシートを編集し、ここからアップロードすることで一括して削除ができます。</div>
+                                </div>
+                            </div>
+                        </section>
+
+                        <section class="section" id="bulkActionResults">
+                            <div class="sectionBody">
+                                <div id="MT" class="tableContainer viewTable">
+                                    <div class="tableHeader">
+                                        <ul class="tableHeaderMainMenuList">
+                                            <li class="tableHeaderMainMenuItem">
+                                                <button id="dataRefresh" data-type="dataRefresh" data-action="positive" style="width:120px;" class="itaButton tableHeaderMainMenuButton button">
+                                                    <span class="inner"><span class="icon icon-update02"></span>
+                                                    <span text-id="000-80052">更新</span>
+                                                </button>
+                                            </li>
+                                            <li class="tableHeaderMainMenuItem">
+                                                <span class="ci" id="bulk_action_results_message"></span>
+                                            </li>
+                                        </ul>
+                                        <ul>
+                                        </ul>
+                                    </div>
+                                    <div class="tableBody">
+                                        <table class="table" width="100%" id="bulk_action_results">
+                                            <thead class="thead">
+                                                <tr class="tHeadTr tr">
+                                                    <th data-id="c1" class="tHeadTh popup th" rowspan="1" colspan="1" title="エラー処理結果" attr-text-id="title=000-92014">
+                                                        <div class="ci" text-id="000-92014">エラー処理結果</div>
+                                                    </th>
+                                                    <th data-id="c2" class="tHeadTh popup th" rowspan="1" colspan="1" title="実行日時" attr-text-id="title=000-92015">
+                                                        <div class="ci" text-id="000-92015">実行日時</div>
+                                                    </th>
+                                                    <th data-id="c3" class="tHeadTh popup th" rowspan="1" colspan="1" title="実行区分" attr-text-id="title=000-92016">
+                                                        <div class="ci" text-id="000-92016">実行区分</div>
+                                                    </th>
+                                                    <th data-id="c4" class="tHeadTh popup th" rowspan="1" colspan="1" title="ステータス" attr-text-id="title=000-92017">
+                                                        <div class="ci" text-id="000-92017">ステータス</div>
+                                                    </th>
+                                                    <th data-id="c5" class="tHeadTh popup th" rowspan="1" colspan="1" title="対象件数" attr-text-id="title=000-92018">
+                                                        <div class="ci" text-id="000-92018">対象件数</div>
+                                                    </th>
+                                                    <th data-id="c6" class="tHeadTh popup th" rowspan="1" colspan="1" title="成功件数" attr-text-id="title=000-92019">
+                                                        <div class="ci" text-id="000-92019">成功件数</div>
+                                                    </th>
+                                                    <th data-id="c7" class="tHeadTh popup th" rowspan="1" colspan="1" title="エラー件数" attr-text-id="title=000-92020">
+                                                        <div class="ci" text-id="000-92020">エラー件数</div>
+                                                    </th>
+                                                    <th data-id="c8" class="tHeadTh popup th" rowspan="1" colspan="1" title="処理結果メッセージ" attr-text-id="title=000-92021">
+                                                        <div class="ci" text-id="000-92021">処理結果メッセージ</div>
+                                                    </th>
+                                                    <th data-id="c9" class="tHeadTh popup th" rowspan="1" colspan="1" title="ユーザー" attr-text-id="title=000-00135">
+                                                        <div class="ci" text-id="000-00135">ユーザー</div>
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="tbody">
+                                                <tr class="tBodyTr tr datarow-template" style="display:none">
+                                                    <td class="tBodyTh tBodyTd td" rowspan="1" colspan="1">
+                                                        <div class="ci" style="text-align: center;">
+                                                            <button title="ダウンロード" attr-text-id="title=000-00208" class="itaButton button button_re_download" data-id="${job_id}" data-status="${job_status}" count_failed="${count_failed}" style="width:200px;" disabled>
+                                                                <span class="inner">
+                                                                    <span class="iconButtonIcon icon icon-download"></span>
+                                                                    <span class="iconButtonBody" text-id="000-00208">ダウンロード</span>
+                                                                </span>
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                    <td class="tBodyTd td" rowspan="1" colspan="1">
+                                                        <div class="ci" style="text-align: center;">${create_timestamp}</div>
+                                                    </td>
+                                                    <td class="tBodyTd td" rowspan="1" colspan="1">
+                                                        <div class="ci">${job_type}</div>
+                                                    </td>
+                                                    <td class="tBodyTd td" rowspan="1" colspan="1">
+                                                        <div class="ci">${job_status}</div>
+                                                    </td>
+                                                    <td class="tBodyTd td" rowspan="1" colspan="1">
+                                                        <div class="ci" style="text-align: right;">${count_total}</div>
+                                                    </td>
+                                                    <td class="tBodyTd td" rowspan="1" colspan="1">
+                                                        <div class="ci" style="text-align: right;">${count_success}</div>
+                                                    </td>
+                                                    <td class="tBodyTd td" rowspan="1" colspan="1">
+                                                        <div class="ci" style="text-align: right;">${count_failed}</div>
+                                                    </td>
+                                                    <td class="tBodyTd td" rowspan="1" colspan="1">
+                                                        <div class="ci textOverWrap">${message}</div>
+                                                    </td>
+                                                    <td class="tBodyTd td" rowspan="1" colspan="1">
+                                                        <div class="ci textOverWrap">${create_user}</div>
+                                                    </td>
+                                                </tr>
+                                                <tr class="tBodyTr tr notfound" style="display:none">
+                                                    <td class="tBodyLeftSticky tBodyTh th" rowspan="1" colspan="9" height="50px">
+                                                        <div class="ci" style="text-align: center;" text-id="000-92022">一括処理の結果はありません</div>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                        <form name="download" target="download_target" method="POST" action="">
+                            <input type="hidden" id="authorization" name="authorization" value="">
+                        </form>
+                        <iframe name="download_target" style="display:none;"></iframe>
+                    </div>
+                </div>
+            </main>
+        </div>
+        <div class="containerLoading"></div>
+    </div>
+</body>
+
+</html>

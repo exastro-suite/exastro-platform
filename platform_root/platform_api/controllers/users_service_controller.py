@@ -134,13 +134,14 @@ def user_create(body, organization_id):
     body = connexion.request.get_json()
     if not body:
         raise common.BadRequestException(
-            message_id='400-000002', message='リクエストボディのパラメータ({})が不正です。'.format('Json')
+            message_id='400-00002', message='リクエストボディのパラメータ({})が不正です。'.format('Json')
         )
 
     user_name = body.get("username")
     user_email = body.get("email")
     user_firstName = body.get("firstName")
     user_lastName = body.get("lastName")
+    password = body.get("password")
     password_temporary = body.get("password_temporary", "True")
     user_affiliation = body.get("affiliation")
     user_description = body.get("description")
@@ -157,6 +158,9 @@ def user_create(body, organization_id):
     if not validate.ok:
         return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
     validate = validation.validate_user_lastName(user_lastName)
+    if not validate.ok:
+        return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
+    validate = validation.validate_password(password)
     if not validate.ok:
         return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
     validate = validation.validate_password_temporary(password_temporary)
@@ -332,12 +336,13 @@ def user_update(body, organization_id, user_id):  # noqa: E501
     body = connexion.request.get_json()
     if not body:
         raise common.BadRequestException(
-            message_id='400-000002', message='リクエストボディのパラメータ({})が不正です。'.format('Json')
+            message_id='400-00002', message='リクエストボディのパラメータ({})が不正です。'.format('Json')
         )
 
     user_email = body.get("email")
     user_firstName = body.get("firstName")
     user_lastName = body.get("lastName")
+    password = body.get("password")
     password_temporary = body.get("password_temporary", "True")
     user_affiliation = body.get("affiliation")
     user_description = body.get("description")
@@ -356,6 +361,10 @@ def user_update(body, organization_id, user_id):  # noqa: E501
     validate = validation.validate_password_temporary(password_temporary)
     if not validate.ok:
         return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
+    if password is not None:
+        validate = validation.validate_password(password)
+        if not validate.ok:
+            return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
     validate = validation.validate_user_affiliation(user_affiliation)
     if not validate.ok:
         return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
@@ -568,8 +577,9 @@ def user_delete(organization_id, user_id):
         message_id = f"500-{MSG_FUNCTION_ID}003"
         message = multi_lang.get_text(
             message_id,
-            "ユーザー削除に失敗しました(対象ユーザーID:{0})",
-            user_id)
+            "ユーザー削除に失敗しました(対象ユーザーID:{0})[{1}]",
+            user_id,
+            json.loads(response.text)["errorMessage"])
 
         raise common.InternalErrorException(message_id=message_id, message=message)
 

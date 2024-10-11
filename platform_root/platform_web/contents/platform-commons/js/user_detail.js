@@ -38,7 +38,7 @@ $(function(){
             }),
         ]).then(function(results) {
             // Display Menu
-            displayMenu('menu_account_management');
+            displayMenu('menu_account_list');
             // Display Topic Path
             displayTopicPath([
                 {"text": getText("000-83001", "ユーザー一覧"), "href": location_conf.href.users.list.replace(/{organization_id}/g, CommonAuth.getRealm()) },
@@ -69,7 +69,7 @@ $(function(){
         $('.button_edit_user').on('click', function() {
             window.location = location_conf.href.users.edit.replace('{organization_id}',CommonAuth.getRealm()).replace('{user_id}',user_id);
         });
-    
+
         $(".button_delete_user")
             .prop("disabled", isSystemAccount || !isUpdateAbleRow)
             .css("cursor", isSystemAccount || !isUpdateAbleRow? "not-allowed": "")

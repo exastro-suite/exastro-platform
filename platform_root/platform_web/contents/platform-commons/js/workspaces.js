@@ -175,6 +175,7 @@ $(function(){
     function disabled_button() {
         $("#new_workspace").prop('disabled', true);
         $("#workspace_list button").prop('disabled', true);
+        $("#workspace_list .btn_ita").css('cursor', 'not-allowed');
     }
 
     function enabled_button() {
@@ -185,6 +186,7 @@ $(function(){
             let $element = $(element);
             if(accessibleWorkspaces.indexOf($element.attr('data-id')) !== -1) {
                 $element.prop('disabled', false);
+                $element.css('cursor', '');
             } else {
                 $element.prop('disabled', true);
                 $element.css('cursor', 'not-allowed');

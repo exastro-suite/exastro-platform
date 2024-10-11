@@ -11,6 +11,8 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
+import logging
+import os
 
 config = None
 logger = None
@@ -25,3 +27,10 @@ def init(app):
     config = app.config
     logger = app.logger
     audit = app.logger
+
+    # multipartログは出力レベルを調整
+    # multipart log adjust output level
+    if os.environ.get('LOG_LEVEL') == 'DEBUG':
+        logging.getLogger('multipart').setLevel(logging.ERROR)
+    else:
+        logging.getLogger('multipart').setLevel(logging.CRITICAL)

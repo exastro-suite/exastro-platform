@@ -21,6 +21,8 @@ from urllib.parse import urlparse
 import traceback
 import re
 import inspect
+from multipart import multipart
+import werkzeug.exceptions
 
 # User Imports
 import globals
@@ -31,6 +33,7 @@ import common_library.common.const as common_const
 import config.auth.auth_pattern as auth_pattern
 # import api_keycloak_call
 import common_library.common.api_keycloak_tokens as api_keycloak_tokens
+from common_library.common import multi_lang
 
 
 class auth_proxy:
@@ -62,8 +65,13 @@ class auth_proxy:
     # Clisent Secret of Client ID for token check
     user_token_client_secret = None
 
+    # 監査ログ用の情報収集変数
+    # Information collection variables for audit logs
+    request_forms = {}
+    request_files = {}
+
     # def __init__(self):
-    def __init__(self, realm, token_check_client_id, token_check_client_secret, user_token_client_id, user_token_client_secret):
+    def __init__(self, realm, token_check_client_id, token_check_client_secret, user_token_client_id, user_token_client_secret, response_chunk_byte):
         """初期化処理 initialize setting
 
         Args:
@@ -71,6 +79,7 @@ class auth_proxy:
             token_check_client_id (str): token check client id
             token_check_client_secret (str): token check client secret
             user_token_client_id (str): user token check client id
+            response_chunk_byte (int): response chunk byte size
 
         """
         self.realm = realm
@@ -81,9 +90,17 @@ class auth_proxy:
         self.token_check_client_secret = token_check_client_secret
         self.user_token_client_id = user_token_client_id
         self.user_token_client_secret = user_token_client_secret
+        self.response_chunk_byte = response_chunk_byte
 
-    def check_authorization(self):  # noqa: C901
+        self.request_forms = {}
+        self.request_files = {}
+
+    def check_authorization(self, stream_mode=False):  # noqa: C901
         """認証情報チェック Authorization check
+
+        Args:
+            stream_mode (bool) :    True is stream mode (submit form authorization)
+                                    False is not stream mode (header authorization)
 
         Returns:
             json :
@@ -111,7 +128,14 @@ class auth_proxy:
         # bearerを取得
         # Get bearer
         # bearer = environ.get('HTTP_AUTHORIZATION')
-        get_auth = request.headers.get('Authorization')
+        if stream_mode:
+            get_auth = request.headers.get('Authorization')
+            # ヘッダーがあれば、ヘッダー優先、なければformの値から取得する
+            # If there is a header, give priority to the header, otherwise get it from the form value
+            if not get_auth:
+                get_auth = request.form.get('authorization')
+        else:
+            get_auth = request.headers.get('Authorization')
         globals.logger.debug(f'auth={get_auth}')
         # アクセストークンチェックを実行
         # Extract only the token part
@@ -267,7 +291,7 @@ class auth_proxy:
             "User-Id": self.token_decode.get("sub"),
             "Roles": roles_str,
             "Org-Roles": org_roles_str,
-            "Language": self.token_decode.get("locale"),
+            "Language": self.token_decode.get("locale") or "ja",
         }
         user_info = {
             "user_id": self.token_decode.get("sub"),
@@ -314,7 +338,7 @@ class auth_proxy:
         except Exception:
             raise
 
-    def call_api(self, dest_url, info):
+    def call_api(self, dest_url, info, stream=False, multipart_mode=False):
         """API呼び出し Call API
 
         Args:
@@ -323,6 +347,8 @@ class auth_proxy:
             {
                 "user_id": user id
             }
+            stream (bool): True: stream mode call (default. False)
+            multipart_mode (bool): True: multipart/form-data mode call (default. False)
 
         Returns:
             _type_: _description_
@@ -330,82 +356,95 @@ class auth_proxy:
 
         globals.logger.debug(f"### start func:{inspect.currentframe().f_code.co_name}")
 
+        globals.logger.debug(f'{dest_url=}')
+
         # ヘッダにuser_idの付与 addtional header user_id
         post_headers = {
             'organization_id': self.realm,
         }
         post_headers.update(info)
-        globals.logger.debug(f'post_headers: {post_headers}')
+        globals.logger.debug(f'{post_headers=}')
 
         # method
         request_method = request.method
-        globals.logger.debug(f'request_method: {request_method}')
-
-        request_body = {}
-        request_form = {}
-        request_files = {}
-
-        # パラメータを形成
-        # Form parameters
-        if request.is_json:
-            try:
-                request_body = request.json.copy()
-                globals.logger.debug(f'request_body: {request_body}')
-            except Exception:
-                request_body = {}
-
-        # パラメータを形成(multipart/form-data)
-        # form parameters, files parameters
-        if request.form:
-            try:
-                request_form = request.form.copy()
-                globals.logger.debug(f'request_form: {request_form}')
-            except Exception:
-                request_form = {}
-        if request.files:
-            try:
-                request_files = request.files.copy()
-                globals.logger.debug(f'request_files: {request_files}')
-            except Exception:
-                request_files = {}
-
-        # レスポンスContent-Type
-        if request.content_type:
-            request_content_type = request.content_type.lower()
-        else:
-            request_content_type = ""
-        globals.logger.debug(f'request_content_type: {request_content_type}')
+        globals.logger.debug(f'{request_method=}')
 
         # 引数
         # query_string
         query_string = request.query_string
-        globals.logger.debug(f'query_string: {query_string}')
+        globals.logger.debug(f'{query_string=}')
 
-        globals.logger.debug(f'CALL dest_url: {dest_url}')
+        # multipartモードの場合は、BODY系要素のアクセスは行わない(大容量ファイルにおいてもアクセスするとすべて送信されるまで待たされる)
+        # In multipart mode, BODY elements are not accessed (even if you access a large file, you will have to wait until all files are sent)
+        if not multipart_mode:
+            request_body = {}
+            request_form = {}
+            request_files = {}
 
-        # リクエストを実行
-        # Execute request
-        ret = self.main_request(request_method, dest_url, post_headers, request_body, query_string, request_content_type, request_form, request_files)
-        # ----ここまでAPサーバへのリクエスト処理---- #
-        # Request processing to the AP server so far
+            # パラメータを形成
+            # Form parameters
+            if request.is_json:
+                try:
+                    request_body = request.json.copy()
+                    globals.logger.debug(f'{request_body=}')
+                except Exception:
+                    request_body = {}
 
-        globals.logger.debug(f'return main_request ret={ret}')
+            # パラメータを形成(multipart/form-data)
+            # form parameters, files parameters
+            if request.form:
+                try:
+                    request_form = request.form.copy()
+                    globals.logger.debug(f'{request_form=}')
+                except Exception:
+                    request_form = {}
+            if request.files:
+                try:
+                    request_files = request.files.copy()
+                    globals.logger.debug(f'{request_files=}')
+                except Exception:
+                    request_files = {}
+
+            # レスポンスContent-Type
+            if request.content_type:
+                request_content_type = request.content_type.lower()
+            else:
+                request_content_type = ""
+            globals.logger.debug(f'{request_content_type=}')
+
+            # リクエストを実行
+            # Execute request
+            ret = self.main_request(request_method, dest_url, post_headers, request_body, query_string, request_content_type, request_form, request_files, stream=stream)
+            # ----ここまでAPサーバへのリクエスト処理---- #
+            # Request processing to the AP server so far
+        else:
+
+            # リクエストを実行
+            # Execute request
+            ret = self.prepared_request(request_method, dest_url, post_headers, query_string)
+            # ----ここまでAPサーバへのリクエスト処理---- #
+            # Request processing to the AP server so far
+
+        globals.logger.debug(f'return request {ret=}')
 
         # レスポンスをリターン
         # Return response
-        status_code = ret.status_code
-        try:
-            info = json.loads(ret.text)
-            result_dump = json.dumps(info)
-            result_encode = result_dump.encode('utf-8')
-            globals.logger.debug(f'SUCCESS call_api. status_code={status_code} info={result_encode}')
+        # status_code = ret.status_code
+        globals.logger.debug(f'SUCCESS call_api. {ret.status_code=}')
+        return ret
+        # json check to disabled
+        # try:
+        #     info = json.loads(ret.text)
+        #     result_dump = json.dumps(info)
+        #     result_encode = result_dump.encode('utf-8')
+        #     globals.logger.debug(f'SUCCESS call_api. status_code={status_code} info={result_encode}')
 
-            return ret
-        except json.JSONDecodeError:
-            info = ret.text
-            message_id = "500-00001"
-            globals.logger.debug(f'SUCCESS call_api. status_code={status_code} info={info}')
-        raise common.InternalErrorException(None, message_id, common.multi_lang.get_text(message_id, "システムエラー"))
+        #     return ret
+        # except json.JSONDecodeError:
+        #     info = ret.text
+        #     message_id = "500-00001"
+        #     globals.logger.debug(f'SUCCESS call_api. status_code={status_code} info={info}')
+        # raise common.InternalErrorException(None, message_id, common.multi_lang.get_text(message_id, "システムエラー"))
 
     def call_fnc(self, func, args):
         """Auth api call
@@ -421,7 +460,7 @@ class auth_proxy:
             globals.logger.error(''.join(list(traceback.TracebackException.from_exception(e).format())))
             raise
 
-    def main_request(self, method, url, post_headers, request_body, query_string, request_content_type=None, request_form={}, request_files={}):
+    def main_request(self, method, url, post_headers, request_body, query_string, request_content_type=None, request_form={}, request_files={}, stream=False):
         """
         APサーバへリクエストを実行
         Execute a request to the AP server
@@ -445,34 +484,40 @@ class auth_proxy:
         # method、request_content_typeによって、呼び出しの内容を変える
         # Change the content of the call depending on method and request_content_type
         if method == 'GET':
-            ret = requests.get(url, headers=post_headers, params=query_string)
+            ret = requests.get(url, headers=post_headers, params=query_string, stream=stream)
 
         elif method == 'POST':
             if 'application/json' in request_content_type:
-                ret = requests.post(url, headers=post_headers, json=request_body, params=query_string)
+                ret = requests.post(url, headers=post_headers, json=request_body, params=query_string, stream=stream)
             elif 'multipart/form-data' in request_content_type:
-                ret = requests.post(url, headers=post_headers, data=request_form, files=request_files, params=query_string)
+                ret = requests.post(url, headers=post_headers, data=request_form, files=request_files, params=query_string, stream=stream)
+            elif 'application/x-www-form-urlencoded' in request_content_type:
+                ret = requests.post(url, headers=post_headers, data=request_form, params=query_string, stream=stream)
             else:
-                ret = requests.post(url, headers=post_headers, json=request_body, params=query_string)
+                ret = requests.post(url, headers=post_headers, json=request_body, params=query_string, stream=stream)
 
         elif method == 'PATCH':
             if 'application/json' in request_content_type:
-                ret = requests.patch(url, headers=post_headers, json=request_body, params=query_string)
+                ret = requests.patch(url, headers=post_headers, json=request_body, params=query_string, stream=stream)
             elif 'multipart/form-data' in request_content_type:
-                ret = requests.patch(url, headers=post_headers, data=request_form, files=request_files, params=query_string)
+                ret = requests.patch(url, headers=post_headers, data=request_form, files=request_files, params=query_string, stream=stream)
+            elif 'application/x-www-form-urlencoded' in request_content_type:
+                ret = requests.post(url, headers=post_headers, data=request_form, params=query_string, stream=stream)
             else:
-                ret = requests.patch(url, headers=post_headers, json=request_body, params=query_string)
+                ret = requests.patch(url, headers=post_headers, json=request_body, params=query_string, stream=stream)
 
         elif method == 'PUT':
             if 'application/json' in request_content_type:
-                ret = requests.put(url, headers=post_headers, json=request_body, params=query_string)
+                ret = requests.put(url, headers=post_headers, json=request_body, params=query_string, stream=stream)
             elif 'multipart/form-data' in request_content_type:
-                ret = requests.put(url, headers=post_headers, data=request_form, files=request_files, params=query_string)
+                ret = requests.put(url, headers=post_headers, data=request_form, files=request_files, params=query_string, stream=stream)
+            elif 'application/x-www-form-urlencoded' in request_content_type:
+                ret = requests.post(url, headers=post_headers, data=request_form, params=query_string, stream=stream)
             else:
-                ret = requests.put(url, headers=post_headers, json=request_body, params=query_string)
+                ret = requests.put(url, headers=post_headers, json=request_body, params=query_string, stream=stream)
 
         elif method == 'DELETE':
-            ret = requests.delete(url, headers=post_headers, params=query_string)
+            ret = requests.delete(url, headers=post_headers, params=query_string, stream=stream)
 
         # 取得したレスポンスの内容を退避
         # Save the contents of the acquired response
@@ -483,6 +528,140 @@ class auth_proxy:
         # エンコードしたレスポンスをリターン
         # Return the encoded response
         return ret
+
+    def prepared_request(self, method, url, post_headers, query_string):
+        """
+        APサーバへリクエストを実行
+        Execute a request to the AP server
+
+        Arguments:
+            method (str): method
+            url (str): url
+            post_headers (dic): post headers
+            query_string (str): query_string
+        Returns:
+            esponse: HTTP Respose
+        """
+
+        globals.logger.debug(f'### start func:{inspect.currentframe().f_code.co_name} {method=} {url=}')
+
+        post_headers.update({
+            'Content-Type': request.headers.get("Content-Type"),
+            'Content-Length': request.headers.get("Content-Length")
+        })
+
+        req = requests.PreparedRequest()
+        req.prepare(method=request.method, url=url, data=self.request_stream_processer())
+        req.prepare_headers(post_headers)
+
+        with requests.Session() as ses:
+            ret = ses.send(req)
+
+        # 取得したレスポンスの内容を退避
+        # Save the contents of the acquired response
+        self.response_original = ret
+
+        globals.logger.debug(f"{self.request_forms=}")
+        globals.logger.debug(f"{self.request_files=}")
+
+        globals.logger.debug(f"### end func:{inspect.currentframe().f_code.co_name}")
+
+        # エンコードしたレスポンスをリターン
+        # Return the encoded response
+        return ret
+
+    def request_stream_processer(self):
+        """request streamを解析し、転送(yield)する
+
+        Yields:
+            bytes: request body chunk
+        """
+        chunk_size = self.response_chunk_byte
+        # request bodyの残bytes
+        content_remaining_length = int(request.headers.get('Content-Length'))
+        # multipart/form-dataのparser生成
+        form_parser = multipart.FormParser(
+            content_type=request.headers.get('Content-Type').split(';')[0],
+            boundary=request.headers.get('Content-Type').split('boundary=')[1],
+            on_field=self.on_field,
+            on_file=self.on_file,
+            FileClass=self.CustomFileClass,
+        )
+
+        try:
+            while True:
+                # request bodyの読み込み
+                buf = request.stream.read(min(chunk_size, content_remaining_length))
+
+                if len(buf) == 0:
+                    break
+                yield buf
+                # multipart/form-dataのparserに書き込み
+                form_parser.write(buf)
+                # request bodyの残bytesを減算
+                content_remaining_length -= len(buf)
+                # request bodyがContent-Lengthに達したら抜ける
+                if content_remaining_length <= 0:
+                    break
+            form_parser.finalize()
+
+        except werkzeug.exceptions.ClientDisconnected as e:
+            globals.logger.info(f'werkzeug.exceptions.ClientDisconnected:{e.args}')
+            message_id = "401-11001"
+            message = multi_lang.get_text(message_id, "要求が中断されました。")
+            raise common.BadRequestException(message_id=message_id, message=message)
+        except (multipart.FormParserError,
+                multipart.MultipartParseError,
+                multipart.QuerystringParseError) as e:
+            globals.logger.info(f'multipart ParserError:{e.args}')
+            message_id = "401-11002"
+            message = multi_lang.get_text(message_id, "request bodyが不正です。")
+            raise common.BadRequestException(message_id=message_id, message=message)
+        finally:
+            form_parser.close()
+
+    def on_field(self, field: multipart.Field):
+        """FormParserのon_fieldイベントハンドラ
+
+        Args:
+            field (Field): 項目情報
+        """
+        field_name = field.field_name.decode()
+        if field_name not in self.request_forms:
+            self.request_forms[field_name] = [field.value.decode()]
+        else:
+            self.request_forms[field_name].append(field.value.decode())
+
+    def on_file(self, file: multipart.File):
+        """FormParserのon_fileイベントハンドラ
+
+        Args:
+            file (File): 項目情報（ファイル）
+        """
+        field_name = file.field_name.decode()
+        file_item = {
+            "file_name": file.file_name.decode()
+        }
+        if field_name not in self.request_files:
+            self.request_files[field_name] = [file_item]
+        else:
+            self.request_files[field_name].append(file_item)
+
+    class CustomFileClass(multipart.File):
+        """FormParserのファイル処理のカスタムClass
+            （ファイル保存しないようにpassでoverrideする）
+
+        Args:
+            File (_type_): _description_
+        """
+        def write(self, data: bytes):
+            pass
+
+        def finalize(self) -> None:
+            pass
+
+        def close(self) -> None:
+            pass
 
     def access_token_get(self, realm, user_name, password):
         """アクセストークン取得 Get access token

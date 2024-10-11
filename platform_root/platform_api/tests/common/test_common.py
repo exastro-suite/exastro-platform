@@ -69,6 +69,99 @@ def requsts_mocker_default():
     return requests_mocker
 
 
+def pymysql_execute_data_mocker(sqlstmt, data=None):
+    """data none 発行mocker
+
+    Args:
+        sqlstmt (stmt): SQL that causes an exception
+        data (row): SQL return row
+
+    Returns:
+        _type_: _description_
+    """
+    # オリジナルのpymysql.connectメソッドを退避
+    pymysql_connect = pymysql.connect
+
+    def mocked_function(host, database, user, password, port, charset, collation, cursorclass, max_allowed_packet=None):
+        conn = pymysql_connect(
+            host=host,
+            database=database,
+            user=user,
+            password=password,
+            port=port,
+            charset=charset,
+            collation=collation,
+            cursorclass=cursorclass,
+            max_allowed_packet=max_allowed_packet
+        )
+        # pymysql.connectで返す内容をpymysql_connection_mocked instanceにする
+        return pymysql_connection_mocked_data(conn, sqlstmt, data)
+
+    return mock.patch.object(pymysql, 'connect', side_effect=mocked_function)
+
+
+class pymysql_connection_mocked_data():
+    """pymysqlのconnectインスタンス（モック時）
+    """
+    def __init__(self, conn, sqlstmt, data):
+        self.sqlstmt = sqlstmt
+        self.conn = conn
+        self.data = data
+
+    def begin(self):
+        return self.conn.begin()
+
+    def close(self):
+        return self.conn.close()
+
+    def commit(self):
+        return self.conn.commit()
+
+    def cursor(self):
+        cursor = self.conn.cursor()
+        return pymysql_cursor_mocked_data(cursor, self.sqlstmt, self.data)
+
+    def rollback(self):
+        return self.conn.rollback()
+
+
+class pymysql_cursor_mocked_data():
+    """pymysqlのcursorインスタンス（モック時）
+    """
+    def __init__(self, cursor, sqlstmt, data):
+        self.cursor = cursor
+        self.sqlstmt = sqlstmt
+        self.data = data
+        self.match_sql = False
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.cursor.close()
+
+    def close(self):
+        self.cursor.close()
+
+    def execute(self, query, args=None):
+        if query == self.sqlstmt:
+            self.match_sql = True
+
+        return self.cursor.execute(query, args)
+
+    def fetchall(self):
+        if self.match_sql:
+            return self.data
+        else:
+            return self.cursor.fetchall()
+
+    def fetchone(self):
+        if self.match_sql:
+            return self.data
+        else:
+            return self.cursor.fetchone()
+
+
 def pymysql_execute_raise_exception_mocker(sqlstmt, exception):
     """DB Exception発行mocker
 
@@ -82,7 +175,7 @@ def pymysql_execute_raise_exception_mocker(sqlstmt, exception):
     # オリジナルのpymysql.connectメソッドを退避
     pymysql_connect = pymysql.connect
 
-    def mocked_function(host, database, user, password, port, charset, collation, cursorclass):
+    def mocked_function(host, database, user, password, port, charset, collation, cursorclass, max_allowed_packet=None):
         conn = pymysql_connect(
             host=host,
             database=database,
@@ -91,7 +184,8 @@ def pymysql_execute_raise_exception_mocker(sqlstmt, exception):
             port=port,
             charset=charset,
             collation=collation,
-            cursorclass=cursorclass
+            cursorclass=cursorclass,
+            max_allowed_packet=max_allowed_packet
         )
         # pymysql.connectで返す内容をpymysql_connection_mocked instanceにする
         return pymysql_connection_mocked(conn, sqlstmt, exception)
@@ -186,7 +280,8 @@ def create_organization(connexion_client):
 
     return {
         "organization_id": organization_id,
-        "user_id": json.loads(resp_get_users.text)['data'][0]['id']
+        "user_id": json.loads(resp_get_users.text)['data'][0]['id'],
+        "preferred_username": json.loads(resp_get_users.text)['data'][0]['preferred_username']
     }
 
 

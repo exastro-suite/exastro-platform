@@ -89,10 +89,10 @@ RUN mkdir ~/.config \
 
 WORKDIR $APP_PATH
 
-COPY ./platform_root/version $APP_PATH/
 COPY ./platform_root/platform_migration/ $APP_PATH/
 COPY ./platform_root/common_library/ $APP_PATH/common_library/
 COPY ./platform_root/common_resources/ $APP_PATH/common_resources/
+COPY ./platform_root/version $APP_PATH/
 
 #
 # Build for production
@@ -105,9 +105,9 @@ ARG APP_PATH
 
 WORKDIR $APP_PATH
 
-COPY ./platform_root/version $APP_PATH/
 COPY ./platform_root/platform_migration/ $APP_PATH/
 COPY ./platform_root/common_library/ $APP_PATH/common_library/
 COPY ./platform_root/common_resources/ $APP_PATH/common_resources/
+COPY ./platform_root/version $APP_PATH/
 
 USER $USERNAME

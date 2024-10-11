@@ -1,0 +1,36 @@
+# not quate strings
+@sys-user-id = admin
+@sys-user-pw = password
+@org-user-id = admin
+@org-user-pw = password
+@base_sys_url = http://platform-auth:{{sys-mng-port}}
+@base_org_url = http://platform-auth:{{org-mng-port}}
+
+# share org_id (同じものを複数記載すると最後の設定値が渡される)
+@org_id = org1
+
+# 1 api to ###
+
+### get Audit log info(platform.system.audit_log.download_exp_days) → OK
+GET {{base_org_url}}/api/{{org_id}}/platform/settings/common/platform.system.audit_log.download_exp_days
+Authorization: Basic {{org-user-id}} {{org-user-pw}}
+
+### get Audit log info(platform.system.audit_log.download_file_limit) → OK
+GET {{base_org_url}}/api/{{org_id}}/platform/settings/common/platform.system.audit_log.download_file_limit
+Authorization: Basic {{org-user-id}} {{org-user-pw}}
+
+### get Audit log info(platform.system.audit_log.retention_days) → OK
+GET {{base_org_url}}/api/{{org_id}}/platform/settings/common/platform.system.audit_log.retention_days
+Authorization: Basic {{org-user-id}} {{org-user-pw}}
+
+### get Audit log info(platform.system.audit_log.cleanup_time) → NG(FORBIDDEN)
+GET {{base_org_url}}/api/{{org_id}}/platform/settings/common/platform.system.audit_log.cleanup_time
+Authorization: Basic {{org-user-id}} {{org-user-pw}}
+
+### get user export import info(platform.system.user_export_import.exp_days) → OK
+GET {{base_org_url}}/api/{{org_id}}/platform/settings/common/platform.system.user_export_import.exp_days
+Authorization: Basic {{org-user-id}} {{org-user-pw}}
+
+### get user export import info(platform.system.user_export_import.cleanup_time) → NG(FORBIDDEN)
+GET {{base_org_url}}/api/{{org_id}}/platform/settings/common/platform.system.user_export_import.cleanup_time
+Authorization: Basic {{org-user-id}} {{org-user-pw}}

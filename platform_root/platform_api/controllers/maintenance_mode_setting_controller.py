@@ -34,7 +34,7 @@ def get_maintenance_mode_setting():  # noqa: E501
 
     :rtype: InlineResponse20024
     """
-    globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
+    globals.logger.debug(f"### func:{inspect.currentframe().f_code.co_name}")
 
     data = {}
     data = maintenancemode.maintenace_mode_get_all()
@@ -57,7 +57,7 @@ def patch_maintenance_mode_setting(body=None):  # noqa: E501
 
     body = connexion.request.get_json()
     if not body:
-        message_id = "400-000002"
+        message_id = "400-00002"
         message = multi_lang.get_text(
             message_id,
             "リクエストボディのパラメータ({0})が不正です。",
@@ -112,7 +112,7 @@ def get_maintenance_mode_setting_organization(organization_id):  # noqa: E501
 
     :rtype: InlineResponse20019
     """
-    globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
+    globals.logger.debug(f"### func:{inspect.currentframe().f_code.co_name}")
 
     # check organization
     DBconnector().get_organization_private(organization_id)
