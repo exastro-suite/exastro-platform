@@ -68,7 +68,7 @@ class LanguageList:
     lang_array['000-00146'] = 'Notifications destination name'
     lang_array['000-00147'] = 'Notifications destination kind'
     lang_array['000-00148'] = 'Notifications destination email'
-    lang_array['000-00149'] = 'Teams webhook for notifications destination '
+    lang_array['000-00149'] = 'Teams url for notifications destination '
     lang_array['000-00150'] = 'Notification destination'
     lang_array['000-00151'] = 'Notification destination email header'
     lang_array['000-00152'] = 'Event type'
@@ -131,6 +131,8 @@ class LanguageList:
     lang_array['000-00209'] = 'File name'
     lang_array['000-00210'] = 'File size'
     lang_array['000-00211'] = 'Notification destination url'
+    lang_array['000-00212'] = 'Webhook url for notifications destination'
+    lang_array['000-00213'] = 'Webhook header for notifications destination'
     lang_array['000-62001'] = 'Processing type'
     lang_array['000-62002'] = 'Registration or Update or Delete'
     #

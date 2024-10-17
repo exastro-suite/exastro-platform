@@ -1285,7 +1285,7 @@ const settings_notifications_common = {
         else if (kind === DESTINATION_KIND_TEAMS){
             $("#form_destination_kind_teams").prop('checked', true);
             destination_informations.forEach(function(element){
-                $("#form_destination_informations_teams").val(fn.cv(element.webhook, '', false));
+                $("#form_destination_informations_teams").val(fn.cv(element.url, '', false));
             });
         }
         else if (kind === DESTINATION_KIND_WEBHOOK){
@@ -1312,7 +1312,7 @@ const settings_notifications_common = {
         else if (kind === DESTINATION_KIND_TEAMS){
             $("#text_destination_informations_teams").css('display', '');
             destination_informations.forEach(function(element){
-                $("#text_destination_informations_teams").text(fn.cv(element.webhook, '', false));
+                $("#text_destination_informations_teams").text(fn.cv(element.url, '', false));
             });
         }
         else if (kind === DESTINATION_KIND_WEBHOOK){
@@ -1399,7 +1399,7 @@ const settings_notifications_common = {
             }
         }
         else if (destination_kind === "Teams"){
-            var teams = { "webhook": $("#form_destination_informations_teams").val() }
+            var teams = { "url": $("#form_destination_informations_teams").val() }
             destination_informations.push(teams);
         }
         else if (destination_kind === "Webhook"){

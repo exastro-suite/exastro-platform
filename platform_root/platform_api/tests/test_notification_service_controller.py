@@ -199,13 +199,13 @@ def test_notifications_validate(connexion_client):
     # validate informations teams array max
     validate = validation.validate_destination_informations(
         const.DESTINATION_KIND_TEAMS,
-        [sample_data_information_teams() for i in range(const.max_destination_teams_webhook)])
+        [sample_data_information_teams() for i in range(const.max_destination_teams_url)])
     assert validate.ok, "create notifications validate informations teams array max"
 
     # validate informations teams array max + 1
     validate = validation.validate_destination_informations(
         const.DESTINATION_KIND_TEAMS,
-        [sample_data_information_teams() for i in range(const.max_destination_teams_webhook + 1)])
+        [sample_data_information_teams() for i in range(const.max_destination_teams_url + 1)])
     assert not validate.ok, "create notifications validate informations teams array max + 1"
 
     # validate informations teams None
