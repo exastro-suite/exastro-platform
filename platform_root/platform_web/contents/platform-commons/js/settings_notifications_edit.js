@@ -74,7 +74,7 @@ $(function(){
 
         $('.description_Mail').html(getText('000-87017', 'email形式 (最大{0}メールアドレス)<br>※複数のメールアドレスを指定する場合は「;（セミコロン）」「,（カンマ）」記号<br>または、改行を区切り文字として使用します', MAX_MAIL_COUNT));
         $('.description_Teams').html(getText('000-87018', 'url形式'));
-        $('.description_WebHook').html(getText('000-87019', '1行目 url形式<br>2行目 ヘッダー内容'));
+        $('.description_Webhook').html(getText('000-87019', '1行目 url形式<br>2行目 ヘッダー内容'));
 
         $('.destination_informations').css('display', 'none');
         $('.description_no_select').css('display', '');
@@ -111,6 +111,9 @@ $(function(){
         else if (destination_row.kind === DESTINATION_KIND_TEAMS){
             $('#form_destination_kind_teams').trigger('click');
         }
+        else if (destination_row.kind === DESTINATION_KIND_WEBHOOK){
+            $('#form_destination_kind_webhook').trigger('click');
+        }
     }
 
     //
@@ -143,7 +146,7 @@ $(function(){
             result = result && validate.result;
             $("#message_destination_informations").text(validate.message);
         }
-        else if (destination_kind === "WebHook"){
+        else if (destination_kind === "Webhook"){
             // validate destination informations (webhook)
             validate = settings_notifications_common.validate.destination_informations_webhook($("#form_destination_informations_webhook").val(), $("#form_destination_informations_webhook_header").val());
             result = result && validate.result;

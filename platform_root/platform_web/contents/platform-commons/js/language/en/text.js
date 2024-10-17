@@ -130,6 +130,7 @@ langArray['000-00207'] = 'Plan item max value'
 langArray['000-00208'] = 'Download'
 langArray['000-00209'] = 'File name'
 langArray['000-00210'] = 'File size'
+langArray['000-00211'] = 'Notification destination url'
 langArray['000-62001'] = 'Processing type'
 langArray['000-62002'] = 'Registration or Update or Delete'
 //
