@@ -130,6 +130,7 @@ class LanguageList:
     lang_array['000-00208'] = 'Download'
     lang_array['000-00209'] = 'File name'
     lang_array['000-00210'] = 'File size'
+    lang_array['000-00211'] = 'Notification destination url'
     lang_array['000-62001'] = 'Processing type'
     lang_array['000-62002'] = 'Registration or Update or Delete'
     #

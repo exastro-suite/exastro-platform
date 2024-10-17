@@ -35,6 +35,7 @@ const MAX_MAIL_COUNT = 100;
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 const DESTINATION_KIND_MAIL = 'Mail';
 const DESTINATION_KIND_TEAMS = 'Teams';
+const DESTINATION_KIND_WEBHOOK = 'Webhook';
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -1287,6 +1288,13 @@ const settings_notifications_common = {
                 $("#form_destination_informations_teams").val(fn.cv(element.webhook, '', false));
             });
         }
+        else if (kind === DESTINATION_KIND_WEBHOOK){
+            $("#form_destination_kind_webhook").prop('checked', true);
+            destination_informations.forEach(function(element){
+                $("#form_destination_informations_webhook").val(fn.cv(element.url, '', false));
+                $("#form_destination_informations_webhook_header").val(fn.cv(element.header, '', false));
+            });
+        }
     },
 
     "set_destination_informations_text": function(kind, destination_informations) {
@@ -1305,6 +1313,15 @@ const settings_notifications_common = {
             $("#text_destination_informations_teams").css('display', '');
             destination_informations.forEach(function(element){
                 $("#text_destination_informations_teams").text(fn.cv(element.webhook, '', false));
+            });
+        }
+        else if (kind === DESTINATION_KIND_WEBHOOK){
+            $("#text_destination_informations_webhook").css('display', '');
+            $("#text_destination_informations_webhook_header").css('display', '');
+            destination_informations.forEach(function(element){
+                $("#hr_destination_informations_webhook").css('display', '');
+                $("#text_destination_informations_webhook").text("url: " + fn.cv(element.url, '', false));
+                $("#text_destination_informations_webhook_header").text("header: " + fn.cv(element.header, '', false));
             });
         }
     },
@@ -1385,7 +1402,7 @@ const settings_notifications_common = {
             var teams = { "webhook": $("#form_destination_informations_teams").val() }
             destination_informations.push(teams);
         }
-        else if (destination_kind === "WebHook"){
+        else if (destination_kind === "Webhook"){
             var webhook = {
                 "url": $("#form_destination_informations_webhook").val(),
                 "header": $("#form_destination_informations_webhook_header").val()
@@ -1515,7 +1532,7 @@ const settings_notifications_common = {
             if(destination_informations_webhook === "") {
                 return {
                     "result": false,
-                    "message": getText("400-00011", "必須項目が不足しています。({0})", getText("000-00150", "通知先"))
+                    "message": getText("400-00011", "必須項目が不足しています。({0})", getText("000-00211", "通知先url"))
                 }
             } else {
                 return {
