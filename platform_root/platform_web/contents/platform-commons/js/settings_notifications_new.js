@@ -184,7 +184,7 @@ $(function(){
             }
         }
         else if (destination_kind === "Teams"){
-            var teams = { "url": $("#form_destination_informations_teams").val() }
+            var teams = { "webhook": $("#form_destination_informations_teams").val() }
             destination_informations.push(teams);
         }
         else if (destination_kind === "Webhook"){

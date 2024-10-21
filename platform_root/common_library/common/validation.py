@@ -1249,37 +1249,36 @@ def validate_destination_informations(destination_kind, destination_info):
                 )
 
     if destination_kind == const.DESTINATION_KIND_TEAMS:
-        if len(destination_info) > const.max_destination_teams_url:
+        if len(destination_info) > const.max_destination_teams_webhook:
             return result(
                 False, 400, '400-{}018'.format(MSG_FUNCTION_ID), '指定可能な最大数を超えています。(項目:{0},最大数:{1})',
-                multi_lang.get_text('000-00149', "通知先Teams url"),
-                str(const.max_destination_teams_url)
+                multi_lang.get_text('000-00149', "通知先Teams webhook"),
+                str(const.max_destination_teams_webhook)
             )
 
         for row in destination_info:
-            print(row)
-            if row.get('url') is None or row.get('url') == "":
+            if row.get('webhook') is None or row.get('webhook') == "":
                 return result(
                     False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
-                    multi_lang.get_text('000-00149', "通知先Teams url")
+                    multi_lang.get_text('000-00149', "通知先Teams webhook")
                 )
 
-            if len(row['url']) > const.length_destination_teams_url:
+            if len(row['webhook']) > const.length_destination_teams_webhook:
                 return result(
                     False, 400, '400-{}012'.format(MSG_FUNCTION_ID), '指定可能な文字数を超えています。(項目:{0},最大文字数:{1})',
-                    multi_lang.get_text('000-00149', "通知先Teams url"),
-                    str(const.length_destination_teams_url)
+                    multi_lang.get_text('000-00149', "通知先Teams webhook"),
+                    str(const.length_destination_teams_webhook)
                 )
 
             try:
-                urlparse = urllib.parse.urlparse(row['url'])
+                urlparse = urllib.parse.urlparse(row['webhook'])
                 if urlparse.scheme not in ['http', 'https']:
                     raise ValueError
 
             except ValueError:
                 return result(
                     False, 400, '400-{}027'.format(MSG_FUNCTION_ID), 'URLの形式に誤りがあります。({0}）',
-                    multi_lang.get_text('000-00149', "通知先Teams url")
+                    multi_lang.get_text('000-00149', "通知先Teams webhook")
                 )
 
     if destination_kind == const.DESTINATION_KIND_WEBHOOK:
@@ -1290,7 +1289,7 @@ def validate_destination_informations(destination_kind, destination_info):
                     multi_lang.get_text('000-00212', "通知先Webhook url")
                 )
 
-            if len(row['url']) > const.length_destination_teams_url:
+            if len(row['url']) > const.length_destination_webhook_url:
                 return result(
                     False, 400, '400-{}012'.format(MSG_FUNCTION_ID), '指定可能な文字数を超えています。(項目:{0},最大文字数:{1})',
                     multi_lang.get_text('000-00212', "通知先Webhook url"),
