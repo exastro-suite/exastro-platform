@@ -1282,37 +1282,11 @@ def validate_destination_informations(destination_kind, destination_info):
                 )
 
     if destination_kind == const.DESTINATION_KIND_TEAMS:
-        if len(destination_info) > const.max_destination_teams_webhook:
-            return result(
-                False, 400, '400-{}018'.format(MSG_FUNCTION_ID), '指定可能な最大数を超えています。(項目:{0},最大数:{1})',
-                multi_lang.get_text('000-00149', "通知先Teams webhook"),
-                str(const.max_destination_teams_webhook)
-            )
-
-        for row in destination_info:
-            if row.get('webhook') is None or row.get('webhook') == "":
-                return result(
-                    False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
-                    multi_lang.get_text('000-00149', "通知先Teams webhook")
-                )
-
-            if len(row['webhook']) > const.length_destination_teams_webhook:
-                return result(
-                    False, 400, '400-{}012'.format(MSG_FUNCTION_ID), '指定可能な文字数を超えています。(項目:{0},最大文字数:{1})',
-                    multi_lang.get_text('000-00149', "通知先Teams webhook"),
-                    str(const.length_destination_teams_webhook)
-                )
-
-            try:
-                urlparse = urllib.parse.urlparse(row['webhook'])
-                if urlparse.scheme not in ['http', 'https']:
-                    raise ValueError
-
-            except ValueError:
-                return result(
-                    False, 400, '400-{}027'.format(MSG_FUNCTION_ID), 'URLの形式に誤りがあります。({0}）',
-                    multi_lang.get_text('000-00149', "通知先Teams webhook")
-                )
+        # 廃止された通知方法のためエラー
+        return result(
+            False, 400, '400-{}036'.format(MSG_FUNCTION_ID), '非推奨の通知方法が指定されています。({0}）',
+            const.DESTINATION_KIND_TEAMS
+        )
 
     if destination_kind == const.DESTINATION_KIND_WEBHOOK:
         if len(destination_info) > const.max_destination_webhook:
@@ -1347,13 +1321,13 @@ def validate_destination_informations(destination_kind, destination_info):
                     multi_lang.get_text('000-00212', "通知先Webhook url")
                 )
 
-            if row['header'] is not None or row['header'] == "":
+            if row['header'] is not None and row['header'] != "":
                 try:
                     json.loads(row['header'])
                 except ValueError:
                     return result(
                         False, 400, '400-{}027'.format(MSG_FUNCTION_ID), 'Headerの形式に誤りがあります。({0}）',
-                        multi_lang.get_text('000-00213', "通知先Webhook header")
+                        multi_lang.get_text('000-00213', "通知先Webhook Header")
                     )
 
     return result(True)

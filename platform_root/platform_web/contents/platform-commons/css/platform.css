@@ -291,6 +291,11 @@ input[type=checkbox]:disabled+.itaOptionsDriversLabel  {
     margin-bottom: 3px;
 }
 
+.notification_alert_msg {
+    color: red;
+    font-weight: bold;
+}
+
 /* Firefox */
 .overflowAuto {
     overflow: auto!important;

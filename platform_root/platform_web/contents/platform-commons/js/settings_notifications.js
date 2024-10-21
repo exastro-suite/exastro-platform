@@ -119,15 +119,25 @@ $(function(){
                 str_conditions += getText("000-87022", "OASE／イベント種別") + ":" + getText("000-00155", '既知（時間切れ）') + ":" + ita_event_type_timeout + "<br>";
                 str_conditions += getText("000-87022", "OASE／イベント種別") + ":" + getText("000-00156", '未知') + ":" + ita_event_type_undetected + "<br>";
 
+                notification_alert_msg = "";
+                if (row.kind == "Teams"){
+                    row.kind = "Teams(deprecated)";
+                    notification_alert_msg = getText("000-00215", "※非推奨の通知方法が選択されています。")
+                }else if(row.kind == "Teams_WF"){
+                    row.kind = "Teams(Workflows)";
+                }
+
                 html += row_template
                     .replace(/\${destination_id}/g, fn.cv(row.id,'',true))
                     .replace(/\${destination_name}/g, fn.cv(row.name,'',true))
                     .replace(/\${destination_kind}/g, fn.cv(row.kind,'',true))
+                    .replace(/\${notification_alert_msg}/g, fn.cv(notification_alert_msg,'',true))
                     .replace(/\${destination_conditions}/g, str_conditions)
                     .replace(/\${last_update_date_time}/g, fn.date(new Date(row.last_update_timestamp),'yyyy/MM/dd HH:mm:ss'));
             }
             $("#settings_notification_list tbody").append(html);
             $("#settings_notification_list .datarow").css('display', '');
+            $(".notification_alert_msg").css('display', '');
 
             $('#settings_notification_list .to_detail').on('click', function() {
                 if (!$(this).prop('disabled')){
