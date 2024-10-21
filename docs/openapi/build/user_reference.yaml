@@ -644,7 +644,7 @@ paths:
                     message:
                       title: subjects
                       message: event message
-              teams message post:
+              teams workflow message post:
                 value:
                   - destination_id: 00000001Z7ZXFAED6872F6C9W9
                     func_id: '00000000'
@@ -653,6 +653,25 @@ paths:
                       key-2: value-2
                     message:
                       title: send title
+                      text: send message
+              teams message post (deprecated):
+                value:
+                  - destination_id: 00000001Z7ZXFAED6872F6C9W9
+                    func_id: '00000000'
+                    func_informations:
+                      key-1: value-1
+                      key-2: value-2
+                    message:
+                      title: send title
+                      text: send message
+              webhook message post:
+                value:
+                  - destination_id: 00000001Z7ZXFAED6872F6C9W9
+                    func_id: '00000000'
+                    func_informations:
+                      key-1: value-1
+                      key-2: value-2
+                    message:
                       text: send message
         required: true
       responses:
@@ -2566,7 +2585,7 @@ components:
           description: Destination name can be any string
         kind:
           type: string
-          description: Select destination kind from Mail/Teams/Webhook
+          description: Select destination kind from Mail/Teams_WF/Webhook
         conditions:
           $ref: '#/components/schemas/settingsDestinationConditions'
         destination_informations:
@@ -2576,7 +2595,9 @@ components:
             description: Set the destination information for the destination
             oneOf:
               - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsMail'
+              - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsTeamsWorkflow'
               - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsTeams'
+              - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsWebhook'
     settingsDestinationList:
       title: destinationList is list of Destination resources.
       type: object
@@ -2607,9 +2628,9 @@ components:
           type: string
           enum:
             - Mail
-            - Teams
+            - Teams_WF
             - Webhook
-          description: Select destination kind from Mail/Teams/Webhook
+          description: Select destination kind from Mail/Teams_WF/Webhook
         conditions:
           $ref: '#/components/schemas/settingsDestinationConditions'
         destination_informations:
@@ -2619,7 +2640,9 @@ components:
             description: Set the destination information for the destination
             anyOf:
               - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsMail'
+              - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsTeamsWorkflow'
               - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsTeams'
+              - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsWebhook'
       required:
         - id
         - name
@@ -2637,9 +2660,9 @@ components:
           type: string
           enum:
             - Mail
-            - Teams
+            - Teams_WF
             - Webhook
-          description: Select destination kind from Mail/Teams/Webhook
+          description: Select destination kind from Mail/Teams_WF/Webhook
         conditions:
           $ref: '#/components/schemas/settingsDestinationConditions'
         destination_informations:
@@ -2649,7 +2672,9 @@ components:
             description: Set the destination information for the destination
             anyOf:
               - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsMail'
+              - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsTeamsWorkflow'
               - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsTeams'
+              - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsWebhook'
       required:
         - name
         - kind
@@ -2665,6 +2690,13 @@ components:
         email:
           type: string
           description: email address
+    settingsDestinationSubDestinationInformationsTeamsWorkflow:
+      title: destinations destination_informations(teams workflow) resource.
+      type: object
+      properties:
+        url:
+          type: string
+          description: teams workflow webhook url
     settingsDestinationSubDestinationInformationsTeams:
       title: destinations destination_informations(teams) resource.
       type: object
@@ -2672,6 +2704,13 @@ components:
         webhook:
           type: string
           description: teams webhook url
+    settingsDestinationSubDestinationInformationsWebhook:
+      title: destinations destination_informations(webhook) resource.
+      type: object
+      properties:
+        url:
+          type: string
+          description: webhook url
     settingsDestinationConditions:
       title: destinations conditions resource.
       type: object

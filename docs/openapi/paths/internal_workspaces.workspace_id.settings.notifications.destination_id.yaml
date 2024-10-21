@@ -47,12 +47,15 @@ get:
           examples:
             mail settings:
               $ref: "../schemas/settings.destinationOne.get.example.mail.yaml"
-            teams settings:
+            teams workflow settings:
+              $ref: "../schemas/settings.destinationOne.get.example.teamsworkflow.yaml"
+            teams settings (deprecated):
               $ref: "../schemas/settings.destinationOne.get.example.teams.yaml"
+            webhook settings:
+              $ref: "../schemas/settings.destinationOne.get.example.webhook.yaml"
     default:
       description: An unexpected error response.
       content:
         application/json:
           schema:
             $ref: '../schemas/runtimeError.yaml'
-            

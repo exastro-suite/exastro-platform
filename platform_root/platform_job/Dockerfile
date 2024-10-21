@@ -89,10 +89,18 @@ ENV KEYCLOAK_TOKEN_REFRESH_INTERVAL_SECONDS=30
 ENV JOB_NOTIFICATION_TIMEOUT_SECONDS=20
 #   プロセス毎に同時実行可能なJob数(未指定時はSUB_PROCESS_MAX_JOBSと同値) / Number of jobs that can be executed simultaneously per process (If not specified, the same value as SUB_PROCESS_MAX_JOBS)
 # ENV JOB_NOTIFICATION_MAX_JOB_PER_PROCESS=
+#   teams workflow webhook connection timeout
+ENV JOB_NOTIFICATION_TEAMS_WF_CONNECTION_TIMEOUT=3.0
+#   teams workflow webhook read timeout
+ENV JOB_NOTIFICATION_TEAMS_WF_READ_TIMEOUT=10.0
 #   teams webhook connection timeout
 ENV JOB_NOTIFICATION_TEAMS_CONNECTION_TIMEOUT=3.0
 #   teams webhook read timeout
 ENV JOB_NOTIFICATION_TEAMS_READ_TIMEOUT=10.0
+#   webhook connection timeout
+ENV JOB_NOTIFICATION_WEBHOOK_CONNECTION_TIMEOUT=3.0
+#   webhook read timeout
+ENV JOB_NOTIFICATION_WEBHOOK_READ_TIMEOUT=10.0
 #   smtp timeout
 ENV JOB_NOTIFICATION_SMTP_TIMEOUT=10.0
 #   smtps ssl verify TRUE/FALSE

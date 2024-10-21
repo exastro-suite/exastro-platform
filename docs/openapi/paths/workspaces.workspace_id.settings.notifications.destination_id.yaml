@@ -47,8 +47,12 @@ get:
           examples:
             mail settings:
               $ref: "../schemas/settings.destinationOne.get.example.mail.yaml"
-            teams settings:
+            teams workflow settings:
+              $ref: "../schemas/settings.destinationOne.get.example.teamsworkflow.yaml"
+            teams settings (deprecated):
               $ref: "../schemas/settings.destinationOne.get.example.teams.yaml"
+            webhook settings:
+              $ref: "../schemas/settings.destinationOne.get.example.webhook.yaml"
     default:
       description: An unexpected error response.
       content:
@@ -85,8 +89,12 @@ put:
         examples:
           mail settings:
             $ref: "../schemas/settings.destinations.put.example.mail.yaml"
-          teams settings:
+          teams workflow settings:
+            $ref: "../schemas/settings.destinations.put.example.teamsworkflow.yaml"
+          teams settings (deprecated):
             $ref: "../schemas/settings.destinations.put.example.teams.yaml"
+          webhook settings:
+            $ref: "../schemas/settings.destinations.put.example.webhook.yaml"
     required: true
   responses:
     200:

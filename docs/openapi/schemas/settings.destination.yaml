@@ -23,9 +23,9 @@ properties:
     description: Destination name can be any string
   kind:
     type: string
-    description: Select destination kind from Mail/Teams/Webhook
+    description: Select destination kind from Mail/Teams_WF/Webhook
   conditions:
-    $ref: './settings.destinations.sub.conditions.yaml' 
+    $ref: './settings.destinations.sub.conditions.yaml'
   destination_informations:
     type: array
     items:
@@ -33,5 +33,7 @@ properties:
       description: Set the destination information for the destination
       oneOf:
         - $ref: './settings.destinations.sub.destination_informations.mail.yaml'
+        - $ref: './settings.destinations.sub.destination_informations.teamsworkflow.yaml'
         - $ref: './settings.destinations.sub.destination_informations.teams.yaml'
-  
+        - $ref: './settings.destinations.sub.destination_informations.webhook.yaml'
+
