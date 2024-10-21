@@ -29,7 +29,7 @@ CREATE_TABLES = [
     (
         DESTINATION_ID	                VARCHAR(36) NOT NULL,	                        -- 通知先ID
         DESTINATION_NAME	            VARCHAR(255),	                                -- 通知先名
-        DESTINATION_KIND	            VARCHAR(20),	                                -- 通知方法(Mail, Teams, Webhook)
+        DESTINATION_KIND	            VARCHAR(20),	                                -- 通知方法(Mail, Teams_WF, Teams, Webhook)
         DESTINATION_INFORMATIONS        LONGTEXT,	                                    -- 通知先(Webhook URL, email) (Json形式)
         CONDITIONS                      LONGTEXT,	                                    -- 通知条件 (Json形式)
         CREATE_TIMESTAMP	            DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,    -- 作成日時
@@ -46,7 +46,7 @@ CREATE_TABLES = [
         NOTIFICATION_ID	                VARCHAR(26) NOT NULL,	                        -- 通知ID ※ULID
         DESTINATION_ID	                VARCHAR(36),	                                -- 通知先ID
         DESTINATION_NAME	            VARCHAR(255),	                                -- 通知先名
-        DESTINATION_KIND	            VARCHAR(20),	                                -- 通知方法(Mail, Teams, Webhook)
+        DESTINATION_KIND	            VARCHAR(20),	                                -- 通知方法(Mail, Teams_WF, Teams, Webhook)
         DESTINATION_INFORMATIONS        LONGTEXT,	                                    -- 通知先(Webhook URL, email) (Json形式) ※暗号化
         CONDITIONS                      LONGTEXT,	                                    -- 通知条件 (Json形式)
         FUNC_ID	                        VARCHAR(100),	                                -- 機能ID (メニューID等）

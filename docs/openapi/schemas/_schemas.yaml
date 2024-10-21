@@ -136,8 +136,12 @@ settingsDestinationPut:
   $ref: "./settings.destinations.put.yaml"
 settingsDestinationSubDestinationInformationsMail:
   $ref: "./settings.destinations.sub.destination_informations.mail.yaml"
+settingsDestinationSubDestinationInformationsTeamsWorkflow:
+  $ref: "./settings.destinations.sub.destination_informations.teamsworkflow.yaml"
 settingsDestinationSubDestinationInformationsTeams:
   $ref: "./settings.destinations.sub.destination_informations.teams.yaml"
+settingsDestinationSubDestinationInformationsWebhook:
+  $ref: "./settings.destinations.sub.destination_informations.webhook.yaml"
 settingsDestinationConditions:
   $ref: "./settings.destinations.sub.conditions.yaml"
 settingsMailserverCreate:

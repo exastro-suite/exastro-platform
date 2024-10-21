@@ -1122,7 +1122,29 @@ paths:
                         create_user: string
                         last_update_timestamp: '2023-11-02T05:36:41.258Z'
                         last_update_user: string
-                teams settings:
+                teams workflow settings:
+                  value:
+                    result: 200
+                    message: SUCCESS
+                    ts: '2023-11-02T05:36:41.258Z'
+                    data:
+                      - id: 00000001Z7ZXFAED6872F6C9W8
+                        name: destinations of teams workflow settings
+                        kind: Teams_WF
+                        conditions:
+                          ita:
+                            event_type:
+                              new: true
+                              evaluated: true
+                              timeout: false
+                              undetected: false
+                        destination_informations:
+                          - url: 'https://{server-name}.{region}.logic.azure.com/workflows/{workflow-ID}/triggers/{trigger-name}/paths/invoke/?XXXXXXXXX'
+                        create_timestamp: '2023-11-02T05:36:41.258Z'
+                        create_user: string
+                        last_update_timestamp: '2023-11-02T05:36:41.258Z'
+                        last_update_user: string
+                teams settings (deprecated):
                   value:
                     result: 200
                     message: SUCCESS
@@ -1140,6 +1162,29 @@ paths:
                               undetected: false
                         destination_informations:
                           - webhook: 'https://xxxxxxxx.webhook.office.com/webhookb/xxxxxxxx-xxxxxx-xxxx-xxxx-xxxxxxxxxxxx'
+                        create_timestamp: '2023-11-02T05:36:41.258Z'
+                        create_user: string
+                        last_update_timestamp: '2023-11-02T05:36:41.258Z'
+                        last_update_user: string
+                webhook settings:
+                  value:
+                    result: 200
+                    message: SUCCESS
+                    ts: '2023-11-02T05:36:41.258Z'
+                    data:
+                      - id: 00000001Z7ZXFAED6872F6C9W8
+                        name: destinations of webhook settings
+                        kind: Webhook
+                        conditions:
+                          ita:
+                            event_type:
+                              new: true
+                              evaluated: true
+                              timeout: false
+                              undetected: false
+                        destination_informations:
+                          - url: 'http://your-webhook-server/hooks/XXXXXXXX'
+                            header: 'Content-Type: application/json'
                         create_timestamp: '2023-11-02T05:36:41.258Z'
                         create_user: string
                         last_update_timestamp: '2023-11-02T05:36:41.258Z'
@@ -1194,7 +1239,21 @@ paths:
                         email: tommy@example.com
                       - address_header: bcc
                         email: nancy@example.com
-              teams settings:
+              teams workflow settings:
+                value:
+                  - id: 00000001Z7ZXFAED6872F6C9W9
+                    name: destinations of teams workflow settings
+                    kind: Teams_WF
+                    conditions:
+                      ita:
+                        event_type:
+                          new: true
+                          evaluated: true
+                          timeout: false
+                          undetected: false
+                    destination_informations:
+                      - url: 'https://{server-name}.{region}.logic.azure.com/workflows/{workflow-ID}/triggers/{trigger-name}/paths/invoke/?XXXXXXXXX'
+              teams settings (deprecated):
                 value:
                   - id: 00000001Z7ZXFAED6872F6C9W9
                     name: destinations of teams settings
@@ -1208,6 +1267,21 @@ paths:
                           undetected: false
                     destination_informations:
                       - webhook: 'https://xxxxxxxx.webhook.office.com/webhookb/xxxxxxxx-xxxxxx-xxxx-xxxx-xxxxxxxxxxxx'
+              webhook settings:
+                value:
+                  - id: 00000001Z7ZXFAED6872F6C9W9
+                    name: destinations of webhook settings
+                    kind: Webhook
+                    conditions:
+                      ita:
+                        event_type:
+                          new: true
+                          evaluated: true
+                          timeout: false
+                          undetected: false
+                    destination_informations:
+                      - url: 'http://your-webhook-server/hooks/XXXXXXXX'
+                        header: 'Content-Type: application/json'
         required: true
       responses:
         '200':
@@ -1289,7 +1363,29 @@ paths:
                       create_user: string
                       last_update_timestamp: '2023-11-02T05:36:41.258Z'
                       last_update_user: string
-                teams settings:
+                teams workflow settings:
+                  value:
+                    result: 200
+                    message: SUCCESS
+                    ts: '2023-11-02T05:36:41.258Z'
+                    data:
+                      id: 00000001Z7ZXFAED6872F6C9W8
+                      name: destinations of teams workflow settings
+                      kind: Teams_WF
+                      conditions:
+                        ita:
+                          event_type:
+                            new: true
+                            evaluated: true
+                            timeout: false
+                            undetected: false
+                      destination_informations:
+                        - url: 'https://{server-name}.{region}.logic.azure.com/workflows/{workflow-ID}/triggers/{trigger-name}/paths/invoke/?XXXXXXXXX'
+                      create_timestamp: '2023-11-02T05:36:41.258Z'
+                      create_user: string
+                      last_update_timestamp: '2023-11-02T05:36:41.258Z'
+                      last_update_user: string
+                teams settings (deprecated):
                   value:
                     result: 200
                     message: SUCCESS
@@ -1307,6 +1403,29 @@ paths:
                             undetected: false
                       destination_informations:
                         - webhook: 'https://xxxxxxxx.webhook.office.com/webhookb/xxxxxxxx-xxxxxx-xxxx-xxxx-xxxxxxxxxxxx'
+                      create_timestamp: '2023-11-02T05:36:41.258Z'
+                      create_user: string
+                      last_update_timestamp: '2023-11-02T05:36:41.258Z'
+                      last_update_user: string
+                webhook settings:
+                  value:
+                    result: 200
+                    message: SUCCESS
+                    ts: '2023-11-02T05:36:41.258Z'
+                    data:
+                      id: 00000001Z7ZXFAED6872F6C9W8
+                      name: destinations of webhook settings
+                      kind: Webhook
+                      conditions:
+                        ita:
+                          event_type:
+                            new: true
+                            evaluated: true
+                            timeout: false
+                            undetected: false
+                      destination_informations:
+                        - url: 'http://your-webhook-server/hooks/XXXXXXXX'
+                          header: 'Content-Type: application/json'
                       create_timestamp: '2023-11-02T05:36:41.258Z'
                       create_user: string
                       last_update_timestamp: '2023-11-02T05:36:41.258Z'
@@ -1363,7 +1482,20 @@ paths:
                       email: tommy@example.com
                     - address_header: bcc
                       email: nancy@example.com
-              teams settings:
+              teams workflow settings:
+                value:
+                  name: destinations of teams workflow settings
+                  kind: Teams_WF
+                  conditions:
+                    ita:
+                      event_type:
+                        new: true
+                        evaluated: true
+                        timeout: true
+                        undetected: true
+                  destination_informations:
+                    - url: 'https://{server-name}.{region}.logic.azure.com/workflows/{workflow-ID}/triggers/{trigger-name}/paths/invoke/?XXXXXXXXX'
+              teams settings (deprecated):
                 value:
                   name: destinations of teams settings
                   kind: Teams
@@ -1376,6 +1508,20 @@ paths:
                         undetected: true
                   destination_informations:
                     - webhook: 'https://xxxxxxxx.webhook.office.com/webhookb/xxxxxxxx-xxxxxx-xxxx-xxxx-xxxxxxxxxxxx'
+              webhook settings:
+                value:
+                  name: destinations of webhook settings
+                  kind: Webhook
+                  conditions:
+                    ita:
+                      event_type:
+                        new: true
+                        evaluated: true
+                        timeout: true
+                        undetected: true
+                  destination_informations:
+                    - url: 'http://your-webhook-server/hooks/XXXXXXXX'
+                      header: 'Content-Type: application/json'
         required: true
       responses:
         '200':
@@ -1565,7 +1711,7 @@ paths:
                     message:
                       title: subjects
                       message: event message
-              teams message post:
+              teams workflow message post:
                 value:
                   - destination_id: 00000001Z7ZXFAED6872F6C9W9
                     func_id: '00000000'
@@ -1574,6 +1720,25 @@ paths:
                       key-2: value-2
                     message:
                       title: send title
+                      text: send message
+              teams message post (deprecated):
+                value:
+                  - destination_id: 00000001Z7ZXFAED6872F6C9W9
+                    func_id: '00000000'
+                    func_informations:
+                      key-1: value-1
+                      key-2: value-2
+                    message:
+                      title: send title
+                      text: send message
+              webhook message post:
+                value:
+                  - destination_id: 00000001Z7ZXFAED6872F6C9W9
+                    func_id: '00000000'
+                    func_informations:
+                      key-1: value-1
+                      key-2: value-2
+                    message:
                       text: send message
         required: true
       responses:
@@ -3346,8 +3511,12 @@ paths:
               examples:
                 mail settings:
                   $ref: '#/paths/~1api~1%7Borganization_id%7D~1platform~1workspaces~1%7Bworkspace_id%7D~1settings~1notifications/get/responses/200/content/application~1json/examples/mail%20settings'
-                teams settings:
-                  $ref: '#/paths/~1api~1%7Borganization_id%7D~1platform~1workspaces~1%7Bworkspace_id%7D~1settings~1notifications/get/responses/200/content/application~1json/examples/teams%20settings'
+                teams workflow settings:
+                  $ref: '#/paths/~1api~1%7Borganization_id%7D~1platform~1workspaces~1%7Bworkspace_id%7D~1settings~1notifications/get/responses/200/content/application~1json/examples/teams%20workflow%20settings'
+                teams settings (deprecated):
+                  $ref: '#/paths/~1api~1%7Borganization_id%7D~1platform~1workspaces~1%7Bworkspace_id%7D~1settings~1notifications/get/responses/200/content/application~1json/examples/teams%20settings%20(deprecated)'
+                webhook settings:
+                  $ref: '#/paths/~1api~1%7Borganization_id%7D~1platform~1workspaces~1%7Bworkspace_id%7D~1settings~1notifications/get/responses/200/content/application~1json/examples/webhook%20settings'
         default:
           description: An unexpected error response.
           content:
@@ -3390,8 +3559,12 @@ paths:
               examples:
                 mail settings:
                   $ref: '#/paths/~1api~1%7Borganization_id%7D~1platform~1workspaces~1%7Bworkspace_id%7D~1settings~1notifications~1%7Bdestination_id%7D/get/responses/200/content/application~1json/examples/mail%20settings'
-                teams settings:
-                  $ref: '#/paths/~1api~1%7Borganization_id%7D~1platform~1workspaces~1%7Bworkspace_id%7D~1settings~1notifications~1%7Bdestination_id%7D/get/responses/200/content/application~1json/examples/teams%20settings'
+                teams workflow settings:
+                  $ref: '#/paths/~1api~1%7Borganization_id%7D~1platform~1workspaces~1%7Bworkspace_id%7D~1settings~1notifications~1%7Bdestination_id%7D/get/responses/200/content/application~1json/examples/teams%20workflow%20settings'
+                teams settings (deprecated):
+                  $ref: '#/paths/~1api~1%7Borganization_id%7D~1platform~1workspaces~1%7Bworkspace_id%7D~1settings~1notifications~1%7Bdestination_id%7D/get/responses/200/content/application~1json/examples/teams%20settings%20(deprecated)'
+                webhook settings:
+                  $ref: '#/paths/~1api~1%7Borganization_id%7D~1platform~1workspaces~1%7Bworkspace_id%7D~1settings~1notifications~1%7Bdestination_id%7D/get/responses/200/content/application~1json/examples/webhook%20settings'
         default:
           description: An unexpected error response.
           content:
@@ -3524,8 +3697,12 @@ paths:
             examples:
               mail message post:
                 $ref: '#/paths/~1api~1%7Borganization_id%7D~1platform~1workspaces~1%7Bworkspace_id%7D~1notifications/post/requestBody/content/application~1json/examples/mail%20message%20post'
-              teams message post:
-                $ref: '#/paths/~1api~1%7Borganization_id%7D~1platform~1workspaces~1%7Bworkspace_id%7D~1notifications/post/requestBody/content/application~1json/examples/teams%20message%20post'
+              teams workflow message post:
+                $ref: '#/paths/~1api~1%7Borganization_id%7D~1platform~1workspaces~1%7Bworkspace_id%7D~1notifications/post/requestBody/content/application~1json/examples/teams%20workflow%20message%20post'
+              teams message post (deprecated):
+                $ref: '#/paths/~1api~1%7Borganization_id%7D~1platform~1workspaces~1%7Bworkspace_id%7D~1notifications/post/requestBody/content/application~1json/examples/teams%20message%20post%20(deprecated)'
+              webhook message post:
+                $ref: '#/paths/~1api~1%7Borganization_id%7D~1platform~1workspaces~1%7Bworkspace_id%7D~1notifications/post/requestBody/content/application~1json/examples/webhook%20message%20post'
         required: true
       responses:
         '200':
@@ -4554,7 +4731,7 @@ components:
           description: Destination name can be any string
         kind:
           type: string
-          description: Select destination kind from Mail/Teams/Webhook
+          description: Select destination kind from Mail/Teams_WF/Webhook
         conditions:
           $ref: '#/components/schemas/settingsDestinationConditions'
         destination_informations:
@@ -4564,7 +4741,9 @@ components:
             description: Set the destination information for the destination
             oneOf:
               - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsMail'
+              - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsTeamsWorkflow'
               - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsTeams'
+              - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsWebhook'
     settingsDestinationList:
       title: destinationList is list of Destination resources.
       type: object
@@ -4595,9 +4774,9 @@ components:
           type: string
           enum:
             - Mail
-            - Teams
+            - Teams_WF
             - Webhook
-          description: Select destination kind from Mail/Teams/Webhook
+          description: Select destination kind from Mail/Teams_WF/Webhook
         conditions:
           $ref: '#/components/schemas/settingsDestinationConditions'
         destination_informations:
@@ -4607,7 +4786,9 @@ components:
             description: Set the destination information for the destination
             anyOf:
               - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsMail'
+              - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsTeamsWorkflow'
               - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsTeams'
+              - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsWebhook'
       required:
         - id
         - name
@@ -4625,9 +4806,9 @@ components:
           type: string
           enum:
             - Mail
-            - Teams
+            - Teams_WF
             - Webhook
-          description: Select destination kind from Mail/Teams/Webhook
+          description: Select destination kind from Mail/Teams_WF/Webhook
         conditions:
           $ref: '#/components/schemas/settingsDestinationConditions'
         destination_informations:
@@ -4637,7 +4818,9 @@ components:
             description: Set the destination information for the destination
             anyOf:
               - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsMail'
+              - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsTeamsWorkflow'
               - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsTeams'
+              - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsWebhook'
       required:
         - name
         - kind
@@ -4653,6 +4836,13 @@ components:
         email:
           type: string
           description: email address
+    settingsDestinationSubDestinationInformationsTeamsWorkflow:
+      title: destinations destination_informations(teams workflow) resource.
+      type: object
+      properties:
+        url:
+          type: string
+          description: teams workflow webhook url
     settingsDestinationSubDestinationInformationsTeams:
       title: destinations destination_informations(teams) resource.
       type: object
@@ -4660,6 +4850,13 @@ components:
         webhook:
           type: string
           description: teams webhook url
+    settingsDestinationSubDestinationInformationsWebhook:
+      title: destinations destination_informations(webhook) resource.
+      type: object
+      properties:
+        url:
+          type: string
+          description: webhook url
     settingsDestinationConditions:
       title: destinations conditions resource.
       type: object

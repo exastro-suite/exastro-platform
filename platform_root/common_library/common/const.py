@@ -50,10 +50,13 @@ length_plan_item_description = 4000
 length_destination_id = 36
 length_destination_name = 255
 length_destination_email = 255
+length_destination_teams_wf_url = 1024
 length_destination_teams_webhook = 1024
 length_destination_webhook_url = 1024
 max_destination_email = 500
+max_destination_teams_wf = 1
 max_destination_teams_webhook = 1
+max_destination_webhook = 1
 length_func_id = 100
 length_smtp_host = 1024
 min_length_separated_by_period_mark = 1
@@ -153,11 +156,13 @@ ALL_RESOURCE_COUNT = [
 # 通知先区分
 # Notification destination kind
 DESTINATION_KIND_MAIL = "Mail"
+DESTINATION_KIND_TEAMS_WF = "Teams_WF"
 DESTINATION_KIND_TEAMS = "Teams"
 DESTINATION_KIND_WEBHOOK = "Webhook"
 
 ALL_DESTINATION_KIND = [
     DESTINATION_KIND_MAIL,
+    DESTINATION_KIND_TEAMS_WF,
     DESTINATION_KIND_TEAMS,
     DESTINATION_KIND_WEBHOOK,
 ]

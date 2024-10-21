@@ -59,8 +59,12 @@ get:
           examples:
             mail settings:
               $ref: "../schemas/settings.destinations.get.example.mail.yaml"
-            teams settings:
+            teams workflow settings:
+              $ref: "../schemas/settings.destinations.get.example.teamsworkflow.yaml"
+            teams settings (deprecated):
               $ref: "../schemas/settings.destinations.get.example.teams.yaml"
+            webhook settings:
+              $ref: "../schemas/settings.destinations.get.example.webhook.yaml"
     default:
       description: An unexpected error response.
       content:
