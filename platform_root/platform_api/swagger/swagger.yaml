@@ -26,9 +26,9 @@ servers:
       default: localhost
     port:
       default: "30080"
-security:
-- BearerAuth: []
-- BasicAuth: []
+# security:
+# - BearerAuth: []
+# - BasicAuth: []
 tags:
 - name: OrganizationService
   description: オーガナイゼーションに関する操作

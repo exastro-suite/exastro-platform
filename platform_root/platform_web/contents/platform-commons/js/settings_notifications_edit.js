@@ -73,8 +73,9 @@ $(function(){
         $('#ita_event_type_undetected').prop("checked", fn.cv(destination_row.conditions.ita.event_type.undetected, false, false));
 
         $('.description_Mail').html(getText('000-87017', 'email形式 (最大{0}メールアドレス)<br>※複数のメールアドレスを指定する場合は「;（セミコロン）」「,（カンマ）」記号<br>または、改行を区切り文字として使用します', MAX_MAIL_COUNT));
-        $('.description_Teams').html(getText('000-87018', 'url形式'));
-        $('.description_Webhook').html(getText('000-87019', '1行目 url形式<br>2行目 ヘッダー内容'));
+        $('.description_Teams').html(getText('000-87018', 'URL形式'));
+        $('.description_Teams_WF').html(getText('000-87018', 'URL形式'));
+        $('.description_Webhook').html(getText('000-87019', '1行目 URL形式<br>2行目 ヘッダー内容'));
 
         $('.destination_informations').css('display', 'none');
         $('.description_no_select').css('display', '');
@@ -111,6 +112,9 @@ $(function(){
         else if (destination_row.kind === DESTINATION_KIND_TEAMS){
             $('#form_destination_kind_teams').trigger('click');
         }
+        else if (destination_row.kind === DESTINATION_KIND_TEAMS_WF){
+            $('#form_destination_kind_teams_wf').trigger('click');
+        }
         else if (destination_row.kind === DESTINATION_KIND_WEBHOOK){
             $('#form_destination_kind_webhook').trigger('click');
         }
@@ -143,6 +147,12 @@ $(function(){
         else if (destination_kind === "Teams"){
             // validate destination informations (teams)
             validate = settings_notifications_common.validate.destination_informations_teams($("#form_destination_informations_teams").val());
+            result = result && validate.result;
+            $("#message_destination_informations").text(validate.message);
+        }
+        else if (destination_kind === "Teams_WF"){
+            // validate destination informations (teams powar automate)
+            validate = settings_notifications_common.validate.destination_informations_teams_wf($("#form_destination_informations_teams_wf").val());
             result = result && validate.result;
             $("#message_destination_informations").text(validate.message);
         }

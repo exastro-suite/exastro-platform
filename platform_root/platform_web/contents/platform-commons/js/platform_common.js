@@ -35,6 +35,7 @@ const MAX_MAIL_COUNT = 100;
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 const DESTINATION_KIND_MAIL = 'Mail';
 const DESTINATION_KIND_TEAMS = 'Teams';
+const DESTINATION_KIND_TEAMS_WF = 'Teams_WF';
 const DESTINATION_KIND_WEBHOOK = 'Webhook';
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1284,8 +1285,15 @@ const settings_notifications_common = {
         }
         else if (kind === DESTINATION_KIND_TEAMS){
             $("#form_destination_kind_teams").prop('checked', true);
+            $(".deprecatedTarget").css('display', '');
             destination_informations.forEach(function(element){
                 $("#form_destination_informations_teams").val(fn.cv(element.webhook, '', false));
+            });
+        }
+        else if (kind === DESTINATION_KIND_TEAMS_WF){
+            $("#form_destination_kind_teams_wf").prop('checked', true);
+            destination_informations.forEach(function(element){
+                $("#form_destination_informations_teams_wf").val(fn.cv(element.url, '', false));
             });
         }
         else if (kind === DESTINATION_KIND_WEBHOOK){
@@ -1313,6 +1321,12 @@ const settings_notifications_common = {
             $("#text_destination_informations_teams").css('display', '');
             destination_informations.forEach(function(element){
                 $("#text_destination_informations_teams").text(fn.cv(element.webhook, '', false));
+            });
+        }
+        else if (kind === DESTINATION_KIND_TEAMS_WF){
+            $("#text_destination_informations_teams_wf").css('display', '');
+            destination_informations.forEach(function(element){
+                $("#text_destination_informations_teams_wf").text(fn.cv(element.url, '', false));
             });
         }
         else if (kind === DESTINATION_KIND_WEBHOOK){
@@ -1401,6 +1415,10 @@ const settings_notifications_common = {
         else if (destination_kind === "Teams"){
             var teams = { "webhook": $("#form_destination_informations_teams").val() }
             destination_informations.push(teams);
+        }
+        else if (destination_kind === "Teams_WF"){
+            var teams_wf = { "url": $("#form_destination_informations_teams_wf").val() }
+            destination_informations.push(teams_wf);
         }
         else if (destination_kind === "Webhook"){
             var webhook = {
@@ -1513,6 +1531,23 @@ const settings_notifications_common = {
         //
         destination_informations_teams: function(destination_informations_teams) {
             if(destination_informations_teams === "") {
+                return {
+                    "result": false,
+                    "message": getText("400-00011", "必須項目が不足しています。({0})", getText("000-00150", "通知先"))
+                }
+            } else {
+                return {
+                    "result": true,
+                    "message": ""
+                }
+            }
+        },
+
+        //
+        // validate description informations (teams workflows)
+        //
+        destination_informations_teams_wf: function(destination_informations_teams_wf) {
+            if(destination_informations_teams_wf === "") {
                 return {
                     "result": false,
                     "message": getText("400-00011", "必須項目が不足しています。({0})", getText("000-00150", "通知先"))
