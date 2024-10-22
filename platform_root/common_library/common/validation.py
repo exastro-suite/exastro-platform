@@ -1292,7 +1292,7 @@ def validate_destination_informations(destination_kind, destination_info):
         if len(destination_info) > const.max_destination_webhook:
             return result(
                 False, 400, '400-{}018'.format(MSG_FUNCTION_ID), '指定可能な最大数を超えています。(項目:{0},最大数:{1})',
-                multi_lang.get_text('000-00212', "通知先Webhook url"),
+                multi_lang.get_text('000-00212', "通知先Webhook URL"),
                 str(const.max_destination_webhook)
             )
 
@@ -1300,13 +1300,13 @@ def validate_destination_informations(destination_kind, destination_info):
             if row.get('url') is None or row.get('url') == "":
                 return result(
                     False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
-                    multi_lang.get_text('000-00212', "通知先Webhook url")
+                    multi_lang.get_text('000-00212', "通知先Webhook URL")
                 )
 
             if len(row['url']) > const.length_destination_webhook_url:
                 return result(
                     False, 400, '400-{}012'.format(MSG_FUNCTION_ID), '指定可能な文字数を超えています。(項目:{0},最大文字数:{1})',
-                    multi_lang.get_text('000-00212', "通知先Webhook url"),
+                    multi_lang.get_text('000-00212', "通知先Webhook URL"),
                     str(const.length_destination_webhook_url)
                 )
 
@@ -1318,7 +1318,7 @@ def validate_destination_informations(destination_kind, destination_info):
             except ValueError:
                 return result(
                     False, 400, '400-{}027'.format(MSG_FUNCTION_ID), 'URLの形式に誤りがあります。({0}）',
-                    multi_lang.get_text('000-00212', "通知先Webhook url")
+                    multi_lang.get_text('000-00212', "通知先Webhook URL")
                 )
 
             if row['header'] is not None and row['header'] != "":

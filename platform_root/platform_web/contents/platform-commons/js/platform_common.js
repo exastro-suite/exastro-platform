@@ -1567,7 +1567,7 @@ const settings_notifications_common = {
             if(destination_informations_webhook === "") {
                 return {
                     "result": false,
-                    "message": getText("400-00011", "必須項目が不足しています。({0})", getText("000-00211", "通知先url"))
+                    "message": getText("400-00011", "必須項目が不足しています。({0})", getText("000-00211", "通知先URL"))
                 }
             } else {
                 return {

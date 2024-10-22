@@ -2696,21 +2696,21 @@ components:
       properties:
         url:
           type: string
-          description: teams workflow webhook url
+          description: teams workflow webhook URL
     settingsDestinationSubDestinationInformationsTeams:
       title: destinations destination_informations(teams) resource.
       type: object
       properties:
         webhook:
           type: string
-          description: teams webhook url
+          description: teams webhook URL
     settingsDestinationSubDestinationInformationsWebhook:
       title: destinations destination_informations(webhook) resource.
       type: object
       properties:
         url:
           type: string
-          description: webhook url
+          description: webhook URL
     settingsDestinationConditions:
       title: destinations conditions resource.
       type: object
