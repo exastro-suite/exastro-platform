@@ -1721,6 +1721,7 @@ paths:
                     key-1: value-1
                     key-2: value-2
                   message:
+                    title: send title
                     text: send message
         required: true
       responses:

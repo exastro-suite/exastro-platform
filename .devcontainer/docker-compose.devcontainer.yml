@@ -139,7 +139,8 @@ services:
       - SSL_CERT_DIR=/etc/ssl/certs
       - NODE_EXTRA_CA_CERTS=/etc/ssl/certs/ca-certificates.crt
       - NODE_TLS_REJECT_UNAUTHORIZED=${NODE_TLS_REJECT_UNAUTHORIZED:-1}
-      - REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt
+      # Slackは下の環境変数を設定しないとエラーとなり、Teamsは下の環境変数を設定するとエラーとなる
+      # - REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt
       - NETWORK_ID=${NETWORK_ID:-}
       - JOB_NOTIFICATION_SMTPS_SSL_VERIFY_ENABLED=FALSE
       - EXT_PORT_PLATFORM_UNITTEST_DB=${EXT_PORT_PLATFORM_UNITTEST_DB:-3308}
