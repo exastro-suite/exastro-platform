@@ -113,7 +113,7 @@ class NotificationJobExecutor(BaseJobExecutor):
             self.__update_status_failed()
             raise err
 
-    def __send_message_teams(self, destination_informations, message_infomations):
+    def __send_message_teams_wf(self, destination_informations, message_infomations):
         """teams workflow へのメッセージ送信 / Send messages to teams workflow
 
         Args:
@@ -131,8 +131,32 @@ class NotificationJobExecutor(BaseJobExecutor):
                 resp_webhook = requests.post(
                     destination_information['url'],
                     json={
-                        "title": message_infomations.get("title"),
-                        "text": message_infomations.get("message").replace('\n','<br/>')
+                        "type": "message",
+                        "attachments": [
+                            {
+                                "contentType": "application/vnd.microsoft.card.adaptive",
+                                "contentUrl": None,
+                                "content": {
+                                    "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+                                    "type": "AdaptiveCard",
+                                    "version": "1.5",
+                                    "body": [
+                                        {
+                                            "type": "TextBlock",
+                                            "text": message_infomations.get("title"),
+                                            "wrap": True,
+                                            "style": "heading",
+                                            "weight": "Bolder"
+                                        },
+                                        {
+                                            "type": "TextBlock",
+                                            "text": message_infomations.get("message").replace('\n', '\n\n'),
+                                            "wrap": True
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
                     },
                     headers={"Content-type": "application/json"},
                     timeout=(
@@ -173,7 +197,7 @@ class NotificationJobExecutor(BaseJobExecutor):
                     destination_information['webhook'],
                     json={
                         "title": message_infomations.get("title"),
-                        "text": message_infomations.get("message").replace('\n','<br/>')
+                        "text": message_infomations.get("message").replace('\n', '<br/>')
                     },
                     headers={"Content-type": "application/json"},
                     timeout=(
@@ -213,7 +237,7 @@ class NotificationJobExecutor(BaseJobExecutor):
                 resp_webhook = requests.post(
                     destination_information['url'],
                     json={
-                        "text": message_infomations.get("message").replace('\n', '<br/>')
+                        "text": message_infomations.get("title") + "\n\n" + message_infomations.get("message")
                     },
                     headers={"Content-type": "application/json"},
                     timeout=(
