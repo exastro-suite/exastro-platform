@@ -1263,11 +1263,11 @@ def validate_destination_informations(destination_kind, destination_info):
                     multi_lang.get_text('000-00214', "通知先Teams(Workflows) URL")
                 )
 
-            if len(row['url']) > const.length_destination_teams_wf:
+            if len(row['url']) > const.length_destination_teams_wf_url:
                 return result(
                     False, 400, '400-{}012'.format(MSG_FUNCTION_ID), '指定可能な文字数を超えています。(項目:{0},最大文字数:{1})',
                     multi_lang.get_text('000-00214', "通知先Teams(Workflows) URL"),
-                    str(const.length_destination_teams_wf)
+                    str(const.length_destination_teams_wf_url)
                 )
 
             try:
