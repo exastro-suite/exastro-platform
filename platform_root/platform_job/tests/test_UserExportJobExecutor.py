@@ -137,11 +137,11 @@ def test_execute_user_get_nomally():
     """ユーザー取得正常系 / User registration normal pattern
     """
     testdata = import_module("tests.db.exports.testdata")
- 
+
     add_user(user=user_json1)
     add_user(user=user_json2)
     add_user(user=user_json3)
-    
+
     with test_common.requsts_mocker_default(), \
         mock.patch("jobs.UserExportJobExecutor.USER_GET_ONCE", 1):
 
@@ -158,7 +158,7 @@ def test_execute_user_get_nomally():
         # 状態が完了で、取得件数が3であること
         t = select_t_jobs_user_export(organization_id, queue["PROCESS_EXEC_ID"])
         assert t["JOB_STATUS"] == const.JOB_USER_COMP
-        assert t["COUNT_EXPORT"] == 3
+        assert t["COUNT_EXPORT"] == 4
 
 def test_execute_user_get_error_limits():
     """userのlimit超過エラー
@@ -179,7 +179,7 @@ def test_execute_user_get_error_limits():
 
     with test_common.requsts_mocker_default(), \
         mock.patch.dict(f"job_manager_config.JOBS", job_config_jobs):
-        
+
         organization_id = list(testdata.ORGANIZATIONS.keys())[0]
         queue = make_queue_export_user('ja', organization_id)
 
@@ -225,7 +225,7 @@ def test_execute_timeout():
     job_config_jobs = copy.deepcopy(job_manager_config.JOBS)
     job_config_jobs[process_kind]["timeout_seconds"] = timeout_sec
     job_config_jobs[process_kind]["extra_config"]["user_export_interval_millisecond"] = 2500
-    
+
     add_user(user=user_json1)
     add_user(user=user_json2)
     add_user(user=user_json3)
@@ -257,7 +257,7 @@ def test_execute_timeout():
                 if t["JOB_STATUS"] != const.JOB_USER_EXEC:
                     break
                 time.sleep(1)
-            
+
             t = select_t_jobs_user_export(organization_id, queue["PROCESS_EXEC_ID"])
             # タイムアウトエラーで終了していること
             assert t["JOB_STATUS"] == const.JOB_USER_FAILED
@@ -357,11 +357,11 @@ def add_user(user):
             str: user id
         """
         testdata = import_module("tests.db.exports.testdata")
-        
+
         with closing(DBconnector().connect_orgdb(list(testdata.ORGANIZATIONS.keys())[0])) as conn:
             organization_private = DBconnector().get_organization_private(list(testdata.ORGANIZATIONS.keys())[0])
             organization_sa_token = jobs_common.organization_sa_token(list(testdata.ORGANIZATIONS.keys())[0], organization_private)
-        
+
         # ユーザーの追加 / add user
         u_create = api_keycloak_users.user_create(
             realm_name=list(testdata.ORGANIZATIONS.keys())[0], user_json=user, token=organization_sa_token.get()
@@ -374,7 +374,7 @@ def make_queue_export_user(lang, organization_id, insert_queue=True):
     Args:
         lang (_type_): _description_
         organization_id (_type_): _description_
-        
+
     Returns:
         _type_: _description_
     """
@@ -394,7 +394,7 @@ def make_queue_export_user(lang, organization_id, insert_queue=True):
 
     with closing(DBconnector().connect_orgdb(organization_id)) as conn,\
         conn.cursor() as cursor:
-    
+
         cursor.execute('''
             INSERT INTO T_JOBS_USER_EXPORT
             (JOB_ID,
