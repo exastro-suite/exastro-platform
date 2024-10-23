@@ -45,7 +45,7 @@ $(function(){
             displayTopicPath([
                 {"text": getText("000-87006", "通知先ワークスペース一覧"), "href": location_conf.href.workspaces.settings.notifications.workspaces.replace(/{organization_id}/g, CommonAuth.getRealm())},
                 {"text": getText("000-87002", "通知先設定一覧"), "href": location_conf.href.workspaces.settings.notifications.list.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{workspace_id}/g, workspace_id)},
-                {"text": getText("000-87014", "新規通知先設定"), "href": location_conf.href.workspaces.settings.notifications.new.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{workspace_id}/g, workspace_id)},
+                {"text": getText("000-87029", "通知先設定詳細"), "href": location_conf.href.workspaces.settings.notifications.new.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{workspace_id}/g, workspace_id)},
             ]);
             display_main(results[1].data);
             finish_onload_progress();
@@ -100,9 +100,9 @@ $(function(){
         $("#text_destination_id").text(destination_row.id);
         $("#text_destination_name").text(destination_row.name);
         if(destination_row.kind == "Teams"){
-            $("#text_destination_kind").text("Teams(deprecated)");
+            $("#text_destination_kind").text("Teams(Webhook)");
             $("#text_destination_kind").append('<p class="notification_alert_msg">');
-            $(".notification_alert_msg").append(getText("000-00215", "※非推奨の通知方法が選択されています。"));
+            $(".notification_alert_msg").append(getText("000-00215", "※廃止された通知方法が選択されています。"));
         } else if(destination_row.kind == "Teams_WF"){
             $("#text_destination_kind").text("Teams(Workflows)");
         }else{

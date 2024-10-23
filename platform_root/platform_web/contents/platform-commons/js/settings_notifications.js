@@ -121,8 +121,8 @@ $(function(){
 
                 notification_alert_msg = "";
                 if (row.kind == "Teams"){
-                    row.kind = "Teams(deprecated)";
-                    notification_alert_msg = getText("000-00215", "※非推奨の通知方法が選択されています。")
+                    row.kind = "Teams(Webhook)";
+                    notification_alert_msg = getText("000-00215", "※廃止された通知方法が選択されています。")
                 }else if(row.kind == "Teams_WF"){
                     row.kind = "Teams(Workflows)";
                 }
