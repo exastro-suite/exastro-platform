@@ -46,8 +46,8 @@ from tests.common import test_common
 from libs.job_manager_classes import SubProcessesManager
 from common_library.common import user_import_file_common
 
-USERNAME_COL_INDEX = 2
-ERROR_TEXT_COL_INDEX = 12
+USERNAME_COL_INDEX = 4
+ERROR_TEXT_COL_INDEX = 14
 
 def test_execute_registration_nomally():
     """ユーザー登録正常系 / User registration normal pattern
@@ -230,7 +230,7 @@ def test_execute_file_error():
         # 状態が異常であること
         t = select_t_jobs_user(organization_id, queue["PROCESS_EXEC_ID"])
         assert t["JOB_STATUS"] == const.JOB_USER_FAILED
-        assert t["MESSAGE"] == 'Excelファイルに必須の項目がありません。({0})'.format('実行処理種別')
+        assert t["MESSAGE"] == 'Excelファイルに必須の項目がありません。({0})'.format('注意事項')
 
 def test_execute_validation_error():
     """Validation error pattern
