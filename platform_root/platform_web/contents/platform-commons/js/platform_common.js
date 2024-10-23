@@ -1334,8 +1334,8 @@ const settings_notifications_common = {
             $("#text_destination_informations_webhook_header").css('display', '');
             destination_informations.forEach(function(element){
                 $("#hr_destination_informations_webhook").css('display', '');
-                $("#text_destination_informations_webhook").text("url: " + fn.cv(element.url, '', false));
-                $("#text_destination_informations_webhook_header").text("header: " + fn.cv(element.header, '', false));
+                $("#text_destination_informations_webhook").text("URL: " + fn.cv(element.url, '', false));
+                $("#text_destination_informations_webhook_header").text("Header: " + fn.cv(element.header, '', false));
             });
         }
     },
