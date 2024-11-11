@@ -55,6 +55,19 @@ services:
       target: develop_build
     volumes:
       - ../.volumes/storage:/storage
+  ita-api-ansible-execution-receiver:
+    build:
+      context: ${ITA_REPO_ROOT}
+      target: develop_build
+    volumes:
+      - ../.volumes/storage:/storage
+  ita-api-oase-receiver:
+    build:
+      context: ${ITA_REPO_ROOT}
+      target: develop_build
+    volumes:
+      - ../.volumes/storage:/storage
+
   ita-web-server:
     build:
       context: ${ITA_REPO_ROOT}
@@ -154,23 +167,15 @@ services:
       context: ${ITA_REPO_ROOT}
     environment:
       - EXECUTE_INTERVAL=${ITA_BY_INTERVAL}
-  ita-migration:
-    build:
-      context: ${ITA_REPO_ROOT}
-      target: develop_build
-    volumes:
-      - ../.volumes/storage:/storage
-
-  ita-api-oase-receiver:
-    build:
-      context: ${ITA_REPO_ROOT}
-      target: develop_build
-    volumes:
-      - ../.volumes/storage:/storage
-
   ita-by-oase-conclusion:
     build:
       context: ${ITA_REPO_ROOT}
     environment:
       - EXECUTE_INTERVAL=${ITA_BY_INTERVAL}
 
+  ita-migration:
+    build:
+      context: ${ITA_REPO_ROOT}
+      target: develop_build
+    volumes:
+      - ../.volumes/storage:/storage
