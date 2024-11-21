@@ -19,7 +19,7 @@ import logging
 from logging.config import dictConfig as dictLogConf
 from flask_log_request_id import RequestID
 import traceback
-from jinja2 import Template
+# from jinja2 import Template
 from packaging import version
 from importlib import import_module
 
@@ -28,7 +28,7 @@ import globals
 from common_library.common.exastro_logging import ExastroLogRecordFactory, LOGGING
 
 import migration_common
-from initialize_db import queries
+# from initialize_db import queries
 
 # load environ variables
 load_dotenv(override=True)
@@ -81,7 +81,11 @@ def __main():
         # get migrations directry name
         # migrationsのディレクトリ名を取得する
         migrations_path = os.path.join(os.path.dirname(__file__), MIGRATIONS_DIR_NAME)
-        migrations = [os.path.basename(f).replace('_', '.') for f in os.listdir(migrations_path) if os.path.isdir(os.path.join(migrations_path, f))]
+        migrations = [
+            os.path.basename(f).replace('_', '.')
+            for f in os.listdir(migrations_path)
+            if os.path.isdir(os.path.join(migrations_path, f)) and os.path.exists(os.path.join(migrations_path, f, "migration.py"))
+        ]
 
         # Process from oldest migration
         # migrationの古い順から処理する
