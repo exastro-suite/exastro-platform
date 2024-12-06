@@ -227,7 +227,9 @@ var location_conf = {
             "console": "/platform/keycloak_console",
             "console_frame": "/auth/admin/master/console",
             "identity_providers": "/{organization_id}/platform/identity_providers",
-            "identity_providers_frame": "/auth/admin/{organization_id}/console/#/{organization_id}/identity-providers"
+            "identity_providers_frame": "/auth/admin/{organization_id}/console/#/{organization_id}/identity-providers",
+            "password_policy": "/{organization_id}/platform/password_policy",
+            "password_policy_frame": "/auth/admin/{organization_id}/console/#/{organization_id}/authentication/policies",
         },
         "settings": {
             "mailserver": "/{organization_id}/platform/settings/mailserver",

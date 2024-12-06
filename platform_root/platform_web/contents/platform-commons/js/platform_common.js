@@ -268,16 +268,24 @@ function displayMenu(curent) {
         $('.menuList').empty().append(`
             <li class="menuItem"><a class="menuLink" id="menu_workspace" href="#" tabindex="-1">${getText("000-80005", "ワークスペース管理")}</a></li>
             <li class="menuItem">
-              <a class="menuLink menuItemContent" id="menu_account_management" type="button" aria-expanded="false" aria-controls="menu_account_management_accordion_panel" href="#" style="display: none;">${getText("000-80006", "ユーザー管理")}</a>
-              <ul id="menu_account_management_accordion_panel" class="menuItem--subGroup" aria-hidden="true">
-                <li><a class="menuLink ActionList--subGroup" id="menu_account_list" href="#">${getText("000-83001", "ユーザー一覧")}</a></li>
-                <li><a class="menuLink ActionList--subGroup" id="menu_account_bulk_actions" href="#">${getText("000-92002", "ユーザー一括登録・削除")}</a></li>
-              </ul>
+                <a class="menuLink menuItemContent" id="menu_account_management" type="button" aria-expanded="false" aria-controls="menu_account_management_accordion_panel" href="#" style="display: none;">${getText("000-80006", "ユーザー管理")}</a>
+                <ul id="menu_account_management_accordion_panel" class="menuItem--subGroup" aria-hidden="true">
+                    <li><a class="menuLink ActionList--subGroup" id="menu_account_list" href="#">${getText("000-83001", "ユーザー一覧")}</a></li>
+                    <li><a class="menuLink ActionList--subGroup" id="menu_account_bulk_actions" href="#">${getText("000-92002", "ユーザー一括登録・削除")}</a></li>
+                </ul>
             </li>
             <li class="menuItem"><a class="menuLink" id="menu_role_management" href="#" style="display: none;">${getText("000-80007", "ロール管理")}</a></li>
             <li class="menuItem"><a class="menuLink" id="menu_settings_notifications" href="#">${getText("000-00183", "通知管理")}</a></li>
-            <li class="menuItem"><a class="menuLink" id="menu_settings_mailserver" href="#" style="display: none;">${getText("000-88002", "メール送信サーバー設定")}</a></li>
-            <li class="menuItem"><a class="menuLink" id="menu_identity_providers" href="#" style="display: none;">${getText("000-80051", "アイデンティティー・プロバイダー")}</a></li>
+
+            <li class="menuItem">
+                <a class="menuLink menuItemContent" id="menu_organization_setting" type="button" aria-expanded="false" aria-controls="menu_organization_setting_accordion_panel" href="#" style="display: none;">${getText("000-80054", "オーガナイゼーション設定")}</a>
+                <ul id="menu_organization_setting_accordion_panel" class="menuItem--subGroup" aria-hidden="true">
+                    <li><a class="menuLink ActionList--subGroup" id="menu_settings_mailserver" href="#" style="display: none;">${getText("000-88002", "メール送信サーバー設定")}</a></li>
+                    <li><a class="menuLink ActionList--subGroup" id="menu_identity_providers" href="#" style="display: none;">${getText("000-80051", "アイデンティティー・プロバイダー")}</a></li>
+                    <li><a class="menuLink ActionList--subGroup" id="menu_password_policy" href="#" style="display: none;">${getText("000-80055", "パスワードポリシー")}</a></li>
+                </ul>
+            </li>
+
             <li class="menuItem"><a class="menuLink" id="menu_auditlog" href="#" style="display: none;">${getText("000-91002", "監査ログ")}</a></li>
         `);
 
@@ -288,6 +296,7 @@ function displayMenu(curent) {
         $('#menu_settings_notifications').attr('href', location_conf.href.workspaces.settings.notifications.workspaces.replace(/{organization_id}/g, CommonAuth.getRealm()));
         $('#menu_settings_mailserver').attr('href', location_conf.href.settings.mailserver.replace(/{organization_id}/g, CommonAuth.getRealm()));
         $('#menu_identity_providers').attr('href', location_conf.href.keycloak.identity_providers.replace(/{organization_id}/g, CommonAuth.getRealm()));
+        $('#menu_password_policy').attr('href', location_conf.href.keycloak.password_policy.replace(/{organization_id}/g, CommonAuth.getRealm()));
         $('#menu_auditlog').attr('href', location_conf.href.auditlog.download.replace(/{organization_id}/g, CommonAuth.getRealm()));
 
         if (CommonAuth.hasAuthority(RolesCommon.ORG_AUTH_USER_MAINTE)) {
@@ -303,11 +312,22 @@ function displayMenu(curent) {
         ||  adminWorkspaces.length > 0) {
             $("#menu_role_management").css("display", "");
         }
+
+        if (CommonAuth.hasAuthority(RolesCommon.ORG_AUTH_UPDATE)
+        ||  CommonAuth.hasRealmManagementAuthority("manage-identity-providers")) {
+            $("#menu_organization_setting").css("display", "");
+            $("#menu_organization_setting").attr("aria-expanded", "true");
+            $("#menu_organization_setting_accordion_panel").attr("aria-hidden", "false");
+        }
+
         if (CommonAuth.hasAuthority(RolesCommon.ORG_AUTH_UPDATE)) {
             $("#menu_settings_mailserver").css("display", "");
         }
         if (CommonAuth.hasRealmManagementAuthority("manage-identity-providers")) {
             $("#menu_identity_providers").css("display", "");
+        }
+        if (CommonAuth.hasRealmManagementAuthority("manage-realm")) {
+            $("#menu_password_policy").css("display", "");
         }
         if (CommonAuth.hasAuthority(RolesCommon.ORG_AUTH_AUDIT_LOG)) {
             $("#menu_auditlog").css("display", "");
