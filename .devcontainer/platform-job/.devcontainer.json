@@ -46,6 +46,9 @@
 					}
 				},
 
+				"python.interpreterPath": "/usr/bin/python3.12",
+				"python.defaultInterpreterPath": "/usr/bin/python3.12",
+
 				// python extension setting
 				"python.linting.pylintEnabled": false,
 				"python.linting.flake8Enabled": true,
