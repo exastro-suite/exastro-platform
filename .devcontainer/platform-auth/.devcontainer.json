@@ -29,21 +29,24 @@
 					}
 				},
 				"terminal.integrated.defaultProfile.linux": "bash",
-		
+
 				// git menu setting
 				"git.allowNoVerifyCommit": true,
-		
+
 				// thunder-client setting
 				"thunder-client.customLocation": "",
 				"thunder-client.saveToWorkspace": true,
 				"thunder-client.workspaceRelativePath": ".vscode_extensions",
-		
+
+				"python.interpreterPath": "/usr/bin/python3.12",
+				"python.defaultInterpreterPath": "/usr/bin/python3.12",
+
 				// python extension setting
 				"python.linting.pylintEnabled": false,
 				"python.linting.flake8Enabled": true,
-		
+
 				"python.linting.lintOnSave": true,
-		
+
 				"python.linting.flake8Args": [
 					"--ignore=W293, W504",
 					"--max-line-length=250",
@@ -56,7 +59,7 @@
 				],
 
 				"python.formatting.provider": "autopep8",
-		
+
 				"python.formatting.autopep8Args": [
 					"--aggressive", "--aggressive",
 				],
