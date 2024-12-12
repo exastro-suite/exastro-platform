@@ -87,7 +87,7 @@
 				"coverage-gutters.coverageBaseDir": "platform_root/platform_api",
 				"coverage-gutters.coverageReportFileName": "platform_root/platform_api/coverage.xml",
 			},
-			Add the IDs of extensions you want installed when the container is created.
+			// Add the IDs of extensions you want installed when the container is created.
 			"extensions": [
 				"donjayamanne.python-extension-pack",
 				"ms-python.vscode-pylance",
