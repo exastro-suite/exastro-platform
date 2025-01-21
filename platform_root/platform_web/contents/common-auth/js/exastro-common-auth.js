@@ -103,8 +103,7 @@ const CommonAuth = {
             CommonAuth.keycloak.onTokenExpired = CommonAuth._onTokenExpired;
 
             // Set automatic token update - tokenの自動更新を設定
-            DebugConsole.log("CommonAuth", "[INFO] update CommonAuth._lastTimeToGetToken");
-            CommonAuth._lastTimeToGetToken = (new Date()).getTime();
+            CommonAuth.__setLastTimeToGetToken();
 
             // tart timer for token auto refresh - トークンの自動更新のタイマーを開始する
             // setInterval(()=>{CommonAuth._autoRefreshToken()}, CommonAuthConfig.TOKEN_CHECK_INTERVAL * 1000);
@@ -158,8 +157,7 @@ const CommonAuth = {
             CommonAuth.logout();
             throw "Token Expired";
         }
-        DebugConsole.log("CommonAuth", "[INFO] update CommonAuth._lastTimeToGetToken");
-        CommonAuth._lastTimeToGetToken = (new Date()).getTime();
+        CommonAuth.__setLastTimeToGetToken();
 
         return CommonAuth.keycloak.token;
     },
@@ -184,7 +182,11 @@ const CommonAuth = {
             throw "not authenticated";
         }
         if(CommonAuth.keycloak.tokenParsed.name) {
-            return CommonAuth.keycloak.tokenParsed.name;
+            if (CommonAuth.getLanguage() == "ja") {
+                return CommonAuth.keycloak.tokenParsed.family_name + " " + CommonAuth.keycloak.tokenParsed.given_name;
+            } else {
+                return CommonAuth.keycloak.tokenParsed.name;
+            }
         } else {
             return CommonAuth.keycloak.tokenParsed.preferred_username;
         }
@@ -269,8 +271,7 @@ const CommonAuth = {
     "refreshTokenForce": function() {
         return new Promise((resolve,reject) => {
                 CommonAuth.keycloak.updateToken(Number.MAX_VALUE).then(() => {
-                    DebugConsole.log("CommonAuth", "[INFO] update CommonAuth._lastTimeToGetToken");
-                    CommonAuth._lastTimeToGetToken = (new Date()).getTime();
+                    CommonAuth.__setLastTimeToGetToken();
                     resolve();
                 }).catch(() => {
                     reject();
@@ -381,11 +382,12 @@ const CommonAuth = {
         return new Promise((resolve, reject) => {
             try {
                 let nowTime = (new Date()).getTime();
-                if(CommonAuthConfig.TOKEN_AUTO_REFRESH === -1 || CommonAuth._token_refresh_permanently || nowTime <= CommonAuth._lastTimeToGetToken + CommonAuthConfig.TOKEN_AUTO_REFRESH * 1000) {
-    
+                if(CommonAuthConfig.TOKEN_AUTO_REFRESH === -1 || CommonAuth._token_refresh_permanently || nowTime <= CommonAuth.__getLastTimeToGetToken() + CommonAuthConfig.TOKEN_AUTO_REFRESH * 1000) {
+                    DebugConsole.log("CommonAuth", `[DEBUG] Auto refresh Remaining time : ${(CommonAuth.__getLastTimeToGetToken() + (CommonAuthConfig.TOKEN_AUTO_REFRESH * 1000) - nowTime) / 1000}` )
+
                     // Renew the token indefinitely or until a certain amount of time has passed since the last request for the token.
                     // - 無制限またはトークンの最後の要求から一定の時間が経過するまで、トークンを更新します
-    
+
                     DebugConsole.log("CommonAuth", "[CALL] keycloak.updateToken");
                     CommonAuth.keycloak.updateToken(CommonAuthConfig.TOKEN_REFRESH_TIMMING).then((refreshed)=>{
                         if(refreshed) {
@@ -452,6 +454,31 @@ const CommonAuth = {
     "_getTopURL": function() {
         return CommonAuth.isPlatformAdminSite()? CommonAuthConfig.PLATFORM_ADMIN_SITE.TOPURL: CommonAuthConfig.ORGANIZATION_USER_SITE.TOPURL;
     },
+
+    /**
+     * Returns last touch time - 画面操作した最後の時間を取得します
+     * @returns {int} last touch time
+     */
+    "__getLastTimeToGetToken": function() {
+        try {
+            // 複数タブで操作していることを考慮し、cookieに保持している最終時刻を返します
+            return parseInt(document.cookie.split(';').filter((item) => item.startsWith(`exastro_${CommonAuth.getRealm()}_LastTimeToGetToken=`))[0].split('=')[1]);
+        } catch {
+            // cookieから最終時刻を取得できないときはjavascript変数上の時刻を返します
+            return CommonAuth._lastTimeToGetToken;
+        }
+    },
+
+    /**
+     * Set last touch time - 画面操作した最後の時間を設定します
+     */
+    "__setLastTimeToGetToken": function() {
+        DebugConsole.log("CommonAuth", "[INFO] update CommonAuth._lastTimeToGetToken");
+        const now = (new Date()).getTime();
+        CommonAuth._lastTimeToGetToken = now;
+        // cookieに操作した最終時刻を書き込みます
+        document.cookie = `exastro_${CommonAuth.getRealm()}_LastTimeToGetToken=${now}`
+    }
 }
 
 // Initialize keycloak adaptor - keycloak adaptor を初期化します
@@ -460,11 +487,16 @@ CommonAuth.keycloak = new Keycloak(CommonAuth._getKeycloakConfig());
 // Keycloak login process after page load - ページロード後にkeycloakのログイン処理を行います
 window.addEventListener('DOMContentLoaded', () => { CommonAuth._login() });
 
-// Rewrite the final time so that automatic update of token continues even if click operation is not performed getToken()
-// - getToken()を行わない、click操作でもtokenの自動更新を継続するように最終時間を書き換え
+// Rewrite the final time so that automatic update of token continues even if click, keydown, focus operation is not performed getToken()
+// - getToken()を行わない、click,keydown,focus操作でもtokenの自動更新を継続するように最終時間を書き換え
 window.addEventListener('click', () => {
-    DebugConsole.log("CommonAuth", "[INFO] update CommonAuth._lastTimeToGetToken");
-    CommonAuth._lastTimeToGetToken = (new Date()).getTime();
+    CommonAuth.__setLastTimeToGetToken();
+});
+window.addEventListener('keydown', () => {
+    CommonAuth.__setLastTimeToGetToken();
+});
+window.addEventListener('focus', () => {
+    CommonAuth.__setLastTimeToGetToken();
 });
 
 // Debug
