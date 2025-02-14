@@ -43,6 +43,8 @@ tags:
     description: ロールに関する操作
   - name: RoleMappingsService
     description: ロール・マッピングに関する操作
+  - name: AgentUsersService
+    description: エージェントユーザーに関する操作
   - name: JobsService
     description: ジョブに関する操作
   - name: MaintenanceModeService
@@ -1185,6 +1187,344 @@ paths:
             schema:
               $ref: '#/components/schemas/roleMappingUser'
         required: true
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        example: null
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+  '/api/{organization_id}/platform/workspaces/{workspace_id}/agent-users':
+    get:
+      tags:
+        - AgentUsersService
+      summary: List returns list of agent users
+      x-openapi-router-controller: controllers.agent_users_service_controller
+      operationId: agent_user_list
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: workspace_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - $ref: '#/components/schemas/agentUserList'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+    post:
+      tags:
+        - AgentUsersService
+      summary: Create an agent user
+      x-openapi-router-controller: controllers.agent_users_service_controller
+      operationId: agent_user_create
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: workspace_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/agentUserCreate'
+        required: true
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        example: null
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+  '/api/{organization_id}/platform/workspaces/{workspace_id}/agent-users/{user_id}':
+    get:
+      tags:
+        - AgentUsersService
+      summary: returns an agent user
+      x-openapi-router-controller: controllers.agent_users_service_controller
+      operationId: get_agent_user
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: workspace_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/agentUser'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+    put:
+      tags:
+        - AgentUsersService
+      summary: Update an agent user
+      x-openapi-router-controller: controllers.agent_users_service_controller
+      operationId: agent_user_update
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: workspace_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/agentUserUpdate'
+        required: true
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        example: null
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+    delete:
+      tags:
+        - AgentUsersService
+      summary: Delete an agent user
+      x-openapi-router-controller: controllers.agent_users_service_controller
+      operationId: agent_user_delete
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: workspace_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        example: null
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+  '/api/{organization_id}/platform/workspaces/{workspace_id}/agent-users/{user_id}/refresh_tokens':
+    get:
+      tags:
+        - AgentUsersService
+      summary: List returns list of agent user tokens
+      x-openapi-router-controller: controllers.agent_users_service_controller
+      operationId: agent_user_token_list
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: workspace_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - $ref: '#/components/schemas/agentUserTokenList'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+    post:
+      tags:
+        - AgentUsersService
+      summary: Create an agent user token
+      x-openapi-router-controller: controllers.agent_users_service_controller
+      operationId: agent_user_token_create
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: workspace_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+        required: true
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          refresh_token:
+                            type: string
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+    delete:
+      tags:
+        - AgentUsersService
+      summary: Delete agent user tokens
+      x-openapi-router-controller: controllers.agent_users_service_controller
+      operationId: agent_user_token_delete
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: workspace_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
       responses:
         '200':
           description: A successful response.
@@ -3031,6 +3371,80 @@ components:
           type: string
           format: date-time
           description: Last Modified
+    agentUser:
+      title: agent user is a definition of Agent user resource.
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/agentUserId'
+        - $ref: '#/components/schemas/agentUserCreate'
+        - type: object
+          properties:
+            token_latest_expire_date:
+              type: string
+              format: date-time
+    agentUserCreate:
+      title: agent user is a definition of Agent user resource.
+      type: object
+      allOf:
+        - type: object
+          properties:
+            username:
+              type: string
+              example: agent-user-01
+            agent_user_type:
+              type: string
+              example: ansible
+          required:
+            - username
+            - agent_user_type
+        - $ref: '#/components/schemas/agentUserUpdate'
+    agentUserId:
+      title: generative ai settings id resources.
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+    agentUserList:
+      title: agent user list is list of agent user resources.
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/agentUser'
+    agentUserUpdate:
+      title: agent user is a definition of Agent user resource.
+      type: object
+      properties:
+        description:
+          type: string
+    agentUserTokenList:
+      title: agent user token list is list of agent user token resources.
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                format: uuid
+              start_timestamp:
+                type: string
+                format: date-time
+              lastaccess_timestamp:
+                type: string
+                format: date-time
+              expire_timestamp:
+                type: string
+                format: date-time
+              create_user_id:
+                type: string
+                format: uuid
+              create_user_name:
+                type: string
   securitySchemes:
     BearerAuth:
       description: Credentials or access token for API

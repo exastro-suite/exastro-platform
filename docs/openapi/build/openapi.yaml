@@ -55,6 +55,8 @@ tags:
     description: メールサーバーに関する操作
   - name: AuditLogService
     description: 監査ログに関する操作
+  - name: AgentUsersService
+    description: エージェントユーザーに関する操作
   - name: InternalCommonService
     description: 共通(内部用)
   - name: InternalPlanService
@@ -1096,99 +1098,13 @@ paths:
                   - $ref: '#/components/schemas/settingsDestinationList'
               examples:
                 mail settings:
-                  value:
-                    result: 200
-                    message: SUCCESS
-                    ts: '2023-11-02T05:36:41.258Z'
-                    data:
-                      - id: 00000001Z7ZXFAED6872F6C9W8
-                        name: destinations of mail settings
-                        kind: Mail
-                        conditions:
-                          ita:
-                            event_type:
-                              new: false
-                              evaluated: false
-                              timeout: true
-                              undetected: true
-                        destination_informations:
-                          - address_header: to
-                            email: mike@example.com
-                          - address_header: cc
-                            email: tommy@example.com
-                          - address_header: bcc
-                            email: nancy@example.com
-                        create_timestamp: '2023-11-02T05:36:41.258Z'
-                        create_user: string
-                        last_update_timestamp: '2023-11-02T05:36:41.258Z'
-                        last_update_user: string
+                  $ref: '#/components/examples/settingsDestinationSubDestinationInformationsExampleMail'
                 teams workflow settings:
-                  value:
-                    result: 200
-                    message: SUCCESS
-                    ts: '2023-11-02T05:36:41.258Z'
-                    data:
-                      - id: 00000001Z7ZXFAED6872F6C9W8
-                        name: destinations of teams workflow settings
-                        kind: Teams_WF
-                        conditions:
-                          ita:
-                            event_type:
-                              new: true
-                              evaluated: true
-                              timeout: false
-                              undetected: false
-                        destination_informations:
-                          - url: 'https://{server-name}.{region}.logic.azure.com/workflows/{workflow-ID}/triggers/{trigger-name}/paths/invoke/?XXXXXXXXX'
-                        create_timestamp: '2023-11-02T05:36:41.258Z'
-                        create_user: string
-                        last_update_timestamp: '2023-11-02T05:36:41.258Z'
-                        last_update_user: string
+                  $ref: '#/components/examples/settingsDestinationSubDestinationInformationsExampleTeamsWorkflow'
                 teams settings (deprecated):
-                  value:
-                    result: 200
-                    message: SUCCESS
-                    ts: '2023-11-02T05:36:41.258Z'
-                    data:
-                      - id: 00000001Z7ZXFAED6872F6C9W8
-                        name: destinations of teams settings
-                        kind: Teams
-                        conditions:
-                          ita:
-                            event_type:
-                              new: true
-                              evaluated: true
-                              timeout: false
-                              undetected: false
-                        destination_informations:
-                          - webhook: 'https://xxxxxxxx.webhook.office.com/webhookb/xxxxxxxx-xxxxxx-xxxx-xxxx-xxxxxxxxxxxx'
-                        create_timestamp: '2023-11-02T05:36:41.258Z'
-                        create_user: string
-                        last_update_timestamp: '2023-11-02T05:36:41.258Z'
-                        last_update_user: string
+                  $ref: '#/components/examples/settingsDestinationSubDestinationInformationsExampleTeams'
                 webhook settings:
-                  value:
-                    result: 200
-                    message: SUCCESS
-                    ts: '2023-11-02T05:36:41.258Z'
-                    data:
-                      - id: 00000001Z7ZXFAED6872F6C9W8
-                        name: destinations of webhook settings
-                        kind: Webhook
-                        conditions:
-                          ita:
-                            event_type:
-                              new: true
-                              evaluated: true
-                              timeout: false
-                              undetected: false
-                        destination_informations:
-                          - url: 'http://your-webhook-server/hooks/XXXXXXXX'
-                            header: 'Content-Type: application/json'
-                        create_timestamp: '2023-11-02T05:36:41.258Z'
-                        create_user: string
-                        last_update_timestamp: '2023-11-02T05:36:41.258Z'
-                        last_update_user: string
+                  $ref: '#/components/examples/settingsDestinationSubDestinationInformationsExampleWebhook'
         default:
           description: An unexpected error response.
           content:
@@ -1337,99 +1253,13 @@ paths:
                   - $ref: '#/components/schemas/responseStat'
               examples:
                 mail settings:
-                  value:
-                    result: 200
-                    message: SUCCESS
-                    ts: '2023-11-02T05:36:41.258Z'
-                    data:
-                      id: 00000001Z7ZXFAED6872F6C9W8
-                      name: destinations of mail settings
-                      kind: Mail
-                      conditions:
-                        ita:
-                          event_type:
-                            new: false
-                            evaluated: false
-                            timeout: true
-                            undetected: true
-                      destination_informations:
-                        - address_header: to
-                          email: mike@example.com
-                        - address_header: cc
-                          email: tommy@example.com
-                        - address_header: bcc
-                          email: nancy@example.com
-                      create_timestamp: '2023-11-02T05:36:41.258Z'
-                      create_user: string
-                      last_update_timestamp: '2023-11-02T05:36:41.258Z'
-                      last_update_user: string
+                  $ref: '#/components/examples/settingsDestinationOneGetExampleMail'
                 teams workflow settings:
-                  value:
-                    result: 200
-                    message: SUCCESS
-                    ts: '2023-11-02T05:36:41.258Z'
-                    data:
-                      id: 00000001Z7ZXFAED6872F6C9W8
-                      name: destinations of teams workflow settings
-                      kind: Teams_WF
-                      conditions:
-                        ita:
-                          event_type:
-                            new: true
-                            evaluated: true
-                            timeout: false
-                            undetected: false
-                      destination_informations:
-                        - url: 'https://{server-name}.{region}.logic.azure.com/workflows/{workflow-ID}/triggers/{trigger-name}/paths/invoke/?XXXXXXXXX'
-                      create_timestamp: '2023-11-02T05:36:41.258Z'
-                      create_user: string
-                      last_update_timestamp: '2023-11-02T05:36:41.258Z'
-                      last_update_user: string
+                  $ref: '#/components/examples/settingsDestinationOneGetExampleTeamsworkflow'
                 teams settings (deprecated):
-                  value:
-                    result: 200
-                    message: SUCCESS
-                    ts: '2023-11-02T05:36:41.258Z'
-                    data:
-                      id: 00000001Z7ZXFAED6872F6C9W8
-                      name: destinations of teams settings
-                      kind: Teams
-                      conditions:
-                        ita:
-                          event_type:
-                            new: true
-                            evaluated: true
-                            timeout: false
-                            undetected: false
-                      destination_informations:
-                        - webhook: 'https://xxxxxxxx.webhook.office.com/webhookb/xxxxxxxx-xxxxxx-xxxx-xxxx-xxxxxxxxxxxx'
-                      create_timestamp: '2023-11-02T05:36:41.258Z'
-                      create_user: string
-                      last_update_timestamp: '2023-11-02T05:36:41.258Z'
-                      last_update_user: string
+                  $ref: '#/components/examples/settingsDestinationOneGetExampleTeams'
                 webhook settings:
-                  value:
-                    result: 200
-                    message: SUCCESS
-                    ts: '2023-11-02T05:36:41.258Z'
-                    data:
-                      id: 00000001Z7ZXFAED6872F6C9W8
-                      name: destinations of webhook settings
-                      kind: Webhook
-                      conditions:
-                        ita:
-                          event_type:
-                            new: true
-                            evaluated: true
-                            timeout: false
-                            undetected: false
-                      destination_informations:
-                        - url: 'http://your-webhook-server/hooks/XXXXXXXX'
-                          header: 'Content-Type: application/json'
-                      create_timestamp: '2023-11-02T05:36:41.258Z'
-                      create_user: string
-                      last_update_timestamp: '2023-11-02T05:36:41.258Z'
-                      last_update_user: string
+                  $ref: '#/components/examples/settingsDestinationOneGetExampleWebhook'
         default:
           description: An unexpected error response.
           content:
@@ -1702,45 +1532,13 @@ paths:
                 $ref: '#/components/schemas/notifications.create'
             examples:
               mail message post:
-                value:
-                  - destination_id: 00000001Z7ZXFAED6872F6C9W8
-                    func_id: '00000000'
-                    func_informations:
-                      key-1: value-1
-                      key-2: value-2
-                    message:
-                      title: subjects
-                      message: event message
+                $ref: '#/components/examples/notificationsCreateExampleMail'
               teams workflow message post:
-                value:
-                  - destination_id: 00000001Z7ZXFAED6872F6C9W9
-                    func_id: '00000000'
-                    func_informations:
-                      key-1: value-1
-                      key-2: value-2
-                    message:
-                      title: send title
-                      text: send message
+                $ref: '#/components/examples/notificationsCreateExampleTeamsworkflow'
               teams message post (deprecated):
-                value:
-                  - destination_id: 00000001Z7ZXFAED6872F6C9W9
-                    func_id: '00000000'
-                    func_informations:
-                      key-1: value-1
-                      key-2: value-2
-                    message:
-                      title: send title
-                      text: send message
+                $ref: '#/components/examples/notificationsCreateExampleTeams'
               webhook message post:
-                value:
-                  - destination_id: 00000001Z7ZXFAED6872F6C9W9
-                    func_id: '00000000'
-                    func_informations:
-                      key-1: value-1
-                      key-2: value-2
-                    message:
-                      title: send title
-                      text: send message
+                $ref: '#/components/examples/notificationsCreateExampleWebhook'
         required: true
       responses:
         '200':
@@ -2941,6 +2739,344 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/runtimeError'
+  '/api/{organization_id}/platform/workspaces/{workspace_id}/agent-users':
+    get:
+      tags:
+        - AgentUsersService
+      summary: List returns list of agent users
+      x-openapi-router-controller: controllers.agent_users_service_controller
+      operationId: agent_user_list
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: workspace_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - $ref: '#/components/schemas/agentUserList'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+    post:
+      tags:
+        - AgentUsersService
+      summary: Create an agent user
+      x-openapi-router-controller: controllers.agent_users_service_controller
+      operationId: agent_user_create
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: workspace_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/agentUserCreate'
+        required: true
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        example: null
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+  '/api/{organization_id}/platform/workspaces/{workspace_id}/agent-users/{user_id}':
+    get:
+      tags:
+        - AgentUsersService
+      summary: returns an agent user
+      x-openapi-router-controller: controllers.agent_users_service_controller
+      operationId: get_agent_user
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: workspace_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/agentUser'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+    put:
+      tags:
+        - AgentUsersService
+      summary: Update an agent user
+      x-openapi-router-controller: controllers.agent_users_service_controller
+      operationId: agent_user_update
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: workspace_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/agentUserUpdate'
+        required: true
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        example: null
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+    delete:
+      tags:
+        - AgentUsersService
+      summary: Delete an agent user
+      x-openapi-router-controller: controllers.agent_users_service_controller
+      operationId: agent_user_delete
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: workspace_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        example: null
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+  '/api/{organization_id}/platform/workspaces/{workspace_id}/agent-users/{user_id}/refresh_tokens':
+    get:
+      tags:
+        - AgentUsersService
+      summary: List returns list of agent user tokens
+      x-openapi-router-controller: controllers.agent_users_service_controller
+      operationId: agent_user_token_list
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: workspace_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - $ref: '#/components/schemas/agentUserTokenList'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+    post:
+      tags:
+        - AgentUsersService
+      summary: Create an agent user token
+      x-openapi-router-controller: controllers.agent_users_service_controller
+      operationId: agent_user_token_create
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: workspace_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+        required: true
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          refresh_token:
+                            type: string
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+    delete:
+      tags:
+        - AgentUsersService
+      summary: Delete agent user tokens
+      x-openapi-router-controller: controllers.agent_users_service_controller
+      operationId: agent_user_token_delete
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: workspace_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        example: null
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
   /internal-api/platform/settings/common:
     get:
       tags:
@@ -3511,13 +3647,13 @@ paths:
                   - $ref: '#/components/schemas/settingsDestinationList'
               examples:
                 mail settings:
-                  $ref: '#/paths/~1api~1%7Borganization_id%7D~1platform~1workspaces~1%7Bworkspace_id%7D~1settings~1notifications/get/responses/200/content/application~1json/examples/mail%20settings'
+                  $ref: '#/components/examples/settingsDestinationSubDestinationInformationsExampleMail'
                 teams workflow settings:
-                  $ref: '#/paths/~1api~1%7Borganization_id%7D~1platform~1workspaces~1%7Bworkspace_id%7D~1settings~1notifications/get/responses/200/content/application~1json/examples/teams%20workflow%20settings'
+                  $ref: '#/components/examples/settingsDestinationSubDestinationInformationsExampleTeamsWorkflow'
                 teams settings (deprecated):
-                  $ref: '#/paths/~1api~1%7Borganization_id%7D~1platform~1workspaces~1%7Bworkspace_id%7D~1settings~1notifications/get/responses/200/content/application~1json/examples/teams%20settings%20(deprecated)'
+                  $ref: '#/components/examples/settingsDestinationSubDestinationInformationsExampleTeams'
                 webhook settings:
-                  $ref: '#/paths/~1api~1%7Borganization_id%7D~1platform~1workspaces~1%7Bworkspace_id%7D~1settings~1notifications/get/responses/200/content/application~1json/examples/webhook%20settings'
+                  $ref: '#/components/examples/settingsDestinationSubDestinationInformationsExampleWebhook'
         default:
           description: An unexpected error response.
           content:
@@ -3559,13 +3695,13 @@ paths:
                   - $ref: '#/components/schemas/responseStat'
               examples:
                 mail settings:
-                  $ref: '#/paths/~1api~1%7Borganization_id%7D~1platform~1workspaces~1%7Bworkspace_id%7D~1settings~1notifications~1%7Bdestination_id%7D/get/responses/200/content/application~1json/examples/mail%20settings'
+                  $ref: '#/components/examples/settingsDestinationOneGetExampleMail'
                 teams workflow settings:
-                  $ref: '#/paths/~1api~1%7Borganization_id%7D~1platform~1workspaces~1%7Bworkspace_id%7D~1settings~1notifications~1%7Bdestination_id%7D/get/responses/200/content/application~1json/examples/teams%20workflow%20settings'
+                  $ref: '#/components/examples/settingsDestinationOneGetExampleTeamsworkflow'
                 teams settings (deprecated):
-                  $ref: '#/paths/~1api~1%7Borganization_id%7D~1platform~1workspaces~1%7Bworkspace_id%7D~1settings~1notifications~1%7Bdestination_id%7D/get/responses/200/content/application~1json/examples/teams%20settings%20(deprecated)'
+                  $ref: '#/components/examples/settingsDestinationOneGetExampleTeams'
                 webhook settings:
-                  $ref: '#/paths/~1api~1%7Borganization_id%7D~1platform~1workspaces~1%7Bworkspace_id%7D~1settings~1notifications~1%7Bdestination_id%7D/get/responses/200/content/application~1json/examples/webhook%20settings'
+                  $ref: '#/components/examples/settingsDestinationOneGetExampleWebhook'
         default:
           description: An unexpected error response.
           content:
@@ -3697,13 +3833,13 @@ paths:
                 $ref: '#/components/schemas/notifications.create'
             examples:
               mail message post:
-                $ref: '#/paths/~1api~1%7Borganization_id%7D~1platform~1workspaces~1%7Bworkspace_id%7D~1notifications/post/requestBody/content/application~1json/examples/mail%20message%20post'
+                $ref: '#/components/examples/notificationsCreateExampleMail'
               teams workflow message post:
-                $ref: '#/paths/~1api~1%7Borganization_id%7D~1platform~1workspaces~1%7Bworkspace_id%7D~1notifications/post/requestBody/content/application~1json/examples/teams%20workflow%20message%20post'
+                $ref: '#/components/examples/notificationsCreateExampleTeamsworkflow'
               teams message post (deprecated):
-                $ref: '#/paths/~1api~1%7Borganization_id%7D~1platform~1workspaces~1%7Bworkspace_id%7D~1notifications/post/requestBody/content/application~1json/examples/teams%20message%20post%20(deprecated)'
+                $ref: '#/components/examples/notificationsCreateExampleTeams'
               webhook message post:
-                $ref: '#/paths/~1api~1%7Borganization_id%7D~1platform~1workspaces~1%7Bworkspace_id%7D~1notifications/post/requestBody/content/application~1json/examples/webhook%20message%20post'
+                $ref: '#/components/examples/notificationsCreateExampleWebhook'
         required: true
       responses:
         '200':
@@ -5177,6 +5313,309 @@ components:
           type: string
           format: date-time
           description: Last Modified
+    agentUser:
+      title: agent user is a definition of Agent user resource.
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/agentUserId'
+        - $ref: '#/components/schemas/agentUserCreate'
+        - type: object
+          properties:
+            token_latest_expire_date:
+              type: string
+              format: date-time
+    agentUserCreate:
+      title: agent user is a definition of Agent user resource.
+      type: object
+      allOf:
+        - type: object
+          properties:
+            username:
+              type: string
+              example: agent-user-01
+            agent_user_type:
+              type: string
+              example: ansible
+          required:
+            - username
+            - agent_user_type
+        - $ref: '#/components/schemas/agentUserUpdate'
+    agentUserId:
+      title: generative ai settings id resources.
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+    agentUserList:
+      title: agent user list is list of agent user resources.
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/agentUser'
+    agentUserUpdate:
+      title: agent user is a definition of Agent user resource.
+      type: object
+      properties:
+        description:
+          type: string
+    agentUserTokenList:
+      title: agent user token list is list of agent user token resources.
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                format: uuid
+              start_timestamp:
+                type: string
+                format: date-time
+              lastaccess_timestamp:
+                type: string
+                format: date-time
+              expire_timestamp:
+                type: string
+                format: date-time
+              create_user_id:
+                type: string
+                format: uuid
+              create_user_name:
+                type: string
+  examples:
+    settingsDestinationSubDestinationInformationsExampleMail:
+      value:
+        result: 200
+        message: SUCCESS
+        ts: '2023-11-02T05:36:41.258Z'
+        data:
+          - id: 00000001Z7ZXFAED6872F6C9W8
+            name: destinations of mail settings
+            kind: Mail
+            conditions:
+              ita:
+                event_type:
+                  new: false
+                  evaluated: false
+                  timeout: true
+                  undetected: true
+            destination_informations:
+              - address_header: to
+                email: mike@example.com
+              - address_header: cc
+                email: tommy@example.com
+              - address_header: bcc
+                email: nancy@example.com
+            create_timestamp: '2023-11-02T05:36:41.258Z'
+            create_user: string
+            last_update_timestamp: '2023-11-02T05:36:41.258Z'
+            last_update_user: string
+    settingsDestinationSubDestinationInformationsExampleTeamsWorkflow:
+      value:
+        result: 200
+        message: SUCCESS
+        ts: '2023-11-02T05:36:41.258Z'
+        data:
+          - id: 00000001Z7ZXFAED6872F6C9W8
+            name: destinations of teams workflow settings
+            kind: Teams_WF
+            conditions:
+              ita:
+                event_type:
+                  new: true
+                  evaluated: true
+                  timeout: false
+                  undetected: false
+            destination_informations:
+              - url: 'https://{server-name}.{region}.logic.azure.com/workflows/{workflow-ID}/triggers/{trigger-name}/paths/invoke/?XXXXXXXXX'
+            create_timestamp: '2023-11-02T05:36:41.258Z'
+            create_user: string
+            last_update_timestamp: '2023-11-02T05:36:41.258Z'
+            last_update_user: string
+    settingsDestinationSubDestinationInformationsExampleTeams:
+      value:
+        result: 200
+        message: SUCCESS
+        ts: '2023-11-02T05:36:41.258Z'
+        data:
+          - id: 00000001Z7ZXFAED6872F6C9W8
+            name: destinations of teams settings
+            kind: Teams
+            conditions:
+              ita:
+                event_type:
+                  new: true
+                  evaluated: true
+                  timeout: false
+                  undetected: false
+            destination_informations:
+              - webhook: 'https://xxxxxxxx.webhook.office.com/webhookb/xxxxxxxx-xxxxxx-xxxx-xxxx-xxxxxxxxxxxx'
+            create_timestamp: '2023-11-02T05:36:41.258Z'
+            create_user: string
+            last_update_timestamp: '2023-11-02T05:36:41.258Z'
+            last_update_user: string
+    settingsDestinationSubDestinationInformationsExampleWebhook:
+      value:
+        result: 200
+        message: SUCCESS
+        ts: '2023-11-02T05:36:41.258Z'
+        data:
+          - id: 00000001Z7ZXFAED6872F6C9W8
+            name: destinations of webhook settings
+            kind: Webhook
+            conditions:
+              ita:
+                event_type:
+                  new: true
+                  evaluated: true
+                  timeout: false
+                  undetected: false
+            destination_informations:
+              - url: 'http://your-webhook-server/hooks/XXXXXXXX'
+                header: 'Content-Type: application/json'
+            create_timestamp: '2023-11-02T05:36:41.258Z'
+            create_user: string
+            last_update_timestamp: '2023-11-02T05:36:41.258Z'
+            last_update_user: string
+    notificationsCreateExampleMail:
+      value:
+        - destination_id: 00000001Z7ZXFAED6872F6C9W8
+          func_id: '00000000'
+          func_informations:
+            key-1: value-1
+            key-2: value-2
+          message:
+            title: subjects
+            message: event message
+    notificationsCreateExampleTeamsworkflow:
+      value:
+        - destination_id: 00000001Z7ZXFAED6872F6C9W9
+          func_id: '00000000'
+          func_informations:
+            key-1: value-1
+            key-2: value-2
+          message:
+            title: send title
+            text: send message
+    notificationsCreateExampleTeams:
+      value:
+        - destination_id: 00000001Z7ZXFAED6872F6C9W9
+          func_id: '00000000'
+          func_informations:
+            key-1: value-1
+            key-2: value-2
+          message:
+            title: send title
+            text: send message
+    notificationsCreateExampleWebhook:
+      value:
+        - destination_id: 00000001Z7ZXFAED6872F6C9W9
+          func_id: '00000000'
+          func_informations:
+            key-1: value-1
+            key-2: value-2
+          message:
+            title: send title
+            text: send message
+    settingsDestinationOneGetExampleMail:
+      value:
+        result: 200
+        message: SUCCESS
+        ts: '2023-11-02T05:36:41.258Z'
+        data:
+          id: 00000001Z7ZXFAED6872F6C9W8
+          name: destinations of mail settings
+          kind: Mail
+          conditions:
+            ita:
+              event_type:
+                new: false
+                evaluated: false
+                timeout: true
+                undetected: true
+          destination_informations:
+            - address_header: to
+              email: mike@example.com
+            - address_header: cc
+              email: tommy@example.com
+            - address_header: bcc
+              email: nancy@example.com
+          create_timestamp: '2023-11-02T05:36:41.258Z'
+          create_user: string
+          last_update_timestamp: '2023-11-02T05:36:41.258Z'
+          last_update_user: string
+    settingsDestinationOneGetExampleTeamsworkflow:
+      value:
+        result: 200
+        message: SUCCESS
+        ts: '2023-11-02T05:36:41.258Z'
+        data:
+          id: 00000001Z7ZXFAED6872F6C9W8
+          name: destinations of teams workflow settings
+          kind: Teams_WF
+          conditions:
+            ita:
+              event_type:
+                new: true
+                evaluated: true
+                timeout: false
+                undetected: false
+          destination_informations:
+            - url: 'https://{server-name}.{region}.logic.azure.com/workflows/{workflow-ID}/triggers/{trigger-name}/paths/invoke/?XXXXXXXXX'
+          create_timestamp: '2023-11-02T05:36:41.258Z'
+          create_user: string
+          last_update_timestamp: '2023-11-02T05:36:41.258Z'
+          last_update_user: string
+    settingsDestinationOneGetExampleTeams:
+      value:
+        result: 200
+        message: SUCCESS
+        ts: '2023-11-02T05:36:41.258Z'
+        data:
+          id: 00000001Z7ZXFAED6872F6C9W8
+          name: destinations of teams settings
+          kind: Teams
+          conditions:
+            ita:
+              event_type:
+                new: true
+                evaluated: true
+                timeout: false
+                undetected: false
+          destination_informations:
+            - webhook: 'https://xxxxxxxx.webhook.office.com/webhookb/xxxxxxxx-xxxxxx-xxxx-xxxx-xxxxxxxxxxxx'
+          create_timestamp: '2023-11-02T05:36:41.258Z'
+          create_user: string
+          last_update_timestamp: '2023-11-02T05:36:41.258Z'
+          last_update_user: string
+    settingsDestinationOneGetExampleWebhook:
+      value:
+        result: 200
+        message: SUCCESS
+        ts: '2023-11-02T05:36:41.258Z'
+        data:
+          id: 00000001Z7ZXFAED6872F6C9W8
+          name: destinations of webhook settings
+          kind: Webhook
+          conditions:
+            ita:
+              event_type:
+                new: true
+                evaluated: true
+                timeout: false
+                undetected: false
+          destination_informations:
+            - url: 'http://your-webhook-server/hooks/XXXXXXXX'
+              header: 'Content-Type: application/json'
+          create_timestamp: '2023-11-02T05:36:41.258Z'
+          create_user: string
+          last_update_timestamp: '2023-11-02T05:36:41.258Z'
+          last_update_user: string
   securitySchemes:
     BearerAuth:
       description: Credentials or access token for API

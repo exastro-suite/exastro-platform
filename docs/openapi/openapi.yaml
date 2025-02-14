@@ -72,6 +72,8 @@ tags:
   description: メールサーバーに関する操作
 - name: AuditLogService
   description: 監査ログに関する操作
+- name: AgentUsersService
+  description: エージェントユーザーに関する操作
 - name: InternalCommonService
   description: 共通(内部用)
 - name: InternalPlanService
@@ -203,6 +205,14 @@ paths:
   "/api/{organization_id}/platform/auditlog/download/{download_id}":
       $ref: './paths/auditlog.download.download_id.yaml'
 
+  "/api/{organization_id}/platform/workspaces/{workspace_id}/agent-users":
+      $ref: './paths/workspaces.workspace_id.agent-users.yaml'
+
+  "/api/{organization_id}/platform/workspaces/{workspace_id}/agent-users/{user_id}":
+      $ref: './paths/workspaces.workspace_id.agent-users.user_id.yaml'
+
+  "/api/{organization_id}/platform/workspaces/{workspace_id}/agent-users/{user_id}/refresh_tokens":
+      $ref: './paths/workspaces.workspace_id.agent-users.user_id.refresh_tokens.yaml'
 
   "/internal-api/platform/settings/common":
       $ref: './paths/internal_common.settings.common.yaml'
@@ -247,6 +257,8 @@ paths:
 components:
   schemas:
     $ref: './schemas/_schemas.yaml'
+  examples:
+    $ref: './schemas/_examples.yaml'
 
   securitySchemes:
     BearerAuth:

@@ -2033,6 +2033,80 @@ components:
           type: string
           format: date-time
           description: Last Modified
+    agentUser:
+      title: agent user is a definition of Agent user resource.
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/agentUserId'
+        - $ref: '#/components/schemas/agentUserCreate'
+        - type: object
+          properties:
+            token_latest_expire_date:
+              type: string
+              format: date-time
+    agentUserCreate:
+      title: agent user is a definition of Agent user resource.
+      type: object
+      allOf:
+        - type: object
+          properties:
+            username:
+              type: string
+              example: agent-user-01
+            agent_user_type:
+              type: string
+              example: ansible
+          required:
+            - username
+            - agent_user_type
+        - $ref: '#/components/schemas/agentUserUpdate'
+    agentUserId:
+      title: generative ai settings id resources.
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+    agentUserList:
+      title: agent user list is list of agent user resources.
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/agentUser'
+    agentUserUpdate:
+      title: agent user is a definition of Agent user resource.
+      type: object
+      properties:
+        description:
+          type: string
+    agentUserTokenList:
+      title: agent user token list is list of agent user token resources.
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                format: uuid
+              start_timestamp:
+                type: string
+                format: date-time
+              lastaccess_timestamp:
+                type: string
+                format: date-time
+              expire_timestamp:
+                type: string
+                format: date-time
+              create_user_id:
+                type: string
+                format: uuid
+              create_user_name:
+                type: string
   securitySchemes:
     BearerAuth:
       description: Credentials or access token for API
