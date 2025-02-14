@@ -1,0 +1,38 @@
+#   Copyright 2025 NEC Corporation
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+
+settingsDestinationSubDestinationInformationsExampleMail:
+  $ref: "./settings.destinations.get.example.mail.yaml"
+settingsDestinationSubDestinationInformationsExampleTeamsWorkflow:
+  $ref: "./settings.destinations.get.example.teamsworkflow.yaml"
+settingsDestinationSubDestinationInformationsExampleTeams:
+  $ref: "./settings.destinations.get.example.teams.yaml"
+settingsDestinationSubDestinationInformationsExampleWebhook:
+  $ref: "./settings.destinations.get.example.webhook.yaml"
+notificationsCreateExampleMail:
+  $ref: "./notifications.create.example.mail.yaml"
+notificationsCreateExampleTeamsworkflow:
+  $ref: "./notifications.create.example.teamsworkflow.yaml"
+notificationsCreateExampleTeams:
+  $ref: "./notifications.create.example.teams.yaml"
+notificationsCreateExampleWebhook:
+  $ref: "./notifications.create.example.webhook.yaml"
+settingsDestinationOneGetExampleMail:
+  $ref: "./settings.destinationOne.get.example.mail.yaml"
+settingsDestinationOneGetExampleTeamsworkflow:
+  $ref: "./settings.destinationOne.get.example.teamsworkflow.yaml"
+settingsDestinationOneGetExampleTeams:
+  $ref: "./settings.destinationOne.get.example.teams.yaml"
+settingsDestinationOneGetExampleWebhook:
+  $ref: "./settings.destinationOne.get.example.webhook.yaml"

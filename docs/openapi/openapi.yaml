@@ -257,6 +257,8 @@ paths:
 components:
   schemas:
     $ref: './schemas/_schemas.yaml'
+  examples:
+    $ref: './schemas/_examples.yaml'
 
   securitySchemes:
     BearerAuth:
