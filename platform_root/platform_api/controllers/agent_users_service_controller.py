@@ -19,7 +19,7 @@ import globals
 import json
 
 from common_library.common import common, multi_lang, const, validation, bl_common_service
-
+from common_library.common import bl_agent_user
 
 @common.platform_exception_handler
 def agent_user_create(body, organization_id, workspace_id):  # noqa: E501
@@ -151,3 +151,5 @@ def get_agent_user(organization_id, workspace_id, user_id):  # noqa: E501
     """
     globals.logger.debug(f"### func:{inspect.currentframe().f_code.co_name}")
     return common.response_200_ok(None)
+
+

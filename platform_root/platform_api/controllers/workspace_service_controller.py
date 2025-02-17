@@ -29,6 +29,8 @@ import common_library.common.const as common_const
 from common_library.common.db import DBconnector
 from libs import queries_workspaces
 
+from common_library.common import bl_agent_user
+
 import globals
 
 MSG_FUNCTION_ID = "22"
@@ -300,6 +302,74 @@ def workspace_create(body, organization_id):
                         message_id,
                         "管理者ユーザーとワークスペース管理者ロールの紐づけに失敗しました(対象ID:{0})",
                         target_user_id,
+                    )
+                    raise common.InternalErrorException(message_id=message_id, message=message)
+
+            # その他のワークスペースビルトインロールを生成する
+            # Generate other workspace built-in roles
+            
+            # compositesするworkspaceのロールを取得する
+            r_role_ws = api_keycloak_roles.clients_role_get(
+                realm_name=organization_id, client_id=private.internal_api_client_id, role_name=workspace_id, token=token,
+            )
+            if r_role_ws.status_code != 200:
+                globals.logger.error(f"response.status_code:{r_role_ws.status_code}")
+                globals.logger.error(f"response.text:{r_role_ws.text}")
+
+                # 一度コミットし、ワークスペース削除ロジックの実行
+                conn.commit()
+                __workspace_delete_main(organization_id, workspace_id, user_id, encode_roles, language)
+
+                message_id = f"500-{MSG_FUNCTION_ID}003"
+                message = multi_lang.get_text(
+                    message_id,
+                    "ワークスペースロールの取得に失敗しました(対象ID:{0})",
+                    workspace_id,
+                )
+                raise common.InternalErrorException(message_id=message_id, message=message)
+
+            builtin_composites_roles = [json.loads(r_role_ws.text)]
+
+            builtin_roles = bl_agent_user.agent_user_roles(workspace_id)
+            for builtin_role in builtin_roles:
+                
+                r_create_role = api_keycloak_roles.clients_role_create(
+                    realm_name=organization_id, client_uid=private.user_token_client_id, role_name=builtin_role, token=token,
+                    role_options=role_options,
+                )
+                if r_create_wsadmin.status_code not in [201, 409]:
+                    # 201 Created 以外に、409 already exists は許容する
+                    globals.logger.error(f"response.status_code:{r_create_role.status_code}")
+                    globals.logger.error(f"response.text:{r_create_role.text}")
+
+                    # 一度コミットし、ワークスペース削除ロジックの実行
+                    conn.commit()
+                    __workspace_delete_main(organization_id, workspace_id, user_id, encode_roles, language)
+
+                    message_id = "500-22001"
+                    message = multi_lang.get_text(
+                        message_id,
+                        "ワークスペースロール作成に失敗しました(対象ID:{0})",
+                        builtin_role,
+                    )
+                    raise common.InternalErrorException(message_id=message_id, message=message)
+
+                r_create_composite = api_keycloak_roles.clients_role_composites_create(
+                    realm_name=organization_id, client_uid=private.user_token_client_id, role_name=builtin_role, add_roles=builtin_composites_roles, token=token,
+                )
+                if r_create_composite.status_code != 204:
+                    globals.logger.error(f"response.status_code:{r_create_composite.status_code}")
+                    globals.logger.error(f"response.text:{r_create_composite.text}")
+
+                    # 一度コミットし、ワークスペース削除ロジックの実行
+                    conn.commit()
+                    __workspace_delete_main(organization_id, workspace_id, user_id, encode_roles, language)
+
+                    message_id = "500-22010"
+                    message = multi_lang.get_text(
+                        message_id,
+                        "ワークスペースロールの紐づけに失敗しました(対象ID:{})",
+                        builtin_role,
                     )
                     raise common.InternalErrorException(message_id=message_id, message=message)
 
