@@ -235,3 +235,7 @@ CONFIG_KEY_USER_EXPORT_IMPORT_EXP_DAYS = "platform.system.user_export_import.exp
 CONFIG_KEY_USER_EXPORT_IMPORT_CLEANUP_TIME = "platform.system.user_export_import.cleanup_time"
 # chunk size for upload/download
 CONFIG_KEY_CHUNK_SIZE = "platform.system.chunk_size"
+
+# Agent user type
+AGENT_USER_TYPE_ANSIBLE = 'ansible'
+AGENT_USER_TYPE_OASE = 'oase'

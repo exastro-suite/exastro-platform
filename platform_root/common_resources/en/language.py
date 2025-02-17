@@ -1,4 +1,4 @@
-# Copyright 2024 NEC Corporation
+# Copyright 2025 NEC Corporation
 #
 # Licensed under the Apache License, Version 2.0 (the ""License"");
 # you may not use this file except in compliance with the License.
@@ -68,7 +68,7 @@ class LanguageList:
     lang_array['000-00146'] = 'Notifications destination name'
     lang_array['000-00147'] = 'Notifications destination kind'
     lang_array['000-00148'] = 'Notifications destination email'
-    lang_array['000-00149'] = 'Teams webhook for notifications destination '
+    lang_array['000-00149'] = 'Teams webhook for notifications destination'
     lang_array['000-00150'] = 'Notification destination'
     lang_array['000-00151'] = 'Notification destination email header'
     lang_array['000-00152'] = 'Event type'
@@ -228,6 +228,8 @@ class LanguageList:
     lang_array['000-80051'] = 'Identity providers'
     lang_array['000-80052'] = 'Refresh'
     lang_array['000-80053'] = 'Warning'
+    lang_array['000-80054'] = 'Organization settings'
+    lang_array['000-80055'] = 'Password policy'
     lang_array['000-81001'] = 'Edit accouont'
     lang_array['000-81002'] = 'Change password'
     lang_array['000-81003'] = 'Two-factor authentication settings'
@@ -493,6 +495,8 @@ class LanguageList:
     lang_array['000-90002'] = 'Keycloak console'
     lang_array['000-90003'] = 'You can change various settings of Keycloak.'
     lang_array['000-90004'] = 'Identity providers / Exastro Platform'
+    lang_array['000-90005'] = 'Password policy / Exastro Platform'
+    lang_array['000-90006'] = 'Password policy is an area where you can set mandatory policies for passwords.'
     lang_array['000-91001'] = 'Audit log / Exastro Platform'
     lang_array['000-91002'] = 'Audit log'
     lang_array['000-91003'] = 'You can download audit logs and view download history.'
@@ -804,6 +808,7 @@ class LanguageList:
     lang_array['500-22007'] = 'Failed to create Exastro IT Automation workspace (Target ID: {})'
     lang_array['500-22008'] = 'Failed to delete Exastro IT Automation workspace (Target ID: {0})'
     lang_array['500-22009'] = 'Failed to create Workspace Database (organization id:{0} workspace_id:{1})'
+    lang_array['500-22010'] = 'Failed to link workspace role (Target ID: {})'
     #
     #
     #
@@ -817,4 +822,3 @@ class LanguageList:
     #
     #
     #
-
