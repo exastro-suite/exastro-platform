@@ -58,6 +58,8 @@ tags:
   description: メールサーバーに関する操作
 - name: AuditLogService
   description: 監査ログに関する操作
+- name: AgentUsersService
+  description: エージェントユーザーに関する操作
 - name: InternalCommonService
   description: 共通(内部用)
 - name: InternalPlanService
@@ -85,13 +87,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200'
+                $ref: "#/components/schemas/inline_response_200"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.organization_service_controller
     post:
       tags:
@@ -111,7 +113,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/organizationCreate'
+              $ref: "#/components/schemas/organizationCreate"
         required: true
       responses:
         "200":
@@ -119,13 +121,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/responseOk'
+                $ref: "#/components/schemas/responseOk"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.organization_service_controller
   /api/platform/organizations/{organization_id}:
     get:
@@ -147,13 +149,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_1'
+                $ref: "#/components/schemas/inline_response_200_1"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.organization_service_controller
     put:
       tags:
@@ -172,7 +174,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/organizations_organization_id_body'
+              $ref: "#/components/schemas/organizations_organization_id_body"
             examples:
               organization:
                 value:
@@ -196,13 +198,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_2'
+                $ref: "#/components/schemas/inline_response_200_2"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.organization_service_controller
     delete:
       tags:
@@ -223,13 +225,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_3'
+                $ref: "#/components/schemas/inline_response_200_3"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.organization_service_controller
   /api/{organization_id}/platform/setting:
     get:
@@ -251,13 +253,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_4'
+                $ref: "#/components/schemas/inline_response_200_4"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.organization_service_controller
     patch:
       tags:
@@ -276,7 +278,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/organizationSetting'
+              $ref: "#/components/schemas/organizationSetting"
         required: true
       responses:
         "200":
@@ -284,13 +286,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/responseOk'
+                $ref: "#/components/schemas/responseOk"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.organization_service_controller
   /auth/realms/{organization_id}/protocol/openid-connect/token:
     post:
@@ -310,20 +312,20 @@ paths:
         content:
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/tokenRequestBody'
+              $ref: "#/components/schemas/tokenRequestBody"
       responses:
         "200":
           description: A successful response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/tokenResponseOK'
+                $ref: "#/components/schemas/tokenResponseOK"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/tokenResponseError'
+                $ref: "#/components/schemas/tokenResponseError"
       x-openapi-router-controller: controllers.token_service_controller
   /api/{organization_id}/platform/users/_current/refresh_tokens:
     get:
@@ -345,13 +347,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_5'
+                $ref: "#/components/schemas/inline_response_200_5"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.token_service_controller
     delete:
       tags:
@@ -372,13 +374,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_2'
+                $ref: "#/components/schemas/inline_response_200_2"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.token_service_controller
   /api/platform/users/_current/refresh_tokens:
     get:
@@ -392,13 +394,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_5'
+                $ref: "#/components/schemas/inline_response_200_5"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.token_service_controller
     delete:
       tags:
@@ -411,13 +413,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_2'
+                $ref: "#/components/schemas/inline_response_200_2"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.token_service_controller
   /api/platform/{organization_id}/plans:
     get:
@@ -439,13 +441,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_6'
+                $ref: "#/components/schemas/inline_response_200_6"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.plan_service_controller
     post:
       tags:
@@ -464,7 +466,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/planMappingOrganization'
+              $ref: "#/components/schemas/planMappingOrganization"
         required: true
       responses:
         "200":
@@ -472,13 +474,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/responseOk'
+                $ref: "#/components/schemas/responseOk"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.plan_service_controller
   /api/platform/{organization_id}/plans/{plan_start_datetime}:
     delete:
@@ -508,13 +510,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/responseOk'
+                $ref: "#/components/schemas/responseOk"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.plan_service_controller
   /api/platform/plans:
     get:
@@ -528,13 +530,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_7'
+                $ref: "#/components/schemas/inline_response_200_7"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.plan_service_controller
     post:
       tags:
@@ -545,7 +547,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/plan'
+              $ref: "#/components/schemas/plan"
         required: true
       responses:
         "200":
@@ -553,13 +555,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/responseOk'
+                $ref: "#/components/schemas/responseOk"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.plan_service_controller
   /api/platform/plan_items:
     get:
@@ -573,13 +575,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_8'
+                $ref: "#/components/schemas/inline_response_200_8"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.plan_service_controller
   /api/{organization_id}/platform/limits:
     get:
@@ -610,13 +612,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_9'
+                $ref: "#/components/schemas/inline_response_200_9"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.plan_service_controller
   /api/platform/usages:
     get:
@@ -647,13 +649,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_10'
+                $ref: "#/components/schemas/inline_response_200_10"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.usage_service_controller
   /api/{organization_id}/platform/usages:
     get:
@@ -684,13 +686,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_11'
+                $ref: "#/components/schemas/inline_response_200_11"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.usage_service_controller
   /api/platform/settings/common:
     get:
@@ -704,13 +706,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_12'
+                $ref: "#/components/schemas/inline_response_200_12"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.common_service_controller
   /api/platform/settings/common/{config_key}:
     put:
@@ -731,7 +733,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/systemConfigUpdate'
+              $ref: "#/components/schemas/systemConfigUpdate"
         required: true
       responses:
         "200":
@@ -739,13 +741,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/responseOk'
+                $ref: "#/components/schemas/responseOk"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.common_service_controller
   /api/{organization_id}/platform/settings/common/{config_key}:
     get:
@@ -774,13 +776,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_13'
+                $ref: "#/components/schemas/inline_response_200_13"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.common_service_controller
   /api/{organization_id}/platform/workspaces:
     get:
@@ -810,13 +812,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_14'
+                $ref: "#/components/schemas/inline_response_200_14"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.workspace_service_controller
     post:
       tags:
@@ -835,7 +837,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/workspace'
+              $ref: "#/components/schemas/workspace"
         required: true
       responses:
         "200":
@@ -843,13 +845,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_2'
+                $ref: "#/components/schemas/inline_response_200_2"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.workspace_service_controller
   /api/{organization_id}/platform/workspaces/{workspace_id}:
     get:
@@ -878,13 +880,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_15'
+                $ref: "#/components/schemas/inline_response_200_15"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.workspace_service_controller
     put:
       tags:
@@ -910,7 +912,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/workspaceUpdate'
+              $ref: "#/components/schemas/workspaceUpdate"
         required: true
       responses:
         "200":
@@ -918,13 +920,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/responseOk'
+                $ref: "#/components/schemas/responseOk"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.workspace_service_controller
     delete:
       tags:
@@ -952,13 +954,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/responseOk'
+                $ref: "#/components/schemas/responseOk"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.workspace_service_controller
   /api/{organization_id}/platform/workspaces/{workspace_id}/members:
     get:
@@ -987,13 +989,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_16'
+                $ref: "#/components/schemas/inline_response_200_16"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.workspace_service_controller
   /api/{organization_id}/platform/workspaces/{workspace_id}/settings/notifications:
     get:
@@ -1046,108 +1048,22 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_17'
+                $ref: "#/components/schemas/inline_response_200_17"
               examples:
                 mail settings:
-                  value:
-                    result: 200
-                    message: SUCCESS
-                    ts: 2023-11-02T05:36:41.258Z
-                    data:
-                    - id: 00000001Z7ZXFAED6872F6C9W8
-                      name: destinations of mail settings
-                      kind: Mail
-                      conditions:
-                        ita:
-                          event_type:
-                            new: false
-                            evaluated: false
-                            timeout: true
-                            undetected: true
-                      destination_informations:
-                      - address_header: to
-                        email: mike@example.com
-                      - address_header: cc
-                        email: tommy@example.com
-                      - address_header: bcc
-                        email: nancy@example.com
-                      create_timestamp: 2023-11-02T05:36:41.258Z
-                      create_user: string
-                      last_update_timestamp: 2023-11-02T05:36:41.258Z
-                      last_update_user: string
+                  $ref: "#/components/examples/settingsDestinationSubDestinationInformationsExampleMail"
                 teams workflow settings:
-                  value:
-                    result: 200
-                    message: SUCCESS
-                    ts: 2023-11-02T05:36:41.258Z
-                    data:
-                    - id: 00000001Z7ZXFAED6872F6C9W8
-                      name: destinations of teams workflow settings
-                      kind: Teams_WF
-                      conditions:
-                        ita:
-                          event_type:
-                            new: true
-                            evaluated: true
-                            timeout: false
-                            undetected: false
-                      destination_informations:
-                      - url: "https://{server-name}.{region}.logic.azure.com/workflows/{workflow-ID}/triggers/{trigger-name}/paths/invoke/?XXXXXXXXX"
-                      create_timestamp: 2023-11-02T05:36:41.258Z
-                      create_user: string
-                      last_update_timestamp: 2023-11-02T05:36:41.258Z
-                      last_update_user: string
+                  $ref: "#/components/examples/settingsDestinationSubDestinationInformationsExampleTeamsWorkflow"
                 teams settings (deprecated):
-                  value:
-                    result: 200
-                    message: SUCCESS
-                    ts: 2023-11-02T05:36:41.258Z
-                    data:
-                    - id: 00000001Z7ZXFAED6872F6C9W8
-                      name: destinations of teams settings
-                      kind: Teams
-                      conditions:
-                        ita:
-                          event_type:
-                            new: true
-                            evaluated: true
-                            timeout: false
-                            undetected: false
-                      destination_informations:
-                      - webhook: https://xxxxxxxx.webhook.office.com/webhookb/xxxxxxxx-xxxxxx-xxxx-xxxx-xxxxxxxxxxxx
-                      create_timestamp: 2023-11-02T05:36:41.258Z
-                      create_user: string
-                      last_update_timestamp: 2023-11-02T05:36:41.258Z
-                      last_update_user: string
+                  $ref: "#/components/examples/settingsDestinationSubDestinationInformationsExampleTeams"
                 webhook settings:
-                  value:
-                    result: 200
-                    message: SUCCESS
-                    ts: 2023-11-02T05:36:41.258Z
-                    data:
-                    - id: 00000001Z7ZXFAED6872F6C9W8
-                      name: destinations of webhook settings
-                      kind: Webhook
-                      conditions:
-                        ita:
-                          event_type:
-                            new: true
-                            evaluated: true
-                            timeout: false
-                            undetected: false
-                      destination_informations:
-                      - url: http://your-webhook-server/hooks/XXXXXXXX
-                        header: "Content-Type: application/json"
-                      create_timestamp: 2023-11-02T05:36:41.258Z
-                      create_user: string
-                      last_update_timestamp: 2023-11-02T05:36:41.258Z
-                      last_update_user: string
+                  $ref: "#/components/examples/settingsDestinationSubDestinationInformationsExampleWebhook"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.notification_service_controller
     post:
       tags:
@@ -1175,7 +1091,7 @@ paths:
             schema:
               type: array
               items:
-                $ref: '#/components/schemas/settingsDestinationCreate'
+                $ref: "#/components/schemas/settingsDestinationCreate"
             examples:
               mail settings:
                 value:
@@ -1246,13 +1162,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_2'
+                $ref: "#/components/schemas/inline_response_200_2"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.notification_service_controller
   /api/{organization_id}/platform/workspaces/{workspace_id}/settings/notifications/{destination_id}:
     get:
@@ -1288,108 +1204,22 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_18'
+                $ref: "#/components/schemas/inline_response_200_18"
               examples:
                 mail settings:
-                  value:
-                    result: 200
-                    message: SUCCESS
-                    ts: 2023-11-02T05:36:41.258Z
-                    data:
-                      id: 00000001Z7ZXFAED6872F6C9W8
-                      name: destinations of mail settings
-                      kind: Mail
-                      conditions:
-                        ita:
-                          event_type:
-                            new: false
-                            evaluated: false
-                            timeout: true
-                            undetected: true
-                      destination_informations:
-                      - address_header: to
-                        email: mike@example.com
-                      - address_header: cc
-                        email: tommy@example.com
-                      - address_header: bcc
-                        email: nancy@example.com
-                      create_timestamp: 2023-11-02T05:36:41.258Z
-                      create_user: string
-                      last_update_timestamp: 2023-11-02T05:36:41.258Z
-                      last_update_user: string
+                  $ref: "#/components/examples/settingsDestinationOneGetExampleMail"
                 teams workflow settings:
-                  value:
-                    result: 200
-                    message: SUCCESS
-                    ts: 2023-11-02T05:36:41.258Z
-                    data:
-                      id: 00000001Z7ZXFAED6872F6C9W8
-                      name: destinations of teams workflow settings
-                      kind: Teams_WF
-                      conditions:
-                        ita:
-                          event_type:
-                            new: true
-                            evaluated: true
-                            timeout: false
-                            undetected: false
-                      destination_informations:
-                      - url: "https://{server-name}.{region}.logic.azure.com/workflows/{workflow-ID}/triggers/{trigger-name}/paths/invoke/?XXXXXXXXX"
-                      create_timestamp: 2023-11-02T05:36:41.258Z
-                      create_user: string
-                      last_update_timestamp: 2023-11-02T05:36:41.258Z
-                      last_update_user: string
+                  $ref: "#/components/examples/settingsDestinationOneGetExampleTeamsworkflow"
                 teams settings (deprecated):
-                  value:
-                    result: 200
-                    message: SUCCESS
-                    ts: 2023-11-02T05:36:41.258Z
-                    data:
-                      id: 00000001Z7ZXFAED6872F6C9W8
-                      name: destinations of teams settings
-                      kind: Teams
-                      conditions:
-                        ita:
-                          event_type:
-                            new: true
-                            evaluated: true
-                            timeout: false
-                            undetected: false
-                      destination_informations:
-                      - webhook: https://xxxxxxxx.webhook.office.com/webhookb/xxxxxxxx-xxxxxx-xxxx-xxxx-xxxxxxxxxxxx
-                      create_timestamp: 2023-11-02T05:36:41.258Z
-                      create_user: string
-                      last_update_timestamp: 2023-11-02T05:36:41.258Z
-                      last_update_user: string
+                  $ref: "#/components/examples/settingsDestinationOneGetExampleTeams"
                 webhook settings:
-                  value:
-                    result: 200
-                    message: SUCCESS
-                    ts: 2023-11-02T05:36:41.258Z
-                    data:
-                      id: 00000001Z7ZXFAED6872F6C9W8
-                      name: destinations of webhook settings
-                      kind: Webhook
-                      conditions:
-                        ita:
-                          event_type:
-                            new: true
-                            evaluated: true
-                            timeout: false
-                            undetected: false
-                      destination_informations:
-                      - url: http://your-webhook-server/hooks/XXXXXXXX
-                        header: "Content-Type: application/json"
-                      create_timestamp: 2023-11-02T05:36:41.258Z
-                      create_user: string
-                      last_update_timestamp: 2023-11-02T05:36:41.258Z
-                      last_update_user: string
+                  $ref: "#/components/examples/settingsDestinationOneGetExampleWebhook"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.notification_service_controller
     put:
       tags:
@@ -1422,7 +1252,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/settingsDestinationPut'
+              $ref: "#/components/schemas/settingsDestinationPut"
             examples:
               mail settings:
                 value:
@@ -1489,13 +1319,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_2'
+                $ref: "#/components/schemas/inline_response_200_2"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.notification_service_controller
     delete:
       tags:
@@ -1530,13 +1360,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/responseOk'
+                $ref: "#/components/schemas/responseOk"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.notification_service_controller
   /api/{organization_id}/platform/workspaces/{workspace_id}/notifications:
     get:
@@ -1647,13 +1477,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_14'
+                $ref: "#/components/schemas/inline_response_200_14"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.notification_service_controller
     post:
       tags:
@@ -1681,48 +1511,16 @@ paths:
             schema:
               type: array
               items:
-                $ref: '#/components/schemas/notifications.create'
+                $ref: "#/components/schemas/notifications.create"
             examples:
               mail message post:
-                value:
-                - destination_id: 00000001Z7ZXFAED6872F6C9W8
-                  func_id: "00000000"
-                  func_informations:
-                    key-1: value-1
-                    key-2: value-2
-                  message:
-                    title: subjects
-                    message: event message
+                $ref: "#/components/examples/notificationsCreateExampleMail"
               teams workflow message post:
-                value:
-                - destination_id: 00000001Z7ZXFAED6872F6C9W9
-                  func_id: "00000000"
-                  func_informations:
-                    key-1: value-1
-                    key-2: value-2
-                  message:
-                    title: send title
-                    text: send message
+                $ref: "#/components/examples/notificationsCreateExampleTeamsworkflow"
               teams message post (deprecated):
-                value:
-                - destination_id: 00000001Z7ZXFAED6872F6C9W9
-                  func_id: "00000000"
-                  func_informations:
-                    key-1: value-1
-                    key-2: value-2
-                  message:
-                    title: send title
-                    text: send message
+                $ref: "#/components/examples/notificationsCreateExampleTeams"
               webhook message post:
-                value:
-                - destination_id: 00000001Z7ZXFAED6872F6C9W9
-                  func_id: "00000000"
-                  func_informations:
-                    key-1: value-1
-                    key-2: value-2
-                  message:
-                    title: send title
-                    text: send message
+                $ref: "#/components/examples/notificationsCreateExampleWebhook"
         required: true
       responses:
         "200":
@@ -1730,13 +1528,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_2'
+                $ref: "#/components/schemas/inline_response_200_2"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.notification_service_controller
   /api/{organization_id}/platform/users:
     get:
@@ -1787,13 +1585,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_19'
+                $ref: "#/components/schemas/inline_response_200_19"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.users_service_controller
     post:
       tags:
@@ -1812,7 +1610,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/userCreate'
+              $ref: "#/components/schemas/userCreate"
         required: true
       responses:
         "200":
@@ -1820,13 +1618,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_2'
+                $ref: "#/components/schemas/inline_response_200_2"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.users_service_controller
   /api/{organization_id}/platform/users/{user_id}:
     get:
@@ -1856,13 +1654,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_20'
+                $ref: "#/components/schemas/inline_response_200_20"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.users_service_controller
     put:
       tags:
@@ -1889,7 +1687,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/userUpdate'
+              $ref: "#/components/schemas/userUpdate"
         required: true
       responses:
         "200":
@@ -1897,13 +1695,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_2'
+                $ref: "#/components/schemas/inline_response_200_2"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.users_service_controller
     delete:
       tags:
@@ -1932,13 +1730,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_2'
+                $ref: "#/components/schemas/inline_response_200_2"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.users_service_controller
   /api/{organization_id}/platform/roles:
     get:
@@ -1972,13 +1770,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_21'
+                $ref: "#/components/schemas/inline_response_200_21"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.role_service_controller
     post:
       tags:
@@ -1997,7 +1795,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/platform_roles_body'
+              $ref: "#/components/schemas/platform_roles_body"
             examples:
               workspace:
                 value:
@@ -2013,13 +1811,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_2'
+                $ref: "#/components/schemas/inline_response_200_2"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.role_service_controller
   /api/{organization_id}/platform/roles/{role_name}:
     put:
@@ -2046,7 +1844,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/roles_role_name_body'
+              $ref: "#/components/schemas/roles_role_name_body"
             examples:
               workspace:
                 value:
@@ -2061,13 +1859,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_2'
+                $ref: "#/components/schemas/inline_response_200_2"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.role_service_controller
     delete:
       tags:
@@ -2095,13 +1893,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_2'
+                $ref: "#/components/schemas/inline_response_200_2"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.role_service_controller
   /api/{organization_id}/platform/roles/{role_name}/users:
     get:
@@ -2151,13 +1949,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_22'
+                $ref: "#/components/schemas/inline_response_200_22"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.role_mappings_service_controller
     post:
       tags:
@@ -2183,7 +1981,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/roleMappingUser'
+              $ref: "#/components/schemas/roleMappingUser"
         required: true
       responses:
         "200":
@@ -2191,13 +1989,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_2'
+                $ref: "#/components/schemas/inline_response_200_2"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.role_mappings_service_controller
     patch:
       tags:
@@ -2223,7 +2021,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/roleMappingUser'
+              $ref: "#/components/schemas/roleMappingUser"
         required: true
       responses:
         "200":
@@ -2231,13 +2029,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_2'
+                $ref: "#/components/schemas/inline_response_200_2"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.role_mappings_service_controller
   /api/{organization_id}/platform/jobs/users/bulk/format:
     post:
@@ -2257,7 +2055,7 @@ paths:
         content:
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/authorizationBody'
+              $ref: "#/components/schemas/authorizationBody"
         required: true
       responses:
         "200":
@@ -2273,7 +2071,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.jobs_service_controller
   /api/{organization_id}/platform/jobs/users/bulk/import:
     post:
@@ -2293,7 +2091,7 @@ paths:
         content:
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/jobsUserBulkImport'
+              $ref: "#/components/schemas/jobsUserBulkImport"
         required: true
       responses:
         "200":
@@ -2301,13 +2099,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_2'
+                $ref: "#/components/schemas/inline_response_200_2"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.jobs_service_controller
   /api/{organization_id}/platform/jobs/users/bulk/delete:
     post:
@@ -2327,7 +2125,7 @@ paths:
         content:
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/jobsUserBulkImport'
+              $ref: "#/components/schemas/jobsUserBulkImport"
         required: true
       responses:
         "200":
@@ -2335,13 +2133,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_2'
+                $ref: "#/components/schemas/inline_response_200_2"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.jobs_service_controller
   /api/{organization_id}/platform/jobs/users/bulk/status:
     get:
@@ -2363,13 +2161,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_23'
+                $ref: "#/components/schemas/inline_response_200_23"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.jobs_service_controller
   /api/{organization_id}/platform/jobs/users/bulk/status/{job_id}:
     get:
@@ -2398,13 +2196,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_24'
+                $ref: "#/components/schemas/inline_response_200_24"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.jobs_service_controller
   /api/{organization_id}/platform/jobs/users/bulk/status/{job_id}/download:
     post:
@@ -2431,7 +2229,7 @@ paths:
         content:
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/authorizationBody'
+              $ref: "#/components/schemas/authorizationBody"
         required: true
       responses:
         "200":
@@ -2447,7 +2245,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.jobs_service_controller
   /api/{organization_id}/platform/jobs/users/export:
     post:
@@ -2467,7 +2265,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/jobsUserExport'
+              $ref: "#/components/schemas/jobsUserExport"
         required: true
       responses:
         "200":
@@ -2475,13 +2273,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_25'
+                $ref: "#/components/schemas/inline_response_200_25"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.jobs_service_controller
   /api/{organization_id}/platform/jobs/users/export/status:
     get:
@@ -2503,13 +2301,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_26'
+                $ref: "#/components/schemas/inline_response_200_26"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.jobs_service_controller
   /api/{organization_id}/platform/jobs/users/export/status/{job_id}:
     get:
@@ -2538,13 +2336,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_27'
+                $ref: "#/components/schemas/inline_response_200_27"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.jobs_service_controller
   /api/{organization_id}/platform/jobs/users/export/status/{job_id}/download:
     post:
@@ -2571,7 +2369,7 @@ paths:
         content:
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/authorizationBody'
+              $ref: "#/components/schemas/authorizationBody"
         required: true
       responses:
         "200":
@@ -2587,7 +2385,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.jobs_service_controller
   /api/platform/maintenance-mode-setting:
     get:
@@ -2602,13 +2400,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_28'
+                $ref: "#/components/schemas/inline_response_200_28"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.maintenance_mode_setting_controller
     patch:
       tags:
@@ -2620,20 +2418,20 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/platform_maintenancemodesetting_body'
+              $ref: "#/components/schemas/platform_maintenancemodesetting_body"
       responses:
         "200":
           description: Success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_3'
+                $ref: "#/components/schemas/inline_response_200_3"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.maintenance_mode_setting_controller
   /api/{organization_id}/platform/maintenance-mode-setting:
     get:
@@ -2655,13 +2453,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_28'
+                $ref: "#/components/schemas/inline_response_200_28"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.maintenance_mode_setting_controller
   /api/{organization_id}/platform/settings/mailserver:
     get:
@@ -2683,7 +2481,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_29'
+                $ref: "#/components/schemas/inline_response_200_29"
               example:
                 value:
                   result: 200
@@ -2709,7 +2507,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.organization_setting_service_controller
     post:
       tags:
@@ -2728,7 +2526,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/settingsMailserverCreate'
+              $ref: "#/components/schemas/settingsMailserverCreate"
             example:
               value:
                 smtp_host: smtp.host
@@ -2748,13 +2546,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_2'
+                $ref: "#/components/schemas/inline_response_200_2"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.organization_setting_service_controller
     delete:
       tags:
@@ -2775,13 +2573,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/responseOk'
+                $ref: "#/components/schemas/responseOk"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.organization_setting_service_controller
   /api/{organization_id}/platform/auditlog/download:
     get:
@@ -2812,13 +2610,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_30'
+                $ref: "#/components/schemas/inline_response_200_30"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.audit_log_service_controller
     post:
       tags:
@@ -2837,7 +2635,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AuditLogDownload'
+              $ref: "#/components/schemas/AuditLogDownload"
         required: true
       responses:
         "200":
@@ -2845,13 +2643,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_31'
+                $ref: "#/components/schemas/inline_response_200_31"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.audit_log_service_controller
   /api/{organization_id}/platform/auditlog/download/{download_id}:
     post:
@@ -2878,7 +2676,7 @@ paths:
         content:
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/authorizationBody'
+              $ref: "#/components/schemas/authorizationBody"
         required: true
       responses:
         "200":
@@ -2894,8 +2692,349 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.audit_log_service_controller
+  /api/{organization_id}/platform/workspaces/{workspace_id}/agent-users:
+    get:
+      tags:
+      - AgentUsersService
+      summary: List returns list of agent users
+      operationId: agent_user_list
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: workspace_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_200_32"
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+      x-openapi-router-controller: controllers.agent_users_service_controller
+    post:
+      tags:
+      - AgentUsersService
+      summary: Create an agent user
+      operationId: agent_user_create
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: workspace_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/agentUserCreate"
+        required: true
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_200_2"
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+      x-openapi-router-controller: controllers.agent_users_service_controller
+  /api/{organization_id}/platform/workspaces/{workspace_id}/agent-users/{user_id}:
+    get:
+      tags:
+      - AgentUsersService
+      summary: returns an agent user
+      operationId: get_agent_user
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: workspace_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: user_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_200_33"
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+      x-openapi-router-controller: controllers.agent_users_service_controller
+    put:
+      tags:
+      - AgentUsersService
+      summary: Update an agent user
+      operationId: agent_user_update
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: workspace_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: user_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/agentUserUpdate"
+        required: true
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_200_2"
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+      x-openapi-router-controller: controllers.agent_users_service_controller
+    delete:
+      tags:
+      - AgentUsersService
+      summary: Delete an agent user
+      operationId: agent_user_delete
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: workspace_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: user_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_200_2"
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+      x-openapi-router-controller: controllers.agent_users_service_controller
+  /api/{organization_id}/platform/workspaces/{workspace_id}/agent-users/{user_id}/refresh_tokens:
+    get:
+      tags:
+      - AgentUsersService
+      summary: List returns list of agent user tokens
+      operationId: agent_user_token_list
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: workspace_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: user_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_200_34"
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+      x-openapi-router-controller: controllers.agent_users_service_controller
+    post:
+      tags:
+      - AgentUsersService
+      summary: Create an agent user token
+      operationId: agent_user_token_create
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: workspace_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: user_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+        required: true
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_200_35"
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+      x-openapi-router-controller: controllers.agent_users_service_controller
+    delete:
+      tags:
+      - AgentUsersService
+      summary: Delete agent user tokens
+      operationId: agent_user_token_delete
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: workspace_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: user_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_200_2"
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+      x-openapi-router-controller: controllers.agent_users_service_controller
   /internal-api/platform/settings/common:
     get:
       tags:
@@ -2908,13 +3047,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_12'
+                $ref: "#/components/schemas/inline_response_200_12"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.internal_common_service_controller
     post:
       tags:
@@ -2925,7 +3064,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/systemConfigCreate'
+              $ref: "#/components/schemas/systemConfigCreate"
         required: true
       responses:
         "200":
@@ -2933,19 +3072,19 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/responseOk'
+                $ref: "#/components/schemas/responseOk"
         "409":
           description: Duplicate key error response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeErrorConflict'
+                $ref: "#/components/schemas/runtimeErrorConflict"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.internal_common_service_controller
   /internal-api/platform/settings/common/{config_key}:
     get:
@@ -2968,13 +3107,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_13'
+                $ref: "#/components/schemas/inline_response_200_13"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.internal_common_service_controller
     put:
       tags:
@@ -2994,7 +3133,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/systemConfigUpdate'
+              $ref: "#/components/schemas/systemConfigUpdate"
         required: true
       responses:
         "200":
@@ -3002,13 +3141,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/responseOk'
+                $ref: "#/components/schemas/responseOk"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.internal_common_service_controller
     delete:
       tags:
@@ -3030,13 +3169,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/responseOk'
+                $ref: "#/components/schemas/responseOk"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.internal_common_service_controller
   /internal-api/{organization_id}/platform/limits:
     get:
@@ -3088,13 +3227,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_9'
+                $ref: "#/components/schemas/inline_response_200_9"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.internal_plan_service_controller
   /internal-api/platform/limits:
     get:
@@ -3139,13 +3278,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_32'
+                $ref: "#/components/schemas/inline_response_200_36"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.internal_plan_service_controller
   /internal-api/platform/plan_items:
     post:
@@ -3157,7 +3296,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/planItemList'
+              $ref: "#/components/schemas/planItemList"
         required: true
       responses:
         "200":
@@ -3165,13 +3304,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/responseOk'
+                $ref: "#/components/schemas/responseOk"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.internal_plan_service_controller
   /internal-api/platform/plan_items/{limit_id}:
     get:
@@ -3194,13 +3333,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_33'
+                $ref: "#/components/schemas/inline_response_200_37"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.internal_plan_service_controller
     put:
       tags:
@@ -3220,7 +3359,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/planItemFields'
+              $ref: "#/components/schemas/planItemFields"
         required: true
       responses:
         "200":
@@ -3228,13 +3367,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/responseOk'
+                $ref: "#/components/schemas/responseOk"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.internal_plan_service_controller
     delete:
       tags:
@@ -3256,13 +3395,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/responseOk'
+                $ref: "#/components/schemas/responseOk"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.internal_plan_service_controller
   /internal-api/{organization_id}/platform/workspaces/{workspace_id}/roles:
     get:
@@ -3312,13 +3451,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_34'
+                $ref: "#/components/schemas/inline_response_200_38"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.internal_workspace_service_controller
   /internal-api/{organization_id}/platform/workspaces/{workspace_id}/users:
     get:
@@ -3368,13 +3507,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_19'
+                $ref: "#/components/schemas/inline_response_200_19"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.internal_workspace_service_controller
   /internal-api/{organization_id}/platform/users/{user_id}/workspaces:
     get:
@@ -3424,13 +3563,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_35'
+                $ref: "#/components/schemas/inline_response_200_39"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.internal_users_service_controller
   /internal-api/platform/maintenance-mode-setting:
     get:
@@ -3445,13 +3584,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_28'
+                $ref: "#/components/schemas/inline_response_200_28"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.internal_maintenance_mode_setting_controller
   /internal-api/{organization_id}/platform/workspaces/{workspace_id}/settings/notifications:
     get:
@@ -3502,22 +3641,22 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_17'
+                $ref: "#/components/schemas/inline_response_200_17"
               examples:
                 mail settings:
-                  $ref: '#/paths/~1api~1%7Borganization_id%7D~1platform~1workspaces~1%7Bworkspace_id%7D~1settings~1notifications/get/responses/200/content/application~1json/examples/mail%20settings'
+                  $ref: "#/components/examples/settingsDestinationSubDestinationInformationsExampleMail"
                 teams workflow settings:
-                  $ref: '#/paths/~1api~1%7Borganization_id%7D~1platform~1workspaces~1%7Bworkspace_id%7D~1settings~1notifications/get/responses/200/content/application~1json/examples/teams%20workflow%20settings'
+                  $ref: "#/components/examples/settingsDestinationSubDestinationInformationsExampleTeamsWorkflow"
                 teams settings (deprecated):
-                  $ref: '#/paths/~1api~1%7Borganization_id%7D~1platform~1workspaces~1%7Bworkspace_id%7D~1settings~1notifications/get/responses/200/content/application~1json/examples/teams%20settings%20(deprecated)'
+                  $ref: "#/components/examples/settingsDestinationSubDestinationInformationsExampleTeams"
                 webhook settings:
-                  $ref: '#/paths/~1api~1%7Borganization_id%7D~1platform~1workspaces~1%7Bworkspace_id%7D~1settings~1notifications/get/responses/200/content/application~1json/examples/webhook%20settings'
+                  $ref: "#/components/examples/settingsDestinationSubDestinationInformationsExampleWebhook"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.internal_notification_service_controller
   /internal-api/{organization_id}/platform/workspaces/{workspace_id}/settings/notifications/{destination_id}:
     get:
@@ -3553,22 +3692,22 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_18'
+                $ref: "#/components/schemas/inline_response_200_18"
               examples:
                 mail settings:
-                  $ref: '#/paths/~1api~1%7Borganization_id%7D~1platform~1workspaces~1%7Bworkspace_id%7D~1settings~1notifications~1%7Bdestination_id%7D/get/responses/200/content/application~1json/examples/mail%20settings'
+                  $ref: "#/components/examples/settingsDestinationOneGetExampleMail"
                 teams workflow settings:
-                  $ref: '#/paths/~1api~1%7Borganization_id%7D~1platform~1workspaces~1%7Bworkspace_id%7D~1settings~1notifications~1%7Bdestination_id%7D/get/responses/200/content/application~1json/examples/teams%20workflow%20settings'
+                  $ref: "#/components/examples/settingsDestinationOneGetExampleTeamsworkflow"
                 teams settings (deprecated):
-                  $ref: '#/paths/~1api~1%7Borganization_id%7D~1platform~1workspaces~1%7Bworkspace_id%7D~1settings~1notifications~1%7Bdestination_id%7D/get/responses/200/content/application~1json/examples/teams%20settings%20(deprecated)'
+                  $ref: "#/components/examples/settingsDestinationOneGetExampleTeams"
                 webhook settings:
-                  $ref: '#/paths/~1api~1%7Borganization_id%7D~1platform~1workspaces~1%7Bworkspace_id%7D~1settings~1notifications~1%7Bdestination_id%7D/get/responses/200/content/application~1json/examples/webhook%20settings'
+                  $ref: "#/components/examples/settingsDestinationOneGetExampleWebhook"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.internal_notification_service_controller
   /internal-api/{organization_id}/platform/workspaces/{workspace_id}/notifications:
     get:
@@ -3679,13 +3818,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_14'
+                $ref: "#/components/schemas/inline_response_200_14"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.internal_notification_service_controller
     post:
       tags:
@@ -3713,16 +3852,16 @@ paths:
             schema:
               type: array
               items:
-                $ref: '#/components/schemas/notifications.create'
+                $ref: "#/components/schemas/notifications.create"
             examples:
               mail message post:
-                $ref: '#/paths/~1api~1%7Borganization_id%7D~1platform~1workspaces~1%7Bworkspace_id%7D~1notifications/post/requestBody/content/application~1json/examples/mail%20message%20post'
+                $ref: "#/components/examples/notificationsCreateExampleMail"
               teams workflow message post:
-                $ref: '#/paths/~1api~1%7Borganization_id%7D~1platform~1workspaces~1%7Bworkspace_id%7D~1notifications/post/requestBody/content/application~1json/examples/teams%20workflow%20message%20post'
+                $ref: "#/components/examples/notificationsCreateExampleTeamsworkflow"
               teams message post (deprecated):
-                $ref: '#/paths/~1api~1%7Borganization_id%7D~1platform~1workspaces~1%7Bworkspace_id%7D~1notifications/post/requestBody/content/application~1json/examples/teams%20message%20post%20(deprecated)'
+                $ref: "#/components/examples/notificationsCreateExampleTeams"
               webhook message post:
-                $ref: '#/paths/~1api~1%7Borganization_id%7D~1platform~1workspaces~1%7Bworkspace_id%7D~1notifications/post/requestBody/content/application~1json/examples/webhook%20message%20post'
+                $ref: "#/components/examples/notificationsCreateExampleWebhook"
         required: true
       responses:
         "200":
@@ -3730,13 +3869,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_2'
+                $ref: "#/components/schemas/inline_response_200_2"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.internal_notification_service_controller
   /internal-api/health-check/liveness:
     get:
@@ -3750,13 +3889,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_2'
+                $ref: "#/components/schemas/inline_response_200_2"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.internal_health_check_service_controller
   /internal-api/health-check/readiness:
     get:
@@ -3770,13 +3909,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_2'
+                $ref: "#/components/schemas/inline_response_200_2"
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/runtimeError'
+                $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.internal_health_check_service_controller
 components:
   schemas:
@@ -3853,19 +3992,19 @@ components:
         organization_managers:
           type: array
           items:
-            $ref: '#/components/schemas/organization_organization_managers'
+            $ref: "#/components/schemas/organization_organization_managers"
         active_plan:
-          $ref: '#/components/schemas/organization_active_plan'
+          $ref: "#/components/schemas/organization_active_plan"
         plans:
           type: array
           items:
-            $ref: '#/components/schemas/planMappingOrganization'
+            $ref: "#/components/schemas/planMappingOrganization"
         enabled:
           type: boolean
           description: organization enabled(true) or disabled(false)
           example: true
         optionsIta:
-          $ref: '#/components/schemas/organization_optionsIta'
+          $ref: "#/components/schemas/organization_optionsIta"
         status:
           type: string
           example: Organization Create Complete
@@ -3884,14 +4023,14 @@ components:
         organization_managers:
           type: array
           items:
-            $ref: '#/components/schemas/organizationUserCreate'
+            $ref: "#/components/schemas/organizationUserCreate"
         plan:
-          $ref: '#/components/schemas/organization_active_plan'
+          $ref: "#/components/schemas/organization_active_plan"
         options:
           type: object
           description: Organization Add Json Parameter (json of KeyCloak)
         optionsIta:
-          $ref: '#/components/schemas/organizationCreate_optionsIta'
+          $ref: "#/components/schemas/organizationCreate_optionsIta"
     organizationUserCreate:
       title: organization-user is a definition of User resource.
       required:
@@ -3911,9 +4050,9 @@ components:
         credentials:
           type: array
           items:
-            $ref: '#/components/schemas/userCredentials'
+            $ref: "#/components/schemas/userCredentials"
         requiredActions:
-          $ref: '#/components/schemas/userRequiredActions'
+          $ref: "#/components/schemas/userRequiredActions"
         enabled:
           type: boolean
     organizationList:
@@ -3923,13 +4062,13 @@ components:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/organization'
+            $ref: "#/components/schemas/organization"
     organizationSetting:
       title: organizationSetting is a definition of oraganaization setting resource.
       type: object
       properties:
         token:
-          $ref: '#/components/schemas/organizationSetting_token'
+          $ref: "#/components/schemas/organizationSetting_token"
     planMappingOrganization:
       title: plan item resources.
       required:
@@ -3951,8 +4090,8 @@ components:
           type: array
           items:
             allOf:
-            - $ref: '#/components/schemas/planMappingOrganization'
-            - $ref: '#/components/schemas/responseStat'
+            - $ref: "#/components/schemas/planMappingOrganization"
+            - $ref: "#/components/schemas/responseStat"
     plan:
       title: plan is a definition of Plan resource.
       type: object
@@ -3964,9 +4103,9 @@ components:
           type: string
           example: name of plan
         informations:
-          $ref: '#/components/schemas/plan_informations'
+          $ref: "#/components/schemas/plan_informations"
         limits:
-          $ref: '#/components/schemas/plan_limits'
+          $ref: "#/components/schemas/plan_limits"
     planList:
       title: planList is list of Plan resources.
       type: object
@@ -3974,7 +4113,7 @@ components:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/plan'
+            $ref: "#/components/schemas/plan"
     planItem:
       title: planItem is a definition of plan item resource.
       allOf:
@@ -3984,7 +4123,7 @@ components:
             type: string
             description: limit id
             example: platform.workspaces
-      - $ref: '#/components/schemas/planItemFields'
+      - $ref: "#/components/schemas/planItemFields"
     planItemList:
       title: plan item list is list of plan items resources.
       type: array
@@ -3995,19 +4134,19 @@ components:
           max: 1000
           default: 100
       items:
-        $ref: '#/components/schemas/planItem'
+        $ref: "#/components/schemas/planItem"
     planItemFields:
       title: planItem is a definition of plan item resource.
       type: object
       properties:
         informations:
-          $ref: '#/components/schemas/planItemFields_informations'
+          $ref: "#/components/schemas/planItemFields_informations"
     limits:
       title: limitValue is a definition of Limit Value resource.
       type: object
       properties:
         data:
-          $ref: '#/components/schemas/plan_limits'
+          $ref: "#/components/schemas/plan_limits"
     limitsList:
       title: limitValue is a definition of Limit Value resource.
       type: object
@@ -4015,7 +4154,7 @@ components:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/limitsList_data'
+            $ref: "#/components/schemas/limitsList_data"
     usage:
       title: usage is a definition of current value resource.
       type: object
@@ -4040,7 +4179,7 @@ components:
           - id: platform.roles
             current_value: 300
           items:
-            $ref: '#/components/schemas/usage'
+            $ref: "#/components/schemas/usage"
     usageOrganizationList:
       title: usageList is list of usage resources.
       type: object
@@ -4065,7 +4204,7 @@ components:
             - id: platform.roles
               current_value: 203
           items:
-            $ref: '#/components/schemas/usageOrganizationList_data'
+            $ref: "#/components/schemas/usageOrganizationList_data"
     role:
       title: role is a definition of Role resource.
       type: object
@@ -4080,7 +4219,7 @@ components:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/role'
+            $ref: "#/components/schemas/role"
     usernameOnly:
       title: username of User resource.
       type: object
@@ -4119,7 +4258,7 @@ components:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/user'
+            $ref: "#/components/schemas/user"
     userCreate:
       title: user is a definition of User resource.
       required:
@@ -4213,7 +4352,7 @@ components:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/member'
+            $ref: "#/components/schemas/member"
     notifications.create:
       title: Notification is a definition of Notification resource.
       required:
@@ -4246,7 +4385,7 @@ components:
           type: string
           example: name of workspace
         informations:
-          $ref: '#/components/schemas/workspace_informations'
+          $ref: "#/components/schemas/workspace_informations"
     workspaceList:
       title: workspaceList is list of Workspace resources.
       type: object
@@ -4255,8 +4394,8 @@ components:
           type: array
           items:
             allOf:
-            - $ref: '#/components/schemas/workspace'
-            - $ref: '#/components/schemas/responseStat'
+            - $ref: "#/components/schemas/workspace"
+            - $ref: "#/components/schemas/responseStat"
     workspaceUpdate:
       title: workspace is a definition for workspace updates.
       type: object
@@ -4265,7 +4404,7 @@ components:
           type: string
           example: name of workspace
         informations:
-          $ref: '#/components/schemas/workspaceUpdate_informations'
+          $ref: "#/components/schemas/workspaceUpdate_informations"
     userWorkspace:
       title: workspace is a definition of Workspace resource.
       type: object
@@ -4289,7 +4428,7 @@ components:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/userWorkspace'
+            $ref: "#/components/schemas/userWorkspace"
     environment:
       title: environments is a definition of Workspace information resource.
       type: object
@@ -4312,8 +4451,8 @@ components:
           type: array
           items:
             oneOf:
-            - $ref: '#/components/schemas/roleDetailWorkspace'
-            - $ref: '#/components/schemas/roleDetailOrganization'
+            - $ref: "#/components/schemas/roleDetailWorkspace"
+            - $ref: "#/components/schemas/roleDetailOrganization"
     roleDetailOrganization:
       title: role is a definition of Role resource.
       type: object
@@ -4330,7 +4469,7 @@ components:
         authorities:
           type: array
           items:
-            $ref: '#/components/schemas/roleDetailOrganization_authorities'
+            $ref: "#/components/schemas/roleDetailOrganization_authorities"
     roleDetailWorkspace:
       title: role is a definition of Role resource.
       type: object
@@ -4347,11 +4486,11 @@ components:
         authorities:
           type: array
           items:
-            $ref: '#/components/schemas/roleDetailWorkspace_authorities'
+            $ref: "#/components/schemas/roleDetailWorkspace_authorities"
         workspaces:
           type: array
           items:
-            $ref: '#/components/schemas/roleDetailWorkspace_workspaces'
+            $ref: "#/components/schemas/roleDetailWorkspace_workspaces"
     roleDetailWorkspacePut:
       title: role is a definition of Role resource.
       type: object
@@ -4365,7 +4504,7 @@ components:
         workspaces:
           type: array
           items:
-            $ref: '#/components/schemas/roleDetailWorkspace_workspaces'
+            $ref: "#/components/schemas/roleDetailWorkspace_workspaces"
     roleMappingUser:
       title: userList is list of User resources.
       type: array
@@ -4374,7 +4513,7 @@ components:
       - preferred_username: username-2
       - preferred_username: username-3
       items:
-        $ref: '#/components/schemas/roleUser'
+        $ref: "#/components/schemas/roleUser"
     roleUser:
       title: role mapping user is a definition of User resource.
       required:
@@ -4476,7 +4615,7 @@ components:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/tokenRefreshList_data'
+            $ref: "#/components/schemas/tokenRefreshList_data"
     systemConfig:
       title: system config is a definition of system config resource.
       required:
@@ -4503,7 +4642,7 @@ components:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/systemConfig'
+            $ref: "#/components/schemas/systemConfig"
     systemConfigCreate:
       title: system config value is a definition of system config resource.
       type: array
@@ -4512,7 +4651,7 @@ components:
         value: "100"
         description: platform max organization
       items:
-        $ref: '#/components/schemas/systemConfig'
+        $ref: "#/components/schemas/systemConfig"
     systemConfigUpdate:
       title: system config is a definition of system config resource.
       required:
@@ -4549,7 +4688,7 @@ components:
           type: string
           example: 000-00000
         data:
-          $ref: '#/components/schemas/maintenanceModeSettings_data'
+          $ref: "#/components/schemas/maintenanceModeSettings_data"
     settingsDestination:
       title: destination is a definition of Destination resource.
       type: object
@@ -4564,17 +4703,17 @@ components:
           type: string
           description: Select destination kind from Mail/Teams_WF/Webhook
         conditions:
-          $ref: '#/components/schemas/settingsDestinationConditions'
+          $ref: "#/components/schemas/settingsDestinationConditions"
         destination_informations:
           type: array
           items:
             type: object
             description: Set the destination information for the destination
             oneOf:
-            - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsMail'
-            - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsTeamsWorkflow'
-            - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsTeams'
-            - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsWebhook'
+            - $ref: "#/components/schemas/settingsDestinationSubDestinationInformationsMail"
+            - $ref: "#/components/schemas/settingsDestinationSubDestinationInformationsTeamsWorkflow"
+            - $ref: "#/components/schemas/settingsDestinationSubDestinationInformationsTeams"
+            - $ref: "#/components/schemas/settingsDestinationSubDestinationInformationsWebhook"
     settingsDestinationList:
       title: destinationList is list of Destination resources.
       type: object
@@ -4583,14 +4722,14 @@ components:
           type: array
           items:
             allOf:
-            - $ref: '#/components/schemas/settingsDestination'
-            - $ref: '#/components/schemas/responseStat'
+            - $ref: "#/components/schemas/settingsDestination"
+            - $ref: "#/components/schemas/responseStat"
     settingsDestinationOne:
       title: destination is a definition of Destination resource.
       type: object
       properties:
         data:
-          $ref: '#/components/schemas/settingsDestination'
+          $ref: "#/components/schemas/settingsDestination"
     settingsDestinationCreate:
       title: destination is a definition of Destination resource.
       required:
@@ -4615,17 +4754,17 @@ components:
           - Teams_WF
           - Webhook
         conditions:
-          $ref: '#/components/schemas/settingsDestinationConditions'
+          $ref: "#/components/schemas/settingsDestinationConditions"
         destination_informations:
           type: array
           items:
             type: object
             description: Set the destination information for the destination
             anyOf:
-            - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsMail'
-            - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsTeamsWorkflow'
-            - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsTeams'
-            - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsWebhook'
+            - $ref: "#/components/schemas/settingsDestinationSubDestinationInformationsMail"
+            - $ref: "#/components/schemas/settingsDestinationSubDestinationInformationsTeamsWorkflow"
+            - $ref: "#/components/schemas/settingsDestinationSubDestinationInformationsTeams"
+            - $ref: "#/components/schemas/settingsDestinationSubDestinationInformationsWebhook"
     settingsDestinationPut:
       title: destination is a definition of Destination resource.
       required:
@@ -4646,17 +4785,17 @@ components:
           - Teams_WF
           - Webhook
         conditions:
-          $ref: '#/components/schemas/settingsDestinationConditions'
+          $ref: "#/components/schemas/settingsDestinationConditions"
         destination_informations:
           type: array
           items:
             type: object
             description: Set the destination information for the destination
             anyOf:
-            - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsMail'
-            - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsTeamsWorkflow'
-            - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsTeams'
-            - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsWebhook'
+            - $ref: "#/components/schemas/settingsDestinationSubDestinationInformationsMail"
+            - $ref: "#/components/schemas/settingsDestinationSubDestinationInformationsTeamsWorkflow"
+            - $ref: "#/components/schemas/settingsDestinationSubDestinationInformationsTeams"
+            - $ref: "#/components/schemas/settingsDestinationSubDestinationInformationsWebhook"
     settingsDestinationSubDestinationInformationsMail:
       title: destinations destination_informations(mail) resource.
       type: object
@@ -4695,7 +4834,7 @@ components:
       type: object
       properties:
         ita:
-          $ref: '#/components/schemas/settingsDestinationConditions_ita'
+          $ref: "#/components/schemas/settingsDestinationConditions_ita"
     settingsMailserverCreate:
       title: mailserver is a mailserver of mailserver resource.
       required:
@@ -4748,8 +4887,8 @@ components:
           type: array
           items:
             allOf:
-            - $ref: '#/components/schemas/settingsMailserverGet'
-            - $ref: '#/components/schemas/responseStat'
+            - $ref: "#/components/schemas/settingsMailserverGet"
+            - $ref: "#/components/schemas/responseStat"
     settingsMailserverGet:
       title: mailserver is a definition of Mailserver resource.
       type: object
@@ -4804,7 +4943,7 @@ components:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/AuditLogDownloadList_data'
+            $ref: "#/components/schemas/AuditLogDownloadList_data"
     authorizationBody:
       title: authorization of Requst form-data
       required:
@@ -4830,7 +4969,7 @@ components:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/jobsUserBulkStatus'
+            $ref: "#/components/schemas/jobsUserBulkStatus"
     jobsUserBulkStatus:
       title: Jobs user bulk processing results.
       type: object
@@ -4906,7 +5045,7 @@ components:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/jobsUserExportStatus'
+            $ref: "#/components/schemas/jobsUserExportStatus"
     jobsUserExportStatus:
       title: Jobs user export processing results.
       type: object
@@ -4945,17 +5084,73 @@ components:
           type: string
           description: Last Modified
           format: date-time
+    agentUser:
+      title: agent user is a definition of Agent user resource.
+      type: object
+      allOf:
+      - $ref: "#/components/schemas/agentUserId"
+      - $ref: "#/components/schemas/agentUserCreate"
+      - type: object
+        properties:
+          token_latest_expire_date:
+            type: string
+            format: date-time
+    agentUserCreate:
+      title: agent user is a definition of Agent user resource.
+      type: object
+      allOf:
+      - required:
+        - agent_user_type
+        - username
+        type: object
+        properties:
+          username:
+            type: string
+            example: agent-user-01
+          agent_user_type:
+            type: string
+            example: ansible
+      - $ref: "#/components/schemas/agentUserUpdate"
+    agentUserId:
+      title: generative ai settings id resources.
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+    agentUserList:
+      title: agent user list is list of agent user resources.
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/agentUser"
+    agentUserUpdate:
+      title: agent user is a definition of Agent user resource.
+      type: object
+      properties:
+        description:
+          type: string
+    agentUserTokenList:
+      title: agent user token list is list of agent user token resources.
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/agentUserTokenList_data"
     inline_response_200:
       allOf:
-      - $ref: '#/components/schemas/responseOk'
-      - $ref: '#/components/schemas/organizationList'
+      - $ref: "#/components/schemas/responseOk"
+      - $ref: "#/components/schemas/organizationList"
     inline_response_200_1:
       allOf:
-      - $ref: '#/components/schemas/responseOk'
+      - $ref: "#/components/schemas/responseOk"
       - type: object
         properties:
           data:
-            $ref: '#/components/schemas/organization'
+            $ref: "#/components/schemas/organization"
     apiplatformorganizationsorganization_id_optionsIta_drivers:
       required:
       - ci_cd
@@ -4990,16 +5185,16 @@ components:
       type: object
       properties:
         document_store:
-          $ref: '#/components/schemas/apiplatformorganizationsorganization_id_optionsIta_services_document_store'
+          $ref: "#/components/schemas/apiplatformorganizationsorganization_id_optionsIta_services_document_store"
     apiplatformorganizationsorganization_id_optionsIta:
       required:
       - drivers
       type: object
       properties:
         drivers:
-          $ref: '#/components/schemas/apiplatformorganizationsorganization_id_optionsIta_drivers'
+          $ref: "#/components/schemas/apiplatformorganizationsorganization_id_optionsIta_drivers"
         services:
-          $ref: '#/components/schemas/apiplatformorganizationsorganization_id_optionsIta_services'
+          $ref: "#/components/schemas/apiplatformorganizationsorganization_id_optionsIta_services"
       description: Organization Add Json Parameter (json of exastro-it-automation)
     organizations_organization_id_body:
       oneOf:
@@ -5018,139 +5213,139 @@ components:
             description: organization enabled(true) or disabled(false)
             example: true
           optionsIta:
-            $ref: '#/components/schemas/apiplatformorganizationsorganization_id_optionsIta'
+            $ref: "#/components/schemas/apiplatformorganizationsorganization_id_optionsIta"
     inline_response_200_2:
       allOf:
-      - $ref: '#/components/schemas/responseOk'
+      - $ref: "#/components/schemas/responseOk"
       - type: object
         properties:
           data:
             type: object
     inline_response_200_3:
       allOf:
-      - $ref: '#/components/schemas/responseOk'
+      - $ref: "#/components/schemas/responseOk"
     inline_response_200_4:
       allOf:
-      - $ref: '#/components/schemas/responseOk'
+      - $ref: "#/components/schemas/responseOk"
       - type: object
         properties:
           data:
-            $ref: '#/components/schemas/organizationSetting'
+            $ref: "#/components/schemas/organizationSetting"
     inline_response_200_5:
       allOf:
-      - $ref: '#/components/schemas/responseOk'
-      - $ref: '#/components/schemas/tokenRefreshList'
+      - $ref: "#/components/schemas/responseOk"
+      - $ref: "#/components/schemas/tokenRefreshList"
     inline_response_200_6:
       allOf:
-      - $ref: '#/components/schemas/responseOk'
-      - $ref: '#/components/schemas/planMappingOrganizationList'
+      - $ref: "#/components/schemas/responseOk"
+      - $ref: "#/components/schemas/planMappingOrganizationList"
     inline_response_200_7:
       allOf:
-      - $ref: '#/components/schemas/responseOk'
-      - $ref: '#/components/schemas/planList'
+      - $ref: "#/components/schemas/responseOk"
+      - $ref: "#/components/schemas/planList"
     inline_response_200_8:
       allOf:
-      - $ref: '#/components/schemas/responseOk'
+      - $ref: "#/components/schemas/responseOk"
       - type: object
         properties:
           data:
-            $ref: '#/components/schemas/planItemList'
+            $ref: "#/components/schemas/planItemList"
     inline_response_200_9:
       allOf:
-      - $ref: '#/components/schemas/responseOk'
-      - $ref: '#/components/schemas/limits'
+      - $ref: "#/components/schemas/responseOk"
+      - $ref: "#/components/schemas/limits"
     inline_response_200_10:
       allOf:
-      - $ref: '#/components/schemas/responseOk'
-      - $ref: '#/components/schemas/usageOrganizationList'
+      - $ref: "#/components/schemas/responseOk"
+      - $ref: "#/components/schemas/usageOrganizationList"
     inline_response_200_11:
       allOf:
-      - $ref: '#/components/schemas/responseOk'
-      - $ref: '#/components/schemas/usageList'
+      - $ref: "#/components/schemas/responseOk"
+      - $ref: "#/components/schemas/usageList"
     inline_response_200_12:
       allOf:
-      - $ref: '#/components/schemas/responseOk'
-      - $ref: '#/components/schemas/systemConfigList'
+      - $ref: "#/components/schemas/responseOk"
+      - $ref: "#/components/schemas/systemConfigList"
     inline_response_200_13:
       allOf:
-      - $ref: '#/components/schemas/responseOk'
+      - $ref: "#/components/schemas/responseOk"
       - type: object
         properties:
           data:
-            $ref: '#/components/schemas/systemConfig'
+            $ref: "#/components/schemas/systemConfig"
     inline_response_200_14:
       allOf:
-      - $ref: '#/components/schemas/responseOk'
-      - $ref: '#/components/schemas/workspaceList'
+      - $ref: "#/components/schemas/responseOk"
+      - $ref: "#/components/schemas/workspaceList"
     inline_response_200_15:
       allOf:
-      - $ref: '#/components/schemas/responseOk'
+      - $ref: "#/components/schemas/responseOk"
       - title: workspaceDetail is Workspace resources.
         type: object
         properties:
           data:
             allOf:
-            - $ref: '#/components/schemas/workspace'
-            - $ref: '#/components/schemas/responseStat'
+            - $ref: "#/components/schemas/workspace"
+            - $ref: "#/components/schemas/responseStat"
     inline_response_200_16:
       allOf:
-      - $ref: '#/components/schemas/responseOk'
-      - $ref: '#/components/schemas/memberList'
+      - $ref: "#/components/schemas/responseOk"
+      - $ref: "#/components/schemas/memberList"
     inline_response_200_17:
       allOf:
-      - $ref: '#/components/schemas/responseOk'
-      - $ref: '#/components/schemas/settingsDestinationList'
+      - $ref: "#/components/schemas/responseOk"
+      - $ref: "#/components/schemas/settingsDestinationList"
     inline_response_200_18:
       allOf:
-      - $ref: '#/components/schemas/responseOk'
-      - $ref: '#/components/schemas/settingsDestinationOne'
-      - $ref: '#/components/schemas/responseStat'
+      - $ref: "#/components/schemas/responseOk"
+      - $ref: "#/components/schemas/settingsDestinationOne"
+      - $ref: "#/components/schemas/responseStat"
     inline_response_200_19:
       allOf:
-      - $ref: '#/components/schemas/responseOk'
-      - $ref: '#/components/schemas/userList'
+      - $ref: "#/components/schemas/responseOk"
+      - $ref: "#/components/schemas/userList"
     inline_response_200_20:
       allOf:
-      - $ref: '#/components/schemas/responseOk'
+      - $ref: "#/components/schemas/responseOk"
       - type: object
         properties:
           data:
-            $ref: '#/components/schemas/user'
+            $ref: "#/components/schemas/user"
     inline_response_200_21:
       allOf:
-      - $ref: '#/components/schemas/responseOk'
-      - $ref: '#/components/schemas/roleDetailList'
+      - $ref: "#/components/schemas/responseOk"
+      - $ref: "#/components/schemas/roleDetailList"
     platform_roles_body:
       oneOf:
-      - $ref: '#/components/schemas/roleDetailWorkspace'
+      - $ref: "#/components/schemas/roleDetailWorkspace"
     roles_role_name_body:
       oneOf:
-      - $ref: '#/components/schemas/roleDetailWorkspacePut'
+      - $ref: "#/components/schemas/roleDetailWorkspacePut"
     inline_response_200_22:
       allOf:
-      - $ref: '#/components/schemas/responseOk'
+      - $ref: "#/components/schemas/responseOk"
       - title: roleList is list of Role resources.
         type: object
         properties:
           data:
             type: array
             items:
-              $ref: '#/components/schemas/roleUser'
+              $ref: "#/components/schemas/roleUser"
     inline_response_200_23:
       allOf:
-      - $ref: '#/components/schemas/responseOk'
-      - $ref: '#/components/schemas/jobsUserBulkStatusList'
+      - $ref: "#/components/schemas/responseOk"
+      - $ref: "#/components/schemas/jobsUserBulkStatusList"
     inline_response_200_24:
       allOf:
-      - $ref: '#/components/schemas/responseOk'
+      - $ref: "#/components/schemas/responseOk"
       - title: Jobs user bulk processing result.
         type: object
         properties:
           data:
-            $ref: '#/components/schemas/jobsUserBulkStatus'
+            $ref: "#/components/schemas/jobsUserBulkStatus"
     inline_response_200_25:
       allOf:
-      - $ref: '#/components/schemas/responseOk'
+      - $ref: "#/components/schemas/responseOk"
       - type: object
         properties:
           data:
@@ -5159,20 +5354,20 @@ components:
               job_id: XXXXXXXXXXXXXXXXXXXXXXXXXX
     inline_response_200_26:
       allOf:
-      - $ref: '#/components/schemas/responseOk'
-      - $ref: '#/components/schemas/jobsUserExportStatusList'
+      - $ref: "#/components/schemas/responseOk"
+      - $ref: "#/components/schemas/jobsUserExportStatusList"
     inline_response_200_27:
       allOf:
-      - $ref: '#/components/schemas/responseOk'
+      - $ref: "#/components/schemas/responseOk"
       - title: Jobs user export processing result.
         type: object
         properties:
           data:
-            $ref: '#/components/schemas/jobsUserExportStatus'
+            $ref: "#/components/schemas/jobsUserExportStatus"
     inline_response_200_28:
       allOf:
-      - $ref: '#/components/schemas/responseOk'
-      - $ref: '#/components/schemas/maintenanceModeSettings'
+      - $ref: "#/components/schemas/responseOk"
+      - $ref: "#/components/schemas/maintenanceModeSettings"
     platform_maintenancemodesetting_body:
       type: object
       properties:
@@ -5184,15 +5379,15 @@ components:
           example: "1"
     inline_response_200_29:
       allOf:
-      - $ref: '#/components/schemas/responseOk'
-      - $ref: '#/components/schemas/settingsMailserverList'
+      - $ref: "#/components/schemas/responseOk"
+      - $ref: "#/components/schemas/settingsMailserverList"
     inline_response_200_30:
       allOf:
-      - $ref: '#/components/schemas/responseOk'
-      - $ref: '#/components/schemas/AuditLogDownloadList'
+      - $ref: "#/components/schemas/responseOk"
+      - $ref: "#/components/schemas/AuditLogDownloadList"
     inline_response_200_31:
       allOf:
-      - $ref: '#/components/schemas/responseOk'
+      - $ref: "#/components/schemas/responseOk"
       - type: object
         properties:
           data:
@@ -5201,23 +5396,45 @@ components:
               download_id: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
     inline_response_200_32:
       allOf:
-      - $ref: '#/components/schemas/responseOk'
-      - $ref: '#/components/schemas/limitsList'
+      - $ref: "#/components/schemas/responseOk"
+      - $ref: "#/components/schemas/agentUserList"
     inline_response_200_33:
       allOf:
-      - $ref: '#/components/schemas/responseOk'
+      - $ref: "#/components/schemas/responseOk"
       - type: object
         properties:
           data:
-            $ref: '#/components/schemas/planItem'
+            $ref: "#/components/schemas/agentUser"
     inline_response_200_34:
       allOf:
-      - $ref: '#/components/schemas/responseOk'
-      - $ref: '#/components/schemas/roleList'
+      - $ref: "#/components/schemas/responseOk"
+      - $ref: "#/components/schemas/agentUserTokenList"
     inline_response_200_35:
       allOf:
-      - $ref: '#/components/schemas/responseOk'
-      - $ref: '#/components/schemas/userWorkspaceList'
+      - $ref: "#/components/schemas/responseOk"
+      - type: object
+        properties:
+          data:
+            $ref: "#/components/schemas/inline_response_200_35_data"
+    inline_response_200_36:
+      allOf:
+      - $ref: "#/components/schemas/responseOk"
+      - $ref: "#/components/schemas/limitsList"
+    inline_response_200_37:
+      allOf:
+      - $ref: "#/components/schemas/responseOk"
+      - type: object
+        properties:
+          data:
+            $ref: "#/components/schemas/planItem"
+    inline_response_200_38:
+      allOf:
+      - $ref: "#/components/schemas/responseOk"
+      - $ref: "#/components/schemas/roleList"
+    inline_response_200_39:
+      allOf:
+      - $ref: "#/components/schemas/responseOk"
+      - $ref: "#/components/schemas/userWorkspaceList"
     organization_organization_managers:
       type: object
       properties:
@@ -5261,7 +5478,7 @@ components:
       type: object
       properties:
         drivers:
-          $ref: '#/components/schemas/organization_optionsIta_drivers'
+          $ref: "#/components/schemas/organization_optionsIta_drivers"
     organizationCreate_optionsIta_drivers:
       type: object
       properties:
@@ -5279,9 +5496,9 @@ components:
       type: object
       properties:
         drivers:
-          $ref: '#/components/schemas/organizationCreate_optionsIta_drivers'
+          $ref: "#/components/schemas/organizationCreate_optionsIta_drivers"
         services:
-          $ref: '#/components/schemas/apiplatformorganizationsorganization_id_optionsIta_services'
+          $ref: "#/components/schemas/apiplatformorganizationsorganization_id_optionsIta_services"
       description: Organization Add Json Parameter (json of exastro-it-automation)
     organizationSetting_token:
       type: object
@@ -5329,7 +5546,7 @@ components:
           type: string
           example: organization_id
         limits:
-          $ref: '#/components/schemas/plan_limits'
+          $ref: "#/components/schemas/plan_limits"
     usageOrganizationList_data:
       type: object
       properties:
@@ -5338,7 +5555,7 @@ components:
         usages:
           type: array
           items:
-            $ref: '#/components/schemas/usage'
+            $ref: "#/components/schemas/usage"
     workspace_informations:
       type: object
       properties:
@@ -5347,11 +5564,11 @@ components:
         environments:
           type: array
           items:
-            $ref: '#/components/schemas/environment'
+            $ref: "#/components/schemas/environment"
         workspace_administrators:
           type: array
           items:
-            $ref: '#/components/schemas/workspace_administrator'
+            $ref: "#/components/schemas/workspace_administrator"
     workspaceUpdate_informations:
       type: object
       properties:
@@ -5360,7 +5577,7 @@ components:
         environments:
           type: array
           items:
-            $ref: '#/components/schemas/environment'
+            $ref: "#/components/schemas/environment"
     roleDetailOrganization_authorities:
       type: object
       properties:
@@ -5430,7 +5647,7 @@ components:
       type: object
       properties:
         event_type:
-          $ref: '#/components/schemas/settingsDestinationConditions_ita_event_type'
+          $ref: "#/components/schemas/settingsDestinationConditions_ita_event_type"
       description: Exastro IT Automation conditions
     AuditLogDownloadList_conditions:
       type: object
@@ -5456,7 +5673,7 @@ components:
           - Failed
           - NoData
         conditions:
-          $ref: '#/components/schemas/AuditLogDownloadList_conditions'
+          $ref: "#/components/schemas/AuditLogDownloadList_conditions"
         count_export:
           type: number
         message:
@@ -5473,9 +5690,263 @@ components:
         last_update_timestamp:
           type: string
           format: date-time
+    agentUserTokenList_data:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        start_timestamp:
+          type: string
+          format: date-time
+        lastaccess_timestamp:
+          type: string
+          format: date-time
+        expire_timestamp:
+          type: string
+          format: date-time
+        create_user_id:
+          type: string
+          format: uuid
+        create_user_name:
+          type: string
+    inline_response_200_35_data:
+      type: object
+      properties:
+        refresh_token:
+          type: string
   responses:
     UnauthorizedError:
       description: Access token is missing or invalid
+  examples:
+    settingsDestinationSubDestinationInformationsExampleMail:
+      value:
+        result: 200
+        message: SUCCESS
+        ts: 2023-11-02T05:36:41.258Z
+        data:
+        - id: 00000001Z7ZXFAED6872F6C9W8
+          name: destinations of mail settings
+          kind: Mail
+          conditions:
+            ita:
+              event_type:
+                new: false
+                evaluated: false
+                timeout: true
+                undetected: true
+          destination_informations:
+          - address_header: to
+            email: mike@example.com
+          - address_header: cc
+            email: tommy@example.com
+          - address_header: bcc
+            email: nancy@example.com
+          create_timestamp: 2023-11-02T05:36:41.258Z
+          create_user: string
+          last_update_timestamp: 2023-11-02T05:36:41.258Z
+          last_update_user: string
+    settingsDestinationSubDestinationInformationsExampleTeamsWorkflow:
+      value:
+        result: 200
+        message: SUCCESS
+        ts: 2023-11-02T05:36:41.258Z
+        data:
+        - id: 00000001Z7ZXFAED6872F6C9W8
+          name: destinations of teams workflow settings
+          kind: Teams_WF
+          conditions:
+            ita:
+              event_type:
+                new: true
+                evaluated: true
+                timeout: false
+                undetected: false
+          destination_informations:
+          - url: "https://{server-name}.{region}.logic.azure.com/workflows/{workflow-ID}/triggers/{trigger-name}/paths/invoke/?XXXXXXXXX"
+          create_timestamp: 2023-11-02T05:36:41.258Z
+          create_user: string
+          last_update_timestamp: 2023-11-02T05:36:41.258Z
+          last_update_user: string
+    settingsDestinationSubDestinationInformationsExampleTeams:
+      value:
+        result: 200
+        message: SUCCESS
+        ts: 2023-11-02T05:36:41.258Z
+        data:
+        - id: 00000001Z7ZXFAED6872F6C9W8
+          name: destinations of teams settings
+          kind: Teams
+          conditions:
+            ita:
+              event_type:
+                new: true
+                evaluated: true
+                timeout: false
+                undetected: false
+          destination_informations:
+          - webhook: https://xxxxxxxx.webhook.office.com/webhookb/xxxxxxxx-xxxxxx-xxxx-xxxx-xxxxxxxxxxxx
+          create_timestamp: 2023-11-02T05:36:41.258Z
+          create_user: string
+          last_update_timestamp: 2023-11-02T05:36:41.258Z
+          last_update_user: string
+    settingsDestinationSubDestinationInformationsExampleWebhook:
+      value:
+        result: 200
+        message: SUCCESS
+        ts: 2023-11-02T05:36:41.258Z
+        data:
+        - id: 00000001Z7ZXFAED6872F6C9W8
+          name: destinations of webhook settings
+          kind: Webhook
+          conditions:
+            ita:
+              event_type:
+                new: true
+                evaluated: true
+                timeout: false
+                undetected: false
+          destination_informations:
+          - url: http://your-webhook-server/hooks/XXXXXXXX
+            header: "Content-Type: application/json"
+          create_timestamp: 2023-11-02T05:36:41.258Z
+          create_user: string
+          last_update_timestamp: 2023-11-02T05:36:41.258Z
+          last_update_user: string
+    notificationsCreateExampleMail:
+      value:
+      - destination_id: 00000001Z7ZXFAED6872F6C9W8
+        func_id: "00000000"
+        func_informations:
+          key-1: value-1
+          key-2: value-2
+        message:
+          title: subjects
+          message: event message
+    notificationsCreateExampleTeamsworkflow:
+      value:
+      - destination_id: 00000001Z7ZXFAED6872F6C9W9
+        func_id: "00000000"
+        func_informations:
+          key-1: value-1
+          key-2: value-2
+        message:
+          title: send title
+          text: send message
+    notificationsCreateExampleTeams:
+      value:
+      - destination_id: 00000001Z7ZXFAED6872F6C9W9
+        func_id: "00000000"
+        func_informations:
+          key-1: value-1
+          key-2: value-2
+        message:
+          title: send title
+          text: send message
+    notificationsCreateExampleWebhook:
+      value:
+      - destination_id: 00000001Z7ZXFAED6872F6C9W9
+        func_id: "00000000"
+        func_informations:
+          key-1: value-1
+          key-2: value-2
+        message:
+          title: send title
+          text: send message
+    settingsDestinationOneGetExampleMail:
+      value:
+        result: 200
+        message: SUCCESS
+        ts: 2023-11-02T05:36:41.258Z
+        data:
+          id: 00000001Z7ZXFAED6872F6C9W8
+          name: destinations of mail settings
+          kind: Mail
+          conditions:
+            ita:
+              event_type:
+                new: false
+                evaluated: false
+                timeout: true
+                undetected: true
+          destination_informations:
+          - address_header: to
+            email: mike@example.com
+          - address_header: cc
+            email: tommy@example.com
+          - address_header: bcc
+            email: nancy@example.com
+          create_timestamp: 2023-11-02T05:36:41.258Z
+          create_user: string
+          last_update_timestamp: 2023-11-02T05:36:41.258Z
+          last_update_user: string
+    settingsDestinationOneGetExampleTeamsworkflow:
+      value:
+        result: 200
+        message: SUCCESS
+        ts: 2023-11-02T05:36:41.258Z
+        data:
+          id: 00000001Z7ZXFAED6872F6C9W8
+          name: destinations of teams workflow settings
+          kind: Teams_WF
+          conditions:
+            ita:
+              event_type:
+                new: true
+                evaluated: true
+                timeout: false
+                undetected: false
+          destination_informations:
+          - url: "https://{server-name}.{region}.logic.azure.com/workflows/{workflow-ID}/triggers/{trigger-name}/paths/invoke/?XXXXXXXXX"
+          create_timestamp: 2023-11-02T05:36:41.258Z
+          create_user: string
+          last_update_timestamp: 2023-11-02T05:36:41.258Z
+          last_update_user: string
+    settingsDestinationOneGetExampleTeams:
+      value:
+        result: 200
+        message: SUCCESS
+        ts: 2023-11-02T05:36:41.258Z
+        data:
+          id: 00000001Z7ZXFAED6872F6C9W8
+          name: destinations of teams settings
+          kind: Teams
+          conditions:
+            ita:
+              event_type:
+                new: true
+                evaluated: true
+                timeout: false
+                undetected: false
+          destination_informations:
+          - webhook: https://xxxxxxxx.webhook.office.com/webhookb/xxxxxxxx-xxxxxx-xxxx-xxxx-xxxxxxxxxxxx
+          create_timestamp: 2023-11-02T05:36:41.258Z
+          create_user: string
+          last_update_timestamp: 2023-11-02T05:36:41.258Z
+          last_update_user: string
+    settingsDestinationOneGetExampleWebhook:
+      value:
+        result: 200
+        message: SUCCESS
+        ts: 2023-11-02T05:36:41.258Z
+        data:
+          id: 00000001Z7ZXFAED6872F6C9W8
+          name: destinations of webhook settings
+          kind: Webhook
+          conditions:
+            ita:
+              event_type:
+                new: true
+                evaluated: true
+                timeout: false
+                undetected: false
+          destination_informations:
+          - url: http://your-webhook-server/hooks/XXXXXXXX
+            header: "Content-Type: application/json"
+          create_timestamp: 2023-11-02T05:36:41.258Z
+          create_user: string
+          last_update_timestamp: 2023-11-02T05:36:41.258Z
+          last_update_user: string
   securitySchemes:
     BearerAuth:
       type: http

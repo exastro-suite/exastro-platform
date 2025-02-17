@@ -79,6 +79,7 @@ services:
       - ./platform-api-with-ita/.vscode/launch.json:/workspace/.vscode/launch.json
       - ./platform-api-with-ita/.vscode/tasks.json:/workspace/.vscode/tasks.json
       - /usr/share/pki/ca-trust-source/anchors/UserRootCertificate.crt:/etc/ssl/certs/ca-certificates.crt
+      - /etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem:${HOST_CERTIFICATE_FILE:-/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem}
       - /mnt/mainte/talisman/.talismanrc:/mnt/mainte/talisman/.talismanrc
       - ~/.config/git/ignore:/home/app_user/.config/git/ignore
       - ${TALISMAN_HOME}:${TALISMAN_HOME}
