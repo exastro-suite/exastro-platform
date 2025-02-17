@@ -120,22 +120,6 @@ def agent_user_token_list(organization_id, workspace_id, user_id):  # noqa: E501
     return common.response_200_ok(None)
 
 
-    """Update an agent user
-
-     # noqa: E501
-
-    :param body: 
-    :type body: dict | bytes
-    :param organization_id: 
-    :type organization_id: str
-    :param workspace_id: 
-    :type workspace_id: str
-    :param user_id: 
-    :type user_id: 
-
-    :rtype: InlineResponse2002
-    """
-
 @common.platform_exception_handler
 def agent_user_update(body, organization_id, workspace_id, user_id):  # noqa: E501
     """Update an agent user
