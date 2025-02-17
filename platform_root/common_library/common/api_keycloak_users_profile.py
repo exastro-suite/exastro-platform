@@ -87,8 +87,8 @@ def configure_realm_users_profiles(users_profiles):
     if len([item for item in users_profiles["attributes"] if item["name"] == "description"]) == 0:
         users_profiles["attributes"].append(__users_profiles_item("description", "説明 / Description", common_const.length_user_description))
 
-    if len([item for item in users_profiles["attributes"] if item["name"] == "agent-user-type"]) == 0:
-        users_profiles["attributes"].append(__hidden_users_profiles("agent-user-type"))
+    if len([item for item in users_profiles["attributes"] if item["name"] == common_const.AGENT_USER_TYPE_ATTRIBUTE_NAME]) == 0:
+        users_profiles["attributes"].append(__hidden_users_profiles(common_const.AGENT_USER_TYPE_ATTRIBUTE_NAME))
 
 
 def __users_profiles_item(name, display_name, max_length):
