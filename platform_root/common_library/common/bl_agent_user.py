@@ -12,7 +12,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-from common_library.common import common, multi_lang, const, validation, bl_common_service
+from common_library.common import const
 
 
 def agent_user_roles(workspace_id):
@@ -49,3 +49,61 @@ def agent_user_type_info(workspace_id):
         {"type": const.AGENT_USER_TYPE_ANSIBLE, "role": f"_{workspace_id}-agent-ansible"},
         {"type": const.AGENT_USER_TYPE_OASE, "role": f"_{workspace_id}-agent-oase"},
     ]
+
+
+def agent_user_role_name(workspace_id, agent_user_type):
+    """user agent role name
+
+    Args:
+        workspace_id (str): workspace id
+        agent_user_type (str): agent user type
+
+    Returns:
+        str: role name
+    """
+    return f"_{workspace_id}-agent-{agent_user_type}"
+
+
+def agent_user_create_parameter(username, agent_user_type, description):
+    """agent user create keycloak parameter
+
+    Args:
+        username (str): username
+        agent_user_type (str): user agent type
+        description (str): description
+
+    Returns:
+        dict: user_
+    """
+    return {
+        "username": username,
+        "email": agent_user_email(username),
+        "firstName": const.AGENT_USER_DUMMY_FIRSTNAME,
+        "lastName": const.AGENT_USER_DUMMY_LASTNAME,
+        # "credentials": [
+        #     {
+        #         "type": "password",
+        #         "value": "",
+        #         "temporary": False
+        #     }
+        # ],
+        "attributes":
+        {
+            "affiliation": [""],
+            "description": [description],
+            const.AGENT_USER_TYPE_ATTRIBUTE_NAME: agent_user_type
+        },
+        "enabled": True
+    }
+
+
+def agent_user_email(username):
+    """agent user email (dummy)
+
+    Args:
+        username (str): agent user dummy email
+
+    Returns:
+        str: dummy email address
+    """
+    return username + const.AGENT_USER_EMAIL_DUMMY_DOMAIN

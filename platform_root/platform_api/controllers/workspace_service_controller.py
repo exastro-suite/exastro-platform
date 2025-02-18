@@ -589,7 +589,10 @@ def __workspace_delete_main(organization_id, workspace_id, user_id, encode_roles
             delete_roles = [
                 {"client_uid": private.internal_api_client_id, "role_name": workspace_id},
                 {"client_uid": private.internal_api_client_id, "role_name": common.get_ws_admin_rolename(workspace_id)},
-                {"client_uid": private.user_token_client_id, "role_name": common.get_ws_admin_rolename(workspace_id)}
+                {"client_uid": private.user_token_client_id, "role_name": common.get_ws_admin_rolename(workspace_id)},
+            ] + [
+                {"client_uid": private.user_token_client_id, "role_name": builtin_role}
+                for builtin_role in bl_agent_user.agent_user_roles(workspace_id)
             ]
 
             for delete_role in delete_roles:
