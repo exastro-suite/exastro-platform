@@ -130,38 +130,48 @@ def agent_user_create(body, organization_id, workspace_id):  # noqa: E501
         )
         raise common.InternalErrorException(message_id=message_id, message=message)
 
-    # get role
-    role_name = bl_agent_user.agent_user_role_name(workspace_id, req_agent_user_type)
-    
-    resp_get_role = api_keycloak_roles.clients_role_get(
-        realm_name=organization_id, client_id=private.user_token_client_id, role_name=role_name, token=token,
-    )
-    if resp_get_role.status_code != 200:
-        globals.logger.debug(f"response:{resp_get_role.text}")
-        message_id = "500-24001"
-        raise common.InternalErrorException(
-            None, message_id, multi_lang.get_text(message_id, "ワークスペースロールの取得に失敗しました(対象ID:{0})", role_name)
+    try:
+        # get role
+        role_name = bl_agent_user.agent_user_role_name(workspace_id, req_agent_user_type)
+        
+        resp_get_role = api_keycloak_roles.clients_role_get(
+            realm_name=organization_id, client_id=private.user_token_client_id, role_name=role_name, token=token,
         )
+        if resp_get_role.status_code != 200:
+            globals.logger.debug(f"response:{resp_get_role.text}")
+            message_id = "500-24001"
+            raise common.InternalErrorException(
+                None, message_id, multi_lang.get_text(message_id, "ワークスペースロールの取得に失敗しました(対象ID:{0})", role_name)
+            )
 
-    client_role = json.loads(resp_get_role.text)
+        client_role = json.loads(resp_get_role.text)
 
-    # create role mapping
-    resp_get_user = api_keycloak_roles.user_client_role_mapping_create(
-        realm_name=organization_id, user_id=user_info[0].get("id"), client_id=private.user_token_client_id,
-        client_roles=[client_role], token=token
-    )
-    if resp_get_user.status_code not in [200, 204]:
-        globals.logger.error(f"response.status_code:{resp_get_user.status_code}")
-        globals.logger.error(f"response.text:{resp_get_user.text}")
-        message_id = "500-26002"
-        message = multi_lang.get_text(
-            message_id,
-            "ロール設定に失敗しました(対象ID:{0} client:{1} username:{2})",
-            organization_id,
-            private.user_token_client_clientid,
-            req_username
+        # create role mapping
+        resp_get_user = api_keycloak_roles.user_client_role_mapping_create(
+            realm_name=organization_id, user_id=user_info[0].get("id"), client_id=private.user_token_client_id,
+            client_roles=[client_role], token=token
         )
-        raise common.InternalErrorException(message_id=message_id, message=message)
+        if resp_get_user.status_code not in [200, 204]:
+            globals.logger.error(f"response.status_code:{resp_get_user.status_code}")
+            globals.logger.error(f"response.text:{resp_get_user.text}")
+            message_id = "500-26002"
+            message = multi_lang.get_text(
+                message_id,
+                "ロール設定に失敗しました(対象ID:{0} client:{1} username:{2})",
+                organization_id,
+                private.user_token_client_clientid,
+                req_username
+            )
+            raise common.InternalErrorException(message_id=message_id, message=message)
+
+    except Exception:
+        # 途中でエラーになった場合、ユーザーは削除する
+        # If an error occurs during the process, the user will delete the
+        try:
+            api_keycloak_users.user_delete(realm_name=organization_id, user_id=user_info[0].get("id"), token=token)
+        except Exception:
+            pass
+        raise
 
     return common.response_200_ok(None)
 
