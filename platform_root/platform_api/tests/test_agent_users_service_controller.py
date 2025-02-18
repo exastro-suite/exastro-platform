@@ -19,7 +19,9 @@ import json
 
 from tests.common import request_parameters, test_common
 from common_library.common import const, validation
-from common_library.common import api_keycloak_users, api_keycloak_tokens
+from common_library.common import api_keycloak_users, api_keycloak_tokens, api_keycloak_roles
+from common_library.common import bl_agent_user
+
 from common_library.common.db import DBconnector
 
 def test_agent_user_service_api(connexion_client):
@@ -133,6 +135,33 @@ def test_agent_user_create(connexion_client):
     #
     # tests
     #
+    with test_common.requsts_mocker_default():
+        #
+        # normally
+        #
+        normally_test_username = 'agent-user-ansible-normally'
+        normally_test_json = __post_sample_data(normally_test_username, const.AGENT_USER_TYPE_ANSIBLE)
+
+        response = connexion_client.post(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/agent-users",
+            headers=request_parameters.request_headers(organization['user_id']),
+            json=normally_test_json
+        )
+        assert response.status_code == 200
+        # ユーザーが作成されていること / 作成されたユーザーの情報が正しいこと
+        create_users = __get_user(organization['organization_id'], 'agent-user-ansible-normally', token)
+        assert len(create_users) == 1
+        assert create_users[0]["username"] == normally_test_json["username"]
+        assert create_users[0]["attributes"]["agent_user_type"][0] == normally_test_json["agent_user_type"]
+        assert create_users[0]["attributes"]["description"][0] == normally_test_json["description"]
+
+        # 作成したユーザにagentロールが付与されていること
+        resp_get_user_role = api_keycloak_roles.user_role_get(realm_name=organization['organization_id'], user_id=create_users[0]["id"], client_id=private.user_token_client_id, token=token)
+        assert resp_get_user_role.status_code == 200
+        resp_get_user_role_json = json.loads(resp_get_user_role.text)
+        assert len(resp_get_user_role_json) == 1
+        assert resp_get_user_role_json[0]["name"] == bl_agent_user.agent_user_role_name(workspace['workspace_id'], normally_test_json["agent_user_type"])
+
     with test_common.requsts_mocker_default():
         #
         # validate error route
@@ -329,6 +358,26 @@ def __exists_user(organization_id, username, token):
         return len(json.loads(response.text)) >= 1
     elif response.status_code == 404:
         return False
+    else:
+        raise Exception('Exception: api_keycloak_users.user_get')
+
+
+def __get_user(organization_id, username, token):
+    """exist user
+
+    Args:
+        organization_id (str): organization id
+        username (str): username
+        token (str): token
+
+    Returns:
+        list[dict]: 
+    """
+    response = api_keycloak_users.user_get(
+        realm_name=organization_id, user_name=username, token=token
+    )
+    if response.status_code == 200:
+        return json.loads(response.text)
     else:
         raise Exception('Exception: api_keycloak_users.user_get')
 

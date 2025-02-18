@@ -269,4 +269,15 @@ AUTH_PATTERN = [
             }
         ]
     },
+    {
+        "url": r"^/api/(?P<org_id>[^/][^/]*)/platform/workspaces/(?P<ws_id>[^/][^/]*)/agent-users($|/.*$)",
+        "auth": [
+            {
+                "method": ["*"],
+                "roles": [
+                    {"client": "{org_id}-workspaces", "role": "_{ws_id}-admin"},
+                ]
+            },
+        ]
+    },
 ]
