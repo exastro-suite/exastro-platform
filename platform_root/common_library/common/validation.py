@@ -18,8 +18,10 @@ from datetime import datetime
 import urllib.parse
 
 from common_library.common import common, multi_lang
+from common_library.common import bl_agent_user
 import common_library.common.const as const
 from email_validator import validate_email, EmailNotValidError
+
 
 MSG_FUNCTION_ID = "00"
 
@@ -1906,6 +1908,22 @@ def validate_audit_log_conditions(conditions):
         return result(
             False, 400, '400-{}020'.format(MSG_FUNCTION_ID), '日時形式以外が指定されています。({0})',
             multi_lang.get_text('000-00206', "タイムスタンプ(To)")
+        )
+
+    return result(True)
+
+
+def validate_agent_user_type(agent_user_type):
+    if agent_user_type is None or agent_user_type == "":
+        return result(
+            False, 400, '400-00011', '必須項目が不足しています。({0})',
+            multi_lang.get_text('000-00216', "エージェントタイプ")
+        )
+
+    if agent_user_type not in bl_agent_user.agent_user_types():
+        return result(
+            False, 400, '400-00037', '指定可能な値ではありません({0})',
+            multi_lang.get_text('000-00216', "エージェントタイプ")
         )
 
     return result(True)

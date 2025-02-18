@@ -16,7 +16,8 @@ import re
 import requests_mock
 
 from tests.common import request_parameters, test_common
-from common_library.common import const
+from common_library.common import const, common, validation
+from common_library.common import bl_agent_user
 
 
 def test_workspace_api(connexion_client):
@@ -184,6 +185,134 @@ def test_workspace_api(connexion_client):
             headers=request_parameters.request_headers(organization['user_id'], workspace_role=ws_role))
 
         assert response.status_code == 404, "get organization response code"
+
+
+def test_workspace_validate(connexion_client):
+    """workspace api validate
+
+    Args:
+        connexion_client (_type_): _description_
+    """
+    #
+    # test validate_workspace_id
+    #
+    validate = validation.validate_workspace_id("")
+    assert not validate.ok
+
+    validate = validation.validate_workspace_id("t".ljust(const.length_workspace_id, "a"))
+    assert validate.ok
+
+    validate = validation.validate_workspace_id("t".ljust(const.length_workspace_id + 1, "a"))
+    assert not validate.ok
+
+    validate = validation.validate_workspace_id("!")
+    assert not validate.ok
+
+    validate = validation.validate_workspace_id("1a")
+    assert not validate.ok
+
+    validate = validation.validate_workspace_id("-a")
+    assert not validate.ok
+
+    validate = validation.validate_workspace_id("_a")
+    assert not validate.ok
+
+    validate = validation.validate_workspace_id("a-0")
+    assert validate.ok
+
+    validate = validation.validate_workspace_id("A_9")
+    assert validate.ok
+
+    #
+    # test validate_workspace_name
+    #
+    validate = validation.validate_workspace_name("")
+    assert not validate.ok
+
+    validate = validation.validate_workspace_name("t".ljust(const.length_workspace_name, "a"))
+    assert validate.ok
+
+    validate = validation.validate_workspace_name("t".ljust(const.length_workspace_name + 1, "a"))
+    assert not validate.ok
+
+    #
+    # test validate_workspace_informations
+    #
+    validate = validation.validate_workspace_informations({"environments": {}})
+    assert not validate.ok
+
+    validate = validation.validate_workspace_informations({"environments": [{"name": f"env{i}"} for i in range(const.max_workspace_environments)]})
+    assert validate.ok
+
+    validate = validation.validate_workspace_informations({"environments": [{"name": f"env{i}"} for i in range(const.max_workspace_environments + 1)]})
+    assert not validate.ok
+
+    validate = validation.validate_workspace_informations({"environments": [{"name": {}}]})
+    assert not validate.ok
+
+    validate = validation.validate_workspace_informations({"environments": [{"name": ""}]})
+    assert not validate.ok
+
+    validate = validation.validate_workspace_informations({"environments": [{"name": "t".ljust(const.length_workspace_environment_name, "a")}]})
+    assert validate.ok
+
+    validate = validation.validate_workspace_informations({"environments": [{"name": "t".ljust(const.length_workspace_environment_name + 1, "a")}]})
+    assert not validate.ok
+
+    validate = validation.validate_workspace_informations(
+        {"environments": [{"name": "nonuniq-01"}, {"name": "uniq-01"}, {"name": "nonuniq-01"}]})
+    assert not validate.ok
+
+    validate = validation.validate_workspace_informations({"description": {}})
+    assert not validate.ok
+
+    validate = validation.validate_workspace_informations({"description": "t".ljust(const.length_workspace_description, "a")})
+    assert validate.ok
+
+    validate = validation.validate_workspace_informations({"description": "t".ljust(const.length_workspace_description + 1, "a")})
+    assert not validate.ok
+
+
+def test_workspace_create(connexion_client):
+    """create workspace api test
+
+    Args:
+        connexion_client (_type_): _description_
+    """
+    organization = test_common.create_organization(connexion_client)
+
+    with test_common.requsts_mocker_default():
+        # create workspace
+        # ワークスペースを作成する
+        workspace_id = 'workspace-01'
+        json_create_01 = sample_data_workspace(workspace_id, organization['user_id'])
+
+        response = connexion_client.post(
+            f"/api/{organization['organization_id']}/platform/workspaces",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization['user_id']),
+            json=json_create_01)
+
+        assert response.status_code == 200, "create workspace response code"
+
+        response = connexion_client.get(
+            f"/api/{organization['organization_id']}/platform/roles?kind={const.ROLE_KIND_WORKSPACE}",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization["user_id"], organization_role=[const.ORG_ROLE_ORG_MANAGER]))
+
+        assert response.status_code == 200
+
+        # 作成ロールの存在チェック
+
+        # 1 (_wsid-admin) + agent_user_roles分のroleが作成されていること
+        assert len(response.json["data"]) == 1 + len(bl_agent_user.agent_user_roles(workspace_id))
+
+        # workspace admin ロールが存在すること
+        assert len([r["name"] for r in response.json["data"] if r["name"] == common.get_ws_admin_rolename(workspace_id)]) == 1
+
+        # agent user ロールが全て存在すること
+        for role in bl_agent_user.agent_user_roles(workspace_id):
+            assert len([r["name"] for r in response.json["data"] if r["name"] == role]) == 1
 
 
 def sample_data_workspace(id, admin_user_id, update={}):

@@ -135,6 +135,7 @@ class LanguageList:
     lang_array['000-00213'] = 'Webhook Header for notifications destination'
     lang_array['000-00214'] = 'Teams(Workflows) URL for notifications destination'
     lang_array['000-00215'] = '* An obsolete Notifications destination kind has been selected'
+    lang_array['000-00216'] = 'Agent type'
     lang_array['000-62001'] = 'Processing type'
     lang_array['000-62002'] = 'Registration or Update or Delete'
     #
@@ -579,6 +580,7 @@ class LanguageList:
     lang_array['400-00034'] = 'The specified value is not a number. ({0})'
     lang_array['400-00035'] = 'The specified value exceeds the allowable range. ({0},Minimum value:{1},Maximum value:{2})'
     lang_array['400-00036'] = 'A deprecated notifications destination kind method has been specified. ({0})'
+    lang_array['400-00037'] = 'Not a specifiable value ({0})'
     lang_array['400-11001'] = 'Request has been aborted.'
     lang_array['400-11002'] = 'Request body is invalid.'
     lang_array['400-23001'] = 'The specified organization ({0}) has already been created and cannot be created.'
