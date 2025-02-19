@@ -68,7 +68,8 @@ $(function(){
         const hiddenPolicyTexts = [
             "Hashing Iterations",
             "Password Blacklist",
-            "Hashing Algorithm"
+            "Hashing Algorithm",
+            "Regular Expression"
         ];
         $body.find('li.pf-c-select__menu-wrapper button.pf-c-select__menu-item').each((index, element) => {
             if(hiddenPolicyTexts.indexOf($(element).text()) != -1) {
@@ -89,6 +90,9 @@ $(function(){
             '   display: none !important;',
             '}',
             'form.keycloak__policies_authentication__form > div.pf-c-form__group:has(label.pf-c-form__label[for="hashAlgorithm"]) {',
+            '   display: none !important;',
+            '}',
+            'form.keycloak__policies_authentication__form > div.pf-c-form__group:has(label.pf-c-form__label[for="regexPattern"]) {',
             '   display: none !important;',
             '}',
             '</style>',
