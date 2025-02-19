@@ -66,6 +66,7 @@ def workspace_create(body, organization_id):
         environments = info.get("environments") if info.get("environments") else []
         wsadmin_users = info.get("workspace_administrators") if info.get("workspace_administrators") else []
     else:
+        info = {}
         description = ""
         environments = []
         wsadmin_users = []
