@@ -9,6 +9,8 @@
 # share org_id (同じものを複数記載すると最後の設定値が渡される)
 @org_id = org1
 
+@ws_id = ws1
+
 # 1 api to ###
 
 ###
@@ -196,6 +198,10 @@ content-type: application/json
 # audit log download get by query
 GET {{base_org_url}}/api/{{org_id}}/platform/auditlog/download
     ?download_id={{download_id}}
+Authorization: Basic {{org-user-id}} {{org-user-pw}}
+
+### Get Notification
+GET {{base_org_url}}/api/{{org_id}}/platform/workspaces/{{ws_id}}/agent-users
 Authorization: Basic {{org-user-id}} {{org-user-pw}}
 
 ###
