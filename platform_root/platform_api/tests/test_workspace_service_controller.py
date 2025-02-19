@@ -14,9 +14,10 @@
 import copy
 import re
 import requests_mock
+from unittest import mock
 
 from tests.common import request_parameters, test_common
-from common_library.common import const, common, validation
+from common_library.common import const, common, validation, maintenancemode
 from common_library.common import bl_agent_user
 
 
@@ -282,8 +283,11 @@ def test_workspace_create(connexion_client):
     organization = test_common.create_organization(connexion_client)
 
     with test_common.requsts_mocker_default():
+        #
+        # normal case
+        #
+
         # create workspace
-        # ワークスペースを作成する
         workspace_id = 'workspace-01'
         json_create_01 = sample_data_workspace(workspace_id, organization['user_id'])
 
@@ -303,7 +307,6 @@ def test_workspace_create(connexion_client):
         assert response.status_code == 200
 
         # 作成ロールの存在チェック
-
         # 1 (_wsid-admin) + agent_user_roles分のroleが作成されていること
         assert len(response.json["data"]) == 1 + len(bl_agent_user.agent_user_roles(workspace_id))
 
@@ -313,6 +316,84 @@ def test_workspace_create(connexion_client):
         # agent user ロールが全て存在すること
         for role in bl_agent_user.agent_user_roles(workspace_id):
             assert len([r["name"] for r in response.json["data"] if r["name"] == role]) == 1
+
+    with test_common.requsts_mocker_default():
+        #
+        # informationsパラメータ無し
+        #
+        workspace_id = "case_no_informations"
+        workscace_param = sample_data_workspace(workspace_id, organization['user_id'])
+
+        del workscace_param["informations"]
+
+        response = connexion_client.post(
+            f"/api/{organization['organization_id']}/platform/workspaces",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization['user_id']),
+            json=workscace_param)
+
+        assert response.status_code == 200
+
+    with test_common.requsts_mocker_default(), \
+            mock.patch.object(maintenancemode, 'maintenace_mode_get', return_value='1'):
+        #
+        # メンテナンスモード中
+        #
+        workspace_id = "case_mente_mode"
+        workscace_param = sample_data_workspace(workspace_id, organization['user_id'])
+
+        response = connexion_client.post(
+            f"/api/{organization['organization_id']}/platform/workspaces",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization['user_id']),
+            json=workscace_param)
+
+        assert response.status_code == 498
+
+    with test_common.requsts_mocker_default():
+        #
+        # validate error workspace id
+        #
+        workspace_id = "_case_validate_err_workspace_id"
+        workscace_param = sample_data_workspace(workspace_id, organization['user_id'])
+
+        response = connexion_client.post(
+            f"/api/{organization['organization_id']}/platform/workspaces",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization['user_id']),
+            json=workscace_param)
+
+        assert response.status_code == 400
+
+    with test_common.requsts_mocker_default():
+        #
+        # validate error workspace name
+        #
+        workspace_id = "case_validate_err_workspace_name"
+        workscace_param = {**sample_data_workspace(workspace_id, organization['user_id']), **{"name": ""}}
+
+        response = connexion_client.post(
+            f"/api/{organization['organization_id']}/platform/workspaces",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization['user_id']),
+            json=workscace_param)
+
+        assert response.status_code == 400
+
+    with test_common.requsts_mocker_default():
+        #
+        # validate error infomations
+        #
+        workspace_id = "case_validate_err_workspace_name"
+        workscace_param = {**sample_data_workspace(workspace_id, organization['user_id']), **{"informations": {"environments": [{"name": "env1"}, {"name": "env1"}]}}}
+
+        response = connexion_client.post(
+            f"/api/{organization['organization_id']}/platform/workspaces",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization['user_id']),
+            json=workscace_param)
+
+        assert response.status_code == 400
 
 
 def sample_data_workspace(id, admin_user_id, update={}):
