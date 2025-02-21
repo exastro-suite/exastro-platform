@@ -338,7 +338,7 @@ def workspace_create(body, organization_id):
                     realm_name=organization_id, client_uid=private.user_token_client_id, role_name=builtin_role, token=token,
                     role_options=role_options,
                 )
-                if r_create_wsadmin.status_code not in [201, 409]:
+                if r_create_role.status_code not in [201, 409]:
                     # 201 Created 以外に、409 already exists は許容する
                     globals.logger.error(f"response.status_code:{r_create_role.status_code}")
                     globals.logger.error(f"response.text:{r_create_role.text}")
