@@ -375,7 +375,13 @@ def workspace_create(body, organization_id):
                     raise common.InternalErrorException(message_id=message_id, message=message)
 
             # workspace database create
-            __workspace_database_create(organization_id, workspace_id, user_id)
+            try:
+                __workspace_database_create(organization_id, workspace_id, user_id)
+            except Exception:
+                # 一度コミットし、ワークスペース削除ロジックの実行
+                conn.commit()
+                __workspace_delete_main(organization_id, workspace_id, user_id, encode_roles, language)
+                raise
 
             # IT Automation call
             r_create_ita_workspace = api_ita_admin_call.ita_workspace_create(
@@ -584,6 +590,10 @@ def __workspace_delete_main(organization_id, workspace_id, user_id, encode_roles
                 )
 
             token = json.loads(token_response.text)["access_token"]
+
+            # Delete agent Users
+            globals.logger.info(f"Delete Platform Agent Users: organization_id={organization_id} / workspace_id={workspace_id}")
+            bl_agent_user.delete_workspace_agent_users(organization_id, workspace_id, private, token)
 
             # Delete Workspace Roles
             globals.logger.info(f"Delete Platform Workspace Role: organization_id={organization_id} / workspace_id={workspace_id}")

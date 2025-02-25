@@ -22,6 +22,7 @@ from common_library.common import const, common, validation, maintenancemode
 from common_library.common import api_keycloak_tokens, api_keycloak_roles
 from common_library.common import bl_agent_user, bl_plan_service
 from common_library.common.db import DBconnector
+from common_library.common.libs import queries_dbinit
 
 
 def test_workspace_api(connexion_client):
@@ -296,12 +297,11 @@ def test_workspace_create(connexion_client):
     #
     # normal case
     #
+    workspace_id = 'workspace-01'
+    json_create_01 = sample_data_workspace(workspace_id, organization['user_id'])
+
     with test_common.requsts_mocker_default():
-
         # create workspace
-        workspace_id = 'workspace-01'
-        json_create_01 = sample_data_workspace(workspace_id, organization['user_id'])
-
         response = connexion_client.post(
             f"/api/{organization['organization_id']}/platform/workspaces",
             content_type='application/json',
@@ -332,10 +332,11 @@ def test_workspace_create(connexion_client):
     # 最大ワークスペース数チェック
     #  normal caseで1件作成済みなので、最大数を1にmockしてエラーになることをチェックする
     #
+    workspace_id = 'case_limit_over_workspace'
+    json_create_01 = sample_data_workspace(workspace_id, organization['user_id'])
+
     with test_common.requsts_mocker_default(), \
             mock.patch.object(bl_plan_service, 'organization_limits_get', return_value={const.RESOURCE_COUNT_WORKSPACES: 1}):
-        workspace_id = 'case_limit_over_workspace'
-        json_create_01 = sample_data_workspace(workspace_id, organization['user_id'])
 
         response = connexion_client.post(
             f"/api/{organization['organization_id']}/platform/workspaces",
@@ -348,10 +349,10 @@ def test_workspace_create(connexion_client):
     #
     # 重複エラー
     #
-    with test_common.requsts_mocker_default():
-        workspace_id = 'workspace-01'
-        json_create_01 = sample_data_workspace(workspace_id, organization['user_id'])
+    workspace_id = 'workspace-01'
+    json_create_01 = sample_data_workspace(workspace_id, organization['user_id'])
 
+    with test_common.requsts_mocker_default():
         response = connexion_client.post(
             f"/api/{organization['organization_id']}/platform/workspaces",
             content_type='application/json',
@@ -363,10 +364,10 @@ def test_workspace_create(connexion_client):
     #
     # informationsパラメータ無し
     #
-    with test_common.requsts_mocker_default():
-        workspace_id = "case_no_informations"
-        workscace_param = sample_data_workspace(workspace_id, organization['user_id'])
+    workspace_id = "case_no_informations"
+    workscace_param = sample_data_workspace(workspace_id, organization['user_id'])
 
+    with test_common.requsts_mocker_default():
         del workscace_param["informations"]
 
         response = connexion_client.post(
@@ -380,10 +381,11 @@ def test_workspace_create(connexion_client):
     #
     # メンテナンスモード中
     #
+    workspace_id = "case_mente_mode"
+    workscace_param = sample_data_workspace(workspace_id, organization['user_id'])
+
     with test_common.requsts_mocker_default(), \
             mock.patch.object(maintenancemode, 'maintenace_mode_get', return_value='1'):
-        workspace_id = "case_mente_mode"
-        workscace_param = sample_data_workspace(workspace_id, organization['user_id'])
 
         response = connexion_client.post(
             f"/api/{organization['organization_id']}/platform/workspaces",
@@ -396,10 +398,10 @@ def test_workspace_create(connexion_client):
     #
     # validate error workspace id
     #
-    with test_common.requsts_mocker_default():
-        workspace_id = "_case_validate_err_workspace_id"
-        workscace_param = sample_data_workspace(workspace_id, organization['user_id'])
+    workspace_id = "_case_validate_err_workspace_id"
+    workscace_param = sample_data_workspace(workspace_id, organization['user_id'])
 
+    with test_common.requsts_mocker_default():
         response = connexion_client.post(
             f"/api/{organization['organization_id']}/platform/workspaces",
             content_type='application/json',
@@ -411,10 +413,10 @@ def test_workspace_create(connexion_client):
     #
     # validate error workspace name
     #
-    with test_common.requsts_mocker_default():
-        workspace_id = "case_validate_err_workspace_name"
-        workscace_param = {**sample_data_workspace(workspace_id, organization['user_id']), **{"name": ""}}
+    workspace_id = "case_validate_err_workspace_name"
+    workscace_param = {**sample_data_workspace(workspace_id, organization['user_id']), **{"name": ""}}
 
+    with test_common.requsts_mocker_default():
         response = connexion_client.post(
             f"/api/{organization['organization_id']}/platform/workspaces",
             content_type='application/json',
@@ -426,10 +428,10 @@ def test_workspace_create(connexion_client):
     #
     # validate error infomations
     #
-    with test_common.requsts_mocker_default():
-        workspace_id = "case_validate_err_workspace_name"
-        workscace_param = {**sample_data_workspace(workspace_id, organization['user_id']), **{"informations": {"environments": [{"name": "env1"}, {"name": "env1"}]}}}
+    workspace_id = "case_validate_err_workspace_name"
+    workscace_param = {**sample_data_workspace(workspace_id, organization['user_id']), **{"informations": {"environments": [{"name": "env1"}, {"name": "env1"}]}}}
 
+    with test_common.requsts_mocker_default():
         response = connexion_client.post(
             f"/api/{organization['organization_id']}/platform/workspaces",
             content_type='application/json',
@@ -441,10 +443,10 @@ def test_workspace_create(connexion_client):
     #
     # Get a service account token error
     #
-    with test_common.requsts_mocker_default() as requests_mocker:
-        workspace_id = "case_get_sa_token_error"
-        workscace_param = sample_data_workspace(workspace_id, organization['user_id'])
+    workspace_id = "case_get_sa_token_error"
+    workscace_param = sample_data_workspace(workspace_id, organization['user_id'])
 
+    with test_common.requsts_mocker_default() as requests_mocker:
         requests_mocker.register_uri(
             requests_mock.POST,
             re.compile(rf'^{test_common.keycloak_origin()}/auth/realms/{organization["organization_id"]}/protocol/openid-connect/token'),
@@ -462,10 +464,10 @@ def test_workspace_create(connexion_client):
     #
     # workcpace compositeロール作成時に失敗
     #
-    with test_common.requsts_mocker_default() as requests_mocker:
-        workspace_id = "case_composite_role_create_error"
-        workscace_param = sample_data_workspace(workspace_id, organization['user_id'])
+    workspace_id = "case_composite_role_create_error"
+    workscace_param = sample_data_workspace(workspace_id, organization['user_id'])
 
+    with test_common.requsts_mocker_default() as requests_mocker:
         requests_mocker.register_uri(
             requests_mock.POST,
             re.compile(rf'^{test_common.keycloak_origin()}/auth/admin/realms/{organization["organization_id"]}/clients/{private.internal_api_client_id}/roles'),
@@ -480,32 +482,16 @@ def test_workspace_create(connexion_client):
 
         assert response.status_code == 500
 
-    with test_common.requsts_mocker_default():
-        # compositeロールだけが出来上がってないこと
-        resp_roles = api_keycloak_roles.clients_roles_get(realm_name=organization['organization_id'], client_id=private.internal_api_client_id, token=token)
-        assert resp_roles.status_code == 200
-        assert len([resp_role["name"] for resp_role in json.loads(resp_roles.text) if resp_role["name"].startswith(f"_{workspace_id}")]) == 0
-        assert len([resp_role["name"] for resp_role in json.loads(resp_roles.text) if resp_role["name"] == workspace_id]) == 0
-
-        # ロールだけが出来上がってないこと
-        resp_roles = api_keycloak_roles.clients_roles_get(realm_name=organization['organization_id'], client_id=private.user_token_client_id, token=token)
-        assert resp_roles.status_code == 200
-        assert len([resp_role["name"] for resp_role in json.loads(resp_roles.text) if resp_role["name"].startswith(f"_{workspace_id}")]) == 0
-
-        # Workspace DB 取得（存在しないこと）
-        resp_ws = connexion_client.get(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace_id}",
-            headers=request_parameters.request_headers(organization['user_id'], workspace_role=common.get_ws_admin_rolename(workspace_id)))
-
-        assert resp_ws.status_code == 404
+    # workspaceのresourceがclean upされていること
+    assert_is_cleaned_up_resource(connexion_client, private, organization, workspace_id, token)
 
     #
     # workcpaceロール作成時に失敗
     #
-    with test_common.requsts_mocker_default() as requests_mocker:
-        workspace_id = "case_role_create_error"
-        workscace_param = sample_data_workspace(workspace_id, organization['user_id'])
+    workspace_id = "case_role_create_error"
+    workscace_param = sample_data_workspace(workspace_id, organization['user_id'])
 
+    with test_common.requsts_mocker_default() as requests_mocker:
         requests_mocker.register_uri(
             requests_mock.POST,
             re.compile(rf'^{test_common.keycloak_origin()}/auth/admin/realms/{organization["organization_id"]}/clients/{private.user_token_client_id}/roles'),
@@ -520,32 +506,16 @@ def test_workspace_create(connexion_client):
 
         assert response.status_code == 500
 
-    with test_common.requsts_mocker_default():
-        # compositeロールだけが出来上がってないこと
-        resp_roles = api_keycloak_roles.clients_roles_get(realm_name=organization['organization_id'], client_id=private.internal_api_client_id, token=token)
-        assert resp_roles.status_code == 200
-        assert len([resp_role["name"] for resp_role in json.loads(resp_roles.text) if resp_role["name"].startswith(f"_{workspace_id}")]) == 0
-        assert len([resp_role["name"] for resp_role in json.loads(resp_roles.text) if resp_role["name"] == workspace_id]) == 0
-
-        # ロールだけが出来上がってないこと
-        resp_roles = api_keycloak_roles.clients_roles_get(realm_name=organization['organization_id'], client_id=private.user_token_client_id, token=token)
-        assert resp_roles.status_code == 200
-        assert len([resp_role["name"] for resp_role in json.loads(resp_roles.text) if resp_role["name"].startswith(f"_{workspace_id}")]) == 0
-
-        # Workspace DB 取得（存在しないこと）
-        resp_ws = connexion_client.get(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace_id}",
-            headers=request_parameters.request_headers(organization['user_id'], workspace_role=common.get_ws_admin_rolename(workspace_id)))
-
-        assert resp_ws.status_code == 404
+    # workspaceのresourceがclean upされていること
+    assert_is_cleaned_up_resource(connexion_client, private, organization, workspace_id, token)
 
     #
     # ロール composite時のrole get(ws role)失敗
     #
-    with test_common.requsts_mocker_default() as requests_mocker:
-        workspace_id = "case_composite_role_get_error"
-        workscace_param = sample_data_workspace(workspace_id, organization['user_id'])
+    workspace_id = "case_composite_role_get_error"
+    workscace_param = sample_data_workspace(workspace_id, organization['user_id'])
 
+    with test_common.requsts_mocker_default() as requests_mocker:
         requests_mocker.register_uri(
             requests_mock.GET,
             re.compile(rf'^{test_common.keycloak_origin()}/auth/admin/realms/{organization["organization_id"]}/clients/{private.internal_api_client_id}/roles/{workspace_id}'),
@@ -560,37 +530,21 @@ def test_workspace_create(connexion_client):
 
         assert response.status_code == 500
 
-    with test_common.requsts_mocker_default():
-        # compositeロールだけが出来上がってないこと
-        resp_roles = api_keycloak_roles.clients_roles_get(realm_name=organization['organization_id'], client_id=private.internal_api_client_id, token=token)
-        assert resp_roles.status_code == 200
-        assert len([resp_role["name"] for resp_role in json.loads(resp_roles.text) if resp_role["name"].startswith(f"_{workspace_id}")]) == 0
-        assert len([resp_role["name"] for resp_role in json.loads(resp_roles.text) if resp_role["name"] == workspace_id]) == 0
-
-        # ロールだけが出来上がってないこと
-        resp_roles = api_keycloak_roles.clients_roles_get(realm_name=organization['organization_id'], client_id=private.user_token_client_id, token=token)
-        assert resp_roles.status_code == 200
-        assert len([resp_role["name"] for resp_role in json.loads(resp_roles.text) if resp_role["name"].startswith(f"_{workspace_id}")]) == 0
-
-        # Workspace DB 取得（存在しないこと）
-        resp_ws = connexion_client.get(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace_id}",
-            headers=request_parameters.request_headers(organization['user_id'], workspace_role=common.get_ws_admin_rolename(workspace_id)))
-
-        assert resp_ws.status_code == 404
+    # workspaceのresourceがclean upされていること
+    assert_is_cleaned_up_resource(connexion_client, private, organization, workspace_id, token)
 
     #
     # ロール composite時の失敗(_ws-admin - ws)
     #
+    workspace_id = "case_composite_role_get_error"
+    workscace_param = sample_data_workspace(workspace_id, organization['user_id'])
+
     with test_common.requsts_mocker_default() as requests_mocker:
         requests_mocker.register_uri(
             requests_mock.POST,
             re.compile(rf'^{test_common.keycloak_origin()}/auth/admin/realms/{organization["organization_id"]}/clients/{private.user_token_client_id}/roles/.*/composites'),
             status_code=500,
             json={})
-
-        workspace_id = "case_composite_role_get_error"
-        workscace_param = sample_data_workspace(workspace_id, organization['user_id'])
 
         response = connexion_client.post(
             f"/api/{organization['organization_id']}/platform/workspaces",
@@ -600,32 +554,16 @@ def test_workspace_create(connexion_client):
 
         assert response.status_code == 500
 
-    with test_common.requsts_mocker_default():
-        # compositeロールだけが出来上がってないこと
-        resp_roles = api_keycloak_roles.clients_roles_get(realm_name=organization['organization_id'], client_id=private.internal_api_client_id, token=token)
-        assert resp_roles.status_code == 200
-        assert len([resp_role["name"] for resp_role in json.loads(resp_roles.text) if resp_role["name"].startswith(f"_{workspace_id}")]) == 0
-        assert len([resp_role["name"] for resp_role in json.loads(resp_roles.text) if resp_role["name"] == workspace_id]) == 0
-
-        # ロールだけが出来上がってないこと
-        resp_roles = api_keycloak_roles.clients_roles_get(realm_name=organization['organization_id'], client_id=private.user_token_client_id, token=token)
-        assert resp_roles.status_code == 200
-        assert len([resp_role["name"] for resp_role in json.loads(resp_roles.text) if resp_role["name"].startswith(f"_{workspace_id}")]) == 0
-
-        # Workspace DB 取得（存在しないこと）
-        resp_ws = connexion_client.get(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace_id}",
-            headers=request_parameters.request_headers(organization['user_id'], workspace_role=common.get_ws_admin_rolename(workspace_id)))
-
-        assert resp_ws.status_code == 404
+    # workspaceのresourceがclean upされていること
+    assert_is_cleaned_up_resource(connexion_client, private, organization, workspace_id, token)
 
     #
     # ワークスペース管理者付与用の_ws-adminロール取得失敗
     #
-    with test_common.requsts_mocker_default() as requests_mocker:
-        workspace_id = "case_admin_role_get_error"
-        workscace_param = sample_data_workspace(workspace_id, organization['user_id'])
+    workspace_id = "case_admin_role_get_error"
+    workscace_param = sample_data_workspace(workspace_id, organization['user_id'])
 
+    with test_common.requsts_mocker_default() as requests_mocker:
         requests_mocker.register_uri(
             requests_mock.GET,
             re.compile(rf'^{test_common.keycloak_origin()}/auth/admin/realms/{organization["organization_id"]}/clients/{private.user_token_client_id}/roles/{common.get_ws_admin_rolename(workspace_id)}'),
@@ -640,32 +578,16 @@ def test_workspace_create(connexion_client):
 
         assert response.status_code == 500
 
-    with test_common.requsts_mocker_default():
-        # compositeロールだけが出来上がってないこと
-        resp_roles = api_keycloak_roles.clients_roles_get(realm_name=organization['organization_id'], client_id=private.internal_api_client_id, token=token)
-        assert resp_roles.status_code == 200
-        assert len([resp_role["name"] for resp_role in json.loads(resp_roles.text) if resp_role["name"].startswith(f"_{workspace_id}")]) == 0
-        assert len([resp_role["name"] for resp_role in json.loads(resp_roles.text) if resp_role["name"] == workspace_id]) == 0
-
-        # ロールだけが出来上がってないこと
-        resp_roles = api_keycloak_roles.clients_roles_get(realm_name=organization['organization_id'], client_id=private.user_token_client_id, token=token)
-        assert resp_roles.status_code == 200
-        assert len([resp_role["name"] for resp_role in json.loads(resp_roles.text) if resp_role["name"].startswith(f"_{workspace_id}")]) == 0
-
-        # Workspace DB 取得（存在しないこと）
-        resp_ws = connexion_client.get(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace_id}",
-            headers=request_parameters.request_headers(organization['user_id'], workspace_role=common.get_ws_admin_rolename(workspace_id)))
-
-        assert resp_ws.status_code == 404
+    # workspaceのresourceがclean upされていること
+    assert_is_cleaned_up_resource(connexion_client, private, organization, workspace_id, token)
 
     #
     # ワークスペース管理者ロール付与失敗
     #
-    with test_common.requsts_mocker_default() as requests_mocker:
-        workspace_id = "case_admin_role_set_error"
-        workscace_param = sample_data_workspace(workspace_id, organization['user_id'])
+    workspace_id = "case_admin_role_set_error"
+    workscace_param = sample_data_workspace(workspace_id, organization['user_id'])
 
+    with test_common.requsts_mocker_default() as requests_mocker:
         requests_mocker.register_uri(
             requests_mock.POST,
             re.compile(rf'^{test_common.keycloak_origin()}/auth/admin/realms/{organization["organization_id"]}/users/.*/role-mappings/clients'),
@@ -680,24 +602,8 @@ def test_workspace_create(connexion_client):
 
         assert response.status_code == 500
 
-    with test_common.requsts_mocker_default():
-        # compositeロールだけが出来上がってないこと
-        resp_roles = api_keycloak_roles.clients_roles_get(realm_name=organization['organization_id'], client_id=private.internal_api_client_id, token=token)
-        assert resp_roles.status_code == 200
-        assert len([resp_role["name"] for resp_role in json.loads(resp_roles.text) if resp_role["name"].startswith(f"_{workspace_id}")]) == 0
-        assert len([resp_role["name"] for resp_role in json.loads(resp_roles.text) if resp_role["name"] == workspace_id]) == 0
-
-        # ロールだけが出来上がってないこと
-        resp_roles = api_keycloak_roles.clients_roles_get(realm_name=organization['organization_id'], client_id=private.user_token_client_id, token=token)
-        assert resp_roles.status_code == 200
-        assert len([resp_role["name"] for resp_role in json.loads(resp_roles.text) if resp_role["name"].startswith(f"_{workspace_id}")]) == 0
-
-        # Workspace DB 取得（存在しないこと）
-        resp_ws = connexion_client.get(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace_id}",
-            headers=request_parameters.request_headers(organization['user_id'], workspace_role=common.get_ws_admin_rolename(workspace_id)))
-
-        assert resp_ws.status_code == 404
+    # workspaceのresourceがclean upされていること
+    assert_is_cleaned_up_resource(connexion_client, private, organization, workspace_id, token)
 
     #
     # その他のワークスペースビルトインロールを生成する際のworkspaceのロールを取得パターンは
@@ -707,10 +613,10 @@ def test_workspace_create(connexion_client):
     #
     # その他のワークスペースビルトインロール生成失敗
     #
-    with test_common.requsts_mocker_default() as requests_mocker:
-        workspace_id = "case_builtin_role_create_error"
-        workscace_param = sample_data_workspace(workspace_id, organization['user_id'])
+    workspace_id = "case_builtin_role_create_error"
+    workscace_param = sample_data_workspace(workspace_id, organization['user_id'])
 
+    with test_common.requsts_mocker_default() as requests_mocker:
         # POSTパラメータがagent user用のロールの場合にrequests_mocker.register_uriに引っかける
         def additional_matcher(request):
             mocked_roles = bl_agent_user.agent_user_roles(workspace_id)
@@ -733,33 +639,17 @@ def test_workspace_create(connexion_client):
 
         assert response.status_code == 500
 
-    with test_common.requsts_mocker_default():
-        # compositeロールだけが出来上がってないこと
-        resp_roles = api_keycloak_roles.clients_roles_get(realm_name=organization['organization_id'], client_id=private.internal_api_client_id, token=token)
-        assert resp_roles.status_code == 200
-        assert len([resp_role["name"] for resp_role in json.loads(resp_roles.text) if resp_role["name"].startswith(f"_{workspace_id}")]) == 0
-        assert len([resp_role["name"] for resp_role in json.loads(resp_roles.text) if resp_role["name"] == workspace_id]) == 0
-
-        # ロールだけが出来上がってないこと
-        resp_roles = api_keycloak_roles.clients_roles_get(realm_name=organization['organization_id'], client_id=private.user_token_client_id, token=token)
-        assert resp_roles.status_code == 200
-        assert len([resp_role["name"] for resp_role in json.loads(resp_roles.text) if resp_role["name"].startswith(f"_{workspace_id}")]) == 0
-
-        # Workspace DB 取得（存在しないこと）
-        resp_ws = connexion_client.get(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace_id}",
-            headers=request_parameters.request_headers(organization['user_id'], workspace_role=common.get_ws_admin_rolename(workspace_id)))
-
-        assert resp_ws.status_code == 404
+    # workspaceのresourceがclean upされていること
+    assert_is_cleaned_up_resource(connexion_client, private, organization, workspace_id, token)
 
     #
     # その他のワークスペースビルトインロール compsite生成失敗
     #
-    with test_common.requsts_mocker_default() as requests_mocker:
-        workspace_id = "case_bi_role_cmp_create_error"
-        workscace_param = sample_data_workspace(workspace_id, organization['user_id'])
+    workspace_id = "case_bi_role_cmp_create_error"
+    workscace_param = sample_data_workspace(workspace_id, organization['user_id'])
+    mocked_roles = bl_agent_user.agent_user_roles(workspace_id)
 
-        mocked_roles = bl_agent_user.agent_user_roles(workspace_id)
+    with test_common.requsts_mocker_default() as requests_mocker:
 
         requests_mocker.register_uri(
             requests_mock.POST,
@@ -776,32 +666,16 @@ def test_workspace_create(connexion_client):
 
         assert response.status_code == 500
 
-    with test_common.requsts_mocker_default():
-        # compositeロールだけが出来上がってないこと
-        resp_roles = api_keycloak_roles.clients_roles_get(realm_name=organization['organization_id'], client_id=private.internal_api_client_id, token=token)
-        assert resp_roles.status_code == 200
-        assert len([resp_role["name"] for resp_role in json.loads(resp_roles.text) if resp_role["name"].startswith(f"_{workspace_id}")]) == 0
-        assert len([resp_role["name"] for resp_role in json.loads(resp_roles.text) if resp_role["name"] == workspace_id]) == 0
-
-        # ロールだけが出来上がってないこと
-        resp_roles = api_keycloak_roles.clients_roles_get(realm_name=organization['organization_id'], client_id=private.user_token_client_id, token=token)
-        assert resp_roles.status_code == 200
-        assert len([resp_role["name"] for resp_role in json.loads(resp_roles.text) if resp_role["name"].startswith(f"_{workspace_id}")]) == 0
-
-        # Workspace DB 取得（存在しないこと）
-        resp_ws = connexion_client.get(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace_id}",
-            headers=request_parameters.request_headers(organization['user_id'], workspace_role=common.get_ws_admin_rolename(workspace_id)))
-
-        assert resp_ws.status_code == 404
+    # workspaceのresourceがclean upされていること
+    assert_is_cleaned_up_resource(connexion_client, private, organization, workspace_id, token)
 
     #
     # IT Automationのワークスペース作成に失敗
     #
-    with test_common.requsts_mocker_default() as requests_mocker:
-        workspace_id = "case_ita_ws_create_error"
-        workscace_param = sample_data_workspace(workspace_id, organization['user_id'])
+    workspace_id = "case_ita_ws_create_error"
+    workscace_param = sample_data_workspace(workspace_id, organization['user_id'])
 
+    with test_common.requsts_mocker_default() as requests_mocker:
         requests_mocker.register_uri(
             requests_mock.POST,
             re.compile(rf'^{test_common.ita_api_admin_origin()}/api/{organization["organization_id"]}/workspaces/{workspace_id}/ita/$'),
@@ -816,6 +690,236 @@ def test_workspace_create(connexion_client):
             json=workscace_param)
 
         assert response.status_code == 500
+
+    # workspaceのresourceがclean upされていること
+    assert_is_cleaned_up_resource(connexion_client, private, organization, workspace_id, token)
+
+    #
+    # DBアクセスエラー
+    #
+    with test_common.requsts_mocker_default(), \
+            test_common.pymysql_execute_raise_exception_mocker(queries_dbinit.SQL_INSERT_WORKSPACE_DBINFO, Exception('INSERT ERROR')):
+
+        workspace_id = "case_db_insert_error"
+        workscace_param = sample_data_workspace(workspace_id, organization['user_id'])
+
+        response = connexion_client.post(
+            f"/api/{organization['organization_id']}/platform/workspaces",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization['user_id']),
+            json=workscace_param)
+
+        assert response.status_code == 500
+
+    # workspaceのresourceがclean upされていること
+    assert_is_cleaned_up_resource(connexion_client, private, organization, workspace_id, token)
+
+
+def test_workspace_delete(connexion_client):
+    """test workspace delete api
+
+    Args:
+        connexion_client (_type_): _description_
+    """
+    organization = test_common.create_organization(connexion_client)
+    db = DBconnector()
+    private = db.get_organization_private(organization['organization_id'])
+
+    token_response = api_keycloak_tokens.service_account_get_token(
+        organization['organization_id'], private.internal_api_client_clientid, private.internal_api_client_secret,
+    )
+    assert token_response.status_code == 200
+    token = json.loads(token_response.text)["access_token"]
+
+    #
+    # normal case
+    #
+    workspace_id = "case_normal"
+    workscace_param = sample_data_workspace(workspace_id, organization['user_id'])
+
+    with test_common.requsts_mocker_default():
+
+        response = connexion_client.post(
+            f"/api/{organization['organization_id']}/platform/workspaces",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization['user_id']),
+            json=workscace_param)
+
+        assert response.status_code == 200
+
+        response = connexion_client.delete(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace_id}",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization['user_id']),
+            json=workscace_param)
+
+        assert response.status_code == 200
+
+    # workspaceのresourceがclean upされていること
+    assert_is_cleaned_up_resource(connexion_client, private, organization, workspace_id, token)
+
+    #
+    # maintenance mode
+    #
+    workspace_id = "case_mente_mode"
+    workscace_param = sample_data_workspace(workspace_id, organization['user_id'])
+
+    with test_common.requsts_mocker_default():
+        response = connexion_client.post(
+            f"/api/{organization['organization_id']}/platform/workspaces",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization['user_id']),
+            json=workscace_param)
+
+    with test_common.requsts_mocker_default(), \
+            mock.patch.object(maintenancemode, 'maintenace_mode_get', return_value='1'):
+
+        response = connexion_client.delete(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace_id}",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization['user_id']),
+            json=workscace_param)
+
+        assert response.status_code == 498
+
+    #
+    # not exists
+    #
+    workspace_id = "case_not_exists"
+    workscace_param = sample_data_workspace(workspace_id, organization['user_id'])
+
+    with test_common.requsts_mocker_default():
+
+        response = connexion_client.delete(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace_id}",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization['user_id']),
+            json=workscace_param)
+
+        assert response.status_code == 404
+
+    #
+    # ita workspace delete error (http:500)
+    #
+    workspace_id = "case_ita_delete_http_500"
+    workscace_param = sample_data_workspace(workspace_id, organization['user_id'])
+
+    with test_common.requsts_mocker_default() as requests_mocker:
+        requests_mocker.register_uri(
+            requests_mock.DELETE,
+            re.compile(rf'^{test_common.ita_api_admin_origin()}/api/{organization["organization_id"]}/workspaces/{workspace_id}/ita/$'),
+            status_code=500,
+            json={}
+        )
+
+        response = connexion_client.post(
+            f"/api/{organization['organization_id']}/platform/workspaces",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization['user_id']),
+            json=workscace_param)
+
+        assert response.status_code == 200
+
+        response = connexion_client.delete(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace_id}",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization['user_id']),
+            json=workscace_param)
+
+        assert response.status_code == 500
+
+    #
+    # ita workspace delete error (http:490)
+    #
+    workspace_id = "case_ita_delete_http_490"
+    workscace_param = sample_data_workspace(workspace_id, organization['user_id'])
+
+    with test_common.requsts_mocker_default() as requests_mocker:
+        requests_mocker.register_uri(
+            requests_mock.DELETE,
+            re.compile(rf'^{test_common.ita_api_admin_origin()}/api/{organization["organization_id"]}/workspaces/{workspace_id}/ita/$'),
+            status_code=490,
+            json={}
+        )
+
+        response = connexion_client.post(
+            f"/api/{organization['organization_id']}/platform/workspaces",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization['user_id']),
+            json=workscace_param)
+
+        assert response.status_code == 200
+
+        response = connexion_client.delete(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace_id}",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization['user_id']),
+            json=workscace_param)
+
+        assert response.status_code == 500
+
+    #
+    # Get a service account token error
+    #
+    workspace_id = "case_get_sa_token_error"
+    workscace_param = sample_data_workspace(workspace_id, organization['user_id'])
+
+    with test_common.requsts_mocker_default():
+        response = connexion_client.post(
+            f"/api/{organization['organization_id']}/platform/workspaces",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization['user_id']),
+            json=workscace_param)
+
+        assert response.status_code == 200
+
+    with test_common.requsts_mocker_default() as requests_mocker:
+        requests_mocker.register_uri(
+            requests_mock.POST,
+            re.compile(rf'^{test_common.keycloak_origin()}/auth/realms/{organization["organization_id"]}/protocol/openid-connect/token'),
+            status_code=500,
+            json={})
+
+        response = connexion_client.delete(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace_id}",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization['user_id']),
+            json=workscace_param)
+
+        assert response.status_code == 401
+
+    #
+    # delete role error
+    #
+    workspace_id = "case_delete_role_error"
+    workscace_param = sample_data_workspace(workspace_id, organization['user_id'])
+
+    with test_common.requsts_mocker_default() as requests_mocker:
+        requests_mocker.register_uri(
+            requests_mock.DELETE,
+            re.compile(rf'^{test_common.keycloak_origin()}/auth/admin/realms/{organization["organization_id"]}/clients/{private.user_token_client_id}/roles/{common.get_ws_admin_rolename(workspace_id)}$'),
+            status_code=500,
+            json={}
+        )
+
+        response = connexion_client.post(
+            f"/api/{organization['organization_id']}/platform/workspaces",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization['user_id']),
+            json=workscace_param)
+
+        assert response.status_code == 200
+
+        response = connexion_client.delete(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace_id}",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization['user_id']),
+            json=workscace_param)
+
+        assert response.status_code == 500
+
+
+def assert_is_cleaned_up_resource(connexion_client, private, organization, workspace_id, token):
 
     with test_common.requsts_mocker_default():
         # compositeロールだけが出来上がってないこと
