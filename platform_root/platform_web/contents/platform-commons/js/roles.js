@@ -94,7 +94,8 @@ $(function(){
             const row_template = $('#roles_list .datarow-template').clone(true).removeClass('datarow-template').addClass('datarow').prop('outerHTML');
             let html = '';
             for(let role of roles.sort((a,b) => {
-                return (((a.kind + ":" + a.name) == (b.kind + ":" + b.name))? 0 : ((a.kind + ":" + a.name) > (b.kind + ":" + b.name))? 1: -1); })) {
+                return (((a.kind + ":" + a.name.toLowerCase()) == (b.kind + ":" + b.name.toLowerCase()))? 
+                            0 : ((a.kind + ":" + a.name.toLowerCase()) > (b.kind + ":" + b.name.toLowerCase()))? 1: -1); })) {
 
                 const authorityTexts = RolesCommon.getAuthorityTexts(role, workspaces);
                 html += row_template

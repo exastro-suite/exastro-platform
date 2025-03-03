@@ -85,13 +85,13 @@ $(function(){
             // sort plan list
             //
             const sortKey = 'id';
-            const sortreverse = -1;
+            const sortreverse = 1; // 昇順
             plans.sort(function(a, b){
                 const as = a[sortKey].toLowerCase(), bs = b[sortKey].toLowerCase();
                 if ( as < bs ) {
-                    return sortreverse * 1;
-                } else if ( as > bs ) {
                     return sortreverse * -1;
+                } else if ( as > bs ) {
+                    return sortreverse * 1;
                 } else {
                     return 0;
                 }

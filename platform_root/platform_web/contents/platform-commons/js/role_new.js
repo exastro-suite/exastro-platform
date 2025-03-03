@@ -104,8 +104,8 @@ $(function(){
         let data_row_template = $("#workspace_list").html();
         let html = '';
 
-        const sortKey = 'last_update_timestamp';
-        const sortreverse = -1;
+        const sortKey = 'workspace_name'; // ワークスペース名
+        const sortreverse = 1;  // 昇順
         workspaceListData.sort(function(a, b){
             const as = a[sortKey].toLowerCase(), bs = b[sortKey].toLowerCase();
             if ( as < bs ) {
