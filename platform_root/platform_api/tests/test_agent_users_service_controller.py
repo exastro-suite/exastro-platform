@@ -16,13 +16,15 @@ import copy
 import re
 import requests_mock
 import json
+import jwt
 
 from tests.common import request_parameters, test_common
-from common_library.common import const, validation
+from common_library.common import const, validation, common
 from common_library.common import api_keycloak_users, api_keycloak_tokens, api_keycloak_roles
 from common_library.common import bl_agent_user
 
 from common_library.common.db import DBconnector
+
 
 def test_agent_user_service_api(connexion_client):
     """agent user service api test
@@ -36,57 +38,69 @@ def test_agent_user_service_api(connexion_client):
     with test_common.requsts_mocker_default():
 
         # 0件のget確認
-        # response = connexion_client.get(
-        #     f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/agent-users",
-        #     headers=request_parameters.request_headers(organization['user_id']))
+        response = connexion_client.get(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/agent-users",
+            headers=request_parameters.request_headers(organization['user_id'], workspace_role=[common.get_ws_admin_authname(workspace['workspace_id'])]))
 
-        # assert response.status_code == 200
-        # assert len(response.json["data"]) == 0
+        assert response.status_code == 200
+        assert len(response.json["data"]) == 0
 
         # agent userの追加
         agent_user1_data = __post_sample_data('ansible-agent-1', const.AGENT_USER_TYPE_ANSIBLE)
         response = connexion_client.post(
             f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/agent-users",
-            headers=request_parameters.request_headers(organization['user_id']),
+            headers=request_parameters.request_headers(organization['user_id'], workspace_role=[common.get_ws_admin_authname(workspace['workspace_id'])]),
             json=agent_user1_data
         )
 
         assert response.status_code == 200
 
         # 作成したagent userの確認
-        # response = connexion_client.get(
-        #     f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/agent-users",
-        #     headers=request_parameters.request_headers(organization['user_id']))
+        response = connexion_client.get(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/agent-users",
+            headers=request_parameters.request_headers(organization['user_id'], workspace_role=[common.get_ws_admin_authname(workspace['workspace_id'])]))
 
-        # assert response.status_code == 200
-        # assert len(response.json["data"]) == 1
-        # assert response.json["data"][0]["username"] == agent_user1_data["username"]
-        # assert response.json["data"][0]["agent_user_type"] == agent_user1_data["agent_user_type"]
-        # assert response.json["data"][0]["description"] == agent_user1_data["description"]
+        assert response.status_code == 200
+        assert len(response.json["data"]) == 1
+        assert response.json["data"][0]["username"] == agent_user1_data["username"]
+        assert response.json["data"][0]["agent_user_type"] == agent_user1_data["agent_user_type"]
+        assert response.json["data"][0]["description"] == agent_user1_data["description"]
 
         # agent userの追加
         agent_user2_data = __post_sample_data('oase-agent-1', const.AGENT_USER_TYPE_OASE)
         response = connexion_client.post(
             f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/agent-users",
-            headers=request_parameters.request_headers(organization['user_id']),
+            headers=request_parameters.request_headers(organization['user_id'], workspace_role=[common.get_ws_admin_authname(workspace['workspace_id'])]),
             json=agent_user2_data
         )
 
         assert response.status_code == 200
 
         # 作成したagent userの確認
-        # response = connexion_client.get(
-        #     f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/agent-users",
-        #     headers=request_parameters.request_headers(organization['user_id']))
+        response = connexion_client.get(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/agent-users",
+            headers=request_parameters.request_headers(organization['user_id'], workspace_role=[common.get_ws_admin_authname(workspace['workspace_id'])]))
 
-        # assert response.status_code == 200
-        # assert len(response.json["data"]) == 2
-        # response_user1_row = [row for row in response.json["data"] if row["username"] == agent_user1_data["username"]]
-        # response_user2_row = [row for row in response.json["data"] if row["username"] == agent_user2_data["username"]]
-        # assert response_user1_row[0]["agent_user_type"] == agent_user1_data["agent_user_type"]
-        # assert response_user1_row[0]["description"] == agent_user1_data["description"]
-        # assert response_user2_row[0]["agent_user_type"] == agent_user2_data["agent_user_type"]
-        # assert response_user2_row[0]["description"] == agent_user2_data["description"]
+        assert response.status_code == 200
+        assert len(response.json["data"]) == 2
+        response_user1_row = [row for row in response.json["data"] if row["username"] == agent_user1_data["username"]]
+        response_user2_row = [row for row in response.json["data"] if row["username"] == agent_user2_data["username"]]
+        assert response_user1_row[0]["agent_user_type"] == agent_user1_data["agent_user_type"]
+        assert response_user1_row[0]["description"] == agent_user1_data["description"]
+        assert response_user2_row[0]["agent_user_type"] == agent_user2_data["agent_user_type"]
+        assert response_user2_row[0]["description"] == agent_user2_data["description"]
+
+        # user1でtokenを発行する
+        response = connexion_client.post(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/agent-users/{response_user1_row[0]['id']}/refresh_tokens",
+            headers=request_parameters.request_headers(organization['user_id'], workspace_role=[common.get_ws_admin_authname(workspace['workspace_id'])]),
+            json={}
+        )
+        assert response.status_code == 200
+        refresh_token = response.json.get("data", {}).get("refresh_token", "")
+        assert refresh_token != ""
+        # jwt decode可能でユーザーが正しいこと
+        assert jwt.decode(refresh_token, options={"verify_signature": False})["sub"] == response_user1_row[0]['id']
 
 
 def test_agent_user_service_validate():
@@ -337,6 +351,59 @@ def test_agent_user_create(connexion_client):
         assert not __exists_user(organization['organization_id'], 'agent_role_mapping_error', token)
 
 
+def test_agent_user_token_create(connexion_client):
+    """test agent_user_token_create
+
+    Args:
+        connexion_client (_type_): _description_
+    """
+    organization = test_common.create_organization(connexion_client)
+    workspace = test_common.create_workspace(connexion_client, organization['organization_id'], 'workspace-01', organization['user_id'])
+
+    #
+    # token発行
+    #
+    db = DBconnector()
+    private = db.get_organization_private(organization['organization_id'])
+
+    token_response = api_keycloak_tokens.service_account_get_token(
+        organization['organization_id'], private.internal_api_client_clientid, private.internal_api_client_secret,
+    )
+    assert token_response.status_code == 200
+    token = json.loads(token_response.text)["access_token"]
+
+    agent_user01 = __make_sample_agent_user(
+        connexion_client,
+        organization['organization_id'],
+        workspace['workspace_id'],
+        organization['user_id'],
+        token,
+        __post_sample_data('test_user01', const.AGENT_USER_TYPE_ANSIBLE))
+
+    agent_user02 = __make_sample_agent_user(
+        connexion_client,
+        organization['organization_id'],
+        workspace['workspace_id'],
+        organization['user_id'],
+        token,
+        __post_sample_data('test_user02', const.AGENT_USER_TYPE_OASE))
+
+    #
+    # case normal
+    #
+    with test_common.requsts_mocker_default():
+        response = connexion_client.post(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/agent-users/{agent_user01['id']}/refresh_tokens",
+            headers=request_parameters.request_headers(organization['user_id'], workspace_role=[common.get_ws_admin_authname(workspace['workspace_id'])]),
+            json={}
+        )
+        assert response.status_code == 200
+        refresh_token = response.json.get("data", {}).get("refresh_token", "")
+        assert refresh_token != ""
+        # jwt decode可能でユーザーが正しいこと
+        assert jwt.decode(refresh_token, options={"verify_signature": False})["sub"] == agent_user01['id']
+
+
 def __exists_user(organization_id, username, token):
     """exist user
 
@@ -380,6 +447,18 @@ def __get_user(organization_id, username, token):
         return json.loads(response.text)
     else:
         raise Exception('Exception: api_keycloak_users.user_get')
+
+
+def __make_sample_agent_user(connexion_client, organization_id, workspace_id, user_id, token, agent_user_json):
+    with test_common.requsts_mocker_default():
+        response = connexion_client.post(
+            f"/api/{organization_id}/platform/workspaces/{workspace_id}/agent-users",
+            headers=request_parameters.request_headers(user_id),
+            json=agent_user_json
+        )
+        assert response.status_code == 200
+
+        return __get_user(organization_id, agent_user_json["username"], token)[0]
 
 
 def __post_sample_data(username, agent_user_type):
