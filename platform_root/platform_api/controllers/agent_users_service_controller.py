@@ -16,6 +16,8 @@ import inspect
 import globals
 import json
 from contextlib import closing
+from flask import request
+import jwt
 
 from common_library.common import common, multi_lang, validation
 from common_library.common import api_keycloak_tokens, api_keycloak_users, api_keycloak_roles, api_keycloak_realms
@@ -23,7 +25,7 @@ from common_library.common.db import DBconnector
 from libs import queries_token
 from common_library.common import check_authority
 
-from common_library.common import bl_agent_user
+from common_library.common import bl_agent_user, bl_token_service
 
 
 @common.platform_exception_handler
@@ -311,7 +313,128 @@ def agent_user_token_create(body, organization_id, workspace_id, user_id):  # no
         Response: HTTP Response
     """
     globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
-    return common.response_200_ok(None)
+
+    private = DBconnector().get_organization_private(organization_id)
+
+    # サービスアカウントのTOKEN取得
+    # Get a service account token
+    token = __get_token(organization_id)
+
+    #
+    # user情報取得
+    #
+    resp_user = api_keycloak_users.user_get_by_id(organization_id, user_id, token)
+    if resp_user.status_code == 404:
+        globals.logger.info(f'agent user not found: {user_id=}')
+        message_id = "400-41007"
+        message = multi_lang.get_text(
+            message_id,
+            "該当のユーザーは存在しません(対象:{0})",
+            user_id
+        )
+        raise common.BadRequestException(message_id=message_id, message=message)
+
+    if resp_user.status_code != 200:
+        globals.logger.error(f'agent user get faild: {user_id=} {resp_user.status_code=} {resp_user.text=}')
+        message_id = "400-41008"
+        message = multi_lang.get_text(
+            message_id,
+            "ユーザー情報の取得に失敗しました(対象:{0})",
+            user_id
+        )
+        raise common.InternalErrorException(message_id=message_id, message=message)
+
+    #
+    # 更新可能なagent userかのチェック / Check updatable  agent user
+    #
+    user = json.loads(resp_user.text)
+    __check_updatable_agent_user(organization_id, workspace_id, user, token)
+
+    #
+    # realm情報取得
+    #
+    resp_realm = api_keycloak_realms.realm_get(organization_id, token)
+    if resp_realm.status_code != 200:
+        globals.logger.error(f"response.status_code:{resp_realm.status_code}")
+        globals.logger.error(f"response.text:{resp_realm.text}")
+        message_id = "400-41004"
+        message = multi_lang.get_text(
+            message_id,
+            "realm情報の取得に失敗しました(対象ID:{0}",
+            organization_id,
+        )
+        raise common.BadRequestException(message_id=message_id, message=message)
+
+    #
+    # 一時パスワード設定
+    #
+    password_set_treis = 10  # パスワード設定を最大試す回数(たまたま、パスワード変更履歴のポリシー有で衝突した場合のため)
+    password_policy = api_keycloak_realms.pickup_password_policy(json.loads(resp_realm.text))
+    password = None
+
+    for try_count in range(password_set_treis):
+        # パスワードポリシーに従ってパスワードを発行する
+        try_password = bl_agent_user.temporary_password(password_policy)
+        resp_passwd = api_keycloak_users.user_reset_password(organization_id, user_id, try_password, token)
+        if resp_passwd.status_code in [200, 204]:
+            globals.logger.debug('password reset succeed')
+            password = try_password
+            break
+        else:
+            globals.logger.debug(f'password reset failed : {try_count=} {try_password=} response.text={resp_passwd.text}')
+
+    if password is None:
+        globals.logger.info(f'agent user password reset failed : {user_id=} {resp_passwd.text}')
+        message_id = "400-41005"
+        message = multi_lang.get_text(
+            message_id,
+            "一時パスワードの設定に失敗しました。パスワードポリシーを確認してください"
+        )
+        raise common.BadRequestException(message_id=message_id, message=message)
+
+    #
+    # token発行
+    #
+    request_token_body = {
+        "client_id": private.api_token_client_clientid,
+        "grant_type": "password",
+        "scope": "openid offline_access",
+        "username": user["username"],
+        "password": password
+    }
+    resp_token = bl_token_service.token_create(organization_id, request_token_body, execute_user_id=request.headers.get("User-Id"))
+    if resp_token.status_code != 200:
+        globals.logger.error(f'agent user generate token failed : {user_id=} {resp_token}')
+        message_id = "400-41006"
+        message = multi_lang.get_text(
+            message_id,
+            "tokenの生成に失敗しました。"
+        )
+        raise common.InternalErrorException(message_id=message_id, message=message)
+
+    refresh_token = json.loads(resp_token.data).get("refresh_token")
+
+    #
+    # refresh tokenの有効期限取得
+    #
+    refresh_token_decode = jwt.decode(refresh_token, options={"verify_signature": False})
+    try:
+        refresh_token_expire = common.keycloak_timestamp_to_datetime(refresh_token_decode['exp'] * 1000)
+    except Exception:
+        refresh_token_expire = None
+
+    #
+    # passwordの消去(失敗は無視)
+    #
+    resp_creds = api_keycloak_users.user_credentials_get(organization_id, user_id, token)
+    if resp_token.status_code == 200:
+        for cred in json.loads(resp_creds.text):
+            api_keycloak_users.user_credentials_delete(organization_id, user_id, cred.get("id"), token)
+
+    return common.response_200_ok({
+        "refresh_token": refresh_token,
+        "refresh_token_expire": refresh_token_expire
+    })
 
 
 @common.platform_exception_handler
@@ -545,3 +668,59 @@ def __get_token_latest_expire_date(private, token, organization_id, realm_info, 
                 token_latest_expire_date = expire_timestamp
 
     return token_latest_expire_date
+
+
+def __check_updatable_agent_user(organization_id, workspace_id, user, token):
+    """agent user更新チェック
+
+    Args:
+        organization_id (str): organization_id
+        workspace_id (str): workspace_id
+        user (dict): keycloak user response json
+        token (str): token
+
+    Raises:
+        common.BadRequestException: parameter error
+        common.InternalErrorException: system error
+    """
+    user_id = user["id"]
+    #
+    # 対象のチェック(agent-userかどうか)
+    #
+    if user.get("attributes", {}).get("agent_user_type", [""])[0] not in bl_agent_user.agent_user_types():
+        globals.logger.info(f'agent user not found: {user_id=}')
+        message_id = "400-41009"
+        message = multi_lang.get_text(
+            message_id,
+            "エージェントユーザーではありません(対象:{0})",
+            user_id
+        )
+        raise common.BadRequestException(message_id=message_id, message=message)
+
+    #
+    # 対象のワークスペースのagent userかチェック
+    #
+    resp_role_map = api_keycloak_roles.get_user_role_mapping(organization_id, user_id, token)
+    if resp_role_map.status_code != 200:
+        globals.logger.error(f'agent user role mapping get faild: {user_id=} {resp_role_map.status_code=} {resp_role_map.text=}')
+        message_id = "400-41010"
+        message = multi_lang.get_text(
+            message_id,
+            "ユーザーのロールの取得に失敗しました(対象:{0})",
+            user_id
+        )
+        raise common.InternalErrorException(message_id=message_id, message=message)
+
+    roles = json.loads(resp_role_map.text).get("clientMappings", {}).get(organization_id, {}).get("mappings", [])
+    if len([role["name"] for role in roles if role["name"] in bl_agent_user.agent_user_roles(workspace_id)]) == 0:
+        # 対象のworkspaceのagent userでない場合
+        globals.logger.info(f'agent user not found workspace: {user_id=} {workspace_id=}')
+        message_id = "400-41007"
+        message = multi_lang.get_text(
+            message_id,
+            "該当のユーザーは存在しません(対象:{0})",
+            f"{workspace_id}/{user_id}"
+        )
+        raise common.BadRequestException(message_id=message_id, message=message)
+
+    return

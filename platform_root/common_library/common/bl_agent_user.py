@@ -12,12 +12,11 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 import json
+import random
+import string
 
 from common_library.common import const
 from common_library.common import api_keycloak_roles, api_keycloak_users
-from common_library.common import common, multi_lang
-
-import globals
 
 
 def agent_user_roles(workspace_id):
@@ -159,3 +158,73 @@ def delete_workspace_agent_users(organization_id, workspace_id, private, token):
                 break
 
             get_first = get_first + get_max
+
+
+def temporary_password(password_policy: dict) -> str:
+    default_length = 20  # デフォルトのパスワード長(policyによって返されるパスワード長は変わります)
+    temporary_password = ""
+
+    if "upperCase" in password_policy:
+        # 英大文字の最低文字数を満たすように英大文字を追加
+        # Add uppercase letters to meet the minimum number of uppercase letters
+        try:
+            temporary_password = temporary_password + ''.join(random.choices(string.ascii_uppercase, k=int(password_policy["upperCase"])))
+        except Exception:
+            pass
+
+    if "lowerCase" in password_policy:
+        # 英小文字の最低文字数を満たすように英小文字を追加
+        # Add lowercase letters to meet the minimum number of lowercase letters
+        try:
+            temporary_password = temporary_password + ''.join(random.choices(string.ascii_lowercase, k=int(password_policy["lowerCase"])))
+        except Exception:
+            pass
+
+    if "digits" in password_policy:
+        # 数字の最低文字数を満たすように数字を追加
+        # Add numbers to meet the minimum number of characters
+        try:
+            temporary_password = temporary_password + ''.join(random.choices(string.digits, k=int(password_policy["digits"])))
+        except Exception:
+            pass
+
+    if "specialChars" in password_policy:
+        # 記号の最低文字数を満たすように記号を追加
+        # Add symbols to meet the minimum number of characters for a symbol
+        try:
+            temporary_password = temporary_password + ''.join(random.choices(string.punctuation, k=int(password_policy["specialChars"])))
+        except Exception:
+            pass
+
+    # パスワードが脆弱にならないように追加でランダム文字列を追加する
+    # Add additional random characters to prevent passwords from becoming weak
+    try:
+        if "maxLength" in password_policy:
+            # max lengthがある場合はmax lengthになる桁数
+            # If there is a max length, the number of characters that will result in that length
+            addtional_length = int(password_policy["maxLength"]) - len(temporary_password)
+
+        elif "length" in password_policy:
+            # 最小文字数がある場合は、デフォルトの桁数未満の時はデフォルトの桁数、デフォルトの桁数以上の場合は指定した最小文字数
+            # If there is a minimum number of characters, use the default number of digits if it is less than the default number of digits,
+            # or the specified minimum number of characters if it is greater than or equal to the default number of digits.
+            if int(password_policy["length"]) < default_length:
+                addtional_length = default_length - len(temporary_password)
+            else:
+                addtional_length = int(password_policy["length"]) - len(temporary_password)
+        else:
+            # 最大・最小文字数の指定が無い場合はデフォルトの桁数
+            # Default number of digits if maximum/minimum number of characters is not specified
+            addtional_length = default_length - len(temporary_password)
+
+        if addtional_length > 0:
+            temporary_password = temporary_password + ''.join(random.choices(string.ascii_letters + string.digits, k=addtional_length))
+    except Exception:
+        pass
+
+    #
+    # 各文字の位置が偏らないように、文字の並びもランダムにシャッフルする
+    #
+    temporary_password = ''.join(random.sample(temporary_password, len(temporary_password)))
+
+    return temporary_password
