@@ -89,8 +89,8 @@ $(function(){
             //
             // sort settings notification destination list
             //
-            const sortKey = 'last_update_timestamp';
-            const sortreverse = -1;
+            const sortKey = 'name';       // 通知先名
+            const sortreverse = 1;      // 昇順
             settings_notifications.sort(function(a, b){
                 const as = a[sortKey].toLowerCase(), bs = b[sortKey].toLowerCase();
                 if ( as < bs ) {
