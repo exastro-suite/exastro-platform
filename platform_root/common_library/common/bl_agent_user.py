@@ -161,7 +161,7 @@ def delete_workspace_agent_users(organization_id, workspace_id, private, token):
 
 
 def temporary_password(password_policy: dict) -> str:
-    default_length = 20  # デフォルトのパスワード長(policyによって返されるパスワード長は変わります)
+    default_length = 30  # デフォルトのパスワード長(policyによって返されるパスワード長は変わります)
     temporary_password = ""
 
     if "upperCase" in password_policy:

@@ -201,7 +201,7 @@ def pickup_password_policy(realm_response_json: dict) -> dict:
     # The passwordPolicy items are included as "length(8) and upperCase(1) ...", so they are processed by dividing them with " and ".
     for policy_item in realm_response_json.get("passwordPolicy", None).split(" and "):
 
-        policy_item_split = re.match(r'^(.+)\((.*\))$', policy_item)
+        policy_item_split = re.match(r'^(.+)\((.*)\)$', policy_item)
         if policy_item_split is None:
             continue
 
