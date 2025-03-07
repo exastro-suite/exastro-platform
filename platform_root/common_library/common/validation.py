@@ -29,6 +29,7 @@ RE_ID_USABLE_CHARACTERS = r'[a-zA-Z0-9_-]'
 RE_ID_USABLE_FIRST_CHARACTER = r'[a-zA-Z]'
 RE_EMAIL_USABLE_CHARACTERS = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
 RE_HOST_CHARACTERS = r'^[a-zA-Z0-9-.]+$'
+RE_USER_DISPLAY_NAME_UNUSABLE_CHARCTERS = r'[!"#$()=^~|{};*<>/?\\[\]]'
 
 ORG_RESERVED_WORDS = [
     {"text": "master", "re": r"^master$"},
@@ -722,6 +723,14 @@ def validate_user_firstName(user_firstName, lang=None):
             str(const.length_user_firstName)
         )
 
+    match = re.search(RE_USER_DISPLAY_NAME_UNUSABLE_CHARCTERS, user_firstName)
+    if match:
+        return result(
+            False, 400, '400-{}013'.format(MSG_FUNCTION_ID), '指定できない文字が含まれています。(項目:{0},指定できない文字:{1})',
+            multi_lang.get_text('000-00130', "名") if lang is None else multi_lang.get_text_spec(lang, '000-00130', "名"),
+            match.group()
+        )
+
     return result(True)
 
 
@@ -742,6 +751,14 @@ def validate_user_lastName(user_lastName, lang=None):
             False, 400, '400-{}012'.format(MSG_FUNCTION_ID), '指定可能な文字数を超えています。(項目:{0},最大文字数:{1})',
             multi_lang.get_text('000-00131', "姓") if lang is None else multi_lang.get_text_spec(lang, '000-00131', "姓"),
             str(const.length_user_lastName)
+        )
+
+    match = re.search(RE_USER_DISPLAY_NAME_UNUSABLE_CHARCTERS, user_lastName)
+    if match:
+        return result(
+            False, 400, '400-{}013'.format(MSG_FUNCTION_ID), '指定できない文字が含まれています。(項目:{0},指定できない文字:{1})',
+            multi_lang.get_text('000-00131', "姓") if lang is None else multi_lang.get_text_spec(lang, '000-00131', "姓"),
+            match.group()
         )
 
     return result(True)
