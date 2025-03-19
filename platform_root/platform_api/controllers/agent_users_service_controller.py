@@ -195,6 +195,75 @@ def agent_user_delete(organization_id, workspace_id, user_id):  # noqa: E501
     """
     globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
 
+    # private = DBconnector().get_organization_private(organization_id)
+    
+    # サービスアカウントのTOKEN取得
+    # Get a service account token
+    token = __get_token(organization_id)
+    
+    # 削除前のユーザー情報の取得
+    # Get user information before update
+    response = api_keycloak_users.user_get_by_id(realm_name=organization_id, user_id=user_id, token=token)
+    if response.status_code == 404:
+        globals.logger.debug(f"response:{response.text}")
+        message_id = "404-25001"
+        message = multi_lang.get_text(
+            message_id,
+            "指定されたユーザーは存在していません。")
+
+        raise common.NotFoundException(message_id=message_id, message=message)
+    
+    elif response.status_code != 200:
+        globals.logger.error(f"response.status_code:{response.status_code}")
+        globals.logger.error(f"response.text:{response.text}")
+        message_id = "500-25001"
+        message = multi_lang.get_text(
+            message_id,
+            "ユーザーの取得に失敗しました(対象ID:{0})",
+            organization_id,
+        )
+        raise common.InternalErrorException(message_id=message_id, message=message)
+
+    # エージェントユーザーチェック
+    # Check updatable agent user
+    user = json.loads(response.text)
+    __check_updatable_agent_user(organization_id, workspace_id, user, token)
+    globals.logger.debug(f"response user:{user}")
+
+    # ユーザー削除
+    # Delete agent user
+    response = api_keycloak_users.user_delete(
+        realm_name=organization_id, user_id=user_id, token=token
+    )
+    
+    if response.status_code == 404:
+        globals.logger.debug(f"response:{response.text}")
+        message_id = "404-25001"
+        message = multi_lang.get_text(
+            message_id,
+            "指定されたユーザーが存在しません")
+
+        raise common.NotFoundException(message_id=message_id, message=message)
+    elif response.status_code == 400:
+        globals.logger.debug(f"response:{response.text}")
+        message_id = "400-25003"
+        message = multi_lang.get_text(
+            message_id,
+            "ユーザー削除に失敗しました(対象ユーザーID:{0})",
+            user_id)
+        raise common.BadRequestException(message_id=message_id, message=message)
+
+    elif response.status_code != 204:
+        globals.logger.debug(f"response:{response.text}")
+        message_id = "500-25003"
+        message = multi_lang.get_text(
+            message_id,
+            "ユーザー削除に失敗しました(対象ユーザーID:{0})[{1}]",
+            user_id,
+            json.loads(response.text)["errorMessage"])
+
+        raise common.InternalErrorException(message_id=message_id, message=message)
+
     return common.response_200_ok(None)
 
 
@@ -450,6 +519,47 @@ def agent_user_token_delete(organization_id, workspace_id, user_id):  # noqa: E5
         Response: HTTP Response
     """
     globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
+    
+    # ログインユーザーの情報を取得
+    # Get login user information
+    user_id = request.headers.get("user_id")
+    
+    # サービスアカウントのTOKEN取得
+    # Get a service account token
+    token = __get_token(organization_id)
+
+    private = DBconnector().get_organization_private(organization_id)
+
+    # call keycloak token api
+    response = api_keycloak_tokens.offline_sessions_delete(organization_id, user_id, private.api_token_client_clientid, token)
+
+    if response.status_code not in [200, 204, 404]:
+        globals.logger.error(f"response.status_code:{response.status_code}")
+        globals.logger.error(f"response.text:{response.text}")
+        message_id = "500-30001"
+        message = multi_lang.get_text(
+            message_id,
+            "offline sessionの削除に失敗しました(対象ID:{0} user:{1} client:{2})",
+            organization_id,
+            user_id,
+            private.api_token_client_clientid,
+        )
+        raise common.InternalErrorException(message_id=message_id, message=message)
+
+    # When the token is successfully deleted - tokenの削除に成功した時
+    # Delete refresh_token information - refresh_tokenの情報を削除する
+
+    # delete T_REFRESH_TOKEN - T_REFRESH_TOKENを削除
+    with closing(DBconnector().connect_orgdb(organization_id)) as conn:
+        with conn.cursor() as cursor:
+            parameter = {
+                "user_id": user_id
+            }
+            where = "WHERE USER_ID = %(user_id)s"
+            cursor.execute(queries_token.SQL_DELETE_REFRESH_TOKEN + where, parameter)
+
+            conn.commit()
+
     return common.response_200_ok(None)
 
 
@@ -483,6 +593,88 @@ def agent_user_update(body, organization_id, workspace_id, user_id):  # noqa: E5
         Response: HTTP Response
     """
     globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
+    
+    # request body
+    body = connexion.request.get_json()
+    if not body:
+        raise common.BadRequestException(
+            message_id='400-00002', message='リクエストボディのパラメータ({})が不正です。'.format('Json')
+        )
+    
+    user_description = body.get("description")
+    
+    # validation check
+    validate = validation.validate_user_description(user_description)
+    if not validate.ok:
+        return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
+
+    # private = DBconnector().get_organization_private(organization_id)
+
+    # サービスアカウントのTOKEN取得
+    # Get a service account token
+    token = __get_token(organization_id)
+
+    # 更新前のユーザー情報の取得
+    # Get user information before update
+    response = api_keycloak_users.user_get_by_id(realm_name=organization_id, user_id=user_id, token=token)
+    if response.status_code == 404:
+        globals.logger.debug(f"response:{response.text}")
+        message_id = "404-25001"
+        message = multi_lang.get_text(
+            message_id,
+            "指定されたユーザーは存在していません。")
+
+        raise common.NotFoundException(message_id=message_id, message=message)
+    
+    elif response.status_code != 200:
+        globals.logger.error(f"response.status_code:{response.status_code}")
+        globals.logger.error(f"response.text:{response.text}")
+        message_id = "500-25001"
+        message = multi_lang.get_text(
+            message_id,
+            "ユーザーの取得に失敗しました(対象ID:{0})",
+            organization_id,
+        )
+        raise common.InternalErrorException(message_id=message_id, message=message)
+
+    user = json.loads(response.text)
+    __check_updatable_agent_user(organization_id, workspace_id, user, token)
+    globals.logger.debug(f"response user:{user}")
+    
+    # ユーザー更新
+    # update user
+    user["attributes"]["description"] = user_description
+
+    u_update = api_keycloak_users.user_update(
+        realm_name=organization_id, user_id=user_id, user_json=user, token=token
+    )
+    if u_update.status_code == 404:
+        globals.logger.debug(f"response:{u_update.text}")
+        message_id = "404-25001"
+        message = multi_lang.get_text(
+            message_id,
+            "指定されたユーザーは存在していません。")
+        raise common.NotFoundException(message_id=message_id, message=message)
+
+    elif u_update.status_code == 400:
+        globals.logger.debug(f"response:{u_update.text}")
+        message_id = "400-25004"
+        message = multi_lang.get_text(
+            message_id,
+            "ユーザー更新に失敗しました({0})",
+            common.get_response_error_message(u_update.text))
+        raise common.BadRequestException(message_id=message_id, message=message)
+
+    elif u_update.status_code not in [200, 204]:
+        globals.logger.debug(f"response:{u_update.text}")
+        message_id = "500-25004"
+        message = multi_lang.get_text(
+            message_id,
+            "ユーザー更新に失敗しました(対象ユーザーID:{0})[{1}]",
+            user_id,
+            json.loads(u_update.text)["errorMessage"])
+        raise common.InternalErrorException(message_id=message_id, message=message)
+
     return common.response_200_ok(None)
 
 
@@ -499,7 +691,72 @@ def get_agent_user(organization_id, workspace_id, user_id):  # noqa: E501
         Response: HTTP Response
     """
     globals.logger.debug(f"### func:{inspect.currentframe().f_code.co_name}")
-    return common.response_200_ok(None)
+        
+    private = DBconnector().get_organization_private(organization_id)
+    
+    # サービスアカウントのTOKEN取得
+    # Get a service account token
+    token = __get_token(organization_id)
+
+    # user 情報取得
+    # user get to keycloak
+    response = api_keycloak_users.user_get_by_id(realm_name=organization_id, user_id=user_id, token=token)
+    if response.status_code == 404:
+        globals.logger.debug(f"response:{response.text}")
+        message_id = "404-25001"
+        message = multi_lang.get_text(
+            message_id,
+            "指定されたユーザーは存在していません。")
+
+        raise common.NotFoundException(message_id=message_id, message=message)
+    
+    elif response.status_code != 200:
+        globals.logger.error(f"response.status_code:{response.status_code}")
+        globals.logger.error(f"response.text:{response.text}")
+        message_id = "500-25001"
+        message = multi_lang.get_text(
+            message_id,
+            "ユーザーの取得に失敗しました(対象ID:{0})",
+            organization_id,
+        )
+        raise common.InternalErrorException(message_id=message_id, message=message)
+
+    user = json.loads(response.text)
+    __check_updatable_agent_user(organization_id, workspace_id, user, token)
+    globals.logger.debug(f"response user:{user}")
+
+    # realm info の取得
+    # get realm info
+    response = api_keycloak_realms.realm_get(organization_id, token)
+    if response.status_code != 200:
+        globals.logger.error(f"response.status_code:{response.status_code}")
+        globals.logger.error(f"response.text:{response.text}")
+        message_id = "400-41004"
+        message = multi_lang.get_text(
+            message_id,
+            "realm情報の取得に失敗しました(対象ID:{0}",
+            organization_id,
+        )
+        raise common.BadRequestException(message_id=message_id, message=message)
+
+    realm_info = json.loads(response.text)
+    
+    # get token_latest_expire_date
+    token_latest_expire_date = __get_token_latest_expire_date(private, token, organization_id, realm_info, user_id)
+
+    ret_user = {
+        "id": user["id"],
+        "username": user.get("username", ""),
+        "agent_user_type": user.get("attributes", {}).get("agent_user_type", [None])[0],
+        "description": user.get("attributes", {}).get("description", [""])[0],
+        "token_latest_expire_date": common.datetime_to_str(token_latest_expire_date)
+    }
+
+    globals.logger.debug(f"ret_user:{ret_user}")
+
+    globals.logger.info(f"### Succeed func:{inspect.currentframe().f_code.co_name}")
+
+    return common.response_200_ok(ret_user)
 
 
 def __get_token(organization_id):

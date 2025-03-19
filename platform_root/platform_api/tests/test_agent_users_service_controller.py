@@ -12,7 +12,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-import copy
+# import copy
 import re
 import requests_mock
 import json
@@ -26,6 +26,7 @@ from common_library.common import bl_agent_user
 from common_library.common.db import DBconnector
 
 from tests.test_user_service_controller import sample_data_user
+from tests.test_user_service_controller import sample_data_put_user
 
 
 def test_agent_user_service_api(connexion_client):
@@ -351,6 +352,710 @@ def test_agent_user_create(connexion_client):
         )
         assert response.status_code == 500
         assert not __exists_user(organization['organization_id'], 'agent_role_mapping_error', token)
+
+
+def test_agent_user_get(connexion_client):
+    """agent user get api test
+
+    Args:
+        connexion_client (_type_): _description_
+    """
+    organization = test_common.create_organization(connexion_client)
+    workspace = test_common.create_workspace(connexion_client, organization['organization_id'], 'workspace-01', organization['user_id'])
+    
+    #
+    # case : normal
+    #
+    with test_common.requsts_mocker_default():
+        # 登録データ
+        post_agent_user = sample_data_agent_user("test-user1", const.AGENT_USER_TYPE_ANSIBLE)
+        
+        # User登録
+        response = connexion_client.post(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/agent-users",
+            headers=request_parameters.request_headers(organization['user_id']),
+            json=post_agent_user
+        )
+        assert response.status_code == 200
+        
+        # Userデータの取得(idの取得)
+        response = connexion_client.get(
+            f"/api/{organization['organization_id']}/platform/users?search={post_agent_user['username']}",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization["user_id"]))
+        
+        posted_agent_user = response.json["data"][0]
+        
+        # 登録データの取得
+        response = connexion_client.get(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/agent-users/{posted_agent_user['id']}",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization["user_id"]))
+        
+        assert response.status_code == 200
+        posted_agent_user = response.json["data"]
+        assert posted_agent_user["username"] == post_agent_user["username"]
+        assert posted_agent_user["agent_user_type"] == post_agent_user["agent_user_type"]
+        assert posted_agent_user["description"] == post_agent_user["description"]
+
+    #
+    # case : get token error
+    #
+    with test_common.requsts_mocker_default() as requests_mocker:
+        # token取得失敗
+        requests_mocker.register_uri(
+            requests_mock.POST,
+            re.compile(rf'^{test_common.keycloak_origin()}/auth/realms/{organization["organization_id"]}/protocol/openid-connect/token'),
+            status_code=500,
+            json={})
+        
+        # 登録データの取得
+        response = connexion_client.get(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/agent-users/{posted_agent_user['id']}",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization["user_id"]))
+        
+        assert response.status_code == 401
+
+    #
+    # case : not exists agent user
+    #
+    with test_common.requsts_mocker_default():
+        response = connexion_client.get(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/agent-users/xxxx",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization['user_id'], workspace_role=[common.get_ws_admin_authname(workspace['workspace_id'])]),
+            json={}
+        )
+        assert response.status_code == 404
+
+    #
+    # case : get user failed
+    #
+    with test_common.requsts_mocker_default() as requests_mocker:
+        # user取得失敗
+        requests_mocker.register_uri(
+            requests_mock.GET,
+            re.compile(rf'^{test_common.keycloak_origin()}/auth/admin/realms/{organization["organization_id"]}/users/.*'),
+            status_code=500,
+            json={})
+
+        # データの取得
+        response = connexion_client.get(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/agent-users/{posted_agent_user['id']}",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization["user_id"]))
+
+        assert response.status_code == 500
+
+    #
+    # case : get realm info failed
+    #
+    with test_common.requsts_mocker_default() as requests_mocker:
+        requests_mocker.register_uri(
+            requests_mock.GET,
+            re.compile(rf'^{test_common.keycloak_origin()}/auth/admin/realms/{organization["organization_id"]}$'),
+            status_code=500,
+            json={})
+
+        response = connexion_client.post(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/agent-users/{posted_agent_user['id']}/refresh_tokens",
+            headers=request_parameters.request_headers(organization['user_id'], workspace_role=[common.get_ws_admin_authname(workspace['workspace_id'])]),
+            json={}
+        )
+        assert response.status_code == 400
+
+
+def test_agent_user_update(connexion_client):
+    """agent user update api test
+
+    Args:
+        connexion_client (_type_): _description_
+    """
+    organization = test_common.create_organization(connexion_client)
+    workspace = test_common.create_workspace(connexion_client, organization['organization_id'], 'workspace-01', organization['user_id'])
+
+    #
+    # case : normal
+    #
+    with test_common.requsts_mocker_default():
+        # 登録データ
+        post_agent_user = sample_data_agent_user("test-user1", const.AGENT_USER_TYPE_ANSIBLE)
+        
+        # User登録
+        response = connexion_client.post(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/agent-users",
+            headers=request_parameters.request_headers(organization['user_id']),
+            json=post_agent_user
+        )
+        assert response.status_code == 200
+        
+        # Userデータの取得(idの取得)
+        response = connexion_client.get(
+            f"/api/{organization['organization_id']}/platform/users?search={post_agent_user['username']}",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization["user_id"]))
+        
+        posted_agent_user = response.json["data"][0]
+        
+        # 登録データの取得
+        response = connexion_client.get(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/agent-users/{posted_agent_user['id']}",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization["user_id"]))
+        
+        assert response.status_code == 200
+        posted_agent_user = response.json["data"]
+
+        # 更新データ
+        put_agent_user = sample_data_put_agent_user(post_agent_user)
+
+        # Userデータの更新
+        response = connexion_client.put(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/agent-users/{posted_agent_user['id']}",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization['user_id']),
+            json=put_agent_user
+        )
+        
+        assert response.status_code == 200
+        
+        # 更新データの取得
+        response = connexion_client.get(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/agent-users/{posted_agent_user['id']}",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization["user_id"]))
+        
+        assert response.status_code == 200
+        updated_agent_user = response.json["data"]
+        posted_agent_user = response.json["data"]
+        assert updated_agent_user["description"] == put_agent_user["description"]
+
+    #
+    # case : not json body
+    #
+    with test_common.requsts_mocker_default():
+        # JSONでないbodyで更新
+        response = connexion_client.put(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/agent-users/{posted_agent_user['id']}",
+            # content_type='application/json',
+            headers=request_parameters.request_headers(organization["user_id"]),
+            data="dummy-data"
+        )
+
+        # connexionでhttp-415応答
+        assert response.status_code >= 400 or response.status_code <= 490
+
+    #
+    # case : Validation Error
+    #
+    with test_common.requsts_mocker_default() as requests_mocker:
+        # description
+        response = connexion_client.put(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/agent-users/{posted_agent_user['id']}",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization["user_id"]),
+            json={**put_agent_user, **{"description": "t".ljust(const.length_user_description + 1, "_")}}
+        )
+
+        assert response.status_code == 400
+
+    #
+    # case : get token error
+    #
+    with test_common.requsts_mocker_default() as requests_mocker:
+        # token取得失敗
+        requests_mocker.register_uri(
+            requests_mock.POST,
+            re.compile(rf'^{test_common.keycloak_origin()}/auth/realms/{organization["organization_id"]}/protocol/openid-connect/token'),
+            status_code=500,
+            json={})
+        
+        # Userデータの更新
+        response = connexion_client.put(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/agent-users/{posted_agent_user['id']}",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization['user_id']),
+            json=put_agent_user
+        )
+        
+        assert response.status_code == 401
+
+    #
+    # case : not exists agent user
+    #
+    with test_common.requsts_mocker_default():
+        response = connexion_client.get(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/agent-users/xxxx",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization['user_id'], workspace_role=[common.get_ws_admin_authname(workspace['workspace_id'])]),
+            json={}
+        )
+        assert response.status_code == 404
+
+    #
+    # case : get agent user failed
+    #
+    with test_common.requsts_mocker_default() as requests_mocker:
+        # user取得失敗
+        requests_mocker.register_uri(
+            requests_mock.GET,
+            re.compile(rf'^{test_common.keycloak_origin()}/auth/admin/realms/{organization["organization_id"]}/users/.*'),
+            status_code=500,
+            json={})
+        
+        # データの取得
+        response = connexion_client.get(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/agent-users/{posted_agent_user['id']}",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization["user_id"]))
+
+        assert response.status_code == 500
+
+    #
+    # case : not updatable agent user
+    #
+    with test_common.requsts_mocker_default() as requests_mocker:
+        # 登録データ
+        post_user = sample_data_user("test-user2")
+        
+        # User登録（エージェントユーザーでない）
+        response = connexion_client.post(
+            f"/api/{organization['organization_id']}/platform/users",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization['user_id']),
+            json=post_user
+        )
+        assert response.status_code == 200
+        
+        # Userデータの取得(idの取得)
+        response = connexion_client.get(
+            f"/api/{organization['organization_id']}/platform/users?search={post_user['username']}",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization["user_id"]))
+        
+        posted_user = response.json["data"][0]
+        
+        # Userデータの更新
+        put_user = sample_data_put_user(post_user)
+
+        response = connexion_client.put(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/agent-users/{posted_user['id']}",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization['user_id']),
+            json=put_user
+        )
+        
+        assert response.status_code == 400
+
+    #
+    # case : get user role failed
+    #
+    with test_common.requsts_mocker_default() as requests_mocker:
+        # role取得失敗
+        requests_mocker.register_uri(
+            requests_mock.GET,
+            re.compile(rf'^{test_common.keycloak_origin()}/auth/admin/realms/{organization["organization_id"]}/users/.*/role-mappings'),
+            status_code=500,
+            json={})
+
+        response = connexion_client.put(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/agent-users/{posted_agent_user['id']}",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization['user_id']),
+            json=put_agent_user
+        )
+
+        assert response.status_code == 500
+
+    #
+    # case : not exist agent user in the target workspace
+    #
+    with test_common.requsts_mocker_default() as requests_mocker:
+        # 対象のworkspaceのagent userでない
+        # ユーザー登録
+        # 登録データ
+        workspace2 = test_common.create_workspace(connexion_client, organization['organization_id'], 'workspace-02', organization['user_id'])
+        post_agent_user2 = sample_data_agent_user("test-agent-user2", const.AGENT_USER_TYPE_ANSIBLE)
+        
+        # User登録
+        response = connexion_client.post(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace2['workspace_id']}/agent-users",
+            headers=request_parameters.request_headers(organization['user_id']),
+            json=post_agent_user2
+        )
+        assert response.status_code == 200
+        
+        # Userデータの取得(idの取得)
+        response = connexion_client.get(
+            f"/api/{organization['organization_id']}/platform/users?search={post_agent_user2['username']}",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization["user_id"]))
+        
+        posted_agent_user2 = response.json["data"][0]
+
+        # Userデータの更新
+        put_user2 = sample_data_put_agent_user(post_agent_user2)
+
+        response = connexion_client.put(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/agent-users/{posted_agent_user2['id']}",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization['user_id']),
+            json=put_user2
+        )
+        
+        assert response.status_code == 400
+
+    #
+    # case : update not exists agent user
+    #
+    with test_common.requsts_mocker_default():
+        # 存在しないユーザーを更新
+        response = connexion_client.put(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/agent-users/xxxx",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization['user_id']),
+            json=put_agent_user
+        )
+
+        assert response.status_code == 404
+
+    #
+    # case : update agent user failed(404)
+    #
+    with test_common.requsts_mocker_default() as requests_mocker:
+        # ユーザー更新失敗(404)
+        requests_mocker.register_uri(
+            requests_mock.PUT,
+            re.compile(rf'^{test_common.keycloak_origin()}/auth/admin/realms/{organization["organization_id"]}/users/{posted_agent_user["id"]}'),
+            status_code=404,
+            json={}
+        )
+        
+        # ユーザーの更新
+        response = connexion_client.put(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/agent-users/{posted_agent_user['id']}",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization["user_id"]),
+            json=put_agent_user
+        )
+        
+        assert response.status_code == 404
+
+    #
+    # case : update agent user failed(400)
+    #
+    with test_common.requsts_mocker_default() as requests_mocker:
+        # ユーザー更新失敗(400)
+        requests_mocker.register_uri(
+            requests_mock.PUT,
+            re.compile(rf'^{test_common.keycloak_origin()}/auth/admin/realms/{organization["organization_id"]}/users/{posted_agent_user["id"]}'),
+            status_code=400,
+            json={}
+        )
+        
+        # ユーザーの更新
+        response = connexion_client.put(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/agent-users/{posted_agent_user['id']}",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization["user_id"]),
+            json=put_agent_user
+        )
+        
+        assert response.status_code == 400
+
+    #
+    # case : update agent user failed(500)
+    #
+    with test_common.requsts_mocker_default() as requests_mocker:
+        # ユーザー更新失敗(500)
+        requests_mocker.register_uri(
+            requests_mock.PUT,
+            re.compile(rf'^{test_common.keycloak_origin()}/auth/admin/realms/{organization["organization_id"]}/users/{posted_agent_user["id"]}'),
+            status_code=500,
+            json={}
+        )
+        
+        # ユーザーの更新
+        response = connexion_client.put(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/agent-users/{posted_agent_user['id']}",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization["user_id"]),
+            json=put_agent_user
+        )
+        
+        assert response.status_code == 500
+
+
+def test_agent_user_delete(connexion_client):
+    """agent user delete api test
+
+    Args:
+        connexion_client (_type_): _description_
+    """
+    organization = test_common.create_organization(connexion_client)
+    workspace = test_common.create_workspace(connexion_client, organization['organization_id'], 'workspace-01', organization['user_id'])
+    
+    #
+    # Agent User登録
+    #
+    with test_common.requsts_mocker_default():
+        # 登録データ
+        post_agent_user = sample_data_agent_user("test-user1", const.AGENT_USER_TYPE_ANSIBLE)
+        
+        # Agent User登録
+        response = connexion_client.post(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/agent-users",
+            headers=request_parameters.request_headers(organization['user_id']),
+            json=post_agent_user
+        )
+        assert response.status_code == 200
+        
+        # Agent Userデータの取得(idの取得)
+        response = connexion_client.get(
+            f"/api/{organization['organization_id']}/platform/users?search={post_agent_user['username']}",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization["user_id"]))
+        
+        posted_agent_user = response.json["data"][0]
+
+    #
+    # case : get token error
+    #
+    with test_common.requsts_mocker_default() as requests_mocker:
+        # token取得失敗
+        requests_mocker.register_uri(
+            requests_mock.POST,
+            re.compile(rf'^{test_common.keycloak_origin()}/auth/realms/{organization["organization_id"]}/protocol/openid-connect/token'),
+            status_code=500,
+            json={})
+        
+        # Agent Agent Userデータの削除
+        response = connexion_client.delete(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/agent-users/{posted_agent_user['id']}",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization['user_id']),
+            json=posted_agent_user
+        )
+
+        assert response.status_code == 401
+
+    #
+    # case : not exists agent user
+    #
+    with test_common.requsts_mocker_default():
+        # Agent Userデータの削除
+        response = connexion_client.delete(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/agent-users/xxxx",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization['user_id'], workspace_role=[common.get_ws_admin_authname(workspace['workspace_id'])]),
+            json={}
+        )
+        assert response.status_code == 404
+
+    #
+    # case : get user failed
+    #
+    with test_common.requsts_mocker_default() as requests_mocker:
+        # Agent user取得失敗
+        requests_mocker.register_uri(
+            requests_mock.GET,
+            re.compile(rf'^{test_common.keycloak_origin()}/auth/admin/realms/{organization["organization_id"]}/users/.*'),
+            status_code=500,
+            json={})
+        
+        # Agent Userデータの削除
+        response = connexion_client.delete(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/agent-users/xxxx",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization['user_id'], workspace_role=[common.get_ws_admin_authname(workspace['workspace_id'])]),
+            json=posted_agent_user
+        )
+
+        assert response.status_code == 500
+
+    #
+    # case : not updatable agent user
+    #
+    with test_common.requsts_mocker_default() as requests_mocker:
+        # 登録データ
+        post_user = sample_data_user("test-user2")
+        
+        # User登録（エージェントユーザーでない）
+        response = connexion_client.post(
+            f"/api/{organization['organization_id']}/platform/users",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization['user_id']),
+            json=post_user
+        )
+        assert response.status_code == 200
+        
+        # Userデータの取得(idの取得)
+        response = connexion_client.get(
+            f"/api/{organization['organization_id']}/platform/users?search={post_user['username']}",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization["user_id"]))
+        
+        posted_user = response.json["data"][0]
+        
+        # Userデータの削除
+        response = connexion_client.delete(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/agent-users/{posted_user['id']}",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization['user_id']),
+            json=posted_user
+        )
+        
+        assert response.status_code == 400
+
+    #
+    # case : get user role failed
+    #
+    with test_common.requsts_mocker_default() as requests_mocker:
+        # role取得失敗
+        requests_mocker.register_uri(
+            requests_mock.GET,
+            re.compile(rf'^{test_common.keycloak_origin()}/auth/admin/realms/{organization["organization_id"]}/users/.*/role-mappings'),
+            status_code=500,
+            json={})
+
+        response = connexion_client.delete(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/agent-users/{posted_agent_user['id']}",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization['user_id']),
+            json=posted_agent_user
+        )
+
+        assert response.status_code == 500
+
+    #
+    # case : not exist agent user in the target workspace
+    #
+    with test_common.requsts_mocker_default() as requests_mocker:
+        # 対象のworkspaceのagent userでない
+        # ユーザー登録
+        # 登録データ
+        workspace2 = test_common.create_workspace(connexion_client, organization['organization_id'], 'workspace-02', organization['user_id'])
+        post_agent_user2 = sample_data_agent_user("test-agent-user2", const.AGENT_USER_TYPE_ANSIBLE)
+        
+        # Agent User登録
+        response = connexion_client.post(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace2['workspace_id']}/agent-users",
+            headers=request_parameters.request_headers(organization['user_id']),
+            json=post_agent_user2
+        )
+        assert response.status_code == 200
+        
+        # Agent Userデータの取得(idの取得)
+        response = connexion_client.get(
+            f"/api/{organization['organization_id']}/platform/users?search={post_agent_user2['username']}",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization["user_id"]))
+        
+        posted_agent_user2 = response.json["data"][0]
+
+        # Agent Userデータの削除
+        response = connexion_client.delete(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/agent-users/{posted_agent_user2['id']}",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization['user_id']),
+            json=posted_agent_user2
+        )
+        
+        assert response.status_code == 400
+
+    #
+    # case : delete not exists agent user
+    #
+    with test_common.requsts_mocker_default():
+        # 存在しないユーザーを削除
+        response = connexion_client.delete(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/agent-users/xxxx",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization["user_id"]),
+            json=posted_agent_user
+        )
+
+        assert response.status_code == 404
+
+    #
+    # case : update agent user failed(404)
+    #
+    with test_common.requsts_mocker_default() as requests_mocker:
+        # ユーザー削除失敗(404)
+        requests_mocker.register_uri(
+            requests_mock.DELETE,
+            re.compile(rf'^{test_common.keycloak_origin()}/auth/admin/realms/{organization["organization_id"]}/users/{posted_agent_user["id"]}'),
+            status_code=404,
+            json={}
+        )
+        
+        # ユーザーの削除
+        response = connexion_client.delete(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/agent-users/{posted_agent_user['id']}",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization["user_id"]),
+            json=posted_agent_user
+        )
+        
+        assert response.status_code == 404
+
+    #
+    # case : update agent user failed(400)
+    #
+    with test_common.requsts_mocker_default() as requests_mocker:
+        # ユーザー削除失敗(400)
+        requests_mocker.register_uri(
+            requests_mock.DELETE,
+            re.compile(rf'^{test_common.keycloak_origin()}/auth/admin/realms/{organization["organization_id"]}/users/{posted_agent_user["id"]}'),
+            status_code=400,
+            json={}
+        )
+        
+        # ユーザーの削除
+        response = connexion_client.delete(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/agent-users/{posted_agent_user['id']}",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization["user_id"]),
+            json=posted_agent_user
+        )
+        
+        assert response.status_code == 400
+
+    #
+    # case : delete agent user failed(500)
+    #
+    with test_common.requsts_mocker_default() as requests_mocker:
+        # ユーザー削除失敗(500)
+        requests_mocker.register_uri(
+            requests_mock.DELETE,
+            re.compile(rf'^{test_common.keycloak_origin()}/auth/admin/realms/{organization["organization_id"]}/users/{posted_agent_user["id"]}'),
+            status_code=500,
+            json={}
+        )
+        
+        # ユーザーの削除
+        response = connexion_client.delete(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/agent-users/{posted_agent_user['id']}",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization["user_id"]),
+            json=posted_agent_user
+        )
+        
+        assert response.status_code == 500
+
+    #
+    # case : normal
+    #
+    with test_common.requsts_mocker_default():
+        # Userデータの削除
+        response = connexion_client.delete(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/agent-users/{posted_agent_user['id']}",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization["user_id"])
+        )
+
+        assert response.status_code == 200
 
 
 def test_agent_user_token_create(connexion_client):
@@ -827,3 +1532,10 @@ def sample_data_agent_user(username, agent_user_type):
         "agent_user_type": agent_user_type,
         "description": f"description {username}"
     }
+
+
+def sample_data_put_agent_user(post_user):
+    return {
+        "description": f'{post_user["description"]} upd',
+    }
+
