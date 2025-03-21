@@ -1263,6 +1263,94 @@ def test_agent_user_token_create(connexion_client):
         assert response.status_code == 500
 
 
+def test_agent_user_token_delete(connexion_client):
+    """test agent_user_token_delete
+
+    Args:
+        connexion_client (_type_): _description_
+    """
+    organization = test_common.create_organization(connexion_client)
+    workspace = test_common.create_workspace(connexion_client, organization['organization_id'], 'workspace-01', organization['user_id'])
+
+    #
+    # token発行
+    #
+    db = DBconnector()
+    private = db.get_organization_private(organization['organization_id'])
+
+    token_response = api_keycloak_tokens.service_account_get_token(
+        organization['organization_id'], private.internal_api_client_clientid, private.internal_api_client_secret,
+    )
+    assert token_response.status_code == 200
+    token = json.loads(token_response.text)["access_token"]
+    
+    agent_user01 = __make_sample_agent_user(
+        connexion_client,
+        organization['organization_id'],
+        workspace['workspace_id'],
+        organization['user_id'],
+        token,
+        sample_data_agent_user('test_user01', const.AGENT_USER_TYPE_ANSIBLE))
+    # token作成
+    response = connexion_client.post(
+        f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/agent-users/{agent_user01['id']}/refresh_tokens",
+        headers=request_parameters.request_headers(organization['user_id'], workspace_role=[common.get_ws_admin_authname(workspace['workspace_id'])]),
+        json={}
+    )
+    assert response.status_code == 200
+    refresh_token = response.json.get("data", {}).get("refresh_token", "")
+    assert refresh_token != ""
+
+    #
+    # case : normal
+    #
+    with test_common.requsts_mocker_default():
+
+        # token削除
+        response = connexion_client.delete(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/agent-users/{agent_user01['id']}/refresh_tokens",
+            headers=request_parameters.request_headers(organization['user_id'], workspace_role=[common.get_ws_admin_authname(workspace['workspace_id'])])
+        )
+        assert response.status_code == 200
+        refresh_token = response.json.get("data", {})
+        assert refresh_token is None
+
+    #
+    # case : get token error
+    #
+    with test_common.requsts_mocker_default() as requests_mocker:
+        # Get a service account token error
+        requests_mocker.register_uri(
+            requests_mock.POST,
+            re.compile(rf'^{test_common.keycloak_origin()}/auth/realms/{organization["organization_id"]}/protocol/openid-connect/token'),
+            status_code=500,
+            json={})
+
+        response = connexion_client.delete(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/agent-users/{agent_user01['id']}/refresh_tokens",
+            headers=request_parameters.request_headers(organization['user_id'], workspace_role=[common.get_ws_admin_authname(workspace['workspace_id'])])
+        )
+        assert response.status_code == 401
+
+    #
+    # case : offline sessionの削除に失敗
+    #
+    with test_common.requsts_mocker_default() as requests_mocker:
+        # faild keycloak api offline_sessions_delete
+        requests_mocker.register_uri(
+            requests_mock.DELETE,
+            re.compile(rf'^{test_common.keycloak_origin()}/auth/admin/realms/{organization["organization_id"]}/users/.*/consents/.*'),
+            status_code=500,
+            json={})
+        
+        response = connexion_client.delete(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/agent-users/{agent_user01['id']}/refresh_tokens",
+            headers=request_parameters.request_headers(organization['user_id'], workspace_role=[common.get_ws_admin_authname(workspace['workspace_id'])])
+        )
+        
+        assert response.status_code == 500
+
+
 def test_temporary_password(connexion_client):
     """一時パスワード生成のポリシー準拠テスト
 
