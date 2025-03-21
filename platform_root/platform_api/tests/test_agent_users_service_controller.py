@@ -79,7 +79,7 @@ def test_agent_user_service_api(connexion_client):
 
         assert response.status_code == 200
 
-        # 作成したagent userの確認
+        # 作成したagent userの確認(list)
         response = connexion_client.get(
             f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/agent-users",
             headers=request_parameters.request_headers(organization['user_id'], workspace_role=[common.get_ws_admin_authname(workspace['workspace_id'])]))
@@ -93,6 +93,71 @@ def test_agent_user_service_api(connexion_client):
         assert response_user2_row[0]["agent_user_type"] == agent_user2_data["agent_user_type"]
         assert response_user2_row[0]["description"] == agent_user2_data["description"]
 
+        #
+        # agent user2の取得(get)
+        #
+        # agent user2データの取得(idの取得)
+        response = connexion_client.get(
+            f"/api/{organization['organization_id']}/platform/users?search={agent_user2_data['username']}",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization["user_id"]))
+        
+        posted_agent_user2 = response.json["data"][0]
+
+        # 登録データの取得
+        response = connexion_client.get(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/agent-users/{posted_agent_user2['id']}",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization["user_id"]))
+        
+        assert response.status_code == 200
+        posted_agent_user2 = response.json["data"]
+        assert posted_agent_user2["username"] == agent_user2_data["username"]
+        assert posted_agent_user2["agent_user_type"] == agent_user2_data["agent_user_type"]
+        assert posted_agent_user2["description"] == agent_user2_data["description"]
+        
+        # agent user2の更新
+        # 更新データ
+        put_agent_user2 = sample_data_put_agent_user(agent_user2_data)
+
+        # Userデータの更新
+        response = connexion_client.put(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/agent-users/{posted_agent_user2['id']}",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization['user_id']),
+            json=put_agent_user2
+        )
+        
+        assert response.status_code == 200
+        
+        # 更新の確認
+        response = connexion_client.get(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/agent-users/{posted_agent_user2['id']}",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization["user_id"]))
+        
+        assert response.status_code == 200
+        updated_agent_user2 = response.json["data"]
+        posted_agent_user2 = response.json["data"]
+        assert updated_agent_user2["description"] == put_agent_user2["description"]
+
+        # agent userの削除(user2)
+        response = connexion_client.delete(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/agent-users/{posted_agent_user2['id']}",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization["user_id"])
+        )
+
+        assert response.status_code == 200
+        
+        # 1件のget確認
+        response = connexion_client.get(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/agent-users",
+            headers=request_parameters.request_headers(organization['user_id'], workspace_role=[common.get_ws_admin_authname(workspace['workspace_id'])]))
+
+        assert response.status_code == 200
+        assert len(response.json["data"]) == 1
+        
         # user1でtokenを発行する
         response = connexion_client.post(
             f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/agent-users/{response_user1_row[0]['id']}/refresh_tokens",
@@ -104,6 +169,16 @@ def test_agent_user_service_api(connexion_client):
         assert refresh_token != ""
         # jwt decode可能でユーザーが正しいこと
         assert jwt.decode(refresh_token, options={"verify_signature": False})["sub"] == response_user1_row[0]['id']
+        
+        # token削除
+        # token削除
+        response = connexion_client.delete(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/agent-users/{response_user1_row[0]['id']}/refresh_tokens",
+            headers=request_parameters.request_headers(organization['user_id'], workspace_role=[common.get_ws_admin_authname(workspace['workspace_id'])])
+        )
+        assert response.status_code == 200
+        refresh_token = response.json.get("data", {})
+        assert refresh_token is None
 
 
 def test_agent_user_service_validate():
