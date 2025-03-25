@@ -287,6 +287,8 @@ function displayMenu(curent) {
             </li>
 
             <li class="menuItem"><a class="menuLink" id="menu_auditlog" href="#" style="display: none;">${getText("000-91002", "監査ログ")}</a></li>
+
+            <li class="menuItem"><a class="menuLink" id="menu_agent_user_management" href="#" style="display: none;">${getText("000-91002", "エージェントユーザー管理")}</a></li>
         `);
 
         $('#menu_workspace').attr('href', location_conf.href.workspaces.list.replace(/{organization_id}/g, CommonAuth.getRealm()));
@@ -298,6 +300,7 @@ function displayMenu(curent) {
         $('#menu_identity_providers').attr('href', location_conf.href.keycloak.identity_providers.replace(/{organization_id}/g, CommonAuth.getRealm()));
         $('#menu_password_policy').attr('href', location_conf.href.keycloak.password_policy.replace(/{organization_id}/g, CommonAuth.getRealm()));
         $('#menu_auditlog').attr('href', location_conf.href.auditlog.download.replace(/{organization_id}/g, CommonAuth.getRealm()));
+        $('#menu_agent_user_list').attr('href', location_conf.href.agentusers.list.replace(/{organization_id}/g, CommonAuth.getRealm()));
 
         if (CommonAuth.hasAuthority(RolesCommon.ORG_AUTH_USER_MAINTE)) {
             $("#menu_account_management").css("display", "");
@@ -332,6 +335,7 @@ function displayMenu(curent) {
         if (CommonAuth.hasAuthority(RolesCommon.ORG_AUTH_AUDIT_LOG)) {
             $("#menu_auditlog").css("display", "");
         }
+        $("#menu_agent_user_list").css("display", "");
     }
 
     if(curent != null) {

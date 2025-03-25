@@ -236,6 +236,9 @@ var location_conf = {
         },
         "auditlog": {
             "download": "/{organization_id}/platform/auditlog"
+        },
+        "agentusers": {
+            "list": "/{organization_id}/platform/workspaces/{workspace_id}/agent-users"
         }
     }
 }
