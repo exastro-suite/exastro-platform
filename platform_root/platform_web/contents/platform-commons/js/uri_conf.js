@@ -43,6 +43,16 @@ var api_conf = {
             "notifications": {
                 "post": "/api/{organization_id}/platform/workspaces/{workspace_id}/notifications",
             },
+            "agent_users": {
+                "get": "/api/{organization_id}/platform/workspaces/{workspace_id}/agent-users",
+                "post": "/api/{organization_id}/platform/workspaces/{workspace_id}/agent-users",
+
+                "detail": {
+                    "get": "/api/{organization_id}/platform/workspaces/{workspace_id}/agent-users/{user-id}",
+                    "put": "/api/{organization_id}/platform/workspaces/{workspace_id}/agent-users/{user-id}",
+                    "delete": "/api/{organization_id}/platform/workspaces/{workspace_id}/agent-users/{user-id}",
+                }
+            },
         },
         "roles": {
             "post": "/api/{organization_id}/platform/roles",
@@ -97,6 +107,11 @@ var api_conf = {
             "organization_user_site": {
                 "get": "/api/{organization_id}/platform/users/_current/refresh_tokens",
                 "delete": "/api/{organization_id}/platform/users/_current/refresh_tokens"
+            },
+            "agent_user_site": {
+                "get": "/api/{organization_id}/platform/workspaces/{workspace_id}/agent-users/{user-id}/refresh_tokens",
+                "post": "/api/{organization_id}/platform/workspaces/{workspace_id}/agent-users/{user-id}/refresh_tokens",
+                "delete": "/api/{organization_id}/platform/workspaces/{workspace_id}/agent-users/{user-id}/refresh_tokens"
             },
         },
         "organizations": {
@@ -175,6 +190,12 @@ var location_conf = {
                     "detail": "/{organization_id}/platform/workspaces/{workspace_id}/settings/notifications/{destination_id}",
                     "edit": "/{organization_id}/platform/workspaces/{workspace_id}/settings/notifications/{destination_id}/edit",
                 },
+                "agent_users": {
+                    "workspace": "/{organization_id}/platform/workspaces/_settings/agent-users",
+                    "new": "/{organization_id}/platform/workspaces/{workspace_id}/settings/agent-users/_new",
+                    "list": "/{organization_id}/platform/workspaces/{workspace_id}/settings/agent-users",
+                    "edit": "/{organization_id}/platform/workspaces/{workspace_id}/settings/agent-users/{user_id}/edit",
+                },
             },
         },
         "roles": {
@@ -237,8 +258,6 @@ var location_conf = {
         "auditlog": {
             "download": "/{organization_id}/platform/auditlog"
         },
-        "agentusers": {
-            "list": "/{organization_id}/platform/workspaces/{workspace_id}/agent-users"
-        }
+        
     }
 }
