@@ -81,7 +81,7 @@ $(function(){
             window.location = location_conf.href.workspaces.settings.agent_users.new.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{workspace_id}/g, workspace_id);
         });
         
-        $('#users_list .datarow .button_edit_agent_user').on('click', function() {
+        $('#agent_users_list .datarow .button_edit_agent_user').on('click', function() {
             let user_id = $(this).attr('data-id');
             if (user_id != undefined){
                 window.location = location_conf.href.users.edit.replace('{organization_id}',CommonAuth.getRealm()).replace('{user_id}',user_id);
@@ -100,17 +100,17 @@ $(function(){
     //
     function display_users_list(agent_users) {
         // 明細行を削除
-        $('#users_list .datarow').remove();
+        $('#agent_users_list .datarow').remove();
 
         if (agent_users.length == 0) {
             // 0件の時はnotfoudの表示
-            $('#users_list .notfound').css('display','');
+            $('#agent_users_list .notfound').css('display','');
         } else {
             // 1件以上の時はnotfoudの非表示
-            $('#users_list .notfound').css('display','none');
+            $('#agent_users_list .notfound').css('display','none');
 
             // 明細のテンプレート行からhtmlを取り出す
-            const row_template = $('#users_list .datarow-template').clone(true).removeClass('datarow-template').addClass('datarow').prop('outerHTML');
+            const row_template = $('#agent_users_list .datarow-template').clone(true).removeClass('datarow-template').addClass('datarow').prop('outerHTML');
 
             // 明細にデータを埋め込み行を明細を作りこむ
             for(let i = 0; i < agent_users.length; ++i) {
@@ -124,7 +124,7 @@ $(function(){
                     .replace(/\${description}/g, fn.cv(user.description,'',true))
                     .replace(/\${tokenExpiration}/g, fn.cv(user.token_latest_expire_date,'',true))
 
-                const $row = $("#users_list tbody").append(row_html).find(".datarow:last-child");
+                const $row = $("#agent_users_list tbody").append(row_html).find(".datarow:last-child");
 
                 console.log("$row", $row);
                 console.log("button_edit", $row.find(".button_token_issuance"));
@@ -136,7 +136,7 @@ $(function(){
             //
             // 「トークン発行」ボタン - token issuance button
             //
-            $('#users_list .datarow .button_token_issuance').on('click', function() {
+            $('#agent_users_list .datarow .button_token_issuance').on('click', function() {
                 let user_id = $(this).attr('data-id');
                 if (user_id != undefined){
                     window.location = location_conf.href.workspaces.settings.agent_users.edit.replace('{organization_id}',CommonAuth.getRealm()).replace('{user_id}',user_id);
@@ -146,7 +146,7 @@ $(function(){
             //
             // 「編集」ボタン - edit agent user button
             //
-            $('#users_list .datarow .button_edit_agent_user').on('click', function() {
+            $('#agent_users_list .datarow .button_edit_agent_user').on('click', function() {
                 let user_id = $(this).attr('data-id');
                 if (user_id != undefined){
                     window.location = location_conf.href.workspaces.settings.agent_users.edit.replace('{organization_id}',CommonAuth.getRealm()).replace('{user_id}',user_id);
@@ -156,11 +156,11 @@ $(function(){
             //
             // 「削除」ボタン - delete agent user button
             //
-            $('#users_list .datarow .button_delete_agent_user').on('click', function() {
+            $('#agent_users_list .datarow .button_delete_agent_user').on('click', function() {
                 click_delete_agent_user_button($(this).attr('data-id'), $(this).attr('username'));
             });
         }
-        $('#users_list .datarow').css('display','');
+        $('#agent_users_list .datarow').css('display','');
     }
 
     //

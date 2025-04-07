@@ -40,7 +40,7 @@
 
         <script src="/_/platform-commons/js/platform_common.js?ver=__BUILD_VERSION__"></script>
         <script src="/_/platform-commons/js/uri_conf.js?ver=__BUILD_VERSION__"></script>
-        <script src="/_/platform-commons/js/agent_users_list.js?ver=__BUILD_VERSION__"></script>
+        <script src="/_/platform-commons/js/agent_user_list.js?ver=__BUILD_VERSION__"></script>
 
     </head>
     <body>
@@ -101,32 +101,33 @@
                                             </ul>
                                         </div>
                                         <div class="tableBody">
-                                            <table class="table" width="100%" id="settings_notification_list">
+                                            <table class="table" width="100%" id="agent_users_list">
                                                 <thead class="thead">
                                                     <tr class="tHeadTr tr">
-                                                        <th data-id="c1" data-rest="username" class="tHeadTh popup th" rowspan="1" colspan="1" title="ユーザー名" attr-text-id="title=000-00128" width="300px;"><div class="ci" text-id="000-00128">ユーザー名</div></th>
+                                                        <th data-id="c1" data-rest="username" class="tHeadLeftSticky tHeadTh popup th" rowspan="1" colspan="1" title="ユーザー名" attr-text-id="title=000-00128" width="300px;"><div class="ci" text-id="000-00128">ユーザー名</div></th>
                                                         <th data-id="c2" data-rest="agentUserType" class="tHeadTh popup th" rowspan="1" colspan="1" title="エージェント種類" attr-text-id="title=000-00146"><div class="ci" text-id="000-00146">エージェント種類</div></th>
                                                         <th data-id="c3" data-rest="description" class="tHeadTh popup th" rowspan="1" colspan="1" title="説明" attr-text-id="title=000-80023"><div class="ci" text-id="000-00106">説明</div></th>
                                                         <th data-id="c4" data-rest="tokenExpiration" class="tHeadTh popup th" rowspan="1" colspan="1" title="トークン有効期限" attr-text-id="title=000-00186"><div class="ci" text-id="000-00186">トークン有効期限</div></th>
-                                                        <th data-id="c5" data-rest="name" class="tHeadTh popup th" rowspan="1" colspan="1" width="130px;"><div class="ci"></div></th>
-                                                        <th data-id="c6" data-rest="name" class="tHeadTh popup th" rowspan="1" colspan="1" width="130px;"><div class="ci"></div></th>
-                                                        <th data-id="c7" data-rest="name" class="tHeadTh popup th" rowspan="1" colspan="1" width="130px;"><div class="ci"></div></th>
+                                                        <th data-id="c5" data-rest="action" class="tHeadTh popup th" rowspan="1" colspan="1" width="130px;"><div class="ci"></div></th>
+                                                        <th data-id="c6" data-rest="action" class="tHeadTh popup th" rowspan="1" colspan="1" width="130px;"><div class="ci"></div></th>
+                                                        <th data-id="c7" data-rest="action" class="tHeadTh popup th" rowspan="1" colspan="1" width="130px;"><div class="ci"></div></th>
                                                     </tr>
                                                 </thead>
                                                 <tbody class="tbody">
                                                     <tr class="tBodyTr tr datarow-template" style="cursor:pointer; display:none" username='${username}' data-id="${user_id}">
-                                                        <td class="tBodyTh th to_detail" rowspan="1" colspan="1" data-id="${user_id}"><div class="ci textOverWrap" style="text-align: left;">${username}</div></td>
+                                                        <th class="tBodyLeftSticky tBodyTh th to_detail" data-id="${user_id}" rowspan="1" colspan="1" }=""><div class="ci textOverWrap" style="text-align: left;">${username}</div></td>
                                                         <td class="tBodyTd td to_detail" rowspan="1" colspan="1" data-id="${user_id}"><div class="ci textOverWrap">${agentUserType}</div></td>
-                                                        <td class="tBodyTd td to_detail" rowspan="1" colspan="1" data-id="${user_id}"><div class="ci textOverWrap" style="text-align: left;">${destination_kind}<p class="notification_alert_msg" style="display:none">${description}</p></div></td>
+                                                        <td class="tBodyTd td to_detail" rowspan="1" colspan="1" data-id="${user_id}"><div class="ci textOverWrap" style="text-align: left;">${description}</div></td>
                                                         <td class="tBodyTd td to_detail" rowspan="1" colspan="1" data-id="${user_id}"><div class="ci pre_ht100">${tokenExpiration}</div></td>
                                                         <td class="tBodyTd td" rowspan="1" colspan="1"><div class="ci" style="text-align: center;">
-                                                            <button title="トークン発行" attr-text-id="title=000-80026" data-action="positive" class="itaButton button button_token_issuance" data-id="${user_id}" style="width:100px;">
+                                                            <button title="トークン発行" attr-text-id="title=000-80026" data-action="positive" class="itaButton button button_token_issuance" data-id="${user_id}" style="width:130px;">
                                                                 <span class="inner">
-                                                                    <span class="iconButtonIcon icon icon-edit"></span>
+                                                                    <span class="iconButtonIcon icon icon-plus"></span>
                                                                     <span class="iconButtonBody" text-id="000-81004">トークン発行</span>
                                                                 </span>
                                                             </button>
-                                                        </div></td>                                                        <td class="tBodyTd td" rowspan="1" colspan="1"><div class="ci" style="text-align: center;">
+                                                        </div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1"><div class="ci" style="text-align: center;">
                                                             <button title="編集" attr-text-id="title=000-80026" data-action="positive" class="itaButton button button_edit_agent_user" data-id="${user_id}" data-name="${destination_name}" style="width:100px;">
                                                                 <span class="inner">
                                                                     <span class="iconButtonIcon icon icon-edit"></span>
