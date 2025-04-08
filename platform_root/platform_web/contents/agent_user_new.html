@@ -75,7 +75,7 @@
                     <div id="content">
                         <div class="contentHeader">
                             <h1 class="contentTitle"><span class="contentTitleInner" text-id="000-83008">新規エージェントユーザー</span></h1>
-                            <p class="contentMenuInfo" text-id="000-83010">新規のエージェントユーザーを作成します。</p>
+                            <p class="contentMenuInfo" text-id="000-83010">新規のエージェントユーザーを作成します</p>
                         </div>
                         <div class="contentBody">
                             <div class="contentMenu">
@@ -101,66 +101,24 @@
                                                 </thead>
                                                 <tbody class="tbody">
                                                     <tr class="tBodyTr tr">
-                                                        <th class="tBodyTh th" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: left;" text-id="000-00144">ユーザーID</div></td>
+                                                        <th class="tBodyTh th" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: left;"><span text-id="000-00128">エージェントユーザー名</span><span class="tHeadRequired" text-id="000-80024">必須</span></div></td>
                                                         <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci textOverWrap">
-                                                            <span id="form_user_id"></span>
-                                                        </div></td>
-                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci textOverWrap" text-id="000-80032">自動付与</div></td>
-                                                    </tr>
-                                                    <tr class="tBodyTr tr">
-                                                        <th class="tBodyTh th" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: left;"><span text-id="000-00128">ユーザー名</span><span class="tHeadRequired" text-id="000-80024">必須</span></div></td>
-                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci textOverWrap">
-                                                            <input type="text" value="" class="tableEditInputText inputText input inputTextWidthAdjustment" id="form_user_username" maxlength="64">
-                                                            <span class="validate_error" id="message_user_username"></span>
+                                                            <input type="text" value="" class="tableEditInputText inputText input inputTextWidthAdjustment" id="form_agentuser_username" maxlength="64">
+                                                            <span class="validate_error" id="message_agentuser_username"></span>
                                                         </div></td>
                                                         <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci textOverWrap" text-id="000-83011">最大64文字 / 使用可能文字：半角英数・ハイフン・アンダースコア</div></td>
                                                     </tr>
                                                     <tr class="tBodyTr tr">
-                                                        <th class="tBodyTh th" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: left;"><span text-id="000-00132">パスワード</span><span class="tHeadRequired" text-id="000-80024">必須</span></div></td>
-                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci textOverWrap">
-                                                            <input type="password" value="" class="tableEditInputText inputText input inputTextWidthAdjustment" id="form_user_password" maxlength="255" placeholder="パスワードを入力してください" attr-text-id="placeholder=000-83025">
-                                                            <input type="password" value="" class="tableEditInputText inputText input inputTextWidthAdjustment" id="form_user_password_confirm" maxlength="255" placeholder="確認のためパスワードを再入力してください" attr-text-id="placeholder=000-83026">
-                                                            <label for="form_user_password_temporary" class="checkboxTextLabel">
-                                                                <input type="checkbox" value="" id="form_user_password_temporary" checked><span text-id="000-83012">初回ログイン時パスワード変更要求</span>
-                                                            </label><br>
-                                                            <span class="validate_error" id="message_user_password"></span>
+                                                        <th class="tBodyTh th" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: left;"><span text-id="000-00129">エージェント種類</span><span class="tHeadRequired" text-id="000-80024">必須</span></div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci">
+                                                            <select class="input" id="form_agentuser_agenttype">
+                                                                <option value="" selected></option>
+                                                                <option value="ansible">Ansible</option>
+                                                                <option value="oase">OASE</option>
+                                                            </select>
+                                                            <span class="validate_error" id="message_agentuser_agenttype"></span>
                                                         </div></td>
-                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci textOverWrap"></div></td>
-                                                    </tr>
-                                                    <tr class="tBodyTr tr">
-                                                        <th class="tBodyTh th" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: left;" text-id="000-00129">email</div></td>
-                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci textOverWrap">
-                                                            <input type="text" value="" class="tableEditInputText inputText input inputTextWidthAdjustment" id="form_user_email" maxlength="255">
-                                                        </div></td>
-                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci textOverWrap" text-id="000-83013">最大255文字 / 使用可能文字：Eメールアドレス形式</div></td>
-                                                    </tr>
-                                                    <tr class="tBodyTr tr">
-                                                        <th class="tBodyTh th" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: left;" text-id="000-00130">名</div></td>
-                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci textOverWrap">
-                                                            <input type="text" value="" class="tableEditInputText inputText input inputTextWidthAdjustment" id="form_user_first_name" maxlength="100">
-                                                        </div></td>
-                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci textOverWrap" text-id="000-83014">最大100文字 / 使用可能文字：全角・半角文字</div></td>
-                                                    </tr>
-                                                    <tr class="tBodyTr tr">
-                                                        <th class="tBodyTh th" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: left;" text-id="000-00131">姓</div></td>
-                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci textOverWrap">
-                                                            <input type="text" value="" class="tableEditInputText inputText input inputTextWidthAdjustment" id="form_user_last_name" maxlength="100">
-                                                        </div></td>
-                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci textOverWrap" text-id="000-83014">最大100文字 / 使用可能文字：全角・半角文字</div></td>
-                                                    </tr>
-                                                    <tr class="tBodyTr tr">
-                                                        <th class="tBodyTh th" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: left;" text-id="000-80031">有効</div></td>
-                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci textOverWrap">
-                                                            <input type="checkbox" value="" id="form_user_enabled" checked>
-                                                        </div></td>
-                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci textOverWrap"></div></td>
-                                                    </tr>
-                                                    <tr class="tBodyTr tr">
-                                                        <th class="tBodyTh th" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: left;" text-id="000-00143">所属</div></td>
-                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci textOverWrap">
-                                                            <input type="text" value="" class="tableEditInputText inputText input inputTextWidthAdjustment" id="form_affiliation" maxlength="255">
-                                                        </div></td>
-                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci textOverWrap" text-id="000-83015">最大255文字 / 使用可能文字：全角・半角文字</div></td>
+                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci textOverWrap" text-id="000-83013">未定</div></td>
                                                     </tr>
                                                     <tr class="tBodyTr tr">
                                                         <th class="tBodyTh th" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: left;" text-id="000-00106">説明</div></td>
@@ -168,13 +126,6 @@
                                                             <input type="text" value="" class="tableEditInputText inputText input inputTextWidthAdjustment" id="form_description" maxlength="255">
                                                         </div></td>
                                                         <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci textOverWrap" text-id="000-83015">最大255文字 / 使用可能文字：全角・半角文字</div></td>
-                                                    </tr>
-                                                    <tr class="tBodyTr tr">
-                                                        <th class="tBodyTh th" rowspan="1" colspan="1" }=""><div class="ci" style="text-align: left;" text-id="000-00142">登録日時</div></td>
-                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci textOverWrap">
-                                                            <span id="form_user_create_timestamp"></span>
-                                                        </div></td>
-                                                        <td class="tBodyTd td" rowspan="1" colspan="1" }=""><div class="ci textOverWrap"></div></td>
                                                     </tr>
                                                 </tbody>
                                             </table>

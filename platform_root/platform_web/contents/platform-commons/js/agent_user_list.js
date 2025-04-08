@@ -19,7 +19,6 @@ $(function(){
 
     CommonAuth.onAuthSuccess(() => {
         new CommonUi(`#container`);
-        maintenanceMode();
         load_main();
     });
 
@@ -109,6 +108,22 @@ $(function(){
             // 1件以上の時はnotfoudの非表示
             $('#agent_users_list .notfound').css('display','none');
 
+            //
+            // sort workspace list
+            //
+            const sortKey = 'username'; // エージェントユーザー名
+            const sortreverse = 1;  // 昇順
+            agent_users.sort(function(a, b){
+                const as = a[sortKey].toLowerCase(), bs = b[sortKey].toLowerCase();
+                if ( as < bs ) {
+                    return sortreverse * -1;
+                } else if ( as > bs ) {
+                    return sortreverse * 1;
+                } else {
+                    return 0;
+                }
+            });
+            
             // 明細のテンプレート行からhtmlを取り出す
             const row_template = $('#agent_users_list .datarow-template').clone(true).removeClass('datarow-template').addClass('datarow').prop('outerHTML');
 
