@@ -1,5 +1,5 @@
 /*
-#   Copyright 2023 NEC Corporation
+#   Copyright 2019 NEC Corporation
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -15,12 +15,10 @@
 */
 
 $(function(){
-    const workspace_id = window.location.pathname.split("/")[4];
-    const destination_id = window.location.pathname.split("/")[7];
+    const user_id = window.location.pathname.split("/")[4];
 
     CommonAuth.onAuthSuccess(() => {
         new CommonUi(`#container`);
-        maintenanceMode();
         load_main();
     });
 
@@ -28,24 +26,23 @@ $(function(){
         Promise.all([
             // Load Common Contents
             loadCommonContents(),
+            // Get User
             call_api_promise({
                 type: "GET",
-                url: api_conf.api.workspaces.settings.notifications.detail.get.replace('{organization_id}', CommonAuth.getRealm()).replace('{workspace_id}', workspace_id).replace('{destination_id}', destination_id),
+                url: api_conf.api.users.getId.replace('{organization_id}', CommonAuth.getRealm()).replace('{user_id}', user_id),
                 headers: {
                     Authorization: "Bearer " + CommonAuth.getToken(),
                 },
                 contentType: "application/json",
                 dataType: "json",
-            })
-
+            }),
         ]).then(function(results) {
             // Display Menu
-            displayMenu('menu_settings_notifications');
+            displayMenu('menu_account_list');
             // Display Topic Path
             displayTopicPath([
-                {"text": getText("000-87006", "通知先ワークスペース一覧"), "href": location_conf.href.workspaces.settings.notifications.workspaces.replace(/{organization_id}/g, CommonAuth.getRealm())},
-                {"text": getText("000-87002", "通知先設定一覧"), "href": location_conf.href.workspaces.settings.notifications.list.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{workspace_id}/g, workspace_id)},
-                {"text": getText("000-87032", "通知先設定編集"), "href": location_conf.href.workspaces.settings.notifications.edit.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{workspace_id}/g, workspace_id)},
+                {"text": getText("000-83001", "ユーザー一覧"), "href": location_conf.href.users.list.replace(/{organization_id}/g, CommonAuth.getRealm()) },
+                {"text": getText("000-83017", "ユーザー編集"), "href": location_conf.href.users.edit.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{user_id}/g, user_id) },
             ]);
             display_main(results[1].data);
             finish_onload_progress();
@@ -58,66 +55,35 @@ $(function(){
         });
     }
 
-    function display_main(destination_row) {
+    function display_main(user) {
         console.log("[CALL] display_main");
 
-        settings_notifications_common.set_conditions();
-        settings_notifications_common.set_destination_informations(destination_row.kind, destination_row.destination_informations);
+        $("#form_user_id").text(user_id);
+        $("#form_user_username").text(user.preferred_username);
+        $("#form_user_email").val(user.email);
+        $("#form_user_first_name").val(user.firstName);
+        $("#form_user_last_name").val(user.lastName);
+        $("#form_user_enabled").prop("checked", user.enabled);
+        $("#form_affiliation").val(user.affiliation);
+        $("#form_description").val(user.description);
+        $("#form_user_create_timestamp").text(fn.date(new Date(user.create_timestamp),'yyyy/MM/dd HH:mm:ss'));
 
-        $('#text_destination_id').text(destination_row.id);
-        $("#form_destination_name").val(destination_row.name);
-
-        $('#ita_event_type_new').prop("checked", fn.cv(destination_row.conditions.ita.event_type.new, false, false));
-        $('#ita_event_type_evaluated').prop("checked", fn.cv(destination_row.conditions.ita.event_type.evaluated, false, false));
-        $('#ita_event_type_timeout').prop("checked", fn.cv(destination_row.conditions.ita.event_type.timeout, false, false));
-        $('#ita_event_type_undetected').prop("checked", fn.cv(destination_row.conditions.ita.event_type.undetected, false, false));
-
-        $('.description_Mail').html(getText('000-87017', 'email形式 (最大{0}メールアドレス)<br>※複数のメールアドレスを指定する場合は「;（セミコロン）」「,（カンマ）」記号<br>または、改行を区切り文字として使用します', MAX_MAIL_COUNT));
-        $('.description_Teams').html(getText('000-87018', 'URL形式'));
-        $('.description_Teams_WF').html(getText('000-87018', 'URL形式'));
-        $('.description_Webhook').html(getText('000-87019', '1行目 URL形式<br>2行目 ヘッダー内容'));
-
-        $('.destination_informations').css('display', 'none');
-        $('.description_no_select').css('display', '');
-
-        //
-        // condition kind click
-        //
-        $('input[name="form_destination_kind"]').on('click',function() {
-            $('.destination_informations').css('display', 'none');
-            let id = $(this).val();
-            console.log("id: "+id);
-            $('.description_' + id).css('display', '');
-            $('.destination_informations_' + id).css('display', '');
-
-            $('input[name="form_destination_informations_' + id + '"]').css('display', '');
-            $('textarea[name="form_destination_informations_' + id + '"]').css('display', '');
+        $("#form_user_password_initialize").change(function() {
+            $("#form_user_password_initialize_fields").css("display", this.checked? "": "none");
         });
 
         //
         // register button
         //
+        $('#button_register').prop('disabled',false);
         $('#button_register').on('click',() => {
             $('#button_register').prop('disabled',true);
             if( ! validate_register() ) {
                 $('#button_register').prop('disabled',false);
                 return;
             }
-            notification_destination_register();
+            user_register();
         });
-
-        if (destination_row.kind === DESTINATION_KIND_MAIL){
-            $('#form_destination_kind_mail').trigger('click');
-        }
-        else if (destination_row.kind === DESTINATION_KIND_TEAMS){
-            $('#form_destination_kind_teams').trigger('click');
-        }
-        else if (destination_row.kind === DESTINATION_KIND_TEAMS_WF){
-            $('#form_destination_kind_teams_wf').trigger('click');
-        }
-        else if (destination_row.kind === DESTINATION_KIND_WEBHOOK){
-            $('#form_destination_kind_webhook').trigger('click');
-        }
     }
 
     //
@@ -127,40 +93,19 @@ $(function(){
         console.log("--- validate check start ----");
         let result=true;
 
-        // validate destination name
-        validate = settings_notifications_common.validate.destination_name($("#form_destination_name").val());
-        result = result && validate.result;
-        $("#message_destination_name").text(validate.message);
-
-        // validate destination kind
-        validate = settings_notifications_common.validate.destination_kind($("input[name=form_destination_kind]:checked"));
-        result = result && validate.result;
-        $("#message_destination_kind").text(validate.message);
-
-        var destination_kind = $("input[name=form_destination_kind]:checked").val();
-        if (destination_kind === "Mail"){
-            // validate destination informations (mail)
-            validate = settings_notifications_common.validate.destination_informations_mail($("#form_destination_informations_mail_to").val(), $("#form_destination_informations_mail_cc").val(), $("#form_destination_informations_mail_bcc").val());
-            result = result && validate.result;
-            $("#message_destination_informations").text(validate.message);
-        }
-        else if (destination_kind === "Teams"){
-            // validate destination informations (teams)
-            validate = settings_notifications_common.validate.destination_informations_teams($("#form_destination_informations_teams").val());
-            result = result && validate.result;
-            $("#message_destination_informations").text(validate.message);
-        }
-        else if (destination_kind === "Teams_WF"){
-            // validate destination informations (teams powar automate)
-            validate = settings_notifications_common.validate.destination_informations_teams_wf($("#form_destination_informations_teams_wf").val());
-            result = result && validate.result;
-            $("#message_destination_informations").text(validate.message);
-        }
-        else if (destination_kind === "Webhook"){
-            // validate destination informations (webhook)
-            validate = settings_notifications_common.validate.destination_informations_webhook($("#form_destination_informations_webhook").val(), $("#form_destination_informations_webhook_header").val());
-            result = result && validate.result;
-            $("#message_destination_informations").text(validate.message);
+        // validate user password
+        if($("#form_user_password_initialize").prop("checked")) {
+            if($("#form_user_password").val() === "" || $("#form_user_password_confirm").val() === "") {
+                $("#message_user_password").text(getText("400-00011", "必須項目が不足しています。({0})", getText("000-00132", "パスワード")));
+                result = false;
+            } else if($("#form_user_password").val() != $("#form_user_password_confirm").val()) {
+                $("#message_user_password").text(getText("000-83027", "パスワードの確認入力が正しくありません"));
+                result = false;
+            } else {
+                $("#message_user_password").text("");
+            }
+        } else {
+            $("#message_user_password").text("");
         }
 
         console.log("--- validate check end [" + result + "] ----");
@@ -169,33 +114,29 @@ $(function(){
     }
 
     //
-    // register setting notification destination
+    // register workspace
     //
-    function notification_destination_register() {
-        var destination_informations = settings_notifications_common.get_destination_informations();
+    function user_register() {
 
-        let reqbody = {
-            "id": destination_id,
-            "name": $('#form_destination_name').val(),
-            "kind": $("input[name=form_destination_kind]:checked").val(),
-            "conditions": {
-                "ita": {
-                    "event_type": {
-                        "new": $('#ita_event_type_new').prop("checked"),
-                        "evaluated": $('#ita_event_type_evaluated').prop("checked"),
-                        "timeout": $('#ita_event_type_timeout').prop("checked"),
-                        "undetected": $('#ita_event_type_undetected').prop("checked"),
-                    },
-                },
-            },
-            "destination_informations": destination_informations,
+        let reqbody =   {
+            "email": $('#form_user_email').val(),
+            "firstName": $('#form_user_first_name').val(),
+            "lastName": $('#form_user_last_name').val(),
+            "affiliation": $('#form_affiliation').val(),
+            "description": $('#form_description').val(),
+            "enabled": ($('#form_user_enabled').prop('checked') ? true : false),
+        }
+
+        if($("#form_user_password_initialize").prop("checked")) {
+            reqbody.password = $('#form_user_password').val();
+            reqbody.password_temporary = $('#form_user_password_temporary').prop('checked');
         }
 
         show_progress();
         call_api_promise(
             {
                 type: "PUT",
-                url: api_conf.api.workspaces.settings.notifications.put.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{workspace_id}/g, workspace_id).replace(/{destination_id}/g, destination_id),
+                url: api_conf.api.users.put.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{user_id}/g, user_id),
                 headers: {
                     Authorization: "Bearer " + CommonAuth.getToken(),
                 },
@@ -205,9 +146,9 @@ $(function(){
             }
         ).then(() => {
             hide_progress();
-            alertMessage(getText("000-80018", "処理結果"), getText("000-87034", "通知先設定を変更しました"),
+            alertMessage(getText("000-80018", "処理結果"), getText("000-83021", "ユーザーを変更しました"),
             () => {
-                window.location = location_conf.href.workspaces.settings.notifications.detail.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{workspace_id}/g, workspace_id).replace(/{destination_id}/g, destination_id);
+                window.location = location_conf.href.users.list.replace(/{organization_id}/g, CommonAuth.getRealm());
             });
         }).catch(() => {
             hide_progress();
