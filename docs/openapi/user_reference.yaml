@@ -60,8 +60,8 @@ tags:
   description: ロールに関する操作
 - name: RoleMappingsService
   description: ロール・マッピングに関する操作
-- name: AgentUsersService
-  description: エージェントユーザーに関する操作
+- name: ServiceAccountUsersService
+  description: サービスアカウントユーザーに関する操作
 - name: JobsService
   description: ジョブに関する操作
 - name: MaintenanceModeService
@@ -114,14 +114,14 @@ paths:
   "/api/{organization_id}/platform/roles/{role_name}/users":
       $ref: './paths/roles.role_name.users.yaml'
 
-  "/api/{organization_id}/platform/workspaces/{workspace_id}/agent-users":
-      $ref: './paths/workspaces.workspace_id.agent-users.yaml'
+  "/api/{organization_id}/platform/workspaces/{workspace_id}/service-account-users":
+      $ref: './paths/workspaces.workspace_id.service-account-users.yaml'
 
-  "/api/{organization_id}/platform/workspaces/{workspace_id}/agent-users/{user_id}":
-      $ref: './paths/workspaces.workspace_id.agent-users.user_id.yaml'
+  "/api/{organization_id}/platform/workspaces/{workspace_id}/service-account-users/{user_id}":
+      $ref: './paths/workspaces.workspace_id.service-account-users.user_id.yaml'
 
-  "/api/{organization_id}/platform/workspaces/{workspace_id}/agent-users/{user_id}/refresh_tokens":
-      $ref: './paths/workspaces.workspace_id.agent-users.user_id.refresh_tokens.yaml'
+  "/api/{organization_id}/platform/workspaces/{workspace_id}/service-account-users/{user_id}/refresh_tokens":
+      $ref: './paths/workspaces.workspace_id.service-account-users.user_id.refresh_tokens.yaml'
 
   "/api/{organization_id}/platform/jobs/users/bulk/format":
       $ref: './paths/jobs.users.bulk.format.yaml'
