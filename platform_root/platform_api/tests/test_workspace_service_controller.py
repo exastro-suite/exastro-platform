@@ -20,7 +20,7 @@ from unittest import mock
 from tests.common import request_parameters, test_common
 from common_library.common import const, common, validation, maintenancemode
 from common_library.common import api_keycloak_tokens, api_keycloak_roles
-from common_library.common import bl_agent_user, bl_plan_service
+from common_library.common import bl_service_account_user, bl_plan_service
 from common_library.common.db import DBconnector
 from common_library.common.libs import queries_dbinit
 
@@ -318,14 +318,14 @@ def test_workspace_create(connexion_client):
         assert response.status_code == 200
 
         # 作成ロールの存在チェック
-        # 1 (_wsid-admin) + agent_user_roles分のroleが作成されていること
-        assert len(response.json["data"]) == 1 + len(bl_agent_user.agent_user_roles(workspace_id))
+        # 1 (_wsid-admin) + service_account_user_roles分のroleが作成されていること
+        assert len(response.json["data"]) == 1 + len(bl_service_account_user.service_account_user_roles(workspace_id))
 
         # workspace admin ロールが存在すること
         assert len([r["name"] for r in response.json["data"] if r["name"] == common.get_ws_admin_rolename(workspace_id)]) == 1
 
-        # agent user ロールが全て存在すること
-        for role in bl_agent_user.agent_user_roles(workspace_id):
+        # service account user ロールが全て存在すること
+        for role in bl_service_account_user.service_account_user_roles(workspace_id):
             assert len([r["name"] for r in response.json["data"] if r["name"] == role]) == 1
 
     #
@@ -617,9 +617,9 @@ def test_workspace_create(connexion_client):
     workscace_param = sample_data_workspace(workspace_id, organization['user_id'])
 
     with test_common.requsts_mocker_default() as requests_mocker:
-        # POSTパラメータがagent user用のロールの場合にrequests_mocker.register_uriに引っかける
+        # POSTパラメータがservice account user用のロールの場合にrequests_mocker.register_uriに引っかける
         def additional_matcher(request):
-            mocked_roles = bl_agent_user.agent_user_roles(workspace_id)
+            mocked_roles = bl_service_account_user.service_account_user_roles(workspace_id)
             ret = json.loads(request.text).get("name") in mocked_roles
             return ret
 
@@ -647,7 +647,7 @@ def test_workspace_create(connexion_client):
     #
     workspace_id = "case_bi_role_cmp_create_error"
     workscace_param = sample_data_workspace(workspace_id, organization['user_id'])
-    mocked_roles = bl_agent_user.agent_user_roles(workspace_id)
+    mocked_roles = bl_service_account_user.service_account_user_roles(workspace_id)
 
     with test_common.requsts_mocker_default() as requests_mocker:
 

@@ -135,7 +135,7 @@ class LanguageList:
     lang_array['000-00213'] = 'Webhook Header for notifications destination'
     lang_array['000-00214'] = 'Teams(Workflows) URL for notifications destination'
     lang_array['000-00215'] = '* An obsolete Notifications destination kind has been selected'
-    lang_array['000-00216'] = 'Agent type'
+    lang_array['000-00216'] = 'Service Account User type'
     lang_array['000-62001'] = 'Processing type'
     lang_array['000-62002'] = 'Registration or Update or Delete'
     #
@@ -627,7 +627,7 @@ class LanguageList:
     lang_array['400-41006'] = 'Failed to generate token.'
     lang_array['400-41007'] = 'The corresponding user does not exist (target: {0})'
     lang_array['400-41008'] = 'Failed to get user information (Target: {0})'
-    lang_array['400-41009'] = 'Not an agent user (Target: {0})'
+    lang_array['400-41009'] = 'Not a service account user (Target: {0})'
     lang_array['400-41010'] = 'Failed to get user role (Target: {0})'
     lang_array['400-41011'] = 'Failed to get user credential information (Target: {0})'
     lang_array['400-62001'] = 'The specified role ({0}) does not exist'

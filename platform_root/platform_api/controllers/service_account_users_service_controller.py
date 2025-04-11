@@ -25,12 +25,12 @@ from common_library.common.db import DBconnector
 from libs import queries_token
 from common_library.common import check_authority
 
-from common_library.common import bl_agent_user, bl_token_service
+from common_library.common import bl_service_account_user, bl_token_service
 
 
 @common.platform_exception_handler
-def agent_user_create(body, organization_id, workspace_id):  # noqa: E501
-    """Create an agent user
+def service_account_user_create(body, organization_id, workspace_id):  # noqa: E501
+    """Create an service account user
 
     Args:
         body (dict): Request body(json)
@@ -44,7 +44,7 @@ def agent_user_create(body, organization_id, workspace_id):  # noqa: E501
 
     # request parameter
     req_username = body.get("username")
-    req_agent_user_type = body.get("agent_user_type")
+    req_service_account_user_type = body.get("service_account_user_type")
     req_description = body.get("description")
 
     # validation check
@@ -52,7 +52,7 @@ def agent_user_create(body, organization_id, workspace_id):  # noqa: E501
     if not validate.ok:
         return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
 
-    validate = validation.validate_agent_user_type(req_agent_user_type)
+    validate = validation.validate_service_account_user_type(req_service_account_user_type)
     if not validate.ok:
         return common.response_status(validate.status_code, None, validate.message_id, validate.base_message, *validate.args)
 
@@ -76,7 +76,7 @@ def agent_user_create(body, organization_id, workspace_id):  # noqa: E501
     token = json.loads(token_response.text)["access_token"]
 
     # create user
-    user_json = bl_agent_user.agent_user_create_parameter(req_username, req_agent_user_type, req_description)
+    user_json = bl_service_account_user.service_account_user_create_parameter(req_username, req_service_account_user_type, req_description)
 
     resp_user_create = api_keycloak_users.user_create(
         realm_name=organization_id, user_json=user_json, token=token
@@ -137,7 +137,7 @@ def agent_user_create(body, organization_id, workspace_id):  # noqa: E501
 
     try:
         # get role
-        role_name = bl_agent_user.agent_user_role_name(workspace_id, req_agent_user_type)
+        role_name = bl_service_account_user.service_account_user_role_name(workspace_id, req_service_account_user_type)
 
         resp_get_role = api_keycloak_roles.clients_role_get(
             realm_name=organization_id, client_id=private.user_token_client_id, role_name=role_name, token=token,
@@ -182,8 +182,8 @@ def agent_user_create(body, organization_id, workspace_id):  # noqa: E501
 
 
 @common.platform_exception_handler
-def agent_user_delete(organization_id, workspace_id, user_id):  # noqa: E501
-    """Delete an agent user
+def service_account_user_delete(organization_id, workspace_id, user_id):  # noqa: E501
+    """Delete an service account user
 
     Args:
         organization_id (str): organization id
@@ -224,14 +224,14 @@ def agent_user_delete(organization_id, workspace_id, user_id):  # noqa: E501
         )
         raise common.InternalErrorException(message_id=message_id, message=message)
 
-    # エージェントユーザーチェック
-    # Check updatable agent user
+    # サービスアカウントユーザーチェック
+    # Check updatable service account user
     user = json.loads(response.text)
-    __check_updatable_agent_user(organization_id, workspace_id, user, token)
+    __check_updatable_service_account_user(organization_id, workspace_id, user, token)
     globals.logger.debug(f"response user:{user}")
 
     # ユーザー削除
-    # Delete agent user
+    # Delete service account user
     response = api_keycloak_users.user_delete(
         realm_name=organization_id, user_id=user_id, token=token
     )
@@ -268,8 +268,8 @@ def agent_user_delete(organization_id, workspace_id, user_id):  # noqa: E501
 
 
 @common.platform_exception_handler
-def agent_user_list(organization_id, workspace_id):  # noqa: E501
-    """List returns list of agent users
+def service_account_user_list(organization_id, workspace_id):  # noqa: E501
+    """List returns list of service account users
 
     Args:
         organization_id (str): organization id
@@ -287,19 +287,19 @@ def agent_user_list(organization_id, workspace_id):  # noqa: E501
     # Get a service account token
     token = __get_token(organization_id)
 
-    # 該当Clientのagent用ロールを取得
+    # 該当Clientのservice account用ロールを取得
     # Process for the number of organization administrators
-    agent_roles = []
-    for role_name in bl_agent_user.agent_user_roles(workspace_id):
+    service_account_roles = []
+    for role_name in bl_service_account_user.service_account_user_roles(workspace_id):
         client_role = __check_autho_role(connexion.request.headers, private, token, organization_id, role_name, False)
-        agent_roles.append(client_role)
+        service_account_roles.append(client_role)
 
     # ロールに紐づくユーザーの取得
     # Get role users
     first = 0
     max = 1000
-    agent_type_users = []
-    for role in agent_roles:
+    service_account_type_users = []
+    for role in service_account_roles:
         response = api_keycloak_roles.role_uesrs_get(
             realm_name=organization_id, client_id=private.user_token_client_id,
             role_name=role.get("name"), token=token, first=first, max=max
@@ -326,7 +326,7 @@ def agent_user_list(organization_id, workspace_id):  # noqa: E501
             )
             raise common.InternalErrorException(message_id=message_id, message=message)
 
-        agent_type_users.append(json.loads(response.text))
+        service_account_type_users.append(json.loads(response.text))
 
     ret_role_users = []
 
@@ -348,7 +348,7 @@ def agent_user_list(organization_id, workspace_id):  # noqa: E501
 
     # 件数分処理する
     # process the number of cases
-    for users in agent_type_users:
+    for users in service_account_type_users:
         for user in users:
             user_id = user.get("id")
 
@@ -359,7 +359,7 @@ def agent_user_list(organization_id, workspace_id):  # noqa: E501
                 {
                     "id": user_id,
                     "username": user.get("username"),
-                    "agent_user_type": user.get("attributes", {}).get("agent_user_type", [None])[0],
+                    "service_account_user_type": user.get("attributes", {}).get("service_account_user_type", [None])[0],
                     "description": user.get("attributes", {}).get("description", [None])[0],
                     "token_latest_expire_date": common.datetime_to_str(token_latest_expire_date),
                 }
@@ -369,8 +369,8 @@ def agent_user_list(organization_id, workspace_id):  # noqa: E501
 
 
 @common.platform_exception_handler
-def agent_user_token_create(body, organization_id, workspace_id, user_id):  # noqa: E501
-    """Create an agent user token
+def service_account_user_token_create(body, organization_id, workspace_id, user_id):  # noqa: E501
+    """Create an service account user token
 
     Args:
         body (dict): Request body(json)
@@ -394,7 +394,7 @@ def agent_user_token_create(body, organization_id, workspace_id, user_id):  # no
     #
     resp_user = api_keycloak_users.user_get_by_id(organization_id, user_id, token)
     if resp_user.status_code == 404:
-        globals.logger.info(f'agent user not found: {user_id=}')
+        globals.logger.info(f'service account user not found: {user_id=}')
         message_id = "400-41007"
         message = multi_lang.get_text(
             message_id,
@@ -404,7 +404,7 @@ def agent_user_token_create(body, organization_id, workspace_id, user_id):  # no
         raise common.BadRequestException(message_id=message_id, message=message)
 
     if resp_user.status_code != 200:
-        globals.logger.error(f'agent user get faild: {user_id=} {resp_user.status_code=} {resp_user.text=}')
+        globals.logger.error(f'service account user get faild: {user_id=} {resp_user.status_code=} {resp_user.text=}')
         message_id = "400-41008"
         message = multi_lang.get_text(
             message_id,
@@ -414,10 +414,10 @@ def agent_user_token_create(body, organization_id, workspace_id, user_id):  # no
         raise common.InternalErrorException(message_id=message_id, message=message)
 
     #
-    # 更新可能なagent userかのチェック / Check updatable  agent user
+    # 更新可能なservice account userかのチェック / Check updatable  service account user
     #
     user = json.loads(resp_user.text)
-    __check_updatable_agent_user(organization_id, workspace_id, user, token)
+    __check_updatable_service_account_user(organization_id, workspace_id, user, token)
 
     #
     # realm情報取得
@@ -443,7 +443,7 @@ def agent_user_token_create(body, organization_id, workspace_id, user_id):  # no
 
     for try_count in range(password_set_treis):
         # パスワードポリシーに従ってパスワードを発行する
-        try_password = bl_agent_user.temporary_password(password_policy)
+        try_password = bl_service_account_user.temporary_password(password_policy)
         resp_passwd = api_keycloak_users.user_reset_password(organization_id, user_id, try_password, token)
         if resp_passwd.status_code in [200, 204]:
             globals.logger.debug('password reset succeed')
@@ -453,7 +453,7 @@ def agent_user_token_create(body, organization_id, workspace_id, user_id):  # no
             globals.logger.debug(f'password reset failed : {try_count=} {try_password=} response.text={resp_passwd.text}')
 
     if password is None:
-        globals.logger.info(f'agent user password reset failed : {user_id=} {resp_passwd.text}')
+        globals.logger.info(f'service account user password reset failed : {user_id=} {resp_passwd.text}')
         message_id = "400-41005"
         message = multi_lang.get_text(
             message_id,
@@ -473,7 +473,7 @@ def agent_user_token_create(body, organization_id, workspace_id, user_id):  # no
     }
     resp_token = bl_token_service.token_create(organization_id, request_token_body, execute_user_id=request.headers.get("User-Id"))
     if resp_token.status_code != 200:
-        globals.logger.error(f'agent user generate token failed : {user_id=} {resp_token}')
+        globals.logger.error(f'service account user generate token failed : {user_id=} {resp_token}')
         message_id = "400-41006"
         message = multi_lang.get_text(
             message_id,
@@ -507,8 +507,8 @@ def agent_user_token_create(body, organization_id, workspace_id, user_id):  # no
 
 
 @common.platform_exception_handler
-def agent_user_token_delete(organization_id, workspace_id, user_id):  # noqa: E501
-    """Delete agent user tokens
+def service_account_user_token_delete(organization_id, workspace_id, user_id):  # noqa: E501
+    """Delete service account user tokens
 
     Args:
         organization_id (str): organization id
@@ -564,8 +564,8 @@ def agent_user_token_delete(organization_id, workspace_id, user_id):  # noqa: E5
 
 
 @common.platform_exception_handler
-def agent_user_token_list(organization_id, workspace_id, user_id):  # noqa: E501
-    """List returns list of agent user tokens
+def service_account_user_token_list(organization_id, workspace_id, user_id):  # noqa: E501
+    """List returns list of service account user tokens
 
     Args:
         organization_id (str): organization id
@@ -580,8 +580,8 @@ def agent_user_token_list(organization_id, workspace_id, user_id):  # noqa: E501
 
 
 @common.platform_exception_handler
-def agent_user_update(body, organization_id, workspace_id, user_id):  # noqa: E501
-    """Update an agent user
+def service_account_user_update(body, organization_id, workspace_id, user_id):  # noqa: E501
+    """Update an service account user
 
     Args:
         body (dict): Request body(json)
@@ -638,7 +638,7 @@ def agent_user_update(body, organization_id, workspace_id, user_id):  # noqa: E5
         raise common.InternalErrorException(message_id=message_id, message=message)
 
     user = json.loads(response.text)
-    __check_updatable_agent_user(organization_id, workspace_id, user, token)
+    __check_updatable_service_account_user(organization_id, workspace_id, user, token)
     globals.logger.debug(f"response user:{user}")
     
     # ユーザー更新
@@ -679,8 +679,8 @@ def agent_user_update(body, organization_id, workspace_id, user_id):  # noqa: E5
 
 
 @common.platform_exception_handler
-def get_agent_user(organization_id, workspace_id, user_id):  # noqa: E501
-    """returns an agent user
+def get_service_account_user(organization_id, workspace_id, user_id):  # noqa: E501
+    """returns an service account user
 
     Args:
         organization_id (_type_): _description_
@@ -722,7 +722,7 @@ def get_agent_user(organization_id, workspace_id, user_id):  # noqa: E501
         raise common.InternalErrorException(message_id=message_id, message=message)
 
     user = json.loads(response.text)
-    __check_updatable_agent_user(organization_id, workspace_id, user, token)
+    __check_updatable_service_account_user(organization_id, workspace_id, user, token)
     globals.logger.debug(f"response user:{user}")
 
     # realm info の取得
@@ -747,7 +747,7 @@ def get_agent_user(organization_id, workspace_id, user_id):  # noqa: E501
     ret_user = {
         "id": user["id"],
         "username": user.get("username", ""),
-        "agent_user_type": user.get("attributes", {}).get("agent_user_type", [None])[0],
+        "service_account_user_type": user.get("attributes", {}).get("service_account_user_type", [None])[0],
         "description": user.get("attributes", {}).get("description", [""])[0],
         "token_latest_expire_date": common.datetime_to_str(token_latest_expire_date)
     }
@@ -927,8 +927,8 @@ def __get_token_latest_expire_date(private, token, organization_id, realm_info, 
     return token_latest_expire_date
 
 
-def __check_updatable_agent_user(organization_id, workspace_id, user, token):
-    """agent user更新チェック
+def __check_updatable_service_account_user(organization_id, workspace_id, user, token):
+    """service account user更新チェック
 
     Args:
         organization_id (str): organization_id
@@ -942,24 +942,24 @@ def __check_updatable_agent_user(organization_id, workspace_id, user, token):
     """
     user_id = user["id"]
     #
-    # 対象のチェック(agent-userかどうか)
+    # 対象のチェック(service-account-userかどうか)
     #
-    if user.get("attributes", {}).get("agent_user_type", [""])[0] not in bl_agent_user.agent_user_types():
-        globals.logger.info(f'agent user not found: {user_id=}')
+    if user.get("attributes", {}).get("service_account_user_type", [""])[0] not in bl_service_account_user.service_account_user_types():
+        globals.logger.info(f'service account user not found: {user_id=}')
         message_id = "400-41009"
         message = multi_lang.get_text(
             message_id,
-            "エージェントユーザーではありません(対象:{0})",
+            "サービスアカウントユーザーではありません(対象:{0})",
             user_id
         )
         raise common.BadRequestException(message_id=message_id, message=message)
 
     #
-    # 対象のワークスペースのagent userかチェック
+    # 対象のワークスペースのservice account userかチェック
     #
     resp_role_map = api_keycloak_roles.get_user_role_mapping(organization_id, user_id, token)
     if resp_role_map.status_code != 200:
-        globals.logger.error(f'agent user role mapping get faild: {user_id=} {resp_role_map.status_code=} {resp_role_map.text=}')
+        globals.logger.error(f'service account user role mapping get faild: {user_id=} {resp_role_map.status_code=} {resp_role_map.text=}')
         message_id = "400-41010"
         message = multi_lang.get_text(
             message_id,
@@ -969,9 +969,9 @@ def __check_updatable_agent_user(organization_id, workspace_id, user, token):
         raise common.InternalErrorException(message_id=message_id, message=message)
 
     roles = json.loads(resp_role_map.text).get("clientMappings", {}).get(organization_id, {}).get("mappings", [])
-    if len([role["name"] for role in roles if role["name"] in bl_agent_user.agent_user_roles(workspace_id)]) == 0:
-        # 対象のworkspaceのagent userでない場合
-        globals.logger.info(f'agent user not found workspace: {user_id=} {workspace_id=}')
+    if len([role["name"] for role in roles if role["name"] in bl_service_account_user.service_account_user_roles(workspace_id)]) == 0:
+        # 対象のworkspaceのservice account userでない場合
+        globals.logger.info(f'service account user not found workspace: {user_id=} {workspace_id=}')
         message_id = "400-41007"
         message = multi_lang.get_text(
             message_id,

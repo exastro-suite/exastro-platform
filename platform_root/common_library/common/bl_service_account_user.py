@@ -19,8 +19,8 @@ from common_library.common import const
 from common_library.common import api_keycloak_roles, api_keycloak_users
 
 
-def agent_user_roles(workspace_id):
-    """agent user roles
+def service_account_user_roles(workspace_id):
+    """service account user roles
 
     Args:
         workspace_id (str): workspace id
@@ -28,52 +28,52 @@ def agent_user_roles(workspace_id):
     Returns:
         list: _description_
     """
-    return [i['role'] for i in agent_user_type_info(workspace_id)]
+    return [i['role'] for i in service_account_user_type_info(workspace_id)]
 
 
-def agent_user_types():
-    """agent user types
+def service_account_user_types():
+    """service account user types
 
     Returns:
-        list: agent user types
+        list: service account user types
     """
-    return [i['type'] for i in agent_user_type_info('_dummy_')]
+    return [i['type'] for i in service_account_user_type_info('_dummy_')]
 
 
-def agent_user_type_info(workspace_id):
-    """agent user type information
+def service_account_user_type_info(workspace_id):
+    """service account user type information
 
     Args:
         workspace_id (str): workspace id
 
     Returns:
-        list: agent user type information
+        list: service account user type information
     """
     return [
-        {"type": const.AGENT_USER_TYPE_ANSIBLE, "role": f"_{workspace_id}-agent-ansible"},
-        {"type": const.AGENT_USER_TYPE_OASE, "role": f"_{workspace_id}-agent-oase"},
+        {"type": const.SERVICE_ACCOUNT_USER_TYPE_ANSIBLE, "role": f"_{workspace_id}-ansible-execution-agent"},
+        {"type": const.SERVICE_ACCOUNT_USER_TYPE_OASE, "role": f"_{workspace_id}-oase-agent"},
     ]
 
 
-def agent_user_role_name(workspace_id, agent_user_type):
-    """user agent role name
+def service_account_user_role_name(workspace_id, service_account_user_type):
+    """user service account role name
 
     Args:
         workspace_id (str): workspace id
-        agent_user_type (str): agent user type
+        service_account_user_type (str): service account user type
 
     Returns:
         str: role name
     """
-    return f"_{workspace_id}-agent-{agent_user_type}"
+    return f"_{workspace_id}-{service_account_user_type}"
 
 
-def agent_user_create_parameter(username, agent_user_type, description):
-    """agent user create keycloak parameter
+def service_account_user_create_parameter(username, service_account_user_type, description):
+    """service account user create keycloak parameter
 
     Args:
         username (str): username
-        agent_user_type (str): user agent type
+        service_account_user_type (str): service account user type
         description (str): description
 
     Returns:
@@ -81,9 +81,9 @@ def agent_user_create_parameter(username, agent_user_type, description):
     """
     return {
         "username": username,
-        "email": agent_user_email(username),
-        "firstName": const.AGENT_USER_DUMMY_FIRSTNAME,
-        "lastName": const.AGENT_USER_DUMMY_LASTNAME,
+        "email": service_account_user_email(username),
+        "firstName": const.SERVICE_ACCOUNT_USER_DUMMY_FIRSTNAME,
+        "lastName": const.SERVICE_ACCOUNT_USER_DUMMY_LASTNAME,
         # "credentials": [
         #     {
         #         "type": "password",
@@ -95,26 +95,26 @@ def agent_user_create_parameter(username, agent_user_type, description):
         {
             "affiliation": [""],
             "description": [description],
-            const.AGENT_USER_TYPE_ATTRIBUTE_NAME: agent_user_type
+            const.SERVICE_ACCOUNT_USER_TYPE_ATTRIBUTE_NAME: service_account_user_type
         },
         "enabled": True
     }
 
 
-def agent_user_email(username):
-    """agent user email (dummy)
+def service_account_user_email(username):
+    """service account user email (dummy)
 
     Args:
-        username (str): agent user dummy email
+        username (str): service account user dummy email
 
     Returns:
         str: dummy email address
     """
-    return username + const.AGENT_USER_EMAIL_DUMMY_DOMAIN
+    return username + const.SERVICE_ACCOUNT_USER_EMAIL_DUMMY_DOMAIN
 
 
-def delete_workspace_agent_users(organization_id, workspace_id, private, token):
-    """delete all agent users in workspace
+def delete_workspace_service_account_users(organization_id, workspace_id, private, token):
+    """delete all service account users in workspace
 
     Args:
         organization_id (_type_): _description_
@@ -126,7 +126,7 @@ def delete_workspace_agent_users(organization_id, workspace_id, private, token):
         common.InternalErrorException: _description_
     """
 
-    for role in agent_user_roles(workspace_id):
+    for role in service_account_user_roles(workspace_id):
         get_first = 0
         get_max = 100
 

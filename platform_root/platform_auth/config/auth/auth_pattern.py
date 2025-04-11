@@ -270,7 +270,7 @@ AUTH_PATTERN = [
         ]
     },
     {
-        "url": r"^/api/(?P<org_id>[^/][^/]*)/platform/workspaces/(?P<ws_id>[^/][^/]*)/agent-users($|/.*$)",
+        "url": r"^/api/(?P<org_id>[^/][^/]*)/platform/workspaces/(?P<ws_id>[^/][^/]*)/service-account-users($|/.*$)",
         "auth": [
             {
                 "method": ["*"],

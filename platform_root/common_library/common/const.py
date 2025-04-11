@@ -236,12 +236,12 @@ CONFIG_KEY_USER_EXPORT_IMPORT_CLEANUP_TIME = "platform.system.user_export_import
 # chunk size for upload/download
 CONFIG_KEY_CHUNK_SIZE = "platform.system.chunk_size"
 
-# Agent user type
-AGENT_USER_TYPE_ATTRIBUTE_NAME = 'agent_user_type'
+# service account user type
+SERVICE_ACCOUNT_USER_TYPE_ATTRIBUTE_NAME = 'service_account_user_type'
 
-AGENT_USER_TYPE_ANSIBLE = 'ansible'
-AGENT_USER_TYPE_OASE = 'oase'
+SERVICE_ACCOUNT_USER_TYPE_ANSIBLE = 'ansible-execution-agent'
+SERVICE_ACCOUNT_USER_TYPE_OASE = 'oase-agent'
 
-AGENT_USER_EMAIL_DUMMY_DOMAIN = '@dummy'
-AGENT_USER_DUMMY_FIRSTNAME = '-'
-AGENT_USER_DUMMY_LASTNAME = '-'
+SERVICE_ACCOUNT_USER_EMAIL_DUMMY_DOMAIN = '@dummy'
+SERVICE_ACCOUNT_USER_DUMMY_FIRSTNAME = '-'
+SERVICE_ACCOUNT_USER_DUMMY_LASTNAME = '-'

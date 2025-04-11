@@ -29,7 +29,7 @@ import common_library.common.const as common_const
 from common_library.common.db import DBconnector
 from libs import queries_workspaces
 
-from common_library.common import bl_agent_user
+from common_library.common import bl_service_account_user
 
 import globals
 
@@ -331,7 +331,7 @@ def workspace_create(body, organization_id):
 
             builtin_composites_roles = [json.loads(r_role_ws.text)]
 
-            builtin_roles = bl_agent_user.agent_user_roles(workspace_id)
+            builtin_roles = bl_service_account_user.service_account_user_roles(workspace_id)
             for builtin_role in builtin_roles:
                 
                 r_create_role = api_keycloak_roles.clients_role_create(
@@ -591,9 +591,9 @@ def __workspace_delete_main(organization_id, workspace_id, user_id, encode_roles
 
             token = json.loads(token_response.text)["access_token"]
 
-            # Delete agent Users
-            globals.logger.info(f"Delete Platform Agent Users: organization_id={organization_id} / workspace_id={workspace_id}")
-            bl_agent_user.delete_workspace_agent_users(organization_id, workspace_id, private, token)
+            # Delete service account Users
+            globals.logger.info(f"Delete Platform Service Account Users: organization_id={organization_id} / workspace_id={workspace_id}")
+            bl_service_account_user.delete_workspace_service_account_users(organization_id, workspace_id, private, token)
 
             # Delete Workspace Roles
             globals.logger.info(f"Delete Platform Workspace Role: organization_id={organization_id} / workspace_id={workspace_id}")
@@ -603,7 +603,7 @@ def __workspace_delete_main(organization_id, workspace_id, user_id, encode_roles
                 {"client_uid": private.user_token_client_id, "role_name": common.get_ws_admin_rolename(workspace_id)},
             ] + [
                 {"client_uid": private.user_token_client_id, "role_name": builtin_role}
-                for builtin_role in bl_agent_user.agent_user_roles(workspace_id)
+                for builtin_role in bl_service_account_user.service_account_user_roles(workspace_id)
             ]
 
             for delete_role in delete_roles:

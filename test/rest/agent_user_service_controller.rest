@@ -13,24 +13,44 @@
 # share ws_id (同じものを複数記載すると最後の設定値が渡される)
 @ws_id = ws1
 
+# share user_id (同じものを複数記載すると最後の設定値が渡される)
+@user_id = 	435f3f3f-0ba6-4b6e-a90e-11d897674a39
+
 # 1 api to ###
 
 
-### Get Agent User List
+### Get Service Account User List
 # @name agent_list
-GET {{base_org_url}}/api/{{org_id}}/platform/workspaces/{{ws_id}}/agent-users
+GET {{base_org_url}}/api/{{org_id}}/platform/workspaces/{{ws_id}}/service-account-users
 Authorization: Basic {{org-user-id}} {{org-user-pw}}
 
-### Create Agent User
-POST {{base_org_url}}/api/{{org_id}}/platform/workspaces/{{ws_id}}/agent-users
+### Create Service Account User
+POST {{base_org_url}}/api/{{org_id}}/platform/workspaces/{{ws_id}}/service-account-users
 Authorization: Basic {{org-user-id}} {{org-user-pw}}
 content-type: application/json
 
 {
-  "username": "agent-user-01",
-  "agent_user_type": "ansible",
-  "description": "ansible agent userです"
+  "username": "service-account-user-01",
+  "service_account_user_type": "ansible-execution-agent",
+  "description": "service account userです"
 }
+
+### Get Service Account User
+GET {{base_org_url}}/api/{{org_id}}/platform/workspaces/{{ws_id}}/service-account-users/{{user_id}}
+Authorization: Basic {{org-user-id}} {{org-user-pw}}
+
+### Update Service Account User
+PUT {{base_org_url}}/api/{{org_id}}/platform/workspaces/{{ws_id}}/service-account-users/{{user_id}}
+Authorization: Basic {{org-user-id}} {{org-user-pw}}
+content-type: application/json
+
+{
+  "description": "service account userです※更新後"
+}
+
+### Delete Service Account User
+DELETE {{base_org_url}}/api/{{org_id}}/platform/workspaces/{{ws_id}}/service-account-users/{{user_id}}
+Authorization: Basic {{org-user-id}} {{org-user-pw}}
 
 ### Create Agent User Token
 @agent_user_id = {{agent_list.response.body.$.data[0].id}}
@@ -40,3 +60,7 @@ content-type: application/json
 
 {
 }
+
+### Delete Service Account User Token
+DELETE {{base_org_url}}/api/{{org_id}}/platform/workspaces/{{ws_id}}/service-account-users/{{user_id}}/refresh_tokens
+Authorization: Basic {{org-user-id}} {{org-user-pw}}
