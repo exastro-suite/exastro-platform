@@ -29,12 +29,12 @@ $(function(){
 
         ]).then(function(results) {
             // Display Menu
-            displayMenu('menu_agent_management');
+            displayMenu('menu_service_account_management');
             
             // Display Topic Path
             displayTopicPath([
-                {"text": getText("000-83001", "エージェントユーザー一覧"), "href": location_conf.href.workspaces.settings.agent_users.list.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{workspace_id}/g, workspace_id)},
-                {"text": getText("000-83008", "新規エージェントユーザー"), "href": location_conf.href.workspaces.settings.agent_users.new.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{workspace_id}/g, workspace_id)},
+                {"text": getText("000-83001", "サービスアカウントユーザー一覧"), "href": location_conf.href.workspaces.settings.service_account_users.list.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{workspace_id}/g, workspace_id)},
+                {"text": getText("000-83008", "新規サービスアカウントユーザー"), "href": location_conf.href.workspaces.settings.service_account_users.new.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{workspace_id}/g, workspace_id)},
             ]);
             display_main();
             finish_onload_progress();
@@ -60,7 +60,7 @@ $(function(){
                 $('#button_register').prop('disabled',false);
                 return;
             }
-            agentuser_register();
+            service_account_user_register();
         });
     }
 
@@ -73,43 +73,43 @@ $(function(){
         let result=true;
 
         //
-        // validate agent user name
+        // validate service account user name
         //
-        if($("#form_agentuser_username").val() === "") {
+        if($("#form_service_account_user_username").val() === "") {
             // 未入力の場合 - If not entered
-            $("#message_agentuser_username").text(
-                getText("400-00011", "必須項目が不足しています。({0})", getText("000-00128", "エージェントユーザー名")));
+            $("#message_service_account_user_username").text(
+                getText("400-00011", "必須項目が不足しています。({0})", getText("000-00128", "サービスアカウントユーザー名")));
             result = false;
 
-        } else if($("#form_agentuser_username").val().replace(/[a-zA-Z0-9_-]/g,"") !== "") {
+        } else if($("#form_service_account_user_username").val().replace(/[a-zA-Z0-9_-]/g,"") !== "") {
             // 指定可能な文字以外を含む場合 - If it contains other characters that can be specified
-            $("#message_agentuser_username").text(
+            $("#message_service_account_user_username").text(
                 getText("400-00017", "指定できない文字が含まれています。(項目:{0},指定可能な文字:{1})",
-                    getText("000-00128", "エージェントユーザー名"),
+                    getText("000-00128", "サービスアカウントユーザー名"),
                     getText("000-80033", "半角英数・ハイフン・アンダースコア")));
             result = false;
 
-        } else if( ! $("#form_agentuser_username").val().match(/^[a-zA-Z]/)) {
+        } else if( ! $("#form_service_account_user_username").val().match(/^[a-zA-Z]/)) {
             // 先頭の文字がアルファベット以外の場合 - If the leading character is not an alphabet
-            $("#message_agentuser_username").text(
-                getText("400-00014", "先頭の文字にアルファベット以外が指定されています。({0})", getText("000-00128", "エージェントユーザー名")));
+            $("#message_service_account_user_username").text(
+                getText("400-00014", "先頭の文字にアルファベット以外が指定されています。({0})", getText("000-00128", "サービスアカウントユーザー名")));
             result = false;
 
         } else {
-            $("#message_agentuser_username").text("");
+            $("#message_service_account_user_username").text("");
         }
 
         //
-        // validate agent type
+        // validate service account type
         //
-        if ($("#form_agentuser_agenttype").val() === "") {
+        if ($("#form_service_account_user_type").val() === "") {
             // 未選択の場合 - If not selected
-            $("#message_agentuser_agenttype").text(
-                getText("400-00011", "必須項目が選択されていません。({0})", getText("000-00128", "エージェント種類")));
+            $("#message_service_account_user_type").text(
+                getText("400-00011", "必須項目が選択されていません。({0})", getText("000-00128", "サービスアカウントユーザー種別")));
             result = false;
         
         } else {
-            $("#message_agentuser_agenttype").text("");
+            $("#message_service_account_user_type").text("");
         }
 
         console.log("--- validate check end [" + result + "] ----");
@@ -118,14 +118,14 @@ $(function(){
     }
 
     //
-    // エージェントユーザー登録
-    // register agent user
+    // サービスアカウントユーザー登録
+    // register service account user
     //
-    function agentuser_register() {
+    function service_account_user_register() {
 
         let reqbody =   {
-            "username": $('#form_agentuser_username').val(),
-            "agent_user_type": $('#form_agentuser_agenttype').val(),
+            "username": $('#form_service_account_user_username').val(),
+            "service_account_user_type": $('#form_service_account_user_type').val(),
             "description": $('#form_description').val(),
         }
 
@@ -133,7 +133,7 @@ $(function(){
         call_api_promise(
             {
                 type: "POST",
-                url: api_conf.api.workspaces.agent_users.post.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{workspace_id}/g, workspace_id),
+                url: api_conf.api.workspaces.service_account_users.post.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{workspace_id}/g, workspace_id),
                 headers: {
                     Authorization: "Bearer " + CommonAuth.getToken(),
                 },
@@ -143,11 +143,11 @@ $(function(){
             }
         ).then(() => {
             hide_progress();
-            alertMessage(getText("000-80018", "処理結果"), getText("000-83016", "エージェントユーザーを作成しました"),
+            alertMessage(getText("000-80018", "処理結果"), getText("000-83016", "サービスアカウントユーザーを作成しました"),
             () => {
-                // 登録後、「エージェントユーザー一覧」画面に遷移する
-                // When registration is complete, you will be redirected to the "Agent User List" screen.
-                window.location = location_conf.href.workspaces.settings.agent_users.list.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{workspace_id}/g, workspace_id);
+                // 登録後、「サービスアカウントユーザー一覧」画面に遷移する
+                // When registration is complete, you will be redirected to the "Service Account User List" screen.
+                window.location = location_conf.href.workspaces.settings.service_account_users.list.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{workspace_id}/g, workspace_id);
             });
         }).catch(() => {
             hide_progress();

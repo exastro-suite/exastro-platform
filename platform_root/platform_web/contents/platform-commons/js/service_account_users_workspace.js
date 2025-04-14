@@ -31,10 +31,10 @@ $(function(){
             
         ]).then(function(results) {
             // Display Menu
-            displayMenu('menu_agent_management');
+            displayMenu('menu_service_account_management');
             // Display Topic Path
             displayTopicPath([
-                {"text": getText("000-87006", "エージェントワークスペース選択"), "href": location_conf.href.workspaces.settings.agent_users.workspace.replace(/{organization_id}/g, CommonAuth.getRealm())}
+                {"text": getText("000-87006", "エージェントワークスペース選択"), "href": location_conf.href.workspaces.settings.service_account_users.workspace.replace(/{organization_id}/g, CommonAuth.getRealm())}
             ]);
 
             display_main(results[1].data);
@@ -125,13 +125,13 @@ $(function(){
             $('#workspace_list .to_detail').on('click', function() {
                 if (!$(this).prop('disabled')){
                     let workspace_id = $(this).attr('data-id');
-                    window.location = location_conf.href.workspaces.settings.agent_users.list.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{workspace_id}/g, workspace_id);
+                    window.location = location_conf.href.workspaces.settings.service_account_users.list.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{workspace_id}/g, workspace_id);
                 }
             });
 
             $('#workspace_list .button_edit_workspace').on('click', function() {
                 let workspace_id = $(this).attr('data-id');
-                window.location = location_conf.href.workspaces.settings.agent_users.list.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{workspace_id}/g, workspace_id);
+                window.location = location_conf.href.workspaces.settings.service_account_users.list.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{workspace_id}/g, workspace_id);
             });
         }
     }

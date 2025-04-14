@@ -277,7 +277,7 @@ function displayMenu(curent) {
             <li class="menuItem"><a class="menuLink" id="menu_role_management" href="#" style="display: none;">${getText("000-80007", "ロール管理")}</a></li>
             <li class="menuItem"><a class="menuLink" id="menu_settings_notifications" href="#">${getText("000-00183", "通知管理")}</a></li>
 
-            <li class="menuItem"><a class="menuLink" id="menu_agent_management" href="#" style="display: none;">${getText("000-91002", "エージェント管理")}</a></li>
+            <li class="menuItem"><a class="menuLink" id="menu_service_account_management" href="#" style="display: none;">${getText("000-91002", "サービスアカウント管理")}</a></li>
 
             <li class="menuItem">
                 <a class="menuLink menuItemContent" id="menu_organization_setting" type="button" aria-expanded="false" aria-controls="menu_organization_setting_accordion_panel" href="#" style="display: none;">${getText("000-80054", "オーガナイゼーション設定")}</a>
@@ -296,7 +296,7 @@ function displayMenu(curent) {
         $('#menu_account_bulk_actions').attr('href', location_conf.href.users.bulk_actions.replace(/{organization_id}/g, CommonAuth.getRealm()));
         $('#menu_role_management').attr('href', location_conf.href.roles.list.replace(/{organization_id}/g, CommonAuth.getRealm()));
         $('#menu_settings_notifications').attr('href', location_conf.href.workspaces.settings.notifications.workspaces.replace(/{organization_id}/g, CommonAuth.getRealm()));
-        $('#menu_agent_management').attr('href', location_conf.href.workspaces.settings.agent_users.workspace.replace(/{organization_id}/g, CommonAuth.getRealm()));
+        $('#menu_service_account_management').attr('href', location_conf.href.workspaces.settings.service_account_users.workspace.replace(/{organization_id}/g, CommonAuth.getRealm()));
         $('#menu_settings_mailserver').attr('href', location_conf.href.settings.mailserver.replace(/{organization_id}/g, CommonAuth.getRealm()));
         $('#menu_identity_providers').attr('href', location_conf.href.keycloak.identity_providers.replace(/{organization_id}/g, CommonAuth.getRealm()));
         $('#menu_password_policy').attr('href', location_conf.href.keycloak.password_policy.replace(/{organization_id}/g, CommonAuth.getRealm()));
@@ -328,7 +328,7 @@ function displayMenu(curent) {
         }
 
         if (CommonAuth.getAdminWorkspaces().length > 0 ) {
-            $("#menu_agent_management").css("display", "");
+            $("#menu_service_account_management").css("display", "");
         }
 
         if (CommonAuth.hasRealmManagementAuthority("manage-identity-providers")) {

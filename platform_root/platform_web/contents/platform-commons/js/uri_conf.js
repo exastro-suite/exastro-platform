@@ -43,14 +43,14 @@ var api_conf = {
             "notifications": {
                 "post": "/api/{organization_id}/platform/workspaces/{workspace_id}/notifications",
             },
-            "agent_users": {
-                "get": "/api/{organization_id}/platform/workspaces/{workspace_id}/agent-users",
-                "post": "/api/{organization_id}/platform/workspaces/{workspace_id}/agent-users",
+            "service_account_users": {
+                "get": "/api/{organization_id}/platform/workspaces/{workspace_id}/service-account-users",
+                "post": "/api/{organization_id}/platform/workspaces/{workspace_id}/service-account-users",
 
                 "detail": {
-                    "get": "/api/{organization_id}/platform/workspaces/{workspace_id}/agent-users/{user-id}",
-                    "put": "/api/{organization_id}/platform/workspaces/{workspace_id}/agent-users/{user-id}",
-                    "delete": "/api/{organization_id}/platform/workspaces/{workspace_id}/agent-users/{user-id}",
+                    "get": "/api/{organization_id}/platform/workspaces/{workspace_id}/service-account-users/{user-id}",
+                    "put": "/api/{organization_id}/platform/workspaces/{workspace_id}/service-account-users/{user-id}",
+                    "delete": "/api/{organization_id}/platform/workspaces/{workspace_id}/service-account-users/{user-id}",
                 }
             },
         },
@@ -108,10 +108,10 @@ var api_conf = {
                 "get": "/api/{organization_id}/platform/users/_current/refresh_tokens",
                 "delete": "/api/{organization_id}/platform/users/_current/refresh_tokens"
             },
-            "agent_user_site": {
-                "get": "/api/{organization_id}/platform/workspaces/{workspace_id}/agent-users/{user-id}/refresh_tokens",
-                "post": "/api/{organization_id}/platform/workspaces/{workspace_id}/agent-users/{user-id}/refresh_tokens",
-                "delete": "/api/{organization_id}/platform/workspaces/{workspace_id}/agent-users/{user-id}/refresh_tokens"
+            "service_account_user_site": {
+                "get": "/api/{organization_id}/platform/workspaces/{workspace_id}/service-account-users/{user-id}/refresh_tokens",
+                "post": "/api/{organization_id}/platform/workspaces/{workspace_id}/service-account-users/{user-id}/refresh_tokens",
+                "delete": "/api/{organization_id}/platform/workspaces/{workspace_id}/service-account-users/{user-id}/refresh_tokens"
             },
         },
         "organizations": {
@@ -190,11 +190,11 @@ var location_conf = {
                     "detail": "/{organization_id}/platform/workspaces/{workspace_id}/settings/notifications/{destination_id}",
                     "edit": "/{organization_id}/platform/workspaces/{workspace_id}/settings/notifications/{destination_id}/edit",
                 },
-                "agent_users": {
-                    "workspace": "/{organization_id}/platform/workspaces/_settings/agent-users",
-                    "new": "/{organization_id}/platform/workspaces/{workspace_id}/settings/agent-users/_new",
-                    "list": "/{organization_id}/platform/workspaces/{workspace_id}/settings/agent-users",
-                    "edit": "/{organization_id}/platform/workspaces/{workspace_id}/settings/agent-users/{user_id}/edit",
+                "service_account_users": {
+                    "workspace": "/{organization_id}/platform/workspaces/_settings/service-account-users",
+                    "new": "/{organization_id}/platform/workspaces/{workspace_id}/settings/service-account-users/_new",
+                    "list": "/{organization_id}/platform/workspaces/{workspace_id}/settings/service-account-users",
+                    "edit": "/{organization_id}/platform/workspaces/{workspace_id}/settings/service-account-users/{user_id}/edit",
                 },
             },
         },

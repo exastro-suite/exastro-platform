@@ -27,22 +27,22 @@ $(function(){
             // Load Common Contents
             loadCommonContents(),
 
-            // エージェントユーザー一覧取得 - Get Agent User List
-            call_api_promise_agent_users(),
+            // サービスアカウントユーザー一覧取得 - Get service account User List
+            call_api_promise_service_account_users(),
 
         ]).then(function(results) {
             // Display Menu
-            displayMenu('menu_agent_management');
+            displayMenu('menu_service_account_management');
 
             // Display Topic Path
             displayTopicPath([
-                {"text": getText("000-87006", "エージェントワークスペース選択"), "href": location_conf.href.workspaces.settings.agent_users.workspace.replace(/{organization_id}/g, CommonAuth.getRealm())},
-                {"text": getText("000-87002", "エージェントユーザー一覧"), "href": location_conf.href.workspaces.settings.agent_users.list.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{workspace_id}/g, workspace_id)},
+                {"text": getText("000-87006", "ワークスペース選択"), "href": location_conf.href.workspaces.settings.service_account_users.workspace.replace(/{organization_id}/g, CommonAuth.getRealm())},
+                {"text": getText("000-87002", "サービスアカウントユーザー一覧"), "href": location_conf.href.workspaces.settings.service_account_users.list.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{workspace_id}/g, workspace_id)},
             ]);
 
             display_main(results[1].data);
             finish_onload_progress();
-            enabled_button();
+
         }).catch((e) => {
             console.log('[ERROR] load_main catch');
             finish_onload_progress_at_error();
@@ -52,13 +52,13 @@ $(function(){
     }
 
     //
-    // エージェントユーザー一覧取得
-    // get agent user list api call
+    // サービスアカウントユーザー一覧取得
+    // get service account user list api call
     //
-    function call_api_promise_agent_users() {
+    function call_api_promise_service_account_users() {
         return  call_api_promise({
             type: "GET",
-            url: api_conf.api.workspaces.agent_users.get.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{workspace_id}/g, workspace_id),
+            url: api_conf.api.workspaces.service_account_users.get.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{workspace_id}/g, workspace_id),
             headers: {
                 Authorization: "Bearer " + CommonAuth.getToken(),
             }
@@ -69,18 +69,18 @@ $(function(){
     // 画面表示
     // screen display
     //
-    function display_main(agent_users) {
+    function display_main(service_account_users) {
         console.log("[CALL] display_main");
 
         //
-        // 作成ボタン - new agent user button
+        // 作成ボタン - new service account user button
         //
-        $('#new_agent_user').css('display','');
-        $('#new_agent_user').on('click',() => {
-            window.location = location_conf.href.workspaces.settings.agent_users.new.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{workspace_id}/g, workspace_id);
+        $('#new_service_account_user').css('display','');
+        $('#new_service_account_user').on('click',() => {
+            window.location = location_conf.href.workspaces.settings.service_account_users.new.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{workspace_id}/g, workspace_id);
         });
         
-        $('#agent_users_list .datarow .button_edit_agent_user').on('click', function() {
+        $('#service_account_users_list .datarow .button_edit_service_account_user').on('click', function() {
             let user_id = $(this).attr('data-id');
             if (user_id != undefined){
                 window.location = location_conf.href.users.edit.replace('{organization_id}',CommonAuth.getRealm()).replace('{user_id}',user_id);
@@ -90,30 +90,30 @@ $(function(){
         //
         // 一覧の表示 - view lists
         //
-        display_users_list(agent_users);
+        display_users_list(service_account_users);
 
     }
 
     //
-    // エージェントユーザー一覧表示 - display agent users list
+    // サービスアカウントユーザー一覧表示 - display service account users list
     //
-    function display_users_list(agent_users) {
+    function display_users_list(service_account_users) {
         // 明細行を削除
-        $('#agent_users_list .datarow').remove();
+        $('#service_account_users_list .datarow').remove();
 
-        if (agent_users.length == 0) {
+        if (service_account_users.length == 0) {
             // 0件の時はnotfoudの表示
-            $('#agent_users_list .notfound').css('display','');
+            $('#service_account_users_list .notfound').css('display','');
         } else {
             // 1件以上の時はnotfoudの非表示
-            $('#agent_users_list .notfound').css('display','none');
+            $('#service_account_users_list .notfound').css('display','none');
 
             //
             // sort workspace list
             //
-            const sortKey = 'username'; // エージェントユーザー名
+            const sortKey = 'username'; // サービスアカウントユーザー名
             const sortreverse = 1;  // 昇順
-            agent_users.sort(function(a, b){
+            service_account_users.sort(function(a, b){
                 const as = a[sortKey].toLowerCase(), bs = b[sortKey].toLowerCase();
                 if ( as < bs ) {
                     return sortreverse * -1;
@@ -125,21 +125,21 @@ $(function(){
             });
             
             // 明細のテンプレート行からhtmlを取り出す
-            const row_template = $('#agent_users_list .datarow-template').clone(true).removeClass('datarow-template').addClass('datarow').prop('outerHTML');
+            const row_template = $('#service_account_users_list .datarow-template').clone(true).removeClass('datarow-template').addClass('datarow').prop('outerHTML');
 
             // 明細にデータを埋め込み行を明細を作りこむ
-            for(let i = 0; i < agent_users.length; ++i) {
-                const user = agent_users[i];
+            for(let i = 0; i < service_account_users.length; ++i) {
+                const user = service_account_users[i];
                 // const isUpdateAbleRow = UsersCommon.isAllowedEditUser(user); // 更新可能か
                 // const isSystemAccount = UsersCommon.isSystemUser(user);
 
                 const row_html = row_template
                     .replace(/\${username}/g, fn.cv(user.username,'',true))
-                    .replace(/\${agentUserType}/g, fn.cv(user.agent_user_type,'',true))
+                    .replace(/\${serviceAccountUserType}/g, fn.cv(user.service_account_user_type,'',true))
                     .replace(/\${description}/g, fn.cv(user.description,'',true))
                     .replace(/\${tokenExpiration}/g, fn.cv(user.token_latest_expire_date,'',true))
 
-                const $row = $("#agent_users_list tbody").append(row_html).find(".datarow:last-child");
+                const $row = $("#service_account_users_list tbody").append(row_html).find(".datarow:last-child");
 
                 console.log("$row", $row);
                 console.log("button_edit", $row.find(".button_token_issuance"));
@@ -151,87 +151,38 @@ $(function(){
             //
             // 「トークン発行」ボタン - token issuance button
             //
-            $('#agent_users_list .datarow .button_token_issuance').on('click', function() {
+            $('#service_account_users_list .datarow .button_token_issuance').on('click', function() {
                 let user_id = $(this).attr('data-id');
                 if (user_id != undefined){
-                    window.location = location_conf.href.workspaces.settings.agent_users.edit.replace('{organization_id}',CommonAuth.getRealm()).replace('{user_id}',user_id);
+                    window.location = location_conf.href.workspaces.settings.service_account_users.edit.replace('{organization_id}',CommonAuth.getRealm()).replace('{user_id}',user_id);
                 }
             });
 
             //
-            // 「編集」ボタン - edit agent user button
+            // 「編集」ボタン - edit service account user button
             //
-            $('#agent_users_list .datarow .button_edit_agent_user').on('click', function() {
+            $('#service_account_users_list .datarow .button_edit_service_account_user').on('click', function() {
                 let user_id = $(this).attr('data-id');
                 if (user_id != undefined){
-                    window.location = location_conf.href.workspaces.settings.agent_users.edit.replace('{organization_id}',CommonAuth.getRealm()).replace('{user_id}',user_id);
+                    window.location = location_conf.href.workspaces.settings.service_account_users.edit.replace('{organization_id}',CommonAuth.getRealm()).replace('{user_id}',user_id);
                 }
             });
 
             //
-            // 「削除」ボタン - delete agent user button
+            // 「削除」ボタン - delete service account user button
             //
-            $('#agent_users_list .datarow .button_delete_agent_user').on('click', function() {
-                click_delete_agent_user_button($(this).attr('data-id'), $(this).attr('username'));
+            $('#service_account_users_list .datarow .button_delete_service_account_user').on('click', function() {
+                click_delete_service_account_user_button($(this).attr('data-id'), $(this).attr('username'));
             });
         }
-        $('#agent_users_list .datarow').css('display','');
+        $('#service_account_users_list .datarow').css('display','');
     }
 
     //
-    // ボタンの活性・非活性処理
-    // Button enable/disable process
-    //
-    // function enabled_button() {
-    //     $("#new_notification").prop('disabled', false);
-
-    //     const adminWorkspaces = CommonAuth.getAdminWorkspaces();
-    //     const accessibleWorkspaces = CommonAuth.getAccessibleWorkspaces();
-
-    //     $('#settings_notification_list .button_delete_notification').each(function(index, element) {
-    //         let $element = $(element);
-    //         if(CommonAuth.hasAuthority(RolesCommon.ORG_AUTH_WS_MAINTE)) {
-    //             $element.prop('disabled', false);
-    //             return;
-    //         }
-    //         if(adminWorkspaces.indexOf($element.attr('data-id')) !== -1) {
-    //             $element.prop('disabled', false);
-    //         } else {
-    //             $element.prop('disabled', true);
-    //             $element.css('cursor', 'not-allowed');
-    //         }
-    //     });
-
-    //     $('#settings_notification_list .button_edit_notification').each(function(index, element) {
-    //         let $element = $(element);
-    //         if(CommonAuth.hasAuthority(RolesCommon.ORG_AUTH_WS_MAINTE)) {
-    //             $element.prop('disabled', false);
-    //             return;
-    //         }
-    //         if(adminWorkspaces.indexOf($element.attr('data-id')) !== -1) {
-    //             $element.prop('disabled', false);
-    //         } else {
-    //             $element.prop('disabled', true);
-    //             $element.css('cursor', 'not-allowed');
-    //         }
-    //     });
-
-    //     $('#workspace_list .to_detail').each(function(index, element) {
-    //         let $element = $(element);
-    //         if(accessibleWorkspaces.indexOf($element.attr('data-id')) !== -1) {
-    //             $element.prop('disabled', false);
-    //         } else {
-    //             $element.prop('disabled', true);
-    //             $element.css('cursor', 'auto');
-    //         }
-    //     });
-    // }
-
-    //
     // 「削除」ボタン押下時処理
-    // delete agent user button event
+    // delete service account user button event
     //
-    function click_delete_agent_user_button(user_id, username) {
+    function click_delete_service_account_user_button(user_id, username) {
         console.log("username", username);
         deleteConfirmMessage(
             getText("000-80017", "実行確認"),
