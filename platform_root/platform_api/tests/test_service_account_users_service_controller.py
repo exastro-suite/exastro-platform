@@ -1394,6 +1394,58 @@ def test_service_account_user_token_list(connexion_client):
     refresh_token = response.json.get("data", {})
     assert len(refresh_token) == 2
 
+    #
+    # case : get token error
+    #
+    with test_common.requsts_mocker_default() as requests_mocker:
+        # Get a service account token error
+        requests_mocker.register_uri(
+            requests_mock.POST,
+            re.compile(rf'^{test_common.keycloak_origin()}/auth/realms/{organization["organization_id"]}/protocol/openid-connect/token'),
+            status_code=500,
+            json={})
+
+        response = connexion_client.delete(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users/{service_account_user01['id']}/refresh_tokens",
+            headers=request_parameters.request_headers(organization['user_id'], workspace_role=[common.get_ws_admin_authname(workspace['workspace_id'])])
+        )
+    assert response.status_code == 401
+
+    #
+    # case : offline sessionの取得に失敗
+    #
+    with test_common.requsts_mocker_default() as requests_mocker:
+        # faild keycloak api offline_sessions_delete
+        requests_mocker.register_uri(
+            requests_mock.GET,
+            re.compile(rf'^{test_common.keycloak_origin()}/auth/admin/realms/{organization["organization_id"]}/users/.*/consents/.*'),
+            status_code=500,
+            json={})
+        
+        response = connexion_client.delete(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users/{service_account_user01['id']}/refresh_tokens",
+            headers=request_parameters.request_headers(organization['user_id'], workspace_role=[common.get_ws_admin_authname(workspace['workspace_id'])])
+        )
+        
+    assert response.status_code == 500
+    
+    #
+    # case : realmの取得に失敗 - get realm info failed
+    #
+    with test_common.requsts_mocker_default() as requests_mocker:
+        requests_mocker.register_uri(
+            requests_mock.GET,
+            re.compile(rf'^{test_common.keycloak_origin()}/auth/admin/realms/{organization["organization_id"]}$'),
+            status_code=500,
+            json={})
+
+        response = connexion_client.post(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users/{service_account_user01['id']}/refresh_tokens",
+            headers=request_parameters.request_headers(organization['user_id'], workspace_role=[common.get_ws_admin_authname(workspace['workspace_id'])]),
+            json={}
+        )
+    assert response.status_code == 400
+
 
 def test_service_account_user_token_delete(connexion_client):
     """test service_account_user_token_delete
