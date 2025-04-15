@@ -530,6 +530,11 @@ def service_account_user_token_delete(organization_id, workspace_id, user_id):  
 
     private = DBconnector().get_organization_private(organization_id)
 
+    #
+    # 更新可能なservice account userかのチェック / Check updatable  service account user
+    #
+    __check_updatable_service_account_user(organization_id, workspace_id, user_id, token)
+
     # call keycloak token api
     response = api_keycloak_tokens.offline_sessions_delete(organization_id, user_id, private.api_token_client_clientid, token)
 
@@ -576,7 +581,72 @@ def service_account_user_token_list(organization_id, workspace_id, user_id):  # 
         Response: HTTP Response
     """
     globals.logger.debug(f"### func:{inspect.currentframe().f_code.co_name}")
-    return common.response_200_ok(None)
+    
+    # サービスアカウントのTOKEN取得
+    # Get a service account token
+    token = __get_token(organization_id)
+    
+    private = DBconnector().get_organization_private(organization_id)
+    
+    # offline refresh tokenの取得
+    # get a offline refresh token
+    response = api_keycloak_tokens.offline_sessions_get(organization_id, user_id, private.api_token_client_id, token)
+    if response.status_code == 404:
+        # 404の場合は、正常終了 dataなしを返却
+        # In case of 404, return normal end no data
+        return common.response_200_ok([])
+    elif response.status_code != 200:
+        globals.logger.error(f"response.status_code:{response.status_code}")
+        globals.logger.error(f"response.text:{response.text}")
+        message_id = "400-30001"
+        message = multi_lang.get_text(
+            message_id,
+            "offline sessionの取得に失敗しました(対象ID:{0} user:{1} client:{2})",
+            organization_id,
+            user_id,
+            private.api_token_client_clientid,
+        )
+        raise common.BadRequestException(message_id=message_id, message=message)
+
+    offline_sessions = json.loads(response.text)
+    
+    # realmの取得
+    # get realm
+    response = api_keycloak_realms.realm_get(organization_id, token)
+    if response.status_code != 200:
+        globals.logger.error(f"response.status_code:{response.status_code}")
+        globals.logger.error(f"response.text:{response.text}")
+        message_id = "400-30002"
+        message = multi_lang.get_text(
+            message_id,
+            "realm情報の取得に失敗しました(対象ID:{0}",
+            organization_id,
+        )
+        raise common.BadRequestException(message_id=message_id, message=message)
+
+    realm_info = json.loads(response.text)
+    
+    # DataBaseに格納した有効期限を取得する
+    # Get expiration date stored in DataBase
+    # plan and plan_limit list get
+    with closing(DBconnector().connect_orgdb(organization_id)) as conn:
+        with conn.cursor() as cursor:
+
+            parameter = {
+                "user_id": user_id,
+            }
+            where = " WHERE USER_ID = %(user_id)s" \
+                    " ORDER BY CREATE_TIMESTAMP ASC"
+            cursor.execute(queries_token.SQL_QUERY_REFRESH_TOKEN + where, parameter)
+            result_token_lists = cursor.fetchall()
+    
+    # 取得したrefresh tokenの一覧を返却する
+    # Return the list of acquired refresh tokens
+    token_list = __make_refresh_tokens_list(offline_sessions, result_token_lists, realm_info, user_id)
+
+    globals.logger.info(f"### Succeed func:{inspect.currentframe().f_code.co_name}")    
+    
+    return common.response_200_ok(token_list)
 
 
 @common.platform_exception_handler
@@ -981,3 +1051,65 @@ def __check_updatable_service_account_user(organization_id, workspace_id, user, 
         raise common.BadRequestException(message_id=message_id, message=message)
 
     return
+
+
+def __make_refresh_tokens_list(offline_sessions, result_token_lists, realm_info, user_id):
+    """make the list of refresh tokens
+
+    Args:
+        offline_sessions (array): offline sessions
+        result_token_lists (array): token lists
+        realm_info (dict): realm info
+        user_id (str): user id
+
+    Returns:
+        array: the list of refresh tokens
+    """
+    # 取得したrefresh tokenの一覧を返却する
+    # Return the list of acquired refresh tokens
+    data = []
+    for offline_session in offline_sessions:
+        # user_idが一致する情報のみ取得
+        # Get only information with matching user_id
+        if user_id == offline_session.get("userId"):
+
+            # dbの情報に該当するセッション情報があるか確認する
+            # Check if there is session information corresponding to db information
+            row_refresh_token = common.get_item(result_token_lists, "SESSION_ID", offline_session.get("id"))
+
+            # keycloak timestamp に 合わせるため有効期限のtimestampを1000倍してから日付変換する
+            # Multiply the expiration timestamp by 1000 to match the keycloak timestamp before converting the date
+            realm_expire_timestamp = common.keycloak_timestamp_to_datetime(offline_session.get("start") +
+                                                                           (realm_info.get("offlineSessionMaxLifespan", 0) * 1000))
+
+            globals.logger.debug("offlineSessionMaxLifespan:{}".format(realm_info.get("offlineSessionMaxLifespan")))
+
+            globals.logger.debug("EXPIRE_TIMESTAMP:{}:realm_expire_timestamp:{}:{}".format(row_refresh_token.get("EXPIRE_TIMESTAMP"),
+                                                                                           realm_expire_timestamp,
+                                                                                           realm_info.get("offlineSessionMaxLifespanEnabled", False)))
+
+            # realm情報のrefresh tokenの有効期限＋開始日とDBに格納された有効期限を比較して小さい方を有効期限とする
+            # realm情報が無期限設定の場合は、DB値を正とする
+            # Compare the expiration date + start date of the refresh token in the realm information and
+            # the expiration date stored in the DB, and set the smaller one as the expiration date
+            if not realm_info.get("offlineSessionMaxLifespanEnabled", False):
+                expire_timestamp = row_refresh_token.get("EXPIRE_TIMESTAMP")
+            elif row_refresh_token.get("EXPIRE_TIMESTAMP") is None:
+                # 設定ありでDBが無期限(None)の場合は、開始日時＋realmの有効期限とする
+                # If there is a setting and the DB is indefinite, the start date and time + the expiration date of realm
+                expire_timestamp = realm_expire_timestamp
+            elif realm_expire_timestamp < row_refresh_token.get("EXPIRE_TIMESTAMP"):
+                expire_timestamp = realm_expire_timestamp
+            else:
+                expire_timestamp = row_refresh_token.get("EXPIRE_TIMESTAMP")
+
+            row = {
+                "id": offline_session.get("id"),
+                "start_timestamp": common.datetime_to_str(common.keycloak_timestamp_to_datetime(offline_session.get("start"))),
+                "lastaccess_timestamp": common.datetime_to_str(common.keycloak_timestamp_to_datetime(offline_session.get("lastAccess"))),
+                "expire_timestamp": common.datetime_to_str(expire_timestamp),
+            }
+
+            data.append(row)
+
+    return data
