@@ -520,10 +520,6 @@ def service_account_user_token_delete(organization_id, workspace_id, user_id):  
     """
     globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
     
-    # ログインユーザーの情報を取得
-    # Get login user information
-    user_id = request.headers.get("user_id")
-    
     # サービスアカウントのTOKEN取得
     # Get a service account token
     token = __get_token(organization_id)
@@ -531,9 +527,34 @@ def service_account_user_token_delete(organization_id, workspace_id, user_id):  
     private = DBconnector().get_organization_private(organization_id)
 
     #
+    # user情報取得
+    #
+    resp_user = api_keycloak_users.user_get_by_id(organization_id, user_id, token)
+    if resp_user.status_code == 404:
+        globals.logger.info(f'service account user not found: {user_id=}')
+        message_id = "400-41007"
+        message = multi_lang.get_text(
+            message_id,
+            "該当のユーザーは存在しません(対象:{0})",
+            user_id
+        )
+        raise common.BadRequestException(message_id=message_id, message=message)
+
+    if resp_user.status_code != 200:
+        globals.logger.error(f'service account user get faild: {user_id=} {resp_user.status_code=} {resp_user.text=}')
+        message_id = "400-41008"
+        message = multi_lang.get_text(
+            message_id,
+            "ユーザー情報の取得に失敗しました(対象:{0})",
+            user_id
+        )
+        raise common.InternalErrorException(message_id=message_id, message=message)
+
+    #
     # 更新可能なservice account userかのチェック / Check updatable  service account user
     #
-    __check_updatable_service_account_user(organization_id, workspace_id, user_id, token)
+    user = json.loads(resp_user.text)
+    __check_updatable_service_account_user(organization_id, workspace_id, user, token)
 
     # call keycloak token api
     response = api_keycloak_tokens.offline_sessions_delete(organization_id, user_id, private.api_token_client_clientid, token)

@@ -1384,7 +1384,7 @@ def test_service_account_user_token_list(connexion_client):
     # case : normal
     #
     with test_common.requsts_mocker_default():
-        # token削除
+        # token取得
         response = connexion_client.get(
             f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users/{service_account_user01['id']}/refresh_tokens",
             content_type='application/json',
@@ -1405,7 +1405,7 @@ def test_service_account_user_token_list(connexion_client):
             status_code=500,
             json={})
 
-        response = connexion_client.delete(
+        response = connexion_client.get(
             f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users/{service_account_user01['id']}/refresh_tokens",
             headers=request_parameters.request_headers(organization['user_id'], workspace_role=[common.get_ws_admin_authname(workspace['workspace_id'])])
         )
@@ -1418,16 +1418,16 @@ def test_service_account_user_token_list(connexion_client):
         # faild keycloak api offline_sessions_delete
         requests_mocker.register_uri(
             requests_mock.GET,
-            re.compile(rf'^{test_common.keycloak_origin()}/auth/admin/realms/{organization["organization_id"]}/users/.*/consents/.*'),
+            re.compile(rf'^{test_common.keycloak_origin()}/auth/admin/realms/{organization["organization_id"]}/users/{service_account_user01['id']}/offline-sessions/'),
             status_code=500,
             json={})
         
-        response = connexion_client.delete(
+        response = connexion_client.get(
             f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users/{service_account_user01['id']}/refresh_tokens",
             headers=request_parameters.request_headers(organization['user_id'], workspace_role=[common.get_ws_admin_authname(workspace['workspace_id'])])
         )
         
-    assert response.status_code == 500
+    assert response.status_code == 400
     
     #
     # case : realmの取得に失敗 - get realm info failed
@@ -1439,7 +1439,7 @@ def test_service_account_user_token_list(connexion_client):
             status_code=500,
             json={})
 
-        response = connexion_client.post(
+        response = connexion_client.get(
             f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users/{service_account_user01['id']}/refresh_tokens",
             headers=request_parameters.request_headers(organization['user_id'], workspace_role=[common.get_ws_admin_authname(workspace['workspace_id'])]),
             json={}
