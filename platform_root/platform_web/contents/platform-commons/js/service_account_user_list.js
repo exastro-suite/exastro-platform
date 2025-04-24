@@ -83,7 +83,7 @@ $(function(){
         $('#service_account_users_list .datarow .button_edit_service_account_user').on('click', function() {
             let user_id = $(this).attr('data-id');
             if (user_id != undefined){
-                window.location = location_conf.href.users.edit.replace('{organization_id}',CommonAuth.getRealm()).replace('{user_id}',user_id);
+                window.location = location_conf.href.workspaces.settings.service_account_users.edit.replace('{organization_id}',CommonAuth.getRealm()).replace('{user_id}',user_id);
             }
         });
 
@@ -134,6 +134,7 @@ $(function(){
                 // const isSystemAccount = UsersCommon.isSystemUser(user);
 
                 const row_html = row_template
+                    .replace(/\${user_id}/g, fn.cv(user.id,'',true))
                     .replace(/\${username}/g, fn.cv(user.username,'',true))
                     .replace(/\${serviceAccountUserType}/g, fn.cv(user.service_account_user_type,'',true))
                     .replace(/\${description}/g, fn.cv(user.description,'',true))
@@ -164,7 +165,7 @@ $(function(){
             $('#service_account_users_list .datarow .button_edit_service_account_user').on('click', function() {
                 let user_id = $(this).attr('data-id');
                 if (user_id != undefined){
-                    window.location = location_conf.href.workspaces.settings.service_account_users.edit.replace('{organization_id}',CommonAuth.getRealm()).replace('{user_id}',user_id);
+                    window.location = location_conf.href.workspaces.settings.service_account_users.edit.replace('{organization_id}',CommonAuth.getRealm()).replace('{workspace_id}', workspace_id).replace('{user_id}',user_id);
                 }
             });
 

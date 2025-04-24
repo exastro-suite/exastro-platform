@@ -48,9 +48,9 @@ var api_conf = {
                 "post": "/api/{organization_id}/platform/workspaces/{workspace_id}/service-account-users",
 
                 "detail": {
-                    "get": "/api/{organization_id}/platform/workspaces/{workspace_id}/service-account-users/{user-id}",
-                    "put": "/api/{organization_id}/platform/workspaces/{workspace_id}/service-account-users/{user-id}",
-                    "delete": "/api/{organization_id}/platform/workspaces/{workspace_id}/service-account-users/{user-id}",
+                    "get": "/api/{organization_id}/platform/workspaces/{workspace_id}/service-account-users/{user_id}",
+                    "put": "/api/{organization_id}/platform/workspaces/{workspace_id}/service-account-users/{user_id}",
+                    "delete": "/api/{organization_id}/platform/workspaces/{workspace_id}/service-account-users/{user_id}",
                 }
             },
         },
@@ -109,9 +109,9 @@ var api_conf = {
                 "delete": "/api/{organization_id}/platform/users/_current/refresh_tokens"
             },
             "service_account_user_site": {
-                "get": "/api/{organization_id}/platform/workspaces/{workspace_id}/service-account-users/{user-id}/refresh_tokens",
-                "post": "/api/{organization_id}/platform/workspaces/{workspace_id}/service-account-users/{user-id}/refresh_tokens",
-                "delete": "/api/{organization_id}/platform/workspaces/{workspace_id}/service-account-users/{user-id}/refresh_tokens"
+                "get": "/api/{organization_id}/platform/workspaces/{workspace_id}/service-account-users/{user_id}/refresh_tokens",
+                "post": "/api/{organization_id}/platform/workspaces/{workspace_id}/service-account-users/{user_id}/refresh_tokens",
+                "delete": "/api/{organization_id}/platform/workspaces/{workspace_id}/service-account-users/{user_id}/refresh_tokens"
             },
         },
         "organizations": {
