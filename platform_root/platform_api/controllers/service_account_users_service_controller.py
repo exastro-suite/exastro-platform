@@ -660,12 +660,63 @@ def service_account_user_token_list(organization_id, workspace_id, user_id):  # 
                     " ORDER BY CREATE_TIMESTAMP ASC"
             cursor.execute(queries_token.SQL_QUERY_REFRESH_TOKEN + where, parameter)
             result_token_lists = cursor.fetchall()
+            
+    # 発行ユーザーIDから発行ユーザー名を取得する
+    # index = 0
+    # for result_token_list in result_token_lists:
+    #     responce = api_keycloak_users.user_get_by_id(organization_id, result_token_list.get("CREATE_USER"), token)
+    #     user = json.loads(responce.text)
+    #     result_token_lists[index]["CREATE_USERNAME"] = user["username"]
+    #     index = index + 1
+    
+    # make response data
+    data = []
+    user_data = []
+    for row in result_token_lists:
+        create_user_id = row["CREATE_USER"]
+        name = None
+        
+        userid_exists = [u["name"] for u in user_data if u["user_id"] == create_user_id]
+        if len(userid_exists) > 0:
+            name = userid_exists[0]
+        else:
+            # get user from keycloak, None if 404
+            response = api_keycloak_users.user_get_by_id(organization_id, create_user_id, token)
+            if response.status_code == 200:
+                user = json.loads(response.text)
+                globals.logger.debug(f"response user:{user}")
+
+                name = common.get_username(user.get("firstName"), user.get("lastName"), user.get("username"))
+            elif response.status_code == 404:
+                globals.logger.debug("response user:not found")
+
+                name = None
+            else:
+                globals.logger.error(f"response.status_code:{response.status_code}")
+                globals.logger.error(f"response.text:{response.text}")
+                message = multi_lang.get_text(
+                    "500-40004",
+                    "ユーザーの取得に失敗しました(対象ID:{0})",
+                    organization_id,
+                )
+                raise common.InternalErrorException(message_id="500-40004", message=message)
+
+            # Save user data and reduce get data from Keycloak
+            user_data.append({"user_id": create_user_id, "name": name, })
+            
+        row = {
+            "SESSION_ID": row["SESSION_ID"],
+            "EXPIRE_TIMESTAMP": row["EXPIRE_TIMESTAMP"],
+            "CREATE_USER_ID": create_user_id,
+            "CREATE_USERNAME": name,
+        }
+        data.append(row)
     
     # 取得したrefresh tokenの一覧を返却する
     # Return the list of acquired refresh tokens
-    token_list = __make_refresh_tokens_list(offline_sessions, result_token_lists, realm_info, user_id)
+    token_list = __make_refresh_tokens_list(offline_sessions, data, realm_info, user_id)
 
-    globals.logger.info(f"### Succeed func:{inspect.currentframe().f_code.co_name}")    
+    globals.logger.info(f"### Succeed func:{inspect.currentframe().f_code.co_name}")
     
     return common.response_200_ok(token_list)
 
@@ -1129,6 +1180,8 @@ def __make_refresh_tokens_list(offline_sessions, result_token_lists, realm_info,
                 "start_timestamp": common.datetime_to_str(common.keycloak_timestamp_to_datetime(offline_session.get("start"))),
                 "lastaccess_timestamp": common.datetime_to_str(common.keycloak_timestamp_to_datetime(offline_session.get("lastAccess"))),
                 "expire_timestamp": common.datetime_to_str(expire_timestamp),
+                "create_user_id": row_refresh_token.get("CREATE_USER"),
+                "create_user_name": row_refresh_token.get("CREATE_USERNAME"),
             }
 
             data.append(row)

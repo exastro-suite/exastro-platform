@@ -189,7 +189,7 @@ $(function(){
 
         ]).then(function(result){
             // 登録したサービスアカウントユーザーのデータを取得 - Get the data of a registered service account user
-            const regUserData = result[0].data.filter(item => item.username === reqbody.username);
+            const regUserData = result[0].data.filter(item => item.username === reqbody.username.toLowerCase());
 
             // refresh tokenを発行 - create refresh token
             return call_api_promise({

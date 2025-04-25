@@ -73,7 +73,7 @@ $(function(){
         console.log("[CALL] display_main");
 
         //
-        // 作成ボタン - new service account user button
+        // 「作成」ボタン - new service account user button
         //
         $('#new_service_account_user').css('display','');
         $('#new_service_account_user').on('click',() => {
@@ -155,7 +155,7 @@ $(function(){
             $('#service_account_users_list .datarow .button_token_issuance').on('click', function() {
                 let user_id = $(this).attr('data-id');
                 if (user_id != undefined){
-                    window.location = location_conf.href.workspaces.settings.service_account_users.edit.replace('{organization_id}',CommonAuth.getRealm()).replace('{user_id}',user_id);
+                    window.location = location_conf.href.workspaces.settings.service_account_users.token.replace('{organization_id}',CommonAuth.getRealm()).replace('{workspace_id}',workspace_id).replace('{user_id}',user_id);
                 }
             });
 

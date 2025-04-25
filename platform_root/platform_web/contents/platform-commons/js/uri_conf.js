@@ -195,6 +195,7 @@ var location_conf = {
                     "new": "/{organization_id}/platform/workspaces/{workspace_id}/settings/service-account-users/_new",
                     "list": "/{organization_id}/platform/workspaces/{workspace_id}/settings/service-account-users",
                     "edit": "/{organization_id}/platform/workspaces/{workspace_id}/settings/service-account-users/{user_id}/edit",
+                    "token": "/{organization_id}/platform/workspaces/{workspace_id}/settings/service-account-users/{user_id}/token"
                 },
             },
         },
