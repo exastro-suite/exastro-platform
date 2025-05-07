@@ -23,6 +23,8 @@ $(function(){
     });
 
     function load_main() {
+        console.log("[CALL] load_main");
+
         Promise.all([
             // Load Common Contents
             loadCommonContents(),
@@ -56,6 +58,8 @@ $(function(){
     // get service account user list api call
     //
     function call_api_promise_service_account_users() {
+        console.log("[CALL] call_api_promise_service_account_users");
+
         return  call_api_promise({
             type: "GET",
             url: api_conf.api.workspaces.service_account_users.get.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{workspace_id}/g, workspace_id),
@@ -98,6 +102,8 @@ $(function(){
     // サービスアカウントユーザー一覧表示 - display service account users list
     //
     function display_users_list(service_account_users) {
+        console.log("[CALL] display_users_list");
+
         // 明細行を削除
         $('#service_account_users_list .datarow').remove();
 
@@ -173,7 +179,7 @@ $(function(){
             // 「削除」ボタン - delete service account user button
             //
             $('#service_account_users_list .datarow .button_delete_service_account_user').on('click', function() {
-                click_delete_service_account_user_button($(this).attr('data-id'), $(this).attr('username'));
+                click_delete_service_account_user_button($(this).attr('data-id'), $(this).closest('.datarow').attr('username'));
             });
         }
         $('#service_account_users_list .datarow').css('display','');
@@ -184,46 +190,40 @@ $(function(){
     // delete service account user button event
     //
     function click_delete_service_account_user_button(user_id, username) {
+        console.log("[CALL] click_delete_service_account_user_button");
         console.log("username", username);
+        
         deleteConfirmMessage(
             getText("000-80017", "実行確認"),
-            getText("000-83005", "以下のユーザーを削除してよろしいですか？"),
+            getText("000-83005", "以下のサービスアカウントユーザーを削除してよろしいですか？"),
             username,
-            getText("000-83006", "削除したユーザーは以降ログインできなくなります。"),
-            CommonAuth.getRealm() + "/" + username,
+            getText("000-83006", "削除したサービスアカウントユーザーは以降使用できなくなります。"),
+            workspace_id + "/" + username,
             () => {
-                disable_event_elements(true);
                 show_progress();
 
                 // APIを呼出す
                 call_api_promise({
                     type: "DELETE",
-                    url: api_conf.api.users.delete.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{user_id}/g, user_id),
+                    url: api_conf.api.workspaces.service_account_users.detail.delete.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{workspace_id}/g, workspace_id).replace(/{user_id}/g, user_id),
                     headers: {
                         Authorization: "Bearer " + CommonAuth.getToken(),
                     },
                 }).then(() => {
-                    if(user_id == CommonAuth.getUserId()) {
-                        return new Promise((resolve, reject) => {resolve(null)})
-                    } else {
-                        return call_api_promise_users();
-                    }
+                    // サービスアカウントユーザー一覧取得 - get service account user list api call
+                    return call_api_promise_service_account_users();
+                    
                 }).then((results) => {
                     if( results != null) {
                         // 一覧の再描画
                         display_main(results.data);
                     }
+                    
                     hide_progress();
-                    alertMessage(getText("000-80018", "処理結果"), getText("000-83007", "ユーザーを削除しました。"),
-                    () => {
-                        if(user_id == CommonAuth.getUserId()) {
-                            // 自分自身を消したときは、top画面に遷移しログイン画面へ
-                            // When you erase yourself, transition to the top screen and go to the login screen
-                            window.location = location_conf.href.menu.organization_user_site.toppage.replace(/{organization_id}/g, CommonAuth.getRealm());
-                        }
-                    });
+
+                    alertMessage(getText("000-80018", "処理結果"), getText("000-83007", "サービスアカウントユーザーを削除しました。"));
+                    
                 }).catch(() => {
-                    disable_event_elements(false);
                     hide_progress();
                 });
             }
