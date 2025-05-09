@@ -277,7 +277,7 @@ function displayMenu(curent) {
             <li class="menuItem"><a class="menuLink" id="menu_role_management" href="#" style="display: none;">${getText("000-80007", "ロール管理")}</a></li>
             <li class="menuItem"><a class="menuLink" id="menu_settings_notifications" href="#">${getText("000-00183", "通知管理")}</a></li>
 
-            <li class="menuItem"><a class="menuLink" id="menu_service_account_management" href="#" style="display: none;">${getText("000-91002", "サービスアカウント管理")}</a></li>
+            <li class="menuItem"><a class="menuLink" id="menu_service_account_management" href="#" style="display: none;">${getText("000-80056", "サービスアカウント管理")}</a></li>
 
             <li class="menuItem">
                 <a class="menuLink menuItemContent" id="menu_organization_setting" type="button" aria-expanded="false" aria-controls="menu_organization_setting_accordion_panel" href="#" style="display: none;">${getText("000-80054", "オーガナイゼーション設定")}</a>

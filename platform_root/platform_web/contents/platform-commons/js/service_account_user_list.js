@@ -38,8 +38,8 @@ $(function(){
 
             // Display Topic Path
             displayTopicPath([
-                {"text": getText("000-87006", "ワークスペース選択"), "href": location_conf.href.workspaces.settings.service_account_users.workspace.replace(/{organization_id}/g, CommonAuth.getRealm())},
-                {"text": getText("000-87002", "サービスアカウントユーザー一覧"), "href": location_conf.href.workspaces.settings.service_account_users.list.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{workspace_id}/g, workspace_id)},
+                {"text": getText("000-93001", "ワークスペース選択"), "href": location_conf.href.workspaces.settings.service_account_users.workspace.replace(/{organization_id}/g, CommonAuth.getRealm())},
+                {"text": getText("000-93005", "サービスアカウントユーザー一覧"), "href": location_conf.href.workspaces.settings.service_account_users.list.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{workspace_id}/g, workspace_id)},
             ]);
 
             display_main(results[1].data);
@@ -195,9 +195,9 @@ $(function(){
         
         deleteConfirmMessage(
             getText("000-80017", "実行確認"),
-            getText("000-83005", "以下のサービスアカウントユーザーを削除してよろしいですか？"),
+            getText("000-93011", "以下のサービスアカウントユーザーを削除してよろしいですか？"),
             username,
-            getText("000-83006", "削除したサービスアカウントユーザーは以降使用できなくなります。"),
+            getText("000-93012", "削除したサービスアカウントユーザーは以降使用できなくなります。"),
             workspace_id + "/" + username,
             () => {
                 show_progress();
@@ -221,7 +221,7 @@ $(function(){
                     
                     hide_progress();
 
-                    alertMessage(getText("000-80018", "処理結果"), getText("000-83007", "サービスアカウントユーザーを削除しました。"));
+                    alertMessage(getText("000-80018", "処理結果"), getText("000-93013", "サービスアカウントユーザーを削除しました。"));
                     
                 }).catch(() => {
                     hide_progress();

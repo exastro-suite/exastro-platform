@@ -24,6 +24,8 @@ $(function(){
     });
 
     function load_main() {
+        console.log("[CALL] load_main");
+
         Promise.all([
             // Load Common Contents
             loadCommonContents(),
@@ -41,11 +43,13 @@ $(function(){
         ]).then(function(results) {
             // Display Menu
             displayMenu('menu_service_account_management');
+
             // Display Topic Path
             displayTopicPath([
-                {"text": getText("000-83001", "サービスアカウントユーザー一覧"), "href": location_conf.href.workspaces.settings.service_account_users.list.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{workspace_id}/g, workspace_id)},
-                {"text": getText("000-83017", "サービスアカウントユーザー編集"), "href": location_conf.href.workspaces.settings.service_account_users.edit.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{workspace_id}/g, workspace_id)},
+                {"text": getText("000-93005", "サービスアカウントユーザー一覧"), "href": location_conf.href.workspaces.settings.service_account_users.list.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{workspace_id}/g, workspace_id)},
+                {"text": getText("000-93019", "サービスアカウントユーザー編集"), "href": location_conf.href.workspaces.settings.service_account_users.edit.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{workspace_id}/g, workspace_id)},
             ]);
+
             display_main(results[1].data);
             finish_onload_progress();
 
@@ -85,6 +89,7 @@ $(function(){
     // validate register
     //
     function validate_register() {
+        console.log("[CALL] validate_register");
         console.log("--- validate check start ----");
         let result=true;
 
@@ -97,6 +102,7 @@ $(function(){
     // register workspace
     //
     function service_account_user_register() {
+        console.log("[CALL] service_account_user_register");
 
         let reqbody =   {
             "description": $('#form_description').val(),
@@ -118,7 +124,7 @@ $(function(){
             }
         ).then(() => {
             hide_progress();
-            alertMessage(getText("000-80018", "処理結果"), getText("000-83021", "ユーザーを変更しました"),
+            alertMessage(getText("000-80018", "処理結果"), getText("000-93022", "サービスアカウントユーザーを変更しました"),
             () => {
                 window.location = location_conf.href.workspaces.settings.service_account_users.list.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{workspace_id}/g, workspace_id);
             });

@@ -24,6 +24,7 @@ $(function(){
     });
 
     function load_main() {
+        console.log("[CALL] load_main");
         Promise.all([
             // Load Common Contents
             loadCommonContents(),
@@ -33,12 +34,12 @@ $(function(){
 
         ]).then(function(results) {
             // Display Menu
-            displayMenu(null);
+            displayMenu('menu_service_account_management');
 
             // Display Topic Path
             displayTopicPath([
-                {"text": getText("000-83001", "サービスアカウントユーザー一覧"), "href": location_conf.href.workspaces.settings.service_account_users.list.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{workspace_id}/g, workspace_id)},
-                {"text": getText("000-83008", "サービスアカウントユーザートークン発行"), "href": location_conf.href.workspaces.settings.service_account_users.token.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{workspace_id}/g, workspace_id).replace(/{user_id}/g, user_id)},
+                {"text": getText("000-93005", "サービスアカウントユーザー一覧"), "href": location_conf.href.workspaces.settings.service_account_users.list.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{workspace_id}/g, workspace_id)},
+                {"text": getText("000-93023", "サービスアカウントユーザートークン発行"), "href": location_conf.href.workspaces.settings.service_account_users.token.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{workspace_id}/g, workspace_id).replace(/{user_id}/g, user_id)},
             ]);
 
             // Display Token List
@@ -60,6 +61,7 @@ $(function(){
     // Call refresh token get API
     // 
     function call_api_promise_getTokenList() {
+        console.log("[CALL] call_api_promise_getTokenList");
         return call_api_promise({
             type: "GET",
             url: api_conf.api.token.service_account_user_site.get.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{workspace_id}/g, workspace_id).replace(/{user_id}/g, user_id),
@@ -76,6 +78,8 @@ $(function(){
     // display a list of refresh tokens
     // 
     function displayTokenList(list) {
+        console.log("[CALL] displayTokenList");
+
         // 明細行を削除
         $("#token_list .datarow").remove();
 
@@ -136,35 +140,6 @@ $(function(){
         });
     }
 
-
-    // Display refresh token issuance modal screen
-    // refresh tokenの発行モーダル画面を表示
-    function create_modal_open() {
-        const dialog = new Dialog({
-            mode: 'modeless',
-            position: 'center',
-            width: 'auto',
-            header: {
-                title: getText("000-81018", "refresh token発行"),
-            },
-            footer: {
-                button: {
-                    append: { text: '<span class="iconButtonIcon icon icon-plus"></span>'+getText("000-80034", "発行"), action: 'positive', style: 'width:200px;'},
-                    close: { text: getText("000-80011", "閉じる"), action: "normal", style: 'width:200px;' }
-                }
-            },
-        },
-        {
-            append: function() {
-                modal_create_button(dialog);
-            },
-            close: function() {
-                dialog.close();
-            }
-        });
-        dialog.open($("#create_token_dialog").html());
-    }
-
     // 
     // トークン発行
     // issuance token
@@ -198,6 +173,8 @@ $(function(){
     // Process to call service account user token creation API
     // 
     function call_api_promise_create_service_account_user_token(reqbody){
+        console.log("[CALL] call_api_promise_create_service_account_user_token");
+        
         // refresh tokenを発行 - create refresh token
         return call_api_promise({
             type: "POST",
@@ -211,85 +188,20 @@ $(function(){
         })
     }
 
-    // Press the refresh token issue button
-    // refresh tokenの発行ボタンを押下
-    function modal_create_button(dialog) {
-
-        // Validate input
-        if ($(dialog.$.dbody).find("#form_password").val() == "") {
-            $(dialog.$.dbody).find("#message_password").text(getText("400-00011", "必須項目が不足しています。({0})", getText("000-00132", "パスワード")));
-            return;
-        }
-
-        // clear message Validate input
-        $(dialog.$.dbody).find("#message_password").text("");
-        $(dialog.$.dbody).find("#message_onetime_password").text("");
-
-        show_progress();
-
-        // Post dataの生成
-        const post_data = {
-            client_id: CommonAuth.isPlatformAdminSite()?
-                CommonAuthConfig.PLATFORM_ADMIN_SITE.TOKEN_CLIENT:
-                CommonAuthConfig.ORGANIZATION_USER_SITE.TOKEN_CLIENT.replace(/{RELMNAME}/g, CommonAuth.getRealm()),
-            grant_type: "password",
-            scope: "openid offline_access",
-            username: CommonAuth.getPreferredUsername(),
-            password: $(dialog.$.dbody).find("#form_password").val()
-        }
-        if ($(dialog.$.dbody).find("#form_onetime_password").val() != "") {
-            // ontime passwordは指定した時のみ付与
-            post_data.totp = $(dialog.$.dbody).find("#form_onetime_password").val();
-        }
-
-        // APIの呼出(401応答を処理したいのでnoMessage版を使う)
-        call_api_promise_noMessage({
-            type: "POST",
-            url: api_conf.api.token.post.replace(/{realm_name}/g, CommonAuth.getRealm()),
-            headers: {
-                contentType: "application/x-www-form-urlencoded",
-            },
-            data: post_data
-        }).then((result) => {
-            hide_progress();
-            dialog.close();
-
-            // refresh tokenの発行結果の表示
-            display_result_created(result.data, result.status, result.jqXHR);
-
-        }).catch((error) => {
-            hide_progress();
-            if(error.jqXHR) {
-                // APIのエラー応答
-                switch(error.jqXHR.status) {
-                    case 401:
-                        alertMessage(getText("000-80018", "処理結果"),getText("000-81019", "入力に誤りがあるため、refresh tokenの発行に失敗しました。"), () => {
-                            $(dialog.$.dbody).find("#form_password").val("");
-                            $(dialog.$.dbody).find("#form_onetime_password").val("");
-                        });
-                        break;
-                    default:
-                        alertMessageApiError(error.jqXHR, error.textStatus, error.errorThrown);
-                        break;
-                }
-            } else {
-                const detail = "";
-                try { detail += "" + error.toString() } catch {}
-                alert(getText("000-81020", "エラーが発生しました。") + detail);
-            }
-        });
-    }
-
+    // 
     // Display of result of issuing refresh token
     // refresh tokenの発行結果の表示
+    // 
     function display_result_created(data, status, jqXHR) {
+        console.log("[CALL] display_result_created");
+
         // 一覧の再描画
         call_api_promise_getTokenList().then((result) => {
             displayTokenList(result.data)
         });
 
         if(data.refresh_token) {
-            const dialog_contents = $("#create_token_result_dialog").html().replace(/{refresh_token}/g, fn.cv(data.refresh_token,'',true));
+            const dialog_contents = $("#create_token_result_dialog").html().replace(/{refresh_token}/g, fn.cv(data.refresh_token,'',true)).replace(/{expiration_date}/g, fn.date(data.refresh_token_expire,'yyyy/MM/dd'));
 
             const dialog = new Dialog({
                 mode: 'modeless',
@@ -328,12 +240,16 @@ $(function(){
         }
     }
 
-    // Delete refresh token
+    //
     // refresh tokenの削除
+    // Delete refresh token
+    //
     function delete_modal_open() {
+        console.log("[CALL] delete_modal_open");
+
         deleteConfirmMessage(
             getText("000-80017", "実行確認"),
-            getText("000-81023", "あなたが発行した以下の全てのrefresh tokenを削除(無効化)してよろしいですか？"),
+            getText("000-93028", "このサービスアカウントユーザー用に発行した以下の全てのrefresh tokenを削除(無効化)してよろしいですか？"),
             $("#token_list .datarow").map((i,elm) => {return fn.cv($(elm).attr("data-id"),"", true)}).get(),
             getText("000-81024", "削除したrefresh tokenを使ってAPIの呼出しを行っている場合、APIの呼び出しができなくなります。"),
             "yes",
@@ -355,9 +271,10 @@ $(function(){
                     // 一覧の再描画
                     displayTokenList(result.data);
                     hide_progress();
-                    alertMessage(getText("000-80018", "処理結果"),getText("000-81025", "あなたが発行した全てのrefresh tokenを削除(無効化)しました。"));
+                    alertMessage(getText("000-80018", "処理結果"),getText("000-93029", "このサービスアカウントユーザー用に発行した全てのrefresh tokenを削除(無効化)しました。"));
                 });
-            });
+            }
+        );
     }
 });
 

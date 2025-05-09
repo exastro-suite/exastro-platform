@@ -23,6 +23,7 @@ $(function(){
     });
 
     function load_main() {
+        console.log("[CALL] load_main");
         Promise.all([
             // Load Common Contents
             loadCommonContents()
@@ -33,8 +34,8 @@ $(function(){
             
             // Display Topic Path
             displayTopicPath([
-                {"text": getText("000-83001", "サービスアカウントユーザー一覧"), "href": location_conf.href.workspaces.settings.service_account_users.list.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{workspace_id}/g, workspace_id)},
-                {"text": getText("000-83008", "新規サービスアカウントユーザー"), "href": location_conf.href.workspaces.settings.service_account_users.new.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{workspace_id}/g, workspace_id)},
+                {"text": getText("000-93005", "サービスアカウントユーザー一覧"), "href": location_conf.href.workspaces.settings.service_account_users.list.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{workspace_id}/g, workspace_id)},
+                {"text": getText("000-93014", "新規サービスアカウントユーザー"), "href": location_conf.href.workspaces.settings.service_account_users.new.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{workspace_id}/g, workspace_id)},
             ]);
             display_main();
             finish_onload_progress();
@@ -69,6 +70,7 @@ $(function(){
     // validate register
     //
     function validate_register() {
+        console.log("[CALL] validate_register");
         console.log("--- validate check start ----");
         let result=true;
 
@@ -79,21 +81,21 @@ $(function(){
         if($("#form_service_account_user_username").val() === "") {
             // 未入力の場合 - If not entered
             $("#message_service_account_user_username").text(
-                getText("400-00011", "必須項目が不足しています。({0})", getText("000-00128", "サービスアカウントユーザー名")));
+                getText("400-00011", "必須項目が不足しています。({0})", getText("000-93017", "サービスアカウントユーザー名")));
             result = false;
 
         } else if($("#form_service_account_user_username").val().replace(/[a-zA-Z0-9_-]/g,"") !== "") {
             // 指定可能な文字以外を含む場合 - If it contains other characters that can be specified
             $("#message_service_account_user_username").text(
                 getText("400-00017", "指定できない文字が含まれています。(項目:{0},指定可能な文字:{1})",
-                    getText("000-00128", "サービスアカウントユーザー名"),
+                    getText("000-93017", "サービスアカウントユーザー名"),
                     getText("000-80033", "半角英数・ハイフン・アンダースコア")));
             result = false;
 
         } else if( ! $("#form_service_account_user_username").val().match(/^[a-zA-Z]/)) {
             // 先頭の文字がアルファベット以外の場合 - If the leading character is not an alphabet
             $("#message_service_account_user_username").text(
-                getText("400-00014", "先頭の文字にアルファベット以外が指定されています。({0})", getText("000-00128", "サービスアカウントユーザー名")));
+                getText("400-00014", "先頭の文字にアルファベット以外が指定されています。({0})", getText("000-93017", "サービスアカウントユーザー名")));
             result = false;
 
         } else {
@@ -107,7 +109,7 @@ $(function(){
         if ($("#form_service_account_user_type").val() === "") {
             // 未選択の場合 - If not selected
             $("#message_service_account_user_type").text(
-                getText("400-00011", "必須項目が選択されていません。({0})", getText("000-00128", "サービスアカウントユーザー種別")));
+                getText("000-93018", "必須項目が選択されていません。({0})", getText("000-93008", "サービスアカウントユーザー種別")));
             result = false;
         
         } else {
@@ -124,6 +126,7 @@ $(function(){
     // register service account user
     //
     function service_account_user_register() {
+        console.log("[CALL] service_account_user_register");
 
         let reqbody =   {
             "username": $('#form_service_account_user_username').val(),
@@ -154,11 +157,14 @@ $(function(){
         });
 
     }
+
     // 
     // サービスアカウントユーザー作成API呼出処理
     // Process to call service account user creation API
     // 
     function call_api_promise_create_service_account_user(reqbody) {
+        console.log("[CALL] call_api_promise_create_service_account_user");
+
         return call_api_promise({
             type: "POST",
             url: api_conf.api.workspaces.service_account_users.post.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{workspace_id}/g, workspace_id),
@@ -176,6 +182,8 @@ $(function(){
     // Process to call service account user token creation API
     // 
     function call_api_promise_create_service_account_user_token(reqbody){
+        console.log("[CALL] call_api_promise_create_service_account_user_token");
+
         // token取得のため、ユーザーIDを取得 - Get user ID to get token
         return Promise.all([
             // サービスアカウントユーザー一覧を取得 - get service account user list
@@ -210,9 +218,12 @@ $(function(){
     // Display of result of issuing refresh token
     // 
     function display_result_created(data, status, jqXHR) {
+        console.log("[CALL] display_result_created");
+
         if(data.refresh_token) {
             // {refresh_token}にデータを代入し、その値を取得する
-            const dialog_contents = $("#create_token_result_dialog").html().replace(/{refresh_token}/g, fn.cv(data.refresh_token,'',true));
+            const dialog_contents = $("#create_token_result_dialog").html().replace(/{refresh_token}/g, fn.cv(data.refresh_token_expire,'',true)).replace(/{expiration_date}/g, fn.date(data.expire_timestamp,'yyyy/MM/dd'));
+            console.log(dialog_contents);
 
             const dialog = new Dialog({
                 mode: 'modeless',

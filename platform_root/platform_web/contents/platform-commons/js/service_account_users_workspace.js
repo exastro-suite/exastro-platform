@@ -22,6 +22,8 @@ $(function(){
     });
 
     function load_main() {
+        console.log("[CALL] load_main");
+
         Promise.all([
             // Load Common Contents
             loadCommonContents(),
@@ -34,7 +36,7 @@ $(function(){
             displayMenu('menu_service_account_management');
             // Display Topic Path
             displayTopicPath([
-                {"text": getText("000-87006", "エージェントワークスペース選択"), "href": location_conf.href.workspaces.settings.service_account_users.workspace.replace(/{organization_id}/g, CommonAuth.getRealm())}
+                {"text": getText("000-93001", "ワークスペース選択"), "href": location_conf.href.workspaces.settings.service_account_users.workspace.replace(/{organization_id}/g, CommonAuth.getRealm())}
             ]);
 
             display_main(results[1].data);
@@ -48,7 +50,13 @@ $(function(){
         });
     }
 
+    // 
+    // ワークスペース一覧取得API呼出
+    // Workspace list acquisition API call process
+    // 
     function call_api_promise_get_workspaces() {
+        console.log("[CALL] call_api_promise_get_workspaces");
+        
         return call_api_promise({
             type: "GET",
             url: api_conf.api.workspaces.get.replace(/{organization_id}/g, CommonAuth.getRealm()),
@@ -82,6 +90,7 @@ $(function(){
         }
         
         //
+        // ワークスペース一覧表示
         // display workspace list
         //
         if ( workspaceListData.length == 0 ) {
@@ -92,6 +101,7 @@ $(function(){
             $("#workspace_list .datarow").remove();
 
             //
+            // ワークスペース一覧のソート
             // sort workspace list
             //
             const sortKey = 'workspace_name'; // ワークスペース名
@@ -129,20 +139,28 @@ $(function(){
                 }
             });
 
-            $('#workspace_list .button_edit_workspace').on('click', function() {
+            $('#workspace_list .button_setting_service_account_user').on('click', function() {
                 let workspace_id = $(this).attr('data-id');
                 window.location = location_conf.href.workspaces.settings.service_account_users.list.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{workspace_id}/g, workspace_id);
             });
         }
     }
 
+    // 
+    // ボタンの有効化
+    // button enabled
+    // 
     function enabled_button() {
+        console.log("[CALL] enabled_button");
+        
+        // 行選択 - Row selection
         $('#workspace_list .to_detail').each(function(index, element) {
             let $element = $(element);
             $element.prop('disabled', false);
         });
 
-        $('#workspace_list .button_edit_workspace').each(function(index, element) {
+        // サービスアカウントユーザー設定ボタン - setting service account user button
+        $('#workspace_list .button_setting_service_account_user').each(function(index, element) {
             let $element = $(element);
             $element.prop('disabled', false);
         });
