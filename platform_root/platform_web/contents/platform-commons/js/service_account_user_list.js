@@ -136,13 +136,21 @@ $(function(){
             // 明細にデータを埋め込み行を明細を作りこむ
             for(let i = 0; i < service_account_users.length; ++i) {
                 const user = service_account_users[i];
-                // const isUpdateAbleRow = UsersCommon.isAllowedEditUser(user); // 更新可能か
-                // const isSystemAccount = UsersCommon.isSystemUser(user);
+                let service_account_user_type_display = user.service_account_user_type;
+
+                // サービスアカウントユーザー種別の変換 - Conversion of Service Account User Types
+                if(service_account_user_type_display == "ansible-execution-agent"){
+                    service_account_user_type_display = 'Ansible Execution Agent';
+
+                }else if (service_account_user_type_display == "oase-agent") {
+                    service_account_user_type_display = 'OASE Agent';
+                    
+                }
 
                 const row_html = row_template
                     .replace(/\${user_id}/g, fn.cv(user.id,'',true))
                     .replace(/\${username}/g, fn.cv(user.username,'',true))
-                    .replace(/\${serviceAccountUserType}/g, fn.cv(user.service_account_user_type,'',true))
+                    .replace(/\${serviceAccountUserType}/g, fn.cv(service_account_user_type_display,'',true))
                     .replace(/\${description}/g, fn.cv(user.description,'',true))
                     .replace(/\${tokenExpiration}/g, fn.cv(user.token_latest_expire_date,'',true))
 

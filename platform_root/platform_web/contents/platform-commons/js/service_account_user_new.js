@@ -222,7 +222,7 @@ $(function(){
 
         if(data.refresh_token) {
             // {refresh_token}にデータを代入し、その値を取得する
-            const dialog_contents = $("#create_token_result_dialog").html().replace(/{refresh_token}/g, fn.cv(data.refresh_token_expire,'',true)).replace(/{expiration_date}/g, fn.date(data.expire_timestamp,'yyyy/MM/dd'));
+            const dialog_contents = $("#create_token_result_dialog").html().replace(/{refresh_token}/g, fn.cv(data.refresh_token,'',true)).replace(/{expiration_date}/g, fn.date(data.refresh_token_expire,'yyyy/MM/dd'));
             console.log(dialog_contents);
 
             const dialog = new Dialog({
