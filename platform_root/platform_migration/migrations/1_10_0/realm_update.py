@@ -99,6 +99,39 @@ class realm_update:
                 # create a authority for organization admin
                 self.__role_update(organization_id, access_token)
 
+                # users profilesを設定する
+                # get users profiles
+                response = api_keycloak_users_profile.get_users_profiles(organization_id, access_token)
+                if response.status_code != 200:
+                    globals.logger.error(f"get_users_profiles response.status_code:{response.status_code}")
+                    globals.logger.error(f"get_users_profiles response.text:{response.text}")
+                    message_id = f"500-{MSG_FUNCTION_ID}025"
+                    message = multi_lang.get_text(
+                        message_id,
+                        "User Profileの取得に失敗しました(対象ID:{0})",
+                        organization_id
+                    )
+                    raise common.InternalErrorException(message_id=message_id, message=message)
+
+                # users profilesを設定する
+                # Set user profiles
+                users_profiles = json.loads(response.text)
+                api_keycloak_users_profile.configure_realm_users_profiles(users_profiles)
+
+                # users profilesを更新する
+                # update users profiles
+                response = api_keycloak_users_profile.put_users_profiles(organization_id, users_profiles, access_token)
+                if response.status_code != 200:
+                    globals.logger.error(f"put_users_profiles response.status_code:{response.status_code}")
+                    globals.logger.error(f"put_users_profiles response.text:{response.text}")
+                    message_id = f"500-{MSG_FUNCTION_ID}026"
+                    message = multi_lang.get_text(
+                        message_id,
+                        "User Profileの更新に失敗しました(対象ID:{0})",
+                        organization_id
+                    )
+                    raise common.InternalErrorException(message_id=message_id, message=message)
+
                 globals.logger.info(f"[{self.step_count}/{self.step_max}] ##### Organization iteration [{self.organization_count}/{len(organizations)}] End")  # noqa: E501
 
             self.step_count += 1
