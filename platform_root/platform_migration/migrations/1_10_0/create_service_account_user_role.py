@@ -21,7 +21,7 @@ from contextlib import closing
 import globals
 from common_library.common.db import DBconnector
 # from common_library.common.db_init import DBinit
-from common_library.common import common, api_keycloak_tokens
+from common_library.common import common, api_keycloak_tokens, api_keycloak_roles
 from common_library.common import multi_lang
 from common_library.common import const
 import common_library.common.const as common_const
@@ -44,10 +44,11 @@ class create_service_account_user_role:
     step_count = 0
     step_max = 0
 
-    def __init__(self):
+    def __init__(self, realm="master"):
         """初期化処理 initialize setting
 
         """
+        self.realm = realm
 
     def start(self):
         """マイグレーション処理 migration start processing
@@ -82,7 +83,7 @@ class create_service_account_user_role:
                 # アクセストークンを取得
                 # Get an access token
                 private = DBconnector().get_platform_private()
-                access_token = self.__access_token_get(organization_id, private.token_check_client_clientid, private.token_check_client_secret)
+                access_token = self.__access_token_get(self.realm, private.token_check_client_clientid, private.token_check_client_secret)
 
                 # ワークスペース情報取得
                 # Get workspace rows
@@ -102,7 +103,7 @@ class create_service_account_user_role:
                             realm_name=organization_id, client_uid=organization_private.user_token_client_id, role_name=builtin_role, token=access_token,
                             role_options=role_options,
                         )
-                    
+                        
                         # すでに存在していた場合、処理継続
                         # If it already exists, continue processing.
                         if r_create_role == 409:
@@ -266,7 +267,7 @@ class create_service_account_user_role:
 
         return result
 
-    def service_account_user_roles_name(workspace_id):
+    def service_account_user_roles_name(self, workspace_id):
         """service account user roles
 
         Args:
@@ -275,9 +276,9 @@ class create_service_account_user_role:
         Returns:
             list: _description_
         """
-        return [i['role'] for i in __class__.service_account_user_type_info(workspace_id)]
+        return [i['role'] for i in self.service_account_user_type_info(workspace_id)]
 
-    def clients_role_create(realm_name, client_uid, role_name, token, role_options=None):
+    def clients_role_create(self, realm_name, client_uid, role_name, token, role_options=None):
         """クライアントロール作成 user client role create
 
         Args:
@@ -321,7 +322,7 @@ class create_service_account_user_role:
 
         return request_response
 
-    def service_account_user_type_info(workspace_id):
+    def service_account_user_type_info(self, workspace_id):
         """service account user type information
 
         Args:
