@@ -96,18 +96,36 @@ class create_service_account_user_role:
                     # Create a service account user role name
                     builtin_roles = self.service_account_user_roles_name(workspace_id)
                     
-                    # サービスアカウントユーザー用ロールの作成
-                    # Generate searvice account users roles
+                    # ロールに紐づけるwsロールを取得する
+                    # get ws role
+                    roles_ws = []
+                    r_get_role_ws = api_keycloak_roles.clients_role_get(
+                        realm_name=organization_id, client_id=organization_private.internal_api_client_id, role_name=workspace_id, token=access_token,
+                    )
+                    if r_get_role_ws.status_code != 200:
+                        globals.logger.debug(f"response:{r_get_role_ws.text}")
+                        raise common.InternalErrorException(None, f"500-{MSG_FUNCTION_ID}001", "ワークスペースロールの取得に失敗しました(対象ID:{})".format(workspace_id))
+
+                    roles_ws.append(json.loads(r_get_role_ws.text))
+
                     for builtin_role in builtin_roles:
-                        r_create_role = self.clients_role_create(
+                        # サービスアカウントユーザー用ロール作成
+                        # Generate searvice account users roles
+                        r_create_role = api_keycloak_roles.clients_role_create(
                             realm_name=organization_id, client_uid=organization_private.user_token_client_id, role_name=builtin_role, token=access_token,
                             role_options=role_options,
                         )
                         
                         # すでに存在していた場合、処理継続
                         # If it already exists, continue processing.
-                        if r_create_role == 409:
+                        if r_create_role.status_code == 409:
                             return 0
+                        
+                        # ロールにwsロールを紐づける
+                        # role composite ws
+                        r_create_composite = api_keycloak_roles.clients_role_composites_create(
+                            realm_name=organization_id, client_uid=organization_private.user_token_client_id, role_name=builtin_role, add_roles=roles_ws, token=access_token,
+                        )
 
             self.step_count += 1
 
