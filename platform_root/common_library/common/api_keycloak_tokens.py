@@ -26,12 +26,13 @@ def __get_keycloak_api_url():
     return "{}://{}:{}".format(os.environ['API_KEYCLOAK_PROTOCOL'], os.environ['API_KEYCLOAK_HOST'], os.environ['API_KEYCLOAK_PORT'])
 
 
-def __get_token(realm_name, data_para):
+def __get_token(realm_name, data_para, set_x_forward_header=True):
     """ token取得 Get token
 
     Args:
         realm_name (str): realm name
         data_para (dictionary):
+        set_x_forward_header (boolean): True = set x_forward_proto x_forward_proto header
 
     Raises:
         Exception: error
@@ -46,16 +47,17 @@ def __get_token(realm_name, data_para):
     header_para = {
         "Content-Type": "application/x-www-form-urlencoded",
     }
-    try:
-        if request.headers.get("X-Forwarded-Host") is not None:
-            header_para["X-Forwarded-Host"] = request.headers.get("X-Forwarded-Host")
-    except Exception:
-        pass
-    try:
-        if request.headers.get("X-Forwarded-Proto") is not None:
-            header_para["X-Forwarded-Proto"] = request.headers.get("X-Forwarded-Proto")
-    except Exception:
-        pass
+    if set_x_forward_header:
+        try:
+            if request.headers.get("X-Forwarded-Host") is not None:
+                header_para["X-Forwarded-Host"] = request.headers.get("X-Forwarded-Host")
+        except Exception:
+            pass
+        try:
+            if request.headers.get("X-Forwarded-Proto") is not None:
+                header_para["X-Forwarded-Proto"] = request.headers.get("X-Forwarded-Proto")
+        except Exception:
+            pass
 
     globals.logger.debug("get token")
     # token情報取得
@@ -136,7 +138,7 @@ def service_account_get_token(realm_name, client_id, client_secret):
 
     # 下位の取得ロジックを呼びだし
     # Call the lower acquisition logic
-    return __get_token(realm_name, data_para)
+    return __get_token(realm_name, data_para, set_x_forward_header=False)
 
 
 def get_user_token(user_name, password, realm_name, client_id="admin-cli", client_secret=None):
