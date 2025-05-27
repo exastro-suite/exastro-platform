@@ -69,12 +69,11 @@ class create_service_account_user_role:
         
         try:
             self.step_count = 1
-            self.step_max = 3
+            self.step_max = 1
             
             # オーガナイゼーションDB情報取得
             # Get organization_db rows
             organization_db_rows = self.__organization_db_get()
-            self.step_count += 1
             
             self.organization_max = len(organization_db_rows)
             self.step_max += 3 * self.organization_max
@@ -86,21 +85,24 @@ class create_service_account_user_role:
                 organization_id = row.get("ORGANIZATION_ID")
                 globals.logger.info(f"[Organization:{self.organization_count}/{self.organization_max}] - ORGANIZATION_ID:{organization_id}")
                 
+                self.step_count += 1
+                
                 # オーガナイゼーション専用情報取得
                 # Get orgnization private info
                 organization_private = self.__organization_private_get(organization_id)
+                
                 self.step_count += 1
                 
                 # アクセストークンを取得
                 # Get an access token
                 private = DBconnector().get_platform_private()
                 access_token = self.__access_token_get(self.realm, private.token_check_client_clientid, private.token_check_client_secret)
+                
                 self.step_count += 1
 
                 # ワークスペース情報取得
                 # Get workspace rows
                 workspace_rows = self.__workspace_get(organization_id)
-                self.step_count += 1
                 
                 self.workspace_max = len(workspace_rows)
                 self.step_max += 5 * self.workspace_max
@@ -116,33 +118,33 @@ class create_service_account_user_role:
                     # Create a service account user role name
                     builtin_roles = self.__service_account_user_roles_name(workspace_id)
                     
+                    self.step_count += 1
+                    
                     # ロールに紐づけるwsロールを取得する
                     # get ws role
                     roles_ws = []
-                    roles_ws.append(self.__clients_role_get(
+                    roles_ws.append(self.__workspace_role_get(
                         organization_id=organization_id, internal_api_client_id=organization_private.internal_api_client_id, workspace_id=workspace_id, access_token=access_token,
                     ))
-                    self.step_count += 1
-
+                    
                     for builtin_role in builtin_roles:
                         self.role_count += 1
                         
                         globals.logger.info(f"[Role:{self.role_count}/{self.role_max}] - ROLE_NAME:{builtin_role}")
+                        
+                        self.step_count += 1
+                        
                         # サービスアカウントユーザー用ロール作成
                         # Generate searvice account users roles
                         r_create_role = self.__service_account_user_role_create(organization_id, organization_private.user_token_client_id, builtin_role, access_token,role_options)
+                        
                         self.step_count += 1
                         
                         # ロールにwsロールを紐づける
                         # role composite ws
-                        r_create_composite = self.__clients_role_composites_create(organization_id, organization_private.user_token_client_id, builtin_role, roles_ws, access_token)
+                        r_create_composite = self.__workspace_role_composites_create(organization_id, organization_private.user_token_client_id, builtin_role, roles_ws, access_token)
                         
-                        r_create_composite = api_keycloak_roles.clients_role_composites_create(
-                            realm_name=organization_id, client_uid=organization_private.user_token_client_id, role_name=builtin_role, add_roles=roles_ws, token=access_token,
-                        )
-                        self.step_count += 1
-
-            self.step_count += 1
+                        self.ok_count += 1
 
             last_message = "service account user role create successful !!"
 
@@ -167,7 +169,7 @@ class create_service_account_user_role:
             last_message = "workspace database create and update failed..."
 
         globals.logger.info("-" * 50)
-        globals.logger.info(f"workspace database create and update status: [OK:{self.ok_count}] [SKIP:{self.skip_count}] [IGNORE:{self.ignore_count}] [NG:{self.failed_count}] [STEP:{self.step_count}/{self.step_max}]")     # noqa: E501
+        globals.logger.info(f"workspace database create and update status: [OK:{self.ok_count}] [SKIP:{self.skip_count}] [IGNORE:{self.ignore_count}] [NG:{self.failed_count}]")     # noqa: E501
         globals.logger.info("-" * 50)
         globals.logger.info(last_message)
 
@@ -226,11 +228,28 @@ class create_service_account_user_role:
         
         globals.logger.info(f"[{self.step_count}/{self.step_max}] ### Start func:{inspect.currentframe().f_code.co_name}")
         
-        # オーガナイゼーション専用情報取得
-        # Get orgnization private info
-        organization_private = DBconnector().get_organization_private(organization_id)
+        # データベース接続
+        # connection database
+        db = DBconnector()
+        try:
+            # オーガナイゼーション専用情報取得
+            # Get orgnization private info
+            globals.logger.info(f"[{self.step_count}/{self.step_max}] - get organization private:")
+            organization_private = db.get_organization_private(organization_id)
+            
+            globals.logger.info(f"[{self.step_count}/{self.step_max}] -- OK: get organization private:")
+        
+        except Exception as e:
+            globals.logger.info(f"[{self.step_count}/{self.step_max}] -- NG: get organization private:")
+            globals.logger.error(f"exception:{e.args}")
+            message_id = "500-90008"
+            message = multi_lang.get_text(message_id,
+                                            "get organization private failed. organization_id:[{0}]",
+                                            organization_id)
+            raise common.InternalErrorException(message_id=message_id, message=message)
         
         globals.logger.info(f"[{self.step_count}/{self.step_max}] ### Succeed func:{inspect.currentframe().f_code.co_name}")
+        
         return organization_private
         
     def __access_token_get(self, realm, token_check_client_clientid, token_check_client_secret):
@@ -262,7 +281,7 @@ class create_service_account_user_role:
                 raise common.AuthException(message_id=message_id, message=message)
 
             globals.logger.info(f"[{self.step_count}/{self.step_max}] -- OK: get token:")
-            self.ok_count += 1
+            # self.ok_count += 1
 
             access_token = json.loads(access_token_response.text)["access_token"]
 
@@ -303,7 +322,7 @@ class create_service_account_user_role:
                     result = cursor.fetchall()
 
                     globals.logger.info(f"[{self.step_count}/{self.step_max}] -- OK: get workspace:")
-                    self.ok_count += 1
+                    # self.ok_count += 1
 
                 except Exception as e:
                     globals.logger.info(f"[{self.step_count}/{self.step_max}] -- NG: get workspace:")
@@ -329,7 +348,7 @@ class create_service_account_user_role:
         """
         return [i['role'] for i in bl_service_account_user.service_account_user_type_info(workspace_id)]
 
-    def __clients_role_get(self, organization_id, internal_api_client_id, workspace_id, access_token):
+    def __workspace_role_get(self, organization_id, internal_api_client_id, workspace_id, access_token):
         """ワークスペースロースの取得 - get clients role
 
         Args:
@@ -346,13 +365,23 @@ class create_service_account_user_role:
         """
         globals.logger.info(f"[{self.step_count}/{self.step_max}] ### Start func:{inspect.currentframe().f_code.co_name}")
         
-        r_get_role_ws = api_keycloak_roles.clients_role_get(
-            realm_name=organization_id, client_id=internal_api_client_id, role_name=workspace_id, token=access_token,
-        )
-        
-        if r_get_role_ws.status_code != 200:
-            globals.logger.error(f"response.text:{r_get_role_ws.text}")
-            raise common.InternalErrorException(None, f"500-90001", "ワークスペースロールの取得に失敗しました(対象ID:{})".format(workspace_id))
+        try:
+            globals.logger.info(f"[{self.step_count}/{self.step_max}] - get workspace role:")
+            r_get_role_ws = api_keycloak_roles.clients_role_get(
+                realm_name=organization_id, client_id=internal_api_client_id, role_name=workspace_id, token=access_token,
+            )
+            
+            globals.logger.info(f"[{self.step_count}/{self.step_max}] -- OK: get workspace role:")
+
+        except Exception as e:
+            globals.logger.info(f"[{self.step_count}/{self.step_max}] -- NG: get workspace role:")
+            globals.logger.error(f"exception:{e.args}")
+            message_id = "500-90001"
+            message = multi_lang.get_text(message_id,
+                                            "get workspace role failed. organization_id:[{0}] workspace_id:[{1}]",
+                                            organization_id,
+                                            workspace_id)
+            raise common.InternalErrorException(message_id=message_id, message=message)
         
         globals.logger.info(f"[{self.step_count}/{self.step_max}] ### Succeed func:{inspect.currentframe().f_code.co_name}")
 
@@ -373,6 +402,8 @@ class create_service_account_user_role:
         """
 
         globals.logger.info(f"[{self.step_count}/{self.step_max}] ### Start func:{inspect.currentframe().f_code.co_name}")
+        
+        globals.logger.info(f"[{self.step_count}/{self.step_max}] - get service account user role:")
         
         # サービスアカウントユーザー用ロール作成
         # Generate searvice account users roles
@@ -400,13 +431,12 @@ class create_service_account_user_role:
             self.skip_count += 1
         else:
             globals.logger.info(f"[{self.step_count}/{self.step_max}] -- OK: create service account user role:")
-            self.ok_count += 1
             
         globals.logger.info(f"[{self.step_count}/{self.step_max}] ### Succeed func:{inspect.currentframe().f_code.co_name}")
 
         return
     
-    def __clients_role_composites_create(self, organization_id, user_token_client_id, builtin_role, roles_ws, access_token):
+    def __workspace_role_composites_create(self, organization_id, user_token_client_id, builtin_role, roles_ws, access_token):
         """ワークスペースロールの紐付け - composite workspace role
 
         Args:
@@ -418,9 +448,24 @@ class create_service_account_user_role:
         """
         globals.logger.info(f"[{self.step_count}/{self.step_max}] ### Start func:{inspect.currentframe().f_code.co_name}")
         
-        r_create_composite = api_keycloak_roles.clients_role_composites_create(
-            realm_name=organization_id, client_uid=user_token_client_id, role_name=builtin_role, add_roles=roles_ws, token=access_token,
-        )
+        try:
+            globals.logger.info(f"[{self.step_count}/{self.step_max}] - composite workspace role:")
+            
+            r_create_composite = api_keycloak_roles.clients_role_composites_create(
+                realm_name=organization_id, client_uid=user_token_client_id, role_name=builtin_role, add_roles=roles_ws, token=access_token,
+            )
+            
+            globals.logger.info(f"[{self.step_count}/{self.step_max}] -- OK: composite workspace role:")
+            
+        except Exception as e:
+            globals.logger.info(f"[{self.step_count}/{self.step_max}] -- NG: composite workspace role:")
+            globals.logger.error(f"exception:{e.args}")
+            message_id = "500-90001"
+            message = multi_lang.get_text(message_id,
+                                            "composite workspace role failed. organization_id:[{0}] role_name:[{1}]",
+                                            organization_id,
+                                            builtin_role)
+            raise common.InternalErrorException(message_id=message_id, message=message)
         
         globals.logger.info(f"[{self.step_count}/{self.step_max}] ### Succeed func:{inspect.currentframe().f_code.co_name}")
         
