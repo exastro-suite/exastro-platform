@@ -81,9 +81,9 @@ def service_account_user_create_parameter(username, service_account_user_type, d
     """
     return {
         "username": username,
-        "email": service_account_user_email(username),
-        "firstName": const.SERVICE_ACCOUNT_USER_DUMMY_FIRSTNAME,
-        "lastName": const.SERVICE_ACCOUNT_USER_DUMMY_LASTNAME,
+        # "email": service_account_user_email(username),
+        # "firstName": const.SERVICE_ACCOUNT_USER_DUMMY_FIRSTNAME,
+        # "lastName": const.SERVICE_ACCOUNT_USER_DUMMY_LASTNAME,
         # "credentials": [
         #     {
         #         "type": "password",
@@ -98,6 +98,44 @@ def service_account_user_create_parameter(username, service_account_user_type, d
             const.SERVICE_ACCOUNT_USER_TYPE_ATTRIBUTE_NAME: service_account_user_type
         },
         "enabled": True
+    }
+
+
+def service_account_user_temporary_parameter(user):
+    """token発行時に一時的に必要なパラメータを設定します
+
+    Args:
+        user (dict): get user response
+
+    Returns:
+        dict: put user response body
+    """
+    return {
+        **user,
+        **{
+            "email": service_account_user_email(user["username"]),
+            "firstName": const.SERVICE_ACCOUNT_USER_DUMMY_FIRSTNAME,
+            "lastName": const.SERVICE_ACCOUNT_USER_DUMMY_LASTNAME,
+        }
+    }
+
+
+def service_account_user_rollback_parameter(user):
+    """token発行時に一時的に設定したパラメータを元に戻します
+
+    Args:
+        user (dict): get user response
+
+    Returns:
+        dict: put user response body
+    """
+    return {
+        **user,
+        **{
+            "email": "",
+            "firstName": "",
+            "lastName": "",
+        }
     }
 
 
