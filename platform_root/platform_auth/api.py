@@ -660,8 +660,15 @@ def platform_api_call(organization_id, subpath):
         extra['username'] = response_json.get("user_info").get("username")
         extra['request_user_headers'] = response_json.get("data")
 
+        api_headers = {
+            **response_json.get("data"),
+            **{
+                "X-Forwarded-Host": urllib.parse.urlparse(os.environ.get('EXTERNAL_URL')).netloc,
+                "X-Forwarded-Proto": urllib.parse.urlparse(os.environ.get('EXTERNAL_URL')).scheme
+            }
+        }
         # api呼び出し call api
-        return_api = proxy.call_api(dest_url, response_json.get("data"), stream=stream, multipart_mode=multipart_mode)
+        return_api = proxy.call_api(dest_url, api_headers, stream=stream, multipart_mode=multipart_mode)
 
         if stream:
             # stream形式の場合は、独自の返却を実施する

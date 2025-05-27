@@ -420,6 +420,42 @@ def service_account_user_token_create(body, organization_id, workspace_id, user_
     __check_updatable_service_account_user(organization_id, workspace_id, user, token)
 
     #
+    # userをtokenが発行できる状態に更新
+    #   ※email, firstName, lastNameが必要となる
+    #
+    upd_user = bl_service_account_user.service_account_user_temporary_parameter(user)
+    resp_upd_user = api_keycloak_users.user_update(organization_id, user_id, upd_user, token)
+
+    if resp_upd_user.status_code == 404:
+        globals.logger.debug(f"response:{resp_upd_user.text}")
+        message_id = "404-25001"
+        message = multi_lang.get_text(
+            message_id,
+            "指定されたユーザーは存在していません。")
+
+        raise common.NotFoundException(message_id=message_id, message=message)
+
+    elif resp_upd_user.status_code == 400:
+        globals.logger.debug(f"response:{resp_upd_user.text}")
+        message_id = "400-25004"
+        message = multi_lang.get_text(
+            message_id,
+            "ユーザー更新に失敗しました({0})",
+            common.get_response_error_message(resp_upd_user.text))
+        raise common.BadRequestException(message_id=message_id, message=message)
+
+    elif resp_upd_user.status_code not in [200, 204]:
+        globals.logger.debug(f"response:{resp_upd_user.text}")
+        message_id = "500-25004"
+        message = multi_lang.get_text(
+            message_id,
+            "ユーザー更新に失敗しました(対象ユーザーID:{0})[{1}]",
+            user_id,
+            json.loads(resp_upd_user.text)["errorMessage"])
+
+        raise common.InternalErrorException(message_id=message_id, message=message)
+
+    #
     # realm情報取得
     #
     resp_realm = api_keycloak_realms.realm_get(organization_id, token)
@@ -491,6 +527,12 @@ def service_account_user_token_create(body, organization_id, workspace_id, user_
         refresh_token_expire = common.keycloak_timestamp_to_datetime(refresh_token_decode['exp'] * 1000)
     except Exception:
         refresh_token_expire = None
+
+    #
+    # userを元に戻す(失敗は無視)
+    #
+    upd_user = bl_service_account_user.service_account_user_rollback_parameter(user)
+    resp_upd_user = api_keycloak_users.user_update(organization_id, user_id, upd_user, token)
 
     #
     # passwordの消去(失敗は無視)
