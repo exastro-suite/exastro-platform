@@ -158,7 +158,7 @@ class create_service_account_user_role:
             globals.logger.error(f'exception handler:\n status_code:[{err.status_code}]\n message_id:[{err.message_id}]\n message:[{err.message}]')
             globals.logger.info("-" * 50)
             globals.logger.error(''.join(list(traceback.TracebackException.from_exception(err).format())))
-            last_message = "workspace database create and update failed..."
+            last_message = "service account user role create failed..."
 
         except Exception as err:
             self.failed_count += 1
@@ -166,10 +166,10 @@ class create_service_account_user_role:
             globals.logger.error(f'exception:\n args:[{err.args}]')
             globals.logger.info("-" * 50)
             globals.logger.error(''.join(list(traceback.TracebackException.from_exception(err).format())))
-            last_message = "workspace database create and update failed..."
+            last_message = "service account user role create failed..."
 
         globals.logger.info("-" * 50)
-        globals.logger.info(f"workspace database create and update status: [OK:{self.ok_count}] [SKIP:{self.skip_count}] [IGNORE:{self.ignore_count}] [NG:{self.failed_count}]")     # noqa: E501
+        globals.logger.info(f"service account user role create status: [OK:{self.ok_count}] [SKIP:{self.skip_count}] [IGNORE:{self.ignore_count}] [NG:{self.failed_count}]")     # noqa: E501
         globals.logger.info("-" * 50)
         globals.logger.info(last_message)
 
@@ -242,9 +242,9 @@ class create_service_account_user_role:
         except Exception as e:
             globals.logger.info(f"[{self.step_count}/{self.step_max}] -- NG: get organization private:")
             globals.logger.error(f"exception:{e.args}")
-            message_id = "500-90008"
+            message_id = "500-90027"
             message = multi_lang.get_text(message_id,
-                                            "get organization private failed. organization_id:[{0}]",
+                                            "オーガナイゼーション情報の取得に失敗しました(organization id:{0})",
                                             organization_id)
             raise common.InternalErrorException(message_id=message_id, message=message)
         
@@ -273,15 +273,15 @@ class create_service_account_user_role:
 
             if access_token_response.status_code not in [200]:
                 globals.logger.info(f"[{self.step_count}/{self.step_max}] -- NG: get token:")
-                message_id = "500-90001"
+                message_id = "500-90028"
                 message = multi_lang.get_text(
                     message_id,
-                    "get access token failed."
+                    "アクセストークンの取得に失敗しました(realm:{0})",
+                    realm
                 )
                 raise common.AuthException(message_id=message_id, message=message)
 
             globals.logger.info(f"[{self.step_count}/{self.step_max}] -- OK: get token:")
-            # self.ok_count += 1
 
             access_token = json.loads(access_token_response.text)["access_token"]
 
@@ -376,11 +376,11 @@ class create_service_account_user_role:
         except Exception as e:
             globals.logger.info(f"[{self.step_count}/{self.step_max}] -- NG: get workspace role:")
             globals.logger.error(f"exception:{e.args}")
-            message_id = "500-90001"
+            message_id = "500-90002"
             message = multi_lang.get_text(message_id,
-                                            "get workspace role failed. organization_id:[{0}] workspace_id:[{1}]",
+                                            "client roleの取得に失敗しました(対象ID:{0} client:{1})",
                                             organization_id,
-                                            workspace_id)
+                                            internal_api_client_id)
             raise common.InternalErrorException(message_id=message_id, message=message)
         
         globals.logger.info(f"[{self.step_count}/{self.step_max}] ### Succeed func:{inspect.currentframe().f_code.co_name}")
@@ -416,10 +416,10 @@ class create_service_account_user_role:
             globals.logger.info(f"[{self.step_count}/{self.step_max}] -- NG: create service account user role:")
             globals.logger.error(f"response.status_code:{response.status_code}")
             globals.logger.error(f"response.text:{response.text}")
-            message_id = "500-24002"
+            message_id = "500-90029"
             message = multi_lang.get_text(
                 message_id,
-                "Role creation failed (target role: {0})",
+                "サービスアカウントユーザーロールの作成に失敗しました(target role:{0})",
                 builtin_role
             )
             raise common.InternalErrorException(message_id=message_id, message=message)
@@ -460,9 +460,9 @@ class create_service_account_user_role:
         except Exception as e:
             globals.logger.info(f"[{self.step_count}/{self.step_max}] -- NG: composite workspace role:")
             globals.logger.error(f"exception:{e.args}")
-            message_id = "500-90001"
+            message_id = "500-90030"
             message = multi_lang.get_text(message_id,
-                                            "composite workspace role failed. organization_id:[{0}] role_name:[{1}]",
+                                            "サービスアカウントユーザーロールへのロール設定に失敗しました(organization id:{0} role name:{1})",
                                             organization_id,
                                             builtin_role)
             raise common.InternalErrorException(message_id=message_id, message=message)
