@@ -152,7 +152,7 @@ $(function(){
                     .replace(/\${username}/g, fn.cv(user.username,'',true))
                     .replace(/\${serviceAccountUserType}/g, fn.cv(service_account_user_type_display,'',true))
                     .replace(/\${description}/g, fn.cv(user.description,'',true))
-                    .replace(/\${tokenExpiration}/g, fn.cv(user.token_latest_expire_date,'',true))
+                    .replace(/\${tokenExpiration}/g, fn.date(new Date(user.token_latest_expire_date),'yyyy/MM/dd HH:mm:ss'))
 
                 const $row = $("#service_account_users_list tbody").append(row_html).find(".datarow:last-child");
 

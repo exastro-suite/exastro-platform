@@ -50,8 +50,8 @@ def service_account_user_type_info(workspace_id):
         list: service account user type information
     """
     return [
-        {"type": const.SERVICE_ACCOUNT_USER_TYPE_ANSIBLE, "role": f"_{workspace_id}-ansible-execution-agent"},
-        {"type": const.SERVICE_ACCOUNT_USER_TYPE_OASE, "role": f"_{workspace_id}-oase-agent"},
+        {"type": const.SERVICE_ACCOUNT_USER_TYPE_ANSIBLE, "role": f"_{workspace_id}-{const.SERVICE_ACCOUNT_USER_TYPE_ANSIBLE}"},
+        {"type": const.SERVICE_ACCOUNT_USER_TYPE_OASE, "role": f"_{workspace_id}-{const.SERVICE_ACCOUNT_USER_TYPE_OASE}"},
     ]
 
 

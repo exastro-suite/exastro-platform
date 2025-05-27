@@ -31,8 +31,6 @@ ORG_ROLE_ORG_MANAGER = "_organization-manager"
 ORG_ROLE_USER_ROLE_MANAGER = "_organization-user-role-manager"
 ORG_ROLE_USER_MANAGER = "_organization-user-manager"
 
-MSG_FUNCTION_ID = "90"
-
 MASTER_REALM_NAME = "master"
 ADD_CLIENT_NAME = "_platform-console"
 
@@ -105,7 +103,7 @@ class realm_update:
                 if response.status_code != 200:
                     globals.logger.error(f"get_users_profiles response.status_code:{response.status_code}")
                     globals.logger.error(f"get_users_profiles response.text:{response.text}")
-                    message_id = f"500-{MSG_FUNCTION_ID}025"
+                    message_id = "500-90025"
                     message = multi_lang.get_text(
                         message_id,
                         "User Profileの取得に失敗しました(対象ID:{0})",
@@ -124,7 +122,7 @@ class realm_update:
                 if response.status_code != 200:
                     globals.logger.error(f"put_users_profiles response.status_code:{response.status_code}")
                     globals.logger.error(f"put_users_profiles response.text:{response.text}")
-                    message_id = f"500-{MSG_FUNCTION_ID}026"
+                    message_id = "500-90026"
                     message = multi_lang.get_text(
                         message_id,
                         "User Profileの更新に失敗しました(対象ID:{0})",
@@ -211,7 +209,7 @@ class realm_update:
 
             if access_token_response.status_code not in [200]:
                 globals.logger.info(f"[{self.step_count}/{self.step_max}] -- NG: get token:")
-                message_id = f"500-{MSG_FUNCTION_ID}001"
+                message_id = "500-90001"
                 message = multi_lang.get_text(
                     message_id,
                     "get access token failed."
@@ -246,7 +244,7 @@ class realm_update:
         if response.status_code != 200:
             globals.logger.error(f"response.status_code:{response.status_code}")
             globals.logger.error(f"response.text:{response.text}")
-            message_id = f"500-{MSG_FUNCTION_ID}001"
+            message_id = "500-90001"
             message = multi_lang.get_text(
                 message_id,
                 "clientの取得に失敗しました(対象ID:{0} client:{1})",
@@ -265,7 +263,7 @@ class realm_update:
         if response.status_code != 200:
             globals.logger.error(f"response.status_code:{response.status_code}")
             globals.logger.error(f"response.text:{response.text}")
-            message_id = f"500-{MSG_FUNCTION_ID}001"
+            message_id = "500-90001"
             message = multi_lang.get_text(
                 message_id,
                 "clientの取得に失敗しました(対象ID:{0} client:{1})",
@@ -290,7 +288,7 @@ class realm_update:
             if response.status_code != 200:
                 globals.logger.error(f"response.status_code:{response.status_code}")
                 globals.logger.error(f"response.text:{response.text}")
-                message_id = f"500-{MSG_FUNCTION_ID}002"
+                message_id = "500-90002"
                 message = multi_lang.get_text(
                     message_id,
                     "client roleの取得に失敗しました(対象ID:{0} client:{1})",
@@ -307,7 +305,7 @@ class realm_update:
         if response.status_code not in [200, 204]:
             globals.logger.error(f"response.status_code:{response.status_code}")
             globals.logger.error(f"response.text:{response.text}")
-            message_id = f"500-{MSG_FUNCTION_ID}010"
+            message_id = "500-90010"
             message = multi_lang.get_text(
                 message_id,
                 "client roleのrole設定に失敗しました(対象ID:{0} client:{1})",
