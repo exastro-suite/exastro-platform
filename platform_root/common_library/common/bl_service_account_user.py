@@ -14,6 +14,7 @@
 import json
 import random
 import string
+import re
 
 from common_library.common import const
 from common_library.common import api_keycloak_roles, api_keycloak_users
@@ -66,6 +67,37 @@ def service_account_user_role_name(workspace_id, service_account_user_type):
         str: role name
     """
     return f"_{workspace_id}-{service_account_user_type}"
+
+
+def is_service_account_role(rolename):
+    """サービスアカウント用のロールの場合Trueを返します
+
+    Args:
+        rolename (str): ロール名
+
+    Returns:
+        boolean: True=サービスアカウント用ロール
+    """
+    for type in service_account_user_types():
+        if re.search(rf'^_.*-{type}$', rolename):
+            return True
+    return False
+
+
+def is_service_account_user(user):
+    """ユーザがサービスアカウントユーザーの場合Trueを返します / Returns True if the user is a service account user.
+
+    Args:
+        user (dict): keycloak apiから返されたuserの情報 / User information returned from the Keycloak API
+
+    Returns:
+        boolean: True=service account user
+    """
+    if user is None:
+        return False
+    else:
+        type = user.get("attributes", {}).get(const.SERVICE_ACCOUNT_USER_TYPE_ATTRIBUTE_NAME,[""])[0]
+        return type != ""
 
 
 def service_account_user_create_parameter(username, service_account_user_type, description):
