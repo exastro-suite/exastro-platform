@@ -64,6 +64,7 @@ def test_user_api(connexion_client):
         assert posted_user["lastName"] == post_user["lastName"]
         assert posted_user["email"] == post_user["email"]
         assert posted_user["affiliation"] == post_user["affiliation"]
+        assert posted_user["service_account_user_type"] is None
         assert posted_user["description"] == post_user["description"]
         assert posted_user["enabled"] == post_user["enabled"]
 

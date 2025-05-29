@@ -1058,6 +1058,9 @@ const RolesCommon =
     "ORG_AUTH_WS_MAINTE":           "_og-ws-mt",
     "ORG_AUTH_AUDIT_LOG":           "_og-audit-log",
 
+    "ANSIBLE_EXECUTION_AGENT_ROLE": "ansible-execution-agent",
+    "OASE_AGENT_ROLE":              "oase-agent",
+
     "isAlllowedCreateRole": function() {
         return CommonAuth.hasAuthority(RolesCommon.ORG_AUTH_WS_ROLE_MAINTE) || ( CommonAuth.getAdminWorkspaces().length > 0 );
     },
@@ -1207,6 +1210,10 @@ const RolesCommon =
             default:
                 return [];
         }
+    },
+
+    "isServiceAccountUserRole": function(role, service_account_user_role_name){
+        return service_account_user_role_name.includes(role.name);
     }
 }
 
@@ -1234,7 +1241,12 @@ const UsersCommon =
             return false;
         }
         return true;
+    },
+
+    "isServiceAccountUser": function(user) {
+        return !(user.service_account_user_type === null) ? true: false;
     }
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

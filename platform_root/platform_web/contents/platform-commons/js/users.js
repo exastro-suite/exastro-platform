@@ -134,6 +134,7 @@ $(function(){
                 const user = users[i];
                 const isUpdateAbleRow = UsersCommon.isAllowedEditUser(user); // 更新可能か
                 const isSystemAccount = UsersCommon.isSystemUser(user);
+                const isServiceAccount = UsersCommon.isServiceAccountUser(user);    // サービスアカウントユーザーか
 
                 const row_html = row_template
                     .replace(/\${user_id}/g, fn.cv(user.id,'',true))
@@ -152,12 +153,12 @@ $(function(){
                 console.log("btn_delete", $row.find(".btn_delete"));
 
                 $row.find(".button_edit")
-                    .prop("disabled", isSystemAccount || !isUpdateAbleRow)
+                    .prop("disabled", isSystemAccount || !isUpdateAbleRow || isServiceAccount)
                     .css("cursor", isSystemAccount || !isUpdateAbleRow ? "not-allowed": "")
                     .css("display", isSystemAccount? "none": "");
 
                 $row.find(".btn_delete")
-                    .prop("disabled", isSystemAccount || !isUpdateAbleRow)
+                    .prop("disabled", isSystemAccount || !isUpdateAbleRow || isServiceAccount)
                     .css("cursor", isSystemAccount || !isUpdateAbleRow? "not-allowed": "")
                     .css("display", isSystemAccount? "none": "");
 

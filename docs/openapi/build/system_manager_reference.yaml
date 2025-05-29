@@ -1086,6 +1086,8 @@ components:
           type: string
         affiliation:
           type: string
+        service_account_user_type:
+          type: string
         description:
           type: string
         enabled:
