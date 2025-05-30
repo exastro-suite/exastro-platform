@@ -38,6 +38,7 @@ $(function(){
 
             // Display Topic Path
             displayTopicPath([
+                {"text": getText("000-93001", "ワークスペース選択"), "href": location_conf.href.workspaces.settings.service_account_users.workspace.replace(/{organization_id}/g, CommonAuth.getRealm())},
                 {"text": getText("000-93005", "サービスアカウントユーザー一覧"), "href": location_conf.href.workspaces.settings.service_account_users.list.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{workspace_id}/g, workspace_id)},
                 {"text": getText("000-93023", "サービスアカウントユーザートークン発行"), "href": location_conf.href.workspaces.settings.service_account_users.token.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{workspace_id}/g, workspace_id).replace(/{user_id}/g, user_id)},
             ]);
