@@ -47,8 +47,8 @@ def user_workspace_list(organization_id, user_id):
 
     # サービスアカウントのTOKEN取得
     # Get a service account token
-    token_response = api_keycloak_tokens.client_user_get_token(
-        organization_id, client_id, private.internal_api_client_secret, user_id, "", grant_type="client_credentials")
+    token_response = api_keycloak_tokens.service_account_get_token(
+        organization_id, client_id, private.internal_api_client_secret)
 
     if token_response.status_code != 200:
         raise common.AuthException("client_user_get_token error status:{}, response:{}".format(token_response.status_code, token_response.text))

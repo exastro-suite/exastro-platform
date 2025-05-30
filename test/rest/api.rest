@@ -201,7 +201,7 @@ GET {{base_org_url}}/api/{{org_id}}/platform/auditlog/download
 Authorization: Basic {{org-user-id}} {{org-user-pw}}
 
 ### Get Notification
-GET {{base_org_url}}/api/{{org_id}}/platform/workspaces/{{ws_id}}/agent-users
+GET {{base_org_url}}/api/{{org_id}}/platform/workspaces/{{ws_id}}/service-account-users
 Authorization: Basic {{org-user-id}} {{org-user-pw}}
 
 ###

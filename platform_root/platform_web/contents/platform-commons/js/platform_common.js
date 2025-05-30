@@ -277,6 +277,8 @@ function displayMenu(curent) {
             <li class="menuItem"><a class="menuLink" id="menu_role_management" href="#" style="display: none;">${getText("000-80007", "ロール管理")}</a></li>
             <li class="menuItem"><a class="menuLink" id="menu_settings_notifications" href="#">${getText("000-00183", "通知管理")}</a></li>
 
+            <li class="menuItem"><a class="menuLink" id="menu_service_account_management" href="#" style="display: none;">${getText("000-80056", "サービスアカウント管理")}</a></li>
+
             <li class="menuItem">
                 <a class="menuLink menuItemContent" id="menu_organization_setting" type="button" aria-expanded="false" aria-controls="menu_organization_setting_accordion_panel" href="#" style="display: none;">${getText("000-80054", "オーガナイゼーション設定")}</a>
                 <ul id="menu_organization_setting_accordion_panel" class="menuItem--subGroup" aria-hidden="true">
@@ -294,6 +296,7 @@ function displayMenu(curent) {
         $('#menu_account_bulk_actions').attr('href', location_conf.href.users.bulk_actions.replace(/{organization_id}/g, CommonAuth.getRealm()));
         $('#menu_role_management').attr('href', location_conf.href.roles.list.replace(/{organization_id}/g, CommonAuth.getRealm()));
         $('#menu_settings_notifications').attr('href', location_conf.href.workspaces.settings.notifications.workspaces.replace(/{organization_id}/g, CommonAuth.getRealm()));
+        $('#menu_service_account_management').attr('href', location_conf.href.workspaces.settings.service_account_users.workspace.replace(/{organization_id}/g, CommonAuth.getRealm()));
         $('#menu_settings_mailserver').attr('href', location_conf.href.settings.mailserver.replace(/{organization_id}/g, CommonAuth.getRealm()));
         $('#menu_identity_providers').attr('href', location_conf.href.keycloak.identity_providers.replace(/{organization_id}/g, CommonAuth.getRealm()));
         $('#menu_password_policy').attr('href', location_conf.href.keycloak.password_policy.replace(/{organization_id}/g, CommonAuth.getRealm()));
@@ -323,6 +326,11 @@ function displayMenu(curent) {
         if (CommonAuth.hasAuthority(RolesCommon.ORG_AUTH_UPDATE)) {
             $("#menu_settings_mailserver").css("display", "");
         }
+
+        if (CommonAuth.getAdminWorkspaces().length > 0 ) {
+            $("#menu_service_account_management").css("display", "");
+        }
+
         if (CommonAuth.hasRealmManagementAuthority("manage-identity-providers")) {
             $("#menu_identity_providers").css("display", "");
         }
@@ -1050,6 +1058,9 @@ const RolesCommon =
     "ORG_AUTH_WS_MAINTE":           "_og-ws-mt",
     "ORG_AUTH_AUDIT_LOG":           "_og-audit-log",
 
+    "ANSIBLE_EXECUTION_AGENT_ROLE": "ansible-execution-agent",
+    "OASE_AGENT_ROLE":              "oase-agent",
+
     "isAlllowedCreateRole": function() {
         return CommonAuth.hasAuthority(RolesCommon.ORG_AUTH_WS_ROLE_MAINTE) || ( CommonAuth.getAdminWorkspaces().length > 0 );
     },
@@ -1199,6 +1210,10 @@ const RolesCommon =
             default:
                 return [];
         }
+    },
+
+    "isServiceAccountUserRole": function(role, service_account_user_role_name){
+        return service_account_user_role_name.includes(role.name);
     }
 }
 
@@ -1226,7 +1241,12 @@ const UsersCommon =
             return false;
         }
         return true;
+    },
+
+    "isServiceAccountUser": function(user) {
+        return !(user.service_account_user_type === null) ? true: false;
     }
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

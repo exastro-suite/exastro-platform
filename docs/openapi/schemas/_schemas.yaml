@@ -168,15 +168,15 @@ jobsUserExportStatusList:
   $ref: "./jobs.user.export.status.list.yaml"
 jobsUserExportStatus:
   $ref: "./jobs.user.export.status.yaml"
-agentUser:
-  $ref: "./agentUser.yaml"
-agentUserCreate:
-  $ref: "./agentUserCreate.yaml"
-agentUserId:
-  $ref: "./agentUserId.yaml"
-agentUserList:
-  $ref: "./agentUserList.yaml"
-agentUserUpdate:
-  $ref: "./agentUserUpdate.yaml"
-agentUserTokenList:
-  $ref: "./agentUserTokenList.yaml"
+serviceAccountUser:
+  $ref: "./serviceAccountUser.yaml"
+serviceAccountUserCreate:
+  $ref: "./serviceAccountUserCreate.yaml"
+serviceAccountUserId:
+  $ref: "./serviceAccountUserId.yaml"
+serviceAccountUserList:
+  $ref: "./serviceAccountUserList.yaml"
+serviceAccountUserUpdate:
+  $ref: "./serviceAccountUserUpdate.yaml"
+serviceAccountUserTokenList:
+  $ref: "./serviceAccountUserTokenList.yaml"

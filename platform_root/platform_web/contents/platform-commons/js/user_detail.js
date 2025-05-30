@@ -60,9 +60,10 @@ $(function(){
 
         const isUpdateAbleRow = UsersCommon.isAllowedEditUser(user); // 更新可能か
         const isSystemAccount = UsersCommon.isSystemUser(user);
+        const isServiceAccount = UsersCommon.isServiceAccountUser(user);    // サービスアカウントユーザーか
 
         $(".button_edit_user")
-            .prop("disabled", isSystemAccount || !isUpdateAbleRow)
+            .prop("disabled", isSystemAccount || !isUpdateAbleRow || isServiceAccount)
             .css("cursor", isSystemAccount || !isUpdateAbleRow ? "not-allowed": "")
             .css("display", isSystemAccount? "none": "");
 
@@ -71,7 +72,7 @@ $(function(){
         });
 
         $(".button_delete_user")
-            .prop("disabled", isSystemAccount || !isUpdateAbleRow)
+            .prop("disabled", isSystemAccount || !isUpdateAbleRow || isServiceAccount)
             .css("cursor", isSystemAccount || !isUpdateAbleRow? "not-allowed": "")
             .css("display", isSystemAccount? "none": "");
 

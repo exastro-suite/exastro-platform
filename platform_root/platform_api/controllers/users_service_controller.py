@@ -86,6 +86,7 @@ def user_list(organization_id, first=0, max=100, search=None):
             "preferred_username": user.get("username", ""),
             "name": common.get_username(user.get("firstName"), user.get("lastName"), user.get("username")),
             "affiliation": user.get("attributes", {}).get("affiliation", [""])[0],
+            "service_account_user_type": user.get("attributes", {}).get("service_account_user_type", [None])[0],
             "description": user.get("attributes", {}).get("description", [""])[0],
             "enabled": user.get("enabled", False),
             "create_timestamp": common.keycloak_timestamp_to_str(user.get("createdTimestamp")),

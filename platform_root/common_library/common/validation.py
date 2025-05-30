@@ -18,7 +18,7 @@ from datetime import datetime
 import urllib.parse
 
 from common_library.common import common, multi_lang
-from common_library.common import bl_agent_user
+from common_library.common import bl_service_account_user
 import common_library.common.const as const
 from email_validator import validate_email, EmailNotValidError
 
@@ -1930,17 +1930,17 @@ def validate_audit_log_conditions(conditions):
     return result(True)
 
 
-def validate_agent_user_type(agent_user_type):
-    if agent_user_type is None or agent_user_type == "":
+def validate_service_account_user_type(service_account_user_type):
+    if service_account_user_type is None or service_account_user_type == "":
         return result(
             False, 400, '400-00011', '必須項目が不足しています。({0})',
-            multi_lang.get_text('000-00216', "エージェントタイプ")
+            multi_lang.get_text('000-00216', "サービスアカウントユーザータイプ")
         )
 
-    if agent_user_type not in bl_agent_user.agent_user_types():
+    if service_account_user_type not in bl_service_account_user.service_account_user_types():
         return result(
             False, 400, '400-00037', '指定可能な値ではありません({0})',
-            multi_lang.get_text('000-00216', "エージェントタイプ")
+            multi_lang.get_text('000-00216', "サービスアカウントユーザータイプ")
         )
 
     return result(True)

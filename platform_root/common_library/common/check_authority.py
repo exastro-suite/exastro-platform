@@ -94,8 +94,8 @@ class CheckAuthority():
 
         # サービスアカウントのTOKEN取得
         # Get a service account token
-        response = api_keycloak_tokens.client_user_get_token(
-            self._organization_id, client_id, private.internal_api_client_secret, user_id, "", grant_type="client_credentials")
+        response = api_keycloak_tokens.service_account_get_token(
+            self._organization_id, client_id, private.internal_api_client_secret)
 
         if response.status_code != 200:
             globals.logger.error(f"response.status_code:{response.status_code}")

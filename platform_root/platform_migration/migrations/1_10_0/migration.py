@@ -14,6 +14,7 @@
 #   limitations under the License.
 
 from . import realm_update
+from . import create_service_account_user_role
 
 
 def main():
@@ -26,6 +27,17 @@ def main():
     # master realm update / organizations realm  update
     api = realm_update.realm_update()
     result.append(api.start())
+    
+    # エラーがあっても処理を継続する
+    # continue processing even if there is an error
+
+    # サービスアカウントユーザー用ロールの作成
+    # Create a service account user roles
+    api = create_service_account_user_role.create_service_account_user_role()
+    result.append(api.start())
+    
+    # エラーがあっても処理を継続する
+    # continue processing even if there is an error
 
     for i in result:
         if i != 0:
