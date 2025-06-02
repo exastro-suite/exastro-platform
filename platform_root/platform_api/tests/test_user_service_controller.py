@@ -80,6 +80,7 @@ def test_user_api(connexion_client):
         assert posted_user["lastName"] == post_user["lastName"]
         assert posted_user["email"] == post_user["email"]
         assert posted_user["affiliation"] == post_user["affiliation"]
+        assert posted_user["service_account_user_type"] is None
         assert posted_user["description"] == post_user["description"]
         assert posted_user["enabled"] == post_user["enabled"]
 
@@ -106,6 +107,7 @@ def test_user_api(connexion_client):
         assert puted_user["lastName"] == put_user["lastName"]
         assert puted_user["email"] == put_user["email"]
         assert puted_user["affiliation"] == put_user["affiliation"]
+        assert posted_user["service_account_user_type"] is None
         assert puted_user["description"] == put_user["description"]
         assert puted_user["enabled"] == put_user["enabled"]
 
@@ -475,6 +477,7 @@ def test_user_get(connexion_client):
         assert posted_user["lastName"] == post_user["lastName"]
         assert posted_user["email"] == post_user["email"]
         assert posted_user["affiliation"] == post_user["affiliation"]
+        assert posted_user["service_account_user_type"] is None
         assert posted_user["description"] == post_user["description"]
         assert posted_user["enabled"] == post_user["enabled"]
 
