@@ -26,7 +26,16 @@
       "runOptions": {
         "runOn": "folderOpen"
       },
+      "dependsOn": [
+        "httpd-stop"
+      ],
       "problemMatcher": []
-    }
+    },
+    {
+      "label": "httpd-stop",
+      "type": "shell",
+      "command": "while [ $(sudo docker inspect devcontainer-ita-migration-1 | jq -r '.[0].State.Status') != 'exited' ]; do echo 'Wait until devcontainer-ita-migration-1 is exited.'; sleep 5; done; httpd -k stop",
+      "problemMatcher": []
+    },
   ]
 }
