@@ -129,7 +129,7 @@ $(function(){
     function service_account_user_register() {
         console.log("[CALL] service_account_user_register");
 
-        let reqbody =   {
+        const reqbody =   {
             "username": $('#form_service_account_user_username').val(),
             "service_account_user_type": $('#form_service_account_user_type').val(),
             "description": $('#form_description').val(),
@@ -137,26 +137,35 @@ $(function(){
 
         show_progress();
 
-        // APIを呼出す
-        return Promise.all([
-            // サービスアカウントユーザー作成 - Create service account user
-            call_api_promise_create_service_account_user(reqbody),
+        // サービスアカウントユーザーの登録
+        call_api_promise_create_service_account_user(reqbody).then((result) => {
 
-            // refresh token発行 - create refresh token
-            call_api_promise_create_service_account_user_token(reqbody),
+            // サービスアカウントユーザーの一覧取得（サービスアカウントユーザー作成後のuser_id取得のため）
+            return call_api_promise_get_service_account_user();
 
-        ]).then(function(result){
+        }).then((result) => {
+            // サービスアカウントユーザーの一覧からuser_idを特定
+            const regUserData = result.data.filter(item => item.username === reqbody.username.toLowerCase())
+            let user_id = "";
+            try {
+                user_id = regUserData[0].id;
+            } catch(e) {
+                throw new Error('Registered service account user not found');
+            }
 
+            // サービスアカウントユーザーのtoken発行
+            return call_api_promise_create_service_account_user_token(user_id);
+
+        }).then((result) => {
             hide_progress();
-
             // refresh tokenの発行結果の表示
-            display_result_created(result[1].data, result[1].status, result[1].jqXHR);
+            display_result_created(result.data);
 
         }).catch((e) => {
+            console.log(e);
             hide_progress();
             $('#button_register').prop('disabled',false);
         });
-
     }
 
     // 
@@ -178,93 +187,86 @@ $(function(){
         });
     }
 
-    // 
-    // サービスアカウントユーザートークン発行API呼出処理
-    // Process to call service account user token creation API
-    // 
-    function call_api_promise_create_service_account_user_token(reqbody){
+    /**
+     * サービスアカウントユーザーの一覧取得（サービスアカウントユーザー作成後のuser_id取得のため）
+     * @returns Promise
+     */
+    function call_api_promise_get_service_account_user() {
+        console.log("[CALL] call_api_promise_get_service_account_user");
+
+        return call_api_promise({
+            type: "GET",
+            url: api_conf.api.workspaces.service_account_users.get.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{workspace_id}/g, workspace_id),
+            headers: {
+                Authorization: "Bearer " + CommonAuth.getToken(),
+            }
+        });
+    }
+
+    /**
+     * サービスアカウントユーザーのtoken発行
+     * @param {*} user_id 
+     * @returns Promise 
+     */
+    function call_api_promise_create_service_account_user_token(user_id) {
         console.log("[CALL] call_api_promise_create_service_account_user_token");
 
-        // token取得のため、ユーザーIDを取得 - Get user ID to get token
-        return Promise.all([
-            // サービスアカウントユーザー一覧を取得 - get service account user list
-            call_api_promise({
-                type: "GET",
-                url: api_conf.api.workspaces.service_account_users.get.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{workspace_id}/g, workspace_id),
-                headers: {
-                    Authorization: "Bearer " + CommonAuth.getToken(),
-                }
-            }),
-
-        ]).then(function(result){
-            // 登録したサービスアカウントユーザーのデータを取得 - Get the data of a registered service account user
-            const regUserData = result[0].data.filter(item => item.username === reqbody.username.toLowerCase());
-
-            // refresh tokenを発行 - create refresh token
-            return call_api_promise({
-                type: "POST",
-                url: api_conf.api.token.service_account_user_site.post.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{workspace_id}/g, workspace_id).replace(/{user_id}/g, regUserData[0].id),
-                headers: {
-                    Authorization: "Bearer " + CommonAuth.getToken(),
-                },
-                data: JSON.stringify(reqbody),
-                contentType: "application/json",
-                dataType: "json",
-            })
-        })
+        return call_api_promise({
+            type: "POST",
+            url: api_conf.api.token.service_account_user_site.post.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{workspace_id}/g, workspace_id).replace(/{user_id}/g, user_id),
+            headers: {
+                Authorization: "Bearer " + CommonAuth.getToken(),
+            },
+            data: JSON.stringify({}),
+            contentType: "application/json",
+            dataType: "json",
+        });
     }
 
     // 
     // refresh tokenの発行結果の表示
     // Display of result of issuing refresh token
     // 
-    function display_result_created(data, status, jqXHR) {
+    function display_result_created(data) {
         console.log("[CALL] display_result_created");
 
-        if(data.refresh_token) {
-            // {refresh_token}にデータを代入し、その値を取得する
-            const dialog_contents = $("#create_token_result_dialog").html().replace(/{refresh_token}/g, fn.cv(data.refresh_token,'',true)).replace(/{expiration_date}/g, fn.date(data.refresh_token_expire,'yyyy/MM/dd'));
-            console.log(dialog_contents);
+        // {refresh_token}にデータを代入し、その値を取得する
+        const dialog_contents = $("#create_token_result_dialog").html().replace(/{refresh_token}/g, fn.cv(data.refresh_token,'',true)).replace(/{expiration_date}/g, fn.date(data.refresh_token_expire,'yyyy/MM/dd'));
+        // console.log(dialog_contents);
 
-            const dialog = new Dialog({
-                mode: 'modeless',
-                position: 'center',
-                width: 'auto',
-                header: {
-                    title: getText("000-81018", "refresh token発行"),
-                },
-                footer: {
-                    button: {
-                        copy: { text: '<span class="iconButtonIcon icon icon-copy"></span>'+getText("000-80035", "クリップボードにコピー"), action: 'positive', style: 'width:250px;'},
-                        close: { text: getText("000-80011", "閉じる"), action: "normal", style: 'width:200px;' }
-                    }
-                },
+        const dialog = new Dialog({
+            mode: 'modeless',
+            position: 'center',
+            width: 'auto',
+            header: {
+                title: getText("000-81018", "refresh token発行"),
             },
-            {
-                copy: function() {
-                    if ( navigator.clipboard ) {
-                        navigator.clipboard.writeText(data.refresh_token).then( function(){
-                            $(dialog.$.dbody).find(".copy_message").text(getText("000-81021", "クリップボードにコピーしました。"));
-                        });
-                    } else {
-                        alert(getText("000-81022", "お使いのブラウザでは、クリップボードにコピーできません。"));
-                    }
-                },
-                close: function() {
-                    dialog.close();
-
-                    // 「サービスアカウントユーザー一覧」画面に遷移する
-                    // Redirected to the "Service Account User List" screen.
-                    window.location = location_conf.href.workspaces.settings.service_account_users.list.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{workspace_id}/g, workspace_id);
-
+            footer: {
+                button: {
+                    copy: { text: '<span class="iconButtonIcon icon icon-copy"></span>'+getText("000-80035", "クリップボードにコピー"), action: 'positive', style: 'width:250px;'},
+                    close: { text: getText("000-80011", "閉じる"), action: "normal", style: 'width:200px;' }
                 }
-            });
-            dialog.open(dialog_contents);
+            },
+        },
+        {
+            copy: function() {
+                if ( navigator.clipboard ) {
+                    navigator.clipboard.writeText(data.refresh_token).then( function(){
+                        $(dialog.$.dbody).find(".copy_message").text(getText("000-81021", "クリップボードにコピーしました。"));
+                    });
+                } else {
+                    alert(getText("000-81022", "お使いのブラウザでは、クリップボードにコピーできません。"));
+                }
+            },
+            close: function() {
+                dialog.close();
 
-        } else {
-            // When a normal response is returned but there is no refresh_token in data
-            // 正常応答が返ってきているが、dataにrefresh_tokenが無いとき
-            alert(getText("000-81026", "refresh tokenの取得に失敗しました。")+`\n\nstatus=${jqXHR.status}`)
-        }
+                // 「サービスアカウントユーザー一覧」画面に遷移する
+                // Redirected to the "Service Account User List" screen.
+                window.location = location_conf.href.workspaces.settings.service_account_users.list.replace(/{organization_id}/g, CommonAuth.getRealm()).replace(/{workspace_id}/g, workspace_id);
+
+            }
+        });
+        dialog.open(dialog_contents);
     }
 });
