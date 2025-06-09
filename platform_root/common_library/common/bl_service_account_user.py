@@ -96,7 +96,7 @@ def is_service_account_user(user):
     if user is None:
         return False
     else:
-        type = user.get("attributes", {}).get(const.SERVICE_ACCOUNT_USER_TYPE_ATTRIBUTE_NAME,[""])[0]
+        type = user.get("attributes", {}).get(const.SERVICE_ACCOUNT_USER_TYPE_ATTRIBUTE_NAME, [""])[0]
         return type != ""
 
 
@@ -114,8 +114,8 @@ def service_account_user_create_parameter(username, service_account_user_type, d
     return {
         "username": username,
         # "email": service_account_user_email(username),
-        # "firstName": const.SERVICE_ACCOUNT_USER_DUMMY_FIRSTNAME,
-        # "lastName": const.SERVICE_ACCOUNT_USER_DUMMY_LASTNAME,
+        "firstName": username,
+        "lastName": const.SERVICE_ACCOUNT_USER_DUMMY_LASTNAME,
         # "credentials": [
         #     {
         #         "type": "password",
@@ -146,8 +146,6 @@ def service_account_user_temporary_parameter(user):
         **user,
         **{
             "email": service_account_user_email(user["username"]),
-            "firstName": const.SERVICE_ACCOUNT_USER_DUMMY_FIRSTNAME,
-            "lastName": const.SERVICE_ACCOUNT_USER_DUMMY_LASTNAME,
         }
     }
 
@@ -165,8 +163,6 @@ def service_account_user_rollback_parameter(user):
         **user,
         **{
             "email": "",
-            "firstName": "",
-            "lastName": "",
         }
     }
 
