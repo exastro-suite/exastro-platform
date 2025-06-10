@@ -1231,7 +1231,7 @@ def test_service_account_user_token_create(connexion_client):
         #
         requests_mocker.register_uri(
             requests_mock.GET,
-            re.compile(rf'^{test_common.keycloak_origin()}/auth/admin/realms/{organization["organization_id"]}/users/{service_account_user01['id']}$'),
+            re.compile(rf'^{test_common.keycloak_origin()}/auth/admin/realms/{organization["organization_id"]}/users/{service_account_user01["id"]}$'),
             status_code=500,
             json={})
 
@@ -1247,7 +1247,7 @@ def test_service_account_user_token_create(connexion_client):
     #
     with test_common.requsts_mocker_default():
         response = connexion_client.post(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users/{non_service_account_user["id"]}/refresh_tokens",
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users/{non_service_account_user['id']}/refresh_tokens",
             headers=request_parameters.request_headers(organization['user_id'], workspace_role=[common.get_ws_admin_authname(workspace['workspace_id'])]),
             json={}
         )
@@ -1259,7 +1259,7 @@ def test_service_account_user_token_create(connexion_client):
     with test_common.requsts_mocker_default() as requests_mocker:
         requests_mocker.register_uri(
             requests_mock.GET,
-            re.compile(rf'^{test_common.keycloak_origin()}/auth/admin/realms/{organization["organization_id"]}/users/{service_account_user01['id']}/role-mappings$'),
+            re.compile(rf'^{test_common.keycloak_origin()}/auth/admin/realms/{organization["organization_id"]}/users/{service_account_user01["id"]}/role-mappings$'),
             status_code=500,
             json={})
 
@@ -1304,7 +1304,7 @@ def test_service_account_user_token_create(connexion_client):
     with test_common.requsts_mocker_default() as requests_mocker:
         requests_mocker.register_uri(
             requests_mock.PUT,
-            re.compile(rf'^{test_common.keycloak_origin()}/auth/admin/realms/{organization["organization_id"]}/users/{service_account_user01['id']}/reset-password$'),
+            re.compile(rf'^{test_common.keycloak_origin()}/auth/admin/realms/{organization["organization_id"]}/users/{service_account_user01["id"]}/reset-password$'),
             status_code=500,
             json={})
 
@@ -1418,7 +1418,7 @@ def test_service_account_user_token_list(connexion_client):
         # faild keycloak api offline_sessions_delete
         requests_mocker.register_uri(
             requests_mock.GET,
-            re.compile(rf'^{test_common.keycloak_origin()}/auth/admin/realms/{organization["organization_id"]}/users/{service_account_user01['id']}/offline-sessions/'),
+            re.compile(rf'^{test_common.keycloak_origin()}/auth/admin/realms/{organization["organization_id"]}/users/{service_account_user01["id"]}/offline-sessions/'),
             status_code=500,
             json={})
         
