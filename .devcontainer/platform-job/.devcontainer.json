@@ -46,8 +46,8 @@
 					}
 				},
 
-				"python.interpreterPath": "/usr/bin/python3.12",
-				"python.defaultInterpreterPath": "/usr/bin/python3.12",
+				"python.interpreterPath": "/usr/bin/python3",
+				"python.defaultInterpreterPath": "/usr/bin/python3",
 
 				// python extension setting
 				"python.linting.pylintEnabled": false,

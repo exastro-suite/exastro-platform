@@ -46,16 +46,17 @@ RUN --mount=type=secret,id=host_certificate_file,dst=/etc/pki/ca-trust/extracted
     httpd \
     gcc \
     httpd-devel \
-    python3.12 \
-    python3.12-devel \
-    python3.12-mod_wsgi \
-    python3.12-pip \
+    python3.11 \
+    python3.11-devel \
+    python3.11-mod_wsgi \
+    python3.11-pip \
     mod_ssl \
 # does not use mod_ssl's default ssl configuration file.
-&&  ln -f -s /usr/bin/python3.12 /usr/bin/python3 \
-&&  ln -f -s /usr/bin/pip3.12 /usr/bin/pip3 \
+&&  alternatives --install /usr/bin/python3 python3 /usr/bin/python3.9 1000000 \
+&&  alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 100 \
+&&  alternatives --set python3 /usr/bin/python3.11 \
 &&  mv /etc/httpd/conf.d/ssl.conf /etc/httpd/conf.d/ssl.conf_bk \
-&&  pip3 install poetry==1.8.4 \
+&&  pip3.11 install poetry==1.8.4 \
 &&  poetry config virtualenvs.create false \
 &&  groupadd $GROUPNAME \
 &&  useradd -m -s /bin/bash -g $GROUPNAME $USERNAME \
