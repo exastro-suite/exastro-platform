@@ -42,7 +42,7 @@ def test_service_account_user_service_api(connexion_client):
 
         # 0件のget確認
         response = connexion_client.get(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users',
             headers=request_parameters.request_headers(organization['user_id'], workspace_role=[common.get_ws_admin_authname(workspace['workspace_id'])]))
 
         assert response.status_code == 200
@@ -51,7 +51,7 @@ def test_service_account_user_service_api(connexion_client):
         # service account userの追加
         service_account_user1_data = sample_data_service_account_user('ansible-service-account-user-1', const.SERVICE_ACCOUNT_USER_TYPE_ANSIBLE)
         response = connexion_client.post(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users',
             headers=request_parameters.request_headers(organization['user_id'], workspace_role=[common.get_ws_admin_authname(workspace['workspace_id'])]),
             json=service_account_user1_data
         )
@@ -60,7 +60,7 @@ def test_service_account_user_service_api(connexion_client):
 
         # 作成したservice account userの確認
         response = connexion_client.get(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users',
             headers=request_parameters.request_headers(organization['user_id'], workspace_role=[common.get_ws_admin_authname(workspace['workspace_id'])]))
 
         assert response.status_code == 200
@@ -72,7 +72,7 @@ def test_service_account_user_service_api(connexion_client):
         # service account userの追加
         service_account_user2_data = sample_data_service_account_user('oase-service-account-1', const.SERVICE_ACCOUNT_USER_TYPE_OASE)
         response = connexion_client.post(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users',
             headers=request_parameters.request_headers(organization['user_id'], workspace_role=[common.get_ws_admin_authname(workspace['workspace_id'])]),
             json=service_account_user2_data
         )
@@ -81,7 +81,7 @@ def test_service_account_user_service_api(connexion_client):
 
         # 作成したservice account userの確認(list)
         response = connexion_client.get(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users',
             headers=request_parameters.request_headers(organization['user_id'], workspace_role=[common.get_ws_admin_authname(workspace['workspace_id'])]))
 
         assert response.status_code == 200
@@ -98,7 +98,7 @@ def test_service_account_user_service_api(connexion_client):
         #
         # service account user2データの取得(idの取得)
         response = connexion_client.get(
-            f"/api/{organization['organization_id']}/platform/users?search={service_account_user2_data['username']}",
+            f'/api/{organization["organization_id"]}/platform/users?search={service_account_user2_data["username"]}',
             content_type='application/json',
             headers=request_parameters.request_headers(organization["user_id"]))
         
@@ -106,7 +106,7 @@ def test_service_account_user_service_api(connexion_client):
 
         # 登録データの取得
         response = connexion_client.get(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users/{posted_service_account_user2['id']}",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users/{posted_service_account_user2["id"]}',
             content_type='application/json',
             headers=request_parameters.request_headers(organization["user_id"]))
         
@@ -122,7 +122,7 @@ def test_service_account_user_service_api(connexion_client):
 
         # Userデータの更新
         response = connexion_client.put(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users/{posted_service_account_user2['id']}",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users/{posted_service_account_user2["id"]}',
             content_type='application/json',
             headers=request_parameters.request_headers(organization['user_id']),
             json=put_service_account_user2
@@ -132,7 +132,7 @@ def test_service_account_user_service_api(connexion_client):
         
         # 更新の確認
         response = connexion_client.get(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users/{posted_service_account_user2['id']}",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users/{posted_service_account_user2["id"]}',
             content_type='application/json',
             headers=request_parameters.request_headers(organization["user_id"]))
         
@@ -143,7 +143,7 @@ def test_service_account_user_service_api(connexion_client):
 
         # service account userの削除(user2)
         response = connexion_client.delete(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users/{posted_service_account_user2['id']}",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users/{posted_service_account_user2["id"]}',
             content_type='application/json',
             headers=request_parameters.request_headers(organization["user_id"])
         )
@@ -152,7 +152,7 @@ def test_service_account_user_service_api(connexion_client):
         
         # 1件のget確認
         response = connexion_client.get(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users',
             headers=request_parameters.request_headers(organization['user_id'], workspace_role=[common.get_ws_admin_authname(workspace['workspace_id'])]))
 
         assert response.status_code == 200
@@ -160,7 +160,7 @@ def test_service_account_user_service_api(connexion_client):
         
         # user1でtokenを発行する
         response = connexion_client.post(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users/{response_user1_row[0]['id']}/refresh_tokens",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users/{response_user1_row[0]["id"]}/refresh_tokens',
             headers=request_parameters.request_headers(organization['user_id'], workspace_role=[common.get_ws_admin_authname(workspace['workspace_id'])]),
             json={}
         )
@@ -173,7 +173,7 @@ def test_service_account_user_service_api(connexion_client):
         # token削除
         # token削除
         response = connexion_client.delete(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users/{response_user1_row[0]['id']}/refresh_tokens",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users/{response_user1_row[0]["id"]}/refresh_tokens',
             headers=request_parameters.request_headers(organization['user_id'], workspace_role=[common.get_ws_admin_authname(workspace['workspace_id'])])
         )
         assert response.status_code == 200
@@ -235,7 +235,7 @@ def test_service_account_user_create(connexion_client):
         normally_test_json = sample_data_service_account_user(normally_test_username, const.SERVICE_ACCOUNT_USER_TYPE_ANSIBLE)
 
         response = connexion_client.post(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users',
             headers=request_parameters.request_headers(organization['user_id']),
             json=normally_test_json
         )
@@ -260,21 +260,21 @@ def test_service_account_user_create(connexion_client):
         #
         service_account_user_data_validate_error = sample_data_service_account_user('validation-error', const.SERVICE_ACCOUNT_USER_TYPE_ANSIBLE)
         response = connexion_client.post(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users',
             headers=request_parameters.request_headers(organization['user_id']),
             json={**service_account_user_data_validate_error, **{"username": "_error-id"}}
         )
         assert response.status_code == 400
 
         response = connexion_client.post(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users',
             headers=request_parameters.request_headers(organization['user_id']),
             json={**service_account_user_data_validate_error, **{"service_account_user_type": "dummy"}}
         )
         assert response.status_code == 400
 
         response = connexion_client.post(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users',
             headers=request_parameters.request_headers(organization['user_id']),
             json={**service_account_user_data_validate_error, **{"description": "t".ljust(const.length_user_description + 1, "_")}}
         )
@@ -291,7 +291,7 @@ def test_service_account_user_create(connexion_client):
             json={})
 
         response = connexion_client.post(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users',
             headers=request_parameters.request_headers(organization['user_id']),
             json=sample_data_service_account_user('get-token-error', const.SERVICE_ACCOUNT_USER_TYPE_ANSIBLE)
         )
@@ -303,7 +303,7 @@ def test_service_account_user_create(connexion_client):
         # Exists user
         #
         response = connexion_client.post(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users',
             headers=request_parameters.request_headers(organization['user_id']),
             json=sample_data_service_account_user('exists_user01', const.SERVICE_ACCOUNT_USER_TYPE_ANSIBLE)
         )
@@ -311,7 +311,7 @@ def test_service_account_user_create(connexion_client):
         assert __exists_user(organization['organization_id'], 'exists_user01', token)
 
         response = connexion_client.post(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users',
             headers=request_parameters.request_headers(organization['user_id']),
             json=sample_data_service_account_user('exists_user01', const.SERVICE_ACCOUNT_USER_TYPE_ANSIBLE)
         )
@@ -329,7 +329,7 @@ def test_service_account_user_create(connexion_client):
             json={})
 
         response = connexion_client.post(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users',
             headers=request_parameters.request_headers(organization['user_id']),
             json=sample_data_service_account_user('create_user_error_400', const.SERVICE_ACCOUNT_USER_TYPE_ANSIBLE)
         )
@@ -347,7 +347,7 @@ def test_service_account_user_create(connexion_client):
             json={})
 
         response = connexion_client.post(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users',
             headers=request_parameters.request_headers(organization['user_id']),
             json=sample_data_service_account_user('create_user_error_500', const.SERVICE_ACCOUNT_USER_TYPE_ANSIBLE)
         )
@@ -365,7 +365,7 @@ def test_service_account_user_create(connexion_client):
             json={})
 
         response = connexion_client.post(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users',
             headers=request_parameters.request_headers(organization['user_id']),
             json=sample_data_service_account_user('get_user_error_500', const.SERVICE_ACCOUNT_USER_TYPE_ANSIBLE)
         )
@@ -384,7 +384,7 @@ def test_service_account_user_create(connexion_client):
             json=[])
 
         response = connexion_client.post(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users',
             headers=request_parameters.request_headers(organization['user_id']),
             json=sample_data_service_account_user('create_user_not_found', const.SERVICE_ACCOUNT_USER_TYPE_ANSIBLE)
         )
@@ -403,7 +403,7 @@ def test_service_account_user_create(connexion_client):
             json={})
 
         response = connexion_client.post(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users',
             headers=request_parameters.request_headers(organization['user_id']),
             json=sample_data_service_account_user('service_account_role_not_found', const.SERVICE_ACCOUNT_USER_TYPE_ANSIBLE)
         )
@@ -421,7 +421,7 @@ def test_service_account_user_create(connexion_client):
             json={})
 
         response = connexion_client.post(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users',
             headers=request_parameters.request_headers(organization['user_id']),
             json=sample_data_service_account_user('service_account_role_mapping_error', const.SERVICE_ACCOUNT_USER_TYPE_ANSIBLE)
         )
@@ -447,7 +447,7 @@ def test_service_account_user_get(connexion_client):
         
         # User登録
         response = connexion_client.post(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users',
             headers=request_parameters.request_headers(organization['user_id']),
             json=post_service_account_user
         )
@@ -455,7 +455,7 @@ def test_service_account_user_get(connexion_client):
         
         # Userデータの取得(idの取得)
         response = connexion_client.get(
-            f"/api/{organization['organization_id']}/platform/users?search={post_service_account_user['username']}",
+            f'/api/{organization["organization_id"]}/platform/users?search={post_service_account_user["username"]}',
             content_type='application/json',
             headers=request_parameters.request_headers(organization["user_id"]))
         
@@ -463,7 +463,7 @@ def test_service_account_user_get(connexion_client):
         
         # 登録データの取得
         response = connexion_client.get(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users/{posted_service_account_user['id']}",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users/{posted_service_account_user["id"]}',
             content_type='application/json',
             headers=request_parameters.request_headers(organization["user_id"]))
         
@@ -486,7 +486,7 @@ def test_service_account_user_get(connexion_client):
         
         # 登録データの取得
         response = connexion_client.get(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users/{posted_service_account_user['id']}",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users/{posted_service_account_user["id"]}',
             content_type='application/json',
             headers=request_parameters.request_headers(organization["user_id"]))
         
@@ -497,7 +497,7 @@ def test_service_account_user_get(connexion_client):
     #
     with test_common.requsts_mocker_default():
         response = connexion_client.get(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users/xxxx",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users/xxxx',
             content_type='application/json',
             headers=request_parameters.request_headers(organization['user_id'], workspace_role=[common.get_ws_admin_authname(workspace['workspace_id'])]),
             json={}
@@ -517,7 +517,7 @@ def test_service_account_user_get(connexion_client):
 
         # データの取得
         response = connexion_client.get(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users/{posted_service_account_user['id']}",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users/{posted_service_account_user["id"]}',
             content_type='application/json',
             headers=request_parameters.request_headers(organization["user_id"]))
 
@@ -534,7 +534,7 @@ def test_service_account_user_get(connexion_client):
             json={})
 
         response = connexion_client.post(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users/{posted_service_account_user['id']}/refresh_tokens",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users/{posted_service_account_user["id"]}/refresh_tokens',
             headers=request_parameters.request_headers(organization['user_id'], workspace_role=[common.get_ws_admin_authname(workspace['workspace_id'])]),
             json={}
         )
@@ -559,7 +559,7 @@ def test_service_account_user_update(connexion_client):
         
         # User登録
         response = connexion_client.post(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users',
             headers=request_parameters.request_headers(organization['user_id']),
             json=post_service_account_user
         )
@@ -567,7 +567,7 @@ def test_service_account_user_update(connexion_client):
         
         # Userデータの取得(idの取得)
         response = connexion_client.get(
-            f"/api/{organization['organization_id']}/platform/users?search={post_service_account_user['username']}",
+            f'/api/{organization["organization_id"]}/platform/users?search={post_service_account_user["username"]}',
             content_type='application/json',
             headers=request_parameters.request_headers(organization["user_id"]))
         
@@ -575,7 +575,7 @@ def test_service_account_user_update(connexion_client):
         
         # 登録データの取得
         response = connexion_client.get(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users/{posted_service_account_user['id']}",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users/{posted_service_account_user["id"]}',
             content_type='application/json',
             headers=request_parameters.request_headers(organization["user_id"]))
         
@@ -587,7 +587,7 @@ def test_service_account_user_update(connexion_client):
 
         # Userデータの更新
         response = connexion_client.put(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users/{posted_service_account_user['id']}",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users/{posted_service_account_user["id"]}',
             content_type='application/json',
             headers=request_parameters.request_headers(organization['user_id']),
             json=put_service_account_user
@@ -597,7 +597,7 @@ def test_service_account_user_update(connexion_client):
         
         # 更新データの取得
         response = connexion_client.get(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users/{posted_service_account_user['id']}",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users/{posted_service_account_user["id"]}',
             content_type='application/json',
             headers=request_parameters.request_headers(organization["user_id"]))
         
@@ -612,7 +612,7 @@ def test_service_account_user_update(connexion_client):
     with test_common.requsts_mocker_default():
         # JSONでないbodyで更新
         response = connexion_client.put(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users/{posted_service_account_user['id']}",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users/{posted_service_account_user["id"]}',
             # content_type='application/json',
             headers=request_parameters.request_headers(organization["user_id"]),
             data="dummy-data"
@@ -627,7 +627,7 @@ def test_service_account_user_update(connexion_client):
     with test_common.requsts_mocker_default() as requests_mocker:
         # description
         response = connexion_client.put(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users/{posted_service_account_user['id']}",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users/{posted_service_account_user["id"]}',
             content_type='application/json',
             headers=request_parameters.request_headers(organization["user_id"]),
             json={**put_service_account_user, **{"description": "t".ljust(const.length_user_description + 1, "_")}}
@@ -648,7 +648,7 @@ def test_service_account_user_update(connexion_client):
         
         # Userデータの更新
         response = connexion_client.put(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users/{posted_service_account_user['id']}",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users/{posted_service_account_user["id"]}',
             content_type='application/json',
             headers=request_parameters.request_headers(organization['user_id']),
             json=put_service_account_user
@@ -661,7 +661,7 @@ def test_service_account_user_update(connexion_client):
     #
     with test_common.requsts_mocker_default():
         response = connexion_client.get(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users/xxxx",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users/xxxx',
             content_type='application/json',
             headers=request_parameters.request_headers(organization['user_id'], workspace_role=[common.get_ws_admin_authname(workspace['workspace_id'])]),
             json={}
@@ -681,7 +681,7 @@ def test_service_account_user_update(connexion_client):
         
         # データの取得
         response = connexion_client.get(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users/{posted_service_account_user['id']}",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users/{posted_service_account_user["id"]}',
             content_type='application/json',
             headers=request_parameters.request_headers(organization["user_id"]))
 
@@ -696,7 +696,7 @@ def test_service_account_user_update(connexion_client):
         
         # User登録（サービスアカウントユーザーでない）
         response = connexion_client.post(
-            f"/api/{organization['organization_id']}/platform/users",
+            f'/api/{organization["organization_id"]}/platform/users',
             content_type='application/json',
             headers=request_parameters.request_headers(organization['user_id']),
             json=post_user
@@ -705,7 +705,7 @@ def test_service_account_user_update(connexion_client):
         
         # Userデータの取得(idの取得)
         response = connexion_client.get(
-            f"/api/{organization['organization_id']}/platform/users?search={post_user['username']}",
+            f'/api/{organization["organization_id"]}/platform/users?search={post_user["username"]}',
             content_type='application/json',
             headers=request_parameters.request_headers(organization["user_id"]))
         
@@ -715,7 +715,7 @@ def test_service_account_user_update(connexion_client):
         put_user = sample_data_put_user(post_user)
 
         response = connexion_client.put(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users/{posted_user['id']}",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users/{posted_user["id"]}',
             content_type='application/json',
             headers=request_parameters.request_headers(organization['user_id']),
             json=put_user
@@ -735,7 +735,7 @@ def test_service_account_user_update(connexion_client):
             json={})
 
         response = connexion_client.put(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users/{posted_service_account_user['id']}",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users/{posted_service_account_user["id"]}',
             content_type='application/json',
             headers=request_parameters.request_headers(organization['user_id']),
             json=put_service_account_user
@@ -755,7 +755,7 @@ def test_service_account_user_update(connexion_client):
         
         # User登録
         response = connexion_client.post(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace2['workspace_id']}/service-account-users",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace2["workspace_id"]}/service-account-users',
             headers=request_parameters.request_headers(organization['user_id']),
             json=post_service_account_user2
         )
@@ -763,7 +763,7 @@ def test_service_account_user_update(connexion_client):
         
         # Userデータの取得(idの取得)
         response = connexion_client.get(
-            f"/api/{organization['organization_id']}/platform/users?search={post_service_account_user2['username']}",
+            f'/api/{organization["organization_id"]}/platform/users?search={post_service_account_user2["username"]}',
             content_type='application/json',
             headers=request_parameters.request_headers(organization["user_id"]))
         
@@ -773,7 +773,7 @@ def test_service_account_user_update(connexion_client):
         put_user2 = sample_data_put_service_account_user(post_service_account_user2)
 
         response = connexion_client.put(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users/{posted_service_account_user2['id']}",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users/{posted_service_account_user2["id"]}',
             content_type='application/json',
             headers=request_parameters.request_headers(organization['user_id']),
             json=put_user2
@@ -787,7 +787,7 @@ def test_service_account_user_update(connexion_client):
     with test_common.requsts_mocker_default():
         # 存在しないユーザーを更新
         response = connexion_client.put(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users/xxxx",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users/xxxx',
             content_type='application/json',
             headers=request_parameters.request_headers(organization['user_id']),
             json=put_service_account_user
@@ -809,7 +809,7 @@ def test_service_account_user_update(connexion_client):
         
         # ユーザーの更新
         response = connexion_client.put(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users/{posted_service_account_user['id']}",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users/{posted_service_account_user["id"]}',
             content_type='application/json',
             headers=request_parameters.request_headers(organization["user_id"]),
             json=put_service_account_user
@@ -831,7 +831,7 @@ def test_service_account_user_update(connexion_client):
         
         # ユーザーの更新
         response = connexion_client.put(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users/{posted_service_account_user['id']}",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users/{posted_service_account_user["id"]}',
             content_type='application/json',
             headers=request_parameters.request_headers(organization["user_id"]),
             json=put_service_account_user
@@ -853,7 +853,7 @@ def test_service_account_user_update(connexion_client):
         
         # ユーザーの更新
         response = connexion_client.put(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users/{posted_service_account_user['id']}",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users/{posted_service_account_user["id"]}',
             content_type='application/json',
             headers=request_parameters.request_headers(organization["user_id"]),
             json=put_service_account_user
@@ -880,7 +880,7 @@ def test_service_account_user_delete(connexion_client):
         
         # Service Account User登録
         response = connexion_client.post(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users',
             headers=request_parameters.request_headers(organization['user_id']),
             json=post_service_account_user
         )
@@ -888,7 +888,7 @@ def test_service_account_user_delete(connexion_client):
         
         # Service Account Userデータの取得(idの取得)
         response = connexion_client.get(
-            f"/api/{organization['organization_id']}/platform/users?search={post_service_account_user['username']}",
+            f'/api/{organization["organization_id"]}/platform/users?search={post_service_account_user["username"]}',
             content_type='application/json',
             headers=request_parameters.request_headers(organization["user_id"]))
         
@@ -907,7 +907,7 @@ def test_service_account_user_delete(connexion_client):
         
         # Service Account Userデータの削除
         response = connexion_client.delete(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users/{posted_service_account_user['id']}",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users/{posted_service_account_user["id"]}',
             content_type='application/json',
             headers=request_parameters.request_headers(organization['user_id']),
             json=posted_service_account_user
@@ -921,7 +921,7 @@ def test_service_account_user_delete(connexion_client):
     with test_common.requsts_mocker_default():
         # Service Account Userデータの削除
         response = connexion_client.delete(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users/xxxx",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users/xxxx',
             content_type='application/json',
             headers=request_parameters.request_headers(organization['user_id'], workspace_role=[common.get_ws_admin_authname(workspace['workspace_id'])]),
             json={}
@@ -941,7 +941,7 @@ def test_service_account_user_delete(connexion_client):
         
         # Service Account Userデータの削除
         response = connexion_client.delete(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users/xxxx",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users/xxxx',
             content_type='application/json',
             headers=request_parameters.request_headers(organization['user_id'], workspace_role=[common.get_ws_admin_authname(workspace['workspace_id'])]),
             json=posted_service_account_user
@@ -958,7 +958,7 @@ def test_service_account_user_delete(connexion_client):
         
         # User登録（サービスアカウントユーザーでない）
         response = connexion_client.post(
-            f"/api/{organization['organization_id']}/platform/users",
+            f'/api/{organization["organization_id"]}/platform/users',
             content_type='application/json',
             headers=request_parameters.request_headers(organization['user_id']),
             json=post_user
@@ -967,7 +967,7 @@ def test_service_account_user_delete(connexion_client):
         
         # Userデータの取得(idの取得)
         response = connexion_client.get(
-            f"/api/{organization['organization_id']}/platform/users?search={post_user['username']}",
+            f'/api/{organization["organization_id"]}/platform/users?search={post_user["username"]}',
             content_type='application/json',
             headers=request_parameters.request_headers(organization["user_id"]))
         
@@ -975,7 +975,7 @@ def test_service_account_user_delete(connexion_client):
         
         # Userデータの削除
         response = connexion_client.delete(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users/{posted_user['id']}",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users/{posted_user["id"]}',
             content_type='application/json',
             headers=request_parameters.request_headers(organization['user_id']),
             json=posted_user
@@ -995,7 +995,7 @@ def test_service_account_user_delete(connexion_client):
             json={})
 
         response = connexion_client.delete(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users/{posted_service_account_user['id']}",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users/{posted_service_account_user["id"]}',
             content_type='application/json',
             headers=request_parameters.request_headers(organization['user_id']),
             json=posted_service_account_user
@@ -1015,7 +1015,7 @@ def test_service_account_user_delete(connexion_client):
         
         # Service Account User登録
         response = connexion_client.post(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace2['workspace_id']}/service-account-users",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace2["workspace_id"]}/service-account-users',
             headers=request_parameters.request_headers(organization['user_id']),
             json=post_service_account_user2
         )
@@ -1023,7 +1023,7 @@ def test_service_account_user_delete(connexion_client):
         
         # Service Account Userデータの取得(idの取得)
         response = connexion_client.get(
-            f"/api/{organization['organization_id']}/platform/users?search={post_service_account_user2['username']}",
+            f'/api/{organization["organization_id"]}/platform/users?search={post_service_account_user2["username"]}',
             content_type='application/json',
             headers=request_parameters.request_headers(organization["user_id"]))
         
@@ -1031,7 +1031,7 @@ def test_service_account_user_delete(connexion_client):
 
         # Service Account Userデータの削除
         response = connexion_client.delete(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users/{posted_service_account_user2['id']}",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users/{posted_service_account_user2["id"]}',
             content_type='application/json',
             headers=request_parameters.request_headers(organization['user_id']),
             json=posted_service_account_user2
@@ -1045,7 +1045,7 @@ def test_service_account_user_delete(connexion_client):
     with test_common.requsts_mocker_default():
         # 存在しないユーザーを削除
         response = connexion_client.delete(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users/xxxx",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users/xxxx',
             content_type='application/json',
             headers=request_parameters.request_headers(organization["user_id"]),
             json=posted_service_account_user
@@ -1067,7 +1067,7 @@ def test_service_account_user_delete(connexion_client):
         
         # ユーザーの削除
         response = connexion_client.delete(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users/{posted_service_account_user['id']}",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users/{posted_service_account_user["id"]}',
             content_type='application/json',
             headers=request_parameters.request_headers(organization["user_id"]),
             json=posted_service_account_user
@@ -1089,7 +1089,7 @@ def test_service_account_user_delete(connexion_client):
         
         # ユーザーの削除
         response = connexion_client.delete(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users/{posted_service_account_user['id']}",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users/{posted_service_account_user["id"]}',
             content_type='application/json',
             headers=request_parameters.request_headers(organization["user_id"]),
             json=posted_service_account_user
@@ -1111,7 +1111,7 @@ def test_service_account_user_delete(connexion_client):
         
         # ユーザーの削除
         response = connexion_client.delete(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users/{posted_service_account_user['id']}",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users/{posted_service_account_user["id"]}',
             content_type='application/json',
             headers=request_parameters.request_headers(organization["user_id"]),
             json=posted_service_account_user
@@ -1125,7 +1125,7 @@ def test_service_account_user_delete(connexion_client):
     with test_common.requsts_mocker_default():
         # Userデータの削除
         response = connexion_client.delete(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users/{posted_service_account_user['id']}",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users/{posted_service_account_user["id"]}',
             content_type='application/json',
             headers=request_parameters.request_headers(organization["user_id"])
         )
@@ -1183,7 +1183,7 @@ def test_service_account_user_token_create(connexion_client):
     #
     with test_common.requsts_mocker_default():
         response = connexion_client.post(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users/{service_account_user01['id']}/refresh_tokens",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users/{service_account_user01["id"]}/refresh_tokens',
             headers=request_parameters.request_headers(organization['user_id'], workspace_role=[common.get_ws_admin_authname(workspace['workspace_id'])]),
             json={}
         )
@@ -1205,7 +1205,7 @@ def test_service_account_user_token_create(connexion_client):
             json={})
 
         response = connexion_client.post(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users/{service_account_user01['id']}/refresh_tokens",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users/{service_account_user01["id"]}/refresh_tokens',
             headers=request_parameters.request_headers(organization['user_id'], workspace_role=[common.get_ws_admin_authname(workspace['workspace_id'])]),
             json={}
         )
@@ -1216,7 +1216,7 @@ def test_service_account_user_token_create(connexion_client):
     #
     with test_common.requsts_mocker_default():
         response = connexion_client.post(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users/not-exists-user-id/refresh_tokens",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users/not-exists-user-id/refresh_tokens',
             headers=request_parameters.request_headers(organization['user_id'], workspace_role=[common.get_ws_admin_authname(workspace['workspace_id'])]),
             json={}
         )
@@ -1236,7 +1236,7 @@ def test_service_account_user_token_create(connexion_client):
             json={})
 
         response = connexion_client.post(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users/{service_account_user01['id']}/refresh_tokens",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users/{service_account_user01["id"]}/refresh_tokens',
             headers=request_parameters.request_headers(organization['user_id'], workspace_role=[common.get_ws_admin_authname(workspace['workspace_id'])]),
             json={}
         )
@@ -1247,7 +1247,7 @@ def test_service_account_user_token_create(connexion_client):
     #
     with test_common.requsts_mocker_default():
         response = connexion_client.post(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users/{non_service_account_user['id']}/refresh_tokens",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users/{non_service_account_user["id"]}/refresh_tokens',
             headers=request_parameters.request_headers(organization['user_id'], workspace_role=[common.get_ws_admin_authname(workspace['workspace_id'])]),
             json={}
         )
@@ -1264,7 +1264,7 @@ def test_service_account_user_token_create(connexion_client):
             json={})
 
         response = connexion_client.post(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users/{service_account_user01['id']}/refresh_tokens",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users/{service_account_user01["id"]}/refresh_tokens',
             headers=request_parameters.request_headers(organization['user_id'], workspace_role=[common.get_ws_admin_authname(workspace['workspace_id'])]),
             json={}
         )
@@ -1275,7 +1275,7 @@ def test_service_account_user_token_create(connexion_client):
     #
     with test_common.requsts_mocker_default():
         response = connexion_client.post(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users/{service_account_user_ws2['id']}/refresh_tokens",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users/{service_account_user_ws2["id"]}/refresh_tokens',
             headers=request_parameters.request_headers(organization['user_id'], workspace_role=[common.get_ws_admin_authname(workspace['workspace_id'])]),
             json={}
         )
@@ -1292,7 +1292,7 @@ def test_service_account_user_token_create(connexion_client):
             json={})
 
         response = connexion_client.post(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users/{service_account_user01['id']}/refresh_tokens",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users/{service_account_user01["id"]}/refresh_tokens',
             headers=request_parameters.request_headers(organization['user_id'], workspace_role=[common.get_ws_admin_authname(workspace['workspace_id'])]),
             json={}
         )
@@ -1309,7 +1309,7 @@ def test_service_account_user_token_create(connexion_client):
             json={})
 
         response = connexion_client.post(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users/{service_account_user01['id']}/refresh_tokens",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users/{service_account_user01["id"]}/refresh_tokens',
             headers=request_parameters.request_headers(organization['user_id'], workspace_role=[common.get_ws_admin_authname(workspace['workspace_id'])]),
             json={}
         )
@@ -1331,7 +1331,7 @@ def test_service_account_user_token_create(connexion_client):
             additional_matcher=additional_matcher)
 
         response = connexion_client.post(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users/{service_account_user01['id']}/refresh_tokens",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users/{service_account_user01["id"]}/refresh_tokens',
             headers=request_parameters.request_headers(organization['user_id'], workspace_role=[common.get_ws_admin_authname(workspace['workspace_id'])]),
             json={}
         )
@@ -1371,7 +1371,7 @@ def test_service_account_user_token_list(connexion_client):
     for i in range(2):
         # 2件作成
         response = connexion_client.post(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users/{service_account_user01['id']}/refresh_tokens",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users/{service_account_user01["id"]}/refresh_tokens',
             headers=request_parameters.request_headers(organization['user_id'], workspace_role=[common.get_ws_admin_authname(workspace['workspace_id'])]),
             json={}
         )
@@ -1386,7 +1386,7 @@ def test_service_account_user_token_list(connexion_client):
     with test_common.requsts_mocker_default():
         # token取得
         response = connexion_client.get(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users/{service_account_user01['id']}/refresh_tokens",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users/{service_account_user01["id"]}/refresh_tokens',
             content_type='application/json',
             headers=request_parameters.request_headers(organization['user_id'], workspace_role=[common.get_ws_admin_authname(workspace['workspace_id'])])
         )
@@ -1406,7 +1406,7 @@ def test_service_account_user_token_list(connexion_client):
             json={})
 
         response = connexion_client.get(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users/{service_account_user01['id']}/refresh_tokens",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users/{service_account_user01["id"]}/refresh_tokens',
             headers=request_parameters.request_headers(organization['user_id'], workspace_role=[common.get_ws_admin_authname(workspace['workspace_id'])])
         )
     assert response.status_code == 401
@@ -1423,7 +1423,7 @@ def test_service_account_user_token_list(connexion_client):
             json={})
         
         response = connexion_client.get(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users/{service_account_user01['id']}/refresh_tokens",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users/{service_account_user01["id"]}/refresh_tokens',
             headers=request_parameters.request_headers(organization['user_id'], workspace_role=[common.get_ws_admin_authname(workspace['workspace_id'])])
         )
         
@@ -1440,7 +1440,7 @@ def test_service_account_user_token_list(connexion_client):
             json={})
 
         response = connexion_client.get(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users/{service_account_user01['id']}/refresh_tokens",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users/{service_account_user01["id"]}/refresh_tokens',
             headers=request_parameters.request_headers(organization['user_id'], workspace_role=[common.get_ws_admin_authname(workspace['workspace_id'])]),
             json={}
         )
@@ -1477,7 +1477,7 @@ def test_service_account_user_token_delete(connexion_client):
         sample_data_service_account_user('test_user01', const.SERVICE_ACCOUNT_USER_TYPE_ANSIBLE))
     # token作成
     response = connexion_client.post(
-        f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users/{service_account_user01['id']}/refresh_tokens",
+        f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users/{service_account_user01["id"]}/refresh_tokens',
         headers=request_parameters.request_headers(organization['user_id'], workspace_role=[common.get_ws_admin_authname(workspace['workspace_id'])]),
         json={}
     )
@@ -1492,7 +1492,7 @@ def test_service_account_user_token_delete(connexion_client):
 
         # token削除
         response = connexion_client.delete(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users/{service_account_user01['id']}/refresh_tokens",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users/{service_account_user01["id"]}/refresh_tokens',
             headers=request_parameters.request_headers(organization['user_id'], workspace_role=[common.get_ws_admin_authname(workspace['workspace_id'])])
         )
         assert response.status_code == 200
@@ -1511,7 +1511,7 @@ def test_service_account_user_token_delete(connexion_client):
             json={})
 
         response = connexion_client.delete(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users/{service_account_user01['id']}/refresh_tokens",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users/{service_account_user01["id"]}/refresh_tokens',
             headers=request_parameters.request_headers(organization['user_id'], workspace_role=[common.get_ws_admin_authname(workspace['workspace_id'])])
         )
         assert response.status_code == 401
@@ -1528,7 +1528,7 @@ def test_service_account_user_token_delete(connexion_client):
             json={})
         
         response = connexion_client.delete(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users/{service_account_user01['id']}/refresh_tokens",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users/{service_account_user01["id"]}/refresh_tokens',
             headers=request_parameters.request_headers(organization['user_id'], workspace_role=[common.get_ws_admin_authname(workspace['workspace_id'])])
         )
         
@@ -1572,7 +1572,7 @@ def test_temporary_password(connexion_client):
 
     with test_common.requsts_mocker_default():
         response = connexion_client.post(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users/{service_account_user01['id']}/refresh_tokens",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users/{service_account_user01["id"]}/refresh_tokens',
             headers=request_parameters.request_headers(organization['user_id'], workspace_role=[common.get_ws_admin_authname(workspace['workspace_id'])]),
             json={}
         )
@@ -1586,7 +1586,7 @@ def test_temporary_password(connexion_client):
 
     with test_common.requsts_mocker_default():
         response = connexion_client.post(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users/{service_account_user01['id']}/refresh_tokens",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users/{service_account_user01["id"]}/refresh_tokens',
             headers=request_parameters.request_headers(organization['user_id'], workspace_role=[common.get_ws_admin_authname(workspace['workspace_id'])]),
             json={}
         )
@@ -1600,7 +1600,7 @@ def test_temporary_password(connexion_client):
 
     with test_common.requsts_mocker_default():
         response = connexion_client.post(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users/{service_account_user01['id']}/refresh_tokens",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users/{service_account_user01["id"]}/refresh_tokens',
             headers=request_parameters.request_headers(organization['user_id'], workspace_role=[common.get_ws_admin_authname(workspace['workspace_id'])]),
             json={}
         )
@@ -1614,7 +1614,7 @@ def test_temporary_password(connexion_client):
 
     with test_common.requsts_mocker_default():
         response = connexion_client.post(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users/{service_account_user01['id']}/refresh_tokens",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users/{service_account_user01["id"]}/refresh_tokens',
             headers=request_parameters.request_headers(organization['user_id'], workspace_role=[common.get_ws_admin_authname(workspace['workspace_id'])]),
             json={}
         )
@@ -1628,7 +1628,7 @@ def test_temporary_password(connexion_client):
 
     with test_common.requsts_mocker_default():
         response = connexion_client.post(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users/{service_account_user01['id']}/refresh_tokens",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users/{service_account_user01["id"]}/refresh_tokens',
             headers=request_parameters.request_headers(organization['user_id'], workspace_role=[common.get_ws_admin_authname(workspace['workspace_id'])]),
             json={}
         )
@@ -1642,7 +1642,7 @@ def test_temporary_password(connexion_client):
 
     with test_common.requsts_mocker_default():
         response = connexion_client.post(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users/{service_account_user01['id']}/refresh_tokens",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users/{service_account_user01["id"]}/refresh_tokens',
             headers=request_parameters.request_headers(organization['user_id'], workspace_role=[common.get_ws_admin_authname(workspace['workspace_id'])]),
             json={}
         )
@@ -1656,7 +1656,7 @@ def test_temporary_password(connexion_client):
 
     with test_common.requsts_mocker_default():
         response = connexion_client.post(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users/{service_account_user01['id']}/refresh_tokens",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users/{service_account_user01["id"]}/refresh_tokens',
             headers=request_parameters.request_headers(organization['user_id'], workspace_role=[common.get_ws_admin_authname(workspace['workspace_id'])]),
             json={}
         )
@@ -1673,7 +1673,7 @@ def test_temporary_password(connexion_client):
 
     with test_common.requsts_mocker_default():
         response = connexion_client.post(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users/{service_account_user01['id']}/refresh_tokens",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users/{service_account_user01["id"]}/refresh_tokens',
             headers=request_parameters.request_headers(organization['user_id'], workspace_role=[common.get_ws_admin_authname(workspace['workspace_id'])]),
             json={}
         )
@@ -1690,7 +1690,7 @@ def test_temporary_password(connexion_client):
 
     with test_common.requsts_mocker_default():
         response = connexion_client.post(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users/{service_account_user01['id']}/refresh_tokens",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users/{service_account_user01["id"]}/refresh_tokens',
             headers=request_parameters.request_headers(organization['user_id'], workspace_role=[common.get_ws_admin_authname(workspace['workspace_id'])]),
             json={}
         )
@@ -1707,7 +1707,7 @@ def test_temporary_password(connexion_client):
 
     with test_common.requsts_mocker_default():
         response = connexion_client.post(
-            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users/{service_account_user01['id']}/refresh_tokens",
+            f'/api/{organization["organization_id"]}/platform/workspaces/{workspace["workspace_id"]}/service-account-users/{service_account_user01["id"]}/refresh_tokens',
             headers=request_parameters.request_headers(organization['user_id'], workspace_role=[common.get_ws_admin_authname(workspace['workspace_id'])]),
             json={}
         )
@@ -1762,7 +1762,7 @@ def __get_user(organization_id, username, token):
 def __make_sample_service_account_user(connexion_client, organization_id, workspace_id, user_id, token, service_account_user_json):
     with test_common.requsts_mocker_default():
         response = connexion_client.post(
-            f"/api/{organization_id}/platform/workspaces/{workspace_id}/service-account-users",
+            f'/api/{organization_id}/platform/workspaces/{workspace_id}/service-account-users',
             headers=request_parameters.request_headers(user_id),
             json=service_account_user_json
         )
@@ -1779,7 +1779,7 @@ def __make_sample_non_service_account_user(connexion_client, organization_id, us
 
         # User登録
         response = connexion_client.post(
-            f"/api/{organization_id}/platform/users",
+            f'/api/{organization_id}/platform/users',
             content_type='application/json',
             headers=request_parameters.request_headers(user_id),
             json=post_user)
@@ -1802,7 +1802,7 @@ def sample_data_service_account_user(username, service_account_user_type):
     return {
         "username": username,
         "service_account_user_type": service_account_user_type,
-        "description": f"description {username}"
+        "description": f'description {username}'
     }
 
 
