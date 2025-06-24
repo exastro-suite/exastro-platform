@@ -194,12 +194,12 @@ SQL_ORGANIZATION_CREATE_TABLES = [
         REMOTE_ADDR                     VARCHAR(40),                                -- リモートアクセスのIPアドレス
         REQUEST_HEADERS                 TEXT,                                       -- APIが呼び出された際のリクエストヘッダー
         REQUEST_USER_HEADERS            TEXT,                                       -- APIを呼び出す際のリクエストヘッダー
-        REQUEST_BODY                    TEXT,                                       -- APIの呼び出し時のリクエストボディ
-        REQUEST_FORM                    TEXT,                                       -- APIの呼び出し時のリクエストfrom
+        REQUEST_BODY                    LONGTEXT,                                   -- APIの呼び出し時のリクエストボディ
+        REQUEST_FORM                    LONGTEXT,                                   -- APIの呼び出し時のリクエストform
         REQUEST_FILES                   TEXT,                                       -- APIの呼び出し時のリクエストfiles
         STATUS_CODE                     VARCHAR(10),                                -- API呼び出し時のステータスコード
         NAME                            VARCHAR(10),                                -- audit固定
-        MESSAGE                         TEXT,                                       -- 応答メッセージ
+        MESSAGE                         LONGTEXT,                                   -- 応答メッセージ
         MESSAGE_ID                      VARCHAR(10),                                -- APIの応答メッセージID
         MESSAGE_TEXT                    TEXT,                                       -- APIの応答メッセージ
         STACK_INFO                      TEXT,                                       -- APIエラー時のスタック情報
