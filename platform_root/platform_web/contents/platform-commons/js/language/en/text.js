@@ -838,6 +838,7 @@ langArray['500-90027'] = 'Failed to get organization information(organization id
 langArray['500-90028'] = 'Failed to get access token(realm:{0})'
 langArray['500-90029'] = 'Failed to create service account user role (target role:{0})'
 langArray['500-90030'] = 'Failed to set role to service account user role (organization id:{0} role name:{1})'
+langArray['500-90031'] = 'organization_db modify column audit_log failed. organization_id:[{0}]'
 langArray['500-22001'] = 'Failed to create workspace role (Target ID: {})'
 langArray['500-22002'] = 'Failed to create workspace administrator role (Target ID: {})'
 langArray['500-22003'] = 'Failed to get workspace administrator role (Target ID: {})'

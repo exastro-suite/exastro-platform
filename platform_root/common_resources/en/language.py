@@ -853,6 +853,7 @@ class LanguageList:
     lang_array['500-90028'] = 'Failed to get access token(realm:{0})'
     lang_array['500-90029'] = 'Failed to create service account user role (target role:{0})'
     lang_array['500-90030'] = 'Failed to set role to service account user role (organization id:{0} role name:{1})'
+    lang_array['500-90031'] = 'organization_db modify column audit_log failed. organization_id:[{0}]'
     lang_array['500-22001'] = 'Failed to create workspace role (Target ID: {})'
     lang_array['500-22002'] = 'Failed to create workspace administrator role (Target ID: {})'
     lang_array['500-22003'] = 'Failed to get workspace administrator role (Target ID: {})'
