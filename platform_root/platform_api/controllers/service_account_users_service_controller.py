@@ -25,7 +25,9 @@ from common_library.common.db import DBconnector
 from libs import queries_token
 from common_library.common import check_authority
 
-from common_library.common import bl_service_account_user, bl_token_service
+from common_library.common import bl_service_account_user, bl_token_service, bl_plan_service
+import common_library.common.const as common_const
+from common_library.common import resources
 
 
 @common.platform_exception_handler
@@ -41,6 +43,25 @@ def service_account_user_create(body, organization_id, workspace_id):  # noqa: E
         Response: HTTP Response
     """
     globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
+
+    # 上限チェック
+    # uper limit check
+    # users limit get
+    limits = bl_plan_service.organization_limits_get(organization_id, common_const.RESOURCE_COUNT_USERS)
+    if common_const.RESOURCE_COUNT_USERS in limits:
+        # 上限値がある場合にチェックする
+        # Check if there is an upper limit
+        rc = resources.counter(organization_id)
+        globals.logger.info("### users count :{}".format(rc(common_const.RESOURCE_COUNT_USERS)))
+
+        if rc(common_const.RESOURCE_COUNT_USERS) >= limits[common_const.RESOURCE_COUNT_USERS]:
+            message_id = "400-93001"
+            message = multi_lang.get_text(
+                message_id,
+                "ユーザーの上限数({0})を超えるため、新しいサービスアカウントユーザーは作成できません。",
+                limits[common_const.RESOURCE_COUNT_USERS]
+            )
+            raise common.BadRequestException(message_id=message_id, message=message)
 
     # request parameter
     req_username = body.get("username")

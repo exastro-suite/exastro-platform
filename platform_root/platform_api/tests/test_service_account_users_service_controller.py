@@ -15,6 +15,7 @@
 # import copy
 import re
 import requests_mock
+from unittest import mock
 import json
 import jwt
 
@@ -22,6 +23,7 @@ from tests.common import request_parameters, test_common
 from common_library.common import const, validation, common
 from common_library.common import api_keycloak_users, api_keycloak_tokens, api_keycloak_roles, api_keycloak_realms
 from common_library.common import bl_service_account_user
+from common_library.common import bl_plan_service
 
 from common_library.common.db import DBconnector
 
@@ -253,6 +255,21 @@ def test_service_account_user_create(connexion_client):
         resp_get_user_role_json = json.loads(resp_get_user_role.text)
         assert len(resp_get_user_role_json) == 1
         assert resp_get_user_role_json[0]["name"] == bl_service_account_user.service_account_user_role_name(workspace['workspace_id'], normally_test_json["service_account_user_type"])
+
+    with test_common.requsts_mocker_default(), \
+            mock.patch.object(bl_plan_service, 'organization_limits_get', return_value={const.RESOURCE_COUNT_USERS: 2}):
+        #
+        # limit users
+        #
+        test_json = sample_data_service_account_user("limit-over", const.SERVICE_ACCOUNT_USER_TYPE_ANSIBLE)
+
+        response = connexion_client.post(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/service-account-users",
+            headers=request_parameters.request_headers(organization['user_id']),
+            json=test_json
+        )
+
+        assert response.status_code == 400
 
     with test_common.requsts_mocker_default():
         #

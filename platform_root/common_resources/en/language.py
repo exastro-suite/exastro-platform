@@ -669,6 +669,7 @@ class LanguageList:
     lang_array['400-62006'] = 'Service account users cannot be changed using the User bulk registration function.'
     lang_array['400-62007'] = 'Service account users cannot be deleted using the User bulk registration function.'
     lang_array['400-87001'] = 'More than {0} email addresses have been specified. ({1})'
+    lang_array['400-93001'] = 'A new service account user cannot be created because it would exceed the user limit ({0}).'
     lang_array['401-00001'] = 'Failed to get token. realm:[{0}] client:[{1}]'
     lang_array['401-00002'] = 'Certification failed.'
     lang_array['401-00003'] = 'The linking setting of the target menu is invalid. (menu: {})'
