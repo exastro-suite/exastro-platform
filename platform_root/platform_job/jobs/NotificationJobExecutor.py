@@ -233,13 +233,18 @@ class NotificationJobExecutor(BaseJobExecutor):
 
         for destination_information in destination_informations:
             resp_webhook_text = None
+            header = {"Content-type": "application/json"}
+            if destination_information.get('header'):
+                destination_information_header = json.loads(destination_information.get('header'))
+                header.update(destination_information_header)
+
             try:
                 resp_webhook = requests.post(
                     destination_information['url'],
                     json={
                         "text": message_infomations.get("title") + "\n\n" + message_infomations.get("message")
                     },
-                    headers={"Content-type": "application/json"},
+                    headers=header,
                     timeout=(
                         job_manager_config.JOBS[const.PROCESS_KIND_NOTIFICATION]['extra_config']['webhook_connection_timeout'],
                         job_manager_config.JOBS[const.PROCESS_KIND_NOTIFICATION]['extra_config']['webhook_read_timeout'],
