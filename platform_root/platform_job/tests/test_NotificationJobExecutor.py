@@ -119,6 +119,7 @@ def test_execute_webhook_nomally():
     workspace_id = testdata.ORGANIZATIONS[organization_id]["workspace_id"][0]
 
     webhook_url_path = "/test_execute_webhook_nomally"
+    webhook_header = '{"X-Api-Key": "test_execute_webhook_nomally"}'
     message_title = "test_execute_webhook_nomally title"
     message_text = "test_execute_webhook_nomally text"
 
@@ -126,6 +127,7 @@ def test_execute_webhook_nomally():
                 organization_id,
                 workspace_id,
                 f"{test_common.TEST_HTTPCODE200_ORIGIN}/{webhook_url_path}",
+                webhook_header,
                 message_title,
                 message_text
                 )
@@ -144,6 +146,7 @@ def test_execute_webhook_nomally():
         # 送信webhookの内容が正しいこと
         assert request_webhooks[0].method == 'POST'
         assert json.loads(request_webhooks[0].text)["text"] == message_title + "\n\n" + message_text
+        assert request_webhooks[0].headers["X-Api-Key"] == "test_execute_webhook_nomally"
 
 
 def test_execute_webhook_http_error():
@@ -155,6 +158,7 @@ def test_execute_webhook_http_error():
     workspace_id = testdata.ORGANIZATIONS[organization_id]["workspace_id"][0]
 
     webhook_url_path = "/test_execute_webhook_http_error"
+    webhook_header = None
     message_title = "test_execute_webhook_http_error title"
     message_text = "test_execute_webhook_http_error text"
 
@@ -162,6 +166,7 @@ def test_execute_webhook_http_error():
                 organization_id,
                 workspace_id,
                 f"{test_common.TEST_HTTPCODE500_ORIGIN}/{webhook_url_path}",
+                webhook_header,
                 message_title,
                 message_text
                 )
@@ -635,7 +640,7 @@ def make_notification_teams_wf(organization_id: str, workspace_id: str, webhook_
     return queue
 
 
-def make_notification_webhook(organization_id: str, workspace_id: str, webhook_uri: str, title: str, message:str):
+def make_notification_webhook(organization_id: str, workspace_id: str, webhook_uri: str, webhook_header: str, title: str, message:str):
     process_id = ulid.new().str
     notification_id = ulid.new().str
 
@@ -645,7 +650,7 @@ def make_notification_webhook(organization_id: str, workspace_id: str, webhook_u
         "DESTINATION_INFORMATIONS": encrypt.encrypt_str(json.dumps(
                 [{
                     "url": webhook_uri,
-                    "header": None,
+                    "header": webhook_header,
                 }]
             )),
         "MESSAGE_INFORMATIONS": json.dumps(
