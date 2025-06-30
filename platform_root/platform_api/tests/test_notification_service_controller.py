@@ -20,6 +20,8 @@ from libs import queries_notification
 from common_library.common.libs import queries_bl_notification
 from common_library.common import api_ita_admin_call
 
+from common_library.common.libs import queries_organization_options
+
 import logging
 
 logger = logging.getLogger(__name__)
@@ -759,14 +761,16 @@ def test_settings_notification_destination_delete(connexion_client):
 
         assert response.status_code == 404, "organization_id not specified. error route"
 
+    with test_common.requsts_mocker_default():
         # Incorrect organization_id
         response = connexion_client.delete(
             f"/api/example/platform/workspaces/{workspace['workspace_id']}/settings/notifications/{setting_notifications[0]['id']}",
             content_type='application/json',
             headers=request_parameters.request_headers(organization['user_id']))
 
-        assert response.status_code == 500, "Incorrect organization_id. error route"
+        assert response.status_code == 404, "Incorrect organization_id. error route"
 
+    with test_common.requsts_mocker_default():
         # workspace_id not specified
         response = connexion_client.delete(
             f"/api/{organization['organization_id']}/platform/workspaces//settings/notifications/{setting_notifications[0]['id']}",
@@ -775,14 +779,16 @@ def test_settings_notification_destination_delete(connexion_client):
 
         assert response.status_code == 404, "workspace_id not specified. error route"
 
+    with test_common.requsts_mocker_default():
         # Incorrect workspace_id
         response = connexion_client.delete(
             f"/api/{organization['organization_id']}/platform/workspaces/example/settings/notifications/{setting_notifications[0]['id']}",
             content_type='application/json',
             headers=request_parameters.request_headers(organization['user_id']))
 
-        assert response.status_code == 500, "Incorrect workspace_id. error route"
+        assert response.status_code == 404, "Incorrect workspace_id. error route"
 
+    with test_common.requsts_mocker_default():
         # destination_id not specified
         response = connexion_client.delete(
             f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/settings/notifications/",
@@ -792,6 +798,7 @@ def test_settings_notification_destination_delete(connexion_client):
         assert response.status_code == 404, "destination_id not specified. error route"
 
     with test_common.requsts_mocker_default(), \
+            test_common.pymysql_execute_data_mocker(queries_organization_options.SQL_QUERY_ORGANIZATION_INFORMATIONS, {"INFORMATIONS": '{"ext_options": {"options_ita": {"drivers": {"oase": true}}}}'}), \
             mock.patch.object(api_ita_admin_call, 'ita_notification_destination', return_value='1') as mock_obj:
 
         mock_obj.return_value = MockResponse({'data': '["mix-mail-01"]'}, 200)
@@ -805,6 +812,10 @@ def test_settings_notification_destination_delete(connexion_client):
         assert response.json["result"] == "400-35001", "destination_id in use"
         assert response.json["message"] == f"The specified notification destination is in use and cannot be deleted (destination id:{setting_notifications[0]['id']})", "destination_id in use"
 
+    with test_common.requsts_mocker_default(), \
+            test_common.pymysql_execute_data_mocker(queries_organization_options.SQL_QUERY_ORGANIZATION_INFORMATIONS, {"INFORMATIONS": '{"ext_options": {"options_ita": {"drivers": {"oase": true}}}}'}), \
+            mock.patch.object(api_ita_admin_call, 'ita_notification_destination', return_value='1') as mock_obj:
+
         mock_obj.return_value = MockResponse({'data': '[]'}, 500)
         # ITA API Error
         response = connexion_client.delete(
@@ -815,6 +826,9 @@ def test_settings_notification_destination_delete(connexion_client):
         assert response.status_code == 500, "ITA API Error"
         assert response.json["result"] == "500-35002", "ITA API Error"
         assert response.json["message"] == "Failed to get notification destination in use (menu:rule column:before_notification_destination)", "ITA API Error"
+
+    with test_common.requsts_mocker_default(), \
+            mock.patch.object(api_ita_admin_call, 'ita_notification_destination', return_value='1') as mock_obj:
 
         mock_obj.return_value = MockResponse({'data': '[]'}, 200)
         # normal route 1
@@ -842,6 +856,19 @@ def test_settings_notification_destination_delete(connexion_client):
         assert response.status_code == 500, "DB error route"
         assert response.json["result"] == "500-35001"
         assert response.json["message"] == f"Failed to delete notification destination (destination id:{setting_notifications[1]['id']})", "DB error route"
+
+    with test_common.requsts_mocker_default(), \
+        test_common.pymysql_execute_data_mocker(queries_organization_options.SQL_QUERY_ORGANIZATION_INFORMATIONS, {"INFORMATIONS": '{"ext_options": {"options_ita": {"drivers": {"oase": false}}}}'}), \
+        mock.patch.object(api_ita_admin_call, 'ita_notification_destination', return_value='1') as mock_obj:
+
+        mock_obj.return_value = MockResponse({'data': '["mix-teams_wf-01"]'}, 200)
+        # destination_id in use
+        response = connexion_client.delete(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/settings/notifications/{setting_notifications[1]['id']}",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization['user_id']))
+
+        assert response.status_code == 200, "oase disabled"
 
 
 def sample_data_mail(id, update={}):

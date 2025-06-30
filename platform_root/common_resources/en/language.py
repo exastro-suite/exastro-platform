@@ -816,6 +816,7 @@ class LanguageList:
     lang_array['500-34003'] = 'Failed to register process queue (process id:{0})'
     lang_array['500-35001'] = 'Failed to delete notification destination (destination id:{0})'
     lang_array['500-35002'] = 'Failed to get notification destination in use (menu:{0} column:{1})'
+    lang_array['500-35003'] = 'Failed to register message notification (destination id:{0})'
     #
     lang_array['500-36002'] = 'Failed to deactivate the mail server (destination id:{0})'
     lang_array['500-36003'] = 'Failed to register/update mail server settings to Keycloak (Target ID:{0})'
