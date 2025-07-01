@@ -26,6 +26,9 @@ ARG APP_PATH
 ENV PYTHONPATH              $APP_PATH/
 ENV PYTHONIOENCODING        utf-8
 ENV KEYCLOAK_VERSION        "24.0"
+ENV DB_CONNECT_TIMEOUT      10
+ENV DB_CONNECT_RETRY_SLEEP_TIME    0.5
+ENV DB_CONNECT_RETRY_LIMIT  3
 
 RUN --mount=type=secret,id=host_certificate_file,dst=/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem \
     dnf install -y \
