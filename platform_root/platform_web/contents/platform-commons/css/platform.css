@@ -285,6 +285,17 @@ input[type=checkbox]:disabled+.itaOptionsDriversLabel  {
     border-radius:5px;
     border: 1px solid black;
 }
+
+.notification_line {
+    margin-top: 1px;
+    margin-bottom: 3px;
+}
+
+.notification_alert_msg {
+    color: red;
+    font-weight: bold;
+}
+
 /* Firefox */
 .overflowAuto {
     overflow: auto!important;

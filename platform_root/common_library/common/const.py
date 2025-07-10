@@ -50,9 +50,13 @@ length_plan_item_description = 4000
 length_destination_id = 36
 length_destination_name = 255
 length_destination_email = 255
+length_destination_teams_wf_url = 1024
 length_destination_teams_webhook = 1024
+length_destination_webhook_url = 1024
 max_destination_email = 500
+max_destination_teams_wf = 1
 max_destination_teams_webhook = 1
+max_destination_webhook = 1
 length_func_id = 100
 length_smtp_host = 1024
 min_length_separated_by_period_mark = 1
@@ -92,6 +96,8 @@ ORG_AUTH_AUDIT_LOG = "_og-audit-log"
 ORG_AUTH_MANAGE_IDP = "manage-identity-providers"
 ORG_AUTH_VIEW_IDP = "view-identity-providers"
 ORG_AUTH_VIEW_REALM = "view-realm"
+ORG_AUTH_VIEW_CLIENTS = "view-clients"
+ORG_AUTH_MANAGE_REALM = "manage-realm"
 
 # ワークスペースロール権限
 # workspace role authority
@@ -100,12 +106,16 @@ WS_AUTH_ADMIN_ANY = "_.*-admin"
 
 # Roleと権限の紐づけ
 # Associating Roles and Permissions
-ORG_PERMISSION_ORG_MANAGER = [ORG_AUTH_UPDATE, ORG_AUTH_OWNER_MAINTE, ORG_AUTH_ROLE_USER, ORG_AUTH_USAGE_SITUATION,
-                              ORG_AUTH_USER_MAINTE, ORG_AUTH_WS_ROLE_MAINTE, ORG_AUTH_WS_ROLE_USER, ORG_AUTH_WS_MAINTE,
-                              ORG_AUTH_AUDIT_LOG, ORG_AUTH_MANAGE_IDP, ORG_AUTH_VIEW_IDP, ORG_AUTH_VIEW_REALM]
+ORG_PERMISSION_ORG_MANAGER = [
+    ORG_AUTH_UPDATE, ORG_AUTH_OWNER_MAINTE, ORG_AUTH_ROLE_USER, ORG_AUTH_USAGE_SITUATION,
+    ORG_AUTH_USER_MAINTE, ORG_AUTH_WS_ROLE_MAINTE, ORG_AUTH_WS_ROLE_USER, ORG_AUTH_WS_MAINTE,
+    ORG_AUTH_AUDIT_LOG, ORG_AUTH_MANAGE_IDP, ORG_AUTH_VIEW_IDP, ORG_AUTH_VIEW_REALM,
+    ORG_AUTH_VIEW_CLIENTS, ORG_AUTH_MANAGE_REALM
+]
 ORG_PERMISSION_USER_ROLE_MANAGER = [ORG_AUTH_USER_MAINTE, ORG_AUTH_WS_ROLE_MAINTE, ORG_AUTH_WS_ROLE_USER]
 ORG_PERMISSION_USER_MANAGER = [ORG_AUTH_USER_MAINTE, ORG_AUTH_WS_ROLE_USER]
 ORG_PERMISSION_IDP_MANAGER = [ORG_AUTH_MANAGE_IDP, ORG_AUTH_VIEW_IDP, ORG_AUTH_VIEW_REALM]
+ORG_PERMISSION_PASSWORD_POLICY = [ORG_AUTH_MANAGE_REALM, ORG_AUTH_VIEW_REALM, ORG_AUTH_VIEW_CLIENTS, ORG_AUTH_VIEW_IDP]
 
 # オーガナイゼーションロール権限 登録
 # Organization role authority registration
@@ -152,11 +162,15 @@ ALL_RESOURCE_COUNT = [
 # 通知先区分
 # Notification destination kind
 DESTINATION_KIND_MAIL = "Mail"
+DESTINATION_KIND_TEAMS_WF = "Teams_WF"
 DESTINATION_KIND_TEAMS = "Teams"
+DESTINATION_KIND_WEBHOOK = "Webhook"
 
 ALL_DESTINATION_KIND = [
     DESTINATION_KIND_MAIL,
+    DESTINATION_KIND_TEAMS_WF,
     DESTINATION_KIND_TEAMS,
+    DESTINATION_KIND_WEBHOOK,
 ]
 
 # 通知先メールヘッダー
@@ -221,3 +235,12 @@ CONFIG_KEY_USER_EXPORT_IMPORT_EXP_DAYS = "platform.system.user_export_import.exp
 CONFIG_KEY_USER_EXPORT_IMPORT_CLEANUP_TIME = "platform.system.user_export_import.cleanup_time"
 # chunk size for upload/download
 CONFIG_KEY_CHUNK_SIZE = "platform.system.chunk_size"
+
+# service account user type
+SERVICE_ACCOUNT_USER_TYPE_ATTRIBUTE_NAME = 'service_account_user_type'
+
+SERVICE_ACCOUNT_USER_TYPE_ANSIBLE = 'ansible-execution-agent'
+SERVICE_ACCOUNT_USER_TYPE_OASE = 'oase-agent'
+
+SERVICE_ACCOUNT_USER_EMAIL_DUMMY_DOMAIN = '@dummy'
+SERVICE_ACCOUNT_USER_DUMMY_LASTNAME = 'SA'

@@ -87,6 +87,9 @@ def configure_realm_users_profiles(users_profiles):
     if len([item for item in users_profiles["attributes"] if item["name"] == "description"]) == 0:
         users_profiles["attributes"].append(__users_profiles_item("description", "説明 / Description", common_const.length_user_description))
 
+    if len([item for item in users_profiles["attributes"] if item["name"] == common_const.SERVICE_ACCOUNT_USER_TYPE_ATTRIBUTE_NAME]) == 0:
+        users_profiles["attributes"].append(__hidden_users_profiles(common_const.SERVICE_ACCOUNT_USER_TYPE_ATTRIBUTE_NAME))
+
 
 def __users_profiles_item(name, display_name, max_length):
     """users profilesに追加するitemを返します / Returns the item to add to users profiles
@@ -115,6 +118,29 @@ def __users_profiles_item(name, display_name, max_length):
             "edit": [
                 "admin",
                 "user"
+            ]
+        },
+        "multivalued": False
+    }
+
+
+def __hidden_users_profiles(name):
+    """users profilesに追加する隠しitemを返します / Returns the hidden item to add to users profiles
+
+    Args:
+        name (str): attribute name
+
+    Returns:
+        dict: users profiles attribute item
+    """
+    return {
+        "name": name,
+        "permissions": {
+            "view": [
+                "admin"
+            ],
+            "edit": [
+                "admin"
             ]
         },
         "multivalued": False

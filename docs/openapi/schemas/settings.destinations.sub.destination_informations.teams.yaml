@@ -17,4 +17,4 @@ type: object
 properties:
   webhook:
     type: string
-    description: teams webhook url
+    description: teams webhook URL

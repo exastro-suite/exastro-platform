@@ -1119,6 +1119,8 @@ def __client_role_setting(organization_id, user_id):
             # Process for the number of organization administrators
             if permission in common_const.ORG_PERMISSION_IDP_MANAGER:
                 client_id_permission = realm_management_client_id
+            elif permission in common_const.ORG_PERMISSION_PASSWORD_POLICY:
+                client_id_permission = realm_management_client_id
             else:
                 client_id_permission = platform_client_id
 

@@ -20,6 +20,8 @@ from libs import queries_notification
 from common_library.common.libs import queries_bl_notification
 from common_library.common import api_ita_admin_call
 
+from common_library.common.libs import queries_organization_options
+
 import logging
 
 logger = logging.getLogger(__name__)
@@ -51,14 +53,34 @@ def test_notification_api(connexion_client):
             headers=request_parameters.request_headers(organization["user_id"]),
             json=[sample_data_teams('teams-01')])
 
-        assert response.status_code == 200, "create notifications (kind = teams) response code"
+        assert response.status_code == 400, "create notifications (kind = teams) response code"
+
+        # Teams_WF通知の追加
+        response = connexion_client.post(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/settings/notifications",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization["user_id"]),
+            json=[sample_data_teams_wf('teams_wf-01')])
+
+        assert response.status_code == 200, "create notifications (kind = Teams_WF) response code"
+
+        # Webhook通知の追加
+        response = connexion_client.post(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/settings/notifications",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization["user_id"]),
+            json=[sample_data_webhook('webhook-01')])
+
+        assert response.status_code == 200, "create notifications (kind = Webhook) response code"
 
         # Mail+Teams通知の追加
         request_json = [
             sample_data_mail('mix-mail-01', {"name": "mail_name1"}),
-            sample_data_teams('mix-teams-01', {"name": "teams_name1"}),
+            sample_data_teams_wf('mix-teams_wf-01', {"name": "teams_wf_name1"}),
+            sample_data_webhook('mix-webhook-01', {"name": "webhook_name1"}),
             sample_data_mail('mix-mail-02', {"name": "mail_name2"}),
-            sample_data_teams('mix-teams-02', {"name": "teams_name2"}),
+            sample_data_teams_wf('mix-teams_wf-02', {"name": "teams_wf_name2"}),
+            sample_data_webhook('mix-webhook-02', {"name": "webhook_name2"}),
         ]
 
         response = connexion_client.post(
@@ -196,41 +218,77 @@ def test_notifications_validate(connexion_client):
         [sample_data_information_email({"email": "dummy"})])
     assert not validate.ok, "create notifications validate informations mail format"
 
-    # validate informations teams array max
+    # validate informations teams workflow array max
     validate = validation.validate_destination_informations(
-        const.DESTINATION_KIND_TEAMS,
-        [sample_data_information_teams() for i in range(const.max_destination_teams_webhook)])
-    assert validate.ok, "create notifications validate informations teams array max"
+        const.DESTINATION_KIND_TEAMS_WF,
+        [sample_data_information_teams_wf() for i in range(const.max_destination_teams_wf)])
+    assert validate.ok, "create notifications validate informations teams workflow array max"
 
-    # validate informations teams array max + 1
+    # validate informations teams workflow array max + 1
     validate = validation.validate_destination_informations(
-        const.DESTINATION_KIND_TEAMS,
-        [sample_data_information_teams() for i in range(const.max_destination_teams_webhook + 1)])
-    assert not validate.ok, "create notifications validate informations teams array max + 1"
+        const.DESTINATION_KIND_TEAMS_WF,
+        [sample_data_information_teams_wf() for i in range(const.max_destination_teams_wf + 1)])
+    assert not validate.ok, "create notifications validate informations teams workflow array max + 1"
 
-    # validate informations teams None
+    # validate informations teams workflow None
     validate = validation.validate_destination_informations(
-        const.DESTINATION_KIND_TEAMS,
-        [sample_data_information_teams({"webhook": None})])
-    assert not validate.ok, "create notifications validate informations teams None"
+        const.DESTINATION_KIND_TEAMS_WF,
+        [sample_data_information_teams_wf({"url": None})])
+    assert not validate.ok, "create notifications validate informations teams workflow None"
 
-    # validate informations teams max length
+    # validate informations teams workflow max length
     validate = validation.validate_destination_informations(
-        const.DESTINATION_KIND_TEAMS,
-        [sample_data_information_teams({"webhook": "https://example.com/".ljust(const.length_destination_teams_webhook, "_")})])
-    assert validate.ok, "create notifications validate informations teams max length"
+        const.DESTINATION_KIND_TEAMS_WF,
+        [sample_data_information_teams_wf({"url": "https://example.com/".ljust(const.length_destination_teams_wf_url, "_")})])
+    assert validate.ok, "create notifications validate informations teams workflow max length"
 
-    # validate informations teams max length + 1
+    # validate informations teams workflow max length + 1
     validate = validation.validate_destination_informations(
-        const.DESTINATION_KIND_TEAMS,
-        [sample_data_information_teams({"webhook": "https://example.com/".ljust(const.length_destination_teams_webhook + 1, "_")})])
-    assert not validate.ok, "create notifications validate informations teams max length + 1"
+        const.DESTINATION_KIND_TEAMS_WF,
+        [sample_data_information_teams_wf({"url": "https://example.com/".ljust(const.length_destination_teams_wf_url + 1, "_")})])
+    assert not validate.ok, "create notifications validate informations teams workflow max length + 1"
 
-    # validate informations teams format
+    # validate informations teams workflow format
     validate = validation.validate_destination_informations(
-        const.DESTINATION_KIND_TEAMS,
-        [sample_data_information_teams({"webhook": "dummy"})])
-    assert not validate.ok, "create notifications validate informations teams format"
+        const.DESTINATION_KIND_TEAMS_WF,
+        [sample_data_information_teams_wf({"url": "dummy"})])
+    assert not validate.ok, "create notifications validate informations teams workflow format"
+
+    # validate informations webhook array max
+    validate = validation.validate_destination_informations(
+        const.DESTINATION_KIND_WEBHOOK,
+        [sample_data_information_webhook() for i in range(const.max_destination_webhook)])
+    assert validate.ok, "create notifications validate informations webhook array max"
+
+    # validate informations webhook array max + 1
+    validate = validation.validate_destination_informations(
+        const.DESTINATION_KIND_WEBHOOK,
+        [sample_data_information_webhook() for i in range(const.max_destination_webhook + 1)])
+    assert not validate.ok, "create notifications validate informations webhook array max + 1"
+
+    # validate informations webhook None
+    validate = validation.validate_destination_informations(
+        const.DESTINATION_KIND_WEBHOOK,
+        [sample_data_information_webhook({"url": None, "header": None})])
+    assert not validate.ok, "create notifications validate informations webhook None"
+
+    # validate informations webhook max length
+    validate = validation.validate_destination_informations(
+        const.DESTINATION_KIND_WEBHOOK,
+        [sample_data_information_webhook({"url": "https://example.com/".ljust(const.length_destination_webhook_url, "_"), "header": None})])
+    assert validate.ok, "create notifications validate informations webhook max length"
+
+    # validate informations webhook max length + 1
+    validate = validation.validate_destination_informations(
+        const.DESTINATION_KIND_WEBHOOK,
+        [sample_data_information_webhook({"url": "https://example.com/".ljust(const.length_destination_webhook_url + 1, "_"), "header": None})])
+    assert not validate.ok, "create notifications validate informations webhook max length + 1"
+
+    # validate informations webhook format
+    validate = validation.validate_destination_informations(
+        const.DESTINATION_KIND_WEBHOOK,
+        [sample_data_information_webhook({"url": "dummy", "header": None})])
+    assert not validate.ok, "create notifications validate informations webhook format"
 
     #
     # validate conditions
@@ -633,7 +691,7 @@ def test_settings_notification_list(connexion_client):
             headers=request_parameters.request_headers(organization['user_id']))
 
         assert response.status_code == 200, "get notifications destination list response OK route"
-        assert len(response.json["data"]) == 2, "get notifications destination list"
+        assert len(response.json["data"]) == 3, "get notifications destination list"
         assert response.json["data"][0].get("id") == setting_notifications[0]['id'], "get notifications destination id check"
 
         #
@@ -645,7 +703,7 @@ def test_settings_notification_list(connexion_client):
             headers=request_parameters.request_headers(organization['user_id']))
 
         assert response.status_code == 200, "get notifications destination list response OK route"
-        assert len(response.json["data"]) == 2, "get notifications destination list"
+        assert len(response.json["data"]) == 3, "get notifications destination list"
         assert response.json["data"][0].get("conditions", {}).get("ita", {}).get("event_type", {}).get("new"), "get notifications destination id check"
 
         #
@@ -668,7 +726,7 @@ def test_settings_notification_list(connexion_client):
             headers=request_parameters.request_headers(organization['user_id']))
 
         assert response.status_code == 200, "get notifications destination list response OK route"
-        assert len(response.json["data"]) == 2, "get notifications destination list"
+        assert len(response.json["data"]) == 3, "get notifications destination list"
         assert response.json["data"][0].get("conditions", {}).get("ita", {}).get("event_type", {}).get("new"), "get notifications destination id check"
         assert not response.json["data"][0].get("conditions", {}).get("ita", {}).get("event_type", {}).get("evaluated"), "get notifications destination id check"
 
@@ -703,14 +761,16 @@ def test_settings_notification_destination_delete(connexion_client):
 
         assert response.status_code == 404, "organization_id not specified. error route"
 
+    with test_common.requsts_mocker_default():
         # Incorrect organization_id
         response = connexion_client.delete(
             f"/api/example/platform/workspaces/{workspace['workspace_id']}/settings/notifications/{setting_notifications[0]['id']}",
             content_type='application/json',
             headers=request_parameters.request_headers(organization['user_id']))
 
-        assert response.status_code == 500, "Incorrect organization_id. error route"
+        assert response.status_code == 404, "Incorrect organization_id. error route"
 
+    with test_common.requsts_mocker_default():
         # workspace_id not specified
         response = connexion_client.delete(
             f"/api/{organization['organization_id']}/platform/workspaces//settings/notifications/{setting_notifications[0]['id']}",
@@ -719,14 +779,16 @@ def test_settings_notification_destination_delete(connexion_client):
 
         assert response.status_code == 404, "workspace_id not specified. error route"
 
+    with test_common.requsts_mocker_default():
         # Incorrect workspace_id
         response = connexion_client.delete(
             f"/api/{organization['organization_id']}/platform/workspaces/example/settings/notifications/{setting_notifications[0]['id']}",
             content_type='application/json',
             headers=request_parameters.request_headers(organization['user_id']))
 
-        assert response.status_code == 500, "Incorrect workspace_id. error route"
+        assert response.status_code == 404, "Incorrect workspace_id. error route"
 
+    with test_common.requsts_mocker_default():
         # destination_id not specified
         response = connexion_client.delete(
             f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/settings/notifications/",
@@ -736,6 +798,7 @@ def test_settings_notification_destination_delete(connexion_client):
         assert response.status_code == 404, "destination_id not specified. error route"
 
     with test_common.requsts_mocker_default(), \
+            test_common.pymysql_execute_data_mocker(queries_organization_options.SQL_QUERY_ORGANIZATION_INFORMATIONS, {"INFORMATIONS": '{"ext_options": {"options_ita": {"drivers": {"oase": true}}}}'}), \
             mock.patch.object(api_ita_admin_call, 'ita_notification_destination', return_value='1') as mock_obj:
 
         mock_obj.return_value = MockResponse({'data': '["mix-mail-01"]'}, 200)
@@ -749,6 +812,10 @@ def test_settings_notification_destination_delete(connexion_client):
         assert response.json["result"] == "400-35001", "destination_id in use"
         assert response.json["message"] == f"The specified notification destination is in use and cannot be deleted (destination id:{setting_notifications[0]['id']})", "destination_id in use"
 
+    with test_common.requsts_mocker_default(), \
+            test_common.pymysql_execute_data_mocker(queries_organization_options.SQL_QUERY_ORGANIZATION_INFORMATIONS, {"INFORMATIONS": '{"ext_options": {"options_ita": {"drivers": {"oase": true}}}}'}), \
+            mock.patch.object(api_ita_admin_call, 'ita_notification_destination', return_value='1') as mock_obj:
+
         mock_obj.return_value = MockResponse({'data': '[]'}, 500)
         # ITA API Error
         response = connexion_client.delete(
@@ -759,6 +826,9 @@ def test_settings_notification_destination_delete(connexion_client):
         assert response.status_code == 500, "ITA API Error"
         assert response.json["result"] == "500-35002", "ITA API Error"
         assert response.json["message"] == "Failed to get notification destination in use (menu:rule column:before_notification_destination)", "ITA API Error"
+
+    with test_common.requsts_mocker_default(), \
+            mock.patch.object(api_ita_admin_call, 'ita_notification_destination', return_value='1') as mock_obj:
 
         mock_obj.return_value = MockResponse({'data': '[]'}, 200)
         # normal route 1
@@ -786,6 +856,19 @@ def test_settings_notification_destination_delete(connexion_client):
         assert response.status_code == 500, "DB error route"
         assert response.json["result"] == "500-35001"
         assert response.json["message"] == f"Failed to delete notification destination (destination id:{setting_notifications[1]['id']})", "DB error route"
+
+    with test_common.requsts_mocker_default(), \
+        test_common.pymysql_execute_data_mocker(queries_organization_options.SQL_QUERY_ORGANIZATION_INFORMATIONS, {"INFORMATIONS": '{"ext_options": {"options_ita": {"drivers": {"oase": false}}}}'}), \
+        mock.patch.object(api_ita_admin_call, 'ita_notification_destination', return_value='1') as mock_obj:
+
+        mock_obj.return_value = MockResponse({'data': '["mix-teams_wf-01"]'}, 200)
+        # destination_id in use
+        response = connexion_client.delete(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/settings/notifications/{setting_notifications[1]['id']}",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization['user_id']))
+
+        assert response.status_code == 200, "oase disabled"
 
 
 def sample_data_mail(id, update={}):
@@ -871,6 +954,89 @@ def sample_data_teams_no_id(update={}):
     }, **update)
 
 
+def sample_data_teams_wf(id, update={}):
+    """sample data teams workflow setting
+
+    Args:
+        id (str): destination id
+        update (dict, optional): update dict. Defaults to {}.
+
+    Returns:
+        dict: sample data
+    """
+    return dict(
+        sample_data_teams_wf_no_id(update),
+        **{"id": id}
+    )
+
+
+def sample_data_teams_wf_no_id(update={}):
+    """sample data teams workflow setting (no id field)
+
+    Args:
+        update (dict, optional): update dict. Defaults to {}.
+
+    Returns:
+        dict: sample data
+    """
+    return dict({
+        "name": "name of teams workflow destination",
+        "kind": "Teams_WF",
+        "destination_informations": [{
+            "url": "https://example.com/teams",
+        }],
+        "conditions": {
+            "ita": {
+                "event_type": {
+                    "new": True, "evaluated": False, "timeout": True, "undetected": False,
+                }
+            }
+        }
+    }, **update)
+
+
+def sample_data_webhook(id, update={}):
+    """sample data webhook setting
+
+    Args:
+        id (str): destination id
+        update (dict, optional): update dict. Defaults to {}.
+
+    Returns:
+        dict: sample data
+    """
+    return dict(
+        sample_data_webhook_no_id(update),
+        **{"id": id}
+    )
+
+
+def sample_data_webhook_no_id(update={}):
+    """sample data webhook setting (no id field)
+
+    Args:
+        update (dict, optional): update dict. Defaults to {}.
+
+    Returns:
+        dict: sample data
+    """
+    return dict({
+        "name": "name of webhook destination",
+        "kind": "Webhook",
+        "destination_informations": [{
+            "url": "https://example.com/hooks",
+            "header": None,
+        }],
+        "conditions": {
+            "ita": {
+                "event_type": {
+                    "new": True, "evaluated": False, "timeout": True, "undetected": False,
+                }
+            }
+        }
+    }, **update)
+
+
 def sample_data_information_email(update={}):
     """sample data (kind=email destination_informations row)
 
@@ -895,6 +1061,30 @@ def sample_data_information_teams(update={}):
     return dict(sample_data_teams_no_id()["destination_informations"][0], **update)
 
 
+def sample_data_information_teams_wf(update={}):
+    """sample data (kind=Teams_WF destination_informations row)
+
+    Args:
+        update (dict, optional): update dict. Defaults to {}.
+
+    Returns:
+        dict: sample data
+    """
+    return dict(sample_data_teams_wf_no_id()["destination_informations"][0], **update)
+
+
+def sample_data_information_webhook(update={}):
+    """sample data (kind=Webhook destination_informations row)
+
+    Args:
+        update (dict, optional): update dict. Defaults to {}.
+
+    Returns:
+        dict: sample data
+    """
+    return dict(sample_data_webhook_no_id()["destination_informations"][0], **update)
+
+
 def sample_data_conditions(update={}):
     """sample data (conditions)
 
@@ -912,7 +1102,7 @@ def sample_data_settings_notifications(id, kind, dest_info, conditions, update={
 
     Args:
         id (str): workspace id
-        kind (str): kind (Mail/Teams)
+        kind (str): kind (Mail/Teams_WF/Teams/Webhook)
         dest_info (dict): destination infomations
         conditions (dict): conditions
         update (dict, optional): update dict. Defaults to {}.

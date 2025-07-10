@@ -128,18 +128,24 @@
                                                                             <label for="form_destination_kind_mail" class="radioTextLabel"><span class="radioTextMark"></span><span class="radioTextText">Mail</span></label>
                                                                         </div>
                                                                     </li>
-                                                                    <li class="commonRadioItem">
+                                                                    <li class="commonRadioItem deprecatedTarget" style="display: none;">
                                                                         <div class="radioTextWrap defaultRadioTextWrap">
                                                                             <input type="radio" value="Teams" id="form_destination_kind_teams" name="form_destination_kind" class="radioText">
-                                                                            <label for="form_destination_kind_teams" class="radioTextLabel"><span class="radioTextMark"></span><span class="radioTextText">Teams</span></label>
+                                                                            <label for="form_destination_kind_teams" class="radioTextLabel"><span class="radioTextMark"></span><span class="radioTextText"><s>Teams(Webhook)</s></span></label>
                                                                         </div>
                                                                     </li>
-                                                                    <!-- <li class="commonRadioItem">
+                                                                    <li class="commonRadioItem">
                                                                         <div class="radioTextWrap defaultRadioTextWrap">
-                                                                            <input type="radio" value="WebHook" id="form_destination_kind_webhook" name="form_destination_kind" class="radioText">
-                                                                            <label for="form_destination_kind_webhook" class="radioTextLabel"><span class="radioTextMark"></span><span class="radioTextText">WebHook</span></label>
+                                                                            <input type="radio" value="Teams_WF" id="form_destination_kind_teams_wf" name="form_destination_kind" class="radioText">
+                                                                            <label for="form_destination_kind_teams_wf" class="radioTextLabel"><span class="radioTextMark"></span><span class="radioTextText">Teams(Workflows)</span></label>
                                                                         </div>
-                                                                    </li> -->
+                                                                    </li>
+                                                                    <li class="commonRadioItem">
+                                                                        <div class="radioTextWrap defaultRadioTextWrap">
+                                                                            <input type="radio" value="Webhook" id="form_destination_kind_webhook" name="form_destination_kind" class="radioText">
+                                                                            <label for="form_destination_kind_webhook" class="radioTextLabel"><span class="radioTextMark"></span><span class="radioTextText">Webhook</span></label>
+                                                                        </div>
+                                                                    </li>
                                                                 </ul>
                                                             </div>
                                                             <span class="validate_error" id="message_destination_kind"></span>
@@ -157,19 +163,22 @@
                                                             <textarea wrap="soft" data-id="4" data-required="0" data-int-min="0" data-int-max="4000" id="form_destination_informations_mail_cc" name="form_destination_informations_Mail" class="tebleEditTextArea textarea input textareaAdjustment destination_informations" maxlength="4000" style="overflow-y:scroll; display: none;"></textarea>
                                                             <span class="ci destination_informations destination_informations_Mail" style="display: none;">bcc:</span>
                                                             <textarea wrap="soft" data-id="4" data-required="0" data-int-min="0" data-int-max="4000" id="form_destination_informations_mail_bcc" name="form_destination_informations_Mail" class="tebleEditTextArea textarea input textareaAdjustment destination_informations" maxlength="4000" style="overflow-y:scroll; display: none;"></textarea>
-                                                            <span class="ci destination_informations destination_informations_Teams" style="display: none;">url:</span>
+                                                            <span class="ci destination_informations destination_informations_Teams" style="display: none;">URL:</span>
                                                             <input type="text" value="" class="tableEditInputText inputText input inputTextWidthAdjustment destination_informations" name="form_destination_informations_Teams" id="form_destination_informations_teams" maxlength="4000" style="display: none;">
-                                                            <span class="ci destination_informations destination_informations_WebHook" style="display: none;">url:</span>
-                                                            <input type="text" value="" class="tableEditInputText inputText input inputTextWidthAdjustment destination_informations" name="form_destination_informations_WebHook" id="form_destination_informations_webhook" maxlength="4000" style="display: none;">
-                                                            <span class="ci destination_informations destination_informations_WebHook" style="display: none;">header:</span>
-                                                            <input type="text" value="" class="tableEditInputText inputText input inputTextWidthAdjustment destination_informations" name="form_destination_informations_WebHook" id="form_destination_informations_webhook_header" maxlength="4000" style="display: none;">
+                                                            <span class="ci destination_informations destination_informations_Teams_WF" style="display: none;">URL:</span>
+                                                            <input type="text" value="" class="tableEditInputText inputText input inputTextWidthAdjustment destination_informations" name="form_destination_informations_Teams_WF" id="form_destination_informations_teams_wf" maxlength="4000" style="display: none;">
+                                                            <span class="ci destination_informations destination_informations_Webhook" style="display: none;">URL:</span>
+                                                            <input type="text" value="" class="tableEditInputText inputText input inputTextWidthAdjustment destination_informations" name="form_destination_informations_Webhook" id="form_destination_informations_webhook" maxlength="4000" style="display: none;">
+                                                            <span class="ci destination_informations destination_informations_Webhook" style="display: none;">Header:</span>
+                                                            <input type="text" value="" class="tableEditInputText inputText input inputTextWidthAdjustment destination_informations" name="form_destination_informations_Webhook" id="form_destination_informations_webhook_header" maxlength="4000" style="display: none;">
                                                             <span class="validate_error" id="message_destination_informations"></span>
                                                         </div></td>
                                                         <td class="tBodyTd td" rowspan="1" colspan="1">
                                                             <div class="ci pre destination_informations description_no_select" text-id="000-87020">通知方法を選択してください</div>
                                                             <div class="ci pre destination_informations description_Mail" style="display: none;"></div>
                                                             <div class="ci pre destination_informations description_Teams" style="display: none;"></div>
-                                                            <div class="ci pre destination_informations description_WebHook" style="display: none;"></div>
+                                                            <div class="ci pre destination_informations description_Teams_WF" style="display: none;"></div>
+                                                            <div class="ci pre destination_informations description_Webhook" style="display: none;"></div>
                                                         </td>
                                                     </tr>
                                                     <!-- <tr class="tBodyTr tr">

@@ -92,15 +92,25 @@ $(function(){
             $('#roles_list notfound').css('dispaly','');
         } else {
             const row_template = $('#roles_list .datarow-template').clone(true).removeClass('datarow-template').addClass('datarow').prop('outerHTML');
+            
+            // サービスアカウントユーザー用ロールのロール名リストを作成
+            // Create a list of role names for service account user role
+            let service_account_user_role_name = [];
+            workspaces.forEach(ws => {
+                service_account_user_role_name.push("_" + ws.id + "-" + RolesCommon.ANSIBLE_EXECUTION_AGENT_ROLE);
+                service_account_user_role_name.push("_" + ws.id + "-" + RolesCommon.OASE_AGENT_ROLE);
+            });
+
             let html = '';
             for(let role of roles.sort((a,b) => {
-                return (((a.kind + ":" + a.name) == (b.kind + ":" + b.name))? 0 : ((a.kind + ":" + a.name) > (b.kind + ":" + b.name))? 1: -1); })) {
+                return (((a.kind + ":" + a.name.toLowerCase()) == (b.kind + ":" + b.name.toLowerCase()))? 
+                            0 : ((a.kind + ":" + a.name.toLowerCase()) > (b.kind + ":" + b.name.toLowerCase()))? 1: -1); })) {
 
                 const authorityTexts = RolesCommon.getAuthorityTexts(role, workspaces);
                 html += row_template
-                    .replace(/\${role_name}/g, fn.cv(role.name,'',true))
-                    .replace(/\${role_description}/g, fn.cv(role.description,'',true))
-                    .replace(/\${role_kind}/g, fn.cv(role.kind,'',true))
+                                .replace(/\${role_name}/g, fn.cv(role.name,'',true))
+                                .replace(/\${role_description}/g, fn.cv(role.description,'',true))
+                                .replace(/\${role_kind}/g, fn.cv(role.kind,'',true))
                     .replace(/\${role_authority}/g, authorityTexts.map((t) => {return '<span class="auth_item">' + fn.cv(t,'',true) +'</span>'}).join("\n"))
             }
             $('#roles_list tbody').append(html);
@@ -149,8 +159,9 @@ $(function(){
                     allowedGrantRole = false;
                 } else {
                     allowedGrantRole = RolesCommon.isAllowedGrantRole(roles[rolesIndex]);
+                    isServiceAccountRole = RolesCommon.isServiceAccountUserRole(roles[rolesIndex], service_account_user_role_name)
                 }
-                $element.prop('disabled', !allowedGrantRole);
+                $element.prop('disabled', !allowedGrantRole || isServiceAccountRole);
                 $element.css('cursor', allowedGrantRole? '' :'not-allowed');
             });
 

@@ -56,8 +56,9 @@ $(function(){
         $('#form_destination_id').val('ND' + destination_id.toUpperCase());
 
         $('.description_Mail').html(getText('000-87017', 'email形式 (最大{0}メールアドレス)<br>※複数のメールアドレスを指定する場合は「;（セミコロン）」「,（カンマ）」記号<br>または、改行を区切り文字として使用します', MAX_MAIL_COUNT));
-        $('.description_Teams').html(getText('000-87018', 'url形式'));
-        $('.description_WebHook').html(getText('000-87019', '1行目 url形式<br>2行目 ヘッダー内容'));
+        // $('.description_Teams').html(getText('000-87018', 'URL形式'));
+        $('.description_Teams_WF').html(getText('000-87018', 'URL形式'));
+        $('.description_Webhook').html(getText('000-87019', '1行目 URL形式<br>2行目 ヘッダー内容'));
 
         $('.destination_informations').css('display', 'none');
         $('.description_no_select').css('display', '');
@@ -118,13 +119,19 @@ $(function(){
             result = result && validate.result;
             $("#message_destination_informations").text(validate.message);
         }
-        else if (destination_kind === "Teams"){
-            // validate destination informations (teams)
-            validate = settings_notifications_common.validate.destination_informations_teams($("#form_destination_informations_teams").val());
+        // else if (destination_kind === "Teams"){
+        //     // validate destination informations (teams)
+        //     validate = settings_notifications_common.validate.destination_informations_teams($("#form_destination_informations_teams").val());
+        //     result = result && validate.result;
+        //     $("#message_destination_informations").text(validate.message);
+        // }
+        else if (destination_kind === "Teams_WF"){
+            // validate destination informations (teams workflows)
+            validate = settings_notifications_common.validate.destination_informations_teams($("#form_destination_informations_teams_wf").val());
             result = result && validate.result;
             $("#message_destination_informations").text(validate.message);
         }
-        else if (destination_kind === "WebHook"){
+        else if (destination_kind === "Webhook"){
             // validate destination informations (webhook)
             validate = settings_notifications_common.validate.destination_informations_webhook($("#form_destination_informations_webhook").val(), $("#form_destination_informations_webhook_header").val());
             result = result && validate.result;
@@ -183,11 +190,15 @@ $(function(){
                 });
             }
         }
-        else if (destination_kind === "Teams"){
-            var teams = { "webhook": $("#form_destination_informations_teams").val() }
-            destination_informations.push(teams);
+        // else if (destination_kind === "Teams"){
+        //     var teams = { "webhook": $("#form_destination_informations_teams").val() }
+        //     destination_informations.push(teams);
+        // }
+        else if (destination_kind === "Teams_WF"){
+            var teams_wf = { "url": $("#form_destination_informations_teams_wf").val() }
+            destination_informations.push(teams_wf);
         }
-        else if (destination_kind === "WebHook"){
+        else if (destination_kind === "Webhook"){
             var webhook = {
                 "url": $("#form_destination_informations_webhook").val(),
                 "header": $("#form_destination_informations_webhook_header").val()

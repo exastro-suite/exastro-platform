@@ -15,7 +15,8 @@ ARG USERNAME=app_user
 ARG GROUPNAME=app_user
 ARG APP_PATH=/app
 
-FROM    registry.access.redhat.com/ubi8/ubi-init as common_build
+# FROM    registry.access.redhat.com/ubi8/ubi-init as common_build
+FROM    registry.access.redhat.com/ubi9/ubi-init:9.4 as common_build
 
 ARG USERNAME
 ARG GROUPNAME
@@ -29,6 +30,9 @@ ENV APACHE_SOCKET_DIR       /var/run_$USERNAME/httpd/socket
 ENV APACHE_TIMEOUT          360
 ENV APACHE_USERNAME         $USERNAME
 ENV APACHE_GROUPNAME        $GROUPNAME
+ENV DB_CONNECT_TIMEOUT      10
+ENV DB_CONNECT_RETRY_SLEEP_TIME    0.5
+ENV DB_CONNECT_RETRY_LIMIT  3
 
 RUN --mount=type=secret,id=host_certificate_file,dst=/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem \
     dnf install -y \
@@ -38,10 +42,14 @@ RUN --mount=type=secret,id=host_certificate_file,dst=/etc/pki/ca-trust/extracted
     httpd \
     gcc \
     httpd-devel \
-    python39 \
-    python39-devel \
-    python39-mod_wsgi \
-&&  pip3.9 install poetry==1.6.0 \
+    python3.11 \
+    python3.11-devel \
+    python3.11-mod_wsgi \
+    python3.11-pip \
+&&  alternatives --install /usr/bin/python3 python3 /usr/bin/python3.9 1000000 \
+&&  alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 100 \
+&&  alternatives --set python3 /usr/bin/python3.11 \
+&&  pip3.11 install poetry==1.8.4 \
 &&  poetry config virtualenvs.create false \
 &&  groupadd $GROUPNAME \
 &&  useradd -m -s /bin/bash -g $GROUPNAME $USERNAME \

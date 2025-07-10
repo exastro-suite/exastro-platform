@@ -141,8 +141,12 @@ post:
         examples:
           mail message post:
             $ref: "../schemas/notifications.create.example.mail.yaml"
-          teams message post:
+          teams workflow message post:
+            $ref: "../schemas/notifications.create.example.teamsworkflow.yaml"
+          teams message post (deprecated):
             $ref: "../schemas/notifications.create.example.teams.yaml"
+          webhook message post:
+            $ref: "../schemas/notifications.create.example.webhook.yaml"
     required: true
   responses:
     200:

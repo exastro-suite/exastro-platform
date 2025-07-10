@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: Exastro Platform API
   description: Exastro Platform API
-  version: 1.9.0
+  version: 1.10.0
 servers:
   - url: 'https://{host}'
     description: API endpoint
@@ -43,6 +43,8 @@ tags:
     description: ロールに関する操作
   - name: RoleMappingsService
     description: ロール・マッピングに関する操作
+  - name: ServiceAccountUsersService
+    description: サービスアカウントユーザーに関する操作
   - name: JobsService
     description: ジョブに関する操作
   - name: MaintenanceModeService
@@ -644,7 +646,27 @@ paths:
                     message:
                       title: subjects
                       message: event message
-              teams message post:
+              teams workflow message post:
+                value:
+                  - destination_id: 00000001Z7ZXFAED6872F6C9W9
+                    func_id: '00000000'
+                    func_informations:
+                      key-1: value-1
+                      key-2: value-2
+                    message:
+                      title: send title
+                      text: send message
+              teams message post (deprecated):
+                value:
+                  - destination_id: 00000001Z7ZXFAED6872F6C9W9
+                    func_id: '00000000'
+                    func_informations:
+                      key-1: value-1
+                      key-2: value-2
+                    message:
+                      title: send title
+                      text: send message
+              webhook message post:
                 value:
                   - destination_id: 00000001Z7ZXFAED6872F6C9W9
                     func_id: '00000000'
@@ -1165,6 +1187,344 @@ paths:
             schema:
               $ref: '#/components/schemas/roleMappingUser'
         required: true
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        example: null
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+  '/api/{organization_id}/platform/workspaces/{workspace_id}/service-account-users':
+    get:
+      tags:
+        - ServiceAccountUsersService
+      summary: List returns list of service account users
+      x-openapi-router-controller: controllers.service_account_users_service_controller
+      operationId: service_account_user_list
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: workspace_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - $ref: '#/components/schemas/serviceAccountUserList'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+    post:
+      tags:
+        - ServiceAccountUsersService
+      summary: Create an service account user
+      x-openapi-router-controller: controllers.service_account_users_service_controller
+      operationId: service_account_user_create
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: workspace_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/serviceAccountUserCreate'
+        required: true
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        example: null
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+  '/api/{organization_id}/platform/workspaces/{workspace_id}/service-account-users/{user_id}':
+    get:
+      tags:
+        - ServiceAccountUsersService
+      summary: returns an service account user
+      x-openapi-router-controller: controllers.service_account_users_service_controller
+      operationId: get_service_account_user
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: workspace_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/serviceAccountUser'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+    put:
+      tags:
+        - ServiceAccountUsersService
+      summary: Update an service account user
+      x-openapi-router-controller: controllers.service_account_users_service_controller
+      operationId: service_account_user_update
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: workspace_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/serviceAccountUserUpdate'
+        required: true
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        example: null
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+    delete:
+      tags:
+        - ServiceAccountUsersService
+      summary: Delete an service account user
+      x-openapi-router-controller: controllers.service_account_users_service_controller
+      operationId: service_account_user_delete
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: workspace_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        example: null
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+  '/api/{organization_id}/platform/workspaces/{workspace_id}/service-account-users/{user_id}/refresh_tokens':
+    get:
+      tags:
+        - ServiceAccountUsersService
+      summary: List returns list of service account user tokens
+      x-openapi-router-controller: controllers.service_account_users_service_controller
+      operationId: service_account_user_token_list
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: workspace_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - $ref: '#/components/schemas/serviceAccountUserTokenList'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+    post:
+      tags:
+        - ServiceAccountUsersService
+      summary: Create an service account user token
+      x-openapi-router-controller: controllers.service_account_users_service_controller
+      operationId: service_account_user_token_create
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: workspace_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+        required: true
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          refresh_token:
+                            type: string
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+    delete:
+      tags:
+        - ServiceAccountUsersService
+      summary: Delete service account user tokens
+      x-openapi-router-controller: controllers.service_account_users_service_controller
+      operationId: service_account_user_token_delete
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: workspace_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
       responses:
         '200':
           description: A successful response.
@@ -2064,6 +2424,8 @@ components:
           type: string
         affiliation:
           type: string
+        service_account_user_type:
+          type: string
         description:
           type: string
         enabled:
@@ -2566,7 +2928,7 @@ components:
           description: Destination name can be any string
         kind:
           type: string
-          description: Select destination kind from Mail/Teams/Webhook
+          description: Select destination kind from Mail/Teams_WF/Webhook
         conditions:
           $ref: '#/components/schemas/settingsDestinationConditions'
         destination_informations:
@@ -2576,7 +2938,9 @@ components:
             description: Set the destination information for the destination
             oneOf:
               - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsMail'
+              - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsTeamsWorkflow'
               - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsTeams'
+              - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsWebhook'
     settingsDestinationList:
       title: destinationList is list of Destination resources.
       type: object
@@ -2607,9 +2971,9 @@ components:
           type: string
           enum:
             - Mail
-            - Teams
+            - Teams_WF
             - Webhook
-          description: Select destination kind from Mail/Teams/Webhook
+          description: Select destination kind from Mail/Teams_WF/Webhook
         conditions:
           $ref: '#/components/schemas/settingsDestinationConditions'
         destination_informations:
@@ -2619,7 +2983,9 @@ components:
             description: Set the destination information for the destination
             anyOf:
               - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsMail'
+              - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsTeamsWorkflow'
               - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsTeams'
+              - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsWebhook'
       required:
         - id
         - name
@@ -2637,9 +3003,9 @@ components:
           type: string
           enum:
             - Mail
-            - Teams
+            - Teams_WF
             - Webhook
-          description: Select destination kind from Mail/Teams/Webhook
+          description: Select destination kind from Mail/Teams_WF/Webhook
         conditions:
           $ref: '#/components/schemas/settingsDestinationConditions'
         destination_informations:
@@ -2649,7 +3015,9 @@ components:
             description: Set the destination information for the destination
             anyOf:
               - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsMail'
+              - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsTeamsWorkflow'
               - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsTeams'
+              - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsWebhook'
       required:
         - name
         - kind
@@ -2665,13 +3033,27 @@ components:
         email:
           type: string
           description: email address
+    settingsDestinationSubDestinationInformationsTeamsWorkflow:
+      title: destinations destination_informations(teams workflow) resource.
+      type: object
+      properties:
+        url:
+          type: string
+          description: teams workflow webhook URL
     settingsDestinationSubDestinationInformationsTeams:
       title: destinations destination_informations(teams) resource.
       type: object
       properties:
         webhook:
           type: string
-          description: teams webhook url
+          description: teams webhook URL
+    settingsDestinationSubDestinationInformationsWebhook:
+      title: destinations destination_informations(webhook) resource.
+      type: object
+      properties:
+        url:
+          type: string
+          description: webhook URL
     settingsDestinationConditions:
       title: destinations conditions resource.
       type: object
@@ -2991,6 +3373,80 @@ components:
           type: string
           format: date-time
           description: Last Modified
+    serviceAccountUser:
+      title: service account user is a definition of Service account user resource.
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/serviceAccountUserId'
+        - $ref: '#/components/schemas/serviceAccountUserCreate'
+        - type: object
+          properties:
+            token_latest_expire_date:
+              type: string
+              format: date-time
+    serviceAccountUserCreate:
+      title: service account user is a definition of Service account user resource.
+      type: object
+      allOf:
+        - type: object
+          properties:
+            username:
+              type: string
+              example: service-account-user-01
+            service_account_user_type:
+              type: string
+              example: ansible
+          required:
+            - username
+            - service_account_user_type
+        - $ref: '#/components/schemas/serviceAccountUserUpdate'
+    serviceAccountUserId:
+      title: generative ai settings id resources.
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+    serviceAccountUserList:
+      title: service account user list is list of Service account user resources.
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/serviceAccountUser'
+    serviceAccountUserUpdate:
+      title: service account user is a definition of Service Account user resource.
+      type: object
+      properties:
+        description:
+          type: string
+    serviceAccountUserTokenList:
+      title: service account user token list is list of Service account user token resources.
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                format: uuid
+              start_timestamp:
+                type: string
+                format: date-time
+              lastaccess_timestamp:
+                type: string
+                format: date-time
+              expire_timestamp:
+                type: string
+                format: date-time
+              create_user_id:
+                type: string
+                format: uuid
+              create_user_name:
+                type: string
   securitySchemes:
     BearerAuth:
       description: Credentials or access token for API

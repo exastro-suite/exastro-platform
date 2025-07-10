@@ -80,9 +80,17 @@ class NotificationJobExecutor(BaseJobExecutor):
 
                     notification_status = const.NOTIFICATION_STATUS_FAILED
 
+                    if row['DESTINATION_KIND'] == const.DESTINATION_KIND_TEAMS_WF:
+                        # Teams workflow へのメッセージ送信 / Send messages to Teams workflow
+                        notification_status = self.__send_message_teams_wf(destination_informations, message_infomations)
+
                     if row['DESTINATION_KIND'] == const.DESTINATION_KIND_TEAMS:
-                        # Teamsへのメッセージ送信 / Send messages to Teams
+                        # Teams へのメッセージ送信 / Send messages to Teams
                         notification_status = self.__send_message_teams(destination_informations, message_infomations)
+
+                    if row['DESTINATION_KIND'] == const.DESTINATION_KIND_WEBHOOK:
+                        # webhook へのメッセージ送信 / Send messages to webhook
+                        notification_status = self.__send_message_webhook(destination_informations, message_infomations)
 
                     if row['DESTINATION_KIND'] == const.DESTINATION_KIND_MAIL:
                         notification_status = self.__send_message_mail(destination_informations, message_infomations)
@@ -105,6 +113,71 @@ class NotificationJobExecutor(BaseJobExecutor):
             self.__update_status_failed()
             raise err
 
+    def __send_message_teams_wf(self, destination_informations, message_infomations):
+        """teams workflow へのメッセージ送信 / Send messages to teams workflow
+
+        Args:
+            destination_informations (dict): 通知先 / Notification destination
+            message_infomations (dict): 通知メッセージ / notification message
+
+        Returns:
+            str: result(notification_status)
+        """
+        faild_send = False
+
+        for destination_information in destination_informations:
+            resp_webhook_text = None
+            try:
+                resp_webhook = requests.post(
+                    destination_information['url'],
+                    json={
+                        "type": "message",
+                        "attachments": [
+                            {
+                                "contentType": "application/vnd.microsoft.card.adaptive",
+                                "contentUrl": None,
+                                "content": {
+                                    "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+                                    "type": "AdaptiveCard",
+                                    "version": "1.5",
+                                    "body": [
+                                        {
+                                            "type": "TextBlock",
+                                            "text": message_infomations.get("title"),
+                                            "wrap": True,
+                                            "style": "heading",
+                                            "weight": "Bolder"
+                                        },
+                                        {
+                                            "type": "TextBlock",
+                                            "text": message_infomations.get("message").replace('\n', '\n\n'),
+                                            "wrap": True
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    headers={"Content-type": "application/json"},
+                    timeout=(
+                        job_manager_config.JOBS[const.PROCESS_KIND_NOTIFICATION]['extra_config']['teams_wf_connection_timeout'],
+                        job_manager_config.JOBS[const.PROCESS_KIND_NOTIFICATION]['extra_config']['teams_wf_read_timeout'],
+                    ))
+
+                if resp_webhook.status_code < 200 or resp_webhook.status_code >= 300:
+                    resp_webhook_text = resp_webhook.text
+                    raise Exception(f"response code:{resp_webhook.status_code}")
+
+            except Exception as err:
+                globals.logger.warning(f'{err}\n-- stack trace --\n{traceback.format_exc()}')
+                globals.logger.debug(f"teams workflow webhook response text\n{resp_webhook_text}")
+                faild_send = True
+
+        if faild_send:
+            return const.NOTIFICATION_STATUS_FAILED
+        else:
+            return const.NOTIFICATION_STATUS_SUCCESSFUL
+
     def __send_message_teams(self, destination_informations, message_infomations):
         """teamsへのメッセージ送信 / Send messages to teams
 
@@ -124,7 +197,7 @@ class NotificationJobExecutor(BaseJobExecutor):
                     destination_information['webhook'],
                     json={
                         "title": message_infomations.get("title"),
-                        "text": message_infomations.get("message").replace('\n','<br/>')
+                        "text": message_infomations.get("message").replace('\n', '<br/>')
                     },
                     headers={"Content-type": "application/json"},
                     timeout=(
@@ -139,6 +212,51 @@ class NotificationJobExecutor(BaseJobExecutor):
             except Exception as err:
                 globals.logger.warning(f'{err}\n-- stack trace --\n{traceback.format_exc()}')
                 globals.logger.debug(f"teams webhook response text\n{resp_webhook_text}")
+                faild_send = True
+
+        if faild_send:
+            return const.NOTIFICATION_STATUS_FAILED
+        else:
+            return const.NOTIFICATION_STATUS_SUCCESSFUL
+
+    def __send_message_webhook(self, destination_informations, message_infomations):
+        """webhook へのメッセージ送信 / Send messages to webhook
+
+        Args:
+            destination_informations (dict): 通知先 / Notification destination
+            message_infomations (dict): 通知メッセージ / notification message
+
+        Returns:
+            str: result(notification_status)
+        """
+        faild_send = False
+
+        for destination_information in destination_informations:
+            resp_webhook_text = None
+            header = {"Content-type": "application/json"}
+            if destination_information.get('header'):
+                destination_information_header = json.loads(destination_information.get('header'))
+                header.update(destination_information_header)
+
+            try:
+                resp_webhook = requests.post(
+                    destination_information['url'],
+                    json={
+                        "text": message_infomations.get("title") + "\n\n" + message_infomations.get("message")
+                    },
+                    headers=header,
+                    timeout=(
+                        job_manager_config.JOBS[const.PROCESS_KIND_NOTIFICATION]['extra_config']['webhook_connection_timeout'],
+                        job_manager_config.JOBS[const.PROCESS_KIND_NOTIFICATION]['extra_config']['webhook_read_timeout'],
+                    ))
+
+                if resp_webhook.status_code < 200 or resp_webhook.status_code >= 300:
+                    resp_webhook_text = resp_webhook.text
+                    raise Exception(f"response code:{resp_webhook.status_code}")
+
+            except Exception as err:
+                globals.logger.warning(f'{err}\n-- stack trace --\n{traceback.format_exc()}')
+                globals.logger.debug(f"webhook response text\n{resp_webhook_text}")
                 faild_send = True
 
         if faild_send:

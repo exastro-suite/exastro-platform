@@ -13,12 +13,15 @@
 #   limitations under the License.
 
 import re
+import json
 from datetime import datetime
 import urllib.parse
 
 from common_library.common import common, multi_lang
+from common_library.common import bl_service_account_user
 import common_library.common.const as const
 from email_validator import validate_email, EmailNotValidError
+
 
 MSG_FUNCTION_ID = "00"
 
@@ -26,6 +29,7 @@ RE_ID_USABLE_CHARACTERS = r'[a-zA-Z0-9_-]'
 RE_ID_USABLE_FIRST_CHARACTER = r'[a-zA-Z]'
 RE_EMAIL_USABLE_CHARACTERS = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
 RE_HOST_CHARACTERS = r'^[a-zA-Z0-9-.]+$'
+RE_USER_DISPLAY_NAME_UNUSABLE_CHARCTERS = r'[!"#$()=^~|{};*<>/?\\[\]]'
 
 ORG_RESERVED_WORDS = [
     {"text": "master", "re": r"^master$"},
@@ -719,6 +723,14 @@ def validate_user_firstName(user_firstName, lang=None):
             str(const.length_user_firstName)
         )
 
+    match = re.search(RE_USER_DISPLAY_NAME_UNUSABLE_CHARCTERS, user_firstName)
+    if match:
+        return result(
+            False, 400, '400-{}013'.format(MSG_FUNCTION_ID), '指定できない文字が含まれています。(項目:{0},指定できない文字:{1})',
+            multi_lang.get_text('000-00130', "名") if lang is None else multi_lang.get_text_spec(lang, '000-00130', "名"),
+            match.group()
+        )
+
     return result(True)
 
 
@@ -739,6 +751,14 @@ def validate_user_lastName(user_lastName, lang=None):
             False, 400, '400-{}012'.format(MSG_FUNCTION_ID), '指定可能な文字数を超えています。(項目:{0},最大文字数:{1})',
             multi_lang.get_text('000-00131', "姓") if lang is None else multi_lang.get_text_spec(lang, '000-00131', "姓"),
             str(const.length_user_lastName)
+        )
+
+    match = re.search(RE_USER_DISPLAY_NAME_UNUSABLE_CHARCTERS, user_lastName)
+    if match:
+        return result(
+            False, 400, '400-{}013'.format(MSG_FUNCTION_ID), '指定できない文字が含まれています。(項目:{0},指定できない文字:{1})',
+            multi_lang.get_text('000-00131', "姓") if lang is None else multi_lang.get_text_spec(lang, '000-00131', "姓"),
+            match.group()
         )
 
     return result(True)
@@ -1247,38 +1267,87 @@ def validate_destination_informations(destination_kind, destination_info):
                     multi_lang.get_text('000-00148', "通知先email"),
                 )
 
-    if destination_kind == const.DESTINATION_KIND_TEAMS:
-        if len(destination_info) > const.max_destination_teams_webhook:
+    if destination_kind == const.DESTINATION_KIND_TEAMS_WF:
+        if len(destination_info) > const.max_destination_teams_wf:
             return result(
                 False, 400, '400-{}018'.format(MSG_FUNCTION_ID), '指定可能な最大数を超えています。(項目:{0},最大数:{1})',
-                multi_lang.get_text('000-00149', "通知先Teams webhook"),
-                str(const.max_destination_teams_webhook)
+                multi_lang.get_text('000-00214', "通知先Teams(Workflows) URL"),
+                str(const.max_destination_teams_wf)
             )
 
         for row in destination_info:
-            if row.get('webhook') is None or row.get('webhook') == "":
+            if row.get('url') is None or row.get('url') == "":
                 return result(
                     False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
-                    multi_lang.get_text('000-00149', "通知先Teams webhook")
+                    multi_lang.get_text('000-00214', "通知先Teams(Workflows) URL")
                 )
 
-            if len(row['webhook']) > const.length_destination_teams_webhook:
+            if len(row['url']) > const.length_destination_teams_wf_url:
                 return result(
                     False, 400, '400-{}012'.format(MSG_FUNCTION_ID), '指定可能な文字数を超えています。(項目:{0},最大文字数:{1})',
-                    multi_lang.get_text('000-00149', "通知先Teams webhook"),
-                    str(const.length_destination_teams_webhook)
+                    multi_lang.get_text('000-00214', "通知先Teams(Workflows) URL"),
+                    str(const.length_destination_teams_wf_url)
                 )
 
             try:
-                urlparse = urllib.parse.urlparse(row['webhook'])
+                urlparse = urllib.parse.urlparse(row['url'])
                 if urlparse.scheme not in ['http', 'https']:
                     raise ValueError
 
             except ValueError:
                 return result(
                     False, 400, '400-{}027'.format(MSG_FUNCTION_ID), 'URLの形式に誤りがあります。({0}）',
-                    multi_lang.get_text('000-00149', "通知先Teams webhook")
+                    multi_lang.get_text('000-00214', "通知先Teams(Workflows) URL")
                 )
+
+    if destination_kind == const.DESTINATION_KIND_TEAMS:
+        # 廃止された通知方法のためエラー
+        return result(
+            False, 400, '400-{}036'.format(MSG_FUNCTION_ID), '非推奨の通知方法が指定されています。({0}）',
+            const.DESTINATION_KIND_TEAMS
+        )
+
+    if destination_kind == const.DESTINATION_KIND_WEBHOOK:
+        if len(destination_info) > const.max_destination_webhook:
+            return result(
+                False, 400, '400-{}018'.format(MSG_FUNCTION_ID), '指定可能な最大数を超えています。(項目:{0},最大数:{1})',
+                multi_lang.get_text('000-00212', "通知先Webhook URL"),
+                str(const.max_destination_webhook)
+            )
+
+        for row in destination_info:
+            if row.get('url') is None or row.get('url') == "":
+                return result(
+                    False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
+                    multi_lang.get_text('000-00212', "通知先Webhook URL")
+                )
+
+            if len(row['url']) > const.length_destination_webhook_url:
+                return result(
+                    False, 400, '400-{}012'.format(MSG_FUNCTION_ID), '指定可能な文字数を超えています。(項目:{0},最大文字数:{1})',
+                    multi_lang.get_text('000-00212', "通知先Webhook URL"),
+                    str(const.length_destination_webhook_url)
+                )
+
+            try:
+                urlparse = urllib.parse.urlparse(row['url'])
+                if urlparse.scheme not in ['http', 'https']:
+                    raise ValueError
+
+            except ValueError:
+                return result(
+                    False, 400, '400-{}027'.format(MSG_FUNCTION_ID), 'URLの形式に誤りがあります。({0}）',
+                    multi_lang.get_text('000-00212', "通知先Webhook URL")
+                )
+
+            if row['header'] is not None and row['header'] != "":
+                try:
+                    json.loads(row['header'])
+                except ValueError:
+                    return result(
+                        False, 400, '400-{}027'.format(MSG_FUNCTION_ID), 'Headerの形式に誤りがあります。({0}）',
+                        multi_lang.get_text('000-00213', "通知先Webhook Header")
+                    )
 
     return result(True)
 
@@ -1856,6 +1925,22 @@ def validate_audit_log_conditions(conditions):
         return result(
             False, 400, '400-{}020'.format(MSG_FUNCTION_ID), '日時形式以外が指定されています。({0})',
             multi_lang.get_text('000-00206', "タイムスタンプ(To)")
+        )
+
+    return result(True)
+
+
+def validate_service_account_user_type(service_account_user_type):
+    if service_account_user_type is None or service_account_user_type == "":
+        return result(
+            False, 400, '400-00011', '必須項目が不足しています。({0})',
+            multi_lang.get_text('000-00216', "サービスアカウントユーザータイプ")
+        )
+
+    if service_account_user_type not in bl_service_account_user.service_account_user_types():
+        return result(
+            False, 400, '400-00037', '指定可能な値ではありません({0})',
+            multi_lang.get_text('000-00216', "サービスアカウントユーザータイプ")
         )
 
     return result(True)
