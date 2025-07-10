@@ -443,6 +443,8 @@ $(function(){
             // 明細にデータを埋め込み行を明細を作りこむ
             for(let i = 0; i < Math.min(users.length, paging.rows_per_page); ++i) {
                 const user = users[i];
+                const isServiceAccount = UsersCommon.isServiceAccountUser(user);    // サービスアカウントユーザーか
+
                 row_html = row_template
                     .replace(/\${user_id}/g, fn.cv(user.id,'',true))
                     .replace(/\${preferred_username}/g, fn.cv(user.preferred_username,'',true))
@@ -452,6 +454,11 @@ $(function(){
                     .replace(/\${affiliation}/g, fn.cv(user.affiliation,'',true))
                     .replace(/\${create_timestamp}/g, fn.date(new Date(user.create_timestamp),'yyyy/MM/dd HH:mm:ss'));
                 dialogBody.find('.user_list tbody').append(row_html);
+                
+                const $row = $(".user_list tbody").find(".datarow:last-child");
+
+                $row.find(".form_check_grant")
+                    .prop("disabled", isServiceAccount);
             }
         }
         // 明細のテンプレート行はdisplay:noneになっていて、それを使って明細を作っているので、作った明細を表示する

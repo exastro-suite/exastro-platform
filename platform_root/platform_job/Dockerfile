@@ -15,7 +15,8 @@ ARG USERNAME=app_user
 ARG GROUPNAME=app_user
 ARG APP_PATH=/app
 
-FROM    registry.access.redhat.com/ubi8/ubi-init as common_build
+# FROM    registry.access.redhat.com/ubi8/ubi-init as common_build
+FROM    registry.access.redhat.com/ubi9/ubi-init:9.4 as common_build
 
 ARG USERNAME
 ARG GROUPNAME
@@ -23,6 +24,9 @@ ARG APP_PATH
 
 ENV PYTHONPATH              $APP_PATH/
 ENV PYTHONIOENCODING        utf-8
+ENV DB_CONNECT_TIMEOUT      10
+ENV DB_CONNECT_RETRY_SLEEP_TIME    0.5
+ENV DB_CONNECT_RETRY_LIMIT  3
 
 RUN --mount=type=secret,id=host_certificate_file,dst=/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem \
     dnf install -y \
@@ -30,8 +34,12 @@ RUN --mount=type=secret,id=host_certificate_file,dst=/etc/pki/ca-trust/extracted
     wget \
     unzip \
     httpd \
-    python39 \
-&&  pip3.9 install poetry==1.6.0 \
+    python3.11 \
+    python3.11-pip \
+&&  alternatives --install /usr/bin/python3 python3 /usr/bin/python3.9 1000000 \
+&&  alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 100 \
+&&  alternatives --set python3 /usr/bin/python3.11 \
+&&  pip3.11 install poetry==1.8.4 \
 &&  poetry config virtualenvs.create false \
 &&  groupadd $GROUPNAME \
 &&  useradd -m -s /bin/bash -g $GROUPNAME $USERNAME
@@ -89,10 +97,18 @@ ENV KEYCLOAK_TOKEN_REFRESH_INTERVAL_SECONDS=30
 ENV JOB_NOTIFICATION_TIMEOUT_SECONDS=20
 #   プロセス毎に同時実行可能なJob数(未指定時はSUB_PROCESS_MAX_JOBSと同値) / Number of jobs that can be executed simultaneously per process (If not specified, the same value as SUB_PROCESS_MAX_JOBS)
 # ENV JOB_NOTIFICATION_MAX_JOB_PER_PROCESS=
+#   teams workflow webhook connection timeout
+ENV JOB_NOTIFICATION_TEAMS_WF_CONNECTION_TIMEOUT=3.0
+#   teams workflow webhook read timeout
+ENV JOB_NOTIFICATION_TEAMS_WF_READ_TIMEOUT=10.0
 #   teams webhook connection timeout
 ENV JOB_NOTIFICATION_TEAMS_CONNECTION_TIMEOUT=3.0
 #   teams webhook read timeout
 ENV JOB_NOTIFICATION_TEAMS_READ_TIMEOUT=10.0
+#   webhook connection timeout
+ENV JOB_NOTIFICATION_WEBHOOK_CONNECTION_TIMEOUT=3.0
+#   webhook read timeout
+ENV JOB_NOTIFICATION_WEBHOOK_READ_TIMEOUT=10.0
 #   smtp timeout
 ENV JOB_NOTIFICATION_SMTP_TIMEOUT=10.0
 #   smtps ssl verify TRUE/FALSE

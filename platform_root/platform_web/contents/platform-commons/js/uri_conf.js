@@ -43,6 +43,16 @@ var api_conf = {
             "notifications": {
                 "post": "/api/{organization_id}/platform/workspaces/{workspace_id}/notifications",
             },
+            "service_account_users": {
+                "get": "/api/{organization_id}/platform/workspaces/{workspace_id}/service-account-users",
+                "post": "/api/{organization_id}/platform/workspaces/{workspace_id}/service-account-users",
+
+                "detail": {
+                    "get": "/api/{organization_id}/platform/workspaces/{workspace_id}/service-account-users/{user_id}",
+                    "put": "/api/{organization_id}/platform/workspaces/{workspace_id}/service-account-users/{user_id}",
+                    "delete": "/api/{organization_id}/platform/workspaces/{workspace_id}/service-account-users/{user_id}",
+                }
+            },
         },
         "roles": {
             "post": "/api/{organization_id}/platform/roles",
@@ -97,6 +107,11 @@ var api_conf = {
             "organization_user_site": {
                 "get": "/api/{organization_id}/platform/users/_current/refresh_tokens",
                 "delete": "/api/{organization_id}/platform/users/_current/refresh_tokens"
+            },
+            "service_account_user_site": {
+                "get": "/api/{organization_id}/platform/workspaces/{workspace_id}/service-account-users/{user_id}/refresh_tokens",
+                "post": "/api/{organization_id}/platform/workspaces/{workspace_id}/service-account-users/{user_id}/refresh_tokens",
+                "delete": "/api/{organization_id}/platform/workspaces/{workspace_id}/service-account-users/{user_id}/refresh_tokens"
             },
         },
         "organizations": {
@@ -175,6 +190,13 @@ var location_conf = {
                     "detail": "/{organization_id}/platform/workspaces/{workspace_id}/settings/notifications/{destination_id}",
                     "edit": "/{organization_id}/platform/workspaces/{workspace_id}/settings/notifications/{destination_id}/edit",
                 },
+                "service_account_users": {
+                    "workspace": "/{organization_id}/platform/workspaces/_settings/service-account-users",
+                    "new": "/{organization_id}/platform/workspaces/{workspace_id}/settings/service-account-users/_new",
+                    "list": "/{organization_id}/platform/workspaces/{workspace_id}/settings/service-account-users",
+                    "edit": "/{organization_id}/platform/workspaces/{workspace_id}/settings/service-account-users/{user_id}/edit",
+                    "token": "/{organization_id}/platform/workspaces/{workspace_id}/settings/service-account-users/{user_id}/token"
+                },
             },
         },
         "roles": {
@@ -227,13 +249,16 @@ var location_conf = {
             "console": "/platform/keycloak_console",
             "console_frame": "/auth/admin/master/console",
             "identity_providers": "/{organization_id}/platform/identity_providers",
-            "identity_providers_frame": "/auth/admin/{organization_id}/console/#/{organization_id}/identity-providers"
+            "identity_providers_frame": "/auth/admin/{organization_id}/console/#/{organization_id}/identity-providers",
+            "password_policy": "/{organization_id}/platform/password_policy",
+            "password_policy_frame": "/auth/admin/{organization_id}/console/#/{organization_id}/authentication/policies",
         },
         "settings": {
             "mailserver": "/{organization_id}/platform/settings/mailserver",
         },
         "auditlog": {
             "download": "/{organization_id}/platform/auditlog"
-        }
+        },
+        
     }
 }

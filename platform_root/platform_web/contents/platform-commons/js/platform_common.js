@@ -35,6 +35,8 @@ const MAX_MAIL_COUNT = 100;
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 const DESTINATION_KIND_MAIL = 'Mail';
 const DESTINATION_KIND_TEAMS = 'Teams';
+const DESTINATION_KIND_TEAMS_WF = 'Teams_WF';
+const DESTINATION_KIND_WEBHOOK = 'Webhook';
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -266,16 +268,26 @@ function displayMenu(curent) {
         $('.menuList').empty().append(`
             <li class="menuItem"><a class="menuLink" id="menu_workspace" href="#" tabindex="-1">${getText("000-80005", "ワークスペース管理")}</a></li>
             <li class="menuItem">
-              <a class="menuLink menuItemContent" id="menu_account_management" type="button" aria-expanded="false" aria-controls="menu_account_management_accordion_panel" href="#" style="display: none;">${getText("000-80006", "ユーザー管理")}</a>
-              <ul id="menu_account_management_accordion_panel" class="menuItem--subGroup" aria-hidden="true">
-                <li><a class="menuLink ActionList--subGroup" id="menu_account_list" href="#">${getText("000-83001", "ユーザー一覧")}</a></li>
-                <li><a class="menuLink ActionList--subGroup" id="menu_account_bulk_actions" href="#">${getText("000-92002", "ユーザー一括登録・削除")}</a></li>
-              </ul>
+                <a class="menuLink menuItemContent" id="menu_account_management" type="button" aria-expanded="false" aria-controls="menu_account_management_accordion_panel" href="#" style="display: none;">${getText("000-80006", "ユーザー管理")}</a>
+                <ul id="menu_account_management_accordion_panel" class="menuItem--subGroup" aria-hidden="true">
+                    <li><a class="menuLink ActionList--subGroup" id="menu_account_list" href="#">${getText("000-83001", "ユーザー一覧")}</a></li>
+                    <li><a class="menuLink ActionList--subGroup" id="menu_account_bulk_actions" href="#">${getText("000-92002", "ユーザー一括登録・削除")}</a></li>
+                </ul>
             </li>
             <li class="menuItem"><a class="menuLink" id="menu_role_management" href="#" style="display: none;">${getText("000-80007", "ロール管理")}</a></li>
             <li class="menuItem"><a class="menuLink" id="menu_settings_notifications" href="#">${getText("000-00183", "通知管理")}</a></li>
-            <li class="menuItem"><a class="menuLink" id="menu_settings_mailserver" href="#" style="display: none;">${getText("000-88002", "メール送信サーバー設定")}</a></li>
-            <li class="menuItem"><a class="menuLink" id="menu_identity_providers" href="#" style="display: none;">${getText("000-80051", "アイデンティティー・プロバイダー")}</a></li>
+
+            <li class="menuItem"><a class="menuLink" id="menu_service_account_management" href="#" style="display: none;">${getText("000-80056", "サービスアカウント管理")}</a></li>
+
+            <li class="menuItem">
+                <a class="menuLink menuItemContent" id="menu_organization_setting" type="button" aria-expanded="false" aria-controls="menu_organization_setting_accordion_panel" href="#" style="display: none;">${getText("000-80054", "オーガナイゼーション設定")}</a>
+                <ul id="menu_organization_setting_accordion_panel" class="menuItem--subGroup" aria-hidden="true">
+                    <li><a class="menuLink ActionList--subGroup" id="menu_settings_mailserver" href="#" style="display: none;">${getText("000-88002", "メール送信サーバー設定")}</a></li>
+                    <li><a class="menuLink ActionList--subGroup" id="menu_identity_providers" href="#" style="display: none;">${getText("000-80051", "アイデンティティー・プロバイダー")}</a></li>
+                    <li><a class="menuLink ActionList--subGroup" id="menu_password_policy" href="#" style="display: none;">${getText("000-80055", "パスワードポリシー")}</a></li>
+                </ul>
+            </li>
+
             <li class="menuItem"><a class="menuLink" id="menu_auditlog" href="#" style="display: none;">${getText("000-91002", "監査ログ")}</a></li>
         `);
 
@@ -284,8 +296,10 @@ function displayMenu(curent) {
         $('#menu_account_bulk_actions').attr('href', location_conf.href.users.bulk_actions.replace(/{organization_id}/g, CommonAuth.getRealm()));
         $('#menu_role_management').attr('href', location_conf.href.roles.list.replace(/{organization_id}/g, CommonAuth.getRealm()));
         $('#menu_settings_notifications').attr('href', location_conf.href.workspaces.settings.notifications.workspaces.replace(/{organization_id}/g, CommonAuth.getRealm()));
+        $('#menu_service_account_management').attr('href', location_conf.href.workspaces.settings.service_account_users.workspace.replace(/{organization_id}/g, CommonAuth.getRealm()));
         $('#menu_settings_mailserver').attr('href', location_conf.href.settings.mailserver.replace(/{organization_id}/g, CommonAuth.getRealm()));
         $('#menu_identity_providers').attr('href', location_conf.href.keycloak.identity_providers.replace(/{organization_id}/g, CommonAuth.getRealm()));
+        $('#menu_password_policy').attr('href', location_conf.href.keycloak.password_policy.replace(/{organization_id}/g, CommonAuth.getRealm()));
         $('#menu_auditlog').attr('href', location_conf.href.auditlog.download.replace(/{organization_id}/g, CommonAuth.getRealm()));
 
         if (CommonAuth.hasAuthority(RolesCommon.ORG_AUTH_USER_MAINTE)) {
@@ -301,11 +315,27 @@ function displayMenu(curent) {
         ||  adminWorkspaces.length > 0) {
             $("#menu_role_management").css("display", "");
         }
+
+        if (CommonAuth.hasAuthority(RolesCommon.ORG_AUTH_UPDATE)
+        ||  CommonAuth.hasRealmManagementAuthority("manage-identity-providers")) {
+            $("#menu_organization_setting").css("display", "");
+            $("#menu_organization_setting").attr("aria-expanded", "true");
+            $("#menu_organization_setting_accordion_panel").attr("aria-hidden", "false");
+        }
+
         if (CommonAuth.hasAuthority(RolesCommon.ORG_AUTH_UPDATE)) {
             $("#menu_settings_mailserver").css("display", "");
         }
+
+        if (CommonAuth.getAdminWorkspaces().length > 0 ) {
+            $("#menu_service_account_management").css("display", "");
+        }
+
         if (CommonAuth.hasRealmManagementAuthority("manage-identity-providers")) {
             $("#menu_identity_providers").css("display", "");
+        }
+        if (CommonAuth.hasRealmManagementAuthority("manage-realm")) {
+            $("#menu_password_policy").css("display", "");
         }
         if (CommonAuth.hasAuthority(RolesCommon.ORG_AUTH_AUDIT_LOG)) {
             $("#menu_auditlog").css("display", "");
@@ -1028,6 +1058,9 @@ const RolesCommon =
     "ORG_AUTH_WS_MAINTE":           "_og-ws-mt",
     "ORG_AUTH_AUDIT_LOG":           "_og-audit-log",
 
+    "ANSIBLE_EXECUTION_AGENT_ROLE": "ansible-execution-agent",
+    "OASE_AGENT_ROLE":              "oase-agent",
+
     "isAlllowedCreateRole": function() {
         return CommonAuth.hasAuthority(RolesCommon.ORG_AUTH_WS_ROLE_MAINTE) || ( CommonAuth.getAdminWorkspaces().length > 0 );
     },
@@ -1177,6 +1210,10 @@ const RolesCommon =
             default:
                 return [];
         }
+    },
+
+    "isServiceAccountUserRole": function(role, service_account_user_role_name){
+        return service_account_user_role_name.includes(role.name);
     }
 }
 
@@ -1204,7 +1241,12 @@ const UsersCommon =
             return false;
         }
         return true;
+    },
+
+    "isServiceAccountUser": function(user) {
+        return !(user.service_account_user_type === null) ? true: false;
     }
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1283,8 +1325,22 @@ const settings_notifications_common = {
         }
         else if (kind === DESTINATION_KIND_TEAMS){
             $("#form_destination_kind_teams").prop('checked', true);
+            $(".deprecatedTarget").css('display', '');
             destination_informations.forEach(function(element){
                 $("#form_destination_informations_teams").val(fn.cv(element.webhook, '', false));
+            });
+        }
+        else if (kind === DESTINATION_KIND_TEAMS_WF){
+            $("#form_destination_kind_teams_wf").prop('checked', true);
+            destination_informations.forEach(function(element){
+                $("#form_destination_informations_teams_wf").val(fn.cv(element.url, '', false));
+            });
+        }
+        else if (kind === DESTINATION_KIND_WEBHOOK){
+            $("#form_destination_kind_webhook").prop('checked', true);
+            destination_informations.forEach(function(element){
+                $("#form_destination_informations_webhook").val(fn.cv(element.url, '', false));
+                $("#form_destination_informations_webhook_header").val(fn.cv(element.header, '', false));
             });
         }
     },
@@ -1305,6 +1361,21 @@ const settings_notifications_common = {
             $("#text_destination_informations_teams").css('display', '');
             destination_informations.forEach(function(element){
                 $("#text_destination_informations_teams").text(fn.cv(element.webhook, '', false));
+            });
+        }
+        else if (kind === DESTINATION_KIND_TEAMS_WF){
+            $("#text_destination_informations_teams_wf").css('display', '');
+            destination_informations.forEach(function(element){
+                $("#text_destination_informations_teams_wf").text(fn.cv(element.url, '', false));
+            });
+        }
+        else if (kind === DESTINATION_KIND_WEBHOOK){
+            $("#text_destination_informations_webhook").css('display', '');
+            $("#text_destination_informations_webhook_header").css('display', '');
+            destination_informations.forEach(function(element){
+                $("#hr_destination_informations_webhook").css('display', '');
+                $("#text_destination_informations_webhook").text("URL: " + fn.cv(element.url, '', false));
+                $("#text_destination_informations_webhook_header").text("Header: " + fn.cv(element.header, '', false));
             });
         }
     },
@@ -1385,7 +1456,11 @@ const settings_notifications_common = {
             var teams = { "webhook": $("#form_destination_informations_teams").val() }
             destination_informations.push(teams);
         }
-        else if (destination_kind === "WebHook"){
+        else if (destination_kind === "Teams_WF"){
+            var teams_wf = { "url": $("#form_destination_informations_teams_wf").val() }
+            destination_informations.push(teams_wf);
+        }
+        else if (destination_kind === "Webhook"){
             var webhook = {
                 "url": $("#form_destination_informations_webhook").val(),
                 "header": $("#form_destination_informations_webhook_header").val()
@@ -1509,13 +1584,30 @@ const settings_notifications_common = {
         },
 
         //
+        // validate description informations (teams workflows)
+        //
+        destination_informations_teams_wf: function(destination_informations_teams_wf) {
+            if(destination_informations_teams_wf === "") {
+                return {
+                    "result": false,
+                    "message": getText("400-00011", "必須項目が不足しています。({0})", getText("000-00150", "通知先"))
+                }
+            } else {
+                return {
+                    "result": true,
+                    "message": ""
+                }
+            }
+        },
+
+        //
         // validate description informations (webhook)
         //
         destination_informations_webhook: function(destination_informations_webhook, destination_informations_webhook_header) {
             if(destination_informations_webhook === "") {
                 return {
                     "result": false,
-                    "message": getText("400-00011", "必須項目が不足しています。({0})", getText("000-00150", "通知先"))
+                    "message": getText("400-00011", "必須項目が不足しています。({0})", getText("000-00211", "通知先URL"))
                 }
             } else {
                 return {

@@ -36,6 +36,7 @@ import job_manager_const
 from jobs import jobs_common
 from libs.exceptions import JobTimeoutException
 from common_library.common.common import FileFormatErrorException
+from common_library.common import bl_service_account_user
 from libs import queries_user_import
 
 
@@ -201,6 +202,13 @@ class UserImportJobExecutor(BaseJobExecutor):
                         break
 
                     try:
+                        # 変更・削除時は登録済みの情報取得
+                        if cell_values["PROC_TYPE"] in user_import_file_common.PROC_TYPE_UPD + user_import_file_common.PROC_TYPE_DEL:
+                            # 登録済みの情報を取得
+                            registered_user = self.__get_user(cell_values["USERNAME"])
+                        else:
+                            registered_user = None
+
                         # 実行処理種別「登録」
                         if cell_values["PROC_TYPE"] in user_import_file_common.PROC_TYPE_ADD:
                             # ユーザ数がLimit値になっていないかチェックする / Check if the number of users is at the limit value
@@ -224,10 +232,10 @@ class UserImportJobExecutor(BaseJobExecutor):
                         # 実行処理種別「更新」
                         if cell_values["PROC_TYPE"] in user_import_file_common.PROC_TYPE_UPD:
                             # validationチェック / validation check
-                            validate = self.__validate_row(cell_values, specifiable_roles)
+                            validate = self.__validate_row(cell_values, specifiable_roles, registered_user)
                             if validate.ok:
                                 # ユーザーIDを取得
-                                user_id = self.__get_user_id(cell_values["USERNAME"])
+                                user_id = registered_user.get("id")
 
                                 # 所属しているロールを取得
                                 current_role_list = self.__get_role_list(user_id)
@@ -249,11 +257,11 @@ class UserImportJobExecutor(BaseJobExecutor):
                         # 実行処理種別「削除」
                         if cell_values["PROC_TYPE"] in user_import_file_common.PROC_TYPE_DEL:
                             # validationチェック / validation check
-                            validate = self.__validate_row(cell_values, specifiable_roles)
+                            validate = self.__validate_row(cell_values, specifiable_roles, registered_user)
                             if validate.ok:
                                 # ユーザーIDを取得
                                 user_name = cell_values["USERNAME"]
-                                user_id = self.__get_user_id(cell_values["USERNAME"])
+                                user_id = registered_user.get("id")
 
                                 # 所属しているロールを取得
                                 current_role_list = self.__get_role_list(user_id)
@@ -317,6 +325,7 @@ class UserImportJobExecutor(BaseJobExecutor):
                         cell_values["ERROR_TEXT"] = multi_lang.get_text_spec(self.language, '401-00020', 'エラーのため処理できませんでした。({0})', ex)
                         self.err_wb.write_row(cell_values)
                         globals.logger.debug(f'Failed User Registration : [ROW:{self.imp_wb.get_row_idx()}] [USERNAME:{cell_values["USERNAME"]}] [ERROR_TEXT:{cell_values["ERROR_TEXT"]}]')
+                        globals.logger.debug(''.join(list(traceback.TracebackException.from_exception(ex).format())))
 
                     if (self.imp_wb.get_row_idx() - user_import_file_common.EXCEL_HEADER_ROWS) % job_manager_config.JOBS[const.PROCESS_KIND_USER_IMPORT]["extra_config"]["status_update_interval"] == 0:
                         # 処理件数を更新
@@ -445,16 +454,24 @@ class UserImportJobExecutor(BaseJobExecutor):
             )
             raise common.BadRequestException(message_id=message_id, message=message)
 
-    def __validate_row(self, cell_values, specifiable_roles):
+    def __validate_row(self, cell_values, specifiable_roles, registered_user=None):
         """validate row
 
         Args:
             cell_values (dict): cellの値 / cell value
             specifiable_roles (dict): 指定可能なロール / Roles that can be specified
+            registered_user(Optional[dict]): 登録済みのユーザー
 
         Returns:
             validation.result: vaidation result
         """
+        # service account userのチェック
+        if bl_service_account_user.is_service_account_user(registered_user):
+            if cell_values["PROC_TYPE"] in user_import_file_common.PROC_TYPE_UPD:
+                return validation.result(False, 400, '400-62006', "ユーザー一括登録・削除の機能でサービスアカウントユーザーの変更は行えません")
+            else:
+                return validation.result(False, 400, '400-62007', "ユーザー一括登録・削除の機能でサービスアカウントユーザーの削除は行えません")
+
         # validation check
         validate = validation.validate_user_name(cell_values["USERNAME"], lang=self.language)
         if not validate.ok:
@@ -492,7 +509,16 @@ class UserImportJobExecutor(BaseJobExecutor):
             # Checking roles (divide by comma and check if it is included in the specifiable roles)
             if cell_values["ROLES"]:
                 for role in cell_values["ROLES"].split(','):
-                    if role != "" and role not in specifiable_roles:
+                    if role == "":
+                        continue
+
+                    if bl_service_account_user.is_service_account_role(role):
+                        return validation.result(
+                            False, 400, '400-62005', 'ユーザー一括登録・削除の機能でサービスアカウントユーザー用のロール({0})は指定できません',
+                            role
+                        )
+
+                    if role not in specifiable_roles:
                         return validation.result(
                             False, 400, '400-62001', '指定されたロール({0})は存在しません',
                             role
@@ -811,6 +837,39 @@ class UserImportJobExecutor(BaseJobExecutor):
         user_id = u_get_json[0]["id"]
 
         return user_id
+
+    def __get_user(self, user_name):
+        """usernameからuser情報を取得 / Get userid from username
+
+        Args:
+            user_id (str): user id
+
+        Returns:
+            current_role_list(list)
+        """
+        # 対象のユーザーを取得 / Get target user
+        u_get = api_keycloak_users.user_get(realm_name=self.organization_id, user_name=user_name, token=self.organization_sa_token.get())
+        if u_get.status_code != 200:
+            message_id = "500-62003"
+            message = multi_lang.get_text_spec(
+                self.language,
+                message_id,
+                "ユーザーの取得に失敗しました(対象ユーザー:{0})",
+                user_name)
+            raise common.InternalErrorException(message_id=message_id, message=message)
+
+        u_get_json = json.loads(u_get.text)
+        if len(u_get_json) == 0:
+            message_id = "400-62002"
+            message = multi_lang.get_text_spec(
+                self.language,
+                message_id,
+                "指定されたユーザーが存在しません")
+            raise common.InternalErrorException(message_id=message_id, message=message)
+
+        user = u_get_json[0]
+
+        return user
 
     def __get_role_list(self, user_id):
         """useridから所属しているロール一覧を取得 / Get a list of roles that a user belongs to from the userid

@@ -35,7 +35,7 @@ CREATE_TABLES = [
         REQUEST_HEADERS                 TEXT,                                       -- APIが呼び出された際のリクエストヘッダー
         REQUEST_USER_HEADERS            TEXT,                                       -- APIを呼び出す際のリクエストヘッダー
         REQUEST_BODY                    TEXT,                                       -- APIの呼び出し時のリクエストボディ
-        REQUEST_FORM                    TEXT,                                       -- APIの呼び出し時のリクエストfrom
+        REQUEST_FORM                    TEXT,                                       -- APIの呼び出し時のリクエストform
         REQUEST_FILES                   TEXT,                                       -- APIの呼び出し時のリクエストfiles
         STATUS_CODE                     VARCHAR(10),                                -- API呼び出し時のステータスコード
         NAME                            VARCHAR(10),                                -- audit固定

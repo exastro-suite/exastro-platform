@@ -74,7 +74,7 @@ def test_internal_settings_notification_list(connexion_client):
             headers=request_parameters.request_headers(organization['user_id']))
 
         assert response.status_code == 200, "get notifications destination list response OK route"
-        assert len(response.json["data"]) == 2, "get notifications destination list"
+        assert len(response.json["data"]) == 3, "get notifications destination list"
         assert response.json["data"][0].get("id") == setting_notifications[0]['id'], "get notifications destination id check"
 
         #
@@ -86,7 +86,7 @@ def test_internal_settings_notification_list(connexion_client):
             headers=request_parameters.request_headers(organization['user_id']))
 
         assert response.status_code == 200, "get notifications destination list response OK route"
-        assert len(response.json["data"]) == 2, "get notifications destination list"
+        assert len(response.json["data"]) == 3, "get notifications destination list"
         assert response.json["data"][0].get("conditions", {}).get("ita", {}).get("event_type", {}).get("new"), "get notifications destination id check"
 
         #
@@ -109,6 +109,6 @@ def test_internal_settings_notification_list(connexion_client):
             headers=request_parameters.request_headers(organization['user_id']))
 
         assert response.status_code == 200, "get notifications destination list response OK route"
-        assert len(response.json["data"]) == 2, "get notifications destination list"
+        assert len(response.json["data"]) == 3, "get notifications destination list"
         assert response.json["data"][0].get("conditions", {}).get("ita", {}).get("event_type", {}).get("new"), "get notifications destination id check"
         assert not response.json["data"][0].get("conditions", {}).get("ita", {}).get("event_type", {}).get("evaluated"), "get notifications destination id check"

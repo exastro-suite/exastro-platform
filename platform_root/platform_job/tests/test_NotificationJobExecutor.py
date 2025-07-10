@@ -35,19 +35,19 @@ from jobs.NotificationJobExecutor import NotificationJobExecutor
 from tests.common import test_common
 
 
-def test_execute_teams_nomally():
-    """teams送信正常パターン / teams sending successful pattern
+def test_execute_teams_wf_nomally():
+    """teams workflow 送信正常パターン / teams workflow sending successful pattern
     """
     testdata = import_module("tests.db.exports.testdata")
 
     organization_id = list(testdata.ORGANIZATIONS.keys())[0]
     workspace_id = testdata.ORGANIZATIONS[organization_id]["workspace_id"][0]
 
-    webhook_url_path = "/test_execute_teams_nomally"
-    message_title = "test_execute_teams_nomally title"
-    message_text = "test_execute_teams_nomally text"
+    webhook_url_path = "/test_execute_teams_wf_nomally"
+    message_title = "test_execute_teams_wf_nomally title"
+    message_text = "test_execute_teams_wf_nomally text"
 
-    queue = make_notification_teams(
+    queue = make_notification_teams_wf(
                 organization_id,
                 workspace_id,
                 f"{test_common.TEST_HTTPCODE200_ORIGIN}/{webhook_url_path}",
@@ -68,23 +68,24 @@ def test_execute_teams_nomally():
         assert len(request_webhooks) == 1
         # 送信webhookの内容が正しいこと
         assert request_webhooks[0].method == 'POST'
-        assert json.loads(request_webhooks[0].text)["title"] == message_title
-        assert json.loads(request_webhooks[0].text)["text"] == message_text
+        assert json.loads(request_webhooks[0].text)["attachments"][0]["content"]["body"][0]["text"] == message_title
+        assert json.loads(request_webhooks[0].text)["attachments"][0]["content"]["body"][1]["text"] == message_text
 
 
-def test_execute_teams_http_error():
-    """teams送信httpエラーパターン / teams send http error pattern
+
+def test_execute_teams_wf_http_error():
+    """teams workflow 送信httpエラーパターン / teams workflow send http error pattern
     """
     testdata = import_module("tests.db.exports.testdata")
 
     organization_id = list(testdata.ORGANIZATIONS.keys())[0]
     workspace_id = testdata.ORGANIZATIONS[organization_id]["workspace_id"][0]
 
-    webhook_url_path = "/test_execute_teams_http_error"
-    message_title = "test_execute_teams_http_error title"
-    message_text = "test_execute_teams_http_error text"
+    webhook_url_path = "/test_execute_teams_wf_http_error"
+    message_title = "test_execute_teams_wf_http_error title"
+    message_text = "test_execute_teams_wf_http_error text"
 
-    queue = make_notification_teams(
+    queue = make_notification_teams_wf(
                 organization_id,
                 workspace_id,
                 f"{test_common.TEST_HTTPCODE500_ORIGIN}/{webhook_url_path}",
@@ -105,8 +106,85 @@ def test_execute_teams_http_error():
         assert len(request_webhooks) == 1
         # 送信webhookの内容が正しいこと
         assert request_webhooks[0].method == 'POST'
-        assert json.loads(request_webhooks[0].text)["title"] == message_title
-        assert json.loads(request_webhooks[0].text)["text"] == message_text
+        assert json.loads(request_webhooks[0].text)["attachments"][0]["content"]["body"][0]["text"] == message_title
+        assert json.loads(request_webhooks[0].text)["attachments"][0]["content"]["body"][1]["text"] == message_text
+
+
+def test_execute_webhook_nomally():
+    """webhook 送信正常パターン / webhook sending successful pattern
+    """
+    testdata = import_module("tests.db.exports.testdata")
+
+    organization_id = list(testdata.ORGANIZATIONS.keys())[0]
+    workspace_id = testdata.ORGANIZATIONS[organization_id]["workspace_id"][0]
+
+    webhook_url_path = "/test_execute_webhook_nomally"
+    webhook_header = '{"X-Api-Key": "test_execute_webhook_nomally"}'
+    message_title = "test_execute_webhook_nomally title"
+    message_text = "test_execute_webhook_nomally text"
+
+    queue = make_notification_webhook(
+                organization_id,
+                workspace_id,
+                f"{test_common.TEST_HTTPCODE200_ORIGIN}/{webhook_url_path}",
+                webhook_header,
+                message_title,
+                message_text
+                )
+
+    with test_common.requsts_mocker_default() as requsts_mocker:
+        executor = NotificationJobExecutor(queue)
+        result = executor.execute_base()
+
+        # 成功を返すこと
+        assert result
+        # ステータスが成功に更新されていること
+        assert get_notification_status(organization_id, workspace_id, queue['PROCESS_EXEC_ID']) == const.NOTIFICATION_STATUS_SUCCESSFUL
+        # 指定したwebhookが1回呼ばれていること
+        request_webhooks = [history for history in requsts_mocker.request_history if history.url == f"{test_common.TEST_HTTPCODE200_ORIGIN}/{webhook_url_path}"]
+        assert len(request_webhooks) == 1
+        # 送信webhookの内容が正しいこと
+        assert request_webhooks[0].method == 'POST'
+        assert json.loads(request_webhooks[0].text)["text"] == message_title + "\n\n" + message_text
+        assert request_webhooks[0].headers["X-Api-Key"] == "test_execute_webhook_nomally"
+
+
+def test_execute_webhook_http_error():
+    """webhook 送信httpエラーパターン / webhook send http error pattern
+    """
+    testdata = import_module("tests.db.exports.testdata")
+
+    organization_id = list(testdata.ORGANIZATIONS.keys())[0]
+    workspace_id = testdata.ORGANIZATIONS[organization_id]["workspace_id"][0]
+
+    webhook_url_path = "/test_execute_webhook_http_error"
+    webhook_header = None
+    message_title = "test_execute_webhook_http_error title"
+    message_text = "test_execute_webhook_http_error text"
+
+    queue = make_notification_webhook(
+                organization_id,
+                workspace_id,
+                f"{test_common.TEST_HTTPCODE500_ORIGIN}/{webhook_url_path}",
+                webhook_header,
+                message_title,
+                message_text
+                )
+
+    with test_common.requsts_mocker_default() as requsts_mocker:
+        executor = NotificationJobExecutor(queue)
+        result = executor.execute_base()
+
+        # 失敗を返すこと
+        assert not result
+        # ステータスが失敗に更新されていること
+        assert get_notification_status(organization_id, workspace_id, queue['PROCESS_EXEC_ID']) == const.NOTIFICATION_STATUS_FAILED
+        # 指定したwebhookが1回呼ばれていること
+        request_webhooks = [history for history in requsts_mocker.request_history if history.url == f"{test_common.TEST_HTTPCODE500_ORIGIN}/{webhook_url_path}"]
+        assert len(request_webhooks) == 1
+        # 送信webhookの内容が正しいこと
+        assert request_webhooks[0].method == 'POST'
+        assert json.loads(request_webhooks[0].text)["text"] == message_title + "\n\n" + message_text
 
 
 def test_execute_mail_smtp_normally():
@@ -396,7 +474,7 @@ def test_cancel_normally():
     message_title = "test_cancel_normal title"
     message_text = "test_cancel_normal text"
 
-    queue = make_notification_teams(
+    queue = make_notification_teams_wf(
                 organization_id,
                 workspace_id,
                 f"{test_common.TEST_HTTPCODE500_ORIGIN}/{webhook_url_path}",
@@ -464,7 +542,7 @@ def test_force_update_status_normally():
     ]
 
     for data in datas:
-        queue = make_notification_teams(data['organization_id'], data['workspace_id'], test_common.TEST_HTTPCODE200_ORIGIN, 'title', 'message')
+        queue = make_notification_teams_wf(data['organization_id'], data['workspace_id'], test_common.TEST_HTTPCODE200_ORIGIN, 'title', 'message')
         data['queue'] = queue
         if data["queue_exists"]:
             # queueにデータをinsert
@@ -500,16 +578,79 @@ def test_force_update_status_normally():
             assert status == const.NOTIFICATION_STATUS_FAILED, f"assert status data[{i}]"
 
 
-def make_notification_teams(organization_id: str, workspace_id: str, webhook_uri: str, title: str, message:str):
+def make_notification_teams_wf(organization_id: str, workspace_id: str, webhook_uri: str, title: str, message:str):
     process_id = ulid.new().str
     notification_id = ulid.new().str
 
     data = {
         "NOTIFICATION_ID": notification_id,
-        "DESTINATION_KIND": const.DESTINATION_KIND_TEAMS,
+        "DESTINATION_KIND": const.DESTINATION_KIND_TEAMS_WF,
         "DESTINATION_INFORMATIONS": encrypt.encrypt_str(json.dumps(
                 [{
-                    "webhook": webhook_uri,
+                    "url": webhook_uri,
+                }]
+            )),
+        "MESSAGE_INFORMATIONS": json.dumps(
+                {
+                    "title": title,
+                    "message": message
+                }
+            ),
+        "NOTIFICATION_STATUS": const.NOTIFICATION_STATUS_UNSENT,
+        "CREATE_USER": job_manager_const.SYSTEM_USER_ID,
+        "LAST_UPDATE_USER": job_manager_const.SYSTEM_USER_ID,
+    }
+
+    with closing(DBconnector().connect_workspacedb(organization_id, workspace_id)) as conn, \
+            conn.cursor() as cursor:
+
+        conn.begin()
+        cursor.execute("""
+                INSERT INTO T_NOTIFICATION_MESSAGE
+                    (
+                        NOTIFICATION_ID,
+                        DESTINATION_KIND,
+                        DESTINATION_INFORMATIONS,
+                        MESSAGE_INFORMATIONS,
+                        NOTIFICATION_STATUS,
+                        CREATE_USER,
+                        LAST_UPDATE_USER
+                    ) VALUES (
+                        %(NOTIFICATION_ID)s,
+                        %(DESTINATION_KIND)s,
+                        %(DESTINATION_INFORMATIONS)s,
+                        %(MESSAGE_INFORMATIONS)s,
+                        %(NOTIFICATION_STATUS)s,
+                        %(CREATE_USER)s,
+                        %(LAST_UPDATE_USER)s
+                    )
+            """, data)
+        conn.commit()
+
+    queue={
+        "PROCESS_ID": process_id,
+        "PROCESS_KIND": const.PROCESS_KIND_NOTIFICATION,
+        "PROCESS_EXEC_ID": notification_id,
+        "ORGANIZATION_ID": organization_id,
+        "WORKSPACE_ID": workspace_id,
+        "LAST_UPDATE_USER": job_manager_const.SYSTEM_USER_ID,
+        "LAST_UPDATE_TIMESTAMP": str(datetime.datetime.now()),
+    }
+    # test_common.insert_queue([queue])
+    return queue
+
+
+def make_notification_webhook(organization_id: str, workspace_id: str, webhook_uri: str, webhook_header: str, title: str, message:str):
+    process_id = ulid.new().str
+    notification_id = ulid.new().str
+
+    data = {
+        "NOTIFICATION_ID": notification_id,
+        "DESTINATION_KIND": const.DESTINATION_KIND_WEBHOOK,
+        "DESTINATION_INFORMATIONS": encrypt.encrypt_str(json.dumps(
+                [{
+                    "url": webhook_uri,
+                    "header": webhook_header,
                 }]
             )),
         "MESSAGE_INFORMATIONS": json.dumps(

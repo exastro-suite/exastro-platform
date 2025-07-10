@@ -194,12 +194,12 @@ SQL_ORGANIZATION_CREATE_TABLES = [
         REMOTE_ADDR                     VARCHAR(40),                                -- リモートアクセスのIPアドレス
         REQUEST_HEADERS                 TEXT,                                       -- APIが呼び出された際のリクエストヘッダー
         REQUEST_USER_HEADERS            TEXT,                                       -- APIを呼び出す際のリクエストヘッダー
-        REQUEST_BODY                    TEXT,                                       -- APIの呼び出し時のリクエストボディ
-        REQUEST_FORM                    TEXT,                                       -- APIの呼び出し時のリクエストfrom
+        REQUEST_BODY                    LONGTEXT,                                   -- APIの呼び出し時のリクエストボディ
+        REQUEST_FORM                    LONGTEXT,                                   -- APIの呼び出し時のリクエストform
         REQUEST_FILES                   TEXT,                                       -- APIの呼び出し時のリクエストfiles
         STATUS_CODE                     VARCHAR(10),                                -- API呼び出し時のステータスコード
         NAME                            VARCHAR(10),                                -- audit固定
-        MESSAGE                         TEXT,                                       -- 応答メッセージ
+        MESSAGE                         LONGTEXT,                                   -- 応答メッセージ
         MESSAGE_ID                      VARCHAR(10),                                -- APIの応答メッセージID
         MESSAGE_TEXT                    TEXT,                                       -- APIの応答メッセージ
         STACK_INFO                      TEXT,                                       -- APIエラー時のスタック情報
@@ -267,7 +267,7 @@ SQL_WORKSPACE_CREATE_TABLES = [
     (
         DESTINATION_ID	                VARCHAR(36) NOT NULL,	                        -- 通知先ID
         DESTINATION_NAME	            VARCHAR(255),	                                -- 通知先名
-        DESTINATION_KIND	            VARCHAR(20),	                                -- 通知方法(Mail, Teams, Webhook)
+        DESTINATION_KIND	            VARCHAR(20),	                                -- 通知方法(Mail, Teams_WF, Teams, Webhook)
         DESTINATION_INFORMATIONS	    LONGTEXT,	                                    -- 通知先(Webhook URL, email) (Json形式)
         CONDITIONS                      LONGTEXT,	                                    -- 通知条件 (Json形式)
         CREATE_TIMESTAMP	            DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,    -- 作成日時
@@ -284,7 +284,7 @@ SQL_WORKSPACE_CREATE_TABLES = [
         NOTIFICATION_ID	                VARCHAR(26) NOT NULL,	                        -- 通知ID ※ULID
         DESTINATION_ID	                VARCHAR(36),	                                -- 通知先ID
         DESTINATION_NAME	            VARCHAR(255),	                                -- 通知先名
-        DESTINATION_KIND	            VARCHAR(20),	                                -- 通知方法(Mail, Teams, Webhook)
+        DESTINATION_KIND	            VARCHAR(20),	                                -- 通知方法(Mail, Teams_WF, Teams, Webhook)
         DESTINATION_INFORMATIONS        LONGTEXT,	                                    -- 通知先(Webhook URL, email) (Json形式) ※暗号化
         CONDITIONS                      LONGTEXT,	                                    -- 通知条件 (Json形式)
         FUNC_ID	                        VARCHAR(100),	                                -- 機能ID (メニューID等）

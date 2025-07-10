@@ -143,8 +143,8 @@ $(function(){
         // プラン一覧を表示する
         //
 
-        const sortKey = 'last_update_timestamp';
-        const sortreverse = -1;
+        const sortKey = 'plan_id';  // リソースプランID
+        const sortreverse = 1;  // 昇順
         planListData.sort(function(a, b){
             const as = a[sortKey].toLowerCase(), bs = b[sortKey].toLowerCase();
             if ( as < bs ) {

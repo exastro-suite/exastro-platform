@@ -192,7 +192,7 @@ def user_reset_password(realm_name, user_id, user_password, token):
         realm_name (str): realm name
         user_id (str): user id
         user_password (str): user new password
-        toekn (str): token
+        token (str): token
     Returns:
         Response: HTTP Respose (success : .status_code=204)
     """
@@ -281,3 +281,55 @@ def user_delete(realm_name, user_id, token):
     globals.logger.debug(f"### Succeed func:{inspect.currentframe().f_code.co_name}")
 
     return request_response
+
+
+def user_credentials_get(realm_name, user_id, token):
+    """ユーザーcredentials取得
+
+        realm_name (str): realm name
+        user_id (str): user id
+        token (str): token
+    Returns:
+        Response: HTTP Respose (success : .status_code=200)
+    """
+    globals.logger.debug(f"### func:{inspect.currentframe().f_code.co_name} realm_name={realm_name}, user_id={user_id}")
+
+    # 呼び出し先設定
+    # Call destination setting
+    api_url = __get_keycloak_api_url()
+
+    header_para = {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer {}".format(token),
+    }
+
+    request_response = requests.get(f"{api_url}/auth/admin/realms/{realm_name}/users/{user_id}/credentials", headers=header_para)
+
+    return request_response
+
+
+def user_credentials_delete(realm_name, user_id, credential_id, token):
+    """ユーザーcredentials削除
+
+        realm_name (str): realm name
+        user_id (str): user id,
+        credential_id (str): credential id
+        token (str): token
+    Returns:
+        Response: HTTP Respose (success : .status_code=200)
+    """
+    globals.logger.debug(f"### func:{inspect.currentframe().f_code.co_name} realm_name={realm_name}, user_id={user_id} {credential_id=}")
+
+    # 呼び出し先設定
+    # Call destination setting
+    api_url = __get_keycloak_api_url()
+
+    header_para = {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer {}".format(token),
+    }
+
+    request_response = requests.delete(f"{api_url}/auth/admin/realms/{realm_name}/users/{user_id}/credentials/{credential_id}", headers=header_para)
+
+    return request_response
+

@@ -16,6 +16,7 @@
 import os
 import inspect
 import requests
+import re
 
 # User Imports
 import globals  # 共通的なglobals Common globals
@@ -176,3 +177,34 @@ def realm_get(realm_name, token):
     # 応答をそのまま返却
     # return response as is
     return request_response
+
+
+def pickup_password_policy(realm_response_json: dict) -> dict:
+    """realm情報からpassword policyの設定情報を返します
+        Returns password policy setting information from realm information
+
+    Args:
+        realm_response_json (dict): get realm response json
+
+    Returns:
+        dict[str,str]: password policy設定情報 / password policy configuration information
+    """
+    if realm_response_json.get("passwordPolicy", None) is None:
+        return {}
+
+    if realm_response_json.get("passwordPolicy", None).rstrip() == "":
+        return {}
+
+    return_value = {}
+
+    # passwordPolicyの項目は "length(8) and upperCase(1) ..."のように入っているので" and "で分割して処理する
+    # The passwordPolicy items are included as "length(8) and upperCase(1) ...", so they are processed by dividing them with " and ".
+    for policy_item in realm_response_json.get("passwordPolicy", None).split(" and "):
+
+        policy_item_split = re.match(r'^(.+)\((.*)\)$', policy_item)
+        if policy_item_split is None:
+            continue
+
+        return_value[policy_item_split.group(1)] = policy_item_split.group(2)
+
+    return return_value

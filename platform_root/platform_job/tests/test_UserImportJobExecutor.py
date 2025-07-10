@@ -33,7 +33,7 @@ import copy
 from common_library.common import const
 from common_library.common import encrypt
 from common_library.common.db import DBconnector
-from common_library.common import bl_plan_service, api_keycloak_users
+from common_library.common import bl_plan_service, bl_service_account_user, api_keycloak_users
 
 import job_manager
 import job_manager_const
@@ -46,8 +46,8 @@ from tests.common import test_common
 from libs.job_manager_classes import SubProcessesManager
 from common_library.common import user_import_file_common
 
-USERNAME_COL_INDEX = 2
-ERROR_TEXT_COL_INDEX = 12
+USERNAME_COL_INDEX = 4
+ERROR_TEXT_COL_INDEX = 14
 
 def test_execute_registration_nomally():
     """ユーザー登録正常系 / User registration normal pattern
@@ -230,7 +230,7 @@ def test_execute_file_error():
         # 状態が異常であること
         t = select_t_jobs_user(organization_id, queue["PROCESS_EXEC_ID"])
         assert t["JOB_STATUS"] == const.JOB_USER_FAILED
-        assert t["MESSAGE"] == 'Excelファイルに必須の項目がありません。({0})'.format('実行処理種別')
+        assert t["MESSAGE"] == 'Excelファイルに必須の項目がありません。({0})'.format('注意事項')
 
 def test_execute_validation_error():
     """Validation error pattern
@@ -455,6 +455,31 @@ def test_execute_validation_error():
         assert ws.max_row == user_import_file_common.EXCEL_HEADER_ROWS + 1
         assert ws.cell(user_import_file_common.EXCEL_HEADER_ROWS + 1, USERNAME_COL_INDEX).value == data_sample_registration["USERNAME"]
         assert ws.cell(user_import_file_common.EXCEL_HEADER_ROWS + 1, ERROR_TEXT_COL_INDEX).value.startswith("指定されたロール({0})は存在しません".format(error_role))
+
+    # ロールエラー(サービスアカウントユーザー用)
+    with test_common.requsts_mocker_default():
+        organization_id = list(testdata.ORGANIZATIONS.keys())[0]
+        error_role = bl_service_account_user.service_account_user_role_name('dummy_ws', const.SERVICE_ACCOUNT_USER_TYPE_ANSIBLE)
+        queue = make_queue_import_user('ja', organization_id, user_import_data=[{**data_sample_registration, **{"ROLES": data_sample_registration["ROLES"] + "," + error_role}}])
+
+        executor = UserImportJobExecutor(queue)
+        result = executor.execute_base()
+        save_result_file(organization_id, queue["PROCESS_EXEC_ID"])
+
+        # 成功を返すこと
+        assert result
+
+        # 状態が完了で、登録失敗件数が１であること
+        t = select_t_jobs_user(organization_id, queue["PROCESS_EXEC_ID"])
+        assert t["JOB_STATUS"] == const.JOB_USER_COMP
+        assert t["COUNT_REGISTER"] == 1 and t["COUNT_UPDATE"] == 0 and t["COUNT_DELETE"] == 0
+        assert t["SUCCESS_REGISTER"] == 0 and t["SUCCESS_UPDATE"] == 0 and t["SUCCESS_DELETE"] == 0
+        assert t["FAILED_REGISTER"] == 1 and t["FAILED_UPDATE"] == 0 and t["FAILED_DELETE"] == 0
+
+        ws = get_result_worksheet(organization_id, queue["PROCESS_EXEC_ID"])
+        assert ws.max_row == user_import_file_common.EXCEL_HEADER_ROWS + 1
+        assert ws.cell(user_import_file_common.EXCEL_HEADER_ROWS + 1, USERNAME_COL_INDEX).value == data_sample_registration["USERNAME"]
+        assert ws.cell(user_import_file_common.EXCEL_HEADER_ROWS + 1, ERROR_TEXT_COL_INDEX).value.startswith("ユーザー一括登録・削除の機能でサービスアカウントユーザー用のロール({0})は指定できません".format(error_role))
 
 
 def test_execute_registration_error_limits():
@@ -887,6 +912,40 @@ def test_execute_update_error_user_update():
         assert ws.max_row == user_import_file_common.EXCEL_HEADER_ROWS + 1
         assert ws.cell(user_import_file_common.EXCEL_HEADER_ROWS + 1, ERROR_TEXT_COL_INDEX).value == "ユーザー一括更新ではオーガナイゼーション管理者ロールを解除できません"
 
+    # サービスアカウントの更新
+    with test_common.requsts_mocker_default():
+        organization_id = list(testdata.ORGANIZATIONS.keys())[0]
+
+        # ユーザー作成登録
+        add_user(user=user_json_service_account1)
+
+        # 更新対象のユーザーを取得 / Get target user
+        u_get = get_user(user_json_service_account1["username"])
+        u_get_json = json.loads(u_get.text)
+        user_id = u_get_json[0]["id"]
+
+        # ユーザー更新処理
+        queue = make_queue_import_user('ja', organization_id, user_import_data=[data_sample_update_sa_1])
+
+        executor = UserImportJobExecutor(queue)
+        result = executor.execute_base()
+        save_result_file(organization_id, queue["PROCESS_EXEC_ID"])
+
+        # 成功を返すこと
+        assert result
+
+        # 状態が完了で、更新失敗件数が１であること
+        t = select_t_jobs_user(organization_id, queue["PROCESS_EXEC_ID"])
+        assert t["JOB_STATUS"] == const.JOB_USER_COMP
+        assert t["COUNT_REGISTER"] == 0 and t["COUNT_UPDATE"] == 1 and t["COUNT_DELETE"] == 0
+        assert t["SUCCESS_REGISTER"] == 0 and t["SUCCESS_UPDATE"] == 0 and t["SUCCESS_DELETE"] == 0
+        assert t["FAILED_REGISTER"] == 0 and t["FAILED_UPDATE"] == 1 and t["FAILED_DELETE"] == 0
+
+        ws = get_result_worksheet(organization_id, queue["PROCESS_EXEC_ID"])
+        assert ws.max_row == user_import_file_common.EXCEL_HEADER_ROWS + 1
+        assert ws.cell(user_import_file_common.EXCEL_HEADER_ROWS + 1, ERROR_TEXT_COL_INDEX).value == "ユーザー一括登録・削除の機能でサービスアカウントユーザーの変更は行えません"
+
+
     # keycloak HTTP-500応答(ユーザー更新に失敗)
     with test_common.requsts_mocker_default() as requests_mocker:
         organization_id = list(testdata.ORGANIZATIONS.keys())[0]
@@ -1051,6 +1110,35 @@ def test_execute_delete_error_user_delete():
         ws = get_result_worksheet(organization_id, queue["PROCESS_EXEC_ID"])
         assert ws.max_row == user_import_file_common.EXCEL_HEADER_ROWS + 1
         assert ws.cell(user_import_file_common.EXCEL_HEADER_ROWS + 1, ERROR_TEXT_COL_INDEX).value == "オーガナイゼーション管理者は削除できません"
+
+    # サービスアカウントの削除
+    with test_common.requsts_mocker_default():
+        organization_id = list(testdata.ORGANIZATIONS.keys())[0]
+
+        # ユーザー作成登録
+        add_user(user=user_json_service_account1)
+
+        # ユーザー削除処理
+        queue = make_queue_import_user('ja', organization_id, user_import_data=[data_sample_delete_sa_1], job_type=const.JOB_TYPE_USER_BULK_DELETE)
+
+        executor = UserImportJobExecutor(queue)
+        result = executor.execute_base()
+        save_result_file(organization_id, queue["PROCESS_EXEC_ID"])
+
+        # 成功を返すこと
+        assert result
+
+        # 状態が完了で、削除失敗件数が１であること
+        t = select_t_jobs_user(organization_id, queue["PROCESS_EXEC_ID"])
+        assert t["JOB_STATUS"] == const.JOB_USER_COMP
+        assert t["COUNT_REGISTER"] == 0 and t["COUNT_UPDATE"] == 0 and t["COUNT_DELETE"] == 1
+        assert t["SUCCESS_REGISTER"] == 0 and t["SUCCESS_UPDATE"] == 0 and t["SUCCESS_DELETE"] == 0
+        assert t["FAILED_REGISTER"] == 0 and t["FAILED_UPDATE"] == 0 and t["FAILED_DELETE"] == 1
+
+        ws = get_result_worksheet(organization_id, queue["PROCESS_EXEC_ID"])
+        assert ws.max_row == user_import_file_common.EXCEL_HEADER_ROWS + 1
+        assert ws.cell(user_import_file_common.EXCEL_HEADER_ROWS + 1, ERROR_TEXT_COL_INDEX).value == "ユーザー一括登録・削除の機能でサービスアカウントユーザーの削除は行えません"
+
 
     # keycloak HTTP-500応答(ユーザー削除に失敗)
     with test_common.requsts_mocker_default() as requests_mocker:
@@ -1653,6 +1741,19 @@ data_sample_update_org_mng_2 = {
     "ROLES": "_ws1-admin",
 }
 
+data_sample_update_sa_1 = {
+    "PROC_TYPE": "更新",
+    "USERNAME": "testsa-01",
+    "EMAIL": "",
+    "LASTNAME": "",
+    "FIRSTNAME": "",
+    "ENABLED": True,
+    "AFFILIATION": "",
+    "DESCRIPTION": "更新",
+    "USER_ID": None,
+    "ROLES": "",
+}
+
 # サンプルデータ（削除用）
 data_sample_delete = {
     "PROC_TYPE": "削除",
@@ -1668,6 +1769,10 @@ data_sample_delete_admin = {
     "USERNAME": "admin",
 }
 
+data_sample_delete_sa_1 = {
+    "PROC_TYPE": "削除",
+    "USERNAME": "testsa-01",
+}
 
 # サンプルユーザーデータ
 user_json1 = {
@@ -1706,6 +1811,17 @@ user_json2 = {
     {
         "affiliation": "所属02",
         "description": "説明02",
+    },
+    "enabled": True
+}
+
+user_json_service_account1 = {
+    "username": "testsa-01",
+    "attributes":
+    {
+        "affiliation": "",
+        "description": "サービスアカウント１",
+        const.SERVICE_ACCOUNT_USER_TYPE_ATTRIBUTE_NAME: const.SERVICE_ACCOUNT_USER_TYPE_ANSIBLE
     },
     "enabled": True
 }

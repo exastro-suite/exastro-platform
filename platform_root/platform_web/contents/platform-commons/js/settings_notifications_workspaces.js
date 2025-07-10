@@ -76,8 +76,8 @@ $(function(){
             //
             // sort workspace list
             //
-            const sortKey = 'last_update_timestamp';
-            const sortreverse = -1;
+            const sortKey = 'name'; // ワークスペース名
+            const sortreverse = 1;  // 昇順
             workspaces.sort(function(a, b){
                 const as = a[sortKey].toLowerCase(), bs = b[sortKey].toLowerCase();
                 if ( as < bs ) {

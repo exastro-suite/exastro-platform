@@ -22,11 +22,9 @@ from common_library.common import encrypt
 from common_library.common import multi_lang
 from common_library.common.libs import queries_bl_notification
 from common_library.common import api_ita_admin_call
-
+from common_library.common import organization_options
 
 import globals
-
-MSG_FUNCTION_ID = "35"
 
 
 def settings_destination_get(organization_id, workspace_id, destination_id):  # noqa: E501
@@ -65,8 +63,8 @@ def settings_destination_get(organization_id, workspace_id, destination_id):  # 
         return data
     else:
         raise common.NotFoundException(
-            message_id=f"404-{MSG_FUNCTION_ID}001",
-            message=multi_lang.get_text(f"404-{MSG_FUNCTION_ID}001", "通知先情報が存在しません(id:{0})", destination_id)
+            message_id="404-35001",
+            message=multi_lang.get_text("404-35001", "通知先情報が存在しません(id:{0})", destination_id)
         )
 
 
@@ -196,8 +194,8 @@ def notification_register(body, organization_id, workspace_id, user_id):  # noqa
                 destinations = cursor.fetchall()
                 if len(destinations) == 0:
                     raise common.NotFoundException(
-                        message_id=f"404-{MSG_FUNCTION_ID}001",
-                        message=multi_lang.get_text(f"404-{MSG_FUNCTION_ID}001", "通知先情報が存在しません(id:{0})", destination_id)
+                        message_id="404-35001",
+                        message=multi_lang.get_text("404-35001", "通知先情報が存在しません(id:{0})", destination_id)
                     )
                 destination = destinations[0]
 
@@ -226,7 +224,7 @@ def notification_register(body, organization_id, workspace_id, user_id):  # noqa
 
                     except Exception as e:
                         globals.logger.error(f"exception:{e.args}")
-                        message_id = f"500-{MSG_FUNCTION_ID}002"
+                        message_id = "500-35003"
                         message = multi_lang.get_text(
                             message_id,
                             "メッセージ通知の登録に失敗しました(destination id:{0})",
@@ -261,7 +259,7 @@ def notification_register(body, organization_id, workspace_id, user_id):  # noqa
 
                     except Exception as e:
                         globals.logger.error(f"exception:{e.args}")
-                        message_id = f"500-{MSG_FUNCTION_ID}003"
+                        message_id = "500-35003"
                         message = multi_lang.get_text(
                             message_id,
                             "処理キューの登録に失敗しました(process id:{0})",
@@ -378,36 +376,39 @@ def settings_notification_delete(organization_id, workspace_id, destination_id, 
         language (str): language
     """
 
-    # ITAに通知先IDを利用しているか問い合わせる
-    # 通知先として利用されている場合は削除不可とするため、エラーを返す
-    check_target = {
-        "rule": [
-            "before_notification_destination",
-            "after_notification_destination"
-        ]
-    }
+    if organization_options.is_enabled_options_ita_drivers(organization_id, "oase"):
+        # OASEが有効の場合、通知先で使用されているかチェックする
 
-    check_id_list = []
-    for key, value in check_target.items():
-        for item in value:
-            r_ita_notification_destination = api_ita_admin_call.ita_notification_destination(
-                organization_id, workspace_id, key, item, user_id, roles, language)
+        # ITAに通知先IDを利用しているか問い合わせる
+        # 通知先として利用されている場合は削除不可とするため、エラーを返す
+        check_target = {
+            "rule": [
+                "before_notification_destination",
+                "after_notification_destination"
+            ]
+        }
 
-            if r_ita_notification_destination.status_code != 200:
-                message_id = f"500-{MSG_FUNCTION_ID}002"
-                message = multi_lang.get_text(message_id, "利用中の通知先の取得に失敗しました(menu:{0} column:{1})", key, item)
-                raise common.InternalErrorException(message_id=message_id, message=message)
+        check_id_list = []
+        for key, value in check_target.items():
+            for item in value:
+                r_ita_notification_destination = api_ita_admin_call.ita_notification_destination(
+                    organization_id, workspace_id, key, item, user_id, roles, language)
 
-            result_dict = r_ita_notification_destination.json()
-            check_id_list.extend(json.loads(result_dict.get("data")))
+                if r_ita_notification_destination.status_code != 200:
+                    message_id = "500-35002"
+                    message = multi_lang.get_text(message_id, "利用中の通知先の取得に失敗しました(menu:{0} column:{1})", key, item)
+                    raise common.InternalErrorException(message_id=message_id, message=message)
 
-    #  重複を排除する
-    check_id_list = list(set(check_id_list))
+                result_dict = r_ita_notification_destination.json()
+                check_id_list.extend(json.loads(result_dict.get("data")))
 
-    if destination_id in check_id_list:
-        message_id = f"400-{MSG_FUNCTION_ID}001"
-        message = multi_lang.get_text(message_id, "指定された通知先は利用されているため削除できません(destination id:{0})", destination_id)
-        raise common.BadRequestException(message_id=message_id, message=message)
+        #  重複を排除する
+        check_id_list = list(set(check_id_list))
+
+        if destination_id in check_id_list:
+            message_id = "400-35001"
+            message = multi_lang.get_text(message_id, "指定された通知先は利用されているため削除できません(destination id:{0})", destination_id)
+            raise common.BadRequestException(message_id=message_id, message=message)
 
     with closing(DBconnector().connect_workspacedb(organization_id, workspace_id)) as conn:
         with conn.cursor() as cursor:
@@ -416,7 +417,7 @@ def settings_notification_delete(organization_id, workspace_id, destination_id, 
                 conn.commit()
             except Exception as e:
                 globals.logger.error(f"exception:{e.args}")
-                message_id = f"500-{MSG_FUNCTION_ID}001"
+                message_id = "500-35001"
                 message = multi_lang.get_text(
                     message_id,
                     "通知先の削除に失敗しました(destination id:{0})",
