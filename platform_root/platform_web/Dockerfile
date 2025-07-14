@@ -1,4 +1,4 @@
-#   Copyright 2022 NEC Corporation
+#   Copyright 2025 NEC Corporation
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -15,28 +15,11 @@ ARG USERNAME=app_user
 ARG GROUPNAME=app_user
 ARG APP_PATH=/app
 
-FROM    registry.access.redhat.com/ubi8/ubi-init as common_build
+FROM    exastro/exastro-platform-web:1.9.0 as common_build
 
 ARG USERNAME
 ARG GROUPNAME
 ARG APP_PATH
-
-ENV LISTEN_PORT             80
-ENV APACHE_PID_DIR          /var/run_$USERNAME/httpd/pid
-ENV APACHE_SOCKET_DIR       /var/run_$USERNAME/httpd/socket
-ENV APACHE_USERNAME         $USERNAME
-ENV APACHE_GROUPNAME        $GROUPNAME
-
-RUN --mount=type=secret,id=host_certificate_file,dst=/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem \
-    dnf install -y httpd \
-&&  groupadd $GROUPNAME \
-&&  useradd -m -s /bin/bash -g $GROUPNAME $USERNAME \
-&&  setcap 'cap_net_bind_service=+ep' /usr/sbin/httpd \
-&&  chown $USERNAME:$GROUPNAME /var/log/httpd \
-&&  mkdir -p $APACHE_PID_DIR \
-&&  chown $USERNAME:$GROUPNAME $APACHE_PID_DIR \
-&&  mkdir -p $APACHE_SOCKET_DIR \
-&&  chown $USERNAME:$GROUPNAME $APACHE_SOCKET_DIR
 
 #
 # Build for development
@@ -47,6 +30,8 @@ FROM    common_build as develop_build
 ARG USERNAME
 ARG GROUPNAME
 ARG APP_PATH
+
+USER root
 
 RUN --mount=type=secret,id=host_certificate_file,dst=/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem \
     dnf config-manager --add-repo=https://download.docker.com/linux/centos/docker-ce.repo \
@@ -62,18 +47,19 @@ RUN --mount=type=secret,id=host_certificate_file,dst=/etc/pki/ca-trust/extracted
 &&  echo '%wheel ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers \
 &&  echo "%${GROUPNAME} ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 
+
 USER $USERNAME
 
 RUN mkdir ~/.config \
 && mkdir ~/.vscode-server \
 && mkdir ~/.vscode-server-insiders
 
-COPY ./platform_root/version /var/www/html/
-COPY ./platform_root/platform_web/contents/ /var/www/html/
-COPY ./platform_root/platform_web/config/httpd.conf/httpd.conf /etc/httpd/conf/httpd.conf
-COPY ./platform_root/platform_web/config/httpd.conf/rewrite.conf /etc/httpd/conf.d/rewrite.conf
+# COPY ./platform_root/version /var/www/html/
+# COPY ./platform_root/platform_web/contents/ /var/www/html/
+# COPY ./platform_root/platform_web/config/httpd.conf/httpd.conf /etc/httpd/conf/httpd.conf
+# COPY ./platform_root/platform_web/config/httpd.conf/rewrite.conf /etc/httpd/conf.d/rewrite.conf
 
-CMD ["httpd","-D","FOREGROUND", "-D", "NO_CACHE_CONTENTS"]
+# CMD ["httpd","-D","FOREGROUND", "-D", "NO_CACHE_CONTENTS"]
 
 #
 # Build for production
@@ -84,17 +70,6 @@ ARG USERNAME
 ARG GROUPNAME
 ARG APP_PATH
 
-COPY ./platform_root/version /var/www/html/
-COPY ./platform_root/platform_web/contents/ /var/www/html/
-COPY ./platform_root/platform_web/config/httpd.conf/httpd.conf /etc/httpd/conf/httpd.conf
-COPY ./platform_root/platform_web/config/httpd.conf/rewrite.conf /etc/httpd/conf.d/rewrite.conf
+# USER $USERNAME
 
-# disable docker build cache
-ADD "https://www.random.org/cgi-bin/randbyte?nbytes=10&format=h" /dev/null
-
-RUN find /var/www/html/ -type f -name '*.html'  -exec sed -i -e "s/ver=__BUILD_VERSION__/ver=$(date '+%Y%m%d-%H%M%S')/g" {} \; \
-&&  find /var/www/html/ -type f -name '*.js'    -exec sed -i -e "s/ver=__BUILD_VERSION__/ver=$(date '+%Y%m%d-%H%M%S')/g" {} \;
-
-USER $USERNAME
-
-CMD ["httpd","-D","FOREGROUND"]
+# CMD ["httpd","-D","FOREGROUND"]
