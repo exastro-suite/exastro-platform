@@ -1,4 +1,4 @@
-#   Copyright 2022 NEC Corporation
+#   Copyright 2025 NEC Corporation
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -16,39 +16,19 @@ ARG USERNAME=app_user
 ARG GROUPNAME=app_user
 ARG APP_PATH=/app
 
-FROM    registry.access.redhat.com/ubi8/ubi-init as common_build
+FROM    exastro/exastro-platform-migration:1.9.0 as common_build
 
 ARG USERNAME
 ARG GROUPNAME
 ARG APP_PATH
 
-ENV PYTHONPATH              $APP_PATH/
-ENV PYTHONIOENCODING        utf-8
-ENV KEYCLOAK_VERSION        "24.0"
+# Patched Env
+ENV DB_CONNECT_TIMEOUT      10
+ENV DB_CONNECT_RETRY_SLEEP_TIME    0.5
+ENV DB_CONNECT_RETRY_LIMIT  3
 
-RUN --mount=type=secret,id=host_certificate_file,dst=/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem \
-    dnf install -y \
-    langpacks-en \
-    wget \
-    unzip \
-    gcc \
-    python39 \
-    python39-devel \
-    python39-mod_wsgi \
-&&  pip3.9 install poetry==1.6.0 \
-&&  poetry config virtualenvs.create false \
-&&  groupadd $GROUPNAME \
-&&  useradd -m -s /bin/bash -g $GROUPNAME $USERNAME
-
-WORKDIR $APP_PATH
-
-COPY ./platform_root/platform_migration/pyproject.toml ./platform_root/platform_migration/poetry.lock $APP_PATH/
-
-RUN --mount=type=secret,id=host_certificate_file,dst=/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem \
-    poetry install --only first_install
-
-RUN --mount=type=secret,id=host_certificate_file,dst=/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem \
-    poetry install --without develop_build
+# Patched File
+COPY ./platform_root/common_library/common/db.py $APP_PATH/common_library/common/db.py
 
 #
 # Build for development
@@ -59,6 +39,8 @@ FROM    common_build as develop_build
 ARG USERNAME
 ARG GROUPNAME
 ARG APP_PATH
+
+USER root
 
 RUN --mount=type=secret,id=host_certificate_file,dst=/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem \
     dnf config-manager --add-repo=https://download.docker.com/linux/centos/docker-ce.repo \
@@ -87,12 +69,12 @@ RUN mkdir ~/.config \
 && mkdir ~/.vscode-server \
 && mkdir ~/.vscode-server-insiders
 
-WORKDIR $APP_PATH
+# WORKDIR $APP_PATH
 
-COPY ./platform_root/platform_migration/ $APP_PATH/
-COPY ./platform_root/common_library/ $APP_PATH/common_library/
-COPY ./platform_root/common_resources/ $APP_PATH/common_resources/
-COPY ./platform_root/version $APP_PATH/
+# COPY ./platform_root/platform_migration/ $APP_PATH/
+# COPY ./platform_root/common_library/ $APP_PATH/common_library/
+# COPY ./platform_root/common_resources/ $APP_PATH/common_resources/
+# COPY ./platform_root/version $APP_PATH/
 
 #
 # Build for production
@@ -103,11 +85,11 @@ ARG USERNAME
 ARG GROUPNAME
 ARG APP_PATH
 
-WORKDIR $APP_PATH
+# WORKDIR $APP_PATH
 
-COPY ./platform_root/platform_migration/ $APP_PATH/
-COPY ./platform_root/common_library/ $APP_PATH/common_library/
-COPY ./platform_root/common_resources/ $APP_PATH/common_resources/
-COPY ./platform_root/version $APP_PATH/
+# COPY ./platform_root/platform_migration/ $APP_PATH/
+# COPY ./platform_root/common_library/ $APP_PATH/common_library/
+# COPY ./platform_root/common_resources/ $APP_PATH/common_resources/
+# COPY ./platform_root/version $APP_PATH/
 
-USER $USERNAME
+# USER $USERNAME

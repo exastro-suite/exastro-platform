@@ -16,6 +16,7 @@ from contextlib import closing
 import os
 import pymysql
 import json
+import time
 
 from common_library.common import common
 from common_library.common import encrypt
@@ -199,18 +200,41 @@ class DBconnector:
         Returns:
             pymysql.connections.Connection: connection
         """
-        conn = pymysql.connect(
-            host=dbinfo.db_host,
-            database=dbinfo.db_database,
-            user=dbinfo.db_user,
-            password=encrypt.decrypt_str(dbinfo.db_password),
-            port=dbinfo.db_port,
-            charset='utf8mb4',
-            collation='utf8mb4_general_ci',
-            cursorclass=pymysql.cursors.DictCursor,
-            max_allowed_packet=536_870_912  # 512MB
-        )
-        return conn
+        connect_timeout = int(os.environ.get("DB_CONNECT_TIMEOUT", 10))
+        sleep_time = float(os.environ.get("DB_CONNECT_RETRY_SLEEP_TIME", 0.5))
+        retry_limit = int(os.environ.get("DB_CONNECT_RETRY_LIMIT", 3))
+        error_code_to_retry = [2003, ]
+        attempts = 0
+        while attempts < retry_limit:
+            try:
+                conn = pymysql.connect(
+                    host=dbinfo.db_host,
+                    database=dbinfo.db_database,
+                    user=dbinfo.db_user,
+                    password=encrypt.decrypt_str(dbinfo.db_password),
+                    port=dbinfo.db_port,
+                    charset='utf8mb4',
+                    collation='utf8mb4_general_ci',
+                    cursorclass=pymysql.cursors.DictCursor,
+                    max_allowed_packet=536_870_912,  # 512MB
+                    connect_timeout=connect_timeout,
+                )
+                return conn
+            except pymysql.err.MySQLError as e:
+                if e.args and e.args[0] in error_code_to_retry:
+                    attempts += 1
+                    globals.logger.warning(f"Connection failed ({e}). Retrying in {sleep_time} seconds (attempt {attempts}/{retry_limit})...")
+                    if attempts < retry_limit:
+                        time.sleep(sleep_time)
+                    else:
+                        # 全てのリトライが失敗した場合、最後に発生した例外を再送出
+                        raise
+                else:
+                    # リトライ対象外のエラー、リトライせず即座に再送出
+                    raise
+            except Exception:
+                # pymysql.err.MySQLError 以外の予期せぬエラー、リトライせずに即座に例外を再送出
+                raise
 
     def connect_admin(self) -> pymysql.connections.Connection:
         """connect database at admin

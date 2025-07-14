@@ -1,4 +1,4 @@
-#   Copyright 2022 NEC Corporation
+#   Copyright 2025 NEC Corporation
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -15,52 +15,19 @@ ARG USERNAME=app_user
 ARG GROUPNAME=app_user
 ARG APP_PATH=/app
 
-FROM    registry.access.redhat.com/ubi8/ubi-init as common_build
+FROM    exastro/exastro-platform-api:1.9.0 as common_build
 
 ARG USERNAME
 ARG GROUPNAME
 ARG APP_PATH
 
-ENV PYTHONPATH              $APP_PATH/
-ENV LISTEN_PORT             8000
-ENV PYTHONIOENCODING        utf-8
-ENV APACHE_PID_DIR          /var/run_$USERNAME/httpd/pid
-ENV APACHE_SOCKET_DIR       /var/run_$USERNAME/httpd/socket
-ENV APACHE_TIMEOUT          360
-ENV APACHE_USERNAME         $USERNAME
-ENV APACHE_GROUPNAME        $GROUPNAME
+# Patched Env
+ENV DB_CONNECT_TIMEOUT      10
+ENV DB_CONNECT_RETRY_SLEEP_TIME    0.5
+ENV DB_CONNECT_RETRY_LIMIT  3
 
-RUN --mount=type=secret,id=host_certificate_file,dst=/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem \
-    dnf install -y \
-    langpacks-en \
-    wget \
-    unzip \
-    httpd \
-    gcc \
-    httpd-devel \
-    python39 \
-    python39-devel \
-    python39-mod_wsgi \
-&&  pip3.9 install poetry==1.6.0 \
-&&  poetry config virtualenvs.create false \
-&&  groupadd $GROUPNAME \
-&&  useradd -m -s /bin/bash -g $GROUPNAME $USERNAME \
-&&  setcap 'cap_net_bind_service=+ep' /usr/sbin/httpd \
-&&  chown $USERNAME:$GROUPNAME /var/log/httpd \
-&&  mkdir -p $APACHE_PID_DIR \
-&&  chown $USERNAME:$GROUPNAME $APACHE_PID_DIR \
-&&  mkdir -p $APACHE_SOCKET_DIR \
-&&  chown $USERNAME:$GROUPNAME $APACHE_SOCKET_DIR
-
-WORKDIR $APP_PATH
-
-COPY ./platform_root/platform_api/pyproject.toml ./platform_root/platform_api/poetry.lock $APP_PATH/
-
-RUN --mount=type=secret,id=host_certificate_file,dst=/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem \
-    poetry install --only first_install
-
-RUN --mount=type=secret,id=host_certificate_file,dst=/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem \
-    poetry install --without develop_build
+# Patched File
+COPY ./platform_root/common_library/common/db.py $APP_PATH/common_library/common/db.py
 
 #
 # Build for development
@@ -71,6 +38,8 @@ FROM    common_build as develop_build
 ARG USERNAME
 ARG GROUPNAME
 ARG APP_PATH
+
+USER root
 
 RUN --mount=type=secret,id=host_certificate_file,dst=/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem \
     dnf config-manager --add-repo=https://download.docker.com/linux/centos/docker-ce.repo \
@@ -107,12 +76,12 @@ WORKDIR $APP_PATH
 COPY ./platform_root/platform_api/config/httpd.conf/httpd.conf /etc/httpd/conf/httpd.conf
 COPY ./platform_root/platform_api/config/httpd.conf/wsgi.conf /etc/httpd/conf.d/wsgi.conf
 
-COPY ./platform_root/version $APP_PATH/
-COPY ./platform_root/platform_api/ $APP_PATH/
-COPY ./platform_root/common_library/ $APP_PATH/common_library/
-COPY ./platform_root/common_resources/ $APP_PATH/common_resources/
+# COPY ./platform_root/version $APP_PATH/
+# COPY ./platform_root/platform_api/ $APP_PATH/
+# COPY ./platform_root/common_library/ $APP_PATH/common_library/
+# COPY ./platform_root/common_resources/ $APP_PATH/common_resources/
 
-CMD ["httpd","-D","FOREGROUND"]
+# CMD ["httpd","-D","FOREGROUND"]
 
 #
 # Build for production
@@ -123,16 +92,13 @@ ARG USERNAME
 ARG GROUPNAME
 ARG APP_PATH
 
-WORKDIR $APP_PATH
+# WORKDIR $APP_PATH
 
-COPY ./platform_root/platform_api/config/httpd.conf/httpd.conf /etc/httpd/conf/httpd.conf
-COPY ./platform_root/platform_api/config/httpd.conf/wsgi.conf /etc/httpd/conf.d/wsgi.conf
+# COPY ./platform_root/common_library/ $APP_PATH/common_library/
+# COPY ./platform_root/common_library/ $APP_PATH/common_library/
+# COPY ./platform_root/common_library/ $APP_PATH/common_library/
+# COPY ./platform_root/common_library/ $APP_PATH/common_library/
 
-COPY ./platform_root/version $APP_PATH/
-COPY ./platform_root/platform_api/ $APP_PATH/
-COPY ./platform_root/common_library/ $APP_PATH/common_library/
-COPY ./platform_root/common_resources/ $APP_PATH/common_resources/
+# USER $USERNAME
 
-USER $USERNAME
-
-CMD ["httpd","-D","FOREGROUND"]
+# CMD ["httpd","-D","FOREGROUND"]
