@@ -82,7 +82,7 @@ def pymysql_execute_data_mocker(sqlstmt, data=None):
     # オリジナルのpymysql.connectメソッドを退避
     pymysql_connect = pymysql.connect
 
-    def mocked_function(host, database, user, password, port, charset, collation, cursorclass, max_allowed_packet=None):
+    def mocked_function(host, database, user, password, port, charset, collation, cursorclass, max_allowed_packet=None, connect_timeout=None):
         conn = pymysql_connect(
             host=host,
             database=database,
@@ -92,7 +92,8 @@ def pymysql_execute_data_mocker(sqlstmt, data=None):
             charset=charset,
             collation=collation,
             cursorclass=cursorclass,
-            max_allowed_packet=max_allowed_packet
+            max_allowed_packet=max_allowed_packet,
+            connect_timeout=connect_timeout
         )
         # pymysql.connectで返す内容をpymysql_connection_mocked instanceにする
         return pymysql_connection_mocked_data(conn, sqlstmt, data)
@@ -175,7 +176,7 @@ def pymysql_execute_raise_exception_mocker(sqlstmt, exception):
     # オリジナルのpymysql.connectメソッドを退避
     pymysql_connect = pymysql.connect
 
-    def mocked_function(host, database, user, password, port, charset, collation, cursorclass, max_allowed_packet=None):
+    def mocked_function(host, database, user, password, port, charset, collation, cursorclass, max_allowed_packet=None, connect_timeout=None):
         conn = pymysql_connect(
             host=host,
             database=database,
@@ -185,7 +186,8 @@ def pymysql_execute_raise_exception_mocker(sqlstmt, exception):
             charset=charset,
             collation=collation,
             cursorclass=cursorclass,
-            max_allowed_packet=max_allowed_packet
+            max_allowed_packet=max_allowed_packet,
+            connect_timeout=connect_timeout
         )
         # pymysql.connectで返す内容をpymysql_connection_mocked instanceにする
         return pymysql_connection_mocked(conn, sqlstmt, exception)
