@@ -15,9 +15,16 @@
 title: destinations destination_informations(webhook) resource.
 type: object
 properties:
-  url:
+  servicenow_user:
     type: string
-    description: webhook URL
-  header:
+    description: ServiceNow user
+  servicenow_password:
     type: string
-    description: webhook header
+    description: ServiceNow password
+  table_api_url:
+    type: string
+    description: ServiceNow table entry API URL
+  batch_api_url:
+    type: string
+    description: ServiceNow batch API URL
+

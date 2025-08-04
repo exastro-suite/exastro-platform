@@ -20,8 +20,8 @@ value:
     "data":[
       {
         "id": "00000001Z7ZXFAED6872F6C9W8",
-        "name": "destinations of webhook settings",
-        "kind": "Webhook",
+        "name": "destinations of ServiceNow settings",
+        "kind": "ServiceNow",
         "conditions": {
           "ita": {
             "event_type": {
@@ -34,10 +34,15 @@ value:
         },
         "destination_informations": [
           {
-            "url": "http://your-webhook-server/hooks/XXXXXXXX",
-            "header": "{\"Content-Type\": \"application/json\"}"
+            "servicenow_user": "servicenow_user01",
+            "servicenow_password": "password",
+            "table_api_url": "https://servicenow-host/api/now/table",
+            "batch_api_url": "https://servicenow-host/api/now/v1/batch"
           }
         ],
+        "enable_batch": true,
+        "batch_period_seconds": 30,
+        "batch_count_limit": 50,
         "create_timestamp": "2023-11-02T05:36:41.258Z",
         "create_user": "string",
         "last_update_timestamp": "2023-11-02T05:36:41.258Z",

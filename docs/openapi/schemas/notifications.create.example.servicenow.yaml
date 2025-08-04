@@ -12,12 +12,18 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-title: destinations destination_informations(webhook) resource.
-type: object
-properties:
-  url:
-    type: string
-    description: webhook URL
-  header:
-    type: string
-    description: webhook header
+value:
+  [
+    {
+      "destination_id": "00000001Z7ZXFAED6872F6C9W9",
+      "func_id": "00000000",
+      "func_informations": {
+        "key-1": "value-1",
+        "key-2": "value-2"
+      },
+      "message": {
+        "table-column1": "table-column1 column value",
+        "table-column2": "table-column2 column value"
+      }
+    }
+  ]
