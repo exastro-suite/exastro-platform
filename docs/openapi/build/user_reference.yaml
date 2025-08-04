@@ -676,6 +676,16 @@ paths:
                     message:
                       title: send title
                       text: send message
+              ServiceNow table post:
+                value:
+                  - destination_id: 00000001Z7ZXFAED6872F6C9W9
+                    func_id: '00000000'
+                    func_informations:
+                      key-1: value-1
+                      key-2: value-2
+                    message:
+                      table-column1: table-column1 column value
+                      table-column2: table-column2 column value
         required: true
       responses:
         '200':
@@ -2941,6 +2951,16 @@ components:
               - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsTeamsWorkflow'
               - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsTeams'
               - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsWebhook'
+              - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsServiceNow'
+        enable_batch:
+          type: boolean
+          description: batch call
+        batch_period_seconds:
+          type: integer
+          description: batch sending period
+        batch_count_limit:
+          type: integer
+          description: batch sending limit
     settingsDestinationList:
       title: destinationList is list of Destination resources.
       type: object
@@ -2973,7 +2993,8 @@ components:
             - Mail
             - Teams_WF
             - Webhook
-          description: Select destination kind from Mail/Teams_WF/Webhook
+            - ServiceNow
+          description: Select destination kind from Mail/Teams_WF/Webhook/ServiceNow
         conditions:
           $ref: '#/components/schemas/settingsDestinationConditions'
         destination_informations:
@@ -2986,6 +3007,16 @@ components:
               - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsTeamsWorkflow'
               - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsTeams'
               - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsWebhook'
+              - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsServiceNow'
+        enable_batch:
+          type: boolean
+          description: batch call
+        batch_period_seconds:
+          type: integer
+          description: batch sending period
+        batch_count_limit:
+          type: integer
+          description: batch sending limit
       required:
         - id
         - name
@@ -3018,6 +3049,16 @@ components:
               - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsTeamsWorkflow'
               - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsTeams'
               - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsWebhook'
+              - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsServiceNow'
+        enable_batch:
+          type: boolean
+          description: batch call
+        batch_period_seconds:
+          type: integer
+          description: batch sending period
+        batch_count_limit:
+          type: integer
+          description: batch sending limit
       required:
         - name
         - kind
@@ -3054,6 +3095,25 @@ components:
         url:
           type: string
           description: webhook URL
+        header:
+          type: string
+          description: webhook header
+    settingsDestinationSubDestinationInformationsServiceNow:
+      title: destinations destination_informations(webhook) resource.
+      type: object
+      properties:
+        servicenow_user:
+          type: string
+          description: ServiceNow user
+        servicenow_password:
+          type: string
+          description: ServiceNow password
+        table_api_url:
+          type: string
+          description: ServiceNow table entry API URL
+        batch_api_url:
+          type: string
+          description: ServiceNow batch API URL
     settingsDestinationConditions:
       title: destinations conditions resource.
       type: object

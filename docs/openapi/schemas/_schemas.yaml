@@ -142,6 +142,8 @@ settingsDestinationSubDestinationInformationsTeams:
   $ref: "./settings.destinations.sub.destination_informations.teams.yaml"
 settingsDestinationSubDestinationInformationsWebhook:
   $ref: "./settings.destinations.sub.destination_informations.webhook.yaml"
+settingsDestinationSubDestinationInformationsServiceNow:
+  $ref: "./settings.destinations.sub.destination_informations.servicenow.yaml"
 settingsDestinationConditions:
   $ref: "./settings.destinations.sub.conditions.yaml"
 settingsMailserverCreate:
