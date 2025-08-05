@@ -232,6 +232,22 @@ def connect_platform_db():
     return conn
 
 
+def get_table_column(conn, table_name, column_name):
+    with conn.cursor() as cursor:
+        cursor.execute(
+            queries_common.SELECT_COLUMN_INFOMATION,
+            {
+                "table_name": table_name,
+                "column_name": column_name
+            }
+        )
+        return cursor.fetchone()
+
+
+def exists_table_column(conn, table_name, column_name):
+    return get_table_column(conn, table_name, column_name) is not None
+
+
 def __get_platform_informations(conn):
 
     with conn.cursor() as cursor:
