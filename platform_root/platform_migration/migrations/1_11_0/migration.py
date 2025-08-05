@@ -12,12 +12,24 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
+from . import update_platform_db
+from . import update_workspace_db
+
 
 def main():
 
     # エラーがあっても処理を継続する
     # continue processing even if there is an error
     result = []
+
+    # 共通認証基盤DBのテーブル変更
+    # PlatformDB table modify
+    api = update_platform_db.update_platform_db()
+    result.append(api.start())
+
+    # WorkspaceDBのテーブル変更
+    api = update_workspace_db.update_workspace_db()
+    result.append(api.start())
 
     for i in result:
         if i != 0:
