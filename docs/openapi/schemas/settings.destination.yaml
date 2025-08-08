@@ -42,8 +42,10 @@ properties:
     description: batch call
   batch_period_seconds:
     type: integer
+    nullable: true
     description: batch sending period
   batch_count_limit:
     type: integer
+    nullable: true
     description: batch sending limit
 
