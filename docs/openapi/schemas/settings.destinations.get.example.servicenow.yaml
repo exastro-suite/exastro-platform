@@ -35,7 +35,6 @@ value:
         "destination_informations": [
           {
             "servicenow_user": "servicenow_user01",
-            "servicenow_password": "password",
             "table_api_url": "https://servicenow-host/api/now/table",
             "batch_api_url": "https://servicenow-host/api/now/v1/batch"
           }
