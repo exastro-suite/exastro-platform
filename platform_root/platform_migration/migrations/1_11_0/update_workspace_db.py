@@ -17,12 +17,12 @@ from contextlib import closing
 
 import globals
 from common_library.common.db import DBconnector
-from common_library.common.db_init import DBinit
 from common_library.common import common
 from common_library.common import multi_lang
 
 import migration_common
 from .libs import queries_db_workspace
+
 
 class update_workspace_db:
 
@@ -192,7 +192,7 @@ class update_workspace_db:
     def __update_workspace_db(self, organization_id, workspace_id):
         db = DBconnector()
         with closing(db.connect_workspacedb(organization_id, workspace_id)) as conn:
-            for sql_alter_table in queries_db_workspace.SQL_ALTER_WORKSPACE_TABLES:
+            for sql_alter_table in queries_db_workspace.SQL_ALTER_TABLES:
                 if not migration_common.exists_table_column(conn, sql_alter_table['COLUMN_TO_ADD']['TABLE_NAME'], sql_alter_table['COLUMN_TO_ADD']['COLUMN_NAME']):
                     # 項目追加されていない場合は、Alter tableを実行しcolumnを追加する
                     globals.logger.info(f"SQL EXECUUTE:{sql_alter_table['ALTER_TABLE_DDL']}")

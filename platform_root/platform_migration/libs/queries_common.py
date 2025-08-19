@@ -28,7 +28,7 @@ INSERT_MIGRATION_HISTORY = """INSERT INTO T_PLATFORM_MIGRATION_HISTORY (VERSION,
 
 SELECT_COLUMN_INFOMATION = """
     SELECT * FROM INFORMATION_SCHEMA.COLUMNS
-        WHERE   LOWER(TABLE_SCHEMA)    !=  'information_schema'
+        WHERE   TABLE_SCHEMA           =   DATABASE()
         AND     UPPER(TABLE_NAME)      =   UPPER(%(table_name)s)
         AND     UPPER(COLUMN_NAME)     =   UPPER(%(column_name)s)
 """
