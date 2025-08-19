@@ -11,18 +11,15 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
-import inspect
 import traceback
 from contextlib import closing
 
 import globals
-from common_library.common.db import DBconnector
-from common_library.common.db_init import DBinit
 from common_library.common import common
-from common_library.common import multi_lang
 
 import migration_common
 from .libs import queries_db_platform
+
 
 class update_platform_db:
 
@@ -49,20 +46,29 @@ class update_platform_db:
 
         try:
             self.step_count = 1
-            self.step_max = 2
+            self.step_max = 3
 
             with closing(migration_common.connect_platform_db()) as conn:
 
-                if not migration_common.exists_table_column(conn, 'T_PROCESS_QUEUE', 'ENABLE_BATCH'):
-                    # 項目が無い場合は、項目追加を行う
-                    globals.logger.info(f'EXECUTE SQL:{queries_db_platform.ALTER_T_PROCESS_QUEUE}')
+                for sql_create_table in queries_db_platform.SQL_CREATE_TABLES:
+                    globals.logger.info(f"SQL EXECUUTE:{sql_create_table}")
                     with conn.cursor() as cur:
-                        cur.execute(queries_db_platform.ALTER_T_PROCESS_QUEUE)
+                        cur.execute(sql_create_table)
                     self.ok_count += 1
-                else:
-                    # 項目が既にある場合は、SKIPする
-                    globals.logger.info('SKIP ALTER TABLE T_PROCESS_QUEUE')
-                    self.skip_count += 1
+
+                self.step_count += 1
+
+                for sql_alter_table in queries_db_platform.SQL_ALTER_TABLES:
+                    if not migration_common.exists_table_column(conn, sql_alter_table['COLUMN_TO_ADD']['TABLE_NAME'], sql_alter_table['COLUMN_TO_ADD']['COLUMN_NAME']):
+                        # 項目追加されていない場合は、Alter tableを実行しcolumnを追加する
+                        globals.logger.info(f"SQL EXECUUTE:{sql_alter_table['ALTER_TABLE_DDL']}")
+                        with conn.cursor() as cur:
+                            cur.execute(sql_alter_table['ALTER_TABLE_DDL'])
+                        self.ok_count += 1
+                    else:
+                        # 項目追加済みの場合はSkipする
+                        globals.logger.info(f"SKIP ALTER TABLE : {sql_alter_table['COLUMN_TO_ADD']['TABLE_NAME']}")
+                        self.skip_count += 1
 
                 self.step_count += 1
 
