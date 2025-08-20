@@ -622,7 +622,7 @@ def test_notification_register(connexion_client):
         assert response.status_code == 500, "register notifications response code: db error"
 
     with test_common.requsts_mocker_default(), \
-            test_common.pymysql_execute_raise_exception_mocker(queries_bl_notification.SQL_INSERT_PROCESS_QUEUE, Exception("DB Error Test")):
+            test_common.pymysql_execute_raise_exception_mocker(queries_bl_notification.SQL_INSERT_PROCESS_QUEUE_BATCH, Exception("DB Error Test")):
         #
         # DB error route
         #
