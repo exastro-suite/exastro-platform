@@ -18,7 +18,7 @@ import json
 import inspect
 import pymysql
 
-from common_library.common import common, validation
+from common_library.common import common, validation, const
 from common_library.common.db import DBconnector
 from common_library.common import multi_lang, encrypt
 from common_library.common import bl_notification_service
@@ -89,6 +89,9 @@ def settings_notification_put(body, organization_id, workspace_id, destination_i
     destination_kind = body.get('kind')
     info = body.get("destination_informations")
     conditions = body.get('conditions')
+    enable_batch = body.get('enable_batch')
+    batch_period_seconds = body.get('batch_period_seconds')
+    batch_count_limit = body.get('batch_count_limit')
     user_id = connexion.request.headers.get("User-id")
 
     # validation check
@@ -100,13 +103,20 @@ def settings_notification_put(body, organization_id, workspace_id, destination_i
     if not validate.ok:
         return common.response_validation_error(validate)
 
-    validate = validation.validate_destination_informations(destination_kind, info)
+    validate = validation.validate_destination_informations(destination_kind, info, enable_batch, batch_period_seconds, batch_count_limit, 'put')
     if not validate.ok:
         return common.response_validation_error(validate)
 
     validate = validation.validate_destination_conditions(conditions)
     if not validate.ok:
         return common.response_validation_error(validate)
+
+    # ServiceNowの場合かつ、servicenow_passwordが空で送られた場合はservicenow_passwordを更新しないため、元々入っていた値に書き換える。
+    # In the case of ServiceNow, if servicenow_password is sent as empty, servicenow_password will not be updated, so it will be rewritten to the original value.
+    if destination_kind == const.DESTINATION_KIND_SERVICENOW and not info[0]['servicenow_password']:
+        current_destination_informations = json.loads(encrypt.decrypt_str(result[0]['DESTINATION_INFORMATIONS']))
+        current_password = current_destination_informations[0].get('servicenow_password')
+        info[0]['servicenow_password'] = current_password
 
     # 通知先更新
     # update Notification
@@ -146,6 +156,9 @@ def settings_notification_put(body, organization_id, workspace_id, destination_i
                 "destination_kind": destination_kind,
                 "destination_informations": encrypt.encrypt_str(json.dumps(info)),
                 "conditions": json.dumps(conditions),
+                "enable_batch": 1 if enable_batch else 0,
+                "batch_period_seconds": batch_period_seconds if enable_batch else None,
+                "batch_count_limit": batch_count_limit if enable_batch else None,
                 "last_update_user": user_id
             }
             cursor.execute(queries_notification.SQL_UPDATE_NOTIFICATION_DESTINATION, parameter)
@@ -188,7 +201,7 @@ def settings_notification_create(body, organization_id, workspace_id):  # noqa: 
         validate = validation.validate_destination_kind(row.get('kind'))
         if not validate.ok:
             return common.response_validation_error(validate)
-        validate = validation.validate_destination_informations(row.get('kind'), row.get('destination_informations'))
+        validate = validation.validate_destination_informations(row.get('kind'), row.get('destination_informations'), row.get('enable_batch'), row.get('batch_period_seconds'), row.get('batch_count_limit'), 'create')
         if not validate.ok:
             return common.response_validation_error(validate)
         validate = validation.validate_destination_conditions(row.get('conditions'))
@@ -258,6 +271,9 @@ def settings_notification_create(body, organization_id, workspace_id):  # noqa: 
                         "destination_kind": row.get('kind'),
                         "destination_informations": encrypt.encrypt_str(json.dumps(row.get('destination_informations'))),
                         "conditions": json.dumps(row.get('conditions')),
+                        "enable_batch": 1 if row.get('enable_batch') else 0,
+                        "batch_period_seconds": row.get('batch_period_seconds') if row.get('enable_batch') else None,
+                        "batch_count_limit": row.get('batch_count_limit') if row.get('enable_batch') else None,
                         "create_user": user_id,
                         "last_update_user": user_id
                     }
