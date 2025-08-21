@@ -17,7 +17,7 @@ import ctypes
 import globals
 import datetime
 from libs.exceptions import JobTimeoutException
-
+import job_manager_config
 
 class BaseJobExecutor(metaclass=abc.ABCMeta):
     """job実行classの基底class / Base class of job execution class
@@ -25,10 +25,12 @@ class BaseJobExecutor(metaclass=abc.ABCMeta):
     Args:
         metaclass (_type_, optional): _description_. Defaults to abc.ABCMeta.
     """
-    def __init__(self, queue: dict):
+    def __init__(self, queue: dict, batch_queue: list[dict] | None = None):
         """constructor
         """
         self.queue = queue
+        self.batch_queue = batch_queue
+        self.job_config = job_manager_config.JOBS[self.queue.get('PROCESS_KIND')]
         self.__job_info = (
             f"kind:[{self.queue.get('PROCESS_KIND')}] / exec_id:[{self.queue.get('PROCESS_EXEC_ID')}] / " +
             f"organization_id:[{self.queue.get('ORGANIZATION_ID')}] / workspace_id:[{self.queue.get('WORKSPACE_ID')}] / " +
@@ -42,6 +44,9 @@ class BaseJobExecutor(metaclass=abc.ABCMeta):
         """job実行 / job execution
         """
         globals.logger.info(f"START Job - {self.__job_info}")
+        if self.batch_queue is not None:
+            globals.logger.info(f"batch count: {len(self.batch_queue)} / exec_id: [{','.join([queue.get('PROCESS_EXEC_ID') for queue in self.batch_queue])}]")
+
         start_time = datetime.datetime.now()
         try:
             self.__thread_id = ctypes.c_long(threading.get_ident())
@@ -52,7 +57,7 @@ class BaseJobExecutor(metaclass=abc.ABCMeta):
             else:
                 globals.logger.warning(f"FAILED Job - {self.__job_info} / elapsed:[{(datetime.datetime.now() - start_time).total_seconds()}]")
             return result
-        except Exception as err:
+        except Exception:
             globals.logger.error(f"FAILED Job - {self.__job_info} / elapsed:[{(datetime.datetime.now() - start_time).total_seconds()}]")
             return False
             

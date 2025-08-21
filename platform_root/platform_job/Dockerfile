@@ -92,33 +92,43 @@ ENV JOB_CANCEL_TIMEOUT_SECONDS=5.0
 # keycloakのtokenを再取得するインターバル / Interval to reacquire keycloak token
 ENV KEYCLOAK_TOKEN_REFRESH_INTERVAL_SECONDS=30
 
+# PROCESS_QUEUE_LOCKのレコードを削除する経過日数
+ENV PROCESS_QUEUE_LOCK_DELETE_DAYS_AGO=3
+
 # 通知Jobの設定 / Notification job settings
 #   Jobタイムアウト / Job timeout
-ENV JOB_NOTIFICATION_TIMEOUT_SECONDS=20
+ENV JOB_NOTIFICATION_TIMEOUT_SECONDS=60
 #   プロセス毎に同時実行可能なJob数(未指定時はSUB_PROCESS_MAX_JOBSと同値) / Number of jobs that can be executed simultaneously per process (If not specified, the same value as SUB_PROCESS_MAX_JOBS)
 # ENV JOB_NOTIFICATION_MAX_JOB_PER_PROCESS=
 #   teams workflow webhook connection timeout
-ENV JOB_NOTIFICATION_TEAMS_WF_CONNECTION_TIMEOUT=3.0
+ENV JOB_NOTIFICATION_TEAMS_WF_CONNECTION_TIMEOUT=5.0
 #   teams workflow webhook read timeout
 ENV JOB_NOTIFICATION_TEAMS_WF_READ_TIMEOUT=10.0
 #   teams webhook connection timeout
-ENV JOB_NOTIFICATION_TEAMS_CONNECTION_TIMEOUT=3.0
+ENV JOB_NOTIFICATION_TEAMS_CONNECTION_TIMEOUT=5.0
 #   teams webhook read timeout
 ENV JOB_NOTIFICATION_TEAMS_READ_TIMEOUT=10.0
 #   webhook connection timeout
-ENV JOB_NOTIFICATION_WEBHOOK_CONNECTION_TIMEOUT=3.0
+ENV JOB_NOTIFICATION_WEBHOOK_CONNECTION_TIMEOUT=5.0
 #   webhook read timeout
 ENV JOB_NOTIFICATION_WEBHOOK_READ_TIMEOUT=10.0
+#   service now connection timeout
+ENV JOB_NOTIFICATION_SERVICENOW_CONNECTION_TIMEOUT=5.0
+#   service now read timeout
+ENV JOB_NOTIFICATION_SERVICENOW_ONE_READTIMEOUT=10.0
+ENV JOB_NOTIFICATION_SERVICENOW_BATCH_READTIMEOUT=50.0
 #   smtp timeout
 ENV JOB_NOTIFICATION_SMTP_TIMEOUT=10.0
 #   smtps ssl verify TRUE/FALSE
 ENV JOB_NOTIFICATION_SMTPS_SSL_VERIFY_ENABLED=TRUE
+#   通知を取りやめる経過時間（0の場合は取りやめしない） 1440(min) = 1(day)
+ENV JOB_NOTIFICATION_ABORTED_EXPIRED_DURATION_MINUTES=1440
 
 # 強制ステータス更新Jobの設定 / Force status update job settings
 #   Jobタイムアウト / Job timeout
 ENV JOB_FORCE_UPDATE_STATUS_TIMEOUT_SECONDS=60
 #   ステータスを強制的にエラーにするJOBの起動インターバル / JOB startup interval that forces the status to error
-ENV JOB_FORCE_UPDATE_STATUS_INTERVAL_SECONDS=180
+ENV JOB_FORCE_UPDATE_STATUS_INTERVAL_SECONDS=600
 
 #   ステータスを強制的にエラーにする最終更新日時からの経過時間 / Elapsed time since last update to force status to error
 ENV JOB_FORCE_UPDATE_STATUS_PROGRASS_SECONDS=600

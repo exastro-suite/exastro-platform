@@ -31,13 +31,13 @@ class AuditLogCleanupJobExecutor(BaseJobExecutor):
     Args:
         BaseJobExecutor (_type_): _description_
     """
-    def __init__(self, queue: dict):
+    def __init__(self, queue: dict, batch_queue: list[dict] | None = None):
         """constructor
 
         Args:
             queue (dict): _description_
         """
-        super().__init__(queue)
+        super().__init__(queue, batch_queue)
 
     def execute(self):
         """監査ログ削除(DB) / Audit log cleanup

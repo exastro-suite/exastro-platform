@@ -11,7 +11,6 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
-import pytest
 from _pytest.logging import LogCaptureFixture
 
 import os
@@ -20,19 +19,20 @@ import logging
 import threading
 import time
 import datetime
+import json
 from unittest import mock
-from unittest.mock import MagicMock
 import ulid
 from importlib import import_module
 import copy
+from contextlib import closing
 
 from common_library.common import const
+from common_library.common.db import DBconnector
 
 from common import test_common
 
 from tests.jobs.TestJobExecutor import TestExecuteStocker
 
-import globals
 import job_manager
 import job_manager_const
 import job_manager_config
@@ -56,14 +56,14 @@ def test_job_manager_main_sigterm_signal():
         try:
             # sub processの起動確認
             assert test_common.check_state(
-                timeout=5.0, conditions=lambda : len([p for p in psutil.Process(os.getpid()).children() if p.name().startswith('python') ]), conditions_value=sub_process_count)
+                timeout=5.0, conditions=lambda: len([p for p in psutil.Process(os.getpid()).children() if p.name().startswith('python')]), conditions_value=sub_process_count)
 
         finally:
             job_manager.job_manager_process_sigterm_handler(None, None)
 
             # sub processの終了確認
             assert test_common.check_state(
-                timeout=5.0, conditions=lambda : len([p for p in psutil.Process(os.getpid()).children() if p.name().startswith('python') ]), conditions_value=0)
+                timeout=5.0, conditions=lambda: len([p for p in psutil.Process(os.getpid()).children() if p.name().startswith('python')]), conditions_value=0)
 
             # main processの終了確認
             assert not main_thread.is_alive()
@@ -87,18 +87,18 @@ def test_job_manager_main_sigint_signal():
         try:
             # sub processの起動確認
             assert test_common.check_state(
-                timeout=5.0, conditions=lambda : len([p for p in psutil.Process(os.getpid()).children() if p.name().startswith('python') ]), conditions_value=sub_process_count)
+                timeout=5.0, conditions=lambda: len([p for p in psutil.Process(os.getpid()).children() if p.name().startswith('python')]), conditions_value=sub_process_count)
 
             # sigint signalの送信
             job_manager.job_manager_process_sigint_handler(None, None)
 
             # sub processの終了確認
             assert test_common.check_state(
-                timeout=10.0, conditions=lambda : len([p for p in psutil.Process(os.getpid()).children() if p.name().startswith('python') ]), conditions_value=0)
+                timeout=10.0, conditions=lambda: len([p for p in psutil.Process(os.getpid()).children() if p.name().startswith('python')]), conditions_value=0)
 
             # 終了しているか確認
             assert test_common.check_state(
-                timeout=5.0, conditions=lambda : not main_thread.is_alive())
+                timeout=5.0, conditions=lambda: not main_thread.is_alive())
 
         finally:
             # sigterm signalの送信
@@ -106,7 +106,7 @@ def test_job_manager_main_sigint_signal():
 
             # main processの終了確認
             assert test_common.check_state(
-                timeout=10.0, conditions=lambda : not main_thread.is_alive())
+                timeout=10.0, conditions=lambda: not main_thread.is_alive())
 
             main_thread.join()
 
@@ -128,16 +128,16 @@ def test_job_manager_main_replacement_sub():
         try:
             # sub processの起動確認
             assert test_common.check_state(
-                timeout=5.0, conditions=lambda : len([p for p in psutil.Process(os.getpid()).children() if p.name().startswith('python') ]), conditions_value=1)
+                timeout=5.0, conditions=lambda: len([p for p in psutil.Process(os.getpid()).children() if p.name().startswith('python')]), conditions_value=1)
 
             pid = [p.pid for p in psutil.Process(os.getpid()).children() if p.name().startswith('python')][0]
 
             # sub processの起動確認(pidが違うものが1件出来上がっている)
             assert test_common.check_state(
-                timeout=10.0, conditions=lambda : len([p for p in psutil.Process(os.getpid()).children() if p.name().startswith('python') and p.pid != pid]), conditions_value=1)
+                timeout=10.0, conditions=lambda: len([p for p in psutil.Process(os.getpid()).children() if p.name().startswith('python') and p.pid != pid]), conditions_value=1)
             # sub processが最終的に1件に戻っている
             assert test_common.check_state(
-                timeout=3.0, conditions=lambda : len([p for p in psutil.Process(os.getpid()).children() if p.name().startswith('python') ]), conditions_value=1)
+                timeout=3.0, conditions=lambda: len([p for p in psutil.Process(os.getpid()).children() if p.name().startswith('python')]), conditions_value=1)
 
         finally:
             # sigterm signalの送信
@@ -145,7 +145,7 @@ def test_job_manager_main_replacement_sub():
 
             # main processの終了確認
             assert test_common.check_state(
-                timeout=5.0, conditions=lambda : not main_thread.is_alive())
+                timeout=5.0, conditions=lambda: not main_thread.is_alive())
 
             main_thread.join()
 
@@ -175,7 +175,7 @@ def test_job_manager_sub_terminate_request():
 
         # sub processの終了確認
         assert test_common.check_state(
-            timeout=3.0, conditions=lambda : not main_thread.is_alive())
+            timeout=3.0, conditions=lambda: not main_thread.is_alive())
 
         main_thread.join()
 
@@ -188,14 +188,14 @@ def test_job_manager_sub_execute_normal_job():
     TestExecuteStocker.initalize()
 
     # Jobの実行classを試験用に切り替え
-    process_kind=const.PROCESS_KIND_NOTIFICATION
+    process_kind = const.PROCESS_KIND_NOTIFICATION
     job_config_jobs = copy.deepcopy(job_manager_config.JOBS)
     job_config_jobs[process_kind]["timeout_seconds"] = 3
     job_config_jobs[process_kind]["max_job_per_process"] = 1
     job_config_jobs[process_kind]["module"] = "tests.jobs.TestJobExecutor"
     job_config_jobs[process_kind]["class"] = "TestNormalJobExecutor"
 
-    with mock.patch.dict(f"job_manager_config.JOBS", job_config_jobs):
+    with mock.patch.dict("job_manager_config.JOBS", job_config_jobs):
 
         # sub process起動用の情報生成
         sub_processes_mgr = SubProcessesManager()
@@ -226,7 +226,7 @@ def test_job_manager_sub_execute_normal_job():
 
             # executedに1件はいること
             assert test_common.check_state(
-                timeout=10.0, conditions=lambda : len(TestExecuteStocker.executed_queue) == 1)
+                timeout=10.0, conditions=lambda: len(TestExecuteStocker.executed_queue) == 1)
             # 実行したものがqueueに入れたものとおなじであること
             assert test_common.equal_queue(queue_data[0], TestExecuteStocker.executed_queue[0])
 
@@ -236,7 +236,89 @@ def test_job_manager_sub_execute_normal_job():
 
             # sub processの終了確認
             assert test_common.check_state(
-                timeout=3.0, conditions=lambda : not main_thread.is_alive())
+                timeout=3.0, conditions=lambda: not main_thread.is_alive())
+
+            main_thread.join()
+
+
+def test_job_manager_sub_execute_normal_batch_job():
+    """JOB正常終了(BATCH)
+    """
+    testdata = import_module("tests.db.exports.testdata")
+
+    TestExecuteStocker.initalize()
+
+    # Jobの実行classを試験用に切り替え
+    process_kind = const.PROCESS_KIND_NOTIFICATION
+    job_config_jobs = copy.deepcopy(job_manager_config.JOBS)
+    job_config_jobs[process_kind]["timeout_seconds"] = 3
+    job_config_jobs[process_kind]["max_job_per_process"] = 1
+    job_config_jobs[process_kind]["module"] = "tests.jobs.TestJobExecutor"
+    job_config_jobs[process_kind]["class"] = "TestNormalJobExecutor"
+
+    with mock.patch.dict("job_manager_config.JOBS", job_config_jobs):
+
+        # sub process起動用の情報生成
+        sub_processes_mgr = SubProcessesManager()
+        sub_process_parameter = sub_processes_mgr.generate_sub_process_parameter()
+        sub_processes_mgr.append_new_process(sub_process_parameter, test_common.get_main_process(os.getpid()))
+
+        # sub processの起動
+        main_thread = threading.Thread(
+            target=job_manager.job_manager_sub_process,
+            args=(sub_process_parameter,),
+            name="sub_process",
+            daemon=True
+        )
+        main_thread.start()
+        try:
+            # queueにデータを作成
+            queue_data = [
+                {
+                    "PROCESS_ID": ulid.new().str,
+                    "PROCESS_KIND": const.PROCESS_KIND_NOTIFICATION,
+                    "PROCESS_EXEC_ID": ulid.new().str,
+                    "ORGANIZATION_ID": list(testdata.ORGANIZATIONS.keys())[0],
+                    "WORKSPACE_ID": testdata.ORGANIZATIONS[list(testdata.ORGANIZATIONS.keys())[0]]["workspace_id"][0],
+                    "ENABLE_BATCH": True,
+                    "BATCH_PERIOD_SECONDS": 10,
+                    "BATCH_COUNT_LIMIT": 4,
+                    "BATCH_GROUP_KEY": json.dumps({"notification_id": "TEST02"}),
+                    "LAST_UPDATE_TIMESTAMP": datetime.datetime.now() - datetime.timedelta(seconds=(10 + 1)),
+                    "LAST_UPDATE_USER": "system",
+                },
+                # 前のデータとBATCH処理されるデータ
+                {
+                    "PROCESS_ID": ulid.new().str,
+                    "PROCESS_KIND": const.PROCESS_KIND_NOTIFICATION,
+                    "PROCESS_EXEC_ID": ulid.new().str,
+                    "ORGANIZATION_ID": list(testdata.ORGANIZATIONS.keys())[0],
+                    "WORKSPACE_ID": testdata.ORGANIZATIONS[list(testdata.ORGANIZATIONS.keys())[0]]["workspace_id"][0],
+                    "ENABLE_BATCH": True,
+                    "BATCH_PERIOD_SECONDS": 10,
+                    "BATCH_COUNT_LIMIT": 4,
+                    "BATCH_GROUP_KEY": json.dumps({"notification_id": "TEST02"}),
+                    "LAST_UPDATE_TIMESTAMP": datetime.datetime.now() - datetime.timedelta(seconds=5),
+                    "LAST_UPDATE_USER": "system",
+                },
+            ]
+            test_common.insert_queue(queue_data)
+
+            # executedに1件はいること
+            assert test_common.check_state(
+                timeout=10.0, conditions=lambda: len(TestExecuteStocker.executed_queue) == 1)
+            # 実行したものがqueueに入れたものとおなじであること
+            assert test_common.equal_queue(queue_data[0], TestExecuteStocker.executed_queue[0])
+            assert test_common.equal_queue(queue_data[0], TestExecuteStocker.executed_batch_queue[0][0])
+            assert test_common.equal_queue(queue_data[1], TestExecuteStocker.executed_batch_queue[0][1])
+
+        finally:
+            # sub processの終了要求
+            sub_processes_mgr.set_sub_process_termination_request(force=True)
+
+            # sub processの終了確認
+            assert test_common.check_state(
+                timeout=3.0, conditions=lambda: not main_thread.is_alive())
 
             main_thread.join()
 
@@ -249,21 +331,20 @@ def test_job_manager_sub_execute_timeout_job():
     TestExecuteStocker.initalize()
 
     # Jobの実行classを試験用に切り替え
-    process_kind=const.PROCESS_KIND_NOTIFICATION
+    process_kind = const.PROCESS_KIND_NOTIFICATION
     job_config_jobs = copy.deepcopy(job_manager_config.JOBS)
     job_config_jobs[process_kind]["timeout_seconds"] = 1
     job_config_jobs[process_kind]["max_job_per_process"] = 1
     job_config_jobs[process_kind]["module"] = "tests.jobs.TestJobExecutor"
     job_config_jobs[process_kind]["class"] = "TestCancelTimeoutJobExecutor"
 
-    with mock.patch.dict(f"job_manager_config.JOBS", job_config_jobs), \
+    with mock.patch.dict("job_manager_config.JOBS", job_config_jobs), \
             mock.patch('job_manager_config.SUB_PROCESS_MAX_CANCEL_TIMEOUT', 3):
 
         # sub process起動用の情報生成
         sub_processes_mgr = SubProcessesManager()
         sub_process_parameter = sub_processes_mgr.generate_sub_process_parameter()
         sub_processes_mgr.append_new_process(sub_process_parameter, test_common.get_main_process(os.getpid()))
-
 
         # sub processの起動
         main_thread = threading.Thread(
@@ -290,11 +371,11 @@ def test_job_manager_sub_execute_timeout_job():
 
             # executed, canceledに1件はいること
             assert test_common.check_state(
-                timeout=3.0, conditions=lambda : len(TestExecuteStocker.executed_queue) == 1)
+                timeout=5.0, conditions=lambda: len(TestExecuteStocker.executed_queue) == 1)
             assert test_common.check_state(
-                timeout=3.0, conditions=lambda : len(TestExecuteStocker.canceled_queue) == 1)
+                timeout=5.0, conditions=lambda: len(TestExecuteStocker.canceled_queue) == 1)
             assert test_common.check_state(
-                timeout=10.0, conditions=lambda : len(TestExecuteStocker.cancel_exited_queue) == 1)
+                timeout=10.0, conditions=lambda: len(TestExecuteStocker.cancel_exited_queue) == 1)
 
             # 実行したものがqueueに入れたものとおなじであること
             assert test_common.equal_queue(queue_data[0], TestExecuteStocker.executed_queue[0])
@@ -324,11 +405,11 @@ def test_job_manager_sub_execute_timeout_job():
 
             # 3件のcancel timeoutが行われていること
             assert test_common.check_state(
-                timeout=20.0, conditions=lambda : len(TestExecuteStocker.cancel_exited_queue) == 3)
+                timeout=20.0, conditions=lambda: len(TestExecuteStocker.cancel_exited_queue) == 3)
 
             # sub processの終了確認
             assert test_common.check_state(
-                timeout=5.0, conditions=lambda : not main_thread.is_alive())
+                timeout=5.0, conditions=lambda: not main_thread.is_alive())
 
         finally:
             # sub processの終了要求
@@ -336,7 +417,7 @@ def test_job_manager_sub_execute_timeout_job():
 
             # sub processの終了確認
             assert test_common.check_state(
-                timeout=5.0, conditions=lambda : not main_thread.is_alive())
+                timeout=5.0, conditions=lambda: not main_thread.is_alive())
 
             main_thread.join()
 
@@ -348,14 +429,14 @@ def test_job_manager_sub_temminate_job_running():
     TestExecuteStocker.initalize()
 
     # Jobの実行classを試験用に切り替え
-    process_kind=const.PROCESS_KIND_NOTIFICATION
+    process_kind = const.PROCESS_KIND_NOTIFICATION
     job_config_jobs = copy.deepcopy(job_manager_config.JOBS)
     job_config_jobs[process_kind]["timeout_seconds"] = 3
     job_config_jobs[process_kind]["max_job_per_process"] = 1
     job_config_jobs[process_kind]["module"] = "tests.jobs.TestJobExecutor"
     job_config_jobs[process_kind]["class"] = "TestTimeoutJobExecutor"
 
-    with mock.patch.dict(f"job_manager_config.JOBS", job_config_jobs):
+    with mock.patch.dict("job_manager_config.JOBS", job_config_jobs):
         # sub process起動用の情報生成
         sub_processes_mgr = SubProcessesManager()
         sub_process_parameter = sub_processes_mgr.generate_sub_process_parameter()
@@ -386,7 +467,7 @@ def test_job_manager_sub_temminate_job_running():
 
             # executedに1件はいること
             assert test_common.check_state(
-                timeout=3.0, conditions=lambda : len(TestExecuteStocker.executed_queue) == 1)
+                timeout=3.0, conditions=lambda: len(TestExecuteStocker.executed_queue) == 1)
             # 実行したものがqueueに入れたものとおなじであること
             assert test_common.equal_queue(queue_data[0], TestExecuteStocker.executed_queue[0])
 
@@ -396,7 +477,7 @@ def test_job_manager_sub_temminate_job_running():
 
             # sub processの終了確認
             assert test_common.check_state(
-                timeout=5.0, conditions=lambda : not main_thread.is_alive())
+                timeout=5.0, conditions=lambda: not main_thread.is_alive())
 
             main_thread.join()
 
@@ -408,14 +489,14 @@ def test_job_manager_sub_db_reconnect(caplog: LogCaptureFixture):
     TestExecuteStocker.initalize()
 
     # Jobの実行classを試験用に切り替え
-    process_kind=const.PROCESS_KIND_NOTIFICATION
+    process_kind = const.PROCESS_KIND_NOTIFICATION
     job_config_jobs = copy.deepcopy(job_manager_config.JOBS)
     job_config_jobs[process_kind]["timeout_seconds"] = 3
     job_config_jobs[process_kind]["max_job_per_process"] = 1
     job_config_jobs[process_kind]["module"] = "tests.jobs.TestJobExecutor"
     job_config_jobs[process_kind]["class"] = "TestNormalJobExecutor"
 
-    with mock.patch.dict(f"job_manager_config.JOBS", job_config_jobs), \
+    with mock.patch.dict("job_manager_config.JOBS", job_config_jobs), \
             mock.patch("job_manager_config.SUB_PROCESS_DB_RECONNECT_INTERVAL_SECONDS", 5):
 
         # sub process起動用の情報生成
@@ -434,8 +515,9 @@ def test_job_manager_sub_db_reconnect(caplog: LogCaptureFixture):
 
         try:
             # DB再接続ルートを通ったか
-            assert test_common.check_state(timeout=10.0,
-                conditions=lambda : ('root', logging.DEBUG, job_manager_const.LOG_RECONNECT) in caplog.record_tuples)
+            assert test_common.check_state(
+                timeout=10.0,
+                conditions=lambda: ('root', logging.DEBUG, job_manager_const.LOG_RECONNECT) in caplog.record_tuples)
 
             # Reconnect後の正常性確認
 
@@ -454,14 +536,14 @@ def test_job_manager_sub_db_reconnect(caplog: LogCaptureFixture):
 
             # executedに1件はいること
             assert test_common.check_state(
-                timeout=3.0, conditions=lambda : len(TestExecuteStocker.executed_queue) == 1)
+                timeout=3.0, conditions=lambda: len(TestExecuteStocker.executed_queue) == 1)
         finally:
             # sub processの終了
             job_manager.job_manager_process_sigterm_handler(None, None)
 
             # sub processの終了確認
             assert test_common.check_state(
-                timeout=5.0, conditions=lambda : not main_thread.is_alive())
+                timeout=5.0, conditions=lambda: not main_thread.is_alive())
 
             main_thread.join()
 
@@ -473,14 +555,14 @@ def test_job_manager_sub_db_helthcheck_error():
     TestExecuteStocker.initalize()
 
     # Jobの実行classを試験用に切り替え
-    process_kind=const.PROCESS_KIND_NOTIFICATION
+    process_kind = const.PROCESS_KIND_NOTIFICATION
     job_config_jobs = copy.deepcopy(job_manager_config.JOBS)
     job_config_jobs[process_kind]["timeout_seconds"] = 3
     job_config_jobs[process_kind]["max_job_per_process"] = 1
     job_config_jobs[process_kind]["module"] = "tests.jobs.TestJobExecutor"
     job_config_jobs[process_kind]["class"] = "TestNormalJobExecutor"
 
-    with mock.patch.dict(f"job_manager_config.JOBS", job_config_jobs), \
+    with mock.patch.dict("job_manager_config.JOBS", job_config_jobs), \
             mock.patch("job_manager_config.SUB_PROCESS_DB_HEALTH_CHECK_INTERVAL_SECONDS", 3), \
             test_common.pymysql_execute_raise_exception_mocker(queries_health_check.SQL_QUERY_HEALTH_CHECK, Exception('unit test error')):
 
@@ -499,8 +581,9 @@ def test_job_manager_sub_db_helthcheck_error():
         main_thread.start()
         try:
             # helth checkエラーが発生していること
-            assert test_common.check_state(timeout=5.0,
-                conditions=lambda : test_common.pymysql_execute_raise_exception_state.call_count(queries_health_check.SQL_QUERY_HEALTH_CHECK) >= 1)
+            assert test_common.check_state(
+                timeout=5.0,
+                conditions=lambda: test_common.pymysql_execute_raise_exception_state.call_count(queries_health_check.SQL_QUERY_HEALTH_CHECK) >= 1)
 
             # helth checkエラー後の正常性確認
 
@@ -519,14 +602,14 @@ def test_job_manager_sub_db_helthcheck_error():
 
             # executedに1件はいること
             assert test_common.check_state(
-                timeout=3.0, conditions=lambda : len(TestExecuteStocker.executed_queue) == 1)
+                timeout=3.0, conditions=lambda: len(TestExecuteStocker.executed_queue) == 1)
         finally:
             # sub processの終了
             job_manager.job_manager_process_sigterm_handler(None, None)
 
             # sub processの終了確認
             assert test_common.check_state(
-                timeout=5.0, conditions=lambda : not main_thread.is_alive())
+                timeout=5.0, conditions=lambda: not main_thread.is_alive())
 
             main_thread.join()
 
@@ -539,14 +622,14 @@ def test_job_manager_sub_job_limit_over():
     max_job_per_process = 2
 
     # Jobの実行classを試験用に切り替え
-    process_kind=const.PROCESS_KIND_NOTIFICATION
+    process_kind = const.PROCESS_KIND_NOTIFICATION
     job_config_jobs = copy.deepcopy(job_manager_config.JOBS)
     job_config_jobs[process_kind]["timeout_seconds"] = 4
     job_config_jobs[process_kind]["max_job_per_process"] = max_job_per_process
     job_config_jobs[process_kind]["module"] = "tests.jobs.TestJobExecutor"
     job_config_jobs[process_kind]["class"] = "TestTimeoutJobExecutor"
 
-    with mock.patch.dict(f"job_manager_config.JOBS", job_config_jobs):
+    with mock.patch.dict("job_manager_config.JOBS", job_config_jobs):
 
         # sub process起動用の情報生成
         sub_processes_mgr = SubProcessesManager()
@@ -602,16 +685,16 @@ def test_job_manager_sub_job_limit_over():
 
             # executedにlimit件はいること
             assert test_common.check_state(
-                timeout=3.0, conditions=lambda : len(TestExecuteStocker.executed_queue) == max_job_per_process)
+                timeout=3.0, conditions=lambda: len(TestExecuteStocker.executed_queue) == max_job_per_process)
             time.sleep(1)
             assert test_common.check_state(
-                timeout=3.0, conditions=lambda : len(TestExecuteStocker.executed_queue) == max_job_per_process)
+                timeout=3.0, conditions=lambda: len(TestExecuteStocker.executed_queue) == max_job_per_process)
             # 同じORGANIZATION_IDばかりが処理されていないこと
             assert TestExecuteStocker.executed_queue[0]["ORGANIZATION_ID"] != TestExecuteStocker.executed_queue[1]["ORGANIZATION_ID"]
 
             # その後全件処理されていること
             assert test_common.check_state(
-                timeout=10.0, conditions=lambda : len(TestExecuteStocker.executed_queue) == len(queue_data))
+                timeout=10.0, conditions=lambda: len(TestExecuteStocker.executed_queue) == len(queue_data))
 
         finally:
             # sub processの終了
@@ -619,9 +702,291 @@ def test_job_manager_sub_job_limit_over():
 
             # sub processの終了確認
             assert test_common.check_state(
-                timeout=10.0, conditions=lambda : not main_thread.is_alive())
+                timeout=10.0, conditions=lambda: not main_thread.is_alive())
 
             main_thread.join()
+
+
+def test_job_manager_get_queue():
+    """QUEUE取り出し
+    """
+    testdata = import_module("tests.db.exports.testdata")
+
+    #
+    # QUEUEが0件のとき
+    #
+    test_common.clear_queue()
+    with closing(DBconnector().connect_platformdb()) as conn:
+        conn.begin()
+        try:
+            ret_queue, ret_batch_queue = job_manager.get_queue(conn, [], 100)
+            # QUEUEの取得結果も0件であること
+            assert len(ret_queue) == 0
+            assert len(ret_batch_queue) == 0
+        finally:
+            conn.rollback()
+
+    #
+    # QUEUE()が1件のとき（BATCHでない）
+    #
+    test_common.clear_queue()
+    queue_data = [
+        {
+            "PROCESS_ID": ulid.new().str,
+            "PROCESS_KIND": const.PROCESS_KIND_NOTIFICATION,
+            "PROCESS_EXEC_ID": ulid.new().str,
+            "ORGANIZATION_ID": list(testdata.ORGANIZATIONS.keys())[0],
+            "WORKSPACE_ID": testdata.ORGANIZATIONS[list(testdata.ORGANIZATIONS.keys())[0]]["workspace_id"][0],
+            "LAST_UPDATE_USER": "system"
+        }
+    ]
+    test_common.insert_queue(queue_data)
+
+    with closing(DBconnector().connect_platformdb()) as conn:
+        conn.begin()
+        try:
+            ret_queue, ret_batch_queue = job_manager.get_queue(conn, [], 100)
+
+            # QUEUEの取得結果も1件で、登録したものが返ってくること
+            assert len(ret_queue) == 1
+            assert len(ret_batch_queue) == 1
+            assert ret_queue[0]['PROCESS_ID'] == queue_data[0]['PROCESS_ID']
+            assert ret_batch_queue[0] is None
+        finally:
+            conn.rollback()
+
+    #
+    # QUEUEの同時要求
+    #
+    test_common.clear_queue()
+    queue_data = [
+        {
+            "PROCESS_ID": ulid.new().str,
+            "PROCESS_KIND": const.PROCESS_KIND_NOTIFICATION,
+            "PROCESS_EXEC_ID": ulid.new().str,
+            "ORGANIZATION_ID": list(testdata.ORGANIZATIONS.keys())[0],
+            "WORKSPACE_ID": testdata.ORGANIZATIONS[list(testdata.ORGANIZATIONS.keys())[0]]["workspace_id"][0],
+            "LAST_UPDATE_USER": "system"
+        },
+
+    ]
+    test_common.insert_queue(queue_data)
+
+    with closing(DBconnector().connect_platformdb()) as conn1, closing(DBconnector().connect_platformdb()) as conn2:
+
+        conn1.begin()
+        conn2.begin()
+        try:
+            ret_queue, ret_batch_queue = job_manager.get_queue(conn1, [], 100)
+
+            # 先発のQUEUEの取得結果が1件で、登録したものが返ってくること
+            assert len(ret_queue) == 1
+            assert len(ret_batch_queue) == 1
+            assert ret_queue[0]['PROCESS_ID'] == queue_data[0]['PROCESS_ID']
+            assert ret_batch_queue[0] is None
+
+            ret_queue, ret_batch_queue = job_manager.get_queue(conn2, [], 100)
+
+            # 後発のQUEUEの取得結果が0件であること
+            assert len(ret_queue) == 0
+            assert len(ret_batch_queue) == 0
+        finally:
+            conn1.rollback()
+            conn2.rollback()
+
+    #
+    # QUEUE()にBATCHのデーター
+    #
+    test_common.clear_queue()
+    queue_data = [
+        # (レコード1) 対象にならない（LAST_UPDATE_TIMESTAMPがBATCH_PERIOD_SECONDS経過してない）
+        {
+            "PROCESS_ID": ulid.new().str,
+            "PROCESS_KIND": const.PROCESS_KIND_NOTIFICATION,
+            "PROCESS_EXEC_ID": ulid.new().str,
+            "ORGANIZATION_ID": list(testdata.ORGANIZATIONS.keys())[0],
+            "WORKSPACE_ID": testdata.ORGANIZATIONS[list(testdata.ORGANIZATIONS.keys())[0]]["workspace_id"][0],
+            "ENABLE_BATCH": True,
+            "BATCH_PERIOD_SECONDS": 10,
+            "BATCH_COUNT_LIMIT": 5,
+            "BATCH_GROUP_KEY": json.dumps({"notification_id": "TEST01"}),
+            "LAST_UPDATE_TIMESTAMP": datetime.datetime.now(),
+            "LAST_UPDATE_USER": "system",
+        },
+        # (レコード2) 対象になる（LAST_UPDATE_TIMESTAMPがBATCH_PERIOD_SECONDS経過後）
+        {
+            "PROCESS_ID": ulid.new().str,
+            "PROCESS_KIND": const.PROCESS_KIND_NOTIFICATION,
+            "PROCESS_EXEC_ID": ulid.new().str,
+            "ORGANIZATION_ID": list(testdata.ORGANIZATIONS.keys())[0],
+            "WORKSPACE_ID": testdata.ORGANIZATIONS[list(testdata.ORGANIZATIONS.keys())[0]]["workspace_id"][0],
+            "ENABLE_BATCH": True,
+            "BATCH_PERIOD_SECONDS": 10,
+            "BATCH_COUNT_LIMIT": 4,
+            "BATCH_GROUP_KEY": json.dumps({"notification_id": "TEST02"}),
+            "LAST_UPDATE_TIMESTAMP": datetime.datetime.now() - datetime.timedelta(seconds=(10 + 1)),
+            "LAST_UPDATE_USER": "system",
+        },
+        # (レコード3) 前のデータとBATCH処理されるデータ
+        {
+            "PROCESS_ID": ulid.new().str,
+            "PROCESS_KIND": const.PROCESS_KIND_NOTIFICATION,
+            "PROCESS_EXEC_ID": ulid.new().str,
+            "ORGANIZATION_ID": list(testdata.ORGANIZATIONS.keys())[0],
+            "WORKSPACE_ID": testdata.ORGANIZATIONS[list(testdata.ORGANIZATIONS.keys())[0]]["workspace_id"][0],
+            "ENABLE_BATCH": True,
+            "BATCH_PERIOD_SECONDS": 10,
+            "BATCH_COUNT_LIMIT": 4,
+            "BATCH_GROUP_KEY": json.dumps({"notification_id": "TEST02"}),
+            "LAST_UPDATE_TIMESTAMP": datetime.datetime.now() - datetime.timedelta(seconds=5),
+            "LAST_UPDATE_USER": "system",
+        },
+        # (レコード4) 前のデータとBATCH処理されるデータ
+        {
+            "PROCESS_ID": ulid.new().str,
+            "PROCESS_KIND": const.PROCESS_KIND_NOTIFICATION,
+            "PROCESS_EXEC_ID": ulid.new().str,
+            "ORGANIZATION_ID": list(testdata.ORGANIZATIONS.keys())[0],
+            "WORKSPACE_ID": testdata.ORGANIZATIONS[list(testdata.ORGANIZATIONS.keys())[0]]["workspace_id"][0],
+            "ENABLE_BATCH": True,
+            "BATCH_PERIOD_SECONDS": 10,
+            "BATCH_COUNT_LIMIT": 4,
+            "BATCH_GROUP_KEY": json.dumps({"notification_id": "TEST02"}),
+            "LAST_UPDATE_TIMESTAMP": datetime.datetime.now() - datetime.timedelta(seconds=4),
+            "LAST_UPDATE_USER": "system",
+        },
+        # (レコード5) 前のデータとBATCH処理されるデータ
+        {
+            "PROCESS_ID": ulid.new().str,
+            "PROCESS_KIND": const.PROCESS_KIND_NOTIFICATION,
+            "PROCESS_EXEC_ID": ulid.new().str,
+            "ORGANIZATION_ID": list(testdata.ORGANIZATIONS.keys())[0],
+            "WORKSPACE_ID": testdata.ORGANIZATIONS[list(testdata.ORGANIZATIONS.keys())[0]]["workspace_id"][0],
+            "ENABLE_BATCH": True,
+            "BATCH_PERIOD_SECONDS": 10,
+            "BATCH_COUNT_LIMIT": 4,
+            "BATCH_GROUP_KEY": json.dumps({"notification_id": "TEST02"}),
+            "LAST_UPDATE_TIMESTAMP": datetime.datetime.now() - datetime.timedelta(seconds=10),
+            "LAST_UPDATE_USER": "system",
+        },
+        # (レコード6) 前のデータとBATCH処理されるデータだけどLIMITを超えてるので対象外
+        {
+            "PROCESS_ID": ulid.new().str,
+            "PROCESS_KIND": const.PROCESS_KIND_NOTIFICATION,
+            "PROCESS_EXEC_ID": ulid.new().str,
+            "ORGANIZATION_ID": list(testdata.ORGANIZATIONS.keys())[0],
+            "WORKSPACE_ID": testdata.ORGANIZATIONS[list(testdata.ORGANIZATIONS.keys())[0]]["workspace_id"][0],
+            "ENABLE_BATCH": True,
+            "BATCH_PERIOD_SECONDS": 10,
+            "BATCH_COUNT_LIMIT": 4,
+            "BATCH_GROUP_KEY": json.dumps({"notification_id": "TEST02"}),
+            "LAST_UPDATE_TIMESTAMP": datetime.datetime.now() - datetime.timedelta(seconds=1),
+            "LAST_UPDATE_USER": "system",
+        },
+        # (レコード7) 対象になるが前のデータとは別のバッチ（LAST_UPDATE_TIMESTAMPがBATCH_PERIOD_SECONDS経過後）
+        {
+            "PROCESS_ID": ulid.new().str,
+            "PROCESS_KIND": const.PROCESS_KIND_NOTIFICATION,
+            "PROCESS_EXEC_ID": ulid.new().str,
+            "ORGANIZATION_ID": list(testdata.ORGANIZATIONS.keys())[0],
+            "WORKSPACE_ID": testdata.ORGANIZATIONS[list(testdata.ORGANIZATIONS.keys())[0]]["workspace_id"][0],
+            "ENABLE_BATCH": True,
+            "BATCH_PERIOD_SECONDS": 10,
+            "BATCH_COUNT_LIMIT": 5,
+            "BATCH_GROUP_KEY": json.dumps({"notification_id": "TEST03"}),
+            "LAST_UPDATE_TIMESTAMP": datetime.datetime.now() - datetime.timedelta(seconds=(10 + 1)),
+            "LAST_UPDATE_USER": "system",
+        },
+    ]
+
+    test_common.insert_queue(queue_data)
+
+    with closing(DBconnector().connect_platformdb()) as conn:
+        conn.begin()
+        try:
+            ret_queue, ret_batch_queue = job_manager.get_queue(conn, [], 100)
+
+            # QUEUEの取得結果も1件で、登録したものが返ってくること
+            assert len(ret_queue) == 2  # レコード2, 7の2件分が返ってくる
+            assert len(ret_batch_queue) == 2   # レコード2, レコード7の2件分が返ってくる
+
+            # レコード2をサーチ
+            record2_index = next((i for i, d in enumerate(ret_queue) if d['PROCESS_ID'] == queue_data[2 - 1]['PROCESS_ID']), None)
+            # レコード2がqueueに含まれること
+            assert record2_index is not None
+            # レコード2のbatch処理対象にレコード2,3,4,5の4件が入っていること
+            assert len(ret_batch_queue[record2_index]) == 4
+            assert next((i for i, d in enumerate(ret_batch_queue[record2_index]) if d['PROCESS_ID'] == queue_data[2 - 1]['PROCESS_ID']), None) is not None
+            assert next((i for i, d in enumerate(ret_batch_queue[record2_index]) if d['PROCESS_ID'] == queue_data[3 - 1]['PROCESS_ID']), None) is not None
+            assert next((i for i, d in enumerate(ret_batch_queue[record2_index]) if d['PROCESS_ID'] == queue_data[4 - 1]['PROCESS_ID']), None) is not None
+            assert next((i for i, d in enumerate(ret_batch_queue[record2_index]) if d['PROCESS_ID'] == queue_data[5 - 1]['PROCESS_ID']), None) is not None
+
+            # レコード7をサーチ
+            record7_index = next((i for i, d in enumerate(ret_queue) if d['PROCESS_ID'] == queue_data[7 - 1]['PROCESS_ID']), None)
+            # レコード7がqueueに含まれること
+            assert record7_index is not None
+            # レコード7のbatch処理対象にレコード7の1件が入っていること
+            assert len(ret_batch_queue[record7_index]) == 1
+            assert next((i for i, d in enumerate(ret_batch_queue[record7_index]) if d['PROCESS_ID'] == queue_data[7 - 1]['PROCESS_ID']), None) is not None
+        finally:
+            conn.rollback()
+    #
+    # バッチのQUEUEの同時要求
+    #
+    test_common.clear_queue()
+    queue_data = [
+        # 対象になる（LAST_UPDATE_TIMESTAMPがBATCH_PERIOD_SECONDS経過後）
+        {
+            "PROCESS_ID": ulid.new().str,
+            "PROCESS_KIND": const.PROCESS_KIND_NOTIFICATION,
+            "PROCESS_EXEC_ID": ulid.new().str,
+            "ORGANIZATION_ID": list(testdata.ORGANIZATIONS.keys())[0],
+            "WORKSPACE_ID": testdata.ORGANIZATIONS[list(testdata.ORGANIZATIONS.keys())[0]]["workspace_id"][0],
+            "ENABLE_BATCH": True,
+            "BATCH_PERIOD_SECONDS": 10,
+            "BATCH_COUNT_LIMIT": 4,
+            "BATCH_GROUP_KEY": json.dumps({"notification_id": "TEST02"}),
+            "LAST_UPDATE_TIMESTAMP": datetime.datetime.now() - datetime.timedelta(seconds=(10 + 1)),
+            "LAST_UPDATE_USER": "system",
+        },
+        # 前のデータとBATCH処理されるデータ
+        {
+            "PROCESS_ID": ulid.new().str,
+            "PROCESS_KIND": const.PROCESS_KIND_NOTIFICATION,
+            "PROCESS_EXEC_ID": ulid.new().str,
+            "ORGANIZATION_ID": list(testdata.ORGANIZATIONS.keys())[0],
+            "WORKSPACE_ID": testdata.ORGANIZATIONS[list(testdata.ORGANIZATIONS.keys())[0]]["workspace_id"][0],
+            "ENABLE_BATCH": True,
+            "BATCH_PERIOD_SECONDS": 10,
+            "BATCH_COUNT_LIMIT": 4,
+            "BATCH_GROUP_KEY": json.dumps({"notification_id": "TEST02"}),
+            "LAST_UPDATE_TIMESTAMP": datetime.datetime.now() - datetime.timedelta(seconds=5),
+            "LAST_UPDATE_USER": "system",
+        },
+    ]
+    test_common.insert_queue(queue_data)
+
+    with closing(DBconnector().connect_platformdb()) as conn1, closing(DBconnector().connect_platformdb()) as conn2:
+
+        conn1.begin()
+        conn2.begin()
+        try:
+            ret_queue, ret_batch_queue = job_manager.get_queue(conn1, [], 100)
+
+            # 先発のQUEUEの取得結果が1件で、登録したものが返ってくること
+            assert len(ret_queue) == 1
+            assert len(ret_batch_queue) == 1
+            assert ret_queue[0]['PROCESS_ID'] == queue_data[0]['PROCESS_ID']
+            assert len(ret_batch_queue[0]) == 2
+
+            ret_queue, ret_batch_queue = job_manager.get_queue(conn2, [], 100)
+
+            # 後発のQUEUEの取得結果が0件であること
+            assert len(ret_queue) == 0
+            assert len(ret_batch_queue) == 0
+        finally:
+            conn1.rollback()
+            conn2.rollback()
 
 
 def test_job_manager_sub_force_update_status():
@@ -636,7 +1001,7 @@ def test_job_manager_sub_force_update_status():
 
     job_config_jobs[job_manager_const.PROCESS_KIND_FORCE_UPDATE_STATUS]["job_interval"] = 3
 
-    with mock.patch.dict(f"job_manager_config.JOBS", job_config_jobs):
+    with mock.patch.dict("job_manager_config.JOBS", job_config_jobs):
 
         # sub process起動用の情報生成
         sub_processes_mgr = SubProcessesManager()
@@ -660,7 +1025,7 @@ def test_job_manager_sub_force_update_status():
         try:
             # force update status呼出確認
             assert test_common.check_state(
-                timeout=10.0, conditions=lambda : TestExecuteStocker.call_force_update_status_count >= 1)
+                timeout=10.0, conditions=lambda: TestExecuteStocker.call_force_update_status_count >= 1)
 
         finally:
             # sub processの終了
@@ -668,7 +1033,7 @@ def test_job_manager_sub_force_update_status():
 
             # sub processの終了確認
             assert test_common.check_state(
-                timeout=10.0, conditions=lambda : not main_thread.is_alive())
+                timeout=10.0, conditions=lambda: not main_thread.is_alive())
 
             main_thread.join()
 
@@ -685,7 +1050,7 @@ def test_job_manager_sub_job_trigger_daily():
     job_config_jobs[process_kind]["module"] = "tests.jobs.TestJobExecutor"
     job_config_jobs[process_kind]["class"] = "TestNormalJobExecutor"
 
-    with mock.patch.dict(f"job_manager_config.JOBS", job_config_jobs):
+    with mock.patch.dict("job_manager_config.JOBS", job_config_jobs):
 
         # sub process起動用の情報生成
         sub_processes_mgr = SubProcessesManager()
@@ -715,7 +1080,7 @@ def test_job_manager_sub_job_trigger_daily():
         try:
             # executedに1件はいること
             assert test_common.check_state(
-                timeout=10.0, conditions=lambda : len(TestExecuteStocker.executed_queue) == 1)
+                timeout=10.0, conditions=lambda: len(TestExecuteStocker.executed_queue) == 1)
 
         finally:
             # sub processの終了
@@ -723,7 +1088,7 @@ def test_job_manager_sub_job_trigger_daily():
 
             # sub processの終了確認
             assert test_common.check_state(
-                timeout=10.0, conditions=lambda : not main_thread.is_alive())
+                timeout=10.0, conditions=lambda: not main_thread.is_alive())
 
             main_thread.join()
 
@@ -731,10 +1096,8 @@ def test_job_manager_sub_job_trigger_daily():
 def test_job_manager_sub_liveness_file():
     """ハングアップ監視用ファイルの確認
     """
-    testdata = import_module("tests.db.exports.testdata")
-
     mock_time = time.time()
-    with mock.patch("time.time", return_value = mock_time):
+    with mock.patch("time.time", return_value=mock_time), mock.patch.dict("os.environ", {"FILE_PATH_LIVENESS": "/tmp/liveness.unittest"}):
 
         # sub process起動用の情報生成
         sub_processes_mgr = SubProcessesManager()
