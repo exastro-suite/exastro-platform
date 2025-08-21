@@ -61,6 +61,10 @@ def settings_destination_get(organization_id, workspace_id, destination_id):  # 
         globals.logger.debug(f"result:{result}")
         data = settings_notification_rowset(result)
 
+        # ServiceNowの場合は、servicenow_passwordを返却値から削除する
+        if data["kind"] == const.DESTINATION_KIND_SERVICENOW:
+            del data["destination_informations"][0]["servicenow_password"]
+
         return data
     else:
         raise common.NotFoundException(
@@ -76,6 +80,9 @@ def settings_notification_rowset(row):
         "kind": row["DESTINATION_KIND"],
         "conditions": json.loads(row["CONDITIONS"]),
         "destination_informations": json.loads(encrypt.decrypt_str(row["DESTINATION_INFORMATIONS"])),
+        "enable_batch": True if row["ENABLE_BATCH"] == 1 else False,
+        "batch_period_seconds": row["BATCH_PERIOD_SECONDS"],
+        "batch_count_limit": row["BATCH_COUNT_LIMIT"],
         "create_timestamp": common.datetime_to_str(row["CREATE_TIMESTAMP"]),
         "create_user": row["CREATE_USER"],
         "last_update_timestamp": common.datetime_to_str(row["LAST_UPDATE_TIMESTAMP"]),

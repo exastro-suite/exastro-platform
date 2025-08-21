@@ -59,6 +59,7 @@ $(function(){
         // $('.description_Teams').html(getText('000-87018', 'URL形式'));
         $('.description_Teams_WF').html(getText('000-87018', 'URL形式'));
         $('.description_Webhook').html(getText('000-87019', '1行目 URL形式<br>2行目 ヘッダー内容'));
+        $('.description_ServiceNow').html(getText('000-87050', 'ServiceNow API URL (個別登録用): ServiceNow テーブルAPIのURLを入力します。<br><br>※バッチAPIを利用して一括で登録を行いたい場合は「一括登録」にチェックを入れ、以下を入力します。<br>ServiceNow API URL (一括登録用): ServiceNow バッチAPIのURLを入力します。<br>送信間隔 (秒): 一括登録を実行する間隔を指定します。ここで指定した秒数毎にバッチAPIがコールされます。入力可能範囲 1～3600<br>一回に送信する最大件数: 一括登録を実行する際に送信されるメッセージの最大件数を指定します。入力可能範囲 1～10000'));
 
         $('.destination_informations').css('display', 'none');
         $('.description_no_select').css('display', '');
@@ -75,6 +76,22 @@ $(function(){
 
             $('input[name="form_destination_informations_' + id + '"]').css('display', '');
             $('textarea[name="form_destination_informations_' + id + '"]').css('display', '');
+        });
+
+        //
+        // condition ServiceNow bulk check
+        //
+        $('#form_destination_informations_servicenow_batch_check').on('click',function() {
+            if ($(this).prop("checked")) {
+                $("#form_destination_informations_servicenow_batch_url").prop('disabled',false);
+                $("#form_destination_informations_servicenow_interval").prop('disabled',false);
+                $("#form_destination_informations_servicenow_limit").prop('disabled',false);
+            } else {
+                $("#form_destination_informations_servicenow_batch_url").prop('disabled',true);
+                $("#form_destination_informations_servicenow_interval").prop('disabled',true);
+                $("#form_destination_informations_servicenow_limit").prop('disabled',true);
+            }
+
         });
 
         //
@@ -134,6 +151,21 @@ $(function(){
         else if (destination_kind === "Webhook"){
             // validate destination informations (webhook)
             validate = settings_notifications_common.validate.destination_informations_webhook($("#form_destination_informations_webhook").val(), $("#form_destination_informations_webhook_header").val());
+            result = result && validate.result;
+            $("#message_destination_informations").text(validate.message);
+        }
+        else if (destination_kind === "ServiceNow"){
+            // validate destination informations (ServiceNow)
+            validate = settings_notifications_common.validate.destination_informations_servicenow(
+                $("#form_destination_informations_servicenow_url").val(),
+                $("#form_destination_informations_servicenow_user").val(),
+                true, //パスワード更新フラグ（新規作成はtrue固定）
+                $("#form_destination_informations_servicenow_password").val(),
+                $("#form_destination_informations_servicenow_batch_check").prop("checked"),
+                $("#form_destination_informations_servicenow_batch_url").val(),
+                $("#form_destination_informations_servicenow_interval").val(),
+                $("#form_destination_informations_servicenow_limit").val(),
+            );
             result = result && validate.result;
             $("#message_destination_informations").text(validate.message);
         }
@@ -205,6 +237,22 @@ $(function(){
             }
             destination_informations.push(webhook);
         }
+        else if (destination_kind === "ServiceNow"){
+            var enable_batch = $("#form_destination_informations_servicenow_batch_check").prop("checked");
+            var batch_api_url;
+            if (enable_batch == true){
+                batch_api_url = $("#form_destination_informations_servicenow_batch_url").val();
+            } else {
+                batch_api_url = "";
+            }
+            var servicenow = {
+                "servicenow_user": $("#form_destination_informations_servicenow_user").val(),
+                "servicenow_password": $("#form_destination_informations_servicenow_password").val(),
+                "table_api_url": $("#form_destination_informations_servicenow_url").val(),
+                "batch_api_url": batch_api_url,
+            }
+            destination_informations.push(servicenow);
+        }
 
         let reqbody = [
             {
@@ -224,6 +272,20 @@ $(function(){
                 "destination_informations": destination_informations,
             }
         ]
+
+        if (destination_kind === "ServiceNow"){
+            let enable_batch = $("#form_destination_informations_servicenow_batch_check").prop("checked");
+            reqbody[0].enable_batch = enable_batch;
+            if (enable_batch == true) {
+                let form_destination_informations_servicenow_interval = $("#form_destination_informations_servicenow_interval").val();
+                let form_destination_informations_servicenow_limit = $("#form_destination_informations_servicenow_limit").val();
+                reqbody[0].batch_period_seconds = Number(form_destination_informations_servicenow_interval);
+                reqbody[0].batch_count_limit = Number(form_destination_informations_servicenow_limit);
+            } else {
+                reqbody[0].batch_period_seconds = null;
+                reqbody[0].batch_count_limit = null;
+            }
+        }
 
         show_progress();
         call_api_promise(

@@ -37,6 +37,7 @@ const DESTINATION_KIND_MAIL = 'Mail';
 const DESTINATION_KIND_TEAMS = 'Teams';
 const DESTINATION_KIND_TEAMS_WF = 'Teams_WF';
 const DESTINATION_KIND_WEBHOOK = 'Webhook';
+const DESTINATION_KIND_SERVICENOW = 'ServiceNow';
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -1315,7 +1316,7 @@ const settings_notifications_common = {
         $("#conditions_list .datarow").css('display', '');
     },
 
-    "set_destination_informations": function(kind, destination_informations) {
+    "set_destination_informations": function(kind, destination_informations, enable_batch, batch_period_seconds, batch_count_limit) {
         if (kind === DESTINATION_KIND_MAIL){
             $("#form_destination_kind_mail").prop('checked', true);
             ret_mail = settings_notifications_common.get_mail_destination_informations(destination_informations);
@@ -1343,9 +1344,26 @@ const settings_notifications_common = {
                 $("#form_destination_informations_webhook_header").val(fn.cv(element.header, '', false));
             });
         }
+        else if (kind === DESTINATION_KIND_SERVICENOW){
+            $("#form_destination_kind_servicenow").prop('checked', true);
+            destination_informations.forEach(function(element){
+                $("#form_destination_informations_servicenow_url").val(fn.cv(element.table_api_url, '', false));
+                $("#form_destination_informations_servicenow_user").val(fn.cv(element.servicenow_user, '', false));
+                $("#form_destination_informations_servicenow_password").val('');
+                $("#form_destination_informations_servicenow_batch_url").val(fn.cv(element.batch_api_url, '', false));
+            });
+            if (enable_batch == true) {
+                $('#form_destination_informations_servicenow_batch_check').prop('checked', true);
+                $("#form_destination_informations_servicenow_batch_url").prop('disabled',false);
+                $("#form_destination_informations_servicenow_interval").prop('disabled',false);
+                $("#form_destination_informations_servicenow_limit").prop('disabled',false);
+            }
+            $("#form_destination_informations_servicenow_interval").val(fn.cv(batch_period_seconds, '', false));
+            $("#form_destination_informations_servicenow_limit").val(fn.cv(batch_count_limit, '', false));
+        }
     },
 
-    "set_destination_informations_text": function(kind, destination_informations) {
+    "set_destination_informations_text": function(kind, destination_informations, batch_period_seconds, batch_count_limit) {
         if (kind === DESTINATION_KIND_MAIL){
             ret_mail = settings_notifications_common.get_mail_destination_informations(destination_informations);
             $("#text_destination_informations_mail_to").css('display', '');
@@ -1377,6 +1395,24 @@ const settings_notifications_common = {
                 $("#text_destination_informations_webhook").text("URL: " + fn.cv(element.url, '', false));
                 $("#text_destination_informations_webhook_header").text("Header: " + fn.cv(element.header, '', false));
             });
+        }
+        else if (kind === DESTINATION_KIND_SERVICENOW){
+            $("#text_destination_informations_servicenow_url").css('display', '');
+            $("#text_destination_informations_servicenow_user").css('display', '');
+            $("#text_destination_informations_servicenow_batch_url").css('display', '');
+            $("#text_destination_informations_servicenow_interval").css('display', '');
+            $("#text_destination_informations_servicenow_limit").css('display', '');
+            destination_informations.forEach(function(element){
+                $("#hr_destination_informations_servicenow_url").css('display', '');
+                $("#hr_destination_informations_servicenow_user").css('display', '');
+                $("#hr_destination_informations_servicenow_batch_url").css('display', '');
+                $("#hr_destination_informations_servicenow_interval").css('display', '');
+                $("#text_destination_informations_servicenow_url").text(getText("000-87042", "ServiceNow API URL (個別登録用)") + ": " + fn.cv(element.table_api_url, '', false));
+                $("#text_destination_informations_servicenow_user").text(getText("000-87043", "ServiceNow ユーザー") + ": " + fn.cv(element.servicenow_user, '', false));
+                $("#text_destination_informations_servicenow_batch_url").text(getText("000-87046", "ServiceNow API URL (一括登録用)") + ": " + fn.cv(element.batch_api_url, '', false));
+            });
+            $("#text_destination_informations_servicenow_interval").text(getText("000-87047", "送信間隔 (秒)") + ": " + fn.cv(batch_period_seconds, '', false));
+            $("#text_destination_informations_servicenow_limit").text(getText("000-87048", "一回に送信する最大件数") + ": " + fn.cv(batch_count_limit, '', false));
         }
     },
 
@@ -1466,6 +1502,29 @@ const settings_notifications_common = {
                 "header": $("#form_destination_informations_webhook_header").val()
             }
             destination_informations.push(webhook);
+        }
+        else if (destination_kind === "ServiceNow"){
+            var servicenow_password_check = $("#form_destination_informations_servicenow_password_check").prop("checked");
+            if (servicenow_password_check == true){
+                servicenow_password = $("#form_destination_informations_servicenow_password").val();
+            } else {
+                servicenow_password = "";
+            }
+
+            var enable_batch = $("#form_destination_informations_servicenow_batch_check").prop("checked");
+            var batch_api_url;
+            if (enable_batch == true){
+                batch_api_url = $("#form_destination_informations_servicenow_batch_url").val();
+            } else {
+                batch_api_url = "";
+            }
+            var servicenow = {
+                "servicenow_user": $("#form_destination_informations_servicenow_user").val(),
+                "servicenow_password": servicenow_password,
+                "table_api_url": $("#form_destination_informations_servicenow_url").val(),
+                "batch_api_url": batch_api_url,
+            }
+            destination_informations.push(servicenow);
         }
 
         return destination_informations;
@@ -1610,6 +1669,65 @@ const settings_notifications_common = {
                     "message": getText("400-00011", "必須項目が不足しています。({0})", getText("000-00211", "通知先URL"))
                 }
             } else {
+                return {
+                    "result": true,
+                    "message": ""
+                }
+            }
+        },
+
+        //
+        // validate description informations (ServiceNow)
+        //
+        destination_informations_servicenow: function(
+            form_destination_informations_servicenow_url,
+            form_destination_informations_servicenow_user,
+            form_destination_informations_servicenow_password_check,
+            form_destination_informations_servicenow_password,
+            form_destination_informations_servicenow_batch_check,
+            form_destination_informations_servicenow_batch_url,
+            form_destination_informations_servicenow_interval,
+            form_destination_informations_servicenow_limit
+        ) {
+            err_flag = false;
+            var target_item_list = [];
+            var target_items = "";
+            if (form_destination_informations_servicenow_url === "") {
+                err_flag = true;
+                target_item_list.push(getText("000-87042", "ServiceNow API URL (個別登録用)"));
+            }
+            if (form_destination_informations_servicenow_user === "") {
+                err_flag = true;
+                target_item_list.push(getText("000-87043", "ServiceNow ユーザー"));
+            }
+            if (form_destination_informations_servicenow_password_check == true) {
+                if (form_destination_informations_servicenow_password === "") {
+                    err_flag = true;
+                    target_item_list.push(getText("000-87044", "ServiceNow パスワード"));
+                }
+            }
+            if (form_destination_informations_servicenow_batch_check == true) {
+                if (form_destination_informations_servicenow_batch_url === "") {
+                    err_flag = true;
+                    target_item_list.push(getText("000-87046", "ServiceNow API URL (一括登録用)"));
+                }
+                if (form_destination_informations_servicenow_interval === "") {
+                    err_flag = true;
+                    target_item_list.push(getText("000-87047", "送信間隔 (秒)"));
+                }
+                if (form_destination_informations_servicenow_limit === "") {
+                    err_flag = true;
+                    target_item_list.push(getText("000-87048", "一回に送信する最大件数"));
+                }
+            }
+
+            if(err_flag){
+                target_items = target_item_list.join(', ');
+                return {
+                    "result": false,
+                    "message": getText("400-00011", "必須項目が不足しています。({0})", target_items)
+                }
+            }else{
                 return {
                     "result": true,
                     "message": ""
