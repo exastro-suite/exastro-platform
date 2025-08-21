@@ -108,7 +108,7 @@ $(function(){
         }else{
             $("#text_destination_kind").text(destination_row.kind);
         }
-        settings_notifications_common.set_destination_informations_text(destination_row.kind, destination_row.destination_informations);
+        settings_notifications_common.set_destination_informations_text(destination_row.kind, destination_row.destination_informations, destination_row.batch_period_seconds, destination_row.batch_count_limit);
 
         try { $("#text_last_update_date_time").text(fn.date(new Date(destination_row.last_update_timestamp),'yyyy/MM/dd HH:mm:ss'))} catch(e) { }
 
@@ -144,19 +144,26 @@ $(function(){
         //
         // notification test button
         //
-        $('#button_test').on('click',() => {
-            confirmMessage(getText("000-80030", "確認"), getText("000-87036", "テスト通知を行いますか？<br><br>タイトル・本文：notification testで通知されます。"),
-                () => {
-                    // OK
-                    $('#button_test').prop('disabled',true);
-                    notification_test(destination_row);
-                },
-                () => {
-                    // Cancel
-                    return;
-                }
-            )
-        });
+        if(destination_row.kind === DESTINATION_KIND_SERVICENOW) {
+            // ServiceNowの場合は通知テストボタンは非表示とする
+            $("#button_test").remove();
+        } else {
+            $('#button_test').on('click',() => {
+                confirmMessage(getText("000-80030", "確認"), getText("000-87036", "テスト通知を行いますか？<br><br>タイトル・本文：notification testで通知されます。"),
+                    () => {
+                        // OK
+                        $('#button_test').prop('disabled',true);
+                        notification_test(destination_row);
+                    },
+                    () => {
+                        // Cancel
+                        return;
+                    }
+                )
+            });
+        }
+
+
     }
 
     function delete_destination(destination_name) {

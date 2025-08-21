@@ -150,6 +150,12 @@
                                                                             <label for="form_destination_kind_webhook" class="radioTextLabel"><span class="radioTextMark"></span><span class="radioTextText">Webhook</span></label>
                                                                         </div>
                                                                     </li>
+                                                                    <li class="commonRadioItem">
+                                                                        <div class="radioTextWrap defaultRadioTextWrap">
+                                                                            <input type="radio" value="ServiceNow" id="form_destination_kind_servicenow" name="form_destination_kind" class="radioText">
+                                                                            <label for="form_destination_kind_servicenow" class="radioTextLabel"><span class="radioTextMark"></span><span class="radioTextText" text-id="000-87041">ServiceNow(レコード登録)</span></label>
+                                                                        </div>
+                                                                    </li>
                                                                 </ul>
                                                             </div>
                                                             <span class="validate_error" id="message_destination_kind"></span>
@@ -175,6 +181,19 @@
                                                             <input type="text" value="" class="tableEditInputText inputText input inputTextWidthAdjustment destination_informations" name="form_destination_informations_Webhook" id="form_destination_informations_webhook" maxlength="4000" style="display: none;">
                                                             <span class="ci destination_informations destination_informations_Webhook" style="display: none;">Header:</span>
                                                             <input type="text" value="" class="tableEditInputText inputText input inputTextWidthAdjustment destination_informations" name="form_destination_informations_Webhook" id="form_destination_informations_webhook_header" maxlength="4000" style="display: none;">
+                                                            <span class="ci destination_informations destination_informations_ServiceNow" text-id="000-87042" style="display: none;">ServiceNow API URL (個別登録用):</span>
+                                                            <input type="text" value="" class="tableEditInputText inputText input inputTextWidthAdjustment destination_informations" name="form_destination_informations_ServiceNow" id="form_destination_informations_servicenow_url" placeholder="https://{ServiceNow Host}/api/now/{Table Name}" maxlength="4000" style="display: none;">
+                                                            <span class="ci destination_informations destination_informations_ServiceNow" text-id="000-87043" style="display: none;">ServiceNow ユーザー:</span>
+                                                            <input type="text" value="" class="tableEditInputText inputText input inputTextWidthAdjustment destination_informations" name="form_destination_informations_ServiceNow" id="form_destination_informations_servicenow_user" maxlength="4000" style="display: none;">
+                                                            <span class="ci destination_informations destination_informations_ServiceNow" text-id="000-87044" style="display: none;">ServiceNow パスワード:</span>
+                                                            <input type="password" value="" class="tableEditInputText inputText input inputTextWidthAdjustment destination_informations" name="form_destination_informations_ServiceNow" id="form_destination_informations_servicenow_password" maxlength="4000" style="display: none;">
+                                                            <span class="destination_informations destination_informations_ServiceNow" style="display: none;"><input name="form_destination_informations_ServiceNow" class="input_checkbox destination_informations" id="form_destination_informations_servicenow_batch_check" type="checkbox"><span text-id="000-87045">一括登録</span><br></span>
+                                                            <span class="ci destination_informations destination_informations_ServiceNow" text-id="000-87046" style="display: none;">ServiceNow API URL (一括登録用):</span>
+                                                            <input type="text" value="" class="tableEditInputText inputText input inputTextWidthAdjustment destination_informations disabledPreventInput" name="form_destination_informations_ServiceNow" id="form_destination_informations_servicenow_batch_url" placeholder="https://{ServiceNow Host}/api/now/v1/batch" maxlength="4000" style="display: none;" disabled>
+                                                            <span class="ci destination_informations destination_informations_ServiceNow" text-id="000-87047" style="display: none;">送信間隔 (秒):</span>
+                                                            <input type="number" value="" class="tableEditInputText inputText input inputTextWidthAdjustment destination_informations disabledPreventInput" name="form_destination_informations_ServiceNow" id="form_destination_informations_servicenow_interval" min="1" max="9999" style="display: none;" disabled>
+                                                            <span class="ci destination_informations destination_informations_ServiceNow" text-id="000-87048" style="display: none;">一回に送信する最大件数:</span>
+                                                            <input type="number" value="" class="tableEditInputText inputText input inputTextWidthAdjustment destination_informations disabledPreventInput" name="form_destination_informations_ServiceNow" id="form_destination_informations_servicenow_limit"  min="1" max="9999" style="display: none;" disabled>
                                                             <span class="validate_error" id="message_destination_informations"></span>
                                                         </div></td>
                                                         <td class="tBodyTd td" rowspan="1" colspan="1">
@@ -183,6 +202,7 @@
                                                             <div class="ci pre destination_informations description_Teams" style="display: none;"></div>
                                                             <div class="ci pre destination_informations description_Teams_WF" style="display: none;"></div>
                                                             <div class="ci pre destination_informations description_Webhook" style="display: none;"></div>
+                                                            <div class="ci pre destination_informations description_ServiceNow" style="display: none;"></div>
                                                         </td>
                                                     </tr>
                                                 </tbody>

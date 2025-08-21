@@ -1200,11 +1200,15 @@ def validate_destination_kind(destination_kind):
     return result(True)
 
 
-def validate_destination_informations(destination_kind, destination_info):
+def validate_destination_informations(destination_kind, destination_info, enable_batch, batch_period_seconds, batch_count_limit, mode):
     """validate destination_informations
 
     Args:
         destination_info (dict): destination_info
+        enable_batch(bool): enable_batch
+        batch_period_seconds(int):batch_period_seconds
+        batch_count_limit(int):batch_count_limit
+        mode(str): 'create' or 'put'
 
     Returns:
         result: Validation result
@@ -1348,6 +1352,130 @@ def validate_destination_informations(destination_kind, destination_info):
                         False, 400, '400-{}027'.format(MSG_FUNCTION_ID), 'Headerの形式に誤りがあります。({0}）',
                         multi_lang.get_text('000-00213', "通知先Webhook Header")
                     )
+
+    if destination_kind == const.DESTINATION_KIND_SERVICENOW:
+        if len(destination_info) > const.max_destination_servicenow:
+            return result(
+                False, 400, '400-{}018'.format(MSG_FUNCTION_ID), '指定可能な最大数を超えています。(項目:{0},最大数:{1})',
+                multi_lang.get_text('000-00217', "通知先ServiceNow"),
+                str(const.max_destination_email)
+            )
+
+        for row in destination_info:
+            if row.get('table_api_url') is None or row.get('table_api_url') == "":
+                return result(
+                    False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
+                    multi_lang.get_text('000-00218', "通知先ServiceNow API URL (個別登録用)")
+                )
+
+            if len(row['table_api_url']) > const.length_destination_servicenow_url:
+                return result(
+                    False, 400, '400-{}012'.format(MSG_FUNCTION_ID), '指定可能な文字数を超えています。(項目:{0},最大文字数:{1})',
+                    multi_lang.get_text('000-00218', "通知先ServiceNow API URL (個別登録用"),
+                    str(const.length_destination_servicenow_url)
+                )
+
+            try:
+                table_api_urlparse = urllib.parse.urlparse(row['table_api_url'])
+                if table_api_urlparse.scheme not in ['http', 'https']:
+                    raise ValueError
+
+            except ValueError:
+                return result(
+                    False, 400, '400-{}027'.format(MSG_FUNCTION_ID), 'URLの形式に誤りがあります。({0}）',
+                    multi_lang.get_text('000-00218', "通知先ServiceNow API URL (個別登録用)")
+                )
+
+            if row.get('servicenow_user') is None or row.get('servicenow_user') == "":
+                return result(
+                    False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
+                    multi_lang.get_text('000-00219', "通知先ServiceNow ユーザー")
+                )
+
+            if len(row['servicenow_user']) > const.length_destination_servicenow_user:
+                return result(
+                    False, 400, '400-{}012'.format(MSG_FUNCTION_ID), '指定可能な文字数を超えています。(項目:{0},最大文字数:{1})',
+                    multi_lang.get_text('000-00219', "ServiceNow ユーザー"),
+                    str(const.length_destination_servicenow_user)
+                )
+
+            if mode == 'create':
+                if row.get('servicenow_password') is None or row.get('servicenow_password') == "":
+                    return result(
+                        False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
+                        multi_lang.get_text('000-00220', "通知先ServiceNow パスワード")
+                    )
+
+            if row.get('servicenow_password'):
+                if len(row['servicenow_password']) > const.length_destination_servicenow_password:
+                    return result(
+                        False, 400, '400-{}012'.format(MSG_FUNCTION_ID), '指定可能な文字数を超えています。(項目:{0},最大文字数:{1})',
+                        multi_lang.get_text('000-00220', "通知先ServiceNow パスワード"),
+                        str(const.length_destination_servicenow_password)
+                    )
+
+            if enable_batch is True:
+                if row.get('batch_api_url') is None or row.get('batch_api_url') == "":
+                    return result(
+                        False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
+                        multi_lang.get_text('000-00221', "通知先ServiceNow API URL (一括登録用)")
+                    )
+
+                if len(row['batch_api_url']) > const.length_destination_servicenow_batch_url:
+                    return result(
+                        False, 400, '400-{}012'.format(MSG_FUNCTION_ID), '指定可能な文字数を超えています。(項目:{0},最大文字数:{1})',
+                        multi_lang.get_text('000-00221', "通知先ServiceNow API URL (一括登録用)"),
+                        str(const.length_destination_servicenow_batch_url)
+                    )
+
+                try:
+                    batch_api_urlparse = urllib.parse.urlparse(row['batch_api_url'])
+                    if batch_api_urlparse.scheme not in ['http', 'https']:
+                        raise ValueError
+
+                except ValueError:
+                    return result(
+                        False, 400, '400-{}027'.format(MSG_FUNCTION_ID), 'URLの形式に誤りがあります。({0}）',
+                        multi_lang.get_text('000-00221', "通知先ServiceNow API URL (一括登録用")
+                    )
+
+                table_api_url_scheme = table_api_urlparse.scheme
+                table_api_url_origin = table_api_urlparse.netloc
+                batch_api_url_scheme = batch_api_urlparse.scheme
+                batch_api_url_origin = batch_api_urlparse.netloc
+                if table_api_url_scheme != batch_api_url_scheme or table_api_url_origin != batch_api_url_origin:
+                    return result(
+                        False, 400, '400-{}038'.format(MSG_FUNCTION_ID), '「ServiceNow API URL (個別登録用)」と「ServiceNow API URL (一括登録用)」について、URLのオリジンに差分があります。'
+                    )
+
+                if batch_period_seconds is None or batch_period_seconds == "":
+                    return result(
+                        False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
+                        multi_lang.get_text('000-00222', "通知先ServiceNow 送信間隔 (秒)")
+                    )
+
+                if batch_period_seconds < const.min_batch_period_seconds or batch_period_seconds > const.max_batch_period_seconds:
+                    return result(
+                        False, 400, '400-{}037'.format(MSG_FUNCTION_ID), '指定可能な値の範囲外です。(項目:{0},最小値:{1},最大値:{2})',
+                        multi_lang.get_text('000-00221', "通知先ServiceNow 送信間隔 (秒)"),
+                        str(const.min_batch_period_seconds),
+                        str(const.max_batch_period_seconds)
+                    )
+
+                if batch_count_limit is None or batch_count_limit == "":
+                    return result(
+                        False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
+                        multi_lang.get_text('000-00223', "通知先ServiceNow 一回に送信する最大件数")
+                    )
+
+                if batch_count_limit < const.min_batch_count_limit or batch_count_limit > const.max_batch_count_limit:
+                    return result(
+                        False, 400, '400-{}037'.format(MSG_FUNCTION_ID), '指定可能な値の範囲外です。(項目:{0},最小値:{1},最大値:{2})',
+                        multi_lang.get_text('000-00223', "通知先ServiceNow 一回に送信する最大件数"),
+                        str(const.min_batch_count_limit),
+                        str(const.max_batch_count_limit)
+                    )
+
 
     return result(True)
 
