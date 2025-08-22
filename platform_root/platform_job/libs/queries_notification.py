@@ -20,6 +20,8 @@ SQL_UPDATE_STATUS_NOTIFICATION_MESSAGE = """
 UPDATE T_NOTIFICATION_MESSAGE
     SET NOTIFICATION_STATUS     =   %(notification_status)s
     ,   LAST_UPDATE_USER        =   %(last_update_user)s
+    ,   HTTP_RESPONSE_CODE      =   %(http_response_code)s
+    ,   HTTP_RESPONSE_BODY      =   %(http_response_body)s
     WHERE   NOTIFICATION_ID     =   %(notification_id)s
     AND     NOTIFICATION_STATUS =   %(notification_status_now)s
 """

@@ -25,8 +25,8 @@ import pymysql
 from common_library.common.db import DBconnector
 
 
-TEST_HTTPCODE200_ORIGIN="http://mocked.httpcode200.test"
-TEST_HTTPCODE500_ORIGIN="http://mocked.httpcode500.test"
+TEST_HTTPCODE200_ORIGIN = "http://mocked.httpcode200.test"
+TEST_HTTPCODE500_ORIGIN = "http://mocked.httpcode500.test"
 
 
 def keycloak_origin():
@@ -78,25 +78,62 @@ def insert_queue(queue: list):
     with closing(DBconnector().connect_platformdb()) as conn, conn.cursor() as cursor:
         conn.begin()
         for row in queue:
-            cursor.execute("""
-                INSERT INTO T_PROCESS_QUEUE
-                (
-                    PROCESS_ID,
-                    PROCESS_KIND,
-                    PROCESS_EXEC_ID,
-                    ORGANIZATION_ID,
-                    WORKSPACE_ID,
-                    LAST_UPDATE_USER
-                ) VALUES (
-                    %(PROCESS_ID)s,
-                    %(PROCESS_KIND)s,
-                    %(PROCESS_EXEC_ID)s,
-                    %(ORGANIZATION_ID)s,
-                    %(WORKSPACE_ID)s,
-                    %(LAST_UPDATE_USER)s
-                )
-            """, row)
+            if 'ENABLE_BATCH' not in row:
+                cursor.execute("""
+                    INSERT INTO T_PROCESS_QUEUE
+                    (
+                        PROCESS_ID,
+                        PROCESS_KIND,
+                        PROCESS_EXEC_ID,
+                        ORGANIZATION_ID,
+                        WORKSPACE_ID,
+                        LAST_UPDATE_USER
+                    ) VALUES (
+                        %(PROCESS_ID)s,
+                        %(PROCESS_KIND)s,
+                        %(PROCESS_EXEC_ID)s,
+                        %(ORGANIZATION_ID)s,
+                        %(WORKSPACE_ID)s,
+                        %(LAST_UPDATE_USER)s
+                    )
+                """, row)
+            else:
+                cursor.execute("""
+                    INSERT INTO T_PROCESS_QUEUE
+                    (
+                        PROCESS_ID,
+                        PROCESS_KIND,
+                        PROCESS_EXEC_ID,
+                        ORGANIZATION_ID,
+                        WORKSPACE_ID,
+                        ENABLE_BATCH,
+                        BATCH_PERIOD_SECONDS,
+                        BATCH_COUNT_LIMIT,
+                        BATCH_GROUP_KEY,
+                        LAST_UPDATE_TIMESTAMP,
+                        LAST_UPDATE_USER
+                    ) VALUES (
+                        %(PROCESS_ID)s,
+                        %(PROCESS_KIND)s,
+                        %(PROCESS_EXEC_ID)s,
+                        %(ORGANIZATION_ID)s,
+                        %(WORKSPACE_ID)s,
+                        %(ENABLE_BATCH)s,
+                        %(BATCH_PERIOD_SECONDS)s,
+                        %(BATCH_COUNT_LIMIT)s,
+                        %(BATCH_GROUP_KEY)s,
+                        %(LAST_UPDATE_TIMESTAMP)s,
+                        %(LAST_UPDATE_USER)s
+                    )
+                """, row)
+
         conn.commit()
+
+
+def clear_queue():
+    with closing(DBconnector().connect_platformdb()) as conn, conn.cursor() as cursor:
+        cursor.execute("TRUNCATE TABLE T_PROCESS_QUEUE")
+        cursor.execute("TRUNCATE TABLE T_PROCESS_QUEUE_LOCK")
 
 
 def equal_queue(queue1: dict, queue2: dict):
@@ -123,7 +160,13 @@ def equal_queue(queue1: dict, queue2: dict):
     if "LAST_UPDATE_TIMESTAMP" in cp_queue2:
         del cp_queue2["LAST_UPDATE_TIMESTAMP"]
 
-    return cp_queue1 == cp_queue2
+    for key in cp_queue1.keys():
+        if cp_queue1[key] == cp_queue2[key]:
+            pass
+        else:
+            return False
+
+    return True
 
 
 class get_main_process(psutil.Process):
@@ -267,6 +310,7 @@ class pymysql_execute_raise_exception_state():
     """pymysql SQL called count
     """
     count = {}
+
     @classmethod
     def initialize(cls):
         cls.count = {}

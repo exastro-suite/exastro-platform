@@ -108,10 +108,18 @@ JOBS = {
             "webhook_connection_timeout": float(os.environ.get('JOB_NOTIFICATION_WEBHOOK_CONNECTION_TIMEOUT')),
             # webhookのhttp read timeout時間 / webhook http read timeout time
             "webhook_read_timeout": float(os.environ.get('JOB_NOTIFICATION_WEBHOOK_READ_TIMEOUT')),
+            # servicenowのhttp connection timeout時間 / servicenow http connection timeout time
+            "servicenow_connetion_timeout": float(os.environ.get('JOB_NOTIFICATION_SERVICENOW_CONNECTION_TIMEOUT')),
+            # servicenowのhttp read timeout時間(1件送信) / servicenow http read timeout time(1 submission)
+            "servicenow_one_read_timeout": float(os.environ.get('JOB_NOTIFICATION_SERVICENOW_ONE_READTIMEOUT')),
+            # servicenowのhttp read timeout時間(バッチ送信) / servicenow http read timeout time(Batch sending)
+            "servicenow_batch_read_timeout": float(os.environ.get('JOB_NOTIFICATION_SERVICENOW_BATCH_READTIMEOUT')),
             # smtpのtimeout時間 / smtp timeout time
             "smtp_timeout": float(os.environ.get('JOB_NOTIFICATION_SMTP_TIMEOUT')),
             # smtpsのssl verify(TRUE/FALSE) / smtps ssl verify(TRUE/FALSE)
             "smtps_ssl_verify_enabled": common.val_to_boolean(os.environ.get('JOB_NOTIFICATION_SMTPS_SSL_VERIFY_ENABLED', 'TRUE')),
+            # 通知を取りやめる経過時間（0の場合は取りやめしない） 1440(min) = 1(day)
+            "aborted_expired_duration_minutes": int(os.environ.get('JOB_NOTIFICATION_ABORTED_EXPIRED_DURATION_MINUTES')),
         }
     },
     const.PROCESS_KIND_USER_IMPORT: {
