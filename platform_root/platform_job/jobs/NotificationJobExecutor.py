@@ -131,7 +131,6 @@ class NotificationJobExecutor(BaseJobExecutor):
                             "http_response_body": notification_result["http_response_body"],
                             "notification_status_now": const.NOTIFICATION_STATUS_UNSENT,
                         })
-                    globals.logger.info(f'servicenow notification result notification_id:[{notification_id}] notification_status:[{notification_result["status"]}]')
                     conn.commit()
 
             return notification_result["status"] == const.NOTIFICATION_STATUS_SUCCESSFUL
@@ -198,7 +197,8 @@ class NotificationJobExecutor(BaseJobExecutor):
                                 "http_response_body": notification_results[index]["http_response_body"],
                                 "notification_status_now": const.NOTIFICATION_STATUS_UNSENT,
                             })
-                        globals.logger.info(f'servicenow notification result[{index}] notification_id:[{queue["PROCESS_EXEC_ID"]}] notification_status:[{notification_results[index]["status"]}]')
+                        self.set_batch_result(index, notification_results[index]["status"] == const.NOTIFICATION_STATUS_SUCCESSFUL)
+
                     conn.commit()
 
             # 全てが成功の場合はTrue,1つでも成功以外があればFalseを返す

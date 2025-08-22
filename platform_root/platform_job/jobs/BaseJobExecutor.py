@@ -19,6 +19,7 @@ import datetime
 from libs.exceptions import JobTimeoutException
 import job_manager_config
 
+
 class BaseJobExecutor(metaclass=abc.ABCMeta):
     """job実行classの基底class / Base class of job execution class
 
@@ -31,10 +32,12 @@ class BaseJobExecutor(metaclass=abc.ABCMeta):
         self.queue = queue
         self.batch_queue = batch_queue
         self.job_config = job_manager_config.JOBS[self.queue.get('PROCESS_KIND')]
-        self.__job_info = (
-            f"kind:[{self.queue.get('PROCESS_KIND')}] / exec_id:[{self.queue.get('PROCESS_EXEC_ID')}] / " +
-            f"organization_id:[{self.queue.get('ORGANIZATION_ID')}] / workspace_id:[{self.queue.get('WORKSPACE_ID')}] / " +
-            f"timestamp:[{self.queue.get('LAST_UPDATE_TIMESTAMP')}]")
+        self.__job_info = self.__format_job_info(queue)
+
+        if self.batch_queue is not None:
+            self.batch_results = [None] * len(batch_queue)
+        else:
+            self.batch_results = [None]
 
         # スレッドidの初期化 / Initializing thread id
         self.__thread_id = None
@@ -51,7 +54,11 @@ class BaseJobExecutor(metaclass=abc.ABCMeta):
         try:
             self.__thread_id = ctypes.c_long(threading.get_ident())
             result = self.execute()
-            
+
+            if self.batch_queue is not None:
+                # BATCHの個別結果の出力
+                self.__output_batch_result_log()
+
             if result:
                 globals.logger.info(f"SUCCEED Job - {self.__job_info} / elapsed:[{(datetime.datetime.now() - start_time).total_seconds()}]")
             else:
@@ -69,6 +76,11 @@ class BaseJobExecutor(metaclass=abc.ABCMeta):
         try:
             self.__cancel_thread_id = ctypes.c_long(threading.get_ident())
             result = self.cancel()
+
+            if self.batch_queue is not None:
+                # BATCHの個別結果の出力
+                self.__output_batch_result_log()
+
             if result:
                 globals.logger.info(f"SUCCEED Cancel Job - {self.__job_info} / elapsed:[{(datetime.datetime.now() - start_time).total_seconds()}]")
             else:
@@ -77,6 +89,15 @@ class BaseJobExecutor(metaclass=abc.ABCMeta):
         except Exception:
             globals.logger.error(f"FAILED Cancel Job - {self.__job_info} / elapsed:[{(datetime.datetime.now() - start_time).total_seconds()}]")
             return False
+
+    def set_batch_result(self, index: int, result: bool):
+        """BATCH処理の個別結果の格納
+
+        Args:
+            index (int): batch_queueのindex
+            result (bool): 処理結果
+        """
+        self.batch_results[index] = result
 
     def raise_timeout_exception(self):
         """job実行の中止(例外発行)
@@ -103,6 +124,26 @@ class BaseJobExecutor(metaclass=abc.ABCMeta):
             ctypes.py_object(JobTimeoutException))
         globals.logger.debug(f"Raise JobTimeoutException cancel_thread id:[{self.__cancel_thread_id}] result:[{rlt}]")
         return rlt == 1
+
+    def __output_batch_result_log(self):
+        """batchの個別の成否を出力
+        """
+        for index, queue in enumerate(self.batch_queue):
+            if self.batch_results[index] is None:
+                result = "Unknown"
+            elif self.batch_results[index]:
+                result = "Succeed"
+            else:
+                result = "Failed"
+
+            job_info = self.__format_job_info(queue)
+            globals.logger.info(f"batch item result({index}): {result} - {job_info}")
+
+    def __format_job_info(self, queue):
+        return (
+            f"kind:[{queue.get('PROCESS_KIND')}] / exec_id:[{queue.get('PROCESS_EXEC_ID')}] / " +
+            f"organization_id:[{queue.get('ORGANIZATION_ID')}] / workspace_id:[{queue.get('WORKSPACE_ID')}] / " +
+            f"timestamp:[{queue.get('LAST_UPDATE_TIMESTAMP')}]")
 
     @abc.abstractmethod
     def execute(self):
