@@ -1839,7 +1839,6 @@ max-width: none;
 .ci.pre.destination_informations{
 overflow: visible !important;
 white-space: unset !important;
-max-width: 95%;
 }
 .tBodyAutoInput {
 display: block;
