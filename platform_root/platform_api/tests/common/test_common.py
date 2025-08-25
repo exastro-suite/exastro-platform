@@ -368,6 +368,7 @@ def create_setting_notifications(connexion_client, organization_id, workspace_id
         rows.append(test_notification_service_controller.sample_data_mail('mix-mail-01'))
         rows.append(test_notification_service_controller.sample_data_teams_wf('mix-teams_wf-01'))
         rows.append(test_notification_service_controller.sample_data_webhook('mix-webhook-01'))
+        rows.append(test_notification_service_controller.sample_data_servicenow('mix-servicenow-01'))
 
     logger = logging.getLogger("TEST")
 
