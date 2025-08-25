@@ -186,6 +186,7 @@ class NotificationJobExecutor(BaseJobExecutor):
                         notification_results = self.__send_message_servicenow_batch(queue_list, destination_informations_list, message_infomations_list)
 
                     # 送信結果を書き込む / Write the transmission result
+                    globals.logger.debug('start write result to db')
                     for index, queue in enumerate(queue_list):
                         cursor.execute(
                             queries_notification.SQL_UPDATE_STATUS_NOTIFICATION_MESSAGE,
@@ -200,6 +201,7 @@ class NotificationJobExecutor(BaseJobExecutor):
                         self.set_batch_result(index, notification_results[index]["status"] == const.NOTIFICATION_STATUS_SUCCESSFUL)
 
                     conn.commit()
+                    globals.logger.debug('end write result to db')
 
             # 全てが成功の場合はTrue,1つでも成功以外があればFalseを返す
             for notification_result in notification_results:
@@ -455,6 +457,7 @@ class NotificationJobExecutor(BaseJobExecutor):
 
             try:
                 resp_webhook_text = None
+                globals.logger.debug('start requests.post')
                 response = requests.post(
                     destination_information['batch_api_url'],
                     json={
@@ -467,6 +470,7 @@ class NotificationJobExecutor(BaseJobExecutor):
                         self.job_config['extra_config']['servicenow_connetion_timeout'],
                         self.job_config['extra_config']['servicenow_batch_read_timeout'],
                     ))
+                globals.logger.debug('end requests.post')
 
                 resp_webhook_text = response.text
 
@@ -479,6 +483,7 @@ class NotificationJobExecutor(BaseJobExecutor):
                     raise Exception(f"response code:{response.status_code}")
 
                 # 1件毎の応答を設定する
+                globals.logger.debug('start setting response')
                 response_json = json.loads(response.text)
                 for serviced_request in response_json["serviced_requests"]:
                     index = next((index for index, queue in enumerate(queue_list) if queue['PROCESS_EXEC_ID'] == serviced_request.get("id")), None)
@@ -492,6 +497,8 @@ class NotificationJobExecutor(BaseJobExecutor):
 
                     notification_results[index]["http_response_code"] = serviced_request.get("status_code")
                     notification_results[index]["http_response_body"] = base64.b64decode(serviced_request.get("body").encode()).decode()
+
+                globals.logger.debug('end setting response')
 
             except Exception as err:
                 globals.logger.warning(f'{err}\n-- stack trace --\n{traceback.format_exc()}')
