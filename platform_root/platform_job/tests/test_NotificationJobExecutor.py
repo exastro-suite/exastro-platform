@@ -1177,7 +1177,7 @@ def make_notification_servicenow_one(organization_id: str, workspace_id: str, sn
                 "servicenow_password": sn_pw,
                 "table_api_url": sn_api_uri
             }])),
-        "MESSAGE_INFORMATIONS": json.dumps(body),
+        "MESSAGE_INFORMATIONS": json.dumps({"title": "dummy-title", "message" : json.dumps(body)}),
         "NOTIFICATION_STATUS": const.NOTIFICATION_STATUS_UNSENT,
         "CREATE_USER": job_manager_const.SYSTEM_USER_ID,
         "LAST_UPDATE_USER": job_manager_const.SYSTEM_USER_ID,
@@ -1244,7 +1244,7 @@ def make_notification_servicenow_batch(organization_id, workspace_id, sn_batch_u
                         "batch_api_url": sn_batch_url,
                         "table_api_url": sn_api_url
                     }])),
-                "MESSAGE_INFORMATIONS": json.dumps(sn_body),
+                "MESSAGE_INFORMATIONS": json.dumps({"title": "dummy-title", "message" : json.dumps(sn_body)}),
                 "NOTIFICATION_STATUS": const.NOTIFICATION_STATUS_UNSENT,
                 "CREATE_USER": job_manager_const.SYSTEM_USER_ID,
                 "LAST_UPDATE_USER": job_manager_const.SYSTEM_USER_ID,

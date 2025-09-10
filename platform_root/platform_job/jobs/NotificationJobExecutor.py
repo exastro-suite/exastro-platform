@@ -400,10 +400,11 @@ class NotificationJobExecutor(BaseJobExecutor):
             "http_response_body": None
         }
         for destination_information in destination_informations:
+            resp_webhook_text = None
             try:
                 response = requests.post(
                     destination_information['table_api_url'],
-                    json=message_infomations,
+                    json=json.loads(message_infomations.get("message", "{}")),
                     headers={"Content-type": "application/json", "Accept": "application/json"},
                     auth=(destination_information['servicenow_user'], destination_information['servicenow_password']),
                     timeout=(
@@ -452,7 +453,7 @@ class NotificationJobExecutor(BaseJobExecutor):
                     ],
                     "url": table_api_path,
                     "method": "POST",
-                    "body": base64.b64encode(json.dumps(message_infomations_list[index]).encode()).decode('ascii')
+                    "body": base64.b64encode(json.dumps(json.loads(message_infomations_list[index].get("message", "{}"))).encode()).decode('ascii')
                 })
 
             try:
