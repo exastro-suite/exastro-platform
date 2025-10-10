@@ -71,6 +71,8 @@ $(function(){
         $('#ita_event_type_evaluated').prop("checked", fn.cv(destination_row.conditions.ita.event_type.evaluated, false, false));
         $('#ita_event_type_timeout').prop("checked", fn.cv(destination_row.conditions.ita.event_type.timeout, false, false));
         $('#ita_event_type_undetected').prop("checked", fn.cv(destination_row.conditions.ita.event_type.undetected, false, false));
+        $('#ita_event_type_new_received').prop("checked", fn.cv(destination_row.conditions.ita.event_type.new_received, false, false));
+        $('#ita_event_type_new_consolidated').prop("checked", fn.cv(destination_row.conditions.ita.event_type.new_consolidated, false, false));
 
         $('.description_Mail').html(getText('000-87017', 'email形式 (最大{0}メールアドレス)<br>※複数のメールアドレスを指定する場合は「;（セミコロン）」「,（カンマ）」記号<br>または、改行を区切り文字として使用します', MAX_MAIL_COUNT));
         $('.description_Teams').html(getText('000-87018', 'URL形式'));
@@ -231,6 +233,8 @@ $(function(){
                         "evaluated": $('#ita_event_type_evaluated').prop("checked"),
                         "timeout": $('#ita_event_type_timeout').prop("checked"),
                         "undetected": $('#ita_event_type_undetected').prop("checked"),
+                        "new_received": $('#ita_event_type_new_received').prop("checked"),
+                        "new_consolidated": $('#ita_event_type_new_consolidated').prop("checked"),
                     },
                 },
             },

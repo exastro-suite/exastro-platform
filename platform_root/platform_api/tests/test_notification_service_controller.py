@@ -618,6 +618,28 @@ def test_notifications_validate(connexion_client):
     validate = validation.validate_destination_conditions(conditions)
     assert not validate.ok, "create notifications validate conditions ita.event_type.undetected different type"
 
+    # validate conditions ita.event_type.new_received
+    conditions = sample_data_conditions()
+    conditions["ita"]["event_type"]["new_received"] = None
+    validate = validation.validate_destination_conditions(conditions)
+    assert not validate.ok, "create notifications validate conditions ita.event_type.new_received None"
+
+    conditions = sample_data_conditions()
+    conditions["ita"]["event_type"]["new_received"] = "dummy"
+    validate = validation.validate_destination_conditions(conditions)
+    assert not validate.ok, "create notifications validate conditions ita.event_type.new_received different type"
+
+    # validate conditions ita.event_type.new_consolidated
+    conditions = sample_data_conditions()
+    conditions["ita"]["event_type"]["new_consolidated"] = None
+    validate = validation.validate_destination_conditions(conditions)
+    assert not validate.ok, "create notifications validate conditions ita.event_type.new_consolidated None"
+
+    conditions = sample_data_conditions()
+    conditions["ita"]["event_type"]["new_consolidated"] = "dummy"
+    validate = validation.validate_destination_conditions(conditions)
+    assert not validate.ok, "create notifications validate conditions ita.event_type.new_consolidated different type"
+
     #
     # validate body
     #
@@ -1021,6 +1043,30 @@ def test_settings_notification_list(connexion_client):
         assert response.json["data"][0].get("conditions", {}).get("ita", {}).get("event_type", {}).get("new"), "get notifications destination id check"
         assert not response.json["data"][0].get("conditions", {}).get("ita", {}).get("event_type", {}).get("evaluated"), "get notifications destination id check"
 
+        #
+        # validate get normal
+        #
+        response = connexion_client.get(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/settings/notifications?event_type_true=ita.event_type.new_received,ita.event_type.new_consolidated",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization['user_id']))
+
+        assert response.status_code == 200, "get notifications destination list response OK route"
+        assert response.json["data"][0].get("conditions", {}).get("ita", {}).get("event_type", {}).get("new_received"), "get notifications destination id check"
+        assert response.json["data"][0].get("conditions", {}).get("ita", {}).get("event_type", {}).get("new_consolidated"), "get notifications destination id check"
+
+        #
+        # validate get normal
+        #
+        response = connexion_client.get(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/settings/notifications?event_type_false=ita.event_type.new_received,ita.event_type.new_consolidated",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization['user_id']))
+
+        assert response.status_code == 200, "get notifications destination list response OK route"
+        assert not response.json["data"][0].get("conditions", {}).get("ita", {}).get("event_type", {}).get("new_received"), "get notifications destination id check"
+        assert not response.json["data"][0].get("conditions", {}).get("ita", {}).get("event_type", {}).get("new_consolidated"), "get notifications destination id check"
+
 
 def test_settings_notification_destination_delete(connexion_client):
     """test settings_destination_get
@@ -1149,8 +1195,8 @@ def test_settings_notification_destination_delete(connexion_client):
         assert response.json["message"] == f"Failed to delete notification destination (destination id:{setting_notifications[1]['id']})", "DB error route"
 
     with test_common.requsts_mocker_default(), \
-        test_common.pymysql_execute_data_mocker(queries_organization_options.SQL_QUERY_ORGANIZATION_INFORMATIONS, {"INFORMATIONS": '{"ext_options": {"options_ita": {"drivers": {"oase": false}}}}'}), \
-        mock.patch.object(api_ita_admin_call, 'ita_notification_destination', return_value='1') as mock_obj:
+         test_common.pymysql_execute_data_mocker(queries_organization_options.SQL_QUERY_ORGANIZATION_INFORMATIONS, {"INFORMATIONS": '{"ext_options": {"options_ita": {"drivers": {"oase": false}}}}'}), \
+         mock.patch.object(api_ita_admin_call, 'ita_notification_destination', return_value='1') as mock_obj:
 
         mock_obj.return_value = MockResponse({'data': '["mix-teams_wf-01"]'}, 200)
         # destination_id in use
@@ -1197,7 +1243,7 @@ def sample_data_mail_no_id(update={}):
         "conditions": {
             "ita": {
                 "event_type": {
-                    "new": True, "evaluated": False, "timeout": True, "undetected": False,
+                    "new": True, "evaluated": False, "timeout": True, "undetected": False, "new_received": True, "new_consolidated": True,
                 }
             }
         }
@@ -1238,7 +1284,7 @@ def sample_data_teams_no_id(update={}):
         "conditions": {
             "ita": {
                 "event_type": {
-                    "new": True, "evaluated": False, "timeout": True, "undetected": False,
+                    "new": True, "evaluated": False, "timeout": True, "undetected": False, "new_received": True, "new_consolidated": True,
                 }
             }
         }
@@ -1279,7 +1325,7 @@ def sample_data_teams_wf_no_id(update={}):
         "conditions": {
             "ita": {
                 "event_type": {
-                    "new": True, "evaluated": False, "timeout": True, "undetected": False,
+                    "new": True, "evaluated": False, "timeout": True, "undetected": False, "new_received": False, "new_consolidated": False,
                 }
             }
         }
@@ -1321,7 +1367,7 @@ def sample_data_webhook_no_id(update={}):
         "conditions": {
             "ita": {
                 "event_type": {
-                    "new": True, "evaluated": False, "timeout": True, "undetected": False,
+                    "new": True, "evaluated": False, "timeout": True, "undetected": False, "new_received": False, "new_consolidated": False,
                 }
             }
         }
@@ -1368,7 +1414,7 @@ def sample_data_servicenow_no_id(update={}):
         "conditions": {
             "ita": {
                 "event_type": {
-                    "new": True, "evaluated": False, "timeout": True, "undetected": False,
+                    "new": True, "evaluated": False, "timeout": True, "undetected": False, "new_received": False, "new_consolidated": False,
                 }
             }
         }

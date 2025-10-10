@@ -112,12 +112,16 @@ $(function(){
                 var ita_event_type_evaluated = fn.cv(row.conditions.ita.event_type.evaluated,false,false) ? getText("000-00184", 'する') : getText("000-00185", 'しない');
                 var ita_event_type_timeout = fn.cv(row.conditions.ita.event_type.timeout,false,false) ? getText("000-00184", 'する') : getText("000-00185", 'しない');
                 var ita_event_type_undetected = fn.cv(row.conditions.ita.event_type.undetected,false,false) ? getText("000-00184", 'する') : getText("000-00185", 'しない');
+                var ita_event_type_new_received = fn.cv(row.conditions.ita.event_type.new_received,false,false) ? getText("000-00184", 'する') : getText("000-00185", 'しない');
+                var ita_event_type_new_consolidated = fn.cv(row.conditions.ita.event_type.new_consolidated,false,false) ? getText("000-00184", 'する') : getText("000-00185", 'しない');
 
                 str_conditions = "";
-                str_conditions += getText("000-87022", "OASE／イベント種別") + ":" + getText("000-00153", '新規') + ":" + ita_event_type_new + "<br>";
-                str_conditions += getText("000-87022", "OASE／イベント種別") + ":" + getText("000-00154", '既知（判定済み）') + ":" + ita_event_type_evaluated + "<br>";
-                str_conditions += getText("000-87022", "OASE／イベント種別") + ":" + getText("000-00155", '既知（時間切れ）') + ":" + ita_event_type_timeout + "<br>";
-                str_conditions += getText("000-87022", "OASE／イベント種別") + ":" + getText("000-00156", '未知') + ":" + ita_event_type_undetected + "<br>";
+                str_conditions += getText("000-87022", "OASE／種別") + ":" + getText("000-00153", '新規イベント（判定前）') + ":" + ita_event_type_new + "<br>";
+                str_conditions += getText("000-87022", "OASE／種別") + ":" + getText("000-00154", '既知イベント（判定時）') + ":" + ita_event_type_evaluated + "<br>";
+                str_conditions += getText("000-87022", "OASE／種別") + ":" + getText("000-00155", '既知イベント（TTL有効期限切れ）') + ":" + ita_event_type_timeout + "<br>";
+                str_conditions += getText("000-87022", "OASE／種別") + ":" + getText("000-00156", '未知イベント') + ":" + ita_event_type_undetected + "<br>";
+                str_conditions += getText("000-87022", "OASE／種別") + ":" + getText("000-00224", '新規イベント（受信時）') + ":" + ita_event_type_new_received + "<br>";
+                str_conditions += getText("000-87022", "OASE／種別") + ":" + getText("000-00225", '新規イベント（統合時）') + ":" + ita_event_type_new_consolidated + "<br>";
 
                 notification_alert_msg = "";
                 if (row.kind == "Teams"){

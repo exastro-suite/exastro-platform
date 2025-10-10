@@ -1150,6 +1150,8 @@ paths:
                           evaluated: false
                           timeout: true
                           undetected: true
+                          new_received: false
+                          new_consolidated: false
                     destination_informations:
                       - address_header: to
                         email: mike@example.com
@@ -1169,6 +1171,8 @@ paths:
                           evaluated: true
                           timeout: false
                           undetected: false
+                          new_received: false
+                          new_consolidated: false
                     destination_informations:
                       - url: 'https://{server-name}.{region}.logic.azure.com/workflows/{workflow-ID}/triggers/{trigger-name}/paths/invoke/?XXXXXXXXX'
               teams settings (deprecated):
@@ -1183,6 +1187,8 @@ paths:
                           evaluated: true
                           timeout: false
                           undetected: false
+                          new_received: false
+                          new_consolidated: false
                     destination_informations:
                       - webhook: 'https://xxxxxxxx.webhook.office.com/webhookb/xxxxxxxx-xxxxxx-xxxx-xxxx-xxxxxxxxxxxx'
               webhook settings:
@@ -1197,6 +1203,8 @@ paths:
                           evaluated: true
                           timeout: false
                           undetected: false
+                          new_received: false
+                          new_consolidated: false
                     destination_informations:
                       - url: 'http://your-webhook-server/hooks/XXXXXXXX'
                         header: '{"Content-Type": "application/json"}'
@@ -1212,6 +1220,8 @@ paths:
                           evaluated: true
                           timeout: false
                           undetected: false
+                          new_received: false
+                          new_consolidated: false
                     destination_informations:
                       - servicenow_user: servicenow_user01
                         servicenow_password: password
@@ -1329,6 +1339,8 @@ paths:
                         evaluated: true
                         timeout: true
                         undetected: true
+                        new_received: false
+                        new_consolidated: false
                   destination_informations:
                     - address_header: to
                       email: mike@example.com
@@ -1347,6 +1359,8 @@ paths:
                         evaluated: true
                         timeout: true
                         undetected: true
+                        new_received: false
+                        new_consolidated: false
                   destination_informations:
                     - url: 'https://{server-name}.{region}.logic.azure.com/workflows/{workflow-ID}/triggers/{trigger-name}/paths/invoke/?XXXXXXXXX'
               teams settings (deprecated):
@@ -1360,6 +1374,8 @@ paths:
                         evaluated: true
                         timeout: true
                         undetected: true
+                        new_received: false
+                        new_consolidated: false
                   destination_informations:
                     - webhook: 'https://xxxxxxxx.webhook.office.com/webhookb/xxxxxxxx-xxxxxx-xxxx-xxxx-xxxxxxxxxxxx'
               webhook settings:
@@ -1373,6 +1389,8 @@ paths:
                         evaluated: true
                         timeout: true
                         undetected: true
+                        new_received: false
+                        new_consolidated: false
                   destination_informations:
                     - url: 'http://your-webhook-server/hooks/XXXXXXXX'
                       header: '{"Content-Type": "application/json"}'
@@ -1387,6 +1405,8 @@ paths:
                         evaluated: true
                         timeout: true
                         undetected: true
+                        new_received: false
+                        new_consolidated: false
                   destination_informations:
                     - servicenow_user: servicenow_user01
                       servicenow_password: password
@@ -5114,21 +5134,29 @@ components:
               properties:
                 new:
                   type: boolean
-                  description: Whether to be notified of new events
+                  description: Whether to be notified of new events before evaluation
                 evaluated:
                   type: boolean
-                  description: Whether to be notified of evaluated event
+                  description: Whether to be notified of known events upon evaluation
                 timeout:
                   type: boolean
-                  description: Whether to be notified of timeout event
+                  description: Whether to be notified of known events upon TTL timeout
                 undetected:
                   type: boolean
-                  description: Whether to be notified of undetected event
+                  description: Whether to be notified of undetected events upon evaluation
+                new_received:
+                  type: boolean
+                  description: Whether to be notified of new events upon reception
+                new_consolidated:
+                  type: boolean
+                  description: Whether to be notified of new events upon consolidation
               required:
                 - new
                 - evaluated
                 - timeout
                 - undetected
+                - new_received
+                - new_consolidated
           required:
             - event_type
       required:
@@ -5510,6 +5538,8 @@ components:
                   evaluated: false
                   timeout: true
                   undetected: true
+                  new_received: false
+                  new_consolidated: false
             destination_informations:
               - address_header: to
                 email: mike@example.com
@@ -5537,6 +5567,8 @@ components:
                   evaluated: true
                   timeout: false
                   undetected: false
+                  new_received: false
+                  new_consolidated: false
             destination_informations:
               - url: 'https://{server-name}.{region}.logic.azure.com/workflows/{workflow-ID}/triggers/{trigger-name}/paths/invoke/?XXXXXXXXX'
             create_timestamp: '2023-11-02T05:36:41.258Z'
@@ -5559,6 +5591,8 @@ components:
                   evaluated: true
                   timeout: false
                   undetected: false
+                  new_received: false
+                  new_consolidated: false
             destination_informations:
               - webhook: 'https://xxxxxxxx.webhook.office.com/webhookb/xxxxxxxx-xxxxxx-xxxx-xxxx-xxxxxxxxxxxx'
             create_timestamp: '2023-11-02T05:36:41.258Z'
@@ -5581,6 +5615,8 @@ components:
                   evaluated: true
                   timeout: false
                   undetected: false
+                  new_received: false
+                  new_consolidated: false
             destination_informations:
               - url: 'http://your-webhook-server/hooks/XXXXXXXX'
                 header: '{"Content-Type": "application/json"}'
@@ -5604,6 +5640,8 @@ components:
                   evaluated: true
                   timeout: false
                   undetected: false
+                  new_received: false
+                  new_consolidated: false
             destination_informations:
               - servicenow_user: servicenow_user01
                 table_api_url: 'https://servicenow-host/api/now/table'
@@ -5681,6 +5719,8 @@ components:
                 evaluated: false
                 timeout: true
                 undetected: true
+                new_received: false
+                new_consolidated: false
           destination_informations:
             - address_header: to
               email: mike@example.com
@@ -5708,6 +5748,8 @@ components:
                 evaluated: true
                 timeout: false
                 undetected: false
+                new_received: false
+                new_consolidated: false
           destination_informations:
             - url: 'https://{server-name}.{region}.logic.azure.com/workflows/{workflow-ID}/triggers/{trigger-name}/paths/invoke/?XXXXXXXXX'
           create_timestamp: '2023-11-02T05:36:41.258Z'
@@ -5730,6 +5772,8 @@ components:
                 evaluated: true
                 timeout: false
                 undetected: false
+                new_received: false
+                new_consolidated: false
           destination_informations:
             - webhook: 'https://xxxxxxxx.webhook.office.com/webhookb/xxxxxxxx-xxxxxx-xxxx-xxxx-xxxxxxxxxxxx'
           create_timestamp: '2023-11-02T05:36:41.258Z'
@@ -5752,6 +5796,8 @@ components:
                 evaluated: true
                 timeout: false
                 undetected: false
+                new_received: false
+                new_consolidated: false
           destination_informations:
             - url: 'http://your-webhook-server/hooks/XXXXXXXX'
               header: 'Content-Type: application/json'
@@ -5775,6 +5821,8 @@ components:
                 evaluated: true
                 timeout: false
                 undetected: false
+                new_received: false
+                new_consolidated: false
           destination_informations:
             - servicenow_user: servicenow_user01
               table_api_url: 'https://servicenow-host/api/now/table'

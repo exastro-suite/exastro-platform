@@ -266,6 +266,8 @@ $(function(){
                             "evaluated": $('#ita_event_type_evaluated').prop("checked"),
                             "timeout": $('#ita_event_type_timeout').prop("checked"),
                             "undetected": $('#ita_event_type_undetected').prop("checked"),
+                            "new_received": $('#ita_event_type_new_received').prop("checked"),
+                            "new_consolidated": $('#ita_event_type_new_consolidated').prop("checked"),
                         },
                     },
                 },
