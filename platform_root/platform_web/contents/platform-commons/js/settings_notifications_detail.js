@@ -112,12 +112,12 @@ $(function(){
 
         try { $("#text_last_update_date_time").text(fn.date(new Date(destination_row.last_update_timestamp),'yyyy/MM/dd HH:mm:ss'))} catch(e) { }
 
+        var ita_event_type_new_received = fn.cv(destination_row.conditions.ita.event_type.new_received,false,false) ? getText("000-00184", 'する') : getText("000-00185", 'しない');
+        var ita_event_type_new_consolidated = fn.cv(destination_row.conditions.ita.event_type.new_consolidated,false,false) ? getText("000-00184", 'する') : getText("000-00185", 'しない');
         var ita_event_type_new = fn.cv(destination_row.conditions.ita.event_type.new,false,false) ? getText("000-00184", 'する') : getText("000-00185", 'しない');
         var ita_event_type_evaluated = fn.cv(destination_row.conditions.ita.event_type.evaluated,false,false) ? getText("000-00184", 'する') : getText("000-00185", 'しない');
         var ita_event_type_timeout = fn.cv(destination_row.conditions.ita.event_type.timeout,false,false) ? getText("000-00184", 'する') : getText("000-00185", 'しない');
         var ita_event_type_undetected = fn.cv(destination_row.conditions.ita.event_type.undetected,false,false) ? getText("000-00184", 'する') : getText("000-00185", 'しない');
-        var ita_event_type_new_received = fn.cv(destination_row.conditions.ita.event_type.new_received,false,false) ? getText("000-00184", 'する') : getText("000-00185", 'しない');
-        var ita_event_type_new_consolidated = fn.cv(destination_row.conditions.ita.event_type.new_consolidated,false,false) ? getText("000-00184", 'する') : getText("000-00185", 'しない');
 
         const row_template_top = $('#conditions_list .datarow-template-top').clone(true).removeClass('datarow-template').addClass('datarow').prop('outerHTML');
         const row_template_2nd = $('#conditions_list .datarow-template-2nd').clone(true).removeClass('datarow-template-sub').addClass('datarow').prop('outerHTML');
@@ -129,6 +129,12 @@ $(function(){
             .replace(/\${conditions_all_count}/g, 6)
             .replace(/\${conditions_group_name}/g, getText("000-87022", "OASE／種別"))
             .replace(/\${conditions_group_count}/g, 6)
+            .replace(/\${conditions_name}/g, getText("000-00224", '新規イベント（受信時）'))
+            .replace(/\${conditions_value}/g, ita_event_type_new_received);
+        html += row_template_3rd
+            .replace(/\${conditions_name}/g, getText("000-00225", '新規イベント（統合時）'))
+            .replace(/\${conditions_value}/g, ita_event_type_new_consolidated);
+        html += row_template_3rd
             .replace(/\${conditions_name}/g, getText("000-00153", '新規イベント（判定前）'))
             .replace(/\${conditions_value}/g, ita_event_type_new);
         html += row_template_3rd
@@ -140,12 +146,6 @@ $(function(){
         html += row_template_3rd
             .replace(/\${conditions_name}/g, getText("000-00156", '未知イベント'))
             .replace(/\${conditions_value}/g, ita_event_type_undetected);
-        html += row_template_3rd
-            .replace(/\${conditions_name}/g, getText("000-00224", '新規イベント（受信時）'))
-            .replace(/\${conditions_value}/g, ita_event_type_new_received);
-        html += row_template_3rd
-            .replace(/\${conditions_name}/g, getText("000-00225", '新規イベント（統合時）'))
-            .replace(/\${conditions_value}/g, ita_event_type_new_consolidated);
         $("#conditions_list tbody").append(html);
         $("#conditions_list .datarow").css('display', '');
 
