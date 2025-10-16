@@ -1488,73 +1488,74 @@ def validate_destination_conditions(conditions):
     Returns:
         result: Validation result
     """
-    if conditions.get('ita', {}).get('event_type', {}).get('new', None) is None:
-        return result(
-            False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
-            multi_lang.get_text('000-00153', "新規イベント（判定前）")
-        )
-
-    if type(conditions.get('ita', {}).get('event_type', {}).get('new', None)) is not bool:
-        return result(
-            False, 400, '400-{}024'.format(MSG_FUNCTION_ID), 'True/False 以外が指定されています。({0})',
-            multi_lang.get_text('000-00153', "新規イベント（判定前）")
-        )
-
-    if conditions.get('ita', {}).get('event_type', {}).get('evaluated', None) is None:
-        return result(
-            False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
-            multi_lang.get_text('000-00154', "既知イベント（判定時）")
-        )
-
-    if type(conditions.get('ita', {}).get('event_type', {}).get('evaluated', None)) is not bool:
-        return result(
-            False, 400, '400-{}024'.format(MSG_FUNCTION_ID), 'True/False 以外が指定されています。({0})',
-            multi_lang.get_text('000-00154', "既知イベント（判定時）")
-        )
-
-    if conditions.get('ita', {}).get('event_type', {}).get('timeout', None) is None:
-        return result(
-            False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
-            multi_lang.get_text('000-00155', "既知イベント（TTL有効期限切れ）")
-        )
-
-    if type(conditions.get('ita', {}).get('event_type', {}).get('timeout', None)) is not bool:
-        return result(
-            False, 400, '400-{}024'.format(MSG_FUNCTION_ID), 'True/False 以外が指定されています。({0})',
-            multi_lang.get_text('000-00155', "既知イベント（TTL有効期限切れ）")
-        )
-
-    if conditions.get('ita', {}).get('event_type', {}).get('undetected', None) is None:
-        return result(
-            False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
-            multi_lang.get_text('000-00156', "未知イベント")
-        )
-    if type(conditions.get('ita', {}).get('event_type', {}).get('undetected', None)) is not bool:
-        return result(
-            False, 400, '400-{}024'.format(MSG_FUNCTION_ID), 'True/False 以外が指定されています。({0})',
-            multi_lang.get_text('000-00156', "未知イベント")
-        )
 
     if conditions.get('ita', {}).get('event_type', {}).get('new_received', None) is None:
         return result(
             False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
-            multi_lang.get_text('000-00224', "新規イベント（受信時）")
+            multi_lang.get_text('000-00224', "1.新規イベント（受信時）")
         )
     if type(conditions.get('ita', {}).get('event_type', {}).get('new_received', None)) is not bool:
         return result(
             False, 400, '400-{}024'.format(MSG_FUNCTION_ID), 'True/False 以外が指定されています。({0})',
-            multi_lang.get_text('000-00224', "新規イベント（受信時）")
+            multi_lang.get_text('000-00224', "1.新規イベント（受信時）")
         )
 
     if conditions.get('ita', {}).get('event_type', {}).get('new_consolidated', None) is None:
         return result(
             False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
-            multi_lang.get_text('000-00218', "新規イベント（統合時）")
+            multi_lang.get_text('000-00218', "2.新規イベント（統合時）")
         )
     if type(conditions.get('ita', {}).get('event_type', {}).get('new_consolidated', None)) is not bool:
         return result(
             False, 400, '400-{}024'.format(MSG_FUNCTION_ID), 'True/False 以外が指定されています。({0})',
-            multi_lang.get_text('000-00218', "新規イベント（統合時）")
+            multi_lang.get_text('000-00218', "2.新規イベント（統合時）")
+        )
+
+    if conditions.get('ita', {}).get('event_type', {}).get('new', None) is None:
+        return result(
+            False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
+            multi_lang.get_text('000-00153', "3.新規イベント（判定前）")
+        )
+
+    if type(conditions.get('ita', {}).get('event_type', {}).get('new', None)) is not bool:
+        return result(
+            False, 400, '400-{}024'.format(MSG_FUNCTION_ID), 'True/False 以外が指定されています。({0})',
+            multi_lang.get_text('000-00153', "3.新規イベント（判定前）")
+        )
+
+    if conditions.get('ita', {}).get('event_type', {}).get('evaluated', None) is None:
+        return result(
+            False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
+            multi_lang.get_text('000-00154', "4.既知イベント（判定時）")
+        )
+
+    if type(conditions.get('ita', {}).get('event_type', {}).get('evaluated', None)) is not bool:
+        return result(
+            False, 400, '400-{}024'.format(MSG_FUNCTION_ID), 'True/False 以外が指定されています。({0})',
+            multi_lang.get_text('000-00154', "4.既知イベント（判定時）")
+        )
+
+    if conditions.get('ita', {}).get('event_type', {}).get('timeout', None) is None:
+        return result(
+            False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
+            multi_lang.get_text('000-00155', "5.既知イベント（TTL有効期限切れ）")
+        )
+
+    if type(conditions.get('ita', {}).get('event_type', {}).get('timeout', None)) is not bool:
+        return result(
+            False, 400, '400-{}024'.format(MSG_FUNCTION_ID), 'True/False 以外が指定されています。({0})',
+            multi_lang.get_text('000-00155', "5.既知イベント（TTL有効期限切れ）")
+        )
+
+    if conditions.get('ita', {}).get('event_type', {}).get('undetected', None) is None:
+        return result(
+            False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
+            multi_lang.get_text('000-00156', "6.未知イベント")
+        )
+    if type(conditions.get('ita', {}).get('event_type', {}).get('undetected', None)) is not bool:
+        return result(
+            False, 400, '400-{}024'.format(MSG_FUNCTION_ID), 'True/False 以外が指定されています。({0})',
+            multi_lang.get_text('000-00156', "6.未知イベント")
         )
 
     return result(True)

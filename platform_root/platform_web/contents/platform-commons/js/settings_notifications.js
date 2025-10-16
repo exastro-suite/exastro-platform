@@ -116,12 +116,12 @@ $(function(){
                 var ita_event_type_undetected = fn.cv(row.conditions.ita.event_type.undetected,false,false) ? getText("000-00184", 'する') : getText("000-00185", 'しない');
 
                 str_conditions = "";
-                str_conditions += getText("000-87022", "OASE／種別") + ":" + getText("000-00224", '新規イベント（受信時）') + ":" + ita_event_type_new_received + "<br>";
-                str_conditions += getText("000-87022", "OASE／種別") + ":" + getText("000-00225", '新規イベント（統合時）') + ":" + ita_event_type_new_consolidated + "<br>";
-                str_conditions += getText("000-87022", "OASE／種別") + ":" + getText("000-00153", '新規イベント（判定前）') + ":" + ita_event_type_new + "<br>";
-                str_conditions += getText("000-87022", "OASE／種別") + ":" + getText("000-00154", '既知イベント（判定時）') + ":" + ita_event_type_evaluated + "<br>";
-                str_conditions += getText("000-87022", "OASE／種別") + ":" + getText("000-00155", '既知イベント（TTL有効期限切れ）') + ":" + ita_event_type_timeout + "<br>";
-                str_conditions += getText("000-87022", "OASE／種別") + ":" + getText("000-00156", '未知イベント') + ":" + ita_event_type_undetected + "<br>";
+                str_conditions += getText("000-87022", "OASE／種別") + ":" + getText("000-00224", '1.新規イベント（受信時）') + ":" + ita_event_type_new_received + "<br>";
+                str_conditions += getText("000-87022", "OASE／種別") + ":" + getText("000-00225", '2.新規イベント（統合時）') + ":" + ita_event_type_new_consolidated + "<br>";
+                str_conditions += getText("000-87022", "OASE／種別") + ":" + getText("000-00153", '3.新規イベント（判定前）') + ":" + ita_event_type_new + "<br>";
+                str_conditions += getText("000-87022", "OASE／種別") + ":" + getText("000-00154", '4.既知イベント（判定時）') + ":" + ita_event_type_evaluated + "<br>";
+                str_conditions += getText("000-87022", "OASE／種別") + ":" + getText("000-00155", '5.既知イベント（TTL有効期限切れ）') + ":" + ita_event_type_timeout + "<br>";
+                str_conditions += getText("000-87022", "OASE／種別") + ":" + getText("000-00156", '6.未知イベント') + ":" + ita_event_type_undetected + "<br>";
 
                 notification_alert_msg = "";
                 if (row.kind == "Teams"){

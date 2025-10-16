@@ -129,22 +129,22 @@ $(function(){
             .replace(/\${conditions_all_count}/g, 6)
             .replace(/\${conditions_group_name}/g, getText("000-87022", "OASE／種別"))
             .replace(/\${conditions_group_count}/g, 6)
-            .replace(/\${conditions_name}/g, getText("000-00224", '新規イベント（受信時）'))
+            .replace(/\${conditions_name}/g, getText("000-00224", '1.新規イベント（受信時）'))
             .replace(/\${conditions_value}/g, ita_event_type_new_received);
         html += row_template_3rd
-            .replace(/\${conditions_name}/g, getText("000-00225", '新規イベント（統合時）'))
+            .replace(/\${conditions_name}/g, getText("000-00225", '2.新規イベント（統合時）'))
             .replace(/\${conditions_value}/g, ita_event_type_new_consolidated);
         html += row_template_3rd
-            .replace(/\${conditions_name}/g, getText("000-00153", '新規イベント（判定前）'))
+            .replace(/\${conditions_name}/g, getText("000-00153", '3.新規イベント（判定前）'))
             .replace(/\${conditions_value}/g, ita_event_type_new);
         html += row_template_3rd
-            .replace(/\${conditions_name}/g, getText("000-00154", '既知イベント（判定時）'))
+            .replace(/\${conditions_name}/g, getText("000-00154", '4.既知イベント（判定時）'))
             .replace(/\${conditions_value}/g, ita_event_type_evaluated);
         html += row_template_3rd
-            .replace(/\${conditions_name}/g, getText("000-00155", '既知イベント（TTL有効期限切れ）'))
+            .replace(/\${conditions_name}/g, getText("000-00155", '5.既知イベント（TTL有効期限切れ）'))
             .replace(/\${conditions_value}/g, ita_event_type_timeout);
         html += row_template_3rd
-            .replace(/\${conditions_name}/g, getText("000-00156", '未知イベント'))
+            .replace(/\${conditions_name}/g, getText("000-00156", '6.未知イベント'))
             .replace(/\${conditions_value}/g, ita_event_type_undetected);
         $("#conditions_list tbody").append(html);
         $("#conditions_list .datarow").css('display', '');
