@@ -144,6 +144,14 @@ input[type=checkbox]:disabled+.itaOptionsDriversLabel  {
     text-overflow: clip !important;
 }
 
+.ci.pre_ht150 {
+    word-break: break-all!important;
+    white-space: pre !important;
+    max-height: 150px;
+    overflow: auto !important;
+    text-overflow: clip !important;
+}
+
 .ci.pre_wmax_ht100 {
     word-break: break-all!important;
     white-space: pre !important;

@@ -46,3 +46,20 @@ SQL_ALTER_TABLES = [
         """
     }
 ]
+
+# 通知のイベント種別に「新規イベント（受信時）」「新規イベント（統合時）」を追加
+# Add "New Event (On Receipt)" and "New Event (On Consolidation)" to the event types for notifications
+SQL_UPDATE_M_NOTIFICATION_DESTINATION = """
+UPDATE  M_NOTIFICATION_DESTINATION
+SET CONDITIONS = JSON_MERGE_PATCH(
+    CONDITIONS,
+    JSON_OBJECT(
+        'ita', JSON_OBJECT(
+            'event_type', JSON_OBJECT(
+                'new_received', COALESCE(JSON_EXTRACT(CONDITIONS, '$.ita.event_type.new_received'), false) = "true",
+                'new_consolidated', COALESCE(JSON_EXTRACT(CONDITIONS, '$.ita.event_type.new_consolidated'), false) = "true"
+            )
+        )
+    )
+);
+"""

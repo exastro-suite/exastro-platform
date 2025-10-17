@@ -1293,25 +1293,38 @@ const settings_notifications_common = {
         // Specify a fixed event type
         let html='';
         html += row_template_top
-            .replace(/\${conditions_all_count}/g, 4)
-            .replace(/\${conditions_group_name}/g, getText("000-87022", "OASE／イベント種別"))
-            .replace(/\${conditions_group_count}/g, 4)
-            .replace(/\${conditions_name}/g, getText("000-00153", '新規'))
+            .replace(/\${conditions_all_count}/g, 6)
+            .replace(/\${conditions_group_name}/g, getText("000-87022", "OASE／種別"))
+            .replace(/\${conditions_group_count}/g, 6)
+            .replace(/\${conditions_name}/g, getText("000-00224", '1.新規イベント（受信時）'))
+            .replace(/\${conditions_key}/g, 'ita_event_type_new_received')
+            .replace(/\${conditions_remarks}/g, getText("000-87051", "イベント受信の通知（ただし、重複排除設定があった場合、同一と判断されたイベントは通知されません）"))
+            ;
+        html += row_template_3rd
+            .replace(/\${conditions_name}/g, getText("000-00225", '2.新規イベント（統合時）'))
+            .replace(/\${conditions_key}/g, 'ita_event_type_new_consolidated')
+            .replace(/\${conditions_remarks}/g, getText("000-87052", "受信したイベントが統合された場合の通知"))
+            ;
+        html += row_template_3rd
+            .replace(/\${conditions_name}/g, getText("000-00153", '3.新規イベント（判定前）'))
             .replace(/\${conditions_key}/g, 'ita_event_type_new')
-            .replace(/\${conditions_remarks}/g, getText("000-87023", "OASEで利用されるイベントの種別ごとに通知の有無を選択します。") + "<br>" +
-            getText("000-87024", "　新規：OASEエージェントから収集、あるいは、外部システムから受け取った直後のイベント") + "<br>" +
-            getText("000-87025", "　既知（判定済み）：いずれかのルールにマッチしたイベント") + "<br>" +
-            getText("000-87026", "　既知（時間切れ）：一部の条件には当てはまったものの、全ての条件に当てはまらないまま、有効期限が切れたイベント") + "<br>" +
-            getText("000-87027", "　未知：ルールやルール内の条件の一切にあてはまらなかったイベント"));
+            .replace(/\${conditions_remarks}/g, getText("000-87024", "重複排除された結果、ルール判定対象となったイベントの通知"))
+            ;
         html += row_template_3rd
-            .replace(/\${conditions_name}/g, getText("000-00154", '既知（判定済み）'))
-            .replace(/\${conditions_key}/g, 'ita_event_type_evaluated');
+            .replace(/\${conditions_name}/g, getText("000-00154", '4.既知イベント（判定時）'))
+            .replace(/\${conditions_key}/g, 'ita_event_type_evaluated')
+            .replace(/\${conditions_remarks}/g, getText("000-87025", "イベントがいずれかのルールにマッチした際の通知"))
+            ;
         html += row_template_3rd
-            .replace(/\${conditions_name}/g, getText("000-00155", '既知（時間切れ）'))
-            .replace(/\${conditions_key}/g, 'ita_event_type_timeout');
+            .replace(/\${conditions_name}/g, getText("000-00155", '5.既知イベント（TTL有効期限切れ）'))
+            .replace(/\${conditions_key}/g, 'ita_event_type_timeout')
+            .replace(/\${conditions_remarks}/g, getText("000-87026", "一部の条件にはマッチしたものの、すべての条件を満たす前にTTL有効期限が切れたイベントの通知"))
+            ;
         html += row_template_3rd
-            .replace(/\${conditions_name}/g, getText("000-00156", '未知'))
-            .replace(/\${conditions_key}/g, 'ita_event_type_undetected');
+            .replace(/\${conditions_name}/g, getText("000-00156", '6.未知イベント'))
+            .replace(/\${conditions_key}/g, 'ita_event_type_undetected')
+            .replace(/\${conditions_remarks}/g, getText("000-87027", "どのルールや条件にもマッチしなかったイベントの通知"))
+            ;
         $("#conditions_list tbody").append(html);
         $("#conditions_list .datarow").css('display', '');
     },

@@ -67,6 +67,8 @@ $(function(){
         $('#text_destination_id').text(destination_row.id);
         $("#form_destination_name").val(destination_row.name);
 
+        $('#ita_event_type_new_received').prop("checked", fn.cv(destination_row.conditions.ita.event_type.new_received, false, false));
+        $('#ita_event_type_new_consolidated').prop("checked", fn.cv(destination_row.conditions.ita.event_type.new_consolidated, false, false));
         $('#ita_event_type_new').prop("checked", fn.cv(destination_row.conditions.ita.event_type.new, false, false));
         $('#ita_event_type_evaluated').prop("checked", fn.cv(destination_row.conditions.ita.event_type.evaluated, false, false));
         $('#ita_event_type_timeout').prop("checked", fn.cv(destination_row.conditions.ita.event_type.timeout, false, false));
@@ -231,6 +233,8 @@ $(function(){
                         "evaluated": $('#ita_event_type_evaluated').prop("checked"),
                         "timeout": $('#ita_event_type_timeout').prop("checked"),
                         "undetected": $('#ita_event_type_undetected').prop("checked"),
+                        "new_received": $('#ita_event_type_new_received').prop("checked"),
+                        "new_consolidated": $('#ita_event_type_new_consolidated').prop("checked"),
                     },
                 },
             },

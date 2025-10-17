@@ -1371,7 +1371,7 @@ def validate_destination_informations(destination_kind, destination_info, enable
             if len(row['table_api_url']) > const.length_destination_servicenow_url:
                 return result(
                     False, 400, '400-{}012'.format(MSG_FUNCTION_ID), '指定可能な文字数を超えています。(項目:{0},最大文字数:{1})',
-                    multi_lang.get_text('000-00218', "通知先ServiceNow API URL (個別登録用"),
+                    multi_lang.get_text('000-00218', "通知先ServiceNow API URL (個別登録用)"),
                     str(const.length_destination_servicenow_url)
                 )
 
@@ -1395,7 +1395,7 @@ def validate_destination_informations(destination_kind, destination_info, enable
             if len(row['servicenow_user']) > const.length_destination_servicenow_user:
                 return result(
                     False, 400, '400-{}012'.format(MSG_FUNCTION_ID), '指定可能な文字数を超えています。(項目:{0},最大文字数:{1})',
-                    multi_lang.get_text('000-00219', "ServiceNow ユーザー"),
+                    multi_lang.get_text('000-00219', "通知先ServiceNow ユーザー"),
                     str(const.length_destination_servicenow_user)
                 )
 
@@ -1436,7 +1436,7 @@ def validate_destination_informations(destination_kind, destination_info, enable
                 except ValueError:
                     return result(
                         False, 400, '400-{}027'.format(MSG_FUNCTION_ID), 'URLの形式に誤りがあります。({0}）',
-                        multi_lang.get_text('000-00221', "通知先ServiceNow API URL (一括登録用")
+                        multi_lang.get_text('000-00221', "通知先ServiceNow API URL (一括登録用)")
                     )
 
                 table_api_url_scheme = table_api_urlparse.scheme
@@ -1445,7 +1445,7 @@ def validate_destination_informations(destination_kind, destination_info, enable
                 batch_api_url_origin = batch_api_urlparse.netloc
                 if table_api_url_scheme != batch_api_url_scheme or table_api_url_origin != batch_api_url_origin:
                     return result(
-                        False, 400, '400-{}038'.format(MSG_FUNCTION_ID), '「ServiceNow API URL (個別登録用)」と「ServiceNow API URL (一括登録用)」について、URLのオリジンに差分があります。'
+                        False, 400, '400-{}039'.format(MSG_FUNCTION_ID), '「ServiceNow API URL (個別登録用)」と「ServiceNow API URL (一括登録用)」について、URLのオリジンに差分があります。'
                     )
 
                 if batch_period_seconds is None or batch_period_seconds == "":
@@ -1456,8 +1456,8 @@ def validate_destination_informations(destination_kind, destination_info, enable
 
                 if batch_period_seconds < const.min_batch_period_seconds or batch_period_seconds > const.max_batch_period_seconds:
                     return result(
-                        False, 400, '400-{}037'.format(MSG_FUNCTION_ID), '指定可能な値の範囲外です。(項目:{0},最小値:{1},最大値:{2})',
-                        multi_lang.get_text('000-00221', "通知先ServiceNow 送信間隔 (秒)"),
+                        False, 400, '400-{}038'.format(MSG_FUNCTION_ID), '指定可能な値の範囲外です。(項目:{0},最小値:{1},最大値:{2})',
+                        multi_lang.get_text('000-00222', "通知先ServiceNow 送信間隔 (秒)"),
                         str(const.min_batch_period_seconds),
                         str(const.max_batch_period_seconds)
                     )
@@ -1470,12 +1470,11 @@ def validate_destination_informations(destination_kind, destination_info, enable
 
                 if batch_count_limit < const.min_batch_count_limit or batch_count_limit > const.max_batch_count_limit:
                     return result(
-                        False, 400, '400-{}037'.format(MSG_FUNCTION_ID), '指定可能な値の範囲外です。(項目:{0},最小値:{1},最大値:{2})',
+                        False, 400, '400-{}038'.format(MSG_FUNCTION_ID), '指定可能な値の範囲外です。(項目:{0},最小値:{1},最大値:{2})',
                         multi_lang.get_text('000-00223', "通知先ServiceNow 一回に送信する最大件数"),
                         str(const.min_batch_count_limit),
                         str(const.max_batch_count_limit)
                     )
-
 
     return result(True)
 
@@ -1489,51 +1488,74 @@ def validate_destination_conditions(conditions):
     Returns:
         result: Validation result
     """
+
+    if conditions.get('ita', {}).get('event_type', {}).get('new_received', None) is None:
+        return result(
+            False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
+            multi_lang.get_text('000-00224', "1.新規イベント（受信時）")
+        )
+    if type(conditions.get('ita', {}).get('event_type', {}).get('new_received', None)) is not bool:
+        return result(
+            False, 400, '400-{}024'.format(MSG_FUNCTION_ID), 'True/False 以外が指定されています。({0})',
+            multi_lang.get_text('000-00224', "1.新規イベント（受信時）")
+        )
+
+    if conditions.get('ita', {}).get('event_type', {}).get('new_consolidated', None) is None:
+        return result(
+            False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
+            multi_lang.get_text('000-00218', "2.新規イベント（統合時）")
+        )
+    if type(conditions.get('ita', {}).get('event_type', {}).get('new_consolidated', None)) is not bool:
+        return result(
+            False, 400, '400-{}024'.format(MSG_FUNCTION_ID), 'True/False 以外が指定されています。({0})',
+            multi_lang.get_text('000-00218', "2.新規イベント（統合時）")
+        )
+
     if conditions.get('ita', {}).get('event_type', {}).get('new', None) is None:
         return result(
             False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
-            multi_lang.get_text('000-00153', "新規イベント")
+            multi_lang.get_text('000-00153', "3.新規イベント（判定前）")
         )
 
     if type(conditions.get('ita', {}).get('event_type', {}).get('new', None)) is not bool:
         return result(
             False, 400, '400-{}024'.format(MSG_FUNCTION_ID), 'True/False 以外が指定されています。({0})',
-            multi_lang.get_text('000-00153', "新規イベント")
+            multi_lang.get_text('000-00153', "3.新規イベント（判定前）")
         )
 
     if conditions.get('ita', {}).get('event_type', {}).get('evaluated', None) is None:
         return result(
             False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
-            multi_lang.get_text('000-00154', "既知（判定済み）")
+            multi_lang.get_text('000-00154', "4.既知イベント（判定時）")
         )
 
     if type(conditions.get('ita', {}).get('event_type', {}).get('evaluated', None)) is not bool:
         return result(
             False, 400, '400-{}024'.format(MSG_FUNCTION_ID), 'True/False 以外が指定されています。({0})',
-            multi_lang.get_text('000-00154', "既知（判定済み）")
+            multi_lang.get_text('000-00154', "4.既知イベント（判定時）")
         )
 
     if conditions.get('ita', {}).get('event_type', {}).get('timeout', None) is None:
         return result(
             False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
-            multi_lang.get_text('000-00155', "既知（時間切れ）")
+            multi_lang.get_text('000-00155', "5.既知イベント（TTL有効期限切れ）")
         )
 
     if type(conditions.get('ita', {}).get('event_type', {}).get('timeout', None)) is not bool:
         return result(
             False, 400, '400-{}024'.format(MSG_FUNCTION_ID), 'True/False 以外が指定されています。({0})',
-            multi_lang.get_text('000-00155', "既知（時間切れ）")
+            multi_lang.get_text('000-00155', "5.既知イベント（TTL有効期限切れ）")
         )
 
     if conditions.get('ita', {}).get('event_type', {}).get('undetected', None) is None:
         return result(
             False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
-            multi_lang.get_text('000-00156', "未知")
+            multi_lang.get_text('000-00156', "6.未知イベント")
         )
     if type(conditions.get('ita', {}).get('event_type', {}).get('undetected', None)) is not bool:
         return result(
             False, 400, '400-{}024'.format(MSG_FUNCTION_ID), 'True/False 以外が指定されています。({0})',
-            multi_lang.get_text('000-00156', "未知")
+            multi_lang.get_text('000-00156', "6.未知イベント")
         )
 
     return result(True)
