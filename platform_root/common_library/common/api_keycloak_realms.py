@@ -44,7 +44,7 @@ def realm_create(realm_json, token):
     # 呼び出し先設定
     # Call destination setting
     api_url = "{}://{}:{}".format(os.environ['API_KEYCLOAK_PROTOCOL'], os.environ['API_KEYCLOAK_HOST'], os.environ['API_KEYCLOAK_PORT'])
-    request_response = requests.post(f"{api_url}/auth/admin/realms", headers=header_para, json=realm_json)
+    request_response = requests.post(f"{api_url}/auth/admin/realms", headers=header_para, json=realm_json, timeout=(12, 600))
 
     globals.logger.debug(request_response.text)
 
@@ -76,7 +76,7 @@ def realm_update(realm_id, realm_json, token):
     # 呼び出し先設定
     # Call destination setting
     api_url = "{}://{}:{}".format(os.environ['API_KEYCLOAK_PROTOCOL'], os.environ['API_KEYCLOAK_HOST'], os.environ['API_KEYCLOAK_PORT'])
-    request_response = requests.put(f"{api_url}/auth/admin/realms/{realm_id}", headers=header_para, json=realm_json)
+    request_response = requests.put(f"{api_url}/auth/admin/realms/{realm_id}", headers=header_para, json=realm_json, timeout=(12, 600))
 
     globals.logger.debug(request_response.text)
 
@@ -107,7 +107,7 @@ def realm_delete(realm_id, token):
     # 呼び出し先設定
     # Call destination setting
     api_url = "{}://{}:{}".format(os.environ['API_KEYCLOAK_PROTOCOL'], os.environ['API_KEYCLOAK_HOST'], os.environ['API_KEYCLOAK_PORT'])
-    request_response = requests.delete(f"{api_url}/auth/admin/realms/{realm_id}", headers=header_para)
+    request_response = requests.delete(f"{api_url}/auth/admin/realms/{realm_id}", headers=header_para, timeout=(12, 600))
 
     globals.logger.debug(request_response.text)
 
@@ -140,7 +140,7 @@ def realms_get(token):
     # 呼び出し先設定
     # Call destination setting
     api_url = __get_keycloak_api_url()
-    request_response = requests.get(f"{api_url}/auth/admin/realms", headers=header_para)
+    request_response = requests.get(f"{api_url}/auth/admin/realms", headers=header_para, timeout=(12, 600))
 
     globals.logger.debug(request_response.text)
 
@@ -170,7 +170,7 @@ def realm_get(realm_name, token):
 
     # 呼び出し先設定
     # Call destination setting
-    request_response = requests.get(f"{api_url}/auth/admin/realms/{realm_name}", headers=header_para)
+    request_response = requests.get(f"{api_url}/auth/admin/realms/{realm_name}", headers=header_para, timeout=(12, 600))
 
     globals.logger.debug(f"# Succeed func:{inspect.currentframe().f_code.co_name}")
 
