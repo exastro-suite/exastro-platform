@@ -32,7 +32,7 @@ def health():
 
     api_url = "{}://{}:{}".format(os.environ['API_KEYCLOAK_PROTOCOL'], os.environ['API_KEYCLOAK_HOST'], os.environ['API_KEYCLOAK_PORT'])
 
-    request_response = requests.get(f"{api_url}/auth/health")
+    request_response = requests.get(f"{api_url}/auth/health", timeout=(12, 600))
 
     return request_response
 
@@ -55,6 +55,6 @@ def serverinfo(token):
         "Authorization": "Bearer {}".format(token),
     }
 
-    request_response = requests.get(f"{api_url}/auth/admin/serverinfo", headers=header_para)
+    request_response = requests.get(f"{api_url}/auth/admin/serverinfo", headers=header_para, timeout=(12, 600))
 
     return request_response

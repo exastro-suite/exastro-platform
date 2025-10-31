@@ -44,6 +44,7 @@ def client_create(realm_name, client_json, token):
     request_response = requests.post(f"{api_url}/auth/admin/realms/{realm_name}/clients",
                                      headers=header_para,
                                      json=client_json,
+                                     timeout=(12, 600)
                                      )
 
     return request_response
@@ -75,6 +76,7 @@ def client_update(realm_name, client_uid, client_json, token):
         f"{api_url}/auth/admin/realms/{realm_name}/clients/{client_uid}",
         headers=header_para,
         json=client_json,
+        timeout=(12, 600)
     )
 
     return request_response
@@ -114,6 +116,7 @@ def clients_get(realm_name, client_id, token):
     request_response = requests.get(f"{api_url}/auth/admin/realms/{realm_name}/clients",
                                     headers=header_para,
                                     params=query_para,
+                                    timeout=(12, 600)
                                     )
 
     # globals.logger.debug(request_response.text)
@@ -145,6 +148,7 @@ def client_secret_create(realm_name, client_id, token):
     request_response = requests.post(
         f"{api_url}/auth/admin/realms/{realm_name}/clients/{client_id}/client-secret",
         headers=header_para,
+        timeout=(12, 600)
     )
 
     return request_response
@@ -173,6 +177,7 @@ def client_secret_get(realm_name, client_id, token):
 
     request_response = requests.get(f"{api_url}/auth/admin/realms/{realm_name}/clients/{client_id}/client-secret",
                                     headers=header_para,
+                                    timeout=(12, 600)
                                     )
 
     return request_response

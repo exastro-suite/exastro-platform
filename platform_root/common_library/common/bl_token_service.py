@@ -51,6 +51,7 @@ def token_create(organization_id, token_request_body, execute_user_id=None):
             f"{os.environ['API_KEYCLOAK_PROTOCOL']}://{os.environ['API_KEYCLOAK_HOST']}:{os.environ['API_KEYCLOAK_PORT']}/auth/realms/{organization_id}/protocol/openid-connect/token",
             data=token_request_body,
             headers=headers_data,
+            timeout=(12, 600)
         )
 
         if redirect_response.status_code == 200:

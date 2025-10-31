@@ -65,7 +65,8 @@ def __get_token(realm_name, data_para, set_x_forward_header=True):
     request_response = requests.post(
         "{}/auth/realms/{}/protocol/openid-connect/token".format(api_url, realm_name),
         headers=header_para,
-        data=data_para
+        data=data_para,
+        timeout=(12, 600)
     )
 
     return request_response
@@ -194,7 +195,8 @@ def user_token_introspect(client_id, client_secret, realm_name, access_token, ke
     request_response = requests.post(
         "{}/auth/realms/{}/protocol/openid-connect/token/introspect".format(api_url, realm_name),
         headers=header_para,
-        data=data_para
+        data=data_para,
+        timeout=(12, 600)
     )
 
     return request_response
@@ -231,7 +233,8 @@ def offline_sessions_delete(realm_name, user_id, client_id, token):
     # Delete offline-session
     request_response = requests.delete(
         f"{api_url}/auth/admin/realms/{realm_name}/users/{user_id}/consents/{client_id}",
-        headers=header_para
+        headers=header_para,
+        timeout=(12, 600)
     )
 
     globals.logger.info(f"# Succeed func:{inspect.currentframe().f_code.co_name}")
@@ -270,7 +273,8 @@ def offline_sessions_get(realm_name, user_id, client_id, token):
     # Get offline-session
     request_response = requests.get(
         f"{api_url}/auth/admin/realms/{realm_name}/users/{user_id}/offline-sessions/{client_id}",
-        headers=header_para
+        headers=header_para,
+        timeout=(12, 600)
     )
 
     globals.logger.debug(f"# Succeed func:{inspect.currentframe().f_code.co_name}")

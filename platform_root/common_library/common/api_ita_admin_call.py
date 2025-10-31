@@ -52,7 +52,8 @@ def ita_organization_create(organization_id, user_id, encode_roles, language):
     api_url = __get_api_url_ita_admin()
     request_response = requests.post(
         "{}/api/organizations/{}/ita/".format(api_url, organization_id),
-        headers=header_para
+        headers=header_para,
+        timeout=(12, 600)
     )
     globals.logger.debug(request_response.text)
 
@@ -85,7 +86,8 @@ def ita_organization_delete(organization_id, user_id, encode_roles, language):
     api_url = __get_api_url_ita_admin()
     request_response = requests.delete(
         "{}/api/organizations/{}/ita/".format(api_url, organization_id),
-        headers=header_para
+        headers=header_para,
+        timeout=(12, 600)
     )
     globals.logger.debug(request_response.text)
 
@@ -128,6 +130,7 @@ def ita_workspace_create(organization_id, workspace_id, wsadmin_role_name, user_
         "{}/api/{}/workspaces/{}/ita/".format(api_url, organization_id, workspace_id),
         headers=header_para,
         data=json.dumps(data_para),
+        timeout=(12, 600)
     )
     globals.logger.debug(request_response.text)
 
@@ -162,7 +165,8 @@ def ita_workspace_delete(organization_id, workspace_id, user_id, encode_roles, l
     api_url = __get_api_url_ita_admin()
     request_response = requests.delete(
         "{}/api/{}/workspaces/{}/ita/".format(api_url, organization_id, workspace_id),
-        headers=header_para
+        headers=header_para,
+        timeout=(12, 600)
     )
     globals.logger.debug(request_response.text)
 
@@ -198,7 +202,8 @@ def ita_notification_destination(organization_id, workspace_id, menu, column, us
     api_url = __get_api_url_ita_admin()
     request_response = requests.get(
         "{}/api/{}/workspaces/{}/ita/menu/{}/info/notifications/destinations/{}/".format(api_url, organization_id, workspace_id, menu, column),
-        headers=header_para
+        headers=header_para,
+        timeout=(12, 600)
     )
     globals.logger.debug(request_response.text)
 
