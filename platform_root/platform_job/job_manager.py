@@ -572,6 +572,7 @@ def get_queue(conn, running_job_queue: list, get_queue_len: int):
         if is_processable and next_process['ENABLE_BATCH']:
             # batch送信の場合、batchで一気に送るqueueを全てLockする
             # In the case of batch sending, acquire and lock all queues to be sent at once in the batch.
+            # ただし、next_process_idのものは必ず実行対象にするので除外して以外のものを取得する
             try:
                 with conn.cursor() as cursor:
                     cursor.execute(
@@ -580,10 +581,14 @@ def get_queue(conn, running_job_queue: list, get_queue_len: int):
                             "organization_id": next_organization_id,
                             "workspace_id": next_process["WORKSPACE_ID"],
                             "process_kind": next_process["PROCESS_KIND"],
-                            "batch_group_key": next_process["BATCH_GROUP_KEY"]
+                            "batch_group_key": next_process["BATCH_GROUP_KEY"],
+                            "exclude_process_id": next_process_id
                         })
-                    # 処理対象件数だけfetchする
-                    batch_queue = cursor.fetchmany(next_process["BATCH_COUNT_LIMIT"])
+                    # 処理対象件数-1だけfetchする(1件はnext_process_idのものがあるため)
+                    batch_queue_add = cursor.fetchmany(next_process["BATCH_COUNT_LIMIT"] - 1)
+                    
+                    # next_processと追加分を合わせてbatch_queueとする
+                    batch_queue = [next_process] + [r for r in batch_queue_add]
 
             except pymysql.err.OperationalError as err:
                 # Lock Error

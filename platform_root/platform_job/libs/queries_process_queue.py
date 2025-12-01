@@ -22,6 +22,7 @@ SELECT * FROM T_PROCESS_QUEUE
     AND     WORKSPACE_ID        =   %(workspace_id)s
     AND     PROCESS_KIND        =   %(process_kind)s
     AND     BATCH_GROUP_KEY     =   %(batch_group_key)s
+    AND     PROCESS_ID          !=  %(exclude_process_id)s
     ORDER BY    LAST_UPDATE_TIMESTAMP
     FOR UPDATE NOWAIT
 """
