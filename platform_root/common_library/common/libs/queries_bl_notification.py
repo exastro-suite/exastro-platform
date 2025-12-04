@@ -67,6 +67,32 @@ LAST_UPDATE_USER
 );
 """
 
+SQL_INSERT_PROCESS_QUEUE_BATCH = """
+INSERT INTO T_PROCESS_QUEUE
+(PROCESS_ID,
+PROCESS_KIND,
+PROCESS_EXEC_ID,
+ORGANIZATION_ID,
+WORKSPACE_ID,
+ENABLE_BATCH,
+BATCH_PERIOD_SECONDS,
+BATCH_COUNT_LIMIT,
+BATCH_GROUP_KEY,
+LAST_UPDATE_USER
+)VALUES(
+%(process_id)s,
+%(process_kind)s,
+%(process_exec_id)s,
+%(organization_id)s,
+%(workspace_id)s,
+%(enable_batch)s,
+%(batch_period_seconds)s,
+%(batch_count_limit)s,
+%(batch_group_key)s,
+%(last_update_user)s
+);
+"""
+
 SQL_DELETE_NOTIFICATION_DESTINATION = """
 DELETE
 FROM

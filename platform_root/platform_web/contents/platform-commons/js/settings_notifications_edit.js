@@ -62,11 +62,13 @@ $(function(){
         console.log("[CALL] display_main");
 
         settings_notifications_common.set_conditions();
-        settings_notifications_common.set_destination_informations(destination_row.kind, destination_row.destination_informations);
+        settings_notifications_common.set_destination_informations(destination_row.kind, destination_row.destination_informations, destination_row.enable_batch, destination_row.batch_period_seconds, destination_row.batch_count_limit);
 
         $('#text_destination_id').text(destination_row.id);
         $("#form_destination_name").val(destination_row.name);
 
+        $('#ita_event_type_new_received').prop("checked", fn.cv(destination_row.conditions.ita.event_type.new_received, false, false));
+        $('#ita_event_type_new_consolidated').prop("checked", fn.cv(destination_row.conditions.ita.event_type.new_consolidated, false, false));
         $('#ita_event_type_new').prop("checked", fn.cv(destination_row.conditions.ita.event_type.new, false, false));
         $('#ita_event_type_evaluated').prop("checked", fn.cv(destination_row.conditions.ita.event_type.evaluated, false, false));
         $('#ita_event_type_timeout').prop("checked", fn.cv(destination_row.conditions.ita.event_type.timeout, false, false));
@@ -76,6 +78,7 @@ $(function(){
         $('.description_Teams').html(getText('000-87018', 'URL形式'));
         $('.description_Teams_WF').html(getText('000-87018', 'URL形式'));
         $('.description_Webhook').html(getText('000-87019', '1行目 URL形式<br>2行目 ヘッダー内容'));
+        $('.description_ServiceNow').html(getText('000-87050', 'ServiceNow API URL (個別登録用): ServiceNow テーブルAPIのURLを入力します。<br><br>※バッチAPIを利用して一括で登録を行いたい場合は「一括登録」にチェックを入れ、以下を入力します。<br>ServiceNow API URL (一括登録用): ServiceNow バッチAPIのURLを入力します。<br>送信間隔 (秒): 一括登録を実行する間隔を指定します。ここで指定した秒数毎にバッチAPIがコールされます。入力可能範囲 1～3600<br>一回に送信する最大件数: 一括登録を実行する際に送信されるメッセージの最大件数を指定します。入力可能範囲 1～10000'));
 
         $('.destination_informations').css('display', 'none');
         $('.description_no_select').css('display', '');
@@ -95,6 +98,32 @@ $(function(){
         });
 
         //
+        // condition ServiceNow password check
+        //
+        $('#form_destination_informations_servicenow_password_check').on('click',function() {
+            if ($(this).prop("checked")) {
+                $("#form_destination_informations_servicenow_password").prop('disabled',false);
+            } else {
+                $("#form_destination_informations_servicenow_password").prop('disabled',true);
+            }
+        });
+
+        //
+        // condition ServiceNow bulk check
+        //
+        $('#form_destination_informations_servicenow_batch_check').on('click',function() {
+            if ($(this).prop("checked")) {
+                $("#form_destination_informations_servicenow_batch_url").prop('disabled',false);
+                $("#form_destination_informations_servicenow_interval").prop('disabled',false);
+                $("#form_destination_informations_servicenow_limit").prop('disabled',false);
+            } else {
+                $("#form_destination_informations_servicenow_batch_url").prop('disabled',true);
+                $("#form_destination_informations_servicenow_interval").prop('disabled',true);
+                $("#form_destination_informations_servicenow_limit").prop('disabled',true);
+            }
+        });
+
+        //
         // register button
         //
         $('#button_register').on('click',() => {
@@ -103,7 +132,8 @@ $(function(){
                 $('#button_register').prop('disabled',false);
                 return;
             }
-            notification_destination_register();
+            var destination_kind = $("input[name=form_destination_kind]:checked").val();
+            notification_destination_register(destination_kind);
         });
 
         if (destination_row.kind === DESTINATION_KIND_MAIL){
@@ -117,6 +147,9 @@ $(function(){
         }
         else if (destination_row.kind === DESTINATION_KIND_WEBHOOK){
             $('#form_destination_kind_webhook').trigger('click');
+        }
+        else if (destination_row.kind === DESTINATION_KIND_SERVICENOW){
+            $('#form_destination_kind_servicenow').trigger('click');
         }
     }
 
@@ -162,6 +195,21 @@ $(function(){
             result = result && validate.result;
             $("#message_destination_informations").text(validate.message);
         }
+        else if (destination_kind === "ServiceNow"){
+            // validate destination informations (ServiceNow)
+            validate = settings_notifications_common.validate.destination_informations_servicenow(
+                $("#form_destination_informations_servicenow_url").val(),
+                $("#form_destination_informations_servicenow_user").val(),
+                $("#form_destination_informations_servicenow_password_check").prop("checked"),
+                $("#form_destination_informations_servicenow_password").val(),
+                $("#form_destination_informations_servicenow_batch_check").prop("checked"),
+                $("#form_destination_informations_servicenow_batch_url").val(),
+                $("#form_destination_informations_servicenow_interval").val(),
+                $("#form_destination_informations_servicenow_limit").val(),
+            );
+            result = result && validate.result;
+            $("#message_destination_informations").text(validate.message);
+        }
 
         console.log("--- validate check end [" + result + "] ----");
 
@@ -171,7 +219,7 @@ $(function(){
     //
     // register setting notification destination
     //
-    function notification_destination_register() {
+    function notification_destination_register(destination_kind) {
         var destination_informations = settings_notifications_common.get_destination_informations();
 
         let reqbody = {
@@ -185,10 +233,26 @@ $(function(){
                         "evaluated": $('#ita_event_type_evaluated').prop("checked"),
                         "timeout": $('#ita_event_type_timeout').prop("checked"),
                         "undetected": $('#ita_event_type_undetected').prop("checked"),
+                        "new_received": $('#ita_event_type_new_received').prop("checked"),
+                        "new_consolidated": $('#ita_event_type_new_consolidated').prop("checked"),
                     },
                 },
             },
             "destination_informations": destination_informations,
+        }
+
+        if (destination_kind === "ServiceNow"){
+            let enable_batch = $("#form_destination_informations_servicenow_batch_check").prop("checked");
+            reqbody.enable_batch = enable_batch;
+            if (enable_batch == true) {
+                let form_destination_informations_servicenow_interval = $("#form_destination_informations_servicenow_interval").val();
+                let form_destination_informations_servicenow_limit = $("#form_destination_informations_servicenow_limit").val();
+                reqbody.batch_period_seconds = Number(form_destination_informations_servicenow_interval);
+                reqbody.batch_count_limit = Number(form_destination_informations_servicenow_limit);
+            } else {
+                reqbody.batch_period_seconds = null;
+                reqbody.batch_count_limit = null;
+            }
         }
 
         show_progress();

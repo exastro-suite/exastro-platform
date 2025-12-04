@@ -25,3 +25,10 @@ SELECT_PLATFORM_PRIVATE = """SELECT INFORMATIONS FROM T_PLATFORM_PRIVATE WHERE I
 
 INSERT_MIGRATION_HISTORY = """INSERT INTO T_PLATFORM_MIGRATION_HISTORY (VERSION, RESULT, MESSAGE, CREATE_USER, LAST_UPDATE_USER)
                                 VALUES ( %(version)s, %(result)s, %(message)s, %(create_user)s, %(last_update_user)s )"""
+
+SELECT_COLUMN_INFOMATION = """
+    SELECT * FROM INFORMATION_SCHEMA.COLUMNS
+        WHERE   TABLE_SCHEMA           =   DATABASE()
+        AND     UPPER(TABLE_NAME)      =   UPPER(%(table_name)s)
+        AND     UPPER(COLUMN_NAME)     =   UPPER(%(column_name)s)
+"""

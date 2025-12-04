@@ -12,13 +12,16 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 from unittest import mock
+from contextlib import closing
 from tests.common import request_parameters, test_common
 import ulid
+import json
 
 from common_library.common import const, validation
 from libs import queries_notification
 from common_library.common.libs import queries_bl_notification
-from common_library.common import api_ita_admin_call
+from common_library.common import api_ita_admin_call, encrypt
+from common_library.common.db import DBconnector
 
 from common_library.common.libs import queries_organization_options
 
@@ -91,6 +94,15 @@ def test_notification_api(connexion_client):
 
         assert response.status_code == 200, "create notifications (kind = mix) response code"
 
+        # ServiceNow通知の追加
+        response = connexion_client.post(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/settings/notifications",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization["user_id"]),
+            json=[sample_data_servicenow('servicenow-01')])
+
+        assert response.status_code == 200, "create notifications (kind = servicenow) response code"
+
 
 def test_notifications_validate(connexion_client):
     """test validate notifications
@@ -161,46 +173,78 @@ def test_notifications_validate(connexion_client):
     #
     # validate destination_informations
     #
+    enable_batch = False
+    batch_period_seconds = 60
+    batch_count_limit = 100
+
     # validate informations None
     validate = validation.validate_destination_informations(
         const.DESTINATION_KIND_MAIL,
-        None)
+        None,
+        enable_batch,
+        batch_period_seconds,
+        batch_count_limit,
+        'create')
     assert not validate.ok, "create notifications validate informations None"
 
     # validate informations array len = 0
     validate = validation.validate_destination_informations(
         const.DESTINATION_KIND_MAIL,
-        [])
+        [],
+        enable_batch,
+        batch_period_seconds,
+        batch_count_limit,
+        'create')
     assert not validate.ok, "create notifications validate informations array len = 0"
 
     # validate informations mail array max
     validate = validation.validate_destination_informations(
         const.DESTINATION_KIND_MAIL,
-        [sample_data_information_email() for i in range(const.max_destination_email)])
+        [sample_data_information_email() for i in range(const.max_destination_email)],
+        enable_batch,
+        batch_period_seconds,
+        batch_count_limit,
+        'create')
     assert validate.ok, "create notifications validate informations mail array max"
 
     # validate informations mail array max + 1
     validate = validation.validate_destination_informations(
         const.DESTINATION_KIND_MAIL,
-        [sample_data_information_email() for i in range(const.max_destination_email + 1)])
+        [sample_data_information_email() for i in range(const.max_destination_email + 1)],
+        enable_batch,
+        batch_period_seconds,
+        batch_count_limit,
+        'create')
     assert not validate.ok, "create notifications validate informations mail array max + 1"
 
     # validate informations address_header None
     validate = validation.validate_destination_informations(
         const.DESTINATION_KIND_MAIL,
-        [sample_data_information_email({"address_header": None})])
+        [sample_data_information_email({"address_header": None})],
+        enable_batch,
+        batch_period_seconds,
+        batch_count_limit,
+        'create')
     assert not validate.ok, "create notifications validate informations address_header None"
 
     # validate informations address_header other
     validate = validation.validate_destination_informations(
         const.DESTINATION_KIND_MAIL,
-        [sample_data_information_email({"address_header": "other"})])
+        [sample_data_information_email({"address_header": "other"})],
+        enable_batch,
+        batch_period_seconds,
+        batch_count_limit,
+        'create')
     assert not validate.ok, "create notifications validate informations address_header other"
 
     # validate informations mail None
     validate = validation.validate_destination_informations(
         const.DESTINATION_KIND_MAIL,
-        [sample_data_information_email({"email": None})])
+        [sample_data_information_email({"email": None})],
+        enable_batch,
+        batch_period_seconds,
+        batch_count_limit,
+        'create')
     assert not validate.ok, "create notifications validate informations mail None"
 
     # validate informations mail max length
@@ -209,86 +253,322 @@ def test_notifications_validate(connexion_client):
     # validate informations mail max length + 1
     validate = validation.validate_destination_informations(
         const.DESTINATION_KIND_MAIL,
-        [sample_data_information_email({"email": "".ljust(const.length_destination_email + 1, "_")})])
+        [sample_data_information_email({"email": "".ljust(const.length_destination_email + 1, "_")})],
+        enable_batch,
+        batch_period_seconds,
+        batch_count_limit,
+        'create')
     assert not validate.ok, "create notifications validate informations mail max length + 1"
 
     # validate informations mail format
     validate = validation.validate_destination_informations(
         const.DESTINATION_KIND_MAIL,
-        [sample_data_information_email({"email": "dummy"})])
+        [sample_data_information_email({"email": "dummy"})],
+        enable_batch,
+        batch_period_seconds,
+        batch_count_limit,
+        'create')
     assert not validate.ok, "create notifications validate informations mail format"
 
     # validate informations teams workflow array max
     validate = validation.validate_destination_informations(
         const.DESTINATION_KIND_TEAMS_WF,
-        [sample_data_information_teams_wf() for i in range(const.max_destination_teams_wf)])
+        [sample_data_information_teams_wf() for i in range(const.max_destination_teams_wf)],
+        enable_batch,
+        batch_period_seconds,
+        batch_count_limit,
+        'create')
     assert validate.ok, "create notifications validate informations teams workflow array max"
 
     # validate informations teams workflow array max + 1
     validate = validation.validate_destination_informations(
         const.DESTINATION_KIND_TEAMS_WF,
-        [sample_data_information_teams_wf() for i in range(const.max_destination_teams_wf + 1)])
+        [sample_data_information_teams_wf() for i in range(const.max_destination_teams_wf + 1)],
+        enable_batch,
+        batch_period_seconds,
+        batch_count_limit,
+        'create')
     assert not validate.ok, "create notifications validate informations teams workflow array max + 1"
 
     # validate informations teams workflow None
     validate = validation.validate_destination_informations(
         const.DESTINATION_KIND_TEAMS_WF,
-        [sample_data_information_teams_wf({"url": None})])
+        [sample_data_information_teams_wf({"url": None})],
+        enable_batch,
+        batch_period_seconds,
+        batch_count_limit,
+        'create')
     assert not validate.ok, "create notifications validate informations teams workflow None"
 
     # validate informations teams workflow max length
     validate = validation.validate_destination_informations(
         const.DESTINATION_KIND_TEAMS_WF,
-        [sample_data_information_teams_wf({"url": "https://example.com/".ljust(const.length_destination_teams_wf_url, "_")})])
+        [sample_data_information_teams_wf({"url": "https://example.com/".ljust(const.length_destination_teams_wf_url, "_")})],
+        enable_batch,
+        batch_period_seconds,
+        batch_count_limit,
+        'create')
     assert validate.ok, "create notifications validate informations teams workflow max length"
 
     # validate informations teams workflow max length + 1
     validate = validation.validate_destination_informations(
         const.DESTINATION_KIND_TEAMS_WF,
-        [sample_data_information_teams_wf({"url": "https://example.com/".ljust(const.length_destination_teams_wf_url + 1, "_")})])
+        [sample_data_information_teams_wf({"url": "https://example.com/".ljust(const.length_destination_teams_wf_url + 1, "_")})],
+        enable_batch,
+        batch_period_seconds,
+        batch_count_limit,
+        'create')
     assert not validate.ok, "create notifications validate informations teams workflow max length + 1"
 
     # validate informations teams workflow format
     validate = validation.validate_destination_informations(
         const.DESTINATION_KIND_TEAMS_WF,
-        [sample_data_information_teams_wf({"url": "dummy"})])
+        [sample_data_information_teams_wf({"url": "dummy"})],
+        enable_batch,
+        batch_period_seconds,
+        batch_count_limit,
+        'create')
     assert not validate.ok, "create notifications validate informations teams workflow format"
 
     # validate informations webhook array max
     validate = validation.validate_destination_informations(
         const.DESTINATION_KIND_WEBHOOK,
-        [sample_data_information_webhook() for i in range(const.max_destination_webhook)])
+        [sample_data_information_webhook() for i in range(const.max_destination_webhook)],
+        enable_batch,
+        batch_period_seconds,
+        batch_count_limit,
+        'create')
     assert validate.ok, "create notifications validate informations webhook array max"
 
     # validate informations webhook array max + 1
     validate = validation.validate_destination_informations(
         const.DESTINATION_KIND_WEBHOOK,
-        [sample_data_information_webhook() for i in range(const.max_destination_webhook + 1)])
+        [sample_data_information_webhook() for i in range(const.max_destination_webhook + 1)],
+        enable_batch,
+        batch_period_seconds,
+        batch_count_limit,
+        'create')
     assert not validate.ok, "create notifications validate informations webhook array max + 1"
 
     # validate informations webhook None
     validate = validation.validate_destination_informations(
         const.DESTINATION_KIND_WEBHOOK,
-        [sample_data_information_webhook({"url": None, "header": None})])
+        [sample_data_information_webhook({"url": None, "header": None})],
+        enable_batch,
+        batch_period_seconds,
+        batch_count_limit,
+        'create')
     assert not validate.ok, "create notifications validate informations webhook None"
 
     # validate informations webhook max length
     validate = validation.validate_destination_informations(
         const.DESTINATION_KIND_WEBHOOK,
-        [sample_data_information_webhook({"url": "https://example.com/".ljust(const.length_destination_webhook_url, "_"), "header": None})])
+        [sample_data_information_webhook({"url": "https://example.com/".ljust(const.length_destination_webhook_url, "_"), "header": None})],
+        enable_batch,
+        batch_period_seconds,
+        batch_count_limit,
+        'create')
     assert validate.ok, "create notifications validate informations webhook max length"
 
     # validate informations webhook max length + 1
     validate = validation.validate_destination_informations(
         const.DESTINATION_KIND_WEBHOOK,
-        [sample_data_information_webhook({"url": "https://example.com/".ljust(const.length_destination_webhook_url + 1, "_"), "header": None})])
+        [sample_data_information_webhook({"url": "https://example.com/".ljust(const.length_destination_webhook_url + 1, "_"), "header": None})],
+        enable_batch,
+        batch_period_seconds,
+        batch_count_limit,
+        'create')
     assert not validate.ok, "create notifications validate informations webhook max length + 1"
 
     # validate informations webhook format
     validate = validation.validate_destination_informations(
         const.DESTINATION_KIND_WEBHOOK,
-        [sample_data_information_webhook({"url": "dummy", "header": None})])
+        [sample_data_information_webhook({"url": "dummy", "header": None})],
+        enable_batch,
+        batch_period_seconds,
+        batch_count_limit,
+        'create')
     assert not validate.ok, "create notifications validate informations webhook format"
+
+    # validate informations servicenow array max
+    validate = validation.validate_destination_informations(
+        const.DESTINATION_KIND_SERVICENOW,
+        [sample_data_information_servicenow() for i in range(const.max_destination_servicenow)],
+        enable_batch,
+        batch_period_seconds,
+        batch_count_limit,
+        'create')
+    assert validate.ok, "create notifications validate informations seervicenow array max"
+
+    # validate informations webhook array max + 1
+    validate = validation.validate_destination_informations(
+        const.DESTINATION_KIND_SERVICENOW,
+        [sample_data_information_servicenow() for i in range(const.max_destination_servicenow + 1)],
+        enable_batch,
+        batch_period_seconds,
+        batch_count_limit,
+        'create')
+    assert not validate.ok, "create notifications validate informations servicenow array max + 1"
+
+    # validate informations servicenow None servicenow_user
+    validate = validation.validate_destination_informations(
+        const.DESTINATION_KIND_SERVICENOW,
+        [sample_data_information_servicenow({"servicenow_user": None})],
+        enable_batch,
+        batch_period_seconds,
+        batch_count_limit,
+        'create')
+    assert not validate.ok, "create notifications validate informations servicenow servicenow_user None"
+
+    # validate informations servicenow servicenow_user max length + 1
+    validate = validation.validate_destination_informations(
+        const.DESTINATION_KIND_SERVICENOW,
+        [sample_data_information_servicenow({"servicenow_user": "".ljust(const.length_destination_servicenow_user + 1, "_")})],
+        enable_batch,
+        batch_period_seconds,
+        batch_count_limit,
+        'create')
+    assert not validate.ok, "create notifications validate informations servicenow servicenow_user max length + 1"
+
+    # validate informations servicenow None servicenow_password
+    validate = validation.validate_destination_informations(
+        const.DESTINATION_KIND_SERVICENOW,
+        [sample_data_information_servicenow({"servicenow_password": None})],
+        enable_batch,
+        batch_period_seconds,
+        batch_count_limit,
+        'create')
+    assert not validate.ok, "create notifications validate informations servicenow servicenow_password None"
+
+    # validate informations servicenow servicenow_password max length + 1
+    validate = validation.validate_destination_informations(
+        const.DESTINATION_KIND_SERVICENOW,
+        [sample_data_information_servicenow({"servicenow_password": "".ljust(const.length_destination_servicenow_password + 1, "_")})],
+        enable_batch,
+        batch_period_seconds,
+        batch_count_limit,
+        'create')
+    assert not validate.ok, "create notifications validate informations servicenow servicenow_password max length + 1"
+
+    # validate informations servicenow None table_api_url
+    validate = validation.validate_destination_informations(
+        const.DESTINATION_KIND_SERVICENOW,
+        [sample_data_information_servicenow({"table_api_url": None})],
+        enable_batch,
+        batch_period_seconds,
+        batch_count_limit,
+        'create')
+    assert not validate.ok, "create notifications validate informations servicenow table_api_url None"
+
+    # validate informations servicenow table_api_url max length + 1
+    validate = validation.validate_destination_informations(
+        const.DESTINATION_KIND_SERVICENOW,
+        [sample_data_information_servicenow({"table_api_url": "https://example.com/".ljust(const.length_destination_teams_wf_url + 1, "_")})],
+        enable_batch,
+        batch_period_seconds,
+        batch_count_limit,
+        'create')
+    assert not validate.ok, "create notifications validate informations servicenow table_api_url max length + 1"
+
+    # validate informations servicenow table_api_url format
+    validate = validation.validate_destination_informations(
+        const.DESTINATION_KIND_SERVICENOW,
+        [sample_data_information_servicenow({"table_api_url": "dummy"})],
+        enable_batch,
+        batch_period_seconds,
+        batch_count_limit,
+        'create')
+    assert not validate.ok, "create notifications validate informations servicenow table_api_url format"
+
+    # validate informations servicenow enable_batch is True, batch_api_url cannot be set to None.
+    validate = validation.validate_destination_informations(
+        const.DESTINATION_KIND_SERVICENOW,
+        [sample_data_information_servicenow({"batch_api_url": None})],
+        True,
+        batch_period_seconds,
+        batch_count_limit,
+        'create')
+    assert not validate.ok, "create notifications validate informations servicenow enable_batch is True, batch_api_url cannot be set to None"
+
+    # validate informations servicenow batch_api_url max length + 1
+    validate = validation.validate_destination_informations(
+        const.DESTINATION_KIND_SERVICENOW,
+        [sample_data_information_servicenow({"batch_api_url": "https://example.com/".ljust(const.length_destination_teams_wf_url + 1, "_")})],
+        True,
+        batch_period_seconds,
+        batch_count_limit,
+        'create')
+    assert not validate.ok, "create notifications validate informations servicenow batch_api_url max length + 1"
+
+    # validate informations servicenow batch_api_url format
+    validate = validation.validate_destination_informations(
+        const.DESTINATION_KIND_SERVICENOW,
+        [sample_data_information_servicenow({"batch_api_url": "dummy"})],
+        True,
+        batch_period_seconds,
+        batch_count_limit,
+        'create')
+    assert not validate.ok, "create notifications validate informations servicenow batch_api_url format"
+
+    # validate informations servicenow enable_batch is True, batch_period_seconds cannot be set to None.
+    validate = validation.validate_destination_informations(
+        const.DESTINATION_KIND_SERVICENOW,
+        [sample_data_information_servicenow()],
+        True,
+        None,
+        batch_count_limit,
+        'create')
+    assert not validate.ok, "create notifications validate informations servicenow enable_batch is True, batch_period_seconds cannot be set to None"
+
+    # validate informations servicenow enable_batch is True, batch_period_seconds min length - 1.
+    validate = validation.validate_destination_informations(
+        const.DESTINATION_KIND_SERVICENOW,
+        [sample_data_information_servicenow()],
+        True,
+        const.min_batch_period_seconds - 1,
+        batch_count_limit,
+        'create')
+    assert not validate.ok, "create notifications validate informations servicenow enable_batch is True, batch_period_seconds min length - 1"
+
+    # validate informations servicenow enable_batch is True, batch_period_seconds max length + 1.
+    validate = validation.validate_destination_informations(
+        const.DESTINATION_KIND_SERVICENOW,
+        [sample_data_information_servicenow()],
+        True,
+        const.max_batch_period_seconds + 1,
+        batch_count_limit,
+        'create')
+    assert not validate.ok, "create notifications validate informations servicenow enable_batch is True, batch_period_seconds max length + 1"
+
+    # validate informations servicenow enable_batch is True, batch_count_limit cannot be set to None.
+    validate = validation.validate_destination_informations(
+        const.DESTINATION_KIND_SERVICENOW,
+        [sample_data_information_servicenow()],
+        True,
+        batch_period_seconds,
+        None,
+        'create')
+    assert not validate.ok, "create notifications validate informations servicenow enable_batch is True, batch_count_limit cannot be set to None"
+
+    # validate informations servicenow enable_batch is True, batch_count_limit min length - 1.
+    validate = validation.validate_destination_informations(
+        const.DESTINATION_KIND_SERVICENOW,
+        [sample_data_information_servicenow()],
+        True,
+        batch_period_seconds,
+        const.min_batch_count_limit - 1,
+        'create')
+    assert not validate.ok, "create notifications validate informations servicenow enable_batch is True, batch_count_limit min length - 1"
+
+    # validate informations servicenow enable_batch is True, batch_count_limit max length + 1.
+    validate = validation.validate_destination_informations(
+        const.DESTINATION_KIND_SERVICENOW,
+        [sample_data_information_servicenow()],
+        True,
+        batch_period_seconds,
+        const.max_batch_count_limit + 1,
+        'create')
+    assert not validate.ok, "create notifications validate informations servicenow enable_batch is True, batch_count_limit max length + 1"
 
     #
     # validate conditions
@@ -337,6 +617,28 @@ def test_notifications_validate(connexion_client):
     conditions["ita"]["event_type"]["undetected"] = "dummy"
     validate = validation.validate_destination_conditions(conditions)
     assert not validate.ok, "create notifications validate conditions ita.event_type.undetected different type"
+
+    # validate conditions ita.event_type.new_received
+    conditions = sample_data_conditions()
+    conditions["ita"]["event_type"]["new_received"] = None
+    validate = validation.validate_destination_conditions(conditions)
+    assert not validate.ok, "create notifications validate conditions ita.event_type.new_received None"
+
+    conditions = sample_data_conditions()
+    conditions["ita"]["event_type"]["new_received"] = "dummy"
+    validate = validation.validate_destination_conditions(conditions)
+    assert not validate.ok, "create notifications validate conditions ita.event_type.new_received different type"
+
+    # validate conditions ita.event_type.new_consolidated
+    conditions = sample_data_conditions()
+    conditions["ita"]["event_type"]["new_consolidated"] = None
+    validate = validation.validate_destination_conditions(conditions)
+    assert not validate.ok, "create notifications validate conditions ita.event_type.new_consolidated None"
+
+    conditions = sample_data_conditions()
+    conditions["ita"]["event_type"]["new_consolidated"] = "dummy"
+    validate = validation.validate_destination_conditions(conditions)
+    assert not validate.ok, "create notifications validate conditions ita.event_type.new_consolidated different type"
 
     #
     # validate body
@@ -622,7 +924,7 @@ def test_notification_register(connexion_client):
         assert response.status_code == 500, "register notifications response code: db error"
 
     with test_common.requsts_mocker_default(), \
-            test_common.pymysql_execute_raise_exception_mocker(queries_bl_notification.SQL_INSERT_PROCESS_QUEUE, Exception("DB Error Test")):
+            test_common.pymysql_execute_raise_exception_mocker(queries_bl_notification.SQL_INSERT_PROCESS_QUEUE_BATCH, Exception("DB Error Test")):
         #
         # DB error route
         #
@@ -668,6 +970,17 @@ def test_settings_destination_get(connexion_client):
 
         assert response.status_code == 200, "get notifications destination response OK route"
 
+        #
+        # validate get normal servicenow
+        #
+        response = connexion_client.get(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/settings/notifications/{setting_notifications[3]['id']}",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization['user_id']))
+
+        assert response.status_code == 200, "get notifications destination response OK route"
+        assert "servicenow_password" not in response.json["data"]["destination_informations"][0], "get notifications destination servicenow, servicenow_password key is not included."
+
 
 def test_settings_notification_list(connexion_client):
     """test settings_notification_list
@@ -691,7 +1004,7 @@ def test_settings_notification_list(connexion_client):
             headers=request_parameters.request_headers(organization['user_id']))
 
         assert response.status_code == 200, "get notifications destination list response OK route"
-        assert len(response.json["data"]) == 3, "get notifications destination list"
+        assert len(response.json["data"]) == 4, "get notifications destination list"
         assert response.json["data"][0].get("id") == setting_notifications[0]['id'], "get notifications destination id check"
 
         #
@@ -703,7 +1016,7 @@ def test_settings_notification_list(connexion_client):
             headers=request_parameters.request_headers(organization['user_id']))
 
         assert response.status_code == 200, "get notifications destination list response OK route"
-        assert len(response.json["data"]) == 3, "get notifications destination list"
+        assert len(response.json["data"]) == 4, "get notifications destination list"
         assert response.json["data"][0].get("conditions", {}).get("ita", {}).get("event_type", {}).get("new"), "get notifications destination id check"
 
         #
@@ -726,9 +1039,33 @@ def test_settings_notification_list(connexion_client):
             headers=request_parameters.request_headers(organization['user_id']))
 
         assert response.status_code == 200, "get notifications destination list response OK route"
-        assert len(response.json["data"]) == 3, "get notifications destination list"
+        assert len(response.json["data"]) == 4, "get notifications destination list"
         assert response.json["data"][0].get("conditions", {}).get("ita", {}).get("event_type", {}).get("new"), "get notifications destination id check"
         assert not response.json["data"][0].get("conditions", {}).get("ita", {}).get("event_type", {}).get("evaluated"), "get notifications destination id check"
+
+        #
+        # validate get normal
+        #
+        response = connexion_client.get(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/settings/notifications?event_type_true=ita.event_type.new_received,ita.event_type.new_consolidated",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization['user_id']))
+
+        assert response.status_code == 200, "get notifications destination list response OK route"
+        assert response.json["data"][0].get("conditions", {}).get("ita", {}).get("event_type", {}).get("new_received"), "get notifications destination id check"
+        assert response.json["data"][0].get("conditions", {}).get("ita", {}).get("event_type", {}).get("new_consolidated"), "get notifications destination id check"
+
+        #
+        # validate get normal
+        #
+        response = connexion_client.get(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/settings/notifications?event_type_false=ita.event_type.new_received,ita.event_type.new_consolidated",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization['user_id']))
+
+        assert response.status_code == 200, "get notifications destination list response OK route"
+        assert not response.json["data"][0].get("conditions", {}).get("ita", {}).get("event_type", {}).get("new_received"), "get notifications destination id check"
+        assert not response.json["data"][0].get("conditions", {}).get("ita", {}).get("event_type", {}).get("new_consolidated"), "get notifications destination id check"
 
 
 def test_settings_notification_destination_delete(connexion_client):
@@ -858,8 +1195,8 @@ def test_settings_notification_destination_delete(connexion_client):
         assert response.json["message"] == f"Failed to delete notification destination (destination id:{setting_notifications[1]['id']})", "DB error route"
 
     with test_common.requsts_mocker_default(), \
-        test_common.pymysql_execute_data_mocker(queries_organization_options.SQL_QUERY_ORGANIZATION_INFORMATIONS, {"INFORMATIONS": '{"ext_options": {"options_ita": {"drivers": {"oase": false}}}}'}), \
-        mock.patch.object(api_ita_admin_call, 'ita_notification_destination', return_value='1') as mock_obj:
+         test_common.pymysql_execute_data_mocker(queries_organization_options.SQL_QUERY_ORGANIZATION_INFORMATIONS, {"INFORMATIONS": '{"ext_options": {"options_ita": {"drivers": {"oase": false}}}}'}), \
+         mock.patch.object(api_ita_admin_call, 'ita_notification_destination', return_value='1') as mock_obj:
 
         mock_obj.return_value = MockResponse({'data': '["mix-teams_wf-01"]'}, 200)
         # destination_id in use
@@ -906,7 +1243,7 @@ def sample_data_mail_no_id(update={}):
         "conditions": {
             "ita": {
                 "event_type": {
-                    "new": True, "evaluated": False, "timeout": True, "undetected": False,
+                    "new": True, "evaluated": False, "timeout": True, "undetected": False, "new_received": True, "new_consolidated": True,
                 }
             }
         }
@@ -947,7 +1284,7 @@ def sample_data_teams_no_id(update={}):
         "conditions": {
             "ita": {
                 "event_type": {
-                    "new": True, "evaluated": False, "timeout": True, "undetected": False,
+                    "new": True, "evaluated": False, "timeout": True, "undetected": False, "new_received": True, "new_consolidated": True,
                 }
             }
         }
@@ -988,7 +1325,7 @@ def sample_data_teams_wf_no_id(update={}):
         "conditions": {
             "ita": {
                 "event_type": {
-                    "new": True, "evaluated": False, "timeout": True, "undetected": False,
+                    "new": True, "evaluated": False, "timeout": True, "undetected": False, "new_received": False, "new_consolidated": False,
                 }
             }
         }
@@ -1030,7 +1367,54 @@ def sample_data_webhook_no_id(update={}):
         "conditions": {
             "ita": {
                 "event_type": {
-                    "new": True, "evaluated": False, "timeout": True, "undetected": False,
+                    "new": True, "evaluated": False, "timeout": True, "undetected": False, "new_received": False, "new_consolidated": False,
+                }
+            }
+        }
+    }, **update)
+
+
+def sample_data_servicenow(id, update={}):
+    """sample data servicenow setting
+
+    Args:
+        id (str): destination id
+        update (dict, optional): update dict. Defaults to {}.
+
+    Returns:
+        dict: sample data
+    """
+    return dict(
+        sample_data_servicenow_no_id(update),
+        **{"id": id}
+    )
+
+
+def sample_data_servicenow_no_id(update={}):
+    """sample data servicenow setting (no id field)
+
+    Args:
+        update (dict, optional): update dict. Defaults to {}.
+
+    Returns:
+        dict: sample data
+    """
+    return dict({
+        "name": "name of servicenow destination",
+        "kind": "ServiceNow",
+        "destination_informations": [{
+            "servicenow_user": "admin",
+            "servicenow_password": "password",
+            "table_api_url": "https://dev999999.service-now.com/api/now/table/x_9999999_test_a_1_tst_tbl_01",
+            "batch_api_url": "https://dev999999.service-now.com/api/now/v1/batch"
+        }],
+        "enable_batch": True,
+        "batch_period_seconds": 60,
+        "batch_count_limit": 100,
+        "conditions": {
+            "ita": {
+                "event_type": {
+                    "new": True, "evaluated": False, "timeout": True, "undetected": False, "new_received": False, "new_consolidated": False,
                 }
             }
         }
@@ -1083,6 +1467,18 @@ def sample_data_information_webhook(update={}):
         dict: sample data
     """
     return dict(sample_data_webhook_no_id()["destination_informations"][0], **update)
+
+
+def sample_data_information_servicenow(update={}):
+    """sample data (kind=ServiceNow destination_informations row)
+
+    Args:
+        update (dict, optional): update dict. Defaults to {}.
+
+    Returns:
+        dict: sample data
+    """
+    return dict(sample_data_servicenow_no_id()["destination_informations"][0], **update)
 
 
 def sample_data_conditions(update={}):
@@ -1308,6 +1704,33 @@ def test_settings_notification_put(connexion_client):
 
         assert response.status_code == 400, "update notifications response code same name error route"
         assert response.json["result"] == "400-34004", "update notifications response code same name error route"
+
+        # ServiceNowはservicenow_passwordが空でも更新可能であること。servicenow_passwordが空の場合、値を更新しないこと。
+        update_destination_informations = [{
+            "servicenow_user": "admin",
+            "servicenow_password": "",
+            "table_api_url": "https://dev999999.service-now.com/api/now/table/x_9999999_test_a_1_tst_tbl_01",
+            "batch_api_url": "https://dev999999.service-now.com/api/now/v1/batch"
+        }]
+        response = connexion_client.put(
+            f"/api/{organization['organization_id']}/platform/workspaces/{workspace['workspace_id']}/settings/notifications/{setting_notifications[3]['id']}",
+            content_type='application/json',
+            headers=request_parameters.request_headers(organization["user_id"]),
+            json=sample_data_servicenow(setting_notifications[3]['id'], {"destination_informations": update_destination_informations}))
+
+        assert response.status_code == 200, "update notifications response code OK route"
+
+        with closing(DBconnector().connect_workspacedb(organization['organization_id'], workspace['workspace_id'])) as conn:
+            with conn.cursor() as cursor:
+                cursor.execute(
+                    queries_notification.SQL_QUERY_NOTIFICATION_DESTINATION + " WHERE destination_id = %(destination_id)s",
+                    {"destination_id": setting_notifications[3]['id']})
+                result = cursor.fetchall()
+
+            current_destination_informations = json.loads(encrypt.decrypt_str(result[0]['DESTINATION_INFORMATIONS']))
+            current_password = current_destination_informations[0].get('servicenow_password')
+
+        assert current_password != "", "Do not update password if blank"
 
     with test_common.requsts_mocker_default(), \
             test_common.pymysql_execute_raise_exception_mocker(queries_notification.SQL_UPDATE_NOTIFICATION_DESTINATION, Exception("DB Error Test")):

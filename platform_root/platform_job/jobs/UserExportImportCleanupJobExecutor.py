@@ -25,19 +25,20 @@ from libs.exceptions import JobTimeoutException
 
 sleep_time = 0.1
 
+
 class UserExportImportCleanupJobExecutor(BaseJobExecutor):
     """ユーザーエクスポート・インポート削除Job / User export and bulk import cleanup
 
     Args:
         BaseJobExecutor (_type_): _description_
     """
-    def __init__(self, queue: dict):
+    def __init__(self, queue: dict, batch_queue: list[dict] | None = None):
         """constructor
 
         Args:
             queue (dict): _description_
         """
-        super().__init__(queue)
+        super().__init__(queue, batch_queue)
 
     def execute(self):
         """ユーザーエクスポート・インポート削除(DB) / User export and bulk import cleanup

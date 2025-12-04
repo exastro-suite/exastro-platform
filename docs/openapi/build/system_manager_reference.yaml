@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: Exastro Platform API (System Management)
   description: Exastro Platform API for System Manager
-  version: 1.10.0
+  version: 1.11.0
 servers:
   - url: 'https://{host}'
     description: API endpoint
@@ -1603,6 +1603,18 @@ components:
               - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsTeamsWorkflow'
               - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsTeams'
               - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsWebhook'
+              - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsServiceNow'
+        enable_batch:
+          type: boolean
+          description: batch call
+        batch_period_seconds:
+          type: integer
+          nullable: true
+          description: batch sending period
+        batch_count_limit:
+          type: integer
+          nullable: true
+          description: batch sending limit
     settingsDestinationList:
       title: destinationList is list of Destination resources.
       type: object
@@ -1635,7 +1647,8 @@ components:
             - Mail
             - Teams_WF
             - Webhook
-          description: Select destination kind from Mail/Teams_WF/Webhook
+            - ServiceNow
+          description: Select destination kind from Mail/Teams_WF/Webhook/ServiceNow
         conditions:
           $ref: '#/components/schemas/settingsDestinationConditions'
         destination_informations:
@@ -1648,6 +1661,18 @@ components:
               - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsTeamsWorkflow'
               - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsTeams'
               - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsWebhook'
+              - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsServiceNow'
+        enable_batch:
+          type: boolean
+          description: batch call
+        batch_period_seconds:
+          type: integer
+          nullable: true
+          description: batch sending period
+        batch_count_limit:
+          type: integer
+          nullable: true
+          description: batch sending limit
       required:
         - id
         - name
@@ -1667,6 +1692,7 @@ components:
             - Mail
             - Teams_WF
             - Webhook
+            - ServiceNow
           description: Select destination kind from Mail/Teams_WF/Webhook
         conditions:
           $ref: '#/components/schemas/settingsDestinationConditions'
@@ -1680,6 +1706,18 @@ components:
               - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsTeamsWorkflow'
               - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsTeams'
               - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsWebhook'
+              - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsServiceNow'
+        enable_batch:
+          type: boolean
+          description: batch call
+        batch_period_seconds:
+          type: integer
+          nullable: true
+          description: batch sending period
+        batch_count_limit:
+          type: integer
+          nullable: true
+          description: batch sending limit
       required:
         - name
         - kind
@@ -1716,6 +1754,25 @@ components:
         url:
           type: string
           description: webhook URL
+        header:
+          type: string
+          description: webhook header
+    settingsDestinationSubDestinationInformationsServiceNow:
+      title: destinations destination_informations(webhook) resource.
+      type: object
+      properties:
+        servicenow_user:
+          type: string
+          description: ServiceNow user
+        servicenow_password:
+          type: string
+          description: ServiceNow password
+        table_api_url:
+          type: string
+          description: ServiceNow table entry API URL
+        batch_api_url:
+          type: string
+          description: ServiceNow batch API URL
     settingsDestinationConditions:
       title: destinations conditions resource.
       type: object
@@ -1730,21 +1787,29 @@ components:
               properties:
                 new:
                   type: boolean
-                  description: Whether to be notified of new events
+                  description: Whether to be notified of new events before evaluation
                 evaluated:
                   type: boolean
-                  description: Whether to be notified of evaluated event
+                  description: Whether to be notified of known events upon evaluation
                 timeout:
                   type: boolean
-                  description: Whether to be notified of timeout event
+                  description: Whether to be notified of known events upon TTL timeout
                 undetected:
                   type: boolean
-                  description: Whether to be notified of undetected event
+                  description: Whether to be notified of undetected events upon evaluation
+                new_received:
+                  type: boolean
+                  description: Whether to be notified of new events upon reception
+                new_consolidated:
+                  type: boolean
+                  description: Whether to be notified of new events upon consolidation
               required:
                 - new
                 - evaluated
                 - timeout
                 - undetected
+                - new_received
+                - new_consolidated
           required:
             - event_type
       required:

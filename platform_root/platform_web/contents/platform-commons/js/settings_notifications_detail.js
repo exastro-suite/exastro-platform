@@ -108,10 +108,12 @@ $(function(){
         }else{
             $("#text_destination_kind").text(destination_row.kind);
         }
-        settings_notifications_common.set_destination_informations_text(destination_row.kind, destination_row.destination_informations);
+        settings_notifications_common.set_destination_informations_text(destination_row.kind, destination_row.destination_informations, destination_row.batch_period_seconds, destination_row.batch_count_limit);
 
         try { $("#text_last_update_date_time").text(fn.date(new Date(destination_row.last_update_timestamp),'yyyy/MM/dd HH:mm:ss'))} catch(e) { }
 
+        var ita_event_type_new_received = fn.cv(destination_row.conditions.ita.event_type.new_received,false,false) ? getText("000-00184", 'する') : getText("000-00185", 'しない');
+        var ita_event_type_new_consolidated = fn.cv(destination_row.conditions.ita.event_type.new_consolidated,false,false) ? getText("000-00184", 'する') : getText("000-00185", 'しない');
         var ita_event_type_new = fn.cv(destination_row.conditions.ita.event_type.new,false,false) ? getText("000-00184", 'する') : getText("000-00185", 'しない');
         var ita_event_type_evaluated = fn.cv(destination_row.conditions.ita.event_type.evaluated,false,false) ? getText("000-00184", 'する') : getText("000-00185", 'しない');
         var ita_event_type_timeout = fn.cv(destination_row.conditions.ita.event_type.timeout,false,false) ? getText("000-00184", 'する') : getText("000-00185", 'しない');
@@ -124,19 +126,25 @@ $(function(){
         // Specify a fixed event type
         let html='';
         html += row_template_top
-            .replace(/\${conditions_all_count}/g, 4)
-            .replace(/\${conditions_group_name}/g, getText("000-87022", "OASE／イベント種別"))
-            .replace(/\${conditions_group_count}/g, 4)
-            .replace(/\${conditions_name}/g, getText("000-00153", '新規'))
+            .replace(/\${conditions_all_count}/g, 6)
+            .replace(/\${conditions_group_name}/g, getText("000-87022", "OASE／種別"))
+            .replace(/\${conditions_group_count}/g, 6)
+            .replace(/\${conditions_name}/g, getText("000-00224", '1.新規イベント（受信時）'))
+            .replace(/\${conditions_value}/g, ita_event_type_new_received);
+        html += row_template_3rd
+            .replace(/\${conditions_name}/g, getText("000-00225", '2.新規イベント（統合時）'))
+            .replace(/\${conditions_value}/g, ita_event_type_new_consolidated);
+        html += row_template_3rd
+            .replace(/\${conditions_name}/g, getText("000-00153", '3.新規イベント（判定前）'))
             .replace(/\${conditions_value}/g, ita_event_type_new);
         html += row_template_3rd
-            .replace(/\${conditions_name}/g, getText("000-00154", '既知（判定済み）'))
+            .replace(/\${conditions_name}/g, getText("000-00154", '4.既知イベント（判定時）'))
             .replace(/\${conditions_value}/g, ita_event_type_evaluated);
         html += row_template_3rd
-            .replace(/\${conditions_name}/g, getText("000-00155", '既知（時間切れ）'))
+            .replace(/\${conditions_name}/g, getText("000-00155", '5.既知イベント（TTL有効期限切れ）'))
             .replace(/\${conditions_value}/g, ita_event_type_timeout);
         html += row_template_3rd
-            .replace(/\${conditions_name}/g, getText("000-00156", '未知'))
+            .replace(/\${conditions_name}/g, getText("000-00156", '6.未知イベント'))
             .replace(/\${conditions_value}/g, ita_event_type_undetected);
         $("#conditions_list tbody").append(html);
         $("#conditions_list .datarow").css('display', '');
@@ -144,19 +152,26 @@ $(function(){
         //
         // notification test button
         //
-        $('#button_test').on('click',() => {
-            confirmMessage(getText("000-80030", "確認"), getText("000-87036", "テスト通知を行いますか？<br><br>タイトル・本文：notification testで通知されます。"),
-                () => {
-                    // OK
-                    $('#button_test').prop('disabled',true);
-                    notification_test(destination_row);
-                },
-                () => {
-                    // Cancel
-                    return;
-                }
-            )
-        });
+        if(destination_row.kind === DESTINATION_KIND_SERVICENOW) {
+            // ServiceNowの場合は通知テストボタンは非表示とする
+            $("#button_test").remove();
+        } else {
+            $('#button_test').on('click',() => {
+                confirmMessage(getText("000-80030", "確認"), getText("000-87036", "テスト通知を行いますか？<br><br>タイトル・本文：notification testで通知されます。"),
+                    () => {
+                        // OK
+                        $('#button_test').prop('disabled',true);
+                        notification_test(destination_row);
+                    },
+                    () => {
+                        // Cancel
+                        return;
+                    }
+                )
+            });
+        }
+
+
     }
 
     function delete_destination(destination_name) {

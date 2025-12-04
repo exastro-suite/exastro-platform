@@ -50,7 +50,7 @@ def user_create(realm_name, user_json, token):
     globals.logger.debug("user post")
     # ユーザ情報取得
     # User information acquisition
-    request_response = requests.post(f"{api_url}/auth/admin/realms/{realm_name}/users", headers=header_para, json=user_json)
+    request_response = requests.post(f"{api_url}/auth/admin/realms/{realm_name}/users", headers=header_para, json=user_json, timeout=(12, 600))
 
     return request_response
 
@@ -88,7 +88,7 @@ def user_get(realm_name, user_name, token, first=0, max=100, search=None):
     globals.logger.debug("user get")
     # ユーザ情報取得
     # User information acquisition
-    request_response = requests.get(f"{api_url}/auth/admin/realms/{realm_name}/users{query_params}", headers=header_para)
+    request_response = requests.get(f"{api_url}/auth/admin/realms/{realm_name}/users{query_params}", headers=header_para, timeout=(12, 600))
 
     return request_response
 
@@ -124,7 +124,7 @@ def user_count_get(realm_name, token, user_name=None, search=None):
     globals.logger.debug("users count get")
     # ユーザー数取得
     # users count acquisition
-    request_response = requests.get(f"{api_url}/auth/admin/realms/{realm_name}/users/count{query_params}", headers=header_para)
+    request_response = requests.get(f"{api_url}/auth/admin/realms/{realm_name}/users/count{query_params}", headers=header_para, timeout=(12, 600))
 
     return request_response
 
@@ -152,7 +152,7 @@ def user_get_by_id(realm_name, user_id, token):
     globals.logger.debug("user get by id")
     # ユーザ情報取得
     # User information acquisition
-    request_response = requests.get("{}/auth/admin/realms/{}/users/{}".format(api_url, realm_name, user_id), headers=header_para)
+    request_response = requests.get("{}/auth/admin/realms/{}/users/{}".format(api_url, realm_name, user_id), headers=header_para, timeout=(12, 600))
 
     return request_response
 
@@ -181,7 +181,7 @@ def user_update(realm_name, user_id, user_json, token):
     globals.logger.debug("user put")
     # ユーザ情報取得
     # User information acquisition
-    request_response = requests.put(f"{api_url}/auth/admin/realms/{realm_name}/users/{user_id}", headers=header_para, json=user_json)
+    request_response = requests.put(f"{api_url}/auth/admin/realms/{realm_name}/users/{user_id}", headers=header_para, json=user_json, timeout=(12, 600))
 
     return request_response
 
@@ -218,7 +218,8 @@ def user_reset_password(realm_name, user_id, user_password, token):
     request_response = requests.put(
         "{}/auth/admin/realms/{}/users/{}/reset-password".format(api_url, realm_name, user_id),
         headers=header_para,
-        data=json.dumps(data_para)
+        data=json.dumps(data_para),
+        timeout=(12, 600)
     )
     # globals.logger.debug(request_response.text)
 
@@ -248,7 +249,7 @@ def service_account_user_get(realm_name, client_id, token):
     globals.logger.debug("service account user get")
     # サービスアカウントユーザー情報取得
     # get service account user
-    request_response = requests.get(f"{api_url}/auth/admin/realms/{realm_name}/clients/{client_id}/service-account-user", headers=header_para)
+    request_response = requests.get(f"{api_url}/auth/admin/realms/{realm_name}/clients/{client_id}/service-account-user", headers=header_para, timeout=(12, 600))
 
     return request_response
 
@@ -276,7 +277,7 @@ def user_delete(realm_name, user_id, token):
     globals.logger.debug("user delete")
     # ユーザ情報削除
     # User information deletetion
-    request_response = requests.delete(f"{api_url}/auth/admin/realms/{realm_name}/users/{user_id}", headers=header_para)
+    request_response = requests.delete(f"{api_url}/auth/admin/realms/{realm_name}/users/{user_id}", headers=header_para, timeout=(12, 600))
 
     globals.logger.debug(f"### Succeed func:{inspect.currentframe().f_code.co_name}")
 
@@ -303,7 +304,7 @@ def user_credentials_get(realm_name, user_id, token):
         "Authorization": "Bearer {}".format(token),
     }
 
-    request_response = requests.get(f"{api_url}/auth/admin/realms/{realm_name}/users/{user_id}/credentials", headers=header_para)
+    request_response = requests.get(f"{api_url}/auth/admin/realms/{realm_name}/users/{user_id}/credentials", headers=header_para, timeout=(12, 600))
 
     return request_response
 
@@ -329,7 +330,7 @@ def user_credentials_delete(realm_name, user_id, credential_id, token):
         "Authorization": "Bearer {}".format(token),
     }
 
-    request_response = requests.delete(f"{api_url}/auth/admin/realms/{realm_name}/users/{user_id}/credentials/{credential_id}", headers=header_para)
+    request_response = requests.delete(f"{api_url}/auth/admin/realms/{realm_name}/users/{user_id}/credentials/{credential_id}", headers=header_para, timeout=(12, 600))
 
     return request_response
 

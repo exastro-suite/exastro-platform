@@ -15,6 +15,7 @@
 from contextlib import closing
 import json
 import ulid
+from datetime import datetime
 
 from common_library.common import common, validation, const
 from common_library.common.db import DBconnector
@@ -60,6 +61,10 @@ def settings_destination_get(organization_id, workspace_id, destination_id):  # 
         globals.logger.debug(f"result:{result}")
         data = settings_notification_rowset(result)
 
+        # ServiceNowの場合は、servicenow_passwordを返却値から削除する
+        if data["kind"] == const.DESTINATION_KIND_SERVICENOW:
+            del data["destination_informations"][0]["servicenow_password"]
+
         return data
     else:
         raise common.NotFoundException(
@@ -75,6 +80,9 @@ def settings_notification_rowset(row):
         "kind": row["DESTINATION_KIND"],
         "conditions": json.loads(row["CONDITIONS"]),
         "destination_informations": json.loads(encrypt.decrypt_str(row["DESTINATION_INFORMATIONS"])),
+        "enable_batch": True if row["ENABLE_BATCH"] == 1 else False,
+        "batch_period_seconds": row["BATCH_PERIOD_SECONDS"],
+        "batch_count_limit": row["BATCH_COUNT_LIMIT"],
         "create_timestamp": common.datetime_to_str(row["CREATE_TIMESTAMP"]),
         "create_user": row["CREATE_USER"],
         "last_update_timestamp": common.datetime_to_str(row["LAST_UPDATE_TIMESTAMP"]),
@@ -212,7 +220,10 @@ def notification_register(body, organization_id, workspace_id, user_id):  # noqa
                     "notification_status": const.NOTIFICATION_STATUS_UNSENT,
                     "notification_timestamp": None,
                     "create_user": user_id,
-                    "last_update_user": user_id
+                    "last_update_user": user_id,
+                    "enable_batch": destination.get('ENABLE_BATCH'),
+                    "batch_period_seconds": destination.get('BATCH_PERIOD_SECONDS'),
+                    "batch_count_limit": destination.get('BATCH_COUNT_LIMIT'),
                 })
 
     with closing(DBconnector().connect_workspacedb(organization_id, workspace_id)) as conn:
@@ -232,26 +243,41 @@ def notification_register(body, organization_id, workspace_id, user_id):  # noqa
                         )
                         raise common.InternalErrorException(message_id=message_id, message=message)
 
-                except Exception as e:
+                except Exception:
                     conn.rollback()
-                    raise e
+                    raise
 
             conn.commit()
 
     with closing(DBconnector().connect_platformdb()) as conn:
         with conn.cursor() as cursor:
             for notifications_row in insert_notifications:
+
+                if notifications_row.get('enable_batch'):
+                    # 通知先IDと通知先の更新日時でbatch送信のグループ化する（更新日時は通知先の情報が変わってるかもしれないので、グループ化しないようにする対処）
+                    # Group batch sending by destination ID and destination update date and time (the destination information may have changed at the update date, so grouping is not performed)
+                    batch_group_key = json.dumps({
+                        "destination_id": destination.get("DESTINATION_ID"),
+                        "last_update_timestamp": int(destination.get("LAST_UPDATE_TIMESTAMP", datetime.min).timestamp())
+                    })
+                else:
+                    batch_group_key = None
+
                 parameter = {
                     "process_id": ulid.new().str,
                     "process_kind": const.PROCESS_KIND_NOTIFICATION,
                     "process_exec_id": notifications_row.get("notification_id"),
                     "organization_id": organization_id,
                     "workspace_id": workspace_id,
+                    "enable_batch": notifications_row.get('enable_batch'),
+                    "batch_period_seconds": notifications_row.get('batch_period_seconds'),
+                    "batch_count_limit": notifications_row.get('batch_count_limit'),
+                    "batch_group_key": batch_group_key,
                     "last_update_user": user_id,
                 }
                 try:
                     try:
-                        cursor.execute(queries_bl_notification.SQL_INSERT_PROCESS_QUEUE, parameter)
+                        cursor.execute(queries_bl_notification.SQL_INSERT_PROCESS_QUEUE_BATCH, parameter)
 
                         # QUEUEは1件ずつコミット
                         # QUEUE commits one item at a time
@@ -267,11 +293,9 @@ def notification_register(body, organization_id, workspace_id, user_id):  # noqa
                         )
                         raise common.InternalErrorException(message_id=message_id, message=message)
 
-                except Exception as e:
+                except Exception:
                     conn.rollback()
-                    raise e
-
-    return
+                    raise
 
 
 def notification_list(organization_id, workspace_id, page_size=None, current_page=None, details_info=None, func_id=None, match=None, like_before=None, like_after=None, like_all=None):  # noqa: E501

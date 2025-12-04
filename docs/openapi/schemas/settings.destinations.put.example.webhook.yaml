@@ -19,14 +19,19 @@ value:
     "conditions": {
       "ita": {
         "event_type": {
-          "new": true, "evaluated": true, "timeout": true, "undetected": true
+          "new": true,
+          "evaluated": true,
+          "timeout": true,
+          "undetected": true,
+          "new_received": false,
+          "new_consolidated": false,
         }
       }
     },
     "destination_informations": [
       {
         "url": "http://your-webhook-server/hooks/XXXXXXXX",
-        "header": "Content-Type: application/json"
+        "header": "{\"Content-Type\": \"application/json\"}"
       }
     ]
   }

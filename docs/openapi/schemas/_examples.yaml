@@ -20,6 +20,8 @@ settingsDestinationSubDestinationInformationsExampleTeams:
   $ref: "./settings.destinations.get.example.teams.yaml"
 settingsDestinationSubDestinationInformationsExampleWebhook:
   $ref: "./settings.destinations.get.example.webhook.yaml"
+settingsDestinationSubDestinationInformationsExampleServiceNow:
+  $ref: "./settings.destinations.get.example.servicenow.yaml"
 notificationsCreateExampleMail:
   $ref: "./notifications.create.example.mail.yaml"
 notificationsCreateExampleTeamsworkflow:
@@ -28,6 +30,8 @@ notificationsCreateExampleTeams:
   $ref: "./notifications.create.example.teams.yaml"
 notificationsCreateExampleWebhook:
   $ref: "./notifications.create.example.webhook.yaml"
+notificationsCreateExampleServiceNow:
+  $ref: "./notifications.create.example.servicenow.yaml"
 settingsDestinationOneGetExampleMail:
   $ref: "./settings.destinationOne.get.example.mail.yaml"
 settingsDestinationOneGetExampleTeamsworkflow:
@@ -36,3 +40,5 @@ settingsDestinationOneGetExampleTeams:
   $ref: "./settings.destinationOne.get.example.teams.yaml"
 settingsDestinationOneGetExampleWebhook:
   $ref: "./settings.destinationOne.get.example.webhook.yaml"
+settingsDestinationOneGetExampleServiceNow:
+  $ref: "./settings.destinationOne.get.example.servicenow.yaml"

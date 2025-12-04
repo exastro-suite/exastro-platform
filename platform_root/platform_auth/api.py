@@ -131,6 +131,7 @@ def openid_connect_token(organization_id):
         f"{proxy_location_origin}/auth/realms/{organization_id}/protocol/openid-connect/token",
         data=request.form,
         headers=headers,
+        timeout=(12, 600)
     )
 
     # remake response header
