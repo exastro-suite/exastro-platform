@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: Exastro Platform API
   description: Exastro Platform API
-  version: 1.10.0
+  version: 1.11.0
 servers:
   - url: 'https://{host}'
     description: API endpoint
@@ -1105,6 +1105,8 @@ paths:
                   $ref: '#/components/examples/settingsDestinationSubDestinationInformationsExampleTeams'
                 webhook settings:
                   $ref: '#/components/examples/settingsDestinationSubDestinationInformationsExampleWebhook'
+                ServiceNow settings:
+                  $ref: '#/components/examples/settingsDestinationSubDestinationInformationsExampleServiceNow'
         default:
           description: An unexpected error response.
           content:
@@ -1148,6 +1150,8 @@ paths:
                           evaluated: false
                           timeout: true
                           undetected: true
+                          new_received: false
+                          new_consolidated: false
                     destination_informations:
                       - address_header: to
                         email: mike@example.com
@@ -1167,6 +1171,8 @@ paths:
                           evaluated: true
                           timeout: false
                           undetected: false
+                          new_received: false
+                          new_consolidated: false
                     destination_informations:
                       - url: 'https://{server-name}.{region}.logic.azure.com/workflows/{workflow-ID}/triggers/{trigger-name}/paths/invoke/?XXXXXXXXX'
               teams settings (deprecated):
@@ -1181,6 +1187,8 @@ paths:
                           evaluated: true
                           timeout: false
                           undetected: false
+                          new_received: false
+                          new_consolidated: false
                     destination_informations:
                       - webhook: 'https://xxxxxxxx.webhook.office.com/webhookb/xxxxxxxx-xxxxxx-xxxx-xxxx-xxxxxxxxxxxx'
               webhook settings:
@@ -1195,9 +1203,33 @@ paths:
                           evaluated: true
                           timeout: false
                           undetected: false
+                          new_received: false
+                          new_consolidated: false
                     destination_informations:
                       - url: 'http://your-webhook-server/hooks/XXXXXXXX'
-                        header: 'Content-Type: application/json'
+                        header: '{"Content-Type": "application/json"}'
+              ServiceNow settings:
+                value:
+                  - id: 00000001Z7ZXFAED6872F6C9W9
+                    name: destinations of servicenow table
+                    kind: ServiceNow
+                    conditions:
+                      ita:
+                        event_type:
+                          new: true
+                          evaluated: true
+                          timeout: false
+                          undetected: false
+                          new_received: false
+                          new_consolidated: false
+                    destination_informations:
+                      - servicenow_user: servicenow_user01
+                        servicenow_password: password
+                        table_api_url: 'https://servicenow-host/api/now/table'
+                        batch_api_url: 'https://servicenow-host/api/now/v1/batch'
+                    enable_batch: true
+                    batch_period_seconds: 30
+                    batch_count_limit: 50
         required: true
       responses:
         '200':
@@ -1260,6 +1292,8 @@ paths:
                   $ref: '#/components/examples/settingsDestinationOneGetExampleTeams'
                 webhook settings:
                   $ref: '#/components/examples/settingsDestinationOneGetExampleWebhook'
+                ServiceNow settings:
+                  $ref: '#/components/examples/settingsDestinationOneGetExampleServiceNow'
         default:
           description: An unexpected error response.
           content:
@@ -1305,6 +1339,8 @@ paths:
                         evaluated: true
                         timeout: true
                         undetected: true
+                        new_received: false
+                        new_consolidated: false
                   destination_informations:
                     - address_header: to
                       email: mike@example.com
@@ -1323,6 +1359,8 @@ paths:
                         evaluated: true
                         timeout: true
                         undetected: true
+                        new_received: false
+                        new_consolidated: false
                   destination_informations:
                     - url: 'https://{server-name}.{region}.logic.azure.com/workflows/{workflow-ID}/triggers/{trigger-name}/paths/invoke/?XXXXXXXXX'
               teams settings (deprecated):
@@ -1336,6 +1374,8 @@ paths:
                         evaluated: true
                         timeout: true
                         undetected: true
+                        new_received: false
+                        new_consolidated: false
                   destination_informations:
                     - webhook: 'https://xxxxxxxx.webhook.office.com/webhookb/xxxxxxxx-xxxxxx-xxxx-xxxx-xxxxxxxxxxxx'
               webhook settings:
@@ -1349,9 +1389,32 @@ paths:
                         evaluated: true
                         timeout: true
                         undetected: true
+                        new_received: false
+                        new_consolidated: false
                   destination_informations:
                     - url: 'http://your-webhook-server/hooks/XXXXXXXX'
-                      header: 'Content-Type: application/json'
+                      header: '{"Content-Type": "application/json"}'
+              ServiceNow settings:
+                value:
+                  name: destinations of ServiceNow settings
+                  kind: ServiceNow
+                  conditions:
+                    ita:
+                      event_type:
+                        new: true
+                        evaluated: true
+                        timeout: true
+                        undetected: true
+                        new_received: false
+                        new_consolidated: false
+                  destination_informations:
+                    - servicenow_user: servicenow_user01
+                      servicenow_password: password
+                      table_api_url: 'https://servicenow-host/api/now/table'
+                      batch_api_url: 'https://servicenow-host/api/now/v1/batch'
+                  enable_batch: true
+                  batch_period_seconds: 30
+                  batch_count_limit: 50
         required: true
       responses:
         '200':
@@ -1539,6 +1602,8 @@ paths:
                 $ref: '#/components/examples/notificationsCreateExampleTeams'
               webhook message post:
                 $ref: '#/components/examples/notificationsCreateExampleWebhook'
+              ServiceNow table post:
+                $ref: '#/components/examples/notificationsCreateExampleServiceNow'
         required: true
       responses:
         '200':
@@ -3840,6 +3905,8 @@ paths:
                 $ref: '#/components/examples/notificationsCreateExampleTeams'
               webhook message post:
                 $ref: '#/components/examples/notificationsCreateExampleWebhook'
+              ServiceNow table post:
+                $ref: '#/components/examples/notificationsCreateExampleServiceNow'
         required: true
       responses:
         '200':
@@ -4883,6 +4950,18 @@ components:
               - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsTeamsWorkflow'
               - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsTeams'
               - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsWebhook'
+              - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsServiceNow'
+        enable_batch:
+          type: boolean
+          description: batch call
+        batch_period_seconds:
+          type: integer
+          nullable: true
+          description: batch sending period
+        batch_count_limit:
+          type: integer
+          nullable: true
+          description: batch sending limit
     settingsDestinationList:
       title: destinationList is list of Destination resources.
       type: object
@@ -4915,7 +4994,8 @@ components:
             - Mail
             - Teams_WF
             - Webhook
-          description: Select destination kind from Mail/Teams_WF/Webhook
+            - ServiceNow
+          description: Select destination kind from Mail/Teams_WF/Webhook/ServiceNow
         conditions:
           $ref: '#/components/schemas/settingsDestinationConditions'
         destination_informations:
@@ -4928,6 +5008,18 @@ components:
               - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsTeamsWorkflow'
               - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsTeams'
               - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsWebhook'
+              - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsServiceNow'
+        enable_batch:
+          type: boolean
+          description: batch call
+        batch_period_seconds:
+          type: integer
+          nullable: true
+          description: batch sending period
+        batch_count_limit:
+          type: integer
+          nullable: true
+          description: batch sending limit
       required:
         - id
         - name
@@ -4947,6 +5039,7 @@ components:
             - Mail
             - Teams_WF
             - Webhook
+            - ServiceNow
           description: Select destination kind from Mail/Teams_WF/Webhook
         conditions:
           $ref: '#/components/schemas/settingsDestinationConditions'
@@ -4960,6 +5053,18 @@ components:
               - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsTeamsWorkflow'
               - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsTeams'
               - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsWebhook'
+              - $ref: '#/components/schemas/settingsDestinationSubDestinationInformationsServiceNow'
+        enable_batch:
+          type: boolean
+          description: batch call
+        batch_period_seconds:
+          type: integer
+          nullable: true
+          description: batch sending period
+        batch_count_limit:
+          type: integer
+          nullable: true
+          description: batch sending limit
       required:
         - name
         - kind
@@ -4996,6 +5101,25 @@ components:
         url:
           type: string
           description: webhook URL
+        header:
+          type: string
+          description: webhook header
+    settingsDestinationSubDestinationInformationsServiceNow:
+      title: destinations destination_informations(webhook) resource.
+      type: object
+      properties:
+        servicenow_user:
+          type: string
+          description: ServiceNow user
+        servicenow_password:
+          type: string
+          description: ServiceNow password
+        table_api_url:
+          type: string
+          description: ServiceNow table entry API URL
+        batch_api_url:
+          type: string
+          description: ServiceNow batch API URL
     settingsDestinationConditions:
       title: destinations conditions resource.
       type: object
@@ -5010,21 +5134,29 @@ components:
               properties:
                 new:
                   type: boolean
-                  description: Whether to be notified of new events
+                  description: Whether to be notified of new events before evaluation
                 evaluated:
                   type: boolean
-                  description: Whether to be notified of evaluated event
+                  description: Whether to be notified of known events upon evaluation
                 timeout:
                   type: boolean
-                  description: Whether to be notified of timeout event
+                  description: Whether to be notified of known events upon TTL timeout
                 undetected:
                   type: boolean
-                  description: Whether to be notified of undetected event
+                  description: Whether to be notified of undetected events upon evaluation
+                new_received:
+                  type: boolean
+                  description: Whether to be notified of new events upon reception
+                new_consolidated:
+                  type: boolean
+                  description: Whether to be notified of new events upon consolidation
               required:
                 - new
                 - evaluated
                 - timeout
                 - undetected
+                - new_received
+                - new_consolidated
           required:
             - event_type
       required:
@@ -5406,6 +5538,8 @@ components:
                   evaluated: false
                   timeout: true
                   undetected: true
+                  new_received: false
+                  new_consolidated: false
             destination_informations:
               - address_header: to
                 email: mike@example.com
@@ -5433,6 +5567,8 @@ components:
                   evaluated: true
                   timeout: false
                   undetected: false
+                  new_received: false
+                  new_consolidated: false
             destination_informations:
               - url: 'https://{server-name}.{region}.logic.azure.com/workflows/{workflow-ID}/triggers/{trigger-name}/paths/invoke/?XXXXXXXXX'
             create_timestamp: '2023-11-02T05:36:41.258Z'
@@ -5455,6 +5591,8 @@ components:
                   evaluated: true
                   timeout: false
                   undetected: false
+                  new_received: false
+                  new_consolidated: false
             destination_informations:
               - webhook: 'https://xxxxxxxx.webhook.office.com/webhookb/xxxxxxxx-xxxxxx-xxxx-xxxx-xxxxxxxxxxxx'
             create_timestamp: '2023-11-02T05:36:41.258Z'
@@ -5477,9 +5615,40 @@ components:
                   evaluated: true
                   timeout: false
                   undetected: false
+                  new_received: false
+                  new_consolidated: false
             destination_informations:
               - url: 'http://your-webhook-server/hooks/XXXXXXXX'
-                header: 'Content-Type: application/json'
+                header: '{"Content-Type": "application/json"}'
+            create_timestamp: '2023-11-02T05:36:41.258Z'
+            create_user: string
+            last_update_timestamp: '2023-11-02T05:36:41.258Z'
+            last_update_user: string
+    settingsDestinationSubDestinationInformationsExampleServiceNow:
+      value:
+        result: 200
+        message: SUCCESS
+        ts: '2023-11-02T05:36:41.258Z'
+        data:
+          - id: 00000001Z7ZXFAED6872F6C9W8
+            name: destinations of ServiceNow settings
+            kind: ServiceNow
+            conditions:
+              ita:
+                event_type:
+                  new: true
+                  evaluated: true
+                  timeout: false
+                  undetected: false
+                  new_received: false
+                  new_consolidated: false
+            destination_informations:
+              - servicenow_user: servicenow_user01
+                table_api_url: 'https://servicenow-host/api/now/table'
+                batch_api_url: 'https://servicenow-host/api/now/v1/batch'
+            enable_batch: true
+            batch_period_seconds: 30
+            batch_count_limit: 50
             create_timestamp: '2023-11-02T05:36:41.258Z'
             create_user: string
             last_update_timestamp: '2023-11-02T05:36:41.258Z'
@@ -5524,6 +5693,16 @@ components:
           message:
             title: send title
             text: send message
+    notificationsCreateExampleServiceNow:
+      value:
+        - destination_id: 00000001Z7ZXFAED6872F6C9W9
+          func_id: '00000000'
+          func_informations:
+            key-1: value-1
+            key-2: value-2
+          message:
+            table-column1: table-column1 column value
+            table-column2: table-column2 column value
     settingsDestinationOneGetExampleMail:
       value:
         result: 200
@@ -5540,6 +5719,8 @@ components:
                 evaluated: false
                 timeout: true
                 undetected: true
+                new_received: false
+                new_consolidated: false
           destination_informations:
             - address_header: to
               email: mike@example.com
@@ -5567,6 +5748,8 @@ components:
                 evaluated: true
                 timeout: false
                 undetected: false
+                new_received: false
+                new_consolidated: false
           destination_informations:
             - url: 'https://{server-name}.{region}.logic.azure.com/workflows/{workflow-ID}/triggers/{trigger-name}/paths/invoke/?XXXXXXXXX'
           create_timestamp: '2023-11-02T05:36:41.258Z'
@@ -5589,6 +5772,8 @@ components:
                 evaluated: true
                 timeout: false
                 undetected: false
+                new_received: false
+                new_consolidated: false
           destination_informations:
             - webhook: 'https://xxxxxxxx.webhook.office.com/webhookb/xxxxxxxx-xxxxxx-xxxx-xxxx-xxxxxxxxxxxx'
           create_timestamp: '2023-11-02T05:36:41.258Z'
@@ -5611,9 +5796,40 @@ components:
                 evaluated: true
                 timeout: false
                 undetected: false
+                new_received: false
+                new_consolidated: false
           destination_informations:
             - url: 'http://your-webhook-server/hooks/XXXXXXXX'
               header: 'Content-Type: application/json'
+          create_timestamp: '2023-11-02T05:36:41.258Z'
+          create_user: string
+          last_update_timestamp: '2023-11-02T05:36:41.258Z'
+          last_update_user: string
+    settingsDestinationOneGetExampleServiceNow:
+      value:
+        result: 200
+        message: SUCCESS
+        ts: '2023-11-02T05:36:41.258Z'
+        data:
+          id: 00000001Z7ZXFAED6872F6C9W8
+          name: destinations of webhook settings
+          kind: ServiceNow
+          conditions:
+            ita:
+              event_type:
+                new: true
+                evaluated: true
+                timeout: false
+                undetected: false
+                new_received: false
+                new_consolidated: false
+          destination_informations:
+            - servicenow_user: servicenow_user01
+              table_api_url: 'https://servicenow-host/api/now/table'
+              batch_api_url: 'https://servicenow-host/api/now/v1/batch'
+          enable_batch: true
+          batch_period_seconds: 30
+          batch_count_limit: 50
           create_timestamp: '2023-11-02T05:36:41.258Z'
           create_user: string
           last_update_timestamp: '2023-11-02T05:36:41.258Z'

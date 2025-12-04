@@ -20,7 +20,7 @@ properties:
     description: Destination name can be any string
   kind:
     type: string
-    enum: [Mail, Teams_WF, Webhook]
+    enum: [Mail, Teams_WF, Webhook, ServiceNow]
     description: Select destination kind from Mail/Teams_WF/Webhook
   conditions:
     $ref: './settings.destinations.sub.conditions.yaml'
@@ -34,6 +34,18 @@ properties:
         - $ref: './settings.destinations.sub.destination_informations.teamsworkflow.yaml'
         - $ref: './settings.destinations.sub.destination_informations.teams.yaml'
         - $ref: './settings.destinations.sub.destination_informations.webhook.yaml'
+        - $ref: './settings.destinations.sub.destination_informations.servicenow.yaml'
+  enable_batch:
+    type: boolean
+    description: batch call
+  batch_period_seconds:
+    type: integer
+    nullable: true
+    description: batch sending period
+  batch_count_limit:
+    type: integer
+    nullable: true
+    description: batch sending limit
 required:
   - name
   - kind

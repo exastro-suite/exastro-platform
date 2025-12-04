@@ -44,13 +44,13 @@ class UserExportJobExecutor(BaseJobExecutor):
     Args:
         BaseJobExecutor (_type_): _description_
     """
-    def __init__(self, queue: dict):
+    def __init__(self, queue: dict, batch_queue: list[dict] | None = None):
         """constructor
 
         Args:
             queue (dict): queue
         """
-        super().__init__(queue)
+        super().__init__(queue, batch_queue)
         self.organization_id = self.queue['ORGANIZATION_ID']
         self.job_id = self.queue['PROCESS_EXEC_ID']
 

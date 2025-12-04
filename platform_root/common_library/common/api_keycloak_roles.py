@@ -65,7 +65,7 @@ def clients_roles_get(realm_name, client_id, token, briefRepresentation=True, fi
     globals.logger.debug(f"client roles get query:{add_query}")
     # 情報取得
     # information acquisition
-    request_response = requests.get(f"{api_url}/auth/admin/realms/{realm_name}/clients/{client_id}/roles{add_query}", headers=header_para)
+    request_response = requests.get(f"{api_url}/auth/admin/realms/{realm_name}/clients/{client_id}/roles{add_query}", headers=header_para, timeout=(12, 600))
 
     return request_response
 
@@ -106,7 +106,8 @@ def clients_role_get(realm_name, client_id, role_name, token, briefRepresentatio
 
     request_response = requests.get(
         f"{api_url}/auth/admin/realms/{realm_name}/clients/{client_id}/roles/{role_name}{add_query}",
-        headers=header_para
+        headers=header_para,
+        timeout=(12, 600)
     )
 
     # globals.logger.debug(request_response.text)
@@ -151,7 +152,8 @@ def clients_role_create(realm_name, client_uid, role_name, token, role_options=N
     request_response = requests.post(
         "{}/auth/admin/realms/{}/clients/{}/roles".format(api_url, realm_name, client_uid),
         headers=header_para,
-        json=data_para
+        json=data_para,
+        timeout=(12, 600)
     )
 
     # globals.logger.debug(request_response.text)
@@ -187,6 +189,7 @@ def clients_role_delete(realm_name, client_uid, role_name, token):
     request_response = requests.delete(
         "{}/auth/admin/realms/{}/clients/{}/roles/{}".format(api_url, realm_name, client_uid, role_name),
         headers=header_para,
+        timeout=(12, 600)
     )
 
     # globals.logger.debug(request_response.text)
@@ -228,7 +231,8 @@ def clients_role_update(realm_name, client_uid, role_name, token, role_options=N
     request_response = requests.put(
         f"{api_url}/auth/admin/realms/{realm_name}/clients/{client_uid}/roles/{role_name}",
         headers=header_para,
-        json=data_para
+        json=data_para,
+        timeout=(12, 600)
     )
 
     # globals.logger.debug(request_response.text)
@@ -261,7 +265,8 @@ def clients_role_composites_get(realm_name, client_uid, role_name, token):
 
     request_response = requests.get(
         f"{api_url}/auth/admin/realms/{realm_name}/clients/{client_uid}/roles/{role_name}/composites",
-        headers=header_para
+        headers=header_para,
+        timeout=(12, 600)
     )
 
     # globals.logger.debug(request_response.text)
@@ -299,6 +304,7 @@ def clients_role_composites_create(realm_name, client_uid, role_name, add_roles,
         f"{api_url}/auth/admin/realms/{realm_name}/clients/{client_uid}/roles/{role_name}/composites",
         headers=header_para,
         json=data_para,
+        timeout=(12, 600)
     )
 
     # globals.logger.debug(request_response.text)
@@ -336,6 +342,7 @@ def clients_role_composites_delete(realm_name, client_uid, role_name, del_roles,
         f"{api_url}/auth/admin/realms/{realm_name}/clients/{client_uid}/roles/{role_name}/composites",
         headers=header_para,
         json=data_para,
+        timeout=(12, 600)
     )
 
     # globals.logger.debug(request_response.text)
@@ -367,7 +374,8 @@ def realm_role_get(realm_name, role_name, token):
 
     request_response = requests.get(
         "{}/auth/admin/realms/{}/roles/{}".format(api_url, realm_name, role_name),
-        headers=header_para
+        headers=header_para,
+        timeout=(12, 600)
     )
 
     # globals.logger.debug(request_response.text)
@@ -398,7 +406,8 @@ def user_role_get(realm_name, user_id, client_id, token):
     api_url = "{}://{}:{}".format(os.environ['API_KEYCLOAK_PROTOCOL'], os.environ['API_KEYCLOAK_HOST'], os.environ['API_KEYCLOAK_PORT'])
     request_response = requests.get(
         "{}/auth/admin/realms/{}/users/{}/role-mappings/clients/{}/composite".format(api_url, realm_name, user_id, client_id),
-        headers=header_para
+        headers=header_para,
+        timeout=(12, 600)
     )
     # globals.logger.debug(request_response.text)
 
@@ -431,7 +440,8 @@ def role_uesrs_get(realm_name, client_id, role_name, token, first=0, max=100):
     api_url = "{}://{}:{}".format(os.environ['API_KEYCLOAK_PROTOCOL'], os.environ['API_KEYCLOAK_HOST'], os.environ['API_KEYCLOAK_PORT'])
     request_response = requests.get(
         "{}/auth/admin/realms/{}/clients/{}/roles/{}/users?first={}&max={}".format(api_url, realm_name, client_id, role_name, first, max),
-        headers=header_para
+        headers=header_para,
+        timeout=(12, 600)
     )
     # globals.logger.debug(request_response.text)
 
@@ -469,7 +479,8 @@ def user_client_role_mapping_create(realm_name, user_id, client_id, client_roles
     request_response = requests.post(
         "{}/auth/admin/realms/{}/users/{}/role-mappings/clients/{}".format(api_url, realm_name, user_id, client_id),
         headers=header_para,
-        json=data_para
+        json=data_para,
+        timeout=(12, 600)
     )
 
     # globals.logger.debug(request_response.text)
@@ -508,7 +519,8 @@ def user_client_role_mapping_delete(realm_name, user_id, client_id, client_roles
     request_response = requests.delete(
         "{}/auth/admin/realms/{}/users/{}/role-mappings/clients/{}".format(api_url, realm_name, user_id, client_id),
         headers=header_para,
-        json=data_para
+        json=data_para,
+        timeout=(12, 600)
     )
 
     # globals.logger.debug(request_response.text)
@@ -540,7 +552,7 @@ def get_user_role_mapping(realm_name, user_id, token):
     globals.logger.debug("get user role-mapping")
     # ユーザ情報取得
     # User information acquisition
-    request_response = requests.get("{}/auth/admin/realms/{}/users/{}/role-mappings".format(api_url, realm_name, user_id), headers=header_para)
+    request_response = requests.get("{}/auth/admin/realms/{}/users/{}/role-mappings".format(api_url, realm_name, user_id), headers=header_para, timeout=(12, 600))
 
     return request_response
 
@@ -575,7 +587,8 @@ def user_realm_role_mapping_create(realm_name, user_id, realm_roles, token):
     request_response = requests.post(
         "{}/auth/admin/realms/{}/users/{}/role-mappings/realm".format(api_url, realm_name, user_id),
         headers=header_para,
-        json=data_para
+        json=data_para,
+        timeout=(12, 600)
     )
 
     # globals.logger.debug(request_response.text)

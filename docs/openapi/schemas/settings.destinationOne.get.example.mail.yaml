@@ -24,7 +24,12 @@ value:
       "conditions": {
         "ita":{
           "event_type": {
-            "new": false, "evaluated": false, "timeout": true, "undetected": true
+            "new": false,
+            "evaluated": false,
+            "timeout": true,
+            "undetected": true,
+            "new_received": false,
+            "new_consolidated": false,
           }
         }
       },

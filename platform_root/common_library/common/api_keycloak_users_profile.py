@@ -47,7 +47,7 @@ def get_users_profiles(realm_name, token):
     }
 
     globals.logger.debug(f"users profiles get : {realm_name=}")
-    request_response = requests.get(f"{__get_keycloak_api_url()}/auth/admin/realms/{realm_name}/users/profile", headers=header_para)
+    request_response = requests.get(f"{__get_keycloak_api_url()}/auth/admin/realms/{realm_name}/users/profile", headers=header_para, timeout=(12, 600))
     globals.logger.debug(f"users profiles get : {request_response.status_code=}")
 
     return request_response
@@ -69,7 +69,7 @@ def put_users_profiles(realm_name, users_profiles, token):
         "Authorization": "Bearer {}".format(token),
     }
     globals.logger.debug(f"users profiles put : {realm_name=}")
-    request_response = requests.put(f"{__get_keycloak_api_url()}/auth/admin/realms/{realm_name}/users/profile", headers=header_para, json=users_profiles)
+    request_response = requests.put(f"{__get_keycloak_api_url()}/auth/admin/realms/{realm_name}/users/profile", headers=header_para, json=users_profiles, timeout=(12, 600))
     globals.logger.debug(f"users profiles put : {request_response.status_code=}")
 
     return request_response

@@ -37,6 +37,7 @@ const DESTINATION_KIND_MAIL = 'Mail';
 const DESTINATION_KIND_TEAMS = 'Teams';
 const DESTINATION_KIND_TEAMS_WF = 'Teams_WF';
 const DESTINATION_KIND_WEBHOOK = 'Webhook';
+const DESTINATION_KIND_SERVICENOW = 'ServiceNow';
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -1292,30 +1293,43 @@ const settings_notifications_common = {
         // Specify a fixed event type
         let html='';
         html += row_template_top
-            .replace(/\${conditions_all_count}/g, 4)
-            .replace(/\${conditions_group_name}/g, getText("000-87022", "OASE／イベント種別"))
-            .replace(/\${conditions_group_count}/g, 4)
-            .replace(/\${conditions_name}/g, getText("000-00153", '新規'))
+            .replace(/\${conditions_all_count}/g, 6)
+            .replace(/\${conditions_group_name}/g, getText("000-87022", "OASE／種別"))
+            .replace(/\${conditions_group_count}/g, 6)
+            .replace(/\${conditions_name}/g, getText("000-00224", '1.新規イベント（受信時）'))
+            .replace(/\${conditions_key}/g, 'ita_event_type_new_received')
+            .replace(/\${conditions_remarks}/g, getText("000-87051", "イベント受信の通知（ただし、重複排除設定があった場合、同一と判断されたイベントは通知されません）"))
+            ;
+        html += row_template_3rd
+            .replace(/\${conditions_name}/g, getText("000-00225", '2.新規イベント（統合時）'))
+            .replace(/\${conditions_key}/g, 'ita_event_type_new_consolidated')
+            .replace(/\${conditions_remarks}/g, getText("000-87052", "受信したイベントが統合された場合の通知"))
+            ;
+        html += row_template_3rd
+            .replace(/\${conditions_name}/g, getText("000-00153", '3.新規イベント（判定前）'))
             .replace(/\${conditions_key}/g, 'ita_event_type_new')
-            .replace(/\${conditions_remarks}/g, getText("000-87023", "OASEで利用されるイベントの種別ごとに通知の有無を選択します。") + "<br>" +
-            getText("000-87024", "　新規：OASEエージェントから収集、あるいは、外部システムから受け取った直後のイベント") + "<br>" +
-            getText("000-87025", "　既知（判定済み）：いずれかのルールにマッチしたイベント") + "<br>" +
-            getText("000-87026", "　既知（時間切れ）：一部の条件には当てはまったものの、全ての条件に当てはまらないまま、有効期限が切れたイベント") + "<br>" +
-            getText("000-87027", "　未知：ルールやルール内の条件の一切にあてはまらなかったイベント"));
+            .replace(/\${conditions_remarks}/g, getText("000-87024", "重複排除された結果、ルール判定対象となったイベントの通知"))
+            ;
         html += row_template_3rd
-            .replace(/\${conditions_name}/g, getText("000-00154", '既知（判定済み）'))
-            .replace(/\${conditions_key}/g, 'ita_event_type_evaluated');
+            .replace(/\${conditions_name}/g, getText("000-00154", '4.既知イベント（判定時）'))
+            .replace(/\${conditions_key}/g, 'ita_event_type_evaluated')
+            .replace(/\${conditions_remarks}/g, getText("000-87025", "イベントがいずれかのルールにマッチした際の通知"))
+            ;
         html += row_template_3rd
-            .replace(/\${conditions_name}/g, getText("000-00155", '既知（時間切れ）'))
-            .replace(/\${conditions_key}/g, 'ita_event_type_timeout');
+            .replace(/\${conditions_name}/g, getText("000-00155", '5.既知イベント（TTL有効期限切れ）'))
+            .replace(/\${conditions_key}/g, 'ita_event_type_timeout')
+            .replace(/\${conditions_remarks}/g, getText("000-87026", "一部の条件にはマッチしたものの、すべての条件を満たす前にTTL有効期限が切れたイベントの通知"))
+            ;
         html += row_template_3rd
-            .replace(/\${conditions_name}/g, getText("000-00156", '未知'))
-            .replace(/\${conditions_key}/g, 'ita_event_type_undetected');
+            .replace(/\${conditions_name}/g, getText("000-00156", '6.未知イベント'))
+            .replace(/\${conditions_key}/g, 'ita_event_type_undetected')
+            .replace(/\${conditions_remarks}/g, getText("000-87027", "どのルールや条件にもマッチしなかったイベントの通知"))
+            ;
         $("#conditions_list tbody").append(html);
         $("#conditions_list .datarow").css('display', '');
     },
 
-    "set_destination_informations": function(kind, destination_informations) {
+    "set_destination_informations": function(kind, destination_informations, enable_batch, batch_period_seconds, batch_count_limit) {
         if (kind === DESTINATION_KIND_MAIL){
             $("#form_destination_kind_mail").prop('checked', true);
             ret_mail = settings_notifications_common.get_mail_destination_informations(destination_informations);
@@ -1343,9 +1357,26 @@ const settings_notifications_common = {
                 $("#form_destination_informations_webhook_header").val(fn.cv(element.header, '', false));
             });
         }
+        else if (kind === DESTINATION_KIND_SERVICENOW){
+            $("#form_destination_kind_servicenow").prop('checked', true);
+            destination_informations.forEach(function(element){
+                $("#form_destination_informations_servicenow_url").val(fn.cv(element.table_api_url, '', false));
+                $("#form_destination_informations_servicenow_user").val(fn.cv(element.servicenow_user, '', false));
+                $("#form_destination_informations_servicenow_password").val('');
+                $("#form_destination_informations_servicenow_batch_url").val(fn.cv(element.batch_api_url, '', false));
+            });
+            if (enable_batch == true) {
+                $('#form_destination_informations_servicenow_batch_check').prop('checked', true);
+                $("#form_destination_informations_servicenow_batch_url").prop('disabled',false);
+                $("#form_destination_informations_servicenow_interval").prop('disabled',false);
+                $("#form_destination_informations_servicenow_limit").prop('disabled',false);
+            }
+            $("#form_destination_informations_servicenow_interval").val(fn.cv(batch_period_seconds, '', false));
+            $("#form_destination_informations_servicenow_limit").val(fn.cv(batch_count_limit, '', false));
+        }
     },
 
-    "set_destination_informations_text": function(kind, destination_informations) {
+    "set_destination_informations_text": function(kind, destination_informations, batch_period_seconds, batch_count_limit) {
         if (kind === DESTINATION_KIND_MAIL){
             ret_mail = settings_notifications_common.get_mail_destination_informations(destination_informations);
             $("#text_destination_informations_mail_to").css('display', '');
@@ -1377,6 +1408,24 @@ const settings_notifications_common = {
                 $("#text_destination_informations_webhook").text("URL: " + fn.cv(element.url, '', false));
                 $("#text_destination_informations_webhook_header").text("Header: " + fn.cv(element.header, '', false));
             });
+        }
+        else if (kind === DESTINATION_KIND_SERVICENOW){
+            $("#text_destination_informations_servicenow_url").css('display', '');
+            $("#text_destination_informations_servicenow_user").css('display', '');
+            $("#text_destination_informations_servicenow_batch_url").css('display', '');
+            $("#text_destination_informations_servicenow_interval").css('display', '');
+            $("#text_destination_informations_servicenow_limit").css('display', '');
+            destination_informations.forEach(function(element){
+                $("#hr_destination_informations_servicenow_url").css('display', '');
+                $("#hr_destination_informations_servicenow_user").css('display', '');
+                $("#hr_destination_informations_servicenow_batch_url").css('display', '');
+                $("#hr_destination_informations_servicenow_interval").css('display', '');
+                $("#text_destination_informations_servicenow_url").text(getText("000-87042", "ServiceNow API URL (個別登録用)") + ": " + fn.cv(element.table_api_url, '', false));
+                $("#text_destination_informations_servicenow_user").text(getText("000-87043", "ServiceNow ユーザー") + ": " + fn.cv(element.servicenow_user, '', false));
+                $("#text_destination_informations_servicenow_batch_url").text(getText("000-87046", "ServiceNow API URL (一括登録用)") + ": " + fn.cv(element.batch_api_url, '', false));
+            });
+            $("#text_destination_informations_servicenow_interval").text(getText("000-87047", "送信間隔 (秒)") + ": " + fn.cv(batch_period_seconds, '', false));
+            $("#text_destination_informations_servicenow_limit").text(getText("000-87048", "一回に送信する最大件数") + ": " + fn.cv(batch_count_limit, '', false));
         }
     },
 
@@ -1466,6 +1515,29 @@ const settings_notifications_common = {
                 "header": $("#form_destination_informations_webhook_header").val()
             }
             destination_informations.push(webhook);
+        }
+        else if (destination_kind === "ServiceNow"){
+            var servicenow_password_check = $("#form_destination_informations_servicenow_password_check").prop("checked");
+            if (servicenow_password_check == true){
+                servicenow_password = $("#form_destination_informations_servicenow_password").val();
+            } else {
+                servicenow_password = "";
+            }
+
+            var enable_batch = $("#form_destination_informations_servicenow_batch_check").prop("checked");
+            var batch_api_url;
+            if (enable_batch == true){
+                batch_api_url = $("#form_destination_informations_servicenow_batch_url").val();
+            } else {
+                batch_api_url = "";
+            }
+            var servicenow = {
+                "servicenow_user": $("#form_destination_informations_servicenow_user").val(),
+                "servicenow_password": servicenow_password,
+                "table_api_url": $("#form_destination_informations_servicenow_url").val(),
+                "batch_api_url": batch_api_url,
+            }
+            destination_informations.push(servicenow);
         }
 
         return destination_informations;
@@ -1610,6 +1682,65 @@ const settings_notifications_common = {
                     "message": getText("400-00011", "必須項目が不足しています。({0})", getText("000-00211", "通知先URL"))
                 }
             } else {
+                return {
+                    "result": true,
+                    "message": ""
+                }
+            }
+        },
+
+        //
+        // validate description informations (ServiceNow)
+        //
+        destination_informations_servicenow: function(
+            form_destination_informations_servicenow_url,
+            form_destination_informations_servicenow_user,
+            form_destination_informations_servicenow_password_check,
+            form_destination_informations_servicenow_password,
+            form_destination_informations_servicenow_batch_check,
+            form_destination_informations_servicenow_batch_url,
+            form_destination_informations_servicenow_interval,
+            form_destination_informations_servicenow_limit
+        ) {
+            err_flag = false;
+            var target_item_list = [];
+            var target_items = "";
+            if (form_destination_informations_servicenow_url === "") {
+                err_flag = true;
+                target_item_list.push(getText("000-87042", "ServiceNow API URL (個別登録用)"));
+            }
+            if (form_destination_informations_servicenow_user === "") {
+                err_flag = true;
+                target_item_list.push(getText("000-87043", "ServiceNow ユーザー"));
+            }
+            if (form_destination_informations_servicenow_password_check == true) {
+                if (form_destination_informations_servicenow_password === "") {
+                    err_flag = true;
+                    target_item_list.push(getText("000-87044", "ServiceNow パスワード"));
+                }
+            }
+            if (form_destination_informations_servicenow_batch_check == true) {
+                if (form_destination_informations_servicenow_batch_url === "") {
+                    err_flag = true;
+                    target_item_list.push(getText("000-87046", "ServiceNow API URL (一括登録用)"));
+                }
+                if (form_destination_informations_servicenow_interval === "") {
+                    err_flag = true;
+                    target_item_list.push(getText("000-87047", "送信間隔 (秒)"));
+                }
+                if (form_destination_informations_servicenow_limit === "") {
+                    err_flag = true;
+                    target_item_list.push(getText("000-87048", "一回に送信する最大件数"));
+                }
+            }
+
+            if(err_flag){
+                target_items = target_item_list.join(', ');
+                return {
+                    "result": false,
+                    "message": getText("400-00011", "必須項目が不足しています。({0})", target_items)
+                }
+            }else{
                 return {
                     "result": true,
                     "message": ""

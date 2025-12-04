@@ -67,6 +67,8 @@ get:
               $ref: "../schemas/settings.destinations.get.example.teams.yaml"
             webhook settings:
               $ref: "../schemas/settings.destinations.get.example.webhook.yaml"
+            ServiceNow settings:
+              $ref: "../schemas/settings.destinations.get.example.servicenow.yaml"
     default:
       description: An unexpected error response.
       content:
@@ -106,6 +108,8 @@ post:
             $ref: "../schemas/settings.destinations.create.example.teams.yaml"
           webhook settings:
             $ref: "../schemas/settings.destinations.create.example.webhook.yaml"
+          ServiceNow settings:
+            $ref: "../schemas/settings.destinations.create.example.servicenow.yaml"
     required: true
   responses:
     200:

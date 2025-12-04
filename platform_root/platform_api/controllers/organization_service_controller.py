@@ -2090,7 +2090,7 @@ def __get_ita_organization(organization_id):
     # 呼び出し先設定
     # Call destination setting
     api_url = "{}://{}:{}".format(os.environ['ITA_API_ADMIN_PROTOCOL'], os.environ['ITA_API_ADMIN_HOST'], os.environ['ITA_API_ADMIN_PORT'])
-    response = requests.get(f"{api_url}/api/organizations/{organization_id}/ita/", headers=header_para)
+    response = requests.get(f"{api_url}/api/organizations/{organization_id}/ita/", headers=header_para, timeout=(12, 600))
     if response.status_code != 200:
         try:
             resp_json = json.loads(response.text)

@@ -28,13 +28,15 @@ value:
               "new": true,
               "evaluated": true,
               "timeout": false,
-              "undetected": false
+              "undetected": false,
+              "new_received": false,
+              "new_consolidated": false,
             }
           }
         },
         "destination_informations": [
           {
-             "url": "https://{server-name}.{region}.logic.azure.com/workflows/{workflow-ID}/triggers/{trigger-name}/paths/invoke/?XXXXXXXXX"
+            "url": "https://{server-name}.{region}.logic.azure.com/workflows/{workflow-ID}/triggers/{trigger-name}/paths/invoke/?XXXXXXXXX"
           }
         ],
         "create_timestamp": "2023-11-02T05:36:41.258Z",

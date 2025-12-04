@@ -484,40 +484,40 @@ class auth_proxy:
         # method、request_content_typeによって、呼び出しの内容を変える
         # Change the content of the call depending on method and request_content_type
         if method == 'GET':
-            ret = requests.get(url, headers=post_headers, params=query_string, stream=stream)
+            ret = requests.get(url, headers=post_headers, params=query_string, stream=stream, timeout=(12, 600))
 
         elif method == 'POST':
             if 'application/json' in request_content_type:
-                ret = requests.post(url, headers=post_headers, json=request_body, params=query_string, stream=stream)
+                ret = requests.post(url, headers=post_headers, json=request_body, params=query_string, stream=stream, timeout=(12, 600))
             elif 'multipart/form-data' in request_content_type:
-                ret = requests.post(url, headers=post_headers, data=request_form, files=request_files, params=query_string, stream=stream)
+                ret = requests.post(url, headers=post_headers, data=request_form, files=request_files, params=query_string, stream=stream, timeout=(12, 600))
             elif 'application/x-www-form-urlencoded' in request_content_type:
-                ret = requests.post(url, headers=post_headers, data=request_form, params=query_string, stream=stream)
+                ret = requests.post(url, headers=post_headers, data=request_form, params=query_string, stream=stream, timeout=(12, 600))
             else:
-                ret = requests.post(url, headers=post_headers, json=request_body, params=query_string, stream=stream)
+                ret = requests.post(url, headers=post_headers, json=request_body, params=query_string, stream=stream, timeout=(12, 600))
 
         elif method == 'PATCH':
             if 'application/json' in request_content_type:
-                ret = requests.patch(url, headers=post_headers, json=request_body, params=query_string, stream=stream)
+                ret = requests.patch(url, headers=post_headers, json=request_body, params=query_string, stream=stream, timeout=(12, 600))
             elif 'multipart/form-data' in request_content_type:
-                ret = requests.patch(url, headers=post_headers, data=request_form, files=request_files, params=query_string, stream=stream)
+                ret = requests.patch(url, headers=post_headers, data=request_form, files=request_files, params=query_string, stream=stream, timeout=(12, 600))
             elif 'application/x-www-form-urlencoded' in request_content_type:
-                ret = requests.post(url, headers=post_headers, data=request_form, params=query_string, stream=stream)
+                ret = requests.post(url, headers=post_headers, data=request_form, params=query_string, stream=stream, timeout=(12, 600))
             else:
-                ret = requests.patch(url, headers=post_headers, json=request_body, params=query_string, stream=stream)
+                ret = requests.patch(url, headers=post_headers, json=request_body, params=query_string, stream=stream, timeout=(12, 600))
 
         elif method == 'PUT':
             if 'application/json' in request_content_type:
-                ret = requests.put(url, headers=post_headers, json=request_body, params=query_string, stream=stream)
+                ret = requests.put(url, headers=post_headers, json=request_body, params=query_string, stream=stream, timeout=(12, 600))
             elif 'multipart/form-data' in request_content_type:
-                ret = requests.put(url, headers=post_headers, data=request_form, files=request_files, params=query_string, stream=stream)
+                ret = requests.put(url, headers=post_headers, data=request_form, files=request_files, params=query_string, stream=stream, timeout=(12, 600))
             elif 'application/x-www-form-urlencoded' in request_content_type:
-                ret = requests.post(url, headers=post_headers, data=request_form, params=query_string, stream=stream)
+                ret = requests.post(url, headers=post_headers, data=request_form, params=query_string, stream=stream, timeout=(12, 600))
             else:
-                ret = requests.put(url, headers=post_headers, json=request_body, params=query_string, stream=stream)
+                ret = requests.put(url, headers=post_headers, json=request_body, params=query_string, stream=stream, timeout=(12, 600))
 
         elif method == 'DELETE':
-            ret = requests.delete(url, headers=post_headers, params=query_string, stream=stream)
+            ret = requests.delete(url, headers=post_headers, params=query_string, stream=stream, timeout=(12, 600))
 
         # 取得したレスポンスの内容を退避
         # Save the contents of the acquired response

@@ -53,10 +53,19 @@ length_destination_email = 255
 length_destination_teams_wf_url = 1024
 length_destination_teams_webhook = 1024
 length_destination_webhook_url = 1024
+length_destination_servicenow_url = 1024
+length_destination_servicenow_batch_url = 1024
+length_destination_servicenow_user = 40
+length_destination_servicenow_password = 255
 max_destination_email = 500
 max_destination_teams_wf = 1
 max_destination_teams_webhook = 1
 max_destination_webhook = 1
+max_destination_servicenow = 1
+min_batch_period_seconds = 1
+max_batch_period_seconds = 3600
+min_batch_count_limit = 1
+max_batch_count_limit = 10000
 length_func_id = 100
 length_smtp_host = 1024
 min_length_separated_by_period_mark = 1
@@ -165,12 +174,14 @@ DESTINATION_KIND_MAIL = "Mail"
 DESTINATION_KIND_TEAMS_WF = "Teams_WF"
 DESTINATION_KIND_TEAMS = "Teams"
 DESTINATION_KIND_WEBHOOK = "Webhook"
+DESTINATION_KIND_SERVICENOW = "ServiceNow"
 
 ALL_DESTINATION_KIND = [
     DESTINATION_KIND_MAIL,
     DESTINATION_KIND_TEAMS_WF,
     DESTINATION_KIND_TEAMS,
     DESTINATION_KIND_WEBHOOK,
+    DESTINATION_KIND_SERVICENOW
 ]
 
 # 通知先メールヘッダー
@@ -190,6 +201,7 @@ ALL_MAIL_HEADER = [
 NOTIFICATION_STATUS_UNSENT = "Unsent"           # 未送信
 NOTIFICATION_STATUS_SUCCESSFUL = "Successful"   # 送信成功
 NOTIFICATION_STATUS_FAILED = "Failed"           # 送信失敗
+NOTIFICATION_STATUS_ABORTED_EXPIRED = "AbortedExpired"  # 有効期限切れで処理中止（送信キューを捌き切れず一定時間以上経過した時）
 
 # ユーザ一括インポート/エクスポートステータス
 JOB_USER_NOT_EXEC = "NotExecuted"               # 未実行

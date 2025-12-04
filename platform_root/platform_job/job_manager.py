@@ -31,7 +31,7 @@ import job_manager_config
 import job_manager_const
 from common_library.common.db import DBconnector
 from libs import queries_process_queue, queries_health_check
-from libs.job_manager_classes import SubProcessesManager, SubProcessParameter, SubProcessManager, Job, IntervalTiming
+from libs.job_manager_classes import SubProcessesManager, SubProcessParameter, SubProcessManager, Job
 
 # 終了指示のシグナル受信
 process_terminate = False   # SIGTERM or SIGINT signal
@@ -133,7 +133,6 @@ def job_manager_main_process():
 
     globals.logger.info('TERMINATE main process')
     globals.terminate()
-    return
 
 
 def wait_until_migration_completed():
@@ -250,7 +249,6 @@ def job_manager_sub_process(parameter: SubProcessParameter):
                         # 例外が発生しても処理は継続する / Processing continues even if an exception occurs
                         globals.logger.error(f'{err}\n---- stack trace ----\n{traceback.format_exc()}')
 
-
         except Exception as err:
             globals.logger.error(f'{err}\n---- stack trace ----\n{traceback.format_exc()}')
             time.sleep(job_manager_config.JOB_STATUS_WATCH_INTERVAL_SECONDS)
@@ -263,7 +261,6 @@ def job_manager_sub_process(parameter: SubProcessParameter):
 
     sub_process_mgr.set_terminated_flag()
     globals.logger.info('EXIT sub process')
-    return
 
 
 def is_healthy_db_connection(conn):
@@ -305,23 +302,33 @@ def job_start_control(conn, sub_process_mgr: SubProcessManager, job_modules):
             start_interval_jobs = get_start_interval_jobs(sub_process_mgr)
 
             # queueから処理可能な処理対象の情報を取得する / Get information about processable objects from the queue
-            queue_rows = get_queue(
-                    conn,
-                    sub_process_mgr.get_running_job_queue(),
-                    job_manager_config.SUB_PROCESS_MAX_JOBS - len(sub_process_mgr.get_running_job_queue()) - len(start_interval_jobs))
+            queue_rows, queue_rows_batch = get_queue(
+                conn,
+                sub_process_mgr.get_running_job_queue(),
+                job_manager_config.SUB_PROCESS_MAX_JOBS - len(sub_process_mgr.get_running_job_queue()) - len(start_interval_jobs))
 
-            # interval実行jobとqueue実行jobを結合する / Combine interval execution job and queue execution job
+            # interval実行jobとqueue実行jobを結合する
+            # interval実行にはbatchする処理は無いのでstart_interval_job分のNoneを結合する
+            # Combine interval execution job and queue execution job
+            # Since there is no batch process for interval execution, combine None for start_interval_job.
             start_jobs = start_interval_jobs + queue_rows
+            start_jobs_batch = [None] * len(start_interval_jobs) + queue_rows_batch
 
             # 取得したqueue分処理する / Process the acquired queue
-            for queue_row in start_jobs:
+            for index, queue_row in enumerate(start_jobs):
                 globals.logger.debug(f"Starting job : {queue_row['PROCESS_ID']} / {queue_row['PROCESS_KIND']}")
 
                 # queueから起動対象のレコードを削除する / Delete the record to be launched from the queue
-                delete_queue(conn, queue_row)
+                delete_queue(conn, queue_row, start_jobs_batch[index])
+
+                # batch処理の場合は一定時間当該のbatch_groupの次回実行をロックする
+                # In the case of batch processing, the next execution of the batch_group is locked for a certain period of time.
+                if queue_row['ENABLE_BATCH']:
+                    lock_queue_batch_group(conn, queue_row)
 
                 # job処理のclassのinstanceを生成する / Generate an instance of the job processing class
-                job_executor = eval(f"job_modules[queue_row['PROCESS_KIND']].{job_manager_config.JOBS[queue_row['PROCESS_KIND']]['class']}")(queue_row)
+                job_class = eval(f"job_modules[queue_row['PROCESS_KIND']].{job_manager_config.JOBS[queue_row['PROCESS_KIND']]['class']}")
+                job_executor = job_class(queue_row, start_jobs_batch[index])
 
                 # job処理のthreadを生成する / Generate a thread for job processing
                 job_thread = threading.Thread(
@@ -355,12 +362,12 @@ def cancel_all_jobs(sub_process_mgr: SubProcessManager):
     Args:
         sub_process_mgr (SubProcessManager): sub process 管理情報 / sub process management information
     """
-    globals.logger.info(f'Start cancel_all_jobs')
+    globals.logger.info('Start cancel_all_jobs')
     all_jobs = sub_process_mgr.get_all_jobs()
     cancel_jobs(all_jobs)
     for job in all_jobs:
         job.cancel_thread.join()
-    globals.logger.info(f'Finish cancel_all_jobs')
+    globals.logger.info('Finish cancel_all_jobs')
 
 
 def cancel_jobs(jobs: list[Job]):
@@ -449,6 +456,10 @@ def get_start_interval_jobs(sub_process_mgr: SubProcessManager):
             "PROCESS_EXEC_ID": None,
             "ORGANIZATION_ID": None,
             "WORKSPACE_ID": None,
+            "ENABLE_BATCH": False,
+            "BATCH_PERIOD_SECONDS": None,
+            "BATCH_COUNT_LIMIT": None,
+            "BATCH_GROUP_KEY": None,
             "LAST_UPDATE_TIMESTAMP": datetime.datetime.now(),
             "LAST_UPDATE_USER": None
         })
@@ -464,7 +475,7 @@ def get_queue(conn, running_job_queue: list, get_queue_len: int):
         get_queue_len(int): queueから取得する最大数 / Maximum number to retrieve from queue
 
     Returns:
-        list: job起動対象のqueue情報 / Queue information for job activation
+        tuple[list, list]: job起動対象のqueue情報, batchで処理するqueue情報
     """
     # 実行中のjobをPROCESS_KINDでグルーピング / Group running jobs by PROCESS_KIND
     running_kind_grouping = queue_grouping(running_job_queue, "PROCESS_KIND", "undefined")
@@ -476,7 +487,10 @@ def get_queue(conn, running_job_queue: list, get_queue_len: int):
     # Obtain the contents of the queue from the DB
     #   taking into account the possibility of the read being discarded due to lock failure, etc., obtain twice the maximum number of items
     with conn.cursor() as cursor:
-        cursor.execute(queries_process_queue.SQL_QUERY_PROCESS, {"job_max_count": get_queue_len * 2})
+        cursor.execute(
+            queries_process_queue.SQL_QUERY_PROCESS,
+            {"job_max_count": get_queue_len * 2}
+        )
         queue = cursor.fetchall()
 
     # queueの情報をorganization_idでグルーピングし、last_update_timestampでソート
@@ -490,6 +504,11 @@ def get_queue(conn, running_job_queue: list, get_queue_len: int):
 
     # return値の配列を初期化 / Initialize return value array
     ret_queue = []
+    ret_batch_queue = []
+
+    # 処理済みのbatch groupは処理対象外にするための判定用のディクショナリ
+    # A dictionary for determining whether to exclude processed batch groups from processing.
+    processing_batch_group = {}
 
     # queueが残っているもしくは取得job数が上限値未満の場合繰り返す
     # Repeat if the maximum number of jobs to be retrieved from the queue remains or the number of jobs to be retrieved is less than the upper limit.
@@ -514,31 +533,78 @@ def get_queue(conn, running_job_queue: list, get_queue_len: int):
 
         # 次に処理するqueue情報 / queue to process next
         next_process_id = queue_org_grouping[next_organization_id][0]['PROCESS_ID']
-        next_process_king = queue_org_grouping[next_organization_id][0]['PROCESS_KIND']
+        next_process_kind = queue_org_grouping[next_organization_id][0]['PROCESS_KIND']
+        next_process = queue_org_grouping[next_organization_id][0]
 
-        if len(running_kind_grouping[next_process_king]) < job_manager_config.JOBS[next_process_king]['max_job_per_process']:
-            # 次に処理するPROCESS_KINDが条件に達していないときは、起動可能かの処理を進める
-            # If the next PROCESS_KIND to be processed does not meet the conditions, proceed with the process to see if it can be started.
+        # 処理対象のものかの判定結果格納用
+        is_processable = True
+        # batchで処理するqueue情報
+        batch_queue = None
 
+        # 次に処理するPROCESS_KINDが既にmaxの同時実行数を超えている場合は処理対象外にする
+        # If the next PROCESS_KIND to be processed already exceeds the max number of concurrent executions, it will be excluded from processing.
+        if len(running_kind_grouping[next_process_kind]) >= job_manager_config.JOBS[next_process_kind]['max_job_per_process']:
+            is_processable = False
+
+        # 処理済みのbatch groupは処理対象外にする
+        # Exclude processed batch groups from the list
+        if is_processable and next_process['ENABLE_BATCH']:
+            batch_group_dict_key = next_process_kind + "\t" + next_process['ORGANIZATION_ID'] + "\t" + next_process['WORKSPACE_ID'] + '\t' + next_process['BATCH_GROUP_KEY']
+            if batch_group_dict_key in processing_batch_group:
+                is_processable = False
+            else:
+                processing_batch_group[batch_group_dict_key] = True
+
+        if is_processable:
             try:
                 # queueをLockする / Lock the queue
                 with conn.cursor() as cursor:
                     cursor.execute(queries_process_queue.SQL_QUERY_PROCESS_LOCK, {"process_id": next_process_id})
-                    lock_succeed = cursor.fetchone() is not None
+                    is_processable = cursor.fetchone() is not None
             except pymysql.err.OperationalError as err:
                 # Lock Error
-                lock_succeed = False
+                is_processable = False
                 globals.logger.debug(err)
             except Exception as err:
-                lock_succeed = False
+                is_processable = False
                 globals.logger.error(f'{err}\n---- stack trace ----\n{traceback.format_exc()}')
 
-            if lock_succeed:
-                # queueのlockに成功した場合、起動対象としてreturn配列に追加
-                # If the queue is successfully locked, add it to the return array as a startup target
-                ret_queue.append(queue_org_grouping[next_organization_id][0])
-                running_kind_grouping[next_process_king].append(queue_org_grouping[next_organization_id][0])
-                running_org_grouping[next_organization_id].append(queue_org_grouping[next_organization_id][0])
+        if is_processable and next_process['ENABLE_BATCH']:
+            # batch送信の場合、batchで一気に送るqueueを全てLockする
+            # In the case of batch sending, acquire and lock all queues to be sent at once in the batch.
+            # ただし、next_process_idのものは必ず実行対象にするので除外して以外のものを取得する
+            try:
+                with conn.cursor() as cursor:
+                    cursor.execute(
+                        queries_process_queue.SQL_QUERY_FETCH_BATCH_PROCESS,
+                        {
+                            "organization_id": next_organization_id,
+                            "workspace_id": next_process["WORKSPACE_ID"],
+                            "process_kind": next_process["PROCESS_KIND"],
+                            "batch_group_key": next_process["BATCH_GROUP_KEY"],
+                            "exclude_process_id": next_process_id
+                        })
+                    # 処理対象件数-1だけfetchする(1件はnext_process_idのものがあるため)
+                    batch_queue_add = cursor.fetchmany(next_process["BATCH_COUNT_LIMIT"] - 1)
+                    
+                    # next_processと追加分を合わせてbatch_queueとする
+                    batch_queue = [next_process] + [r for r in batch_queue_add]
+
+            except pymysql.err.OperationalError as err:
+                # Lock Error
+                is_processable = False
+                globals.logger.debug(err)
+            except Exception as err:
+                is_processable = False
+                globals.logger.error(f'{err}\n---- stack trace ----\n{traceback.format_exc()}')
+
+        if is_processable:
+            # queueのlockに成功した場合、起動対象としてreturn配列に追加
+            # If the queue is successfully locked, add it to the return array as a startup target
+            ret_queue.append(queue_org_grouping[next_organization_id][0])
+            ret_batch_queue.append(batch_queue)
+            running_kind_grouping[next_process_kind].append(queue_org_grouping[next_organization_id][0])
+            running_org_grouping[next_organization_id].append(queue_org_grouping[next_organization_id][0])
 
         # 次のqueue情報に進むためqueueの配列から削除 / Delete from queue array to proceed to next queue information
         del queue_org_grouping[next_organization_id][0]
@@ -546,7 +612,7 @@ def get_queue(conn, running_job_queue: list, get_queue_len: int):
             # 0件になったらorganization_idのキーも消す / When the number becomes 0, delete the organization_id key as well.
             del queue_org_grouping[next_organization_id]
 
-    return ret_queue
+    return ret_queue, ret_batch_queue
 
 
 def queue_grouping(queue: list, group_key: str, group_null_vale: str, sort_key: str = None):
@@ -577,15 +643,45 @@ def queue_grouping(queue: list, group_key: str, group_null_vale: str, sort_key: 
         }
 
 
-def delete_queue(conn, queue_row: dict):
+def delete_queue(conn, queue_row: dict, batch_queue_rows: list[dict] | None):
     """queueのレコード削除 / Delete queue record
 
     Args:
         conn (_type_): db connection
         queue_row (dict): 削除対象 / Target for deletion
+        batch_queue_rows (list[dict] | None) 削除対象 / Target for deletion
     """
     with conn.cursor() as cursor:
         cursor.execute(queries_process_queue.SQL_QUERY_PROCESS_DELETE, {"process_id": queue_row["PROCESS_ID"]})
+        if batch_queue_rows is not None:
+            for batch_queue_row in batch_queue_rows:
+                cursor.execute(queries_process_queue.SQL_QUERY_PROCESS_DELETE, {"process_id": batch_queue_row["PROCESS_ID"]})
+
+
+def lock_queue_batch_group(conn, queue_row: dict):
+    """queueのbatch_groupのロックする
+
+    Args:
+        conn (_type_): db connection
+        queue_row (dict): ロック対象
+    """
+    sql_parameter = {
+        "process_kind": queue_row["PROCESS_KIND"],
+        "organization_id": queue_row["ORGANIZATION_ID"],
+        "workspace_id": queue_row["WORKSPACE_ID"],
+        "group_key": queue_row["BATCH_GROUP_KEY"],
+        "batch_period_seconds": queue_row["BATCH_PERIOD_SECONDS"]
+    }
+
+    with conn.cursor() as cursor:
+        cursor.execute(queries_process_queue.SQL_UPDATE_PROCESS_QUEUE_LOCK, sql_parameter)
+        if cursor.rowcount == 0:
+            # updateの結果が0件だったらINSERTを試みる
+            try:
+                cursor.execute(queries_process_queue.SQL_INSERT_PROCESS_QUEUE_LOCK, sql_parameter)
+            except pymysql.err.IntegrityError:
+                # INSERTした際に偶然ダブって一意誓約違反なら、レコードはもうあるはずなので更新する
+                cursor.execute(queries_process_queue.SQL_UPDATE_PROCESS_QUEUE_LOCK, sql_parameter)
 
 
 def job_manager_process_sigterm_handler(signum, frame):

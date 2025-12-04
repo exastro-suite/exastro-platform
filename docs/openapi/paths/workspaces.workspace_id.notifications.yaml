@@ -147,6 +147,8 @@ post:
             $ref: "../schemas/notifications.create.example.teams.yaml"
           webhook message post:
             $ref: "../schemas/notifications.create.example.webhook.yaml"
+          ServiceNow table post:
+            $ref: "../schemas/notifications.create.example.servicenow.yaml"
     required: true
   responses:
     200:

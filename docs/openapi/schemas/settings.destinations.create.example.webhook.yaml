@@ -24,14 +24,16 @@ value:
             "new": true,
             "evaluated": true,
             "timeout": false,
-            "undetected": false
+            "undetected": false,
+            "new_received": false,
+            "new_consolidated": false,
           }
         }
       },
       "destination_informations": [
         {
           "url": "http://your-webhook-server/hooks/XXXXXXXX",
-          "header": "Content-Type: application/json"
+          "header": "{\"Content-Type\": \"application/json\"}"
         }
       ]
     }
