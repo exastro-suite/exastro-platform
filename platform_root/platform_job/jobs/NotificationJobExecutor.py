@@ -439,8 +439,8 @@ class NotificationJobExecutor(BaseJobExecutor):
 
         for destination_information in destination_informations_list[0]:
             # ServiceNow API path
-            table_api_path = urlparse(destination_information['table_api_url']).path
-
+            table_api_path = self.__get_relative_url(destination_information['table_api_url'])
+    
             # batch送信用のbodyを作成する
             rest_requests = []
             for index, queue in enumerate(queue_list):
@@ -506,6 +506,28 @@ class NotificationJobExecutor(BaseJobExecutor):
                 globals.logger.debug(f"webhook response text\n{resp_webhook_text}")
 
         return notification_results
+
+    def __get_relative_url(self, full_url: str) -> str:
+        """path以降のURLを取得する
+
+        Args:
+            full_url (str): _description_
+
+        Returns:
+            str: _description_
+        """
+        parsed_url = urlparse(full_url)
+        relative_url = parsed_url.path
+        if parsed_url.params:
+            relative_url += ';' + parsed_url.params
+
+        if parsed_url.query:
+            relative_url += '?' + parsed_url.query
+
+        if parsed_url.fragment:
+            relative_url += '#' + parsed_url.fragment
+
+        return relative_url
 
     def __send_message_mail(self, destination_informations, message_infomations):
         """mailへのメッセージ送信 / Send messages to email
