@@ -13,6 +13,8 @@
 #   limitations under the License.
 from jobs.BaseJobExecutor import BaseJobExecutor
 
+from collections.abc import Iterable
+import concurrent.futures
 import os
 from contextlib import closing
 import traceback
@@ -20,7 +22,6 @@ import requests
 import datetime
 import time
 import json
-import random
 import base64
 import ssl
 import smtplib
@@ -166,7 +167,7 @@ class NotificationJobExecutor(BaseJobExecutor):
                             destination_informations_list.append(json.loads(encrypt.decrypt_str(row['DESTINATION_INFORMATIONS'])))
                             message_infomations_list.append(json.loads(row['MESSAGE_INFORMATIONS']))
                             notification_results.append({"status": const.NOTIFICATION_STATUS_FAILED, "http_response_code": None, "http_response_body": None})
-    
+
                     if row['DESTINATION_KIND'] == const.DESTINATION_KIND_TEAMS_WF:
                         # Teams workflow へのメッセージ送信 / Send messages to Teams workflow
                         raise Exception("Not Support Batch Send Notifications")
@@ -428,84 +429,154 @@ class NotificationJobExecutor(BaseJobExecutor):
 
         return notification_result
 
-    def __send_message_servicenow_batch(self, queue_list, destination_informations_list, message_infomations_list):
-        notification_results = []
-        for i in range(len(queue_list)):
-            notification_results.append({
+    def __send_message_servicenow_batch(
+        self,
+        queue_list: list[dict],
+        destination_informations_list: list[list[dict]],
+        message_infomations_list: list[dict],
+    ):
+        notification_results = [
+            {
                 "status": const.NOTIFICATION_STATUS_FAILED,
                 "http_response_code": None,
-                "http_response_body": None
-            })
+                "http_response_body": None,
+            }
+            for _ in queue_list
+        ]
+        chunk_size = int(os.environ.get("SERVICENOW_BATCH_CHUNK_SIZE", 50))
+        max_workers = int(os.environ.get("SERVICENOW_BATCH_MAX_WORKERS", 3))
 
-        for destination_information in destination_informations_list[0]:
-            # ServiceNow API path
-            table_api_path = self.__get_relative_url(destination_information['table_api_url'])
-    
-            # batch送信用のbodyを作成する
-            rest_requests = []
-            for index, queue in enumerate(queue_list):
-                rest_requests.append({
-                    "id": queue['PROCESS_EXEC_ID'],
+        # chunkに分割したindex付きqueueのリストを作成する
+        indexed_chunks = (
+            zip(range(i, i + chunk_size), queue_list[i:i + chunk_size])
+            for i in range(0, len(queue_list), chunk_size)
+        )
+        chunk_count = (len(queue_list) + chunk_size - 1) // chunk_size
+
+        # 同時実行数はchunk数 * 送信先情報とmax_workersの小さい方にする(無駄なスレッドを立てない)
+        with concurrent.futures.ThreadPoolExecutor(
+            max_workers=min(max_workers, chunk_count * len(destination_informations_list[0]))
+        ) as executor:
+            for destination_information in destination_informations_list[0]:
+                # ServiceNow API path
+                table_api_path = self.__get_relative_url(
+                    destination_information["table_api_url"]
+                )
+                for indexed_queue_list in indexed_chunks:
+                    executor.submit(
+                        NotificationJobExecutor.__send_message_servicenow_batch_chunk,
+                        indexed_queue_list,
+                        destination_information,
+                        message_infomations_list,
+                        table_api_path,
+                        self.job_config["extra_config"]["servicenow_connetion_timeout"],
+                        self.job_config["extra_config"][
+                            "servicenow_batch_read_timeout"
+                        ],
+                        notification_results,
+                    )
+
+        return notification_results
+
+    @staticmethod
+    def __send_message_servicenow_batch_chunk(
+        indexed_queue_list: Iterable[tuple[int, dict]],
+        destination_information: dict[str, str],
+        message_infomations_list: list[dict],
+        table_api_path: str,
+        servicenow_connetion_timeout: float,
+        servicenow_batch_read_timeout: float,
+        notification_results: list[dict],
+    ):
+        # batch送信用のbodyを作成する
+        rest_requests: dict[str, tuple[int, dict]] = {
+            queue["PROCESS_EXEC_ID"]: (
+                index,
+                {
+                    "id": queue["PROCESS_EXEC_ID"],
                     "exclude_response_headers": True,
                     "headers": [
                         {"name": "Content-Type", "value": "application/json"},
-                        {"name": "Accept", "value": "application/json"}
+                        {"name": "Accept", "value": "application/json"},
                     ],
                     "url": table_api_path,
                     "method": "POST",
-                    "body": base64.b64encode(json.dumps(json.loads(message_infomations_list[index].get("message", "{}"))).encode()).decode('ascii')
-                })
+                    "body": base64.b64encode(
+                        json.dumps(
+                            json.loads(
+                                message_infomations_list[index].get("message", "{}")
+                            )
+                        ).encode()
+                    ).decode("ascii"),
+                },
+            )
+            for index, queue in indexed_queue_list
+        }
 
-            try:
-                resp_webhook_text = None
-                globals.logger.debug('start requests.post')
-                response = requests.post(
-                    destination_information['batch_api_url'],
-                    json={
-                        "batch_request_id": queue_list[0]['PROCESS_EXEC_ID'],
-                        "rest_requests": rest_requests
-                    },
-                    headers={"Content-type": "application/json", "Accept": "application/json"},
-                    auth=(destination_information['servicenow_user'], destination_information['servicenow_password']),
-                    timeout=(
-                        self.job_config['extra_config']['servicenow_connetion_timeout'],
-                        self.job_config['extra_config']['servicenow_batch_read_timeout'],
-                    ))
-                globals.logger.debug('end requests.post')
+        try:
+            resp_webhook_text = None
+            globals.logger.debug("start requests.post")
+            response = requests.post(
+                destination_information["batch_api_url"],
+                json={
+                    "batch_request_id": next(iter(rest_requests.keys())),
+                    "rest_requests": [
+                        rest_request for _, rest_request in rest_requests.values()
+                    ],
+                },
+                headers={
+                    "Content-type": "application/json",
+                    "Accept": "application/json",
+                },
+                auth=(
+                    destination_information["servicenow_user"],
+                    destination_information["servicenow_password"],
+                ),
+                timeout=(
+                    servicenow_connetion_timeout,
+                    servicenow_batch_read_timeout,
+                ),
+            )
+            globals.logger.debug("end requests.post")
 
-                resp_webhook_text = response.text
+            resp_webhook_text = response.text
 
-                if response.status_code < 200 or response.status_code >= 300:
-                    # batchの応答自体がHTTP200系以外の時は全てその応答を設定する
-                    for notification_result in notification_results:
-                        notification_result["http_response_code"] = response.status_code
-                        notification_result["http_response_body"] = response.text
+            if response.status_code < 200 or response.status_code >= 300:
+                # batchの応答自体がHTTP200系以外の時は全てその応答を設定する
+                for notification_result in notification_results:
+                    notification_result["http_response_code"] = response.status_code
+                    notification_result["http_response_body"] = response.text
 
-                    raise Exception(f"response code:{response.status_code}")
+                raise Exception(f"response code:{response.status_code}")
 
-                # 1件毎の応答を設定する
-                globals.logger.debug('start setting response')
-                response_json = json.loads(response.text)
-                for serviced_request in response_json["serviced_requests"]:
-                    index = next((index for index, queue in enumerate(queue_list) if queue['PROCESS_EXEC_ID'] == serviced_request.get("id")), None)
-                    if index is None:
-                        continue
+            # 1件毎の応答を設定する
+            globals.logger.debug("start setting response")
+            response_json = json.loads(response.text)
+            for serviced_request in response_json["serviced_requests"]:
+                index, _ = rest_requests.get(serviced_request.get("id"), (None, None))
+                if index is None:
+                    continue
 
-                    if serviced_request.get("status_code") >= 200 and serviced_request.get("status_code") < 300:
-                        notification_results[index]["status"] = const.NOTIFICATION_STATUS_SUCCESSFUL
-                    else:
-                        notification_results[index]["status"] = const.NOTIFICATION_STATUS_FAILED
+                notification_result = notification_results[index]
+                if (
+                    200 <= serviced_request.get("status_code") < 300
+                ):
+                    notification_result["status"] = const.NOTIFICATION_STATUS_SUCCESSFUL
+                else:
+                    notification_result["status"] = const.NOTIFICATION_STATUS_FAILED
 
-                    notification_results[index]["http_response_code"] = serviced_request.get("status_code")
-                    notification_results[index]["http_response_body"] = base64.b64decode(serviced_request.get("body").encode()).decode()
+                notification_result["http_response_code"] = serviced_request.get(
+                    "status_code"
+                )
+                notification_result["http_response_body"] = base64.b64decode(
+                    serviced_request.get("body").encode()
+                ).decode()
 
-                globals.logger.debug('end setting response')
-
-            except Exception as err:
-                globals.logger.warning(f'{err}\n-- stack trace --\n{traceback.format_exc()}')
-                globals.logger.debug(f"webhook response text\n{resp_webhook_text}")
-
-        return notification_results
+        except Exception as err:
+            globals.logger.warning(
+                f"{err}\n-- stack trace --\n{traceback.format_exc()}"
+            )
+            globals.logger.debug(f"webhook response text\n{resp_webhook_text}")
 
     def __get_relative_url(self, full_url: str) -> str:
         """path以降のURLを取得する
