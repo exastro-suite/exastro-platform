@@ -13,6 +13,7 @@
 #   limitations under the License.
 from jobs.BaseJobExecutor import BaseJobExecutor
 
+from itertools import islice
 from collections.abc import Iterable
 import concurrent.futures
 import os
@@ -443,20 +444,16 @@ class NotificationJobExecutor(BaseJobExecutor):
             }
             for _ in queue_list
         ]
-        chunk_size = int(os.environ.get("SERVICENOW_BATCH_CHUNK_SIZE", 50))
-        max_workers = int(os.environ.get("SERVICENOW_BATCH_MAX_WORKERS", 3))
+        max_workers = int(os.environ.get("JOB_NOTIFICATION_SERVICENOW_BATCH_MAX_WORKERS", 4))
 
         # chunkに分割したindex付きqueueのリストを作成する
-        indexed_chunks = (
-            zip(range(i, i + chunk_size), queue_list[i:i + chunk_size])
+        chunk_size = (len(queue_list) + max_workers - 1) // max_workers
+        indexed_chunks = [
+            list(zip(range(i, i + chunk_size), islice(queue_list, i, i + chunk_size)))
             for i in range(0, len(queue_list), chunk_size)
-        )
-        chunk_count = (len(queue_list) + chunk_size - 1) // chunk_size
+        ]
 
-        # 同時実行数はchunk数 * 送信先情報とmax_workersの小さい方にする(無駄なスレッドを立てない)
-        with concurrent.futures.ThreadPoolExecutor(
-            max_workers=min(max_workers, chunk_count * len(destination_informations_list[0]))
-        ) as executor:
+        with concurrent.futures.ThreadPoolExecutor(max_workers) as executor:
             for destination_information in destination_informations_list[0]:
                 # ServiceNow API path
                 table_api_path = self.__get_relative_url(
@@ -501,13 +498,9 @@ class NotificationJobExecutor(BaseJobExecutor):
                     ],
                     "url": table_api_path,
                     "method": "POST",
-                    "body": base64.b64encode(
-                        json.dumps(
-                            json.loads(
-                                message_infomations_list[index].get("message", "{}")
-                            )
-                        ).encode()
-                    ).decode("ascii"),
+                    "body": NotificationJobExecutor.__encode_servicenow_batch_body(
+                        message_infomations_list[index].get("message", "{}")
+                    ),
                 },
             )
             for index, queue in indexed_queue_list
@@ -599,6 +592,22 @@ class NotificationJobExecutor(BaseJobExecutor):
             relative_url += '#' + parsed_url.fragment
 
         return relative_url
+
+    @staticmethod
+    def __encode_servicenow_batch_body(json_message: str) -> str:
+        """ServiceNow batch API用のbodyエンコード
+
+        Args:
+            json_message (str): メッセージ
+
+        Returns:
+            str: エンコード済みメッセージ
+        """
+        # TODO: try-catchでエラー時のログ出力を出す
+        loaded_message = json.loads(json_message)
+        utf8_message = json.dumps(loaded_message).encode('utf-8')
+        base64_message = base64.b64encode(utf8_message).decode('ascii')
+        return base64_message
 
     def __send_message_mail(self, destination_informations, message_infomations):
         """mailへのメッセージ送信 / Send messages to email
@@ -843,8 +852,17 @@ class NotificationJobExecutor(BaseJobExecutor):
                             conn_ws.rollback()
                             raise
 
+                # 古い処理済み通知メッセージのクリーンアップ
+                cleanup_days = int(os.environ.get('JOB_NOTIFICATION_CLEANUP_EXPIRED_DAYS', "0"))
+                if cleanup_days > 0:
+                    cleanup_timestamp = datetime.datetime.now() - datetime.timedelta(days=cleanup_days)
+                    cursor_ws.execute(
+                        queries_notification.SQL_CLEANUP_NOTIFICATION_MESSAGE,
+                        {"create_timestamp": cleanup_timestamp, "notification_status": const.NOTIFICATION_STATUS_UNSENT})
+
         except JobTimeoutException:
-            raise  # TimeoutException時は即終了する
+            # TimeoutException時は即終了する
+            globals.logger.info(f'JobTimeoutException occurred. Stop force update status : ORGANIZATION_ID:[{organization_id}] / WORKSPACE_ID:[{workspace_id}]')
         except Exception as err:
             # 次の処理に進むためraiseしない
             globals.logger.error(f'{err}\n-- stack trace --\n{traceback.format_exc()}')

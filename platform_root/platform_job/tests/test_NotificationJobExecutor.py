@@ -531,6 +531,7 @@ def test_execute_servicenow_one_error():
         assert sn_requests_history[0].headers['Authorization'] == sn_auth_header
 
 
+@mock.patch.dict(os.environ, {"JOB_NOTIFICATION_SERVICENOW_BATCH_MAX_WORKERS": "1"})
 def test_execute_servicenow_batch_normallry():
     """servicenow連携(一括送信) 正常系
     """
@@ -613,9 +614,9 @@ def test_execute_servicenow_batch_normallry():
         assert sn_requests_history[0].headers['Authorization'] == sn_auth_header
 
 
-@mock.patch.dict(os.environ, {"SERVICENOW_BATCH_CHUNK_SIZE": "2"})
+@mock.patch.dict(os.environ, {"JOB_NOTIFICATION_SERVICENOW_BATCH_MAX_WORKERS": "2"})
 def test_execute_servicenow_batch_normally_multithread():
-    """servicenow連携(一括送信) 正常系
+    """servicenow連携(一括送信) 正常系(マルチスレッド)
     """
     testdata = import_module("tests.db.exports.testdata")
 
@@ -680,9 +681,8 @@ def test_execute_servicenow_batch_normally_multithread():
         # sn_batch_urlへの要求を取得する
         sn_requests_histories = [his for his in requests_mocker.request_history if his.url == sn_batch_url]
 
-        # sn_batch_urlへの要求がチャンク単位に分かれる事
-        chunk_size = int(os.environ["SERVICENOW_BATCH_CHUNK_SIZE"])
-        assert (len(sn_bodys) + chunk_size - 1) // chunk_size == len(sn_requests_histories)
+        # sn_batch_urlへの要求がスレッド単位に分かれる事
+        assert len(sn_requests_histories) == int(os.environ["JOB_NOTIFICATION_SERVICENOW_BATCH_MAX_WORKERS"])
         # sn_batch_urlへ要求したbodyが要求したものと等しいこと
         sn_batch_bodies = [
             sn_batch_body
@@ -719,6 +719,7 @@ def test_execute_servicenow_batch_normally_multithread():
         assert sn_requests_histories[0].headers['Authorization'] == sn_auth_header
 
 
+@mock.patch.dict(os.environ, {"JOB_NOTIFICATION_SERVICENOW_BATCH_MAX_WORKERS": "1"})
 def test_execute_servicenow_batch_partially_failed():
     """servicenow連携(一括送信) 一部失敗
     """
