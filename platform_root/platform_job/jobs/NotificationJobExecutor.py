@@ -13,6 +13,7 @@
 #   limitations under the License.
 from jobs.BaseJobExecutor import BaseJobExecutor
 
+import pymysql
 from itertools import islice
 from collections.abc import Iterable
 import concurrent.futures
@@ -853,12 +854,7 @@ class NotificationJobExecutor(BaseJobExecutor):
                             raise
 
                 # 古い処理済み通知メッセージのクリーンアップ
-                cleanup_days = int(os.environ.get('JOB_NOTIFICATION_CLEANUP_EXPIRED_DAYS', "0"))
-                if cleanup_days > 0:
-                    cleanup_timestamp = datetime.datetime.now() - datetime.timedelta(days=cleanup_days)
-                    cursor_ws.execute(
-                        queries_notification.SQL_CLEANUP_NOTIFICATION_MESSAGE,
-                        {"create_timestamp": cleanup_timestamp, "notification_status": const.NOTIFICATION_STATUS_UNSENT})
+                cls.__cleanup_expired_notifications(cursor_ws)
 
         except JobTimeoutException:
             # TimeoutException時は即終了する
@@ -866,3 +862,43 @@ class NotificationJobExecutor(BaseJobExecutor):
         except Exception as err:
             # 次の処理に進むためraiseしない
             globals.logger.error(f'{err}\n-- stack trace --\n{traceback.format_exc()}')
+
+    @classmethod
+    def __cleanup_expired_notifications(cls, cursor_ws: pymysql.cursors.Cursor):
+        """古い処理済み通知メッセージのクリーンアップ / Cleanup old processed notification messages
+
+        Args:
+            cursor_ws: ワークスペースDBカーソル / Workspace DB cursor
+        """
+        cleanup_days = int(os.environ.get("JOB_NOTIFICATION_CLEANUP_EXPIRED_DAYS", "0"))
+        throttle = int(
+            os.environ.get("JOB_NOTIFICATION_CLEANUP_THROTTLE", "1000")
+        )
+        if cleanup_days > 0 and throttle > 0:
+            cleanup_timestamp = datetime.datetime.now() - datetime.timedelta(
+                days=cleanup_days
+            )
+            total_cleanuped_rows = 0
+            # 初回はループに入るためにthrottle件数分の値をセット
+            cleanuped_rows = throttle
+            try:
+                while cleanuped_rows >= throttle:
+                    cursor_ws.connection.begin()
+                    cleanuped_rows = cursor_ws.execute(
+                        queries_notification.SQL_CLEANUP_NOTIFICATION_MESSAGE,
+                        {
+                            "create_timestamp": cleanup_timestamp,
+                            "notification_status": const.NOTIFICATION_STATUS_UNSENT,
+                            "cleanup_throttle": throttle,
+                        },
+                    )
+                    cursor_ws.connection.commit()
+                    total_cleanuped_rows += cleanuped_rows
+            except Exception:
+                cursor_ws.connection.rollback()
+                raise
+            finally:
+                if total_cleanuped_rows > 0:
+                    globals.logger.info(
+                        f"Cleaned up {total_cleanuped_rows} notification messages created before {cleanup_timestamp}"
+                    )
