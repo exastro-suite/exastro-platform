@@ -584,9 +584,13 @@ def get_queue(conn, running_job_queue: list, get_queue_len: int):
                             "batch_group_key": next_process["BATCH_GROUP_KEY"],
                             "exclude_process_id": next_process_id
                         })
-                    # 処理対象件数-1だけfetchする(1件はnext_process_idのものがあるため)
-                    batch_queue_add = cursor.fetchmany(next_process["BATCH_COUNT_LIMIT"] - 1)
-                    
+                    # 処理対象件数*スレッド数-1だけfetchする(1件はnext_process_idのものがあるため)
+                    batch_queue_add = cursor.fetchmany(
+                        next_process["BATCH_COUNT_LIMIT"]
+                        * int(os.environ.get("JOB_NOTIFICATION_SERVICENOW_BATCH_MAX_WORKERS", 4))
+                        - 1
+                    )
+
                     # next_processと追加分を合わせてbatch_queueとする
                     batch_queue = [next_process] + [r for r in batch_queue_add]
 
