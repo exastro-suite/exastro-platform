@@ -630,7 +630,8 @@ def test_execute_servicenow_batch_normally_multithread():
     sn_pw = "sn-password01"
     sn_auth_header = 'Basic ' + base64.b64encode(f'{sn_user}:{sn_pw}'.encode('utf-8')).decode('utf-8')
 
-    # 2チャンク以上になるように3件作成
+    # 2チャンク以上になるように、BATCH_COUNT_LIMIT=2で3件作成(BATCH_COUNT_LIMIT*MAX_WORKERS=4件取得)
+    batch_count_limit = 2
     sn_bodys = [
         {"field1": "value1-1", "field2": "value1-2"},
         {"field1": "value2-1", "field2": "value2-2"},
@@ -643,7 +644,7 @@ def test_execute_servicenow_batch_normally_multithread():
         {"status": 202, "body": {"unit-test-response": "3-OK"}},
     ]
 
-    queues = make_notification_servicenow_batch(organization_id, workspace_id, sn_batch_url, sn_api_url, sn_user, sn_pw, sn_bodys)
+    queues = make_notification_servicenow_batch(organization_id, workspace_id, sn_batch_url, sn_api_url, sn_user, sn_pw, sn_bodys, batch_count_limit=batch_count_limit)
 
     # ServiceNowのbatchのレスポンス情報の生成
     sn_resp_body = {
@@ -1383,7 +1384,7 @@ def make_notification_servicenow_one(organization_id: str, workspace_id: str, sn
     return queue
 
 
-def make_notification_servicenow_batch(organization_id, workspace_id, sn_batch_url, sn_api_url, sn_user, sn_pw, sn_bodys):
+def make_notification_servicenow_batch(organization_id, workspace_id, sn_batch_url, sn_api_url, sn_user, sn_pw, sn_bodys, batch_count_limit=100):
     queues = []
     
     with closing(DBconnector().connect_workspacedb(organization_id, workspace_id)) as conn, \
@@ -1438,6 +1439,10 @@ def make_notification_servicenow_batch(organization_id, workspace_id, sn_batch_u
                 "PROCESS_EXEC_ID": notification_id,
                 "ORGANIZATION_ID": organization_id,
                 "WORKSPACE_ID": workspace_id,
+                "ENABLE_BATCH": 0,
+                "BATCH_PERIOD_SECONDS": None,
+                "BATCH_COUNT_LIMIT": batch_count_limit,
+                "BATCH_GROUP_KEY": None,
                 "LAST_UPDATE_USER": job_manager_const.SYSTEM_USER_ID,
                 "LAST_UPDATE_TIMESTAMP": str(datetime.datetime.now()),
             })

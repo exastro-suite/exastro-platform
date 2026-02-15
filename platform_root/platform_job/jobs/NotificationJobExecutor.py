@@ -13,6 +13,7 @@
 #   limitations under the License.
 from jobs.BaseJobExecutor import BaseJobExecutor
 
+import threading
 import pymysql
 from itertools import islice
 from collections.abc import Iterable
@@ -447,14 +448,17 @@ class NotificationJobExecutor(BaseJobExecutor):
         ]
         max_workers = int(os.environ.get("JOB_NOTIFICATION_SERVICENOW_BATCH_MAX_WORKERS", 4))
 
+        # batch送信のchunkサイズは、queue_listの最初の要素のBATCH_COUNT_LIMITとする
+        chunk_size = queue_list[0]["BATCH_COUNT_LIMIT"]
         # chunkに分割したindex付きqueueのリストを作成する
-        chunk_size = (len(queue_list) + max_workers - 1) // max_workers
         indexed_chunks = [
             list(zip(range(i, i + chunk_size), islice(queue_list, i, i + chunk_size)))
             for i in range(0, len(queue_list), chunk_size)
         ]
 
-        with concurrent.futures.ThreadPoolExecutor(max_workers) as executor:
+        with concurrent.futures.ThreadPoolExecutor(
+            max_workers, thread_name_prefix=threading.current_thread().name
+        ) as executor:
             for destination_information in destination_informations_list[0]:
                 # ServiceNow API path
                 table_api_path = self.__get_relative_url(
