@@ -490,26 +490,34 @@ class NotificationJobExecutor(BaseJobExecutor):
         servicenow_batch_read_timeout: float,
         notification_results: list[dict],
     ):
-        # batch送信用のbodyを作成する
-        rest_requests: dict[str, tuple[int, dict]] = {
-            queue["PROCESS_EXEC_ID"]: (
-                index,
-                {
-                    "id": queue["PROCESS_EXEC_ID"],
-                    "exclude_response_headers": True,
-                    "headers": [
-                        {"name": "Content-Type", "value": "application/json"},
-                        {"name": "Accept", "value": "application/json"},
-                    ],
-                    "url": table_api_path,
-                    "method": "POST",
-                    "body": NotificationJobExecutor.__encode_servicenow_batch_body(
-                        message_infomations_list[index].get("message", "{}")
-                    ),
-                },
-            )
-            for index, queue in indexed_queue_list
-        }
+        try:
+            process_exec_id = None
+            # batch送信用のbodyを作成する
+            rest_requests: dict[str, tuple[int, dict]] = {
+                queue["PROCESS_EXEC_ID"]: (
+                    index,
+                    {
+                        "id": (process_exec_id := queue["PROCESS_EXEC_ID"]),
+                        "exclude_response_headers": True,
+                        "headers": [
+                            {"name": "Content-Type", "value": "application/json"},
+                            {"name": "Accept", "value": "application/json"},
+                        ],
+                        "url": table_api_path,
+                        "method": "POST",
+                        "body": NotificationJobExecutor.__encode_servicenow_batch_body(
+                            message_infomations_list[index].get("message", "{}")
+                        ),
+                    },
+                )
+                for index, queue in indexed_queue_list
+            }
+        except json.JSONDecodeError as err:
+            globals.logger.warning(f'Cannot decode message[id:{process_exec_id}] as JSON: {err}\n-- message --\n{err.doc}\n-- stack trace --\n{traceback.format_exc()}')
+            raise
+        except Exception as err:
+            globals.logger.warning(f'{err}\n-- stack trace --\n{traceback.format_exc()}')
+            raise
 
         try:
             resp_webhook_text = None
@@ -608,7 +616,6 @@ class NotificationJobExecutor(BaseJobExecutor):
         Returns:
             str: エンコード済みメッセージ
         """
-        # TODO: try-catchでエラー時のログ出力を出す
         loaded_message = json.loads(json_message)
         utf8_message = json.dumps(loaded_message).encode('utf-8')
         base64_message = base64.b64encode(utf8_message).decode('ascii')
