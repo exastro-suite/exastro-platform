@@ -630,7 +630,7 @@ def test_execute_servicenow_batch_normally_multithread():
     sn_p = "sn-pw01"
     sn_auth_header = 'Basic ' + base64.b64encode(f'{sn_user}:{sn_p}'.encode('utf-8')).decode('utf-8')
 
-    # 2チャンク以上になるように、BATCH_COUNT_LIMIT=3で4件作成(BATCH_COUNT_LIMIT*MAX_WORKERS=12件取得)
+    # 2チャンク以上になるように、BATCH_COUNT_LIMIT=3で10件作成: MAX_WORKERS=4なので、3、3、3、1件の4チャンクになる
     batch_count_limit = 3
     sn_bodys = [
         {"field1": "value1-1", "field2": "value1-2"},
@@ -866,6 +866,7 @@ def test_execute_servicenow_batch_error():
             assert_notification_response(organization_id, workspace_id, queue['PROCESS_EXEC_ID'], 500, json.dumps(sn_resp_body))
 
 
+@mock.patch.dict(os.environ, {"JOB_NOTIFICATION_SERVICENOW_BATCH_MAX_WORKERS": "4"})
 def test_execute_servicenow_batch_invalid_message():
     """servicenow連携(一括送信) 異常系
     """
@@ -879,10 +880,18 @@ def test_execute_servicenow_batch_invalid_message():
     sn_user = "sn_user01"
     sn_p = "sn-pw01"
 
+    batch_count_limit = 3
     sn_bodys = [
         {"field1": "value1-1", "field2": "value1-2"},
         {"field1": "value2-1", "field2": "value2-2"},
         {"field1": "value3-1", "field2": "value3-2"},
+        {"field1": "value4-1", "field2": "value4-2"},
+        {"field1": "value5-1", "field2": "value5-2"},
+        {"field1": "value6-1", "field2": "value6-2"},
+        {"field1": "value7-1", "field2": "value7-2"},
+        {"field1": "value8-1", "field2": "value8-2"},
+        {"field1": "value9-1", "field2": "value9-2"},
+        {"field1": "value10-1", "field2": "value10-2"},
     ]
 
     queues = make_notification_servicenow_batch_invalid_message(
@@ -893,6 +902,7 @@ def test_execute_servicenow_batch_invalid_message():
         sn_user,
         sn_p,
         sn_bodys,
+        batch_count_limit=batch_count_limit
     )
 
     # ServiceNowのbatchのレスポンス情報の生成
