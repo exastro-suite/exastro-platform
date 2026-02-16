@@ -608,11 +608,17 @@ class NotificationJobExecutor(BaseJobExecutor):
         Returns:
             str: エンコード済みメッセージ
         """
-        # TODO: try-catchでエラー時のログ出力を出す
-        loaded_message = json.loads(json_message)
-        utf8_message = json.dumps(loaded_message).encode('utf-8')
-        base64_message = base64.b64encode(utf8_message).decode('ascii')
-        return base64_message
+        try:
+            loaded_message = json.loads(json_message)
+            utf8_message = json.dumps(loaded_message).encode('utf-8')
+            base64_message = base64.b64encode(utf8_message).decode('ascii')
+            return base64_message
+        except json.JSONDecodeError as err:
+            globals.logger.warning(f'Cannot decode message as JSON: {err}\n-- message --\n{err.doc}\n-- stack trace --\n{traceback.format_exc()}')
+            raise
+        except Exception as err:
+            globals.logger.warning(f'{err}\n-- stack trace --\n{traceback.format_exc()}')
+            raise
 
     def __send_message_mail(self, destination_informations, message_infomations):
         """mailへのメッセージ送信 / Send messages to email
