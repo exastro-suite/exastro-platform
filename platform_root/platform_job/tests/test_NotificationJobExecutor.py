@@ -13,6 +13,7 @@
 #   limitations under the License.
 import requests_mock
 
+import os
 import ulid
 import base64
 import json
@@ -442,13 +443,13 @@ def test_execute_servicenow_one_normallry():
 
     sn_api_url = "http://sn.dummy/api/api_url"
     sn_user = "sn_user01"
-    sn_pw = "sn-password01"
-    sn_auth_header = 'Basic ' + base64.b64encode(f'{sn_user}:{sn_pw}'.encode('utf-8')).decode('utf-8')
+    sn_p = "sn-pw01"
+    sn_auth_header = 'Basic ' + base64.b64encode(f'{sn_user}:{sn_p}'.encode('utf-8')).decode('utf-8')
 
     sn_body = {"field1": "value1", "field2": "value2"}
     sn_resp = {"unit-test-response": "OK"}
 
-    queue = make_notification_servicenow_one(organization_id, workspace_id, sn_api_url, sn_user, sn_pw, sn_body)
+    queue = make_notification_servicenow_one(organization_id, workspace_id, sn_api_url, sn_user, sn_p, sn_body)
 
     with test_common.requsts_mocker_default() as requests_mocker:
         # ServiceNowへの要求をmockする
@@ -491,13 +492,13 @@ def test_execute_servicenow_one_error():
 
     sn_api_url = "http://sn.dummy/api/api_url"
     sn_user = "sn_user01"
-    sn_pw = "sn-password01"
-    sn_auth_header = 'Basic ' + base64.b64encode(f'{sn_user}:{sn_pw}'.encode('utf-8')).decode('utf-8')
+    sn_p = "sn-pw01"
+    sn_auth_header = 'Basic ' + base64.b64encode(f'{sn_user}:{sn_p}'.encode('utf-8')).decode('utf-8')
 
     sn_body = {"field1": "value1", "field2": "value2"}
     sn_resp = {"unit-test-response": "OK"}
 
-    queue = make_notification_servicenow_one(organization_id, workspace_id, sn_api_url, sn_user, sn_pw, sn_body)
+    queue = make_notification_servicenow_one(organization_id, workspace_id, sn_api_url, sn_user, sn_p, sn_body)
 
     with test_common.requsts_mocker_default() as requests_mocker:
         # ServiceNowへの要求をmockする
@@ -530,6 +531,7 @@ def test_execute_servicenow_one_error():
         assert sn_requests_history[0].headers['Authorization'] == sn_auth_header
 
 
+@mock.patch.dict(os.environ, {"JOB_NOTIFICATION_SERVICENOW_BATCH_MAX_WORKERS": "1"})
 def test_execute_servicenow_batch_normallry():
     """servicenow連携(一括送信) 正常系
     """
@@ -542,8 +544,8 @@ def test_execute_servicenow_batch_normallry():
     sn_api_url = "http://sn.dummy/api/api_url"
     sn_api_path = "/api/api_url"
     sn_user = "sn_user01"
-    sn_pw = "sn-password01"
-    sn_auth_header = 'Basic ' + base64.b64encode(f'{sn_user}:{sn_pw}'.encode('utf-8')).decode('utf-8')
+    sn_p = "sn-pw01"
+    sn_auth_header = 'Basic ' + base64.b64encode(f'{sn_user}:{sn_p}'.encode('utf-8')).decode('utf-8')
 
     sn_bodys = [
         {"field1": "value1-1", "field2": "value1-2"},
@@ -557,7 +559,7 @@ def test_execute_servicenow_batch_normallry():
         {"status": 202, "body": {"unit-test-response": "3-OK"}},
     ]
 
-    queues = make_notification_servicenow_batch(organization_id, workspace_id, sn_batch_url, sn_api_url, sn_user, sn_pw, sn_bodys)
+    queues = make_notification_servicenow_batch(organization_id, workspace_id, sn_batch_url, sn_api_url, sn_user, sn_p, sn_bodys)
 
     # ServiceNowのbatchのレスポンス情報の生成
     sn_resp_body = {
@@ -612,6 +614,127 @@ def test_execute_servicenow_batch_normallry():
         assert sn_requests_history[0].headers['Authorization'] == sn_auth_header
 
 
+@mock.patch.dict(os.environ, {"JOB_NOTIFICATION_SERVICENOW_BATCH_MAX_WORKERS": "4"})
+def test_execute_servicenow_batch_normally_multithread():
+    """servicenow連携(一括送信) 正常系(マルチスレッド)
+    """
+    testdata = import_module("tests.db.exports.testdata")
+
+    organization_id = list(testdata.ORGANIZATIONS.keys())[0]
+    workspace_id = testdata.ORGANIZATIONS[organization_id]["workspace_id"][0]
+
+    sn_batch_url = "http://sn.dummy/api/batch_url"
+    sn_api_url = "http://sn.dummy/api/api_url"
+    sn_api_path = "/api/api_url"
+    sn_user = "sn_user01"
+    sn_p = "sn-pw01"
+    sn_auth_header = 'Basic ' + base64.b64encode(f'{sn_user}:{sn_p}'.encode('utf-8')).decode('utf-8')
+
+    # 2チャンク以上になるように、BATCH_COUNT_LIMIT=3で10件作成: MAX_WORKERS=4なので、3、3、3、1件の4チャンクになる
+    batch_count_limit = 3
+    sn_bodys = [
+        {"field1": "value1-1", "field2": "value1-2"},
+        {"field1": "value2-1", "field2": "value2-2"},
+        {"field1": "value3-1", "field2": "value3-2"},
+        {"field1": "value4-1", "field2": "value4-2"},
+        {"field1": "value5-1", "field2": "value5-2"},
+        {"field1": "value6-1", "field2": "value6-2"},
+        {"field1": "value7-1", "field2": "value7-2"},
+        {"field1": "value8-1", "field2": "value8-2"},
+        {"field1": "value9-1", "field2": "value9-2"},
+        {"field1": "value10-1", "field2": "value10-2"},
+    ]
+
+    sn_resps = [
+        {"status": 200, "body": {"unit-test-response": "1-OK"}},
+        {"status": 201, "body": {"unit-test-response": "2-OK"}},
+        {"status": 202, "body": {"unit-test-response": "3-OK"}},
+        {"status": 203, "body": {"unit-test-response": "4-OK"}},
+        {"status": 204, "body": {"unit-test-response": "5-OK"}},
+        {"status": 205, "body": {"unit-test-response": "6-OK"}},
+        {"status": 206, "body": {"unit-test-response": "7-OK"}},
+        {"status": 207, "body": {"unit-test-response": "8-OK"}},
+        {"status": 208, "body": {"unit-test-response": "9-OK"}},
+        {"status": 209, "body": {"unit-test-response": "10-OK"}},
+    ]
+
+    queues = make_notification_servicenow_batch(organization_id, workspace_id, sn_batch_url, sn_api_url, sn_user, sn_p, sn_bodys, batch_count_limit=batch_count_limit)
+
+    # ServiceNowのbatchのレスポンス情報の生成
+    sn_resp_body = {
+        "serviced_requests": [
+            {
+                "id": queues[index]['PROCESS_EXEC_ID'],
+                "status_code": sn_resp["status"],
+                "body": base64.b64encode(json.dumps(sn_resp["body"]).encode()).decode('ascii')
+            }
+            for index, sn_resp in enumerate(sn_resps)
+        ]
+    }
+
+    with test_common.requsts_mocker_default() as requests_mocker:
+        # ServiceNowへの要求をmockする
+        requests_mocker.register_uri(
+            requests_mock.POST,
+            sn_batch_url,
+            status_code=200,
+            json=sn_resp_body)
+
+        executor = NotificationJobExecutor(queues[0], queues)
+        result = executor.execute_base()
+
+        # 全て成功なのでTrueを返すこと
+        assert result
+
+        for index, queue in enumerate(queues):
+            # ステータスが成功に更新されていること
+            assert get_notification_status(organization_id, workspace_id, queue['PROCESS_EXEC_ID']) == const.NOTIFICATION_STATUS_SUCCESSFUL
+
+            # HTTPCODEとRESPONSE BODYが更新されていること
+            assert_notification_response(organization_id, workspace_id, queue['PROCESS_EXEC_ID'], sn_resps[index]["status"], json.dumps(sn_resps[index]["body"]))
+
+        # sn_batch_urlへの要求を取得する
+        sn_requests_histories = [his for his in requests_mocker.request_history if his.url == sn_batch_url]
+
+        # sn_batch_urlへの要求がスレッド単位に分かれる事
+        assert len(sn_requests_histories) == int(os.environ["JOB_NOTIFICATION_SERVICENOW_BATCH_MAX_WORKERS"])
+        # sn_batch_urlへ要求したbodyが要求したものと等しいこと
+        sn_batch_bodies = [
+            sn_batch_body
+            for sn_requests in sn_requests_histories
+            for sn_batch_body in json.loads(sn_requests.body).get("rest_requests", [])
+        ]
+        assert len(sn_batch_bodies) == len(queues)
+        for i, sn_batch_body, queue in (
+            (
+                i,
+                next(
+                    (
+                        body
+                        for body in sn_batch_bodies
+                        if body["id"] == queue["PROCESS_EXEC_ID"]
+                    ),
+                    None,
+                ),
+                queue,
+            )
+            for i, queue in enumerate(queues)
+        ):
+            assert sn_batch_body is not None
+            assert sn_batch_body["id"] == queue["PROCESS_EXEC_ID"]
+            assert sn_batch_body["method"] == "POST"
+            assert sn_batch_body["url"] == sn_api_path
+            assert sn_batch_body["body"] == base64.b64encode(
+                json.dumps(sn_bodys[i]).encode()
+            ).decode("ascii")
+
+        # sn_api_urlへ要求した際にAuthorizationヘッダが存在こと
+        assert 'Authorization' in sn_requests_histories[0].headers
+        # sn_api_urlへ要求した際にAuthorizationヘッダの内容が設定した内容であること
+        assert sn_requests_histories[0].headers['Authorization'] == sn_auth_header
+
+
+@mock.patch.dict(os.environ, {"JOB_NOTIFICATION_SERVICENOW_BATCH_MAX_WORKERS": "1"})
 def test_execute_servicenow_batch_partially_failed():
     """servicenow連携(一括送信) 一部失敗
     """
@@ -624,8 +747,8 @@ def test_execute_servicenow_batch_partially_failed():
     sn_api_url = "http://sn.dummy/api/api_url"
     sn_api_path = "/api/api_url"
     sn_user = "sn_user01"
-    sn_pw = "sn-password01"
-    sn_auth_header = 'Basic ' + base64.b64encode(f'{sn_user}:{sn_pw}'.encode('utf-8')).decode('utf-8')
+    sn_p = "sn-pw01"
+    sn_auth_header = 'Basic ' + base64.b64encode(f'{sn_user}:{sn_p}'.encode('utf-8')).decode('utf-8')
 
     sn_bodys = [
         {"field1": "value1-1", "field2": "value1-2"},
@@ -641,7 +764,7 @@ def test_execute_servicenow_batch_partially_failed():
         {"status": 200, "body": {"unit-test-response": "4-OK"}},
     ]
 
-    queues = make_notification_servicenow_batch(organization_id, workspace_id, sn_batch_url, sn_api_url, sn_user, sn_pw, sn_bodys)
+    queues = make_notification_servicenow_batch(organization_id, workspace_id, sn_batch_url, sn_api_url, sn_user, sn_p, sn_bodys)
 
     # ServiceNowのbatchのレスポンス情報の生成
     sn_resp_body = {
@@ -708,7 +831,7 @@ def test_execute_servicenow_batch_error():
     sn_batch_url = "http://sn.dummy/api/batch_url"
     sn_api_url = "http://sn.dummy/api/api_url"
     sn_user = "sn_user01"
-    sn_pw = "sn-password01"
+    sn_p = "sn-pw01"
 
     sn_bodys = [
         {"field1": "value1-1", "field2": "value1-2"},
@@ -716,7 +839,7 @@ def test_execute_servicenow_batch_error():
         {"field1": "value3-1", "field2": "value3-2"},
     ]
 
-    queues = make_notification_servicenow_batch(organization_id, workspace_id, sn_batch_url, sn_api_url, sn_user, sn_pw, sn_bodys)
+    queues = make_notification_servicenow_batch(organization_id, workspace_id, sn_batch_url, sn_api_url, sn_user, sn_p, sn_bodys)
 
     # ServiceNowのbatchのレスポンス情報の生成
     sn_resp_body = {"messege": "error!!"}
@@ -741,6 +864,70 @@ def test_execute_servicenow_batch_error():
 
             # HTTPCODEとRESPONSE BODYがAPIで返された応答であること
             assert_notification_response(organization_id, workspace_id, queue['PROCESS_EXEC_ID'], 500, json.dumps(sn_resp_body))
+
+
+@mock.patch.dict(os.environ, {"JOB_NOTIFICATION_SERVICENOW_BATCH_MAX_WORKERS": "4"})
+def test_execute_servicenow_batch_invalid_message():
+    """servicenow連携(一括送信) 異常系
+    """
+    testdata = import_module("tests.db.exports.testdata")
+
+    organization_id = list(testdata.ORGANIZATIONS.keys())[0]
+    workspace_id = testdata.ORGANIZATIONS[organization_id]["workspace_id"][0]
+
+    sn_batch_url = "http://sn.dummy/api/batch_url"
+    sn_api_url = "http://sn.dummy/api/api_url"
+    sn_user = "sn_user01"
+    sn_p = "sn-pw01"
+
+    batch_count_limit = 3
+    sn_bodys = [
+        {"field1": "value1-1", "field2": "value1-2"},
+        {"field1": "value2-1", "field2": "value2-2"},
+        {"field1": "value3-1", "field2": "value3-2"},
+        {"field1": "value4-1", "field2": "value4-2"},
+        {"field1": "value5-1", "field2": "value5-2"},
+        {"field1": "value6-1", "field2": "value6-2"},
+        {"field1": "value7-1", "field2": "value7-2"},
+        {"field1": "value8-1", "field2": "value8-2"},
+        {"field1": "value9-1", "field2": "value9-2"},
+        {"field1": "value10-1", "field2": "value10-2"},
+    ]
+
+    queues = make_notification_servicenow_batch_invalid_message(
+        organization_id,
+        workspace_id,
+        sn_batch_url,
+        sn_api_url,
+        sn_user,
+        sn_p,
+        sn_bodys,
+        batch_count_limit=batch_count_limit
+    )
+
+    # ServiceNowのbatchのレスポンス情報の生成
+    sn_resp_body = {"messege": "error!!"}
+
+    with test_common.requsts_mocker_default() as requests_mocker:
+        # ServiceNowへの要求をmockする
+        requests_mocker.register_uri(
+            requests_mock.POST,
+            sn_batch_url,
+            status_code=500,
+            json=sn_resp_body)
+
+        executor = NotificationJobExecutor(queues[0], queues)
+        result = executor.execute_base()
+
+        # 失敗なのでFalseを返すこと
+        assert not result
+
+        for index, queue in enumerate(queues):
+            # ステータスが失敗に更新されていること
+            assert get_notification_status(organization_id, workspace_id, queue['PROCESS_EXEC_ID']) == const.NOTIFICATION_STATUS_FAILED
+
+            # HTTPCODEとRESPONSE BODYがないこと
+            assert_notification_response(organization_id, workspace_id, queue['PROCESS_EXEC_ID'], None, None)
 
 
 def test_execute_no_notification():
@@ -797,68 +984,98 @@ def test_cancel_normally():
     assert get_notification_status(organization_id, workspace_id, queue['PROCESS_EXEC_ID']) == const.NOTIFICATION_STATUS_FAILED
 
 
+@mock.patch.dict(
+    os.environ,
+    {
+        "JOB_NOTIFICATION_CLEANUP_EXPIRED_DAYS": "14",
+        "JOB_NOTIFICATION_CLEANUP_THROTTLE": "2",
+    },
+)
 def test_force_update_status_normally():
     """ 強制ステータス更新正常パターン / Forced status update normal pattern
     """
     testdata = import_module("tests.db.exports.testdata")
 
+    organizations = list(testdata.ORGANIZATIONS.keys())
     datas = [
         {
-            "organization_id": list(testdata.ORGANIZATIONS.keys())[0],
-            "workspace_id": testdata.ORGANIZATIONS[list(testdata.ORGANIZATIONS.keys())[0]]["workspace_id"][0],
+            "organization_id": organizations[0],
+            "workspace_id": testdata.ORGANIZATIONS[organizations[0]]["workspace_id"][0],
             "queue_exists": False,
             "too_old_date": True,
             "expired_date": False,
+            "too_old_processed": False,
             "queue": None,
         },
         {
-            "organization_id": list(testdata.ORGANIZATIONS.keys())[0],
-            "workspace_id": testdata.ORGANIZATIONS[list(testdata.ORGANIZATIONS.keys())[0]]["workspace_id"][1],
+            "organization_id": organizations[0],
+            "workspace_id": testdata.ORGANIZATIONS[organizations[0]]["workspace_id"][1],
             "queue_exists": False,
             "too_old_date": True,
             "expired_date": False,
+            "too_old_processed": False,
             "queue": None,
         },
         {
-            "organization_id": list(testdata.ORGANIZATIONS.keys())[1],
-            "workspace_id": testdata.ORGANIZATIONS[list(testdata.ORGANIZATIONS.keys())[1]]["workspace_id"][0],
+            "organization_id": organizations[1],
+            "workspace_id": testdata.ORGANIZATIONS[organizations[1]]["workspace_id"][0],
             "queue_exists": False,
             "too_old_date": True,
             "expired_date": False,
+            "too_old_processed": False,
             "queue": None,
         },
         {
-            "organization_id": list(testdata.ORGANIZATIONS.keys())[1],
-            "workspace_id": testdata.ORGANIZATIONS[list(testdata.ORGANIZATIONS.keys())[1]]["workspace_id"][0],
+            "organization_id": organizations[1],
+            "workspace_id": testdata.ORGANIZATIONS[organizations[1]]["workspace_id"][1],
             "queue_exists": True,
             "too_old_date": True,
             "expired_date": False,
+            "too_old_processed": False,
             "queue": None,
         },
         {
-            "organization_id": list(testdata.ORGANIZATIONS.keys())[2],
-            "workspace_id": testdata.ORGANIZATIONS[list(testdata.ORGANIZATIONS.keys())[2]]["workspace_id"][0],
+            "organization_id": organizations[2],
+            "workspace_id": testdata.ORGANIZATIONS[organizations[2]]["workspace_id"][0],
             "queue_exists": False,
             "too_old_date": True,
             "expired_date": False,
+            "too_old_processed": False,
             "queue": None,
         },
         {
-            "organization_id": list(testdata.ORGANIZATIONS.keys())[2],
-            "workspace_id": testdata.ORGANIZATIONS[list(testdata.ORGANIZATIONS.keys())[2]]["workspace_id"][0],
+            "organization_id": organizations[2],
+            "workspace_id": testdata.ORGANIZATIONS[organizations[2]]["workspace_id"][0],
             "queue_exists": False,
             "too_old_date": False,
             "expired_date": False,
+            "too_old_processed": False,
             "queue": None,
         },
         {
-            "organization_id": list(testdata.ORGANIZATIONS.keys())[2],
-            "workspace_id": testdata.ORGANIZATIONS[list(testdata.ORGANIZATIONS.keys())[2]]["workspace_id"][0],
+            "organization_id": organizations[2],
+            "workspace_id": testdata.ORGANIZATIONS[organizations[2]]["workspace_id"][0],
             "queue_exists": True,
             "too_old_date": True,
             "expired_date": True,
+            "too_old_processed": False,
             "queue": None,
         },
+        # 期限切れのデータが複数件ある場合、全て更新されることを確認するため、JOB_NOTIFICATION_CLEANUP_THROTTLEの数+1件作成
+        *(
+            {
+                "organization_id": organizations[2],
+                "workspace_id": testdata.ORGANIZATIONS[organizations[2]]["workspace_id"][0],
+                "queue_exists": False,
+                "too_old_date": False,
+                "expired_date": False,
+                "too_old_processed": True,
+                "queue": None,
+            }
+            for _ in range(
+                int(os.environ["JOB_NOTIFICATION_CLEANUP_THROTTLE"]) + 1
+            )
+        ),
     ]
 
     for data in datas:
@@ -904,6 +1121,26 @@ def test_force_update_status_normally():
                     })
                 conn.commit()
 
+        elif data["too_old_processed"]:
+            # データを古い時間に更新
+            with closing(DBconnector().connect_workspacedb(data['organization_id'], data['workspace_id'])) as conn, \
+                    conn.cursor() as cursor:
+
+                cursor.execute(
+                    """
+                    UPDATE T_NOTIFICATION_MESSAGE
+                        SET LAST_UPDATE_TIMESTAMP = DATE_SUB(LAST_UPDATE_TIMESTAMP, INTERVAL %(DAYS)s DAY)
+                        ,   CREATE_TIMESTAMP = DATE_SUB(CREATE_TIMESTAMP, INTERVAL %(DAYS)s DAY)
+                        ,   NOTIFICATION_STATUS = %(NOTIFICATION_STATUS)s
+                        WHERE NOTIFICATION_ID = %(NOTIFICATION_ID)s
+                    """,
+                    {
+                        "NOTIFICATION_ID": queue['PROCESS_EXEC_ID'],
+                        "DAYS": int(os.environ["JOB_NOTIFICATION_CLEANUP_EXPIRED_DAYS"]) + 1,
+                        "NOTIFICATION_STATUS": const.NOTIFICATION_STATUS_FAILED
+                    })
+                conn.commit()
+
     # 強制ステータス更新を実行
     NotificationJobExecutor.force_update_status()
     # データの更新状況を確認
@@ -913,6 +1150,9 @@ def test_force_update_status_normally():
             assert status == const.NOTIFICATION_STATUS_ABORTED_EXPIRED, f"assert status data[{i}]"
             with closing(DBconnector().connect_platformdb()) as conn_pf:
                 assert not jobs_common.exists_queue(conn_pf, data['queue']['PROCESS_EXEC_ID'])
+        elif data["too_old_processed"]:
+            # 日付が古く、かつ処理済みのデータは削除される
+            assert status is None, f"assert status data[{i}]"
         elif data['queue_exists']:
             # queueに情報が残っている場合は、日時とは関係なく更新しない
             assert status == const.NOTIFICATION_STATUS_UNSENT, f"assert status data[{i}]"
@@ -1164,7 +1404,7 @@ def make_notification_mail(organization_id: str, workspace_id: str, mails_to: li
     return queue
 
 
-def make_notification_servicenow_one(organization_id: str, workspace_id: str, sn_api_uri: str, sn_user: str, sn_pw: str, body: dict):
+def make_notification_servicenow_one(organization_id: str, workspace_id: str, sn_api_uri: str, sn_user: str, sn_p: str, body: dict):
     process_id = ulid.new().str
     notification_id = ulid.new().str
 
@@ -1174,7 +1414,7 @@ def make_notification_servicenow_one(organization_id: str, workspace_id: str, sn
         "DESTINATION_INFORMATIONS": encrypt.encrypt_str(json.dumps(
             [{
                 "servicenow_user": sn_user,
-                "servicenow_password": sn_pw,
+                "servicenow_password": sn_p,
                 "table_api_url": sn_api_uri
             }])),
         "MESSAGE_INFORMATIONS": json.dumps({"title": "dummy-title", "message" : json.dumps(body)}),
@@ -1222,9 +1462,9 @@ def make_notification_servicenow_one(organization_id: str, workspace_id: str, sn
     return queue
 
 
-def make_notification_servicenow_batch(organization_id, workspace_id, sn_batch_url, sn_api_url, sn_user, sn_pw, sn_bodys):
+def make_notification_servicenow_batch(organization_id, workspace_id, sn_batch_url, sn_api_url, sn_user, sn_p, sn_bodys, batch_count_limit=100):
     queues = []
-    
+
     with closing(DBconnector().connect_workspacedb(organization_id, workspace_id)) as conn, \
             conn.cursor() as cursor:
 
@@ -1240,16 +1480,16 @@ def make_notification_servicenow_batch(organization_id, workspace_id, sn_batch_u
                 "DESTINATION_INFORMATIONS": encrypt.encrypt_str(json.dumps(
                     [{
                         "servicenow_user": sn_user,
-                        "servicenow_password": sn_pw,
+                        "servicenow_password": sn_p,
                         "batch_api_url": sn_batch_url,
                         "table_api_url": sn_api_url
                     }])),
-                "MESSAGE_INFORMATIONS": json.dumps({"title": "dummy-title", "message" : json.dumps(sn_body)}),
+                "MESSAGE_INFORMATIONS": json.dumps({"title": "dummy-title", "message": json.dumps(sn_body)}),
                 "NOTIFICATION_STATUS": const.NOTIFICATION_STATUS_UNSENT,
                 "CREATE_USER": job_manager_const.SYSTEM_USER_ID,
                 "LAST_UPDATE_USER": job_manager_const.SYSTEM_USER_ID,
             }
-            
+
             cursor.execute("""
                     INSERT INTO T_NOTIFICATION_MESSAGE
                         (
@@ -1270,16 +1510,111 @@ def make_notification_servicenow_batch(organization_id, workspace_id, sn_batch_u
                             %(LAST_UPDATE_USER)s
                         )
                 """, data)
-            
+
             queues.append({
                 "PROCESS_ID": process_id,
                 "PROCESS_KIND": const.PROCESS_KIND_NOTIFICATION,
                 "PROCESS_EXEC_ID": notification_id,
                 "ORGANIZATION_ID": organization_id,
                 "WORKSPACE_ID": workspace_id,
+                "ENABLE_BATCH": 0,
+                "BATCH_PERIOD_SECONDS": None,
+                "BATCH_COUNT_LIMIT": batch_count_limit,
+                "BATCH_GROUP_KEY": None,
                 "LAST_UPDATE_USER": job_manager_const.SYSTEM_USER_ID,
                 "LAST_UPDATE_TIMESTAMP": str(datetime.datetime.now()),
             })
+
+        conn.commit()
+
+    # test_common.insert_queue([queue])
+    return queues
+
+
+def make_notification_servicenow_batch_invalid_message(
+    organization_id,
+    workspace_id,
+    sn_batch_url,
+    sn_api_url,
+    sn_user,
+    sn_p,
+    sn_bodys,
+    batch_count_limit=100,
+):
+    queues = []
+    template = "Invalid message format test: {field1} {field2}"
+
+    db = DBconnector().connect_workspacedb(organization_id, workspace_id)
+    with closing(db) as conn, conn.cursor() as cursor:
+
+        conn.begin()
+
+        for sn_body in sn_bodys:
+            notification_id = ulid.new().str
+            process_id = ulid.new().str
+
+            data = {
+                "NOTIFICATION_ID": notification_id,
+                "DESTINATION_KIND": const.DESTINATION_KIND_SERVICENOW,
+                "DESTINATION_INFORMATIONS": encrypt.encrypt_str(
+                    json.dumps(
+                        [
+                            {
+                                "servicenow_user": sn_user,
+                                "servicenow_password": sn_p,
+                                "batch_api_url": sn_batch_url,
+                                "table_api_url": sn_api_url,
+                            }
+                        ]
+                    )
+                ),
+                "MESSAGE_INFORMATIONS": json.dumps(
+                    {"title": "dummy-title", "message": template.format(**sn_body)}
+                ),
+                "NOTIFICATION_STATUS": const.NOTIFICATION_STATUS_UNSENT,
+                "CREATE_USER": job_manager_const.SYSTEM_USER_ID,
+                "LAST_UPDATE_USER": job_manager_const.SYSTEM_USER_ID,
+            }
+
+            cursor.execute(
+                """
+                    INSERT INTO T_NOTIFICATION_MESSAGE
+                        (
+                            NOTIFICATION_ID,
+                            DESTINATION_KIND,
+                            DESTINATION_INFORMATIONS,
+                            MESSAGE_INFORMATIONS,
+                            NOTIFICATION_STATUS,
+                            CREATE_USER,
+                            LAST_UPDATE_USER
+                        ) VALUES (
+                            %(NOTIFICATION_ID)s,
+                            %(DESTINATION_KIND)s,
+                            %(DESTINATION_INFORMATIONS)s,
+                            %(MESSAGE_INFORMATIONS)s,
+                            %(NOTIFICATION_STATUS)s,
+                            %(CREATE_USER)s,
+                            %(LAST_UPDATE_USER)s
+                        )
+                """,
+                data,
+            )
+
+            queues.append(
+                {
+                    "PROCESS_ID": process_id,
+                    "PROCESS_KIND": const.PROCESS_KIND_NOTIFICATION,
+                    "PROCESS_EXEC_ID": notification_id,
+                    "ORGANIZATION_ID": organization_id,
+                    "WORKSPACE_ID": workspace_id,
+                    "ENABLE_BATCH": 0,
+                    "BATCH_PERIOD_SECONDS": None,
+                    "BATCH_COUNT_LIMIT": batch_count_limit,
+                    "BATCH_GROUP_KEY": None,
+                    "LAST_UPDATE_USER": job_manager_const.SYSTEM_USER_ID,
+                    "LAST_UPDATE_TIMESTAMP": str(datetime.datetime.now()),
+                }
+            )
 
         conn.commit()
 

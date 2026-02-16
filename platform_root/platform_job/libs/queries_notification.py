@@ -26,6 +26,13 @@ UPDATE T_NOTIFICATION_MESSAGE
     AND     NOTIFICATION_STATUS =   %(notification_status_now)s
 """
 
+SQL_CLEANUP_NOTIFICATION_MESSAGE = """
+DELETE FROM T_NOTIFICATION_MESSAGE
+    WHERE   NOTIFICATION_STATUS     <>  %(notification_status)s
+    AND     CREATE_TIMESTAMP        <   %(create_timestamp)s
+LIMIT %(cleanup_throttle)s
+"""
+
 SQL_QUERY_NOTIFICATION_MESSAGE_UNSENT_LONGTIME = """
 SELECT * FROM T_NOTIFICATION_MESSAGE
     WHERE   NOTIFICATION_STATUS     =   %(notification_status)s
