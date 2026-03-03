@@ -144,7 +144,7 @@ class LanguageList:
     lang_array['000-00222'] = 'Notifications destination ServiceNow Send Interval (seconds)'
     lang_array['000-00223'] = 'Notifications destination ServiceNow Maximum number of messages sent at one time'
     lang_array['000-00224'] = '1.New event (received)'
-    lang_array['000-00225'] = '2.New event (consolidated)'
+    lang_array['000-00225'] = '2.New event (consolidate)'
     lang_array['000-62001'] = 'Processing type'
     lang_array['000-62002'] = 'Registration or Update or Delete'
     #
@@ -484,7 +484,7 @@ class LanguageList:
     lang_array['000-87049'] = 'Update password'
     lang_array['000-87050'] = 'ServiceNow API URL (Individual registration): URL format<br>ServiceNow User: ServiceNow User name<br>ServiceNow Password: ServiceNow Password<br><br>*If you want to register in bulk using the batch API, check "Bulk registration" and enter the following.<br>ServiceNow API URL (Bulk registration): Enter the ServiceNow Batch API URL.<br>Send Interval (seconds): Specify the interval for executing bulk registration. The batch API will be called every number of seconds specified here. Input range: 1 ~ 3600<br>Maximum number of messages sent at one time: Specify the maximum number of messages to be sent when performing bulk registration. Allowed range: 1 ~ 10000'
     lang_array['000-87051'] = 'Notification of event reception (however, events determined to be identical will not be notified if duplicate elimination settings are configured)'
-    lang_array['000-87052'] = 'Notification when received events are consolidated'
+    lang_array['000-87052'] = 'Notifications are sent upon first event reception in redundant groups with deduplication settings'
     lang_array['000-88001'] = 'Settings Notification Destination details / Notification Management / Exastro Platform'
     lang_array['000-88002'] = 'Email sending server settings'
     lang_array['000-88003'] = 'Please set up your email sending smtp server.'
