@@ -47,8 +47,8 @@ SQL_ALTER_TABLES = [
     }
 ]
 
-# 通知のイベント種別に「新規イベント（受信時）」「新規イベント（統合時）」を追加
-# Add "New Event (On Receipt)" and "New Event (On Consolidation)" to the event types for notifications
+# 通知のイベント種別に「新規イベント（受信時）」「新規イベント（統合予定）」を追加
+# Add "New Event (On Receipt)" and "New Event (Consolidate)" to the event types for notifications
 SQL_UPDATE_M_NOTIFICATION_DESTINATION = """
 UPDATE  M_NOTIFICATION_DESTINATION
 SET CONDITIONS = JSON_MERGE_PATCH(
