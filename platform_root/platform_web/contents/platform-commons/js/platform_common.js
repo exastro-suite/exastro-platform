@@ -1301,9 +1301,9 @@ const settings_notifications_common = {
             .replace(/\${conditions_remarks}/g, getText("000-87051", "イベント受信の通知（ただし、重複排除設定があった場合、同一と判断されたイベントは通知されません）"))
             ;
         html += row_template_3rd
-            .replace(/\${conditions_name}/g, getText("000-00225", '2.新規イベント（統合時）'))
+            .replace(/\${conditions_name}/g, getText("000-00225", '2.新規イベント（統合予定）'))
             .replace(/\${conditions_key}/g, 'ita_event_type_new_consolidated')
-            .replace(/\${conditions_remarks}/g, getText("000-87052", "受信したイベントが統合された場合の通知"))
+            .replace(/\${conditions_remarks}/g, getText("000-87052", "重複排除設定のある冗長グループにおいて、最初のイベント受信時に通知"))
             ;
         html += row_template_3rd
             .replace(/\${conditions_name}/g, getText("000-00153", '3.新規イベント（判定前）'))
