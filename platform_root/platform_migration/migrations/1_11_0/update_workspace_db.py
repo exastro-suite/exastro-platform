@@ -210,8 +210,8 @@ class update_workspace_db:
                     globals.logger.info(f"SKIP ALTER TABLE : {sql_alter_table['COLUMN_TO_ADD']['TABLE_NAME']}")
                     self.skip_count += 1
 
-            # 通知設定の追加(新規イベント（受信時）・新規イベント（統合時）)
-            # Add notification settings (new event (received), new event (consolidated))
+            # 通知設定の追加(新規イベント（受信時）・新規イベント（統合予定）)
+            # Add notification settings (new event (received), new event (consolidate))
             sql_update_table = queries_db_workspace.SQL_UPDATE_M_NOTIFICATION_DESTINATION
             globals.logger.info(f"SQL EXECUUTE:{sql_update_table}")
             with conn.cursor() as cur:
