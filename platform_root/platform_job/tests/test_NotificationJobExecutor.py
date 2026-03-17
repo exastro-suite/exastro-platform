@@ -751,14 +751,14 @@ def test_execute_servicenow_batch_partially_failed():
     sn_auth_header = 'Basic ' + base64.b64encode(f'{sn_user}:{sn_p}'.encode('utf-8')).decode('utf-8')
 
     sn_bodys = [
-        {"field1": "value1-1", "field2": "value1-2"},
+        "invalid_body",  # 1件目はbodyが不正で失敗させる
         {"field1": "value2-1", "field2": "value2-2"},
         {"field1": "value3-1", "field2": "value3-2"},
         {"field1": "value4-1", "field2": "value4-2"},
     ]
 
     sn_resps = [
-        {"status": 200, "body": {"unit-test-response": "1-OK"}},
+        None,  # 1件目はbodyが不正で失敗させるので、レスポンスは設定しない
         {"status": 400, "body": {"unit-test-response": "2-OK"}},
         {"status": 401, "body": {"unit-test-response": "3-OK"}},
         {"status": 200, "body": {"unit-test-response": "4-OK"}},
@@ -775,6 +775,7 @@ def test_execute_servicenow_batch_partially_failed():
                 "body": base64.b64encode(json.dumps(sn_resp["body"]).encode()).decode('ascii')
             }
             for index, sn_resp in enumerate(sn_resps)
+            if sn_resp is not None
         ]
     }
 
@@ -794,11 +795,27 @@ def test_execute_servicenow_batch_partially_failed():
 
         for index, queue in enumerate(queues):
             # ステータスがstatus_code毎に更新されていること
-            assert get_notification_status(organization_id, workspace_id, queue['PROCESS_EXEC_ID']) \
-                == const.NOTIFICATION_STATUS_SUCCESSFUL if sn_resps[index]["status"] == 200 else const.NOTIFICATION_STATUS_FAILED
+            assert get_notification_status(
+                organization_id, workspace_id, queue["PROCESS_EXEC_ID"]
+            ) == (
+                const.NOTIFICATION_STATUS_SUCCESSFUL
+                if sn_resps[index] is not None and sn_resps[index]["status"] == 200
+                else const.NOTIFICATION_STATUS_FAILED
+            )
 
             # HTTPCODEとRESPONSE BODYが更新されていること
-            assert_notification_response(organization_id, workspace_id, queue['PROCESS_EXEC_ID'], sn_resps[index]["status"], json.dumps(sn_resps[index]["body"]))
+            assert_notification_response(
+                organization_id,
+                workspace_id,
+                queue["PROCESS_EXEC_ID"],
+                sn_resps[index]["status"] if sn_resps[index] is not None else None,
+                (
+                    json.dumps(sn_resps[index]["body"])
+                    if sn_resps[index] is not None
+                    and sn_resps[index]["status"] is not None
+                    else None
+                ),
+            )
 
         # sn_batch_urlへの要求を取得する
         sn_requests_history = [his for his in requests_mocker.request_history if his.url == sn_batch_url]
@@ -1417,7 +1434,7 @@ def make_notification_servicenow_one(organization_id: str, workspace_id: str, sn
                 "servicenow_password": sn_p,
                 "table_api_url": sn_api_uri
             }])),
-        "MESSAGE_INFORMATIONS": json.dumps({"title": "dummy-title", "message" : json.dumps(body)}),
+        "MESSAGE_INFORMATIONS": json.dumps({"title": "dummy-title", "message": json.dumps(body)}),
         "NOTIFICATION_STATUS": const.NOTIFICATION_STATUS_UNSENT,
         "CREATE_USER": job_manager_const.SYSTEM_USER_ID,
         "LAST_UPDATE_USER": job_manager_const.SYSTEM_USER_ID,
@@ -1462,13 +1479,30 @@ def make_notification_servicenow_one(organization_id: str, workspace_id: str, sn
     return queue
 
 
-def make_notification_servicenow_batch(organization_id, workspace_id, sn_batch_url, sn_api_url, sn_user, sn_p, sn_bodys, batch_count_limit=100):
+def make_notification_servicenow_batch(
+    organization_id,
+    workspace_id,
+    sn_batch_url,
+    sn_api_url,
+    sn_user,
+    sn_p,
+    sn_bodys,
+    batch_count_limit=100,
+):
     queues = []
 
-    with closing(DBconnector().connect_workspacedb(organization_id, workspace_id)) as conn, \
-            conn.cursor() as cursor:
+    with closing(
+        DBconnector().connect_workspacedb(organization_id, workspace_id)
+    ) as conn, conn.cursor() as cursor:
 
         conn.begin()
+
+        def _dump_json_passthrough(obj):
+            try:
+                return json.dumps(obj)
+            except (TypeError, ValueError):
+                # passthrough if not JSON serializable
+                return obj
 
         for sn_body in sn_bodys:
             notification_id = ulid.new().str
@@ -1477,20 +1511,31 @@ def make_notification_servicenow_batch(organization_id, workspace_id, sn_batch_u
             data = {
                 "NOTIFICATION_ID": notification_id,
                 "DESTINATION_KIND": const.DESTINATION_KIND_SERVICENOW,
-                "DESTINATION_INFORMATIONS": encrypt.encrypt_str(json.dumps(
-                    [{
-                        "servicenow_user": sn_user,
-                        "servicenow_password": sn_p,
-                        "batch_api_url": sn_batch_url,
-                        "table_api_url": sn_api_url
-                    }])),
-                "MESSAGE_INFORMATIONS": json.dumps({"title": "dummy-title", "message": json.dumps(sn_body)}),
+                "DESTINATION_INFORMATIONS": encrypt.encrypt_str(
+                    json.dumps(
+                        [
+                            {
+                                "servicenow_user": sn_user,
+                                "servicenow_password": sn_p,
+                                "batch_api_url": sn_batch_url,
+                                "table_api_url": sn_api_url,
+                            }
+                        ]
+                    )
+                ),
+                "MESSAGE_INFORMATIONS": json.dumps(
+                    {
+                        "title": "dummy-title",
+                        "message": _dump_json_passthrough(sn_body),
+                    }
+                ),
                 "NOTIFICATION_STATUS": const.NOTIFICATION_STATUS_UNSENT,
                 "CREATE_USER": job_manager_const.SYSTEM_USER_ID,
                 "LAST_UPDATE_USER": job_manager_const.SYSTEM_USER_ID,
             }
 
-            cursor.execute("""
+            cursor.execute(
+                """
                     INSERT INTO T_NOTIFICATION_MESSAGE
                         (
                             NOTIFICATION_ID,
@@ -1509,21 +1554,25 @@ def make_notification_servicenow_batch(organization_id, workspace_id, sn_batch_u
                             %(CREATE_USER)s,
                             %(LAST_UPDATE_USER)s
                         )
-                """, data)
+                """,
+                data,
+            )
 
-            queues.append({
-                "PROCESS_ID": process_id,
-                "PROCESS_KIND": const.PROCESS_KIND_NOTIFICATION,
-                "PROCESS_EXEC_ID": notification_id,
-                "ORGANIZATION_ID": organization_id,
-                "WORKSPACE_ID": workspace_id,
-                "ENABLE_BATCH": 0,
-                "BATCH_PERIOD_SECONDS": None,
-                "BATCH_COUNT_LIMIT": batch_count_limit,
-                "BATCH_GROUP_KEY": None,
-                "LAST_UPDATE_USER": job_manager_const.SYSTEM_USER_ID,
-                "LAST_UPDATE_TIMESTAMP": str(datetime.datetime.now()),
-            })
+            queues.append(
+                {
+                    "PROCESS_ID": process_id,
+                    "PROCESS_KIND": const.PROCESS_KIND_NOTIFICATION,
+                    "PROCESS_EXEC_ID": notification_id,
+                    "ORGANIZATION_ID": organization_id,
+                    "WORKSPACE_ID": workspace_id,
+                    "ENABLE_BATCH": 0,
+                    "BATCH_PERIOD_SECONDS": None,
+                    "BATCH_COUNT_LIMIT": batch_count_limit,
+                    "BATCH_GROUP_KEY": None,
+                    "LAST_UPDATE_USER": job_manager_const.SYSTEM_USER_ID,
+                    "LAST_UPDATE_TIMESTAMP": str(datetime.datetime.now()),
+                }
+            )
 
         conn.commit()
 
