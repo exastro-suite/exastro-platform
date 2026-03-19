@@ -1503,12 +1503,12 @@ def validate_destination_conditions(conditions):
     if conditions.get('ita', {}).get('event_type', {}).get('new_consolidated', None) is None:
         return result(
             False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
-            multi_lang.get_text('000-00218', "2.新規イベント（統合時）")
+            multi_lang.get_text('000-00218', "2.新規イベント（統合予定）")
         )
     if type(conditions.get('ita', {}).get('event_type', {}).get('new_consolidated', None)) is not bool:
         return result(
             False, 400, '400-{}024'.format(MSG_FUNCTION_ID), 'True/False 以外が指定されています。({0})',
-            multi_lang.get_text('000-00218', "2.新規イベント（統合時）")
+            multi_lang.get_text('000-00218', "2.新規イベント（統合予定）")
         )
 
     if conditions.get('ita', {}).get('event_type', {}).get('new', None) is None:

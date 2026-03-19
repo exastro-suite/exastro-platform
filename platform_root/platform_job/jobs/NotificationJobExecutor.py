@@ -506,7 +506,8 @@ class NotificationJobExecutor(BaseJobExecutor):
                         "url": table_api_path,
                         "method": "POST",
                         "body": NotificationJobExecutor.__encode_servicenow_batch_body(
-                            message_infomations_list[index].get("message", "{}")
+                            message_infomations_list[index].get("message", "{}"),
+                            queue["PROCESS_EXEC_ID"],
                         ),
                     },
                 )
@@ -522,14 +523,21 @@ class NotificationJobExecutor(BaseJobExecutor):
         try:
             resp_webhook_text = None
             globals.logger.debug("start requests.post")
+            json_body = {
+                "batch_request_id": next(iter(rest_requests.keys())),
+                "rest_requests": [
+                    rest_request
+                    for _, rest_request in rest_requests.values()
+                    if rest_request.get("body") is not None
+                ],
+            }
+            if len(json_body["rest_requests"]) == 0:
+                # 全てのリクエストのbodyが不正でエンコードできなかった場合は、batch APIに送信せずに全て失敗とする
+                return
+
             response = requests.post(
                 destination_information["batch_api_url"],
-                json={
-                    "batch_request_id": next(iter(rest_requests.keys())),
-                    "rest_requests": [
-                        rest_request for _, rest_request in rest_requests.values()
-                    ],
-                },
+                json=json_body,
                 headers={
                     "Content-type": "application/json",
                     "Accept": "application/json",
@@ -564,9 +572,7 @@ class NotificationJobExecutor(BaseJobExecutor):
                     continue
 
                 notification_result = notification_results[index]
-                if (
-                    200 <= serviced_request.get("status_code") < 300
-                ):
+                if 200 <= serviced_request.get("status_code") < 300:
                     notification_result["status"] = const.NOTIFICATION_STATUS_SUCCESSFUL
                 else:
                     notification_result["status"] = const.NOTIFICATION_STATUS_FAILED
@@ -607,7 +613,7 @@ class NotificationJobExecutor(BaseJobExecutor):
         return relative_url
 
     @staticmethod
-    def __encode_servicenow_batch_body(json_message: str) -> str:
+    def __encode_servicenow_batch_body(json_message: str, process_exec_id: str | None = None) -> str:
         """ServiceNow batch API用のbodyエンコード
 
         Args:
@@ -616,10 +622,15 @@ class NotificationJobExecutor(BaseJobExecutor):
         Returns:
             str: エンコード済みメッセージ
         """
-        loaded_message = json.loads(json_message)
-        utf8_message = json.dumps(loaded_message).encode('utf-8')
-        base64_message = base64.b64encode(utf8_message).decode('ascii')
-        return base64_message
+        try:
+            loaded_message = json.loads(json_message)
+            utf8_message = json.dumps(loaded_message).encode('utf-8')
+            base64_message = base64.b64encode(utf8_message).decode('ascii')
+            return base64_message
+        except json.JSONDecodeError as err:
+            globals.logger.warning(f'Cannot decode message[id:{process_exec_id}] as JSON: {err}\n-- message --\n{err.doc}\n-- stack trace --\n{traceback.format_exc()}')
+        except Exception as err:
+            globals.logger.warning(f'{err}\n-- stack trace --\n{traceback.format_exc()}')
 
     def __send_message_mail(self, destination_informations, message_infomations):
         """mailへのメッセージ送信 / Send messages to email

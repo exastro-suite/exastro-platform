@@ -635,14 +635,14 @@ def queue_grouping(queue: list, group_key: str, group_null_vale: str, sort_key: 
         return {
             key: list(rows)
             for key, rows in itertools.groupby(
-                sorted(queue, key=lambda x: x[group_key]),
+                sorted(queue, key=lambda x: x[group_key] if x[group_key] is not None else group_null_vale),
                 lambda x: x[group_key] if x[group_key] is not None else group_null_vale)
         }
     else:
         return {
-            key: sorted(list(rows), key=lambda x: x[sort_key])
+            key: sorted(list(rows), key=lambda x: x[sort_key] if x[sort_key] is not None else group_null_vale)
             for key, rows in itertools.groupby(
-                sorted(queue, key=lambda x: x[group_key]),
+                sorted(queue, key=lambda x: x[group_key] if x[group_key] is not None else group_null_vale),
                 lambda x: x[group_key] if x[group_key] is not None else group_null_vale)
         }
 
