@@ -26,6 +26,17 @@ UPDATE T_NOTIFICATION_MESSAGE
     AND     NOTIFICATION_STATUS =   %(notification_status_now)s
 """
 
+SQL_UPDATE_STATUS_NOTIFICATION_MESSAGE_WITH_RETRY = """
+UPDATE T_NOTIFICATION_MESSAGE
+    SET NOTIFICATION_STATUS     =   %(notification_status)s
+    ,   LAST_UPDATE_USER        =   %(last_update_user)s
+    ,   HTTP_RESPONSE_CODE      =   %(http_response_code)s
+    ,   HTTP_RESPONSE_BODY      =   %(http_response_body)s
+    ,   RETRY_COUNT             =   %(retry_count)s
+    WHERE   NOTIFICATION_ID     =   %(notification_id)s
+    AND     NOTIFICATION_STATUS =   %(notification_status_now)s
+"""
+
 SQL_CLEANUP_NOTIFICATION_MESSAGE = """
 DELETE FROM T_NOTIFICATION_MESSAGE
     WHERE   NOTIFICATION_STATUS     <>  %(notification_status)s
