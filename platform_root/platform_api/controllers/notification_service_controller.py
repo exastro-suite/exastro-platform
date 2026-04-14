@@ -216,14 +216,17 @@ def settings_notification_create(body, organization_id, workspace_id):  # noqa: 
         validate = validation.validate_destination_kind(row.get('kind'))
         if not validate.ok:
             return common.response_validation_error(validate)
+        # TODO: enable_retryとretry_count_limitをbodyから受け取るようにする
+        enable_retry = os.environ.get("DEFAULT_ENABLE_RETRY", "false").lower() == "true"
+        retry_count_limit = int(os.environ.get("DEFAULT_RETRY_COUNT_LIMIT", 0)) if enable_retry else None
         validate = validation.validate_destination_informations(
             row.get("kind"),
             row.get("destination_informations"),
             row.get("enable_batch"),
             row.get("batch_period_seconds"),
             row.get("batch_count_limit"),
-            row.get("enable_retry"),
-            row.get("retry_count_limit"),
+            enable_retry,
+            retry_count_limit,
             "create",
         )
         if not validate.ok:
@@ -289,6 +292,9 @@ def settings_notification_create(body, organization_id, workspace_id):  # noqa: 
         with conn.cursor() as cursor:
             for row in body:
                 try:
+                    # TODO: enable_retryとretry_count_limitをbodyから受け取るようにする
+                    enable_retry = os.environ.get("DEFAULT_ENABLE_RETRY", "false").lower() == "true"
+                    retry_count_limit = int(os.environ.get("DEFAULT_RETRY_COUNT_LIMIT", 0)) if enable_retry else None
                     parameter = {
                         "destination_id": row.get('id'),
                         "destination_name": row.get('name'),
@@ -298,8 +304,8 @@ def settings_notification_create(body, organization_id, workspace_id):  # noqa: 
                         "enable_batch": 1 if row.get('enable_batch') else 0,
                         "batch_period_seconds": row.get('batch_period_seconds') if row.get('enable_batch') else None,
                         "batch_count_limit": row.get('batch_count_limit') if row.get('enable_batch') else None,
-                        "enable_retry": 1 if row.get('enable_batch') and row.get('enable_retry') else 0,
-                        "retry_count_limit": row.get('retry_count_limit') if row.get('enable_batch') and row.get('enable_retry') else None,
+                        "enable_retry": 1 if row.get('enable_batch') and enable_retry else 0,
+                        "retry_count_limit": retry_count_limit if row.get('enable_batch') and enable_retry else None,
                         "create_user": user_id,
                         "last_update_user": user_id
                     }
