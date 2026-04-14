@@ -187,6 +187,8 @@ class NotificationJobExecutor(BaseJobExecutor):
                                 "retry_count_limit": row['RETRY_COUNT_LIMIT'],
                                 "retry_count": row['RETRY_COUNT'],
                                 "is_retry": False,
+                                "is_lost": False,
+                                "lost_reason": None,
                             }
                         )
                         retry_informations.append(
@@ -218,6 +220,32 @@ class NotificationJobExecutor(BaseJobExecutor):
                         destination_informations_list,
                         message_infomations_list,
                         retry_informations,
+                    )
+
+                # メッセージの送信に失敗していて、かつメッセージの内容に問題があるなどの理由でリトライもできない場合は、ロストメッセージとしてカウントする
+                lost_messages_count = 0
+                lost_messages_summary_by_reason = {}
+                for result in (
+                    r for r in notification_results if r and r.get("is_lost")
+                ):
+                    lost_reason = result["lost_reason"]
+
+                    lost_messages_summary = lost_messages_summary_by_reason.setdefault(
+                        lost_reason, {"count": 0, "lost_ids": []}
+                    )
+                    lost_messages_summary["count"] += 1
+                    lost_messages_summary["lost_ids"].append(result.get("lost_id"))
+                    lost_messages_count += 1
+                if lost_messages_count > 0:
+                    # Losted messages summary [{lost_messages_count}]: {reason1} {count1} messages [id: {id1_1}, {id1_2}, ...], {reason2} {count2} messages [id: {id2_1}, {id2_2}, ...], ...
+                    lost_messages_summary = ", ".join(
+                        [
+                            f'{reason} {info["count"]} messages [id: {", ".join(info["lost_ids"])}]'
+                            for reason, info in lost_messages_summary_by_reason.items()
+                        ]
+                    )
+                    globals.logger.warning(
+                        f"Losted messages summary [{lost_messages_count}]: {lost_messages_summary}"
                     )
 
                 # 送信結果を書き込む / Write the transmission result
@@ -498,6 +526,8 @@ class NotificationJobExecutor(BaseJobExecutor):
                 "retry_count_limit": retry_information.get("retry_count_limit"),
                 "retry_count": retry_information.get("retry_count"),
                 "is_retry": False,
+                "is_lost": False,
+                "lost_reason": None,
             }
             for retry_information in retry_informations
         ]
@@ -563,6 +593,7 @@ class NotificationJobExecutor(BaseJobExecutor):
                         "body": NotificationJobExecutor.__encode_servicenow_batch_body(
                             message_infomations_list[index].get("message", "{}"),
                             queue["PROCESS_EXEC_ID"],
+                            notification_results[index],
                         ),
                     },
                 )
@@ -645,6 +676,10 @@ class NotificationJobExecutor(BaseJobExecutor):
                             globals.logger.warning(
                                 f"Cannot send message[id:{request['id']}]: reached retry limit.\n-- message --\n{message}"
                             )
+                            # リトライ対象で、かつリトライ回数がリトライ上限に達しているものは失われたメッセージとしてカウントする
+                            notification_result["is_lost"] = True
+                            notification_result["lost_reason"] = "Reached retry limit"
+                            notification_result["lost_id"] = request["id"]
 
                 notification_result["http_response_code"] = serviced_request.get(
                     "status_code"
@@ -671,6 +706,10 @@ class NotificationJobExecutor(BaseJobExecutor):
                         globals.logger.warning(
                             f"Cannot send message[id:{request['id']}]: reached retry limit.\n-- message --\n{message}"
                         )
+                        # リトライ対象で、かつリトライ回数がリトライ上限に達しているものは失われたメッセージとしてカウントする
+                        notification_result["is_lost"] = True
+                        notification_result["lost_reason"] = "Reached retry limit"
+                        notification_result["lost_id"] = request["id"]
             globals.logger.warning(
                 f"{err}\n-- stack trace --\n{traceback.format_exc()}"
             )
@@ -699,7 +738,11 @@ class NotificationJobExecutor(BaseJobExecutor):
         return relative_url
 
     @staticmethod
-    def __encode_servicenow_batch_body(json_message: str, process_exec_id: str | None = None) -> str:
+    def __encode_servicenow_batch_body(
+        json_message: str,
+        process_exec_id: str | None = None,
+        notification_result: dict | None = None,
+    ) -> str:
         """ServiceNow batch API用のbodyエンコード
 
         Args:
@@ -715,8 +758,16 @@ class NotificationJobExecutor(BaseJobExecutor):
             return base64_message
         except json.JSONDecodeError as err:
             globals.logger.warning(f'Cannot decode message[id:{process_exec_id}] as JSON: {err}\n-- message --\n{err.doc}\n-- stack trace --\n{traceback.format_exc()}')
+            if notification_result is not None:
+                notification_result["is_lost"] = True
+                notification_result["lost_reason"] = "JSON error"
+                notification_result["lost_id"] = process_exec_id
         except Exception as err:
-            globals.logger.warning(f'{err}\n-- stack trace --\n{traceback.format_exc()}')
+            globals.logger.warning(f'Unknown JSON error: {err}\n-- message --\n{json_message}\n-- stack trace --\n{traceback.format_exc()}')
+            if notification_result is not None:
+                notification_result["is_lost"] = True
+                notification_result["lost_reason"] = "Unknown JSON error"
+                notification_result["lost_id"] = process_exec_id
 
     def __send_message_mail(self, destination_informations, message_infomations):
         """mailへのメッセージ送信 / Send messages to email
