@@ -694,9 +694,12 @@ class NotificationJobExecutor(BaseJobExecutor):
                 ).decode()
 
         except Exception as err:
-            # バッチ送信APIで例外が発生した場合は、全件リトライ対象チェックして、
+            # バッチ送信APIで例外が発生した場合は、全件リトライ対象チェック
             for index, request in rest_requests.values():
                 notification_result = notification_results[index]
+                if notification_result["is_lost"]:
+                    # すでに失われたメッセージとしてカウントされているものはスキップする
+                    continue
                 if notification_result["enable_retry"] == 1:
                     if (
                         notification_result["retry_count"]
