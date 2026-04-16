@@ -676,12 +676,12 @@ class NotificationJobExecutor(BaseJobExecutor):
                             globals.logger.warning(
                                 f"Cannot send message[id:{request['id']}]: reached retry limit.\n-- message --\n{message}"
                             )
-                            # リトライ対象で、かつリトライ回数がリトライ上限に達しているものは失われたメッセージとしてカウントする
+                            # リトライ対象で、かつリトライ回数がリトライ上限に達しているものはロストメッセージとしてカウントする
                             notification_result["is_lost"] = True
                             notification_result["lost_reason"] = "Reached retry limit"
                             notification_result["lost_id"] = request["id"]
                     else:
-                        # リトライ対象外の場合は、失われたメッセージとしてカウントする
+                        # リトライ対象外の場合は、ロストメッセージとしてカウントする
                         notification_result["is_lost"] = True
                         notification_result["lost_reason"] = "Not eligible for retry"
                         notification_result["lost_id"] = request["id"]
@@ -696,10 +696,10 @@ class NotificationJobExecutor(BaseJobExecutor):
         except Exception as err:
             # バッチ送信APIで例外が発生した場合は、全件リトライ対象チェック
             for index, request in rest_requests.values():
-                notification_result = notification_results[index]
-                if notification_result["is_lost"]:
-                    # すでに失われたメッセージとしてカウントされているものはスキップする
+                if request["body"] is None:
+                    # JSONのエンコードに失敗してbodyが作成できなかったリクエストは、リトライ対象外のため処理しない
                     continue
+                notification_result = notification_results[index]
                 if notification_result["enable_retry"] == 1:
                     if (
                         notification_result["retry_count"]
@@ -714,12 +714,12 @@ class NotificationJobExecutor(BaseJobExecutor):
                         globals.logger.warning(
                             f"Cannot send message[id:{request['id']}]: reached retry limit.\n-- message --\n{message}"
                         )
-                        # リトライ対象で、かつリトライ回数がリトライ上限に達しているものは失われたメッセージとしてカウントする
+                        # リトライ対象で、かつリトライ回数がリトライ上限に達しているものはロストメッセージとしてカウントする
                         notification_result["is_lost"] = True
                         notification_result["lost_reason"] = "Reached retry limit"
                         notification_result["lost_id"] = request["id"]
                 else:
-                    # リトライ対象外の場合は、失われたメッセージとしてカウントする
+                    # リトライ対象外の場合は、ロストメッセージとしてカウントする
                     notification_result["is_lost"] = True
                     notification_result["lost_reason"] = "Not eligible for retry"
                     notification_result["lost_id"] = request["id"]
