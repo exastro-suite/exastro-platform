@@ -680,6 +680,11 @@ class NotificationJobExecutor(BaseJobExecutor):
                             notification_result["is_lost"] = True
                             notification_result["lost_reason"] = "Reached retry limit"
                             notification_result["lost_id"] = request["id"]
+                    else:
+                        # リトライ対象外の場合は、失われたメッセージとしてカウントする
+                        notification_result["is_lost"] = True
+                        notification_result["lost_reason"] = "Not eligible for retry"
+                        notification_result["lost_id"] = request["id"]
 
                 notification_result["http_response_code"] = serviced_request.get(
                     "status_code"
@@ -710,6 +715,11 @@ class NotificationJobExecutor(BaseJobExecutor):
                         notification_result["is_lost"] = True
                         notification_result["lost_reason"] = "Reached retry limit"
                         notification_result["lost_id"] = request["id"]
+                else:
+                    # リトライ対象外の場合は、失われたメッセージとしてカウントする
+                    notification_result["is_lost"] = True
+                    notification_result["lost_reason"] = "Not eligible for retry"
+                    notification_result["lost_id"] = request["id"]
             globals.logger.warning(
                 f"{err}\n-- stack trace --\n{traceback.format_exc()}"
             )
