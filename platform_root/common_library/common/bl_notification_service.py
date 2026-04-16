@@ -224,6 +224,9 @@ def notification_register(body, organization_id, workspace_id, user_id):  # noqa
                     "enable_batch": destination.get('ENABLE_BATCH'),
                     "batch_period_seconds": destination.get('BATCH_PERIOD_SECONDS'),
                     "batch_count_limit": destination.get('BATCH_COUNT_LIMIT'),
+                    "enable_retry": destination.get('ENABLE_RETRY'),
+                    "retry_count_limit": destination.get('RETRY_COUNT_LIMIT'),
+                    "retry_count": 0 if destination.get('ENABLE_RETRY') else None,
                 })
 
     with closing(DBconnector().connect_workspacedb(organization_id, workspace_id)) as conn:

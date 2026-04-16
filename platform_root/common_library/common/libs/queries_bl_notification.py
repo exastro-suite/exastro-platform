@@ -30,6 +30,9 @@ FUNC_INFORMATIONS,
 MESSAGE_INFORMATIONS,
 NOTIFICATION_STATUS,
 NOTIFICATION_TIMESTAMP,
+ENABLE_RETRY,
+RETRY_COUNT_LIMIT,
+RETRY_COUNT,
 CREATE_USER,
 LAST_UPDATE_USER
 ) VALUES (
@@ -44,6 +47,9 @@ LAST_UPDATE_USER
 %(message_informations)s,
 %(notification_status)s,
 %(notification_timestamp)s,
+%(enable_retry)s,
+%(retry_count_limit)s,
+%(retry_count)s,
 %(create_user)s,
 %(last_update_user)s
 );

@@ -14,8 +14,11 @@
 import abc
 import threading
 import ctypes
+
+import ulid
 import globals
 import datetime
+from libs import queries_process_queue
 from libs.exceptions import JobTimeoutException
 import job_manager_config
 
@@ -67,7 +70,7 @@ class BaseJobExecutor(metaclass=abc.ABCMeta):
         except Exception:
             globals.logger.error(f"FAILED Job - {self.__job_info} / elapsed:[{(datetime.datetime.now() - start_time).total_seconds()}]")
             return False
-            
+
     def cancel_base(self):
         """job cancel実行 / job cancel execution
         """
@@ -124,6 +127,33 @@ class BaseJobExecutor(metaclass=abc.ABCMeta):
             ctypes.py_object(JobTimeoutException))
         globals.logger.debug(f"Raise JobTimeoutException cancel_thread id:[{self.__cancel_thread_id}] result:[{rlt}]")
         return rlt == 1
+
+    def retry_queue(self, cursor_pf, queue):
+        """再実行キューの登録 / Register retry queue
+
+        Args:
+            cursor_pf (_type_): db cursor (platform db)
+            queue (dict): queue information
+        """
+        cursor_pf.execute(
+            queries_process_queue.SQL_INSERT_PROCESS_QUEUE_BATCH_RETRY,
+            {
+                # PROCESS_QUEUEのレコードをコピーしてPROCESS_IDだけ新規に発行する
+                "process_id": ulid.new().str,
+                "process_kind": queue.get("PROCESS_KIND"),
+                "process_exec_id": queue.get("PROCESS_EXEC_ID"),
+                "organization_id": queue.get("ORGANIZATION_ID"),
+                "workspace_id": queue.get("WORKSPACE_ID"),
+                "enable_batch": queue.get("ENABLE_BATCH"),
+                "batch_period_seconds": queue.get("BATCH_PERIOD_SECONDS"),
+                "batch_count_limit": queue.get("BATCH_COUNT_LIMIT"),
+                "batch_group_key": queue.get("BATCH_GROUP_KEY"),
+                "last_update_user": queue.get("LAST_UPDATE_USER"),
+                # 処理順を維持するため、LAST_UPDATE_TIMESTAMPを引き継ぐ
+                "last_update_timestamp": queue.get("LAST_UPDATE_TIMESTAMP")
+            },
+        )
+        return cursor_pf.rowcount
 
     def __output_batch_result_log(self):
         """batchの個別の成否を出力
