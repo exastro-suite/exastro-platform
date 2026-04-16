@@ -82,6 +82,33 @@ SQL_DELETE_PROCESS_QUEUE_EXEC_ID = """
 DELETE FROM T_PROCESS_QUEUE WHERE PROCESS_EXEC_ID = %(process_exec_id)s
 """
 
+SQL_INSERT_PROCESS_QUEUE_BATCH_RETRY = """
+INSERT INTO T_PROCESS_QUEUE
+(PROCESS_ID,
+PROCESS_KIND,
+PROCESS_EXEC_ID,
+ORGANIZATION_ID,
+WORKSPACE_ID,
+ENABLE_BATCH,
+BATCH_PERIOD_SECONDS,
+BATCH_COUNT_LIMIT,
+BATCH_GROUP_KEY,
+LAST_UPDATE_USER,
+LAST_UPDATE_TIMESTAMP
+)VALUES(
+%(process_id)s,
+%(process_kind)s,
+%(process_exec_id)s,
+%(organization_id)s,
+%(workspace_id)s,
+%(enable_batch)s,
+%(batch_period_seconds)s,
+%(batch_count_limit)s,
+%(batch_group_key)s,
+%(last_update_user)s,
+%(last_update_timestamp)s
+);
+"""
 
 SQL_UPDATE_PROCESS_QUEUE_LOCK = """
 UPDATE  T_PROCESS_QUEUE_LOCK

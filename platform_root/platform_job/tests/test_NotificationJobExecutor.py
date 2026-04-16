@@ -947,6 +947,207 @@ def test_execute_servicenow_batch_invalid_message():
             assert_notification_response(organization_id, workspace_id, queue['PROCESS_EXEC_ID'], None, None)
 
 
+@mock.patch.dict(os.environ, {"JOB_NOTIFICATION_SERVICENOW_BATCH_MAX_WORKERS": "1"})
+def test_execute_servicenow_batch_retry():
+    """servicenow連携(一括送信) リトライ
+    """
+    testdata = import_module("tests.db.exports.testdata")
+
+    organization_id = list(testdata.ORGANIZATIONS.keys())[0]
+    workspace_id = testdata.ORGANIZATIONS[organization_id]["workspace_id"][0]
+
+    sn_batch_url = "http://sn.dummy/api/batch_url"
+    sn_api_url = "http://sn.dummy/api/api_url"
+    # sn_api_path = "/api/api_url"
+    sn_user = "sn_user01"
+    sn_p = "sn-pw01"
+    # sn_auth_header = 'Basic ' + base64.b64encode(f'{sn_user}:{sn_p}'.encode('utf-8')).decode('utf-8')
+
+    def get_queue_all():
+        """T_NOTIFICATION_QUEUEから全てのキューを取得する"""
+        with (
+            closing(DBconnector().connect_platformdb()) as conn,
+            conn.cursor() as cursor,
+        ):
+            cursor.execute(
+                "SELECT * FROM T_PROCESS_QUEUE ORDER BY LAST_UPDATE_TIMESTAMP ASC"
+            )
+            return [
+                {
+                    "PROCESS_ID": row.get("PROCESS_ID"),
+                    "PROCESS_KIND": row.get("PROCESS_KIND"),
+                    "PROCESS_EXEC_ID": row.get("PROCESS_EXEC_ID"),
+                    "ORGANIZATION_ID": row.get("ORGANIZATION_ID"),
+                    "WORKSPACE_ID": row.get("WORKSPACE_ID"),
+                    "ENABLE_BATCH": row.get("ENABLE_BATCH"),
+                    "BATCH_PERIOD_SECONDS": row.get("BATCH_PERIOD_SECONDS"),
+                    "BATCH_COUNT_LIMIT": row.get("BATCH_COUNT_LIMIT"),
+                    "BATCH_GROUP_KEY": row.get("BATCH_GROUP_KEY"),
+                    "LAST_UPDATE_USER": row.get("LAST_UPDATE_USER"),
+                    "LAST_UPDATE_TIMESTAMP": row.get("LAST_UPDATE_TIMESTAMP"),
+                }
+                for row in cursor
+            ]
+
+    # 以下のシナリオで進める
+    # 前提条件: BATCH_COUNT_LIMIT=4、RETRY_COUNT_LIMIT=2で、6件の通知情報がある状態
+    # 1回目の送信:
+    #   通知情報1: bodyが不正で送信失敗(リトライ対象外)
+    #   通知情報2: 400(リトライ1回目)
+    #   通知情報3: 200(完了)
+    #   通知情報4: 401(リトライ1回目)
+    #   通知情報5、通知情報6: 送信されない(バッチの上限数4件のため)
+    # 2回目の送信:
+    #   バッチAPIエラーで全件リトライ
+    #   通知情報2: 400(リトライ2回目)
+    #   通知情報4: 400(リトライ2回目)
+    #   通知情報5: 400(リトライ1回目)
+    #   通知情報6: 400(リトライ1回目)
+    # 3回目の送信:
+    #   通知情報2: 200(完了)
+    #   通知情報4: 400(RETRY_COUNT_LIMIT超過のためリトライ対象外)
+    #   通知情報5: 200(完了)
+    #   通知情報6: 200(完了)
+
+    batch_count_limit = 4
+    retry_count_limit = 2
+
+    sn_bodys = [
+        # 1回目送信分
+        "invalid_body",  # 通知情報1はbodyが不正で失敗させる
+        {"field1": "value2-1", "field2": "value2-2"},
+        {"field1": "value3-1", "field2": "value3-2"},
+        {"field1": "value4-1", "field2": "value4-2"},
+        # 2回目送信分
+        {"field1": "value5-1", "field2": "value5-2"},
+        {"field1": "value6-1", "field2": "value6-2"},
+    ]
+
+    sn_resps = [
+        # 1回目の送信レスポンス
+        {
+            "status": 200,
+            "batch_resp": [
+                # 1件目はbodyが不正で失敗させるので、レスポンスは設定しない(リトライ対象にならない)
+                None,
+                {"status": 400, "body": {"unit-test-response": "2-NG"}},
+                {"status": 200, "body": {"unit-test-response": "3-OK"}},
+                {"status": 401, "body": {"unit-test-response": "4-NG"}},
+            ],
+        },
+        # 2回目の送信レスポンス
+        {
+            # バッチ全体のHTTPステータスコードを400とし、全件リトライとなる
+            "status": 400,
+            "batch_resp": [],
+        },
+        # 3回目の送信レスポンス
+        {
+            "status": 200,
+            "batch_resp": [
+                {"status": 200, "body": {"unit-test-response": "2-OK"}},
+                {"status": 400, "body": {"unit-test-response": "4-NG"}},
+                {"status": 200, "body": {"unit-test-response": "5-OK"}},
+                {"status": 200, "body": {"unit-test-response": "6-OK"}},
+            ],
+        },
+        # 4回目の送信レスポンスは送信されない(通知情報4がリトライ上限に達しているため)
+    ]
+
+    queues = make_notification_servicenow_batch_retry(
+        organization_id,
+        workspace_id,
+        sn_batch_url,
+        sn_api_url,
+        sn_user,
+        sn_p,
+        sn_bodys,
+        batch_count_limit=batch_count_limit,
+        retry_count_limit=retry_count_limit,
+    )
+
+    not_id_map: dict[int, str] = {index: queue["PROCESS_EXEC_ID"] for index, queue in enumerate(queues)}
+    notification_status_after_job = [
+        # 1回目の送信後のリトライ回数のマッピング
+        {
+            not_id_map[0]: (const.NOTIFICATION_STATUS_FAILED, 0),  # 通知情報1は本文エラー・リトライ対象外
+            not_id_map[1]: (const.NOTIFICATION_STATUS_FAILED, 1),  # 通知情報2は個別APIエラー・リトライ対象(1回目)
+            not_id_map[2]: (const.NOTIFICATION_STATUS_SUCCESSFUL, 0),  # 通知情報3は成功・リトライ対象外
+            not_id_map[3]: (const.NOTIFICATION_STATUS_FAILED, 1),  # 通知情報4は個別APIエラー・リトライ対象(1回目)
+            not_id_map[4]: (const.NOTIFICATION_STATUS_UNSENT, 0),  # 通知情報5は未送信
+            not_id_map[5]: (const.NOTIFICATION_STATUS_UNSENT, 0),  # 通知情報6は未送信
+        },
+        # 2回目の送信後のリトライ回数のマッピング
+        {
+            not_id_map[0]: (const.NOTIFICATION_STATUS_FAILED, 0),  # 通知情報1は本文エラー・リトライ対象外
+            not_id_map[1]: (const.NOTIFICATION_STATUS_FAILED, 2),  # 通知情報2はバッチAPIエラー・リトライ対象(2回目)
+            not_id_map[2]: (const.NOTIFICATION_STATUS_SUCCESSFUL, 0),  # 通知情報3は成功・リトライ対象外
+            not_id_map[3]: (const.NOTIFICATION_STATUS_FAILED, 2),  # 通知情報4はバッチAPIエラー・リトライ対象(2回目)
+            not_id_map[4]: (const.NOTIFICATION_STATUS_FAILED, 1),  # 通知情報5はバッチAPIエラー・リトライ対象(1回目)
+            not_id_map[5]: (const.NOTIFICATION_STATUS_FAILED, 1),  # 通知情報6はバッチAPIエラー・リトライ対象(1回目)
+        },
+        # 3回目の送信後のリトライ回数のマッピング
+        {
+            not_id_map[0]: (const.NOTIFICATION_STATUS_FAILED, 0),  # 通知情報1は本文エラー・リトライ対象外
+            not_id_map[1]: (const.NOTIFICATION_STATUS_FAILED, 2),  # 通知情報2は個別APIエラー・リトライ上限
+            not_id_map[2]: (const.NOTIFICATION_STATUS_SUCCESSFUL, 0),  # 通知情報3は成功・リトライ対象外
+            not_id_map[3]: (const.NOTIFICATION_STATUS_SUCCESSFUL, 2),  # 通知情報4は成功
+            not_id_map[4]: (const.NOTIFICATION_STATUS_SUCCESSFUL, 1),  # 通知情報5は成功
+            not_id_map[5]: (const.NOTIFICATION_STATUS_FAILED, 1),  # 通知情報6は個別APIエラー・リトライ対象(2回目)
+        }
+    ]
+
+    # ServiceNowのbatchのレスポンス情報の生成
+    def generate_sn_resp_body(sn_resps):
+        return {
+            "serviced_requests": [
+                {
+                    "id": queues[index]['PROCESS_EXEC_ID'],
+                    "status_code": sn_resp["status"],
+                    "body": base64.b64encode(json.dumps(sn_resp["body"]).encode()).decode('ascii')
+                }
+                for index, sn_resp in enumerate(sn_resps["batch_resp"])
+                if sn_resp is not None
+            ]
+        }
+
+    for job_index, notification_status_after in enumerate(notification_status_after_job):
+        with test_common.requsts_mocker_default() as requests_mocker:
+            # ServiceNowへの要求をmockする
+            requests_mocker.register_uri(
+                requests_mock.POST,
+                sn_batch_url,
+                status_code=sn_resps[job_index]["status"],
+                json=generate_sn_resp_body(sn_resps[job_index]))
+
+            # job_manager.get_queueの代替処理
+            # queuesの先頭からbatch_count_limit件送信されるため、送信済みのキューをqueuesから削除する
+            processing_queues = [queues.pop(0) for _ in range(batch_count_limit)]
+
+            # NotificationJobExecutorの実行
+            executor = NotificationJobExecutor(processing_queues[0], processing_queues)
+            executor.execute_base()
+
+            for queue in queues:
+                notification = get_notification(
+                    organization_id, workspace_id, queue["PROCESS_EXEC_ID"]
+                )
+
+                # ステータスとリトライ回数が期待値通りであること
+                assert notification_status_after[queue["PROCESS_EXEC_ID"]] == (
+                    notification["NOTIFICATION_STATUS"],
+                    notification["RETRY_COUNT"],
+                )
+
+            # queries_process_queue.SQL_QUERY_PROCESSの代替処理
+            # 実際のT_PROCESS_QUEUEの取り出しのされ方に合わせて、LAST_UPDATE_TIMESTAMPの昇順でソートする
+            queues = [*queues, *get_queue_all()]
+            queues.sort(key=lambda x: x["LAST_UPDATE_TIMESTAMP"])
+            test_common.clear_queue()
+
+    assert len(queues) == 0  # 最終的に全てのキューが処理されていること
+
+
 def test_execute_no_notification():
     """通知情報なしパターン / No notification information pattern
     """
@@ -1488,6 +1689,8 @@ def make_notification_servicenow_batch(
     sn_p,
     sn_bodys,
     batch_count_limit=100,
+    enable_retry=False,
+    retry_count_limit=0,
 ):
     queues = []
 
@@ -1532,6 +1735,9 @@ def make_notification_servicenow_batch(
                 "NOTIFICATION_STATUS": const.NOTIFICATION_STATUS_UNSENT,
                 "CREATE_USER": job_manager_const.SYSTEM_USER_ID,
                 "LAST_UPDATE_USER": job_manager_const.SYSTEM_USER_ID,
+                "ENABLE_RETRY": enable_retry,
+                "RETRY_COUNT": 0 if enable_retry else None,
+                "RETRY_COUNT_LIMIT": retry_count_limit if enable_retry else None,
             }
 
             cursor.execute(
@@ -1544,7 +1750,10 @@ def make_notification_servicenow_batch(
                             MESSAGE_INFORMATIONS,
                             NOTIFICATION_STATUS,
                             CREATE_USER,
-                            LAST_UPDATE_USER
+                            LAST_UPDATE_USER,
+                            ENABLE_RETRY,
+                            RETRY_COUNT,
+                            RETRY_COUNT_LIMIT
                         ) VALUES (
                             %(NOTIFICATION_ID)s,
                             %(DESTINATION_KIND)s,
@@ -1552,7 +1761,10 @@ def make_notification_servicenow_batch(
                             %(MESSAGE_INFORMATIONS)s,
                             %(NOTIFICATION_STATUS)s,
                             %(CREATE_USER)s,
-                            %(LAST_UPDATE_USER)s
+                            %(LAST_UPDATE_USER)s,
+                            %(ENABLE_RETRY)s,
+                            %(RETRY_COUNT)s,
+                            %(RETRY_COUNT_LIMIT)s
                         )
                 """,
                 data,
@@ -1589,6 +1801,8 @@ def make_notification_servicenow_batch_invalid_message(
     sn_p,
     sn_bodys,
     batch_count_limit=100,
+    enable_retry=False,
+    retry_count_limit=0,
 ):
     queues = []
     template = "Invalid message format test: {field1} {field2}"
@@ -1623,6 +1837,9 @@ def make_notification_servicenow_batch_invalid_message(
                 "NOTIFICATION_STATUS": const.NOTIFICATION_STATUS_UNSENT,
                 "CREATE_USER": job_manager_const.SYSTEM_USER_ID,
                 "LAST_UPDATE_USER": job_manager_const.SYSTEM_USER_ID,
+                "ENABLE_RETRY": enable_retry,
+                "RETRY_COUNT": 0 if enable_retry else None,
+                "RETRY_COUNT_LIMIT": retry_count_limit if enable_retry else None,
             }
 
             cursor.execute(
@@ -1635,7 +1852,10 @@ def make_notification_servicenow_batch_invalid_message(
                             MESSAGE_INFORMATIONS,
                             NOTIFICATION_STATUS,
                             CREATE_USER,
-                            LAST_UPDATE_USER
+                            LAST_UPDATE_USER,
+                            ENABLE_RETRY,
+                            RETRY_COUNT,
+                            RETRY_COUNT_LIMIT
                         ) VALUES (
                             %(NOTIFICATION_ID)s,
                             %(DESTINATION_KIND)s,
@@ -1643,7 +1863,10 @@ def make_notification_servicenow_batch_invalid_message(
                             %(MESSAGE_INFORMATIONS)s,
                             %(NOTIFICATION_STATUS)s,
                             %(CREATE_USER)s,
-                            %(LAST_UPDATE_USER)s
+                            %(LAST_UPDATE_USER)s,
+                            %(ENABLE_RETRY)s,
+                            %(RETRY_COUNT)s,
+                            %(RETRY_COUNT_LIMIT)s
                         )
                 """,
                 data,
@@ -1669,6 +1892,134 @@ def make_notification_servicenow_batch_invalid_message(
 
     # test_common.insert_queue([queue])
     return queues
+
+
+def make_notification_servicenow_batch_retry(
+    organization_id,
+    workspace_id,
+    sn_batch_url,
+    sn_api_url,
+    sn_user,
+    sn_p,
+    sn_bodys,
+    batch_count_limit=100,
+    retry_count_limit=0,
+):
+    queues: list[dict[str]] = []
+
+    with (
+        closing(
+            DBconnector().connect_workspacedb(organization_id, workspace_id)
+        ) as conn_ws,
+        conn_ws.cursor() as cursor_ws,
+    ):
+
+        conn_ws.begin()
+
+        def _dump_json_passthrough(obj):
+            try:
+                return json.dumps(obj)
+            except (TypeError, ValueError):
+                # passthrough if not JSON serializable
+                return obj
+
+        for sn_body in sn_bodys:
+            notification_id = ulid.new().str
+            process_id = ulid.new().str
+
+            data = {
+                "NOTIFICATION_ID": notification_id,
+                "DESTINATION_KIND": const.DESTINATION_KIND_SERVICENOW,
+                "DESTINATION_INFORMATIONS": encrypt.encrypt_str(
+                    json.dumps(
+                        [
+                            {
+                                "servicenow_user": sn_user,
+                                "servicenow_password": sn_p,
+                                "batch_api_url": sn_batch_url,
+                                "table_api_url": sn_api_url,
+                            }
+                        ]
+                    )
+                ),
+                "MESSAGE_INFORMATIONS": json.dumps(
+                    {
+                        "title": "dummy-title",
+                        "message": _dump_json_passthrough(sn_body),
+                    }
+                ),
+                "NOTIFICATION_STATUS": const.NOTIFICATION_STATUS_UNSENT,
+                "CREATE_USER": job_manager_const.SYSTEM_USER_ID,
+                "LAST_UPDATE_USER": job_manager_const.SYSTEM_USER_ID,
+                "ENABLE_RETRY": 1,
+                "RETRY_COUNT": 0,
+                "RETRY_COUNT_LIMIT": retry_count_limit,
+            }
+
+            cursor_ws.execute(
+                """
+                    INSERT INTO T_NOTIFICATION_MESSAGE
+                        (
+                            NOTIFICATION_ID,
+                            DESTINATION_KIND,
+                            DESTINATION_INFORMATIONS,
+                            MESSAGE_INFORMATIONS,
+                            NOTIFICATION_STATUS,
+                            CREATE_USER,
+                            LAST_UPDATE_USER,
+                            ENABLE_RETRY,
+                            RETRY_COUNT,
+                            RETRY_COUNT_LIMIT
+                        ) VALUES (
+                            %(NOTIFICATION_ID)s,
+                            %(DESTINATION_KIND)s,
+                            %(DESTINATION_INFORMATIONS)s,
+                            %(MESSAGE_INFORMATIONS)s,
+                            %(NOTIFICATION_STATUS)s,
+                            %(CREATE_USER)s,
+                            %(LAST_UPDATE_USER)s,
+                            %(ENABLE_RETRY)s,
+                            %(RETRY_COUNT)s,
+                            %(RETRY_COUNT_LIMIT)s
+                        )
+                """,
+                data,
+            )
+
+            # リトライにはキューの情報も必要なため、バッチ有効等もしっかり設定する
+            queue = {
+                "PROCESS_ID": process_id,
+                "PROCESS_KIND": const.PROCESS_KIND_NOTIFICATION,
+                "PROCESS_EXEC_ID": notification_id,
+                "ORGANIZATION_ID": organization_id,
+                "WORKSPACE_ID": workspace_id,
+                "ENABLE_BATCH": 1,
+                "BATCH_PERIOD_SECONDS": 0,
+                "BATCH_COUNT_LIMIT": batch_count_limit,
+                "BATCH_GROUP_KEY": json.dumps({"notification_id": "test"}),
+                "LAST_UPDATE_USER": job_manager_const.SYSTEM_USER_ID,
+                "LAST_UPDATE_TIMESTAMP": datetime.datetime.now(),
+            }
+
+            queues.append(queue)
+
+        conn_ws.commit()
+
+    return queues
+
+
+def get_notification(organization_id, workspace_id, notification_id):
+    with closing(DBconnector().connect_workspacedb(organization_id, workspace_id)) as conn, \
+            conn.cursor() as cursor:
+        cursor.execute("""
+                SELECT *  FROM    T_NOTIFICATION_MESSAGE
+                    WHERE   NOTIFICATION_ID     =   %(NOTIFICATION_ID)s
+            """, {"NOTIFICATION_ID": notification_id})
+        row: dict[str] = cursor.fetchone()
+        if row is not None:
+            return row
+        else:
+            return None
 
 
 def get_notification_status(organization_id, workspace_id, notification_id):
