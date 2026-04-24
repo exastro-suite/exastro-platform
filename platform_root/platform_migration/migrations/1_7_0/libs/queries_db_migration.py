@@ -24,8 +24,7 @@ CREATE_TABLES = [
         WORKSPACE_ID                    VARCHAR(36),                                -- ワークスペースID
         LAST_UPDATE_TIMESTAMP           DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- 最終更新日時
         LAST_UPDATE_USER                VARCHAR(40),                                -- 最終更新者
-        PRIMARY KEY(PROCESS_ID),
-        INDEX IND_PROCESS_EXEC_ID (PROCESS_EXEC_ID)
+        PRIMARY KEY(PROCESS_ID)
     )ENGINE = InnoDB, CHARSET = utf8mb4, COLLATE = utf8mb4_bin, ROW_FORMAT=COMPRESSED ,KEY_BLOCK_SIZE=8;
     """
 ]
