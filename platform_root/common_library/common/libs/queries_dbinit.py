@@ -273,6 +273,8 @@ SQL_WORKSPACE_CREATE_TABLES = [
         ENABLE_BATCH                    BOOLEAN NOT NULL DEFAULT 0,                     -- 一括送信（既定：FALSE）
         BATCH_PERIOD_SECONDS            INT,                                            -- 一括送信間隔(秒)
         BATCH_COUNT_LIMIT               INT,                                            -- 一括送信最大件数
+        ENABLE_RETRY                    BOOLEAN NOT NULL DEFAULT 0,                     -- リトライ（既定：FALSE）
+        RETRY_COUNT_LIMIT               INT,                                            -- リトライ最大回数
         CREATE_TIMESTAMP	            DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,    -- 作成日時
         CREATE_USER	                    VARCHAR(40),	                                -- 作成者
         LAST_UPDATE_TIMESTAMP	        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,    -- 最終更新日時
@@ -297,6 +299,9 @@ SQL_WORKSPACE_CREATE_TABLES = [
         NOTIFICATION_TIMESTAMP	        DATETIME,	                                    -- 送信日時
         HTTP_RESPONSE_CODE              INT,                                            -- 応答HTTPレスポンスコード
         HTTP_RESPONSE_BODY              LONGTEXT,                                       -- 応答HTTPレスポンスボディー
+        ENABLE_RETRY                    BOOLEAN NOT NULL DEFAULT 0,                     -- リトライ（既定：FALSE）
+        RETRY_COUNT_LIMIT               INT,                                            -- リトライ最大回数
+        RETRY_COUNT                     INT,                                            -- リトライ回数
         CREATE_TIMESTAMP	            DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,	-- 作成日時
         CREATE_USER	                    VARCHAR(40),	                                -- 作成者
         LAST_UPDATE_TIMESTAMP	        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,	-- 最終更新日時
