@@ -17,7 +17,7 @@ SELECT * FROM T_PROCESS_QUEUE WHERE PROCESS_ID = %(process_id)s FOR UPDATE NOWAI
 """
 
 SQL_QUERY_FETCH_BATCH_PROCESS = """
-SELECT * FROM T_PROCESS_QUEUE
+SELECT * FROM T_PROCESS_QUEUE FORCE INDEX (IDX_ORGANIZATION_ID)
     WHERE   ORGANIZATION_ID     =   %(organization_id)s
     AND     WORKSPACE_ID        =   %(workspace_id)s
     AND     PROCESS_KIND        =   %(process_kind)s
