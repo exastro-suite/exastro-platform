@@ -19,6 +19,7 @@ import globals
 from common_library.common.db import DBconnector
 from common_library.common import common
 from common_library.common import multi_lang
+import migration_common
 
 from .libs import queries_db_workspace
 
@@ -197,6 +198,20 @@ class update_workspace_db:
 
         db = DBconnector()
         with closing(db.connect_workspacedb(organization_id, workspace_id)) as conn:
+            # カラム追加
+            # add column
+            for sql_alter_table in queries_db_workspace.SQL_ALTER_TABLES:
+                if not migration_common.exists_table_column(conn, sql_alter_table['COLUMN_TO_ADD']['TABLE_NAME'], sql_alter_table['COLUMN_TO_ADD']['COLUMN_NAME']):
+                    globals.logger.info(f"SQL EXECUUTE:{sql_alter_table['ALTER_TABLE_DDL']}")
+                    with conn.cursor() as cur:
+                        cur.execute(sql_alter_table['ALTER_TABLE_DDL'])
+                    self.ok_count += 1
+                else:
+                    globals.logger.info(f"SKIP ALTER TABLE : {sql_alter_table['COLUMN_TO_ADD']['TABLE_NAME']}")
+                    self.skip_count += 1
+
+            # インデックス追加
+            # add index
             for sql_create_index in queries_db_workspace.SQL_CREATE_INDEXES:
                 if not self.__exists_index(conn, sql_create_index['TABLE_NAME'], sql_create_index['INDEX_NAME']):
                     globals.logger.info(f"SQL EXECUUTE:{sql_create_index['CREATE_INDEX_DDL']}")
