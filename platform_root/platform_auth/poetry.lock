@@ -1462,13 +1462,13 @@ dev = ["black", "build", "freezegun", "mdx_truly_sane_lists", "mike", "mkdocs", 
 
 [[package]]
 name = "python-multipart"
-version = "0.0.26"
+version = "0.0.21"
 description = "A streaming multipart parser for Python"
 optional = false
 python-versions = ">=3.10"
 files = [
-    {file = "python_multipart-0.0.26-py3-none-any.whl", hash = "sha256:c0b169f8c4484c13b0dcf2ef0ec3a4adb255c4b7d18d8e420477d2b1dd03f185"},
-    {file = "python_multipart-0.0.26.tar.gz", hash = "sha256:08fadc45918cd615e26846437f50c5d6d23304da32c341f289a617127b081f17"},
+    {file = "python_multipart-0.0.21-py3-none-any.whl", hash = "sha256:cf7a6713e01c87aa35387f4774e812c4361150938d20d232800f75ffcf266090"},
+    {file = "python_multipart-0.0.21.tar.gz", hash = "sha256:7137ebd4d3bbf70ea1622998f902b97a29434a9e8dc40eb203bbcf7c2a2cba92"},
 ]
 
 [[package]]
@@ -1929,4 +1929,4 @@ propcache = ">=0.2.1"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "3e0737ac4648e64f875355f237b3764775b283f2b1c4f6bbdd51bcc843ad267a"
+content-hash = "7f2b27f78ff918abfb6025d65683f8ca68fa938cd74383d30b4f3459be14a42a"
