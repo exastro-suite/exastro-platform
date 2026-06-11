@@ -1200,7 +1200,7 @@ def validate_destination_kind(destination_kind):
     return result(True)
 
 
-def validate_destination_informations(destination_kind, destination_info, enable_batch, batch_period_seconds, batch_count_limit, mode):
+def validate_destination_informations(destination_kind, destination_info, enable_batch, batch_period_seconds, batch_count_limit, enable_retry, retry_count_limit, mode):
     """validate destination_informations
 
     Args:
@@ -1208,6 +1208,8 @@ def validate_destination_informations(destination_kind, destination_info, enable
         enable_batch(bool): enable_batch
         batch_period_seconds(int):batch_period_seconds
         batch_count_limit(int):batch_count_limit
+        enable_retry(bool): enable_retry
+        retry_count_limit(int): retry_count_limit
         mode(str): 'create' or 'put'
 
     Returns:
@@ -1476,6 +1478,21 @@ def validate_destination_informations(destination_kind, destination_info, enable
                         str(const.max_batch_count_limit)
                     )
 
+                if enable_retry is True:
+                    if retry_count_limit is None or retry_count_limit == "":
+                        return result(
+                            False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
+                            multi_lang.get_text('000-00224', "通知先ServiceNow リトライ回数")
+                        )
+
+                    if retry_count_limit < const.min_retry_count_limit or retry_count_limit > const.max_retry_count_limit:
+                        return result(
+                            False, 400, '400-{}038'.format(MSG_FUNCTION_ID), '指定可能な値の範囲外です。(項目:{0},最小値:{1},最大値:{2})',
+                            multi_lang.get_text('000-00224', "通知先ServiceNow リトライ回数"),
+                            str(const.min_retry_count_limit),
+                            str(const.max_retry_count_limit)
+                        )
+
     return result(True)
 
 
@@ -1503,12 +1520,12 @@ def validate_destination_conditions(conditions):
     if conditions.get('ita', {}).get('event_type', {}).get('new_consolidated', None) is None:
         return result(
             False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
-            multi_lang.get_text('000-00218', "2.新規イベント（統合時）")
+            multi_lang.get_text('000-00218', "2.新規イベント（統合予定）")
         )
     if type(conditions.get('ita', {}).get('event_type', {}).get('new_consolidated', None)) is not bool:
         return result(
             False, 400, '400-{}024'.format(MSG_FUNCTION_ID), 'True/False 以外が指定されています。({0})',
-            multi_lang.get_text('000-00218', "2.新規イベント（統合時）")
+            multi_lang.get_text('000-00218', "2.新規イベント（統合予定）")
         )
 
     if conditions.get('ita', {}).get('event_type', {}).get('new', None) is None:

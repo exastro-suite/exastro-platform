@@ -13,6 +13,11 @@
 #   limitations under the License.
 from jobs.BaseJobExecutor import BaseJobExecutor
 
+import threading
+import pymysql
+from itertools import islice
+from collections.abc import Iterable
+import concurrent.futures
 import os
 from contextlib import closing
 import traceback
@@ -20,7 +25,6 @@ import requests
 import datetime
 import time
 import json
-import random
 import base64
 import ssl
 import smtplib
@@ -150,62 +154,140 @@ class NotificationJobExecutor(BaseJobExecutor):
         destination_informations_list = []
         message_infomations_list = []
         notification_results = []
+        retry_informations = []
 
         try:
-            with closing(DBconnector().connect_workspacedb(self.organization_id, self.workspace_id)) as conn:
-                with conn.cursor() as cursor:
+            with (
+                closing(DBconnector().connect_platformdb()) as conn_pf,
+                closing(
+                    DBconnector().connect_workspacedb(
+                        self.organization_id, self.workspace_id
+                    )
+                ) as conn_ws,
+                conn_pf.cursor() as cursor_pf,
+                conn_ws.cursor() as cursor_ws,
+            ):
 
-                    for index, queue in enumerate(self.batch_queue):
-                        # 通知メッセージを取得 / Get notification message
-                        cursor.execute(queries_notification.SQL_QUERY_NOTIFICATION_MESSAGE, {"notification_id": queue['PROCESS_EXEC_ID']})
-                        row = cursor.fetchone()
+                for index, queue in enumerate(self.batch_queue):
+                    # 通知メッセージを取得 / Get notification message
+                    cursor_ws.execute(queries_notification.SQL_QUERY_NOTIFICATION_MESSAGE, {"notification_id": queue['PROCESS_EXEC_ID']})
+                    row = cursor_ws.fetchone()
 
-                        if row is not None:
-                            # 通知先・通知メッセージを取得する（取得できなかったものは無視する）
-                            queue_list.append(queue)
-                            destination_informations_list.append(json.loads(encrypt.decrypt_str(row['DESTINATION_INFORMATIONS'])))
-                            message_infomations_list.append(json.loads(row['MESSAGE_INFORMATIONS']))
-                            notification_results.append({"status": const.NOTIFICATION_STATUS_FAILED, "http_response_code": None, "http_response_body": None})
-    
-                    if row['DESTINATION_KIND'] == const.DESTINATION_KIND_TEAMS_WF:
-                        # Teams workflow へのメッセージ送信 / Send messages to Teams workflow
-                        raise Exception("Not Support Batch Send Notifications")
-
-                    if row['DESTINATION_KIND'] == const.DESTINATION_KIND_TEAMS:
-                        # Teams へのメッセージ送信 / Send messages to Teams
-                        raise Exception("Not Support Batch Send Notifications")
-
-                    if row['DESTINATION_KIND'] == const.DESTINATION_KIND_WEBHOOK:
-                        # webhook へのメッセージ送信 / Send messages to webhook
-                        raise Exception("Not Support Batch Send Notifications")
-
-                    if row['DESTINATION_KIND'] == const.DESTINATION_KIND_MAIL:
-                        raise Exception("Not Support Batch Send Notifications")
-
-                    if row['DESTINATION_KIND'] == const.DESTINATION_KIND_SERVICENOW:
-                        notification_results = self.__send_message_servicenow_batch(queue_list, destination_informations_list, message_infomations_list)
-
-                    # 送信結果を書き込む / Write the transmission result
-                    globals.logger.debug('start write result to db')
-                    for index, queue in enumerate(queue_list):
-                        cursor.execute(
-                            queries_notification.SQL_UPDATE_STATUS_NOTIFICATION_MESSAGE,
+                    if row is not None:
+                        # 通知先・通知メッセージを取得する（取得できなかったものは無視する）
+                        queue_list.append(queue)
+                        destination_informations_list.append(json.loads(encrypt.decrypt_str(row['DESTINATION_INFORMATIONS'])))
+                        message_infomations_list.append(json.loads(row['MESSAGE_INFORMATIONS']))
+                        notification_results.append(
                             {
-                                "notification_id": queue['PROCESS_EXEC_ID'],
-                                "notification_status": notification_results[index]["status"],
-                                "last_update_user": job_manager_const.SYSTEM_USER_ID,
-                                "http_response_code": notification_results[index]["http_response_code"],
-                                "http_response_body": notification_results[index]["http_response_body"],
-                                "notification_status_now": const.NOTIFICATION_STATUS_UNSENT,
-                            })
-                        self.set_batch_result(index, notification_results[index]["status"] == const.NOTIFICATION_STATUS_SUCCESSFUL)
+                                "status": const.NOTIFICATION_STATUS_FAILED,
+                                "http_response_code": None,
+                                "http_response_body": None,
+                                "enable_retry": row['ENABLE_RETRY'],
+                                "retry_count_limit": row['RETRY_COUNT_LIMIT'],
+                                "retry_count": row['RETRY_COUNT'],
+                                "is_retry": False,
+                                "is_lost": False,
+                                "lost_reason": None,
+                            }
+                        )
+                        retry_informations.append(
+                            {
+                                "enable_retry": row['ENABLE_RETRY'],
+                                "retry_count_limit": row['RETRY_COUNT_LIMIT'],
+                                "retry_count": row['RETRY_COUNT'],
+                            }
+                        )
 
-                    conn.commit()
-                    globals.logger.debug('end write result to db')
+                if row['DESTINATION_KIND'] == const.DESTINATION_KIND_TEAMS_WF:
+                    # Teams workflow へのメッセージ送信 / Send messages to Teams workflow
+                    raise Exception("Not Support Batch Send Notifications")
+
+                if row['DESTINATION_KIND'] == const.DESTINATION_KIND_TEAMS:
+                    # Teams へのメッセージ送信 / Send messages to Teams
+                    raise Exception("Not Support Batch Send Notifications")
+
+                if row['DESTINATION_KIND'] == const.DESTINATION_KIND_WEBHOOK:
+                    # webhook へのメッセージ送信 / Send messages to webhook
+                    raise Exception("Not Support Batch Send Notifications")
+
+                if row['DESTINATION_KIND'] == const.DESTINATION_KIND_MAIL:
+                    raise Exception("Not Support Batch Send Notifications")
+
+                if row['DESTINATION_KIND'] == const.DESTINATION_KIND_SERVICENOW:
+                    notification_results = self.__send_message_servicenow_batch(
+                        queue_list,
+                        destination_informations_list,
+                        message_infomations_list,
+                        retry_informations,
+                    )
+
+                # メッセージの送信に失敗していて、かつメッセージの内容に問題があるなどの理由でリトライもできない場合は、ロストメッセージとしてカウントする
+                lost_messages_count = 0
+                lost_messages_summary_by_reason = {}
+                for result in (
+                    r for r in notification_results if r and r.get("is_lost")
+                ):
+                    lost_reason = result["lost_reason"]
+
+                    lost_messages_summary = lost_messages_summary_by_reason.setdefault(
+                        lost_reason, {"count": 0, "lost_ids": []}
+                    )
+                    lost_messages_summary["count"] += 1
+                    lost_messages_summary["lost_ids"].append(result.get("lost_id"))
+                    lost_messages_count += 1
+                if lost_messages_count > 0:
+                    # Losted messages summary [{lost_messages_count}]: {reason1} {count1} messages [id: {id1_1}, {id1_2}, ...], {reason2} {count2} messages [id: {id2_1}, {id2_2}, ...], ...
+                    lost_messages_summary = ", ".join(
+                        [
+                            f'{reason} {info["count"]} messages [id: {", ".join(info["lost_ids"])}]'
+                            for reason, info in lost_messages_summary_by_reason.items()
+                        ]
+                    )
+                    globals.logger.warning(
+                        f"Losted messages summary [{lost_messages_count}]: {lost_messages_summary}"
+                    )
+
+                # 送信結果を書き込む / Write the transmission result
+                globals.logger.debug('start write result to db')
+                for index, queue in enumerate(queue_list):
+                    result = notification_results[index]
+                    # リトライ対象で、かつリトライ回数がリトライ上限に達していない場合は再度キューに登録する
+                    if result["is_retry"]:
+                        self.retry_queue(cursor_pf, queue_list[index])
+                    cursor_ws.execute(
+                        queries_notification.SQL_UPDATE_STATUS_NOTIFICATION_MESSAGE_WITH_RETRY,
+                        {
+                            "notification_id": queue["PROCESS_EXEC_ID"],
+                            "notification_status": result["status"],
+                            "last_update_user": job_manager_const.SYSTEM_USER_ID,
+                            "http_response_code": result["http_response_code"],
+                            "http_response_body": result["http_response_body"],
+                            "retry_count": result["retry_count"],
+                            # リトライ対象以外: ステータスがUnsent
+                            # リトライ対象: 初回失敗はステータスがUnsent、2回目以降の失敗はステータスがFailed
+                            "notification_status_now": (
+                                const.NOTIFICATION_STATUS_FAILED
+                                if (
+                                    result["enable_retry"] == 1
+                                    and result["retry_count"] > 1
+                                )
+                                else const.NOTIFICATION_STATUS_UNSENT
+                            ),
+                        },
+                    )
+                    self.set_batch_result(
+                        index,
+                        result["status"] == const.NOTIFICATION_STATUS_SUCCESSFUL,
+                    )
+
+                conn_pf.commit()
+                conn_ws.commit()
+                globals.logger.debug('end write result to db')
 
             # 全てが成功の場合はTrue,1つでも成功以外があればFalseを返す
-            for notification_result in notification_results:
-                if notification_result.get("status") != const.NOTIFICATION_STATUS_SUCCESSFUL:
+            for result in notification_results:
+                if result.get("status") != const.NOTIFICATION_STATUS_SUCCESSFUL:
                     return False
 
             return True
@@ -428,84 +510,277 @@ class NotificationJobExecutor(BaseJobExecutor):
 
         return notification_result
 
-    def __send_message_servicenow_batch(self, queue_list, destination_informations_list, message_infomations_list):
-        notification_results = []
-        for i in range(len(queue_list)):
-            notification_results.append({
+    def __send_message_servicenow_batch(
+        self,
+        queue_list: list[dict],
+        destination_informations_list: list[list[dict]],
+        message_infomations_list: list[dict],
+        retry_informations: list[dict],
+    ):
+        notification_results = [
+            {
                 "status": const.NOTIFICATION_STATUS_FAILED,
                 "http_response_code": None,
-                "http_response_body": None
-            })
+                "http_response_body": None,
+                "enable_retry": retry_information.get("enable_retry", 0),
+                "retry_count_limit": retry_information.get("retry_count_limit"),
+                "retry_count": retry_information.get("retry_count"),
+                "is_retry": False,
+                "is_lost": False,
+                "lost_reason": None,
+            }
+            for retry_information in retry_informations
+        ]
+        max_workers = int(os.environ.get("JOB_NOTIFICATION_SERVICENOW_BATCH_MAX_WORKERS", 4))
 
-        for destination_information in destination_informations_list[0]:
-            # ServiceNow API path
-            table_api_path = urlparse(destination_information['table_api_url']).path
+        # batch送信のchunkサイズは、queue_listの最初の要素のBATCH_COUNT_LIMITとする
+        chunk_size = queue_list[0]["BATCH_COUNT_LIMIT"]
+        # chunkに分割したindex付きqueueのリストを作成する
+        indexed_chunks = [
+            list(zip(range(i, i + chunk_size), islice(queue_list, i, i + chunk_size)))
+            for i in range(0, len(queue_list), chunk_size)
+        ]
 
-            # batch送信用のbodyを作成する
-            rest_requests = []
-            for index, queue in enumerate(queue_list):
-                rest_requests.append({
-                    "id": queue['PROCESS_EXEC_ID'],
-                    "exclude_response_headers": True,
-                    "headers": [
-                        {"name": "Content-Type", "value": "application/json"},
-                        {"name": "Accept", "value": "application/json"}
-                    ],
-                    "url": table_api_path,
-                    "method": "POST",
-                    "body": base64.b64encode(json.dumps(json.loads(message_infomations_list[index].get("message", "{}"))).encode()).decode('ascii')
-                })
-
-            try:
-                resp_webhook_text = None
-                globals.logger.debug('start requests.post')
-                response = requests.post(
-                    destination_information['batch_api_url'],
-                    json={
-                        "batch_request_id": queue_list[0]['PROCESS_EXEC_ID'],
-                        "rest_requests": rest_requests
-                    },
-                    headers={"Content-type": "application/json", "Accept": "application/json"},
-                    auth=(destination_information['servicenow_user'], destination_information['servicenow_password']),
-                    timeout=(
-                        self.job_config['extra_config']['servicenow_connetion_timeout'],
-                        self.job_config['extra_config']['servicenow_batch_read_timeout'],
-                    ))
-                globals.logger.debug('end requests.post')
-
-                resp_webhook_text = response.text
-
-                if response.status_code < 200 or response.status_code >= 300:
-                    # batchの応答自体がHTTP200系以外の時は全てその応答を設定する
-                    for notification_result in notification_results:
-                        notification_result["http_response_code"] = response.status_code
-                        notification_result["http_response_body"] = response.text
-
-                    raise Exception(f"response code:{response.status_code}")
-
-                # 1件毎の応答を設定する
-                globals.logger.debug('start setting response')
-                response_json = json.loads(response.text)
-                for serviced_request in response_json["serviced_requests"]:
-                    index = next((index for index, queue in enumerate(queue_list) if queue['PROCESS_EXEC_ID'] == serviced_request.get("id")), None)
-                    if index is None:
-                        continue
-
-                    if serviced_request.get("status_code") >= 200 and serviced_request.get("status_code") < 300:
-                        notification_results[index]["status"] = const.NOTIFICATION_STATUS_SUCCESSFUL
-                    else:
-                        notification_results[index]["status"] = const.NOTIFICATION_STATUS_FAILED
-
-                    notification_results[index]["http_response_code"] = serviced_request.get("status_code")
-                    notification_results[index]["http_response_body"] = base64.b64decode(serviced_request.get("body").encode()).decode()
-
-                globals.logger.debug('end setting response')
-
-            except Exception as err:
-                globals.logger.warning(f'{err}\n-- stack trace --\n{traceback.format_exc()}')
-                globals.logger.debug(f"webhook response text\n{resp_webhook_text}")
+        with concurrent.futures.ThreadPoolExecutor(
+            max_workers, thread_name_prefix=threading.current_thread().name
+        ) as executor:
+            for destination_information in destination_informations_list[0]:
+                # ServiceNow API path
+                table_api_path = self.__get_relative_url(
+                    destination_information["table_api_url"]
+                )
+                for indexed_queue_list in indexed_chunks:
+                    executor.submit(
+                        NotificationJobExecutor.__send_message_servicenow_batch_chunk,
+                        indexed_queue_list,
+                        destination_information,
+                        message_infomations_list,
+                        table_api_path,
+                        self.job_config["extra_config"]["servicenow_connetion_timeout"],
+                        self.job_config["extra_config"][
+                            "servicenow_batch_read_timeout"
+                        ],
+                        notification_results,
+                    )
 
         return notification_results
+
+    @staticmethod
+    def __send_message_servicenow_batch_chunk(
+        indexed_queue_list: Iterable[tuple[int, dict]],
+        destination_information: dict[str, str],
+        message_infomations_list: list[dict],
+        table_api_path: str,
+        servicenow_connetion_timeout: float,
+        servicenow_batch_read_timeout: float,
+        notification_results: list[dict],
+    ):
+        try:
+            process_exec_id = None
+            # batch送信用のbodyを作成する
+            rest_requests: dict[str, tuple[int, dict]] = {
+                queue["PROCESS_EXEC_ID"]: (
+                    index,
+                    {
+                        "id": (process_exec_id := queue["PROCESS_EXEC_ID"]),
+                        "exclude_response_headers": True,
+                        "headers": [
+                            {"name": "Content-Type", "value": "application/json"},
+                            {"name": "Accept", "value": "application/json"},
+                        ],
+                        "url": table_api_path,
+                        "method": "POST",
+                        "body": NotificationJobExecutor.__encode_servicenow_batch_body(
+                            message_infomations_list[index].get("message", "{}"),
+                            queue["PROCESS_EXEC_ID"],
+                            notification_results[index],
+                        ),
+                    },
+                )
+                for index, queue in indexed_queue_list
+            }
+        except json.JSONDecodeError as err:
+            globals.logger.warning(f'Cannot decode message[id:{process_exec_id}] as JSON: {err}\n-- message --\n{err.doc}\n-- stack trace --\n{traceback.format_exc()}')
+            raise
+        except Exception as err:
+            globals.logger.warning(f'{err}\n-- stack trace --\n{traceback.format_exc()}')
+            raise
+
+        try:
+            resp_webhook_text = None
+            globals.logger.debug("start requests.post")
+            json_body = {
+                "batch_request_id": next(iter(rest_requests.keys())),
+                "rest_requests": [
+                    rest_request
+                    for _, rest_request in rest_requests.values()
+                    if rest_request.get("body") is not None
+                ],
+            }
+            if len(json_body["rest_requests"]) == 0:
+                # 全てのリクエストのbodyが不正でエンコードできなかった場合は、batch APIに送信せずに全て失敗とする
+                return
+
+            response = requests.post(
+                destination_information["batch_api_url"],
+                json=json_body,
+                headers={
+                    "Content-type": "application/json",
+                    "Accept": "application/json",
+                },
+                auth=(
+                    destination_information["servicenow_user"],
+                    destination_information["servicenow_password"],
+                ),
+                timeout=(
+                    servicenow_connetion_timeout,
+                    servicenow_batch_read_timeout,
+                ),
+            )
+            globals.logger.debug("end requests.post")
+
+            resp_webhook_text = response.text
+
+            if response.status_code < 200 or response.status_code >= 300:
+                # batchの応答自体がHTTP200系以外の時は全てその応答を設定する
+                for notification_result in notification_results:
+                    notification_result["http_response_code"] = response.status_code
+                    notification_result["http_response_body"] = response.text
+
+                raise Exception(f"response code:{response.status_code}")
+
+            # 1件毎の応答を設定する
+            globals.logger.debug("start setting response")
+            response_json = json.loads(response.text)
+            for serviced_request in response_json["serviced_requests"]:
+                index, request = rest_requests.get(serviced_request.get("id"), (None, None))
+                if index is None:
+                    continue
+
+                notification_result = notification_results[index]
+                if 200 <= serviced_request.get("status_code") < 300:
+                    notification_result["status"] = const.NOTIFICATION_STATUS_SUCCESSFUL
+                else:
+                    notification_result["status"] = const.NOTIFICATION_STATUS_FAILED
+                    if notification_result["enable_retry"] == 1:
+                        if (
+                            notification_result["retry_count"]
+                            < notification_result["retry_count_limit"]
+                        ):
+                            # リトライ対象で、かつリトライ回数がリトライ上限に達していない場合は再度キューに登録する
+                            notification_result["retry_count"] += 1
+                            notification_result["is_retry"] = True
+                        else:
+                            # リトライ対象で、かつリトライ回数がリトライ上限に達している場合はログに出力する
+                            message = base64.b64decode(request["body"]).decode("utf-8")
+                            globals.logger.warning(
+                                f"Cannot send message[id:{request['id']}]: reached retry limit.\n-- message --\n{message}"
+                            )
+                            # リトライ対象で、かつリトライ回数がリトライ上限に達しているものはロストメッセージとしてカウントする
+                            notification_result["is_lost"] = True
+                            notification_result["lost_reason"] = "Reached retry limit"
+                            notification_result["lost_id"] = request["id"]
+                    else:
+                        # リトライ対象外の場合は、ロストメッセージとしてカウントする
+                        notification_result["is_lost"] = True
+                        notification_result["lost_reason"] = "Not eligible for retry"
+                        notification_result["lost_id"] = request["id"]
+
+                notification_result["http_response_code"] = serviced_request.get(
+                    "status_code"
+                )
+                notification_result["http_response_body"] = base64.b64decode(
+                    serviced_request.get("body").encode()
+                ).decode()
+
+        except Exception as err:
+            # バッチ送信APIで例外が発生した場合は、全件リトライ対象チェック
+            for index, request in rest_requests.values():
+                if request["body"] is None:
+                    # JSONのエンコードに失敗してbodyが作成できなかったリクエストは、リトライ対象外のため処理しない
+                    continue
+                notification_result = notification_results[index]
+                if notification_result["enable_retry"] == 1:
+                    if (
+                        notification_result["retry_count"]
+                        < notification_result["retry_count_limit"]
+                    ):
+                        # リトライ対象で、かつリトライ回数がリトライ上限に達していないものは再度キューに登録する
+                        notification_result["retry_count"] += 1
+                        notification_result["is_retry"] = True
+                    else:
+                        # リトライ対象で、かつリトライ回数がリトライ上限に達しているものはログに出力する
+                        message = base64.b64decode(request["body"]).decode("utf-8")
+                        globals.logger.warning(
+                            f"Cannot send message[id:{request['id']}]: reached retry limit.\n-- message --\n{message}"
+                        )
+                        # リトライ対象で、かつリトライ回数がリトライ上限に達しているものはロストメッセージとしてカウントする
+                        notification_result["is_lost"] = True
+                        notification_result["lost_reason"] = "Reached retry limit"
+                        notification_result["lost_id"] = request["id"]
+                else:
+                    # リトライ対象外の場合は、ロストメッセージとしてカウントする
+                    notification_result["is_lost"] = True
+                    notification_result["lost_reason"] = "Not eligible for retry"
+                    notification_result["lost_id"] = request["id"]
+            globals.logger.warning(
+                f"{err}\n-- stack trace --\n{traceback.format_exc()}"
+            )
+            globals.logger.debug(f"webhook response text\n{resp_webhook_text}")
+
+    def __get_relative_url(self, full_url: str) -> str:
+        """path以降のURLを取得する
+
+        Args:
+            full_url (str): _description_
+
+        Returns:
+            str: _description_
+        """
+        parsed_url = urlparse(full_url)
+        relative_url = parsed_url.path
+        if parsed_url.params:
+            relative_url += ';' + parsed_url.params
+
+        if parsed_url.query:
+            relative_url += '?' + parsed_url.query
+
+        if parsed_url.fragment:
+            relative_url += '#' + parsed_url.fragment
+
+        return relative_url
+
+    @staticmethod
+    def __encode_servicenow_batch_body(
+        json_message: str,
+        process_exec_id: str | None = None,
+        notification_result: dict | None = None,
+    ) -> str:
+        """ServiceNow batch API用のbodyエンコード
+
+        Args:
+            json_message (str): メッセージ
+
+        Returns:
+            str: エンコード済みメッセージ
+        """
+        try:
+            loaded_message = json.loads(json_message)
+            utf8_message = json.dumps(loaded_message).encode('utf-8')
+            base64_message = base64.b64encode(utf8_message).decode('ascii')
+            return base64_message
+        except json.JSONDecodeError as err:
+            globals.logger.warning(f'Cannot decode message[id:{process_exec_id}] as JSON: {err}\n-- message --\n{err.doc}\n-- stack trace --\n{traceback.format_exc()}')
+            if notification_result is not None:
+                notification_result["is_lost"] = True
+                notification_result["lost_reason"] = "JSON error"
+                notification_result["lost_id"] = process_exec_id
+        except Exception as err:
+            globals.logger.warning(f'Unknown JSON error: {err}\n-- message --\n{json_message}\n-- stack trace --\n{traceback.format_exc()}')
+            if notification_result is not None:
+                notification_result["is_lost"] = True
+                notification_result["lost_reason"] = "Unknown JSON error"
+                notification_result["lost_id"] = process_exec_id
 
     def __send_message_mail(self, destination_informations, message_infomations):
         """mailへのメッセージ送信 / Send messages to email
@@ -750,8 +1025,52 @@ class NotificationJobExecutor(BaseJobExecutor):
                             conn_ws.rollback()
                             raise
 
+                # 古い処理済み通知メッセージのクリーンアップ
+                cls.__cleanup_expired_notifications(cursor_ws)
+
         except JobTimeoutException:
-            raise  # TimeoutException時は即終了する
+            # TimeoutException時は即終了する
+            globals.logger.info(f'JobTimeoutException occurred. Stop force update status : ORGANIZATION_ID:[{organization_id}] / WORKSPACE_ID:[{workspace_id}]')
         except Exception as err:
             # 次の処理に進むためraiseしない
             globals.logger.error(f'{err}\n-- stack trace --\n{traceback.format_exc()}')
+
+    @classmethod
+    def __cleanup_expired_notifications(cls, cursor_ws: pymysql.cursors.Cursor):
+        """古い処理済み通知メッセージのクリーンアップ / Cleanup old processed notification messages
+
+        Args:
+            cursor_ws: ワークスペースDBカーソル / Workspace DB cursor
+        """
+        cleanup_days = int(os.environ.get("JOB_NOTIFICATION_CLEANUP_EXPIRED_DAYS", "0"))
+        throttle = int(
+            os.environ.get("JOB_NOTIFICATION_CLEANUP_THROTTLE", "1000")
+        )
+        if cleanup_days > 0 and throttle > 0:
+            cleanup_timestamp = datetime.datetime.now() - datetime.timedelta(
+                days=cleanup_days
+            )
+            total_cleanuped_rows = 0
+            # 初回はループに入るためにthrottle件数分の値をセット
+            cleanuped_rows = throttle
+            try:
+                while cleanuped_rows >= throttle:
+                    cursor_ws.connection.begin()
+                    cleanuped_rows = cursor_ws.execute(
+                        queries_notification.SQL_CLEANUP_NOTIFICATION_MESSAGE,
+                        {
+                            "create_timestamp": cleanup_timestamp,
+                            "notification_status": const.NOTIFICATION_STATUS_UNSENT,
+                            "cleanup_throttle": throttle,
+                        },
+                    )
+                    cursor_ws.connection.commit()
+                    total_cleanuped_rows += cleanuped_rows
+            except Exception:
+                cursor_ws.connection.rollback()
+                raise
+            finally:
+                if total_cleanuped_rows > 0:
+                    globals.logger.info(
+                        f"Cleaned up {total_cleanuped_rows} notification messages created before {cleanup_timestamp}"
+                    )

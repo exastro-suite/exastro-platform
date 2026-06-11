@@ -1,4 +1,4 @@
-#   Copyright 2025 NEC Corporation
+#   Copyright 2026 NEC Corporation
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@ import globals
 from common_library.common.db import DBconnector
 from common_library.common import common
 from common_library.common import multi_lang
-
 import migration_common
+
 from .libs import queries_db_workspace
 
 
@@ -56,8 +56,8 @@ class update_workspace_db:
             organization_db_rows = self.__organization_db_get()
             self.step_count += 1
 
-            # ワークスペースDataBase作成
-            # workspace database create
+            # WorkspaceDBの更新
+            # update workspace database
             for row in organization_db_rows:
                 organization_id = row.get("ORGANIZATION_ID")
 
@@ -198,24 +198,46 @@ class update_workspace_db:
 
         db = DBconnector()
         with closing(db.connect_workspacedb(organization_id, workspace_id)) as conn:
+            # カラム追加
+            # add column
             for sql_alter_table in queries_db_workspace.SQL_ALTER_TABLES:
                 if not migration_common.exists_table_column(conn, sql_alter_table['COLUMN_TO_ADD']['TABLE_NAME'], sql_alter_table['COLUMN_TO_ADD']['COLUMN_NAME']):
-                    # 項目追加されていない場合は、Alter tableを実行しcolumnを追加する
                     globals.logger.info(f"SQL EXECUUTE:{sql_alter_table['ALTER_TABLE_DDL']}")
                     with conn.cursor() as cur:
                         cur.execute(sql_alter_table['ALTER_TABLE_DDL'])
                     self.ok_count += 1
                 else:
-                    # 項目追加済みの場合はSkipする
                     globals.logger.info(f"SKIP ALTER TABLE : {sql_alter_table['COLUMN_TO_ADD']['TABLE_NAME']}")
                     self.skip_count += 1
 
-            # 通知設定の追加(新規イベント（受信時）・新規イベント（統合予定）)
-            # Add notification settings (new event (received), new event (consolidate))
-            sql_update_table = queries_db_workspace.SQL_UPDATE_M_NOTIFICATION_DESTINATION
-            globals.logger.info(f"SQL EXECUUTE:{sql_update_table}")
-            with conn.cursor() as cur:
-                cur.execute(sql_update_table)
-            self.ok_count += 1
-            
+            # インデックス追加
+            # add index
+            for sql_create_index in queries_db_workspace.SQL_CREATE_INDEXES:
+                if not self.__exists_index(conn, sql_create_index['TABLE_NAME'], sql_create_index['INDEX_NAME']):
+                    globals.logger.info(f"SQL EXECUUTE:{sql_create_index['CREATE_INDEX_DDL']}")
+                    with conn.cursor() as cur:
+                        cur.execute(sql_create_index['CREATE_INDEX_DDL'])
+                    self.ok_count += 1
+                else:
+                    globals.logger.info(f"SKIP CREATE INDEX : {sql_create_index['TABLE_NAME']}.{sql_create_index['INDEX_NAME']}")
+                    self.skip_count += 1
+
             conn.commit()
+
+    def __exists_index(self, conn, table_name, index_name):
+        """インデックスの存在確認 check index exists
+
+        """
+        with conn.cursor() as cursor:
+            cursor.execute(
+                """
+                SELECT 1
+                  FROM information_schema.statistics
+                 WHERE table_schema = DATABASE()
+                   AND table_name = %s
+                   AND index_name = %s
+                 LIMIT 1
+                """,
+                (table_name, index_name)
+            )
+            return cursor.fetchone() is not None

@@ -707,6 +707,7 @@ def test_job_manager_sub_job_limit_over():
             main_thread.join()
 
 
+@mock.patch.dict(os.environ, {"JOB_NOTIFICATION_SERVICENOW_BATCH_MAX_WORKERS": "2"})
 def test_job_manager_get_queue():
     """QUEUE取り出し
     """
@@ -814,7 +815,7 @@ def test_job_manager_get_queue():
             "LAST_UPDATE_USER": "system",
         },
         # (レコード2) 対象になる（LAST_UPDATE_TIMESTAMPがBATCH_PERIOD_SECONDS経過後）
-        {
+        r2 := {
             "PROCESS_ID": ulid.new().str,
             "PROCESS_KIND": const.PROCESS_KIND_NOTIFICATION,
             "PROCESS_EXEC_ID": ulid.new().str,
@@ -828,7 +829,7 @@ def test_job_manager_get_queue():
             "LAST_UPDATE_USER": "system",
         },
         # (レコード3) 前のデータとBATCH処理されるデータ
-        {
+        r3 := {
             "PROCESS_ID": ulid.new().str,
             "PROCESS_KIND": const.PROCESS_KIND_NOTIFICATION,
             "PROCESS_EXEC_ID": ulid.new().str,
@@ -842,7 +843,7 @@ def test_job_manager_get_queue():
             "LAST_UPDATE_USER": "system",
         },
         # (レコード4) 前のデータとBATCH処理されるデータ
-        {
+        r4 := {
             "PROCESS_ID": ulid.new().str,
             "PROCESS_KIND": const.PROCESS_KIND_NOTIFICATION,
             "PROCESS_EXEC_ID": ulid.new().str,
@@ -856,7 +857,7 @@ def test_job_manager_get_queue():
             "LAST_UPDATE_USER": "system",
         },
         # (レコード5) 前のデータとBATCH処理されるデータ
-        {
+        r5 := {
             "PROCESS_ID": ulid.new().str,
             "PROCESS_KIND": const.PROCESS_KIND_NOTIFICATION,
             "PROCESS_EXEC_ID": ulid.new().str,
@@ -869,8 +870,64 @@ def test_job_manager_get_queue():
             "LAST_UPDATE_TIMESTAMP": datetime.datetime.now() - datetime.timedelta(seconds=10),
             "LAST_UPDATE_USER": "system",
         },
-        # (レコード6) 前のデータとBATCH処理されるデータだけどLIMITを超えてるので対象外
-        {
+        # (レコード6) 前のデータとBATCH処理されるデータ(2スレッド目)
+        r6 := {
+            "PROCESS_ID": ulid.new().str,
+            "PROCESS_KIND": const.PROCESS_KIND_NOTIFICATION,
+            "PROCESS_EXEC_ID": ulid.new().str,
+            "ORGANIZATION_ID": list(testdata.ORGANIZATIONS.keys())[0],
+            "WORKSPACE_ID": testdata.ORGANIZATIONS[list(testdata.ORGANIZATIONS.keys())[0]]["workspace_id"][0],
+            "ENABLE_BATCH": True,
+            "BATCH_PERIOD_SECONDS": 10,
+            "BATCH_COUNT_LIMIT": 4,
+            "BATCH_GROUP_KEY": json.dumps({"notification_id": "TEST02"}),
+            "LAST_UPDATE_TIMESTAMP": datetime.datetime.now() - datetime.timedelta(seconds=6),
+            "LAST_UPDATE_USER": "system",
+        },
+        # (レコード7) 前のデータとBATCH処理されるデータ(2スレッド目)
+        r7 := {
+            "PROCESS_ID": ulid.new().str,
+            "PROCESS_KIND": const.PROCESS_KIND_NOTIFICATION,
+            "PROCESS_EXEC_ID": ulid.new().str,
+            "ORGANIZATION_ID": list(testdata.ORGANIZATIONS.keys())[0],
+            "WORKSPACE_ID": testdata.ORGANIZATIONS[list(testdata.ORGANIZATIONS.keys())[0]]["workspace_id"][0],
+            "ENABLE_BATCH": True,
+            "BATCH_PERIOD_SECONDS": 10,
+            "BATCH_COUNT_LIMIT": 4,
+            "BATCH_GROUP_KEY": json.dumps({"notification_id": "TEST02"}),
+            "LAST_UPDATE_TIMESTAMP": datetime.datetime.now() - datetime.timedelta(seconds=5),
+            "LAST_UPDATE_USER": "system",
+        },
+        # (レコード8) 前のデータとBATCH処理されるデータ(2スレッド目)
+        r8 := {
+            "PROCESS_ID": ulid.new().str,
+            "PROCESS_KIND": const.PROCESS_KIND_NOTIFICATION,
+            "PROCESS_EXEC_ID": ulid.new().str,
+            "ORGANIZATION_ID": list(testdata.ORGANIZATIONS.keys())[0],
+            "WORKSPACE_ID": testdata.ORGANIZATIONS[list(testdata.ORGANIZATIONS.keys())[0]]["workspace_id"][0],
+            "ENABLE_BATCH": True,
+            "BATCH_PERIOD_SECONDS": 10,
+            "BATCH_COUNT_LIMIT": 4,
+            "BATCH_GROUP_KEY": json.dumps({"notification_id": "TEST02"}),
+            "LAST_UPDATE_TIMESTAMP": datetime.datetime.now() - datetime.timedelta(seconds=3),
+            "LAST_UPDATE_USER": "system",
+        },
+        # (レコード9) 前のデータとBATCH処理されるデータ(2スレッド目)
+        r9 := {
+            "PROCESS_ID": ulid.new().str,
+            "PROCESS_KIND": const.PROCESS_KIND_NOTIFICATION,
+            "PROCESS_EXEC_ID": ulid.new().str,
+            "ORGANIZATION_ID": list(testdata.ORGANIZATIONS.keys())[0],
+            "WORKSPACE_ID": testdata.ORGANIZATIONS[list(testdata.ORGANIZATIONS.keys())[0]]["workspace_id"][0],
+            "ENABLE_BATCH": True,
+            "BATCH_PERIOD_SECONDS": 10,
+            "BATCH_COUNT_LIMIT": 4,
+            "BATCH_GROUP_KEY": json.dumps({"notification_id": "TEST02"}),
+            "LAST_UPDATE_TIMESTAMP": datetime.datetime.now() - datetime.timedelta(seconds=2),
+            "LAST_UPDATE_USER": "system",
+        },
+        # (レコード10) 前のデータとBATCH処理されるデータだけどLIMIT*スレッド数を超えてるので対象外
+        r10 := {
             "PROCESS_ID": ulid.new().str,
             "PROCESS_KIND": const.PROCESS_KIND_NOTIFICATION,
             "PROCESS_EXEC_ID": ulid.new().str,
@@ -883,8 +940,8 @@ def test_job_manager_get_queue():
             "LAST_UPDATE_TIMESTAMP": datetime.datetime.now() - datetime.timedelta(seconds=1),
             "LAST_UPDATE_USER": "system",
         },
-        # (レコード7) 対象になるが前のデータとは別のバッチ（LAST_UPDATE_TIMESTAMPがBATCH_PERIOD_SECONDS経過後）
-        {
+        # (レコード11) 対象になるが前のデータとは別のバッチ（LAST_UPDATE_TIMESTAMPがBATCH_PERIOD_SECONDS経過後）
+        r11 := {
             "PROCESS_ID": ulid.new().str,
             "PROCESS_KIND": const.PROCESS_KIND_NOTIFICATION,
             "PROCESS_EXEC_ID": ulid.new().str,
@@ -907,27 +964,34 @@ def test_job_manager_get_queue():
             ret_queue, ret_batch_queue = job_manager.get_queue(conn, [], 100)
 
             # QUEUEの取得結果も1件で、登録したものが返ってくること
-            assert len(ret_queue) == 2  # レコード2, 7の2件分が返ってくる
-            assert len(ret_batch_queue) == 2   # レコード2, レコード7の2件分が返ってくる
+            assert len(ret_queue) == 2  # レコード2, 11の2件分が返ってくる
+            assert len(ret_batch_queue) == 2   # レコード2, レコード11の2件分が返ってくる
 
             # レコード2をサーチ
-            record2_index = next((i for i, d in enumerate(ret_queue) if d['PROCESS_ID'] == queue_data[2 - 1]['PROCESS_ID']), None)
+            record2_index = next((i for i, d in enumerate(ret_queue) if d['PROCESS_ID'] == r2['PROCESS_ID']), None)
             # レコード2がqueueに含まれること
             assert record2_index is not None
-            # レコード2のbatch処理対象にレコード2,3,4,5の4件が入っていること
-            assert len(ret_batch_queue[record2_index]) == 4
-            assert next((i for i, d in enumerate(ret_batch_queue[record2_index]) if d['PROCESS_ID'] == queue_data[2 - 1]['PROCESS_ID']), None) is not None
-            assert next((i for i, d in enumerate(ret_batch_queue[record2_index]) if d['PROCESS_ID'] == queue_data[3 - 1]['PROCESS_ID']), None) is not None
-            assert next((i for i, d in enumerate(ret_batch_queue[record2_index]) if d['PROCESS_ID'] == queue_data[4 - 1]['PROCESS_ID']), None) is not None
-            assert next((i for i, d in enumerate(ret_batch_queue[record2_index]) if d['PROCESS_ID'] == queue_data[5 - 1]['PROCESS_ID']), None) is not None
+            # レコード2のbatch処理対象にレコード2～9の8件が入っていること
+            assert len(ret_batch_queue[record2_index]) == 8
+            record2_batch_process_ids = [r['PROCESS_ID'] for r in ret_batch_queue[record2_index]]
+            assert r2['PROCESS_ID'] in record2_batch_process_ids
+            assert r3['PROCESS_ID'] in record2_batch_process_ids
+            assert r4['PROCESS_ID'] in record2_batch_process_ids
+            assert r5['PROCESS_ID'] in record2_batch_process_ids
+            assert r6['PROCESS_ID'] in record2_batch_process_ids
+            assert r7['PROCESS_ID'] in record2_batch_process_ids
+            assert r8['PROCESS_ID'] in record2_batch_process_ids
+            assert r9['PROCESS_ID'] in record2_batch_process_ids
+            # レコード2のbatch処理対象にレコード10は入っていないこと（LIMIT超えのため）
+            assert r10['PROCESS_ID'] not in record2_batch_process_ids
 
-            # レコード7をサーチ
-            record7_index = next((i for i, d in enumerate(ret_queue) if d['PROCESS_ID'] == queue_data[7 - 1]['PROCESS_ID']), None)
-            # レコード7がqueueに含まれること
-            assert record7_index is not None
-            # レコード7のbatch処理対象にレコード7の1件が入っていること
-            assert len(ret_batch_queue[record7_index]) == 1
-            assert next((i for i, d in enumerate(ret_batch_queue[record7_index]) if d['PROCESS_ID'] == queue_data[7 - 1]['PROCESS_ID']), None) is not None
+            # レコード11をサーチ
+            record11_index = next((i for i, d in enumerate(ret_queue) if d['PROCESS_ID'] == r11['PROCESS_ID']), None)
+            # レコード11がqueueに含まれること
+            assert record11_index is not None
+            # レコード11のbatch処理対象にレコード11の1件が入っていること
+            assert len(ret_batch_queue[record11_index]) == 1
+            assert r11['PROCESS_ID'] in (r['PROCESS_ID'] for r in ret_batch_queue[record11_index])
         finally:
             conn.rollback()
     #
