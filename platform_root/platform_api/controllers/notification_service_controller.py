@@ -17,6 +17,7 @@ from contextlib import closing
 import json
 import inspect
 import pymysql
+import os
 
 from common_library.common import common, validation, const
 from common_library.common.db import DBconnector
@@ -50,7 +51,7 @@ def settings_destination_get(organization_id, workspace_id, destination_id):  # 
 
 
 @common.platform_exception_handler
-def settings_notification_put(body, organization_id, workspace_id, destination_id):  # noqa: E501
+def settings_notification_put(body: dict[str], organization_id, workspace_id, destination_id):  # noqa: E501
     """Put an settings notification
 
     Args:
@@ -92,6 +93,9 @@ def settings_notification_put(body, organization_id, workspace_id, destination_i
     enable_batch = body.get('enable_batch')
     batch_period_seconds = body.get('batch_period_seconds')
     batch_count_limit = body.get('batch_count_limit')
+    # TODO: enable_retryとretry_count_limitをbodyから受け取るようにする
+    enable_retry = os.environ.get("DEFAULT_ENABLE_RETRY", "false").lower() == "true"
+    retry_count_limit = int(os.environ.get("DEFAULT_RETRY_COUNT_LIMIT", 0)) if enable_retry else None
     user_id = connexion.request.headers.get("User-id")
 
     # validation check
@@ -103,7 +107,16 @@ def settings_notification_put(body, organization_id, workspace_id, destination_i
     if not validate.ok:
         return common.response_validation_error(validate)
 
-    validate = validation.validate_destination_informations(destination_kind, info, enable_batch, batch_period_seconds, batch_count_limit, 'put')
+    validate = validation.validate_destination_informations(
+        destination_kind,
+        info,
+        enable_batch,
+        batch_period_seconds,
+        batch_count_limit,
+        enable_retry,
+        retry_count_limit,
+        "put",
+    )
     if not validate.ok:
         return common.response_validation_error(validate)
 
@@ -159,6 +172,8 @@ def settings_notification_put(body, organization_id, workspace_id, destination_i
                 "enable_batch": 1 if enable_batch else 0,
                 "batch_period_seconds": batch_period_seconds if enable_batch else None,
                 "batch_count_limit": batch_count_limit if enable_batch else None,
+                "enable_retry": 1 if enable_batch and enable_retry else 0,
+                "retry_count_limit": retry_count_limit if enable_batch and enable_retry else None,
                 "last_update_user": user_id
             }
             cursor.execute(queries_notification.SQL_UPDATE_NOTIFICATION_DESTINATION, parameter)
@@ -201,7 +216,19 @@ def settings_notification_create(body, organization_id, workspace_id):  # noqa: 
         validate = validation.validate_destination_kind(row.get('kind'))
         if not validate.ok:
             return common.response_validation_error(validate)
-        validate = validation.validate_destination_informations(row.get('kind'), row.get('destination_informations'), row.get('enable_batch'), row.get('batch_period_seconds'), row.get('batch_count_limit'), 'create')
+        # TODO: enable_retryとretry_count_limitをbodyから受け取るようにする
+        enable_retry = os.environ.get("DEFAULT_ENABLE_RETRY", "false").lower() == "true"
+        retry_count_limit = int(os.environ.get("DEFAULT_RETRY_COUNT_LIMIT", 0)) if enable_retry else None
+        validate = validation.validate_destination_informations(
+            row.get("kind"),
+            row.get("destination_informations"),
+            row.get("enable_batch"),
+            row.get("batch_period_seconds"),
+            row.get("batch_count_limit"),
+            enable_retry,
+            retry_count_limit,
+            "create",
+        )
         if not validate.ok:
             return common.response_validation_error(validate)
         validate = validation.validate_destination_conditions(row.get('conditions'))
@@ -265,6 +292,9 @@ def settings_notification_create(body, organization_id, workspace_id):  # noqa: 
         with conn.cursor() as cursor:
             for row in body:
                 try:
+                    # TODO: enable_retryとretry_count_limitをbodyから受け取るようにする
+                    enable_retry = os.environ.get("DEFAULT_ENABLE_RETRY", "false").lower() == "true"
+                    retry_count_limit = int(os.environ.get("DEFAULT_RETRY_COUNT_LIMIT", 0)) if enable_retry else None
                     parameter = {
                         "destination_id": row.get('id'),
                         "destination_name": row.get('name'),
@@ -274,6 +304,8 @@ def settings_notification_create(body, organization_id, workspace_id):  # noqa: 
                         "enable_batch": 1 if row.get('enable_batch') else 0,
                         "batch_period_seconds": row.get('batch_period_seconds') if row.get('enable_batch') else None,
                         "batch_count_limit": row.get('batch_count_limit') if row.get('enable_batch') else None,
+                        "enable_retry": 1 if row.get('enable_batch') and enable_retry else 0,
+                        "retry_count_limit": retry_count_limit if row.get('enable_batch') and enable_retry else None,
                         "create_user": user_id,
                         "last_update_user": user_id
                     }

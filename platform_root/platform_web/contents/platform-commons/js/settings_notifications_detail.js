@@ -132,7 +132,7 @@ $(function(){
             .replace(/\${conditions_name}/g, getText("000-00224", '1.新規イベント（受信時）'))
             .replace(/\${conditions_value}/g, ita_event_type_new_received);
         html += row_template_3rd
-            .replace(/\${conditions_name}/g, getText("000-00225", '2.新規イベント（統合時）'))
+            .replace(/\${conditions_name}/g, getText("000-00225", '2.新規イベント（統合予定）'))
             .replace(/\${conditions_value}/g, ita_event_type_new_consolidated);
         html += row_template_3rd
             .replace(/\${conditions_name}/g, getText("000-00153", '3.新規イベント（判定前）'))
