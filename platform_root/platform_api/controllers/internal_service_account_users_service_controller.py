@@ -368,12 +368,20 @@ def internal_service_account_user_token_create(body, organization_id, workspace_
 
     elif resp_upd_user.status_code not in [200, 204]:
         globals.logger.debug(f"response:{resp_upd_user.text}")
+        # 安全にレスポンスからエラーメッセージを抽出する
+        try:
+            res_json = json.loads(resp_upd_user.text)
+            err_msg = res_json.get("errorMessage", resp_upd_user.text)
+        except Exception:
+            err_msg = resp_upd_user.text if resp_upd_user.text else f"Status Code: {resp_upd_user.status_code}"
+
         message_id = "500-25004"
         message = multi_lang.get_text(
             message_id,
             "ユーザー更新に失敗しました(対象ユーザーID:{0})[{1}]",
             user_id,
-            json.loads(resp_upd_user.text)["errorMessage"])
+            err_msg
+        )
 
         raise common.InternalErrorException(message_id=message_id, message=message)
 
@@ -395,11 +403,11 @@ def internal_service_account_user_token_create(body, organization_id, workspace_
     #
     # 一時パスワード設定
     #
-    password_set_treis = 10  # パスワード設定を最大試す回数(たまたま、パスワード変更履歴のポリシー有で衝突した場合のため)
+    password_set_tries = 10  # パスワード設定を最大試す回数(たまたま、パスワード変更履歴のポリシー有で衝突した場合のため)
     password_policy = api_keycloak_realms.pickup_password_policy(json.loads(resp_realm.text))
     password = None
 
-    for try_count in range(password_set_treis):
+    for try_count in range(password_set_tries):
         # パスワードポリシーに従ってパスワードを発行する
         try_password = bl_service_account_user.temporary_password(password_policy)
         resp_passwd = api_keycloak_users.user_reset_password(organization_id, user_id, try_password, token)
