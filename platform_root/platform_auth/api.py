@@ -364,7 +364,7 @@ def extra_init(organization_id='-', workspace_id='-', multipart_mode=False):
     Returns:
         extra(dict): extra items
     """
-    
+
     # request.headersより機微情報を除いた情報をauditlogに設定する
     # Set information in auditlog excluding sensitive information from request.headers
     save_headers = {}
@@ -784,6 +784,10 @@ def ita_workspace_api_call(organization_id, workspace_id, function, subpath):
         elif function == "ansible_execution_agent":
             # Ansible Execution Agent Call
             dest_url = "{}://{}:{}/api/{}/workspaces/{}/ansible_execution_agent/{}".format(
+                os.environ['ITA_API_ANSIBLE_EXECUTION_RECEIVER_PROTOCOL'], os.environ['ITA_API_ANSIBLE_EXECUTION_RECEIVER_HOST'], os.environ['ITA_API_ANSIBLE_EXECUTION_RECEIVER_PORT'], organization_id, workspace_id, subpath)
+        elif function == "aap":
+            # Ansible Automation Platform Call
+            dest_url = "{}://{}:{}/api/{}/workspaces/{}/aap/{}".format(
                 os.environ['ITA_API_ANSIBLE_EXECUTION_RECEIVER_PROTOCOL'], os.environ['ITA_API_ANSIBLE_EXECUTION_RECEIVER_HOST'], os.environ['ITA_API_ANSIBLE_EXECUTION_RECEIVER_PORT'], organization_id, workspace_id, subpath)
         else:
             # Page Not Found
