@@ -191,7 +191,7 @@ paths:
                       properties:
                         drivers:
                           type: object
-                          description: 'terraform_cloud_ep: Terraform-Cloud/EP driver <br/>terraform_cli: Terraform-CLI driver, <br/>ci_cd: CI/CD for IaC, <br/>oase: OASE, '
+                          description: 'terraform_cloud_ep: Terraform-Cloud/EP driver <br/>terraform_cli: Terraform-CLI driver, <br/>ci_cd: CI/CD for IaC, <br/>oase: OASE, <br/>ai_assistant: Exastro AI Assistant, '
                           properties:
                             terraform_cloud_ep:
                               type: boolean
@@ -201,11 +201,14 @@ paths:
                               type: boolean
                             oase:
                               type: boolean
+                            ai_assistant:
+                              type: boolean
                           required:
                             - terraform_cloud_ep
                             - terraform_cli
                             - ci_cd
                             - oase
+                            - ai_assistant
                         services:
                           type: object
                           properties:
@@ -238,6 +241,7 @@ paths:
                       terraform_cli: true
                       ci_cd: true
                       oase: true
+                      ai_assistant: true
                     services:
                       document_store:
                         name: mongodb
@@ -4267,6 +4271,8 @@ components:
                   type: boolean
                 oase:
                   type: boolean
+                ai_assistant:
+                  type: boolean
         status:
           type: string
           example: Organization Create Complete
@@ -4299,7 +4305,7 @@ components:
           properties:
             drivers:
               type: object
-              description: 'terraform_cloud_ep: Terraform-Cloud/EP driver <br/>terraform_cli: Terraform-CLI driver, <br/>ci_cd: CI/CD for IaC, <br/>oase: OASE, '
+              description: 'terraform_cloud_ep: Terraform-Cloud/EP driver <br/>terraform_cli: Terraform-CLI driver, <br/>ci_cd: CI/CD for IaC, <br/>oase: OASE, <br/>ai_assistant: Exastro AI Assistant, '
               properties:
                 terraform_cloud_ep:
                   type: boolean
@@ -4308,6 +4314,8 @@ components:
                 ci_cd:
                   type: boolean
                 oase:
+                  type: boolean
+                ai_assistant:
                   type: boolean
             services:
               type: object

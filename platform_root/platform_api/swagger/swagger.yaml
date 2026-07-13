@@ -188,6 +188,7 @@ paths:
                       terraform_cli: true
                       ci_cd: true
                       oase: true
+                      ai_assistant: true
                     services:
                       document_store:
                         name: mongodb
@@ -5448,6 +5449,7 @@ components:
             $ref: "#/components/schemas/organization"
     apiplatformorganizationsorganization_id_optionsIta_drivers:
       required:
+      - ai_assistant
       - ci_cd
       - oase
       - terraform_cli
@@ -5462,8 +5464,11 @@ components:
           type: boolean
         oase:
           type: boolean
+        ai_assistant:
+          type: boolean
       description: "terraform_cloud_ep: Terraform-Cloud/EP driver <br/>terraform_cli:\
-        \ Terraform-CLI driver, <br/>ci_cd: CI/CD for IaC, <br/>oase: OASE, "
+        \ Terraform-CLI driver, <br/>ci_cd: CI/CD for IaC, <br/>oase: OASE, <br/>ai_assistant:\
+        \ Exastro AI Assistant, "
     apiplatformorganizationsorganization_id_optionsIta_services_document_store:
       type: object
       properties:
@@ -5769,6 +5774,8 @@ components:
           type: boolean
         oase:
           type: boolean
+        ai_assistant:
+          type: boolean
     organization_optionsIta:
       type: object
       properties:
@@ -5785,8 +5792,11 @@ components:
           type: boolean
         oase:
           type: boolean
+        ai_assistant:
+          type: boolean
       description: "terraform_cloud_ep: Terraform-Cloud/EP driver <br/>terraform_cli:\
-        \ Terraform-CLI driver, <br/>ci_cd: CI/CD for IaC, <br/>oase: OASE, "
+        \ Terraform-CLI driver, <br/>ci_cd: CI/CD for IaC, <br/>oase: OASE, <br/>ai_assistant:\
+        \ Exastro AI Assistant, "
     organizationCreate_optionsIta:
       type: object
       properties:
