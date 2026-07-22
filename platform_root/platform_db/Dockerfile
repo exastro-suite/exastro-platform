@@ -11,7 +11,7 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
-FROM mariadb:10.4.8
+FROM mariadb:10.11.4
 
 COPY ./platform_root/platform_db/conf/my.cnf    /etc/mysql/conf.d/my.cnf
 COPY ./platform_root/platform_db/initdb         /docker-entrypoint-initdb.d
