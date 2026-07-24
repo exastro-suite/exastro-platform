@@ -341,6 +341,7 @@ def test_organization_get(connexion_client):
                     "terraform_cli": False,
                     "ci_cd": True,
                     "oase": False,
+                    "ai_assistant": True
                 },
                 "services": {
                     "document_store": {
@@ -562,7 +563,8 @@ def test_organization_update(connexion_client):
                 "drivers": {
                     "terraform_cli": True,
                     "ci_cd": False,
-                    "oase": False
+                    "oase": False,
+                    "ai_assistant": False
                 }
             }}))
 
@@ -578,7 +580,8 @@ def test_organization_update(connexion_client):
                 "drivers": {
                     "terraform_cloud_ep": False,
                     "ci_cd": False,
-                    "oase": False
+                    "oase": False,
+                    "ai_assistant": False
                 }
             }}))
 
@@ -594,7 +597,8 @@ def test_organization_update(connexion_client):
                 "drivers": {
                     "terraform_cloud_ep": False,
                     "terraform_cli": True,
-                    "oase": False
+                    "oase": False,
+                    "ai_assistant": False
                 }
             }}))
 
@@ -610,7 +614,8 @@ def test_organization_update(connexion_client):
                 "drivers": {
                     "terraform_cloud_ep": False,
                     "terraform_cli": True,
-                    "ci_cd": False
+                    "ci_cd": False,
+                    "ai_assistant": False
                 }
             }}))
 
@@ -627,7 +632,8 @@ def test_organization_update(connexion_client):
                     "terraform_cloud_ep": None,
                     "terraform_cli": True,
                     "ci_cd": False,
-                    "oase": False
+                    "oase": False,
+                    "ai_assistant": False
                 }
             }}))
 
@@ -644,7 +650,8 @@ def test_organization_update(connexion_client):
                     "terraform_cloud_ep": True,
                     "terraform_cli": None,
                     "ci_cd": False,
-                    "oase": False
+                    "oase": False,
+                    "ai_assistant": False
                 }
             }}))
 
@@ -661,7 +668,8 @@ def test_organization_update(connexion_client):
                     "terraform_cloud_ep": True,
                     "terraform_cli": False,
                     "ci_cd": None,
-                    "oase": False
+                    "oase": False,
+                    "ai_assistant": False
                 }
             }}))
 
@@ -678,7 +686,8 @@ def test_organization_update(connexion_client):
                     "terraform_cloud_ep": True,
                     "terraform_cli": False,
                     "ci_cd": False,
-                    "oase": None
+                    "oase": None,
+                    "ai_assistant": False
                 }
             }}))
 
@@ -695,7 +704,8 @@ def test_organization_update(connexion_client):
                     "terraform_cloud_ep": "True",
                     "terraform_cli": False,
                     "ci_cd": False,
-                    "oase": False
+                    "oase": False,
+                    "ai_assistant": False
                 }
             }}))
 
@@ -712,7 +722,8 @@ def test_organization_update(connexion_client):
                     "terraform_cloud_ep": True,
                     "terraform_cli": "False",
                     "ci_cd": False,
-                    "oase": False
+                    "oase": False,
+                    "ai_assistant": False
                 }
             }}))
 
@@ -729,7 +740,8 @@ def test_organization_update(connexion_client):
                     "terraform_cloud_ep": True,
                     "terraform_cli": False,
                     "ci_cd": "False",
-                    "oase": False
+                    "oase": False,
+                    "ai_assistant": False
                 }
             }}))
 
@@ -746,7 +758,8 @@ def test_organization_update(connexion_client):
                     "terraform_cloud_ep": True,
                     "terraform_cli": False,
                     "ci_cd": False,
-                    "oase": "False"
+                    "oase": "False",
+                    "ai_assistant": False
                 }
             }}))
 
@@ -763,7 +776,8 @@ def test_organization_update(connexion_client):
                     "terraform_cloud_ep": 1,
                     "terraform_cli": False,
                     "ci_cd": False,
-                    "oase": False
+                    "oase": False,
+                    "ai_assistant": False
                 }
             }}))
 
@@ -780,7 +794,8 @@ def test_organization_update(connexion_client):
                     "terraform_cloud_ep": True,
                     "terraform_cli": 0,
                     "ci_cd": False,
-                    "oase": False
+                    "oase": False,
+                    "ai_assistant": False
                 }
             }}))
 
@@ -797,7 +812,8 @@ def test_organization_update(connexion_client):
                     "terraform_cloud_ep": True,
                     "terraform_cli": False,
                     "ci_cd": 0,
-                    "oase": False
+                    "oase": False,
+                    "ai_assistant": False
                 }
             }}))
 
@@ -814,7 +830,8 @@ def test_organization_update(connexion_client):
                     "terraform_cloud_ep": True,
                     "terraform_cli": False,
                     "ci_cd": False,
-                    "oase": 0
+                    "oase": 0,
+                    "ai_assistant": False
                 }
             }}))
 
@@ -832,6 +849,7 @@ def test_organization_update(connexion_client):
                     "terraform_cli": True,
                     "ci_cd": True,
                     "oase": True,
+                    "ai_assistant": True
                 },
                 "services": {
                     "document_store": {
@@ -856,6 +874,7 @@ def test_organization_update(connexion_client):
                     "terraform_cli": True,
                     "ci_cd": True,
                     "oase": True,
+                    "ai_assistant": True
                 },
                 "services": {
                     "document_store": {
@@ -880,6 +899,7 @@ def test_organization_update(connexion_client):
                     "terraform_cli": True,
                     "ci_cd": True,
                     "oase": True,
+                    "ai_assistant": True
                 },
                 "services": {
                     "document_store": {
@@ -942,7 +962,8 @@ def test_organization_update(connexion_client):
                         "terraform_cloud_ep": False,
                         "terraform_cli": True,
                         "ci_cd": False,
-                        "oase": True
+                        "oase": True,
+                        "ai_assistant": False
                     },
                     "services": {
                         "document_store": {
@@ -969,6 +990,7 @@ def test_organization_update(connexion_client):
         assert drivers["terraform_cli"] is True, "create status"
         assert drivers["ci_cd"] is False, "create status"
         assert drivers["oase"] is True, "create status"
+        assert drivers["ai_assistant"] is False, "create status"
 
         document_store = json.loads(org_info["INFORMATIONS"])["ext_options"]["options_ita"]["services"]["document_store"]
         assert document_store["name"] == "mongodb", "create status"
@@ -983,7 +1005,8 @@ def test_organization_update(connexion_client):
                         "terraform_cloud_ep": True,
                         "terraform_cli": True,
                         "ci_cd": True,
-                        "oase": True
+                        "oase": True,
+                        "ai_assistant": True
                     },
                     "services": {
                         "document_store": {
@@ -1010,6 +1033,7 @@ def test_organization_update(connexion_client):
         assert drivers["terraform_cli"] is True, "update status"
         assert drivers["ci_cd"] is True, "update status"
         assert drivers["oase"] is True, "update status"
+        assert drivers["ai_assistant"] is True, "update status"
 
         document_store = json.loads(updated_org_info["INFORMATIONS"])["ext_options"]["options_ita"]["services"]["document_store"]
         assert document_store["name"] == "mongodb", "update status"
@@ -1026,6 +1050,7 @@ def test_organization_list(connexion_client):
                     "terraform_cli": False,
                     "ci_cd": True,
                     "oase": False,
+                    "ai_assistant": True
                 },
                 "services": {
                     "document_store": {
@@ -1043,6 +1068,7 @@ def test_organization_list(connexion_client):
                     "terraform_cli": True,
                     "ci_cd": False,
                     "oase": True,
+                    "ai_assistant": False
                 },
                 "services": {
                     "document_store": {
@@ -1258,7 +1284,8 @@ def sample_data_organization_update(update={}):
                 "terraform_cloud_ep": True,
                 "terraform_cli": True,
                 "ci_cd": True,
-                "oase": True
+                "oase": True,
+                "ai_assistant": True
             },
             "services": {
                 "document_store": {
