@@ -101,5 +101,7 @@
     "offlineSessionIdleTimeout": 31536000,
     "offlineSessionMaxLifespanEnabled": true,
     "offlineSessionMaxLifespan": 31536000,
+    "ssoSessionIdleTimeout": 86400,
+    "ssoSessionMaxLifespan": 86400,
     "sslRequired": "none"
 }

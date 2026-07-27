@@ -11,6 +11,17 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
+"""
+Token service controller tests
+
+Includes Keycloak 25/26 compatibility tests:
+- Keycloak 25.0.0: basic scope and sub claim
+- Keycloak 26.6.2: token introspection audience validation
+
+Reference:
+- https://www.keycloak.org/docs/latest/upgrading/index.html#migrating-to-25-0-0
+- https://www.keycloak.org/docs/latest/upgrading/index.html#migrating-to-26-6-2
+"""
 import re
 # from unittest import mock
 from contextlib import closing
@@ -70,7 +81,20 @@ def test_token_api_system_manager(connexion_client):
         assert response.json['access_token'] is not None
         assert response.json['refresh_token'] is not None
 
-        user_id = jwt.decode(response.json['access_token'], options={"verify_signature": False}).get("sub")
+        # Keycloak 25/26 compatibility: Verify token claims
+        access_token = response.json['access_token']
+        decoded = jwt.decode(access_token, options={"verify_signature": False})
+
+        # Keycloak 25+: 'sub' claim must exist (provided by 'basic' scope)
+        assert 'sub' in decoded, "Token missing 'sub' claim - ensure 'basic' scope is in defaultClientScopes"
+        assert decoded['sub'] is not None, "'sub' claim is None"
+
+        # Keycloak 26+: 'aud' claim must include '_platform' for token introspection
+        assert 'aud' in decoded, "Token missing 'aud' claim - ensure audience mappers are configured"
+        aud = decoded['aud'] if isinstance(decoded['aud'], list) else [decoded['aud']]
+        assert '_platform' in aud, f"'_platform' not in audience claim. Got: {aud}"
+
+        user_id = decoded.get("sub")
 
         # DBにデータができているか
         with closing(DBconnector().connect_platformdb()) as conn, conn.cursor() as cursor:
@@ -186,7 +210,22 @@ def test_token_api_organization_user(connexion_client):
         assert response.json['access_token'] is not None
         assert response.json['refresh_token'] is not None
 
-        user_id = jwt.decode(response.json['access_token'], options={"verify_signature": False}).get("sub")
+        # Keycloak 25/26 compatibility: Verify token claims for organization realm
+        access_token = response.json['access_token']
+        decoded = jwt.decode(access_token, options={"verify_signature": False})
+
+        # Keycloak 25+: 'sub' claim must exist (provided by 'basic' scope)
+        assert 'sub' in decoded, "Token missing 'sub' claim - ensure 'basic' scope is in defaultClientScopes"
+        assert decoded['sub'] is not None, "'sub' claim is None"
+
+        # Keycloak 26+: 'aud' claim must include '_platform' and 'system-{org}-auth'
+        assert 'aud' in decoded, "Token missing 'aud' claim - ensure audience mappers are configured"
+        aud = decoded['aud'] if isinstance(decoded['aud'], list) else [decoded['aud']]
+        assert '_platform' in aud, f"'_platform' not in audience claim. Got: {aud}"
+        expected_auth_client = f"system-{organization['organization_id']}-auth"
+        assert expected_auth_client in aud, f"'{expected_auth_client}' not in audience claim. Got: {aud}"
+
+        user_id = decoded.get("sub")
 
         # DBにデータができているか
         with closing(DBconnector().connect_orgdb(organization['organization_id'])) as conn, conn.cursor() as cursor:

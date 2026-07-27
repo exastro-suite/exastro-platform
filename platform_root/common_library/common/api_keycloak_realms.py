@@ -22,6 +22,16 @@ import re
 import globals  # 共通的なglobals Common globals
 
 
+def __get_keycloak_api_url():
+    """Keycloak API URLを取得
+       Get Keycloak API URL
+
+    Returns:
+        str: Keycloak API base URL
+    """
+    return "{}://{}:{}".format(os.environ['API_KEYCLOAK_PROTOCOL'], os.environ['API_KEYCLOAK_HOST'], os.environ['API_KEYCLOAK_PORT'])
+
+
 def realm_create(realm_json, token):
     """realm作成
 
@@ -43,7 +53,7 @@ def realm_create(realm_json, token):
     globals.logger.debug("realms post send")
     # 呼び出し先設定
     # Call destination setting
-    api_url = "{}://{}:{}".format(os.environ['API_KEYCLOAK_PROTOCOL'], os.environ['API_KEYCLOAK_HOST'], os.environ['API_KEYCLOAK_PORT'])
+    api_url = __get_keycloak_api_url()
     request_response = requests.post(f"{api_url}/auth/admin/realms", headers=header_para, json=realm_json, timeout=(12, 600))
 
     globals.logger.debug(request_response.text)
@@ -75,7 +85,7 @@ def realm_update(realm_id, realm_json, token):
     globals.logger.debug("realms put send")
     # 呼び出し先設定
     # Call destination setting
-    api_url = "{}://{}:{}".format(os.environ['API_KEYCLOAK_PROTOCOL'], os.environ['API_KEYCLOAK_HOST'], os.environ['API_KEYCLOAK_PORT'])
+    api_url = __get_keycloak_api_url()
     request_response = requests.put(f"{api_url}/auth/admin/realms/{realm_id}", headers=header_para, json=realm_json, timeout=(12, 600))
 
     globals.logger.debug(request_response.text)
@@ -106,7 +116,7 @@ def realm_delete(realm_id, token):
 
     # 呼び出し先設定
     # Call destination setting
-    api_url = "{}://{}:{}".format(os.environ['API_KEYCLOAK_PROTOCOL'], os.environ['API_KEYCLOAK_HOST'], os.environ['API_KEYCLOAK_PORT'])
+    api_url = __get_keycloak_api_url()
     request_response = requests.delete(f"{api_url}/auth/admin/realms/{realm_id}", headers=header_para, timeout=(12, 600))
 
     globals.logger.debug(request_response.text)
@@ -114,10 +124,6 @@ def realm_delete(realm_id, token):
     # 応答をそのまま返却
     # return response as is
     return request_response
-
-
-def __get_keycloak_api_url():
-    return "{}://{}:{}".format(os.environ['API_KEYCLOAK_PROTOCOL'], os.environ['API_KEYCLOAK_HOST'], os.environ['API_KEYCLOAK_PORT'])
 
 
 def realms_get(token):
@@ -177,6 +183,79 @@ def realm_get(realm_name, token):
     # 応答をそのまま返却
     # return response as is
     return request_response
+
+
+def get_organization_realms(token):
+    """組織realm一覧取得（master realmを除く）
+       Get list of organization realms (excluding master realm)
+
+    Args:
+        token (str): keycloak admin access token
+
+    Returns:
+        list[str]: 組織realm名のリスト / List of organization realm names
+    """
+    globals.logger.debug('Get organization realms (excluding master)')
+
+    response = realms_get(token)
+
+    if response.status_code != 200:
+        globals.logger.error(f"Failed to get realms: status={response.status_code} response={response.text}")
+        return []
+
+    realms = response.json()
+    organization_realms = [r['realm'] for r in realms if r['realm'] != 'master']
+
+    globals.logger.debug(f"Found {len(organization_realms)} organization realms")
+
+    return organization_realms
+
+
+def update_realm_sso_settings(realm_name, token, sso_session_idle_timeout=86400, sso_session_max_lifespan=86400):
+    """realm の SSO session timeout 設定を更新
+       Update SSO session timeout settings for a realm
+
+    Args:
+        realm_name (str): realm name
+        token (str): keycloak admin access token
+        sso_session_idle_timeout (int): SSO session idle timeout in seconds (default: 86400 = 24 hours)
+        sso_session_max_lifespan (int): SSO session max lifespan in seconds (default: 86400 = 24 hours)
+
+    Returns:
+        bool: True if updated or already configured, False if failed
+    """
+    globals.logger.debug(f"Updating SSO settings for realm: {realm_name}")
+
+    # Get current realm settings
+    response = realm_get(realm_name, token)
+    if response.status_code != 200:
+        globals.logger.warning(f"Failed to get realm {realm_name}: {response.status_code}")
+        return False
+
+    realm_config = response.json()
+
+    # Check if SSO settings are already configured
+    current_idle = realm_config.get('ssoSessionIdleTimeout')
+    current_max = realm_config.get('ssoSessionMaxLifespan')
+
+    if current_idle == sso_session_idle_timeout and current_max == sso_session_max_lifespan:
+        globals.logger.info(f"SSO settings already configured for realm {realm_name}")
+        return True
+
+    # Update SSO settings
+    update_config = {
+        "ssoSessionIdleTimeout": sso_session_idle_timeout,
+        "ssoSessionMaxLifespan": sso_session_max_lifespan
+    }
+
+    response = realm_update(realm_name, update_config, token)
+
+    if response.status_code in [200, 204]:
+        globals.logger.info(f"Successfully updated SSO settings for realm {realm_name}")
+        return True
+    else:
+        globals.logger.error(f"Failed to update SSO settings for realm {realm_name}: {response.status_code} {response.text}")
+        return False
 
 
 def pickup_password_policy(realm_response_json: dict) -> dict:
