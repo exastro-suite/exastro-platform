@@ -129,7 +129,7 @@ services:
         condition: service_completed_successfully
 
   platform-db:
-    image: mariadb:10.4.8
+    image: mariadb:10.11.4
     healthcheck:
       test: mysqladmin ping --silent && mysql -u root -p$${MYSQL_ROOT_PASSWORD} -e 'select 1;'
       interval: 3s

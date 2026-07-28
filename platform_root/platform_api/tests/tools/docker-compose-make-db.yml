@@ -13,7 +13,7 @@
 #   limitations under the License.
 services:
   makedb-platform-db:
-    image: mariadb:10.4.8
+    image: mariadb:10.11.4
     healthcheck:
       test: mysql -u keycloak -ppassword -e 'select 1;'
       interval: 3s
@@ -126,7 +126,7 @@ services:
         condition: service_completed_successfully
 
   makedb-db-exports:
-    image: mariadb:10.4.8
+    image: mariadb:10.11.4
     # command: "echo 'Y' | bash -c '/tools/make_tests_db_exports.sh; while(true) do sleep 600; done'"
     command: "bash -c '/tools/make_tests_db_exports.sh'"
     environment:
