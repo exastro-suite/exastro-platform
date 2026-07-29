@@ -15,16 +15,6 @@ ARG USERNAME=app_user
 ARG GROUPNAME=app_user
 ARG APP_PATH=/app
 
-# Build keycloak-js for static serving (Keycloak 26+ no longer serves it)
-FROM    node:20-slim as keycloak_js_builder
-
-WORKDIR /build
-
-COPY ./platform_root/platform_web/keycloak-js-build/package.json ./
-COPY ./platform_root/platform_web/keycloak-js-build/rollup.config.js ./
-
-RUN npm install && npm run build
-
 # FROM    registry.access.redhat.com/ubi8/ubi-init as common_build
 FROM    registry.access.redhat.com/ubi9/ubi-init:9.4 as common_build
 
@@ -84,9 +74,6 @@ COPY ./platform_root/platform_web/contents/ /var/www/html/
 COPY ./platform_root/platform_web/config/httpd.conf/httpd.conf /etc/httpd/conf/httpd.conf
 COPY ./platform_root/platform_web/config/httpd.conf/rewrite.conf /etc/httpd/conf.d/rewrite.conf
 
-# Copy bundled keycloak.js from builder stage (after contents to avoid overwrite)
-COPY --from=keycloak_js_builder --chown=$USERNAME:$GROUPNAME /build/dist/keycloak.js /var/www/html/common-auth/js/keycloak.js
-
 CMD ["httpd","-D","FOREGROUND", "-D", "NO_CACHE_CONTENTS"]
 
 #
@@ -108,9 +95,6 @@ ADD "https://www.random.org/cgi-bin/randbyte?nbytes=10&format=h" /dev/null
 
 RUN find /var/www/html/ -type f -name '*.html'  -exec sed -i -e "s/ver=__BUILD_VERSION__/ver=$(date '+%Y%m%d-%H%M%S')/g" {} \; \
 &&  find /var/www/html/ -type f -name '*.js'    -exec sed -i -e "s/ver=__BUILD_VERSION__/ver=$(date '+%Y%m%d-%H%M%S')/g" {} \;
-
-# Copy bundled keycloak.js from builder stage (after contents and version replacement to avoid overwrite)
-COPY --from=keycloak_js_builder --chown=$USERNAME:$GROUPNAME /build/dist/keycloak.js /var/www/html/common-auth/js/keycloak.js
 
 USER $USERNAME
 
