@@ -20,6 +20,7 @@ from unittest import mock
 import requests_mock
 import ulid
 from common_library.common import const, maintenancemode, validation
+from common_library.common import api_keycloak_tokens, api_keycloak_clients
 from common_library.common.db import DBconnector
 from libs import queries_organizations
 from tests.common import request_parameters, test_common
@@ -58,6 +59,52 @@ def test_organization_api(connexion_client):
             json=json_create_01)
 
         assert response.status_code == 200, "create organization response code"
+
+        # Verify Keycloak client session timeout settings
+        # Keycloakクライアントのセッションタイムアウト設定を検証
+        organization_id = json_create_01['id']
+        token_response = api_keycloak_tokens.get_user_token("admin", "password", "master")
+        admin_token = token_response.json()['access_token']
+
+        # Check user token client ({{organization_id}})
+        # ユーザートークン用クライアント ({{organization_id}}) の設定確認
+        user_client_response = api_keycloak_clients.clients_get(organization_id, organization_id, admin_token)
+        assert user_client_response.status_code == 200, "get user token client"
+        user_clients = user_client_response.json()
+        assert len(user_clients) == 1, "user token client exists"
+        user_client = user_clients[0]
+        user_client_attrs = user_client.get('attributes', {})
+
+        # Assert: access.token.lifespan should NOT be set (inherit from realm: 5 minutes)
+        # アクセストークン有効期限は設定されていない（レルム継承：5分）
+        assert 'access.token.lifespan' not in user_client_attrs, \
+            "user token client should not have access.token.lifespan (inherit from realm)"
+
+        # Assert: client session timeouts should be set
+        # クライアントセッションタイムアウトは設定されている
+        assert user_client_attrs.get('client.session.max.lifespan') == '36000', \
+            "user token client.session.max.lifespan should be 36000 (10 hours)"
+        assert user_client_attrs.get('client.session.idle.timeout') == '1800', \
+            "user token client.session.idle.timeout should be 1800 (30 minutes)"
+
+        # Check API token client (_{{organization_id}}-api)
+        # API用トークンクライアント (_{{organization_id}}-api) の設定確認
+        api_client_id = f"_{organization_id}-api"
+        api_client_response = api_keycloak_clients.clients_get(organization_id, api_client_id, admin_token)
+        assert api_client_response.status_code == 200, "get api token client"
+        api_clients = api_client_response.json()
+        assert len(api_clients) == 1, "api token client exists"
+        api_client = api_clients[0]
+        api_client_attrs = api_client.get('attributes', {})
+
+        # Assert: API token client should have all timeouts set to 1 day (86400)
+        # API用トークンクライアントは全て1日（86400秒）に設定されている
+        assert api_client_attrs.get('access.token.lifespan') == '86400', \
+            "api token client access.token.lifespan should be 86400 (1 day)"
+        assert api_client_attrs.get('client.session.max.lifespan') == '86400', \
+            "api token client.session.max.lifespan should be 86400 (1 day)"
+        assert api_client_attrs.get('client.session.idle.timeout') == '86400', \
+            "api token client.session.idle.timeout should be 86400 (1 day)"
 
         # get organization
         # 作成したオーガナイゼーションを取得する
