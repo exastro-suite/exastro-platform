@@ -103,9 +103,16 @@ class update_keycloak_session_timeout():
         """Update session timeout settings for a realm
 
         Processing order:
-        1. Update user token client session timeout (if not configured)
-        2. Get maximum client session timeout across all clients
-        3. Update realm SSO session timeout to accommodate all clients
+        Phase 1: Information gathering
+          1. Get realm SSO settings
+          2. Get user token client current settings
+          3. Get maximum client session timeout across all clients
+        Phase 2: Calculate target values
+          4. Calculate client timeout values (inherit from realm or use defaults)
+          5. Calculate realm SSO values (accommodate all clients)
+        Phase 3: Update
+          6. Update user token client (if not configured)
+          7. Update realm SSO (if needed)
 
         Args:
             realm_name (str): realm name
@@ -119,39 +126,10 @@ class update_keycloak_session_timeout():
         stats = {'realm_updated': 0, 'realm_skipped': 0, 'client_updated': 0, 'client_skipped': 0, 'failed': 0}
 
         try:
-            # Step 1: Update user token client session timeout (skip if already configured)
-            globals.logger.info(f"Step 1: Update user token client session timeout for realm {realm_name}")
-            client_result = api_keycloak_clients.update_user_token_clients_session_timeouts(
-                realm_name=realm_name,
-                token=token,
-                access_token_lifespan=1800,      # 30 minutes
-                session_max_lifespan=36000,      # 10 hours
-                session_idle_timeout=1800,       # 30 minutes
-                skip_if_configured=True          # Respect user's customization
-            )
-            stats['client_updated'] += client_result['updated']
-            stats['client_skipped'] += client_result['skipped']
-            stats['failed'] += client_result['failed']
-            globals.logger.info(f"User token client result: updated={client_result['updated']}, skipped={client_result['skipped']}, failed={client_result['failed']}")
+            # Phase 1: Information gathering
+            globals.logger.debug(f"[Phase 1] Gathering information for realm {realm_name}")
 
-            # Step 2: Get maximum client session timeout
-            globals.logger.info(f"Step 2: Get maximum client session timeout for realm {realm_name}")
-            max_client_timeout = self.__get_max_client_session_timeout(realm_name, token)
-            globals.logger.info(f"Maximum client session timeout: {max_client_timeout} seconds")
-
-            # Step 3: Update realm SSO settings to accommodate all clients
-            globals.logger.info(f"Step 3: Update realm SSO settings for realm {realm_name}")
-
-            # Default values (Keycloak default)
-            default_idle = 1800   # 30 minutes
-            default_max = 36000   # 10 hours
-
-            # Realm must accommodate the largest client timeout
-            # Use at least default values, but extend if clients need more
-            realm_idle = max(default_idle, max_client_timeout)
-            realm_max = max(default_max, max_client_timeout)
-
-            # Get current realm settings
+            # Get realm SSO settings
             realm_response = api_keycloak_realms.realm_get(realm_name, token)
             if realm_response.status_code != 200:
                 globals.logger.error(f"Failed to get realm {realm_name}: {realm_response.status_code}")
@@ -159,45 +137,119 @@ class update_keycloak_session_timeout():
                 return stats
 
             realm_config = realm_response.json()
-            current_idle = realm_config.get('ssoSessionIdleTimeout')
-            current_max = realm_config.get('ssoSessionMaxLifespan')
+            realm_idle = realm_config.get('ssoSessionIdleTimeout')
+            realm_max = realm_config.get('ssoSessionMaxLifespan')
+            globals.logger.debug(f"Realm SSO: idle={realm_idle}, max={realm_max}")
+
+            # Get user token client current settings
+            client_response = api_keycloak_clients.clients_get(realm_name, realm_name, token)
+            if client_response.status_code != 200:
+                globals.logger.warning(f"Failed to get client {realm_name}: {client_response.status_code}")
+                client_configured = False
+            else:
+                clients = client_response.json()
+                if not clients:
+                    globals.logger.warning(f"Client {realm_name} not found")
+                    client_configured = False
+                else:
+                    client = clients[0]
+                    attributes = client.get('attributes', {})
+                    current_max_lifespan = attributes.get('client.session.max.lifespan')
+                    current_idle_timeout = attributes.get('client.session.idle.timeout')
+
+                    # Check if any session timeout is already configured
+                    client_configured = (current_max_lifespan is not None or current_idle_timeout is not None)
+                    globals.logger.debug(f"User token client: configured={client_configured}, "
+                                      f"max={current_max_lifespan}, idle={current_idle_timeout}")
+
+            # Get maximum client session timeout (only explicitly configured clients)
+            max_client_timeout = self.__get_max_client_session_timeout(realm_name, token)
+            globals.logger.debug(f"Max client timeout: {max_client_timeout}s")
+
+            # Phase 2: Calculate target values
+            globals.logger.debug(f"[Phase 2] Calculating target values for realm {realm_name}")
+
+            # Default values (Keycloak default)
+            default_idle = 1800   # 30 minutes
+            default_max = 36000   # 10 hours
+
+            # Calculate client timeout values (inherit from realm SSO or use defaults)
+            target_client_idle = realm_idle if realm_idle is not None else default_idle
+            target_client_max = realm_max if realm_max is not None else default_max
+            globals.logger.debug(f"Target client: idle={target_client_idle}, max={target_client_max}")
+
+            # Calculate realm SSO values (must accommodate all clients)
+            # Use the maximum of explicit client settings
+            new_realm_idle = max(default_idle, max_client_timeout)
+            new_realm_max = max(default_max, max_client_timeout)
+            globals.logger.debug(f"Calculated realm SSO: idle={new_realm_idle}, max={new_realm_max}")
 
             # Decide whether to update realm settings
-            should_update = False
-            reason = ""
+            should_update_realm = False
+            realm_update_reason = ""
 
-            if current_idle is None or current_max is None:
-                # Realm settings not configured, set defaults
-                should_update = True
-                reason = "not configured"
-            elif current_idle < max_client_timeout or current_max < max_client_timeout:
-                # Realm settings too small to accommodate clients, extend them
-                should_update = True
-                reason = f"too small (current: idle={current_idle}, max={current_max}, need: {max_client_timeout})"
+            if realm_idle is None or realm_max is None:
+                should_update_realm = True
+                realm_update_reason = "not configured"
+            elif realm_idle < max_client_timeout or realm_max < max_client_timeout:
+                should_update_realm = True
+                realm_update_reason = f"too small (current: idle={realm_idle}, max={realm_max}, max_client={max_client_timeout})"
                 # Keep user's settings if larger than required
-                realm_idle = max(realm_idle, current_idle) if current_idle else realm_idle
-                realm_max = max(realm_max, current_max) if current_max else realm_max
+                new_realm_idle = max(new_realm_idle, realm_idle)
+                new_realm_max = max(new_realm_max, realm_max)
             else:
-                # Realm settings already sufficient
-                reason = f"sufficient (current: idle={current_idle}, max={current_max}, max_client={max_client_timeout})"
+                realm_update_reason = f"sufficient (current: idle={realm_idle}, max={realm_max}, max_client={max_client_timeout})"
 
-            if should_update:
+            globals.logger.debug(f"Realm SSO update: {should_update_realm}, reason={realm_update_reason}")
+
+            # Phase 3: Update
+            globals.logger.debug(f"[Phase 3] Applying updates for realm {realm_name}")
+
+            # Update user token client
+            if client_configured:
+                globals.logger.info(f"Client {realm_name} already configured, skipping (respecting user customization)")
+                stats['client_skipped'] += 1
+            else:
+                result = self.__update_client_timeouts(
+                    realm_name=realm_name,
+                    client_id=realm_name,
+                    token=token,
+                    access_token_lifespan=None,              # Do not set - inherit from realm (5 minutes)
+                    session_max_lifespan=target_client_max,  # Inherit from realm SSO or defaults
+                    session_idle_timeout=target_client_idle, # Inherit from realm SSO or defaults
+                    skip_if_configured=False                 # We've already checked
+                )
+                if result['updated']:
+                    stats['client_updated'] += 1
+                    globals.logger.info(f"Updated client {realm_name} session timeouts: idle={target_client_idle}, max={target_client_max}")
+                elif result['skipped']:
+                    stats['client_skipped'] += 1
+                else:
+                    stats['failed'] += 1
+
+            # Update realm SSO
+            if should_update_realm:
                 success = api_keycloak_realms.update_realm_sso_settings(
                     realm_name=realm_name,
                     token=token,
-                    sso_session_idle_timeout=realm_idle,
-                    sso_session_max_lifespan=realm_max,
+                    sso_session_idle_timeout=new_realm_idle,
+                    sso_session_max_lifespan=new_realm_max,
                     skip_if_configured=False  # We've already checked and decided to update
                 )
                 if success:
                     stats['realm_updated'] += 1
-                    globals.logger.info(f"Updated realm SSO settings: idle={realm_idle}, max={realm_max}, reason={reason}")
+                    globals.logger.info(f"Updated realm {realm_name} SSO: idle={new_realm_idle}, max={new_realm_max} ({realm_update_reason})")
                 else:
                     stats['failed'] += 1
                     globals.logger.error(f"Failed to update realm SSO settings")
             else:
                 stats['realm_skipped'] += 1
-                globals.logger.info(f"Skipped realm SSO update: {reason}")
+                globals.logger.info(f"Skipped realm {realm_name} SSO update ({realm_update_reason})")
+
+            # Show final state summary
+            final_realm_idle = new_realm_idle if should_update_realm else realm_idle
+            final_realm_max = new_realm_max if should_update_realm else realm_max
+            globals.logger.info(f"Realm {realm_name} final state: SSO idle={final_realm_idle}s, max={final_realm_max}s")
 
         except Exception as e:
             globals.logger.error(f"Exception while processing realm {realm_name}: {e}")
@@ -267,6 +319,79 @@ class update_keycloak_session_timeout():
             globals.logger.error(f"Exception while getting max client timeout for realm {realm_name}: {e}")
             return 0
 
+    def __update_client_timeouts(self, realm_name, client_id, token, access_token_lifespan=None, session_max_lifespan=None, session_idle_timeout=None, skip_if_configured=False):
+        """Update client timeout settings (migration-specific helper method)
+
+        Args:
+            realm_name (str): realm name
+            client_id (str): client ID (not UUID)
+            token (str): keycloak admin access token
+            access_token_lifespan (int): access token lifespan in seconds (None = no change)
+            session_max_lifespan (int): client session max lifespan in seconds (None = no change)
+            session_idle_timeout (int): client session idle timeout in seconds (None = no change)
+            skip_if_configured (bool): If True, skip update when any timeout is already configured
+
+        Returns:
+            dict: {'updated': bool, 'skipped': bool, 'failed': bool, 'reason': str}
+        """
+        try:
+            # Get client information
+            response = api_keycloak_clients.clients_get(realm_name, client_id, token)
+            if response.status_code != 200:
+                globals.logger.warning(f"Failed to get client {client_id} in realm {realm_name}: {response.status_code}")
+                return {'updated': False, 'skipped': False, 'failed': True, 'reason': f'client_get failed: {response.status_code}'}
+
+            clients = response.json()
+            if not clients:
+                globals.logger.warning(f"Client {client_id} not found in realm {realm_name}")
+                return {'updated': False, 'skipped': False, 'failed': True, 'reason': 'client not found'}
+
+            client = clients[0]
+            client_uuid = client.get('id')
+            attributes = client.get('attributes', {})
+
+            # Check current timeout settings
+            current_max_lifespan = attributes.get('client.session.max.lifespan')
+            current_idle_timeout = attributes.get('client.session.idle.timeout')
+
+            # If skip_if_configured=True, skip when any of the timeout settings to be updated is already configured
+            configured_settings = []
+            if session_max_lifespan is not None and current_max_lifespan is not None:
+                configured_settings.append(f"max={current_max_lifespan}")
+            if session_idle_timeout is not None and current_idle_timeout is not None:
+                configured_settings.append(f"idle={current_idle_timeout}")
+
+            if skip_if_configured and configured_settings:
+                globals.logger.info(f"Client {client_id} already has timeout configured ({', '.join(configured_settings)}), skipping to respect user configuration")
+                return {'updated': False, 'skipped': True, 'failed': False, 'reason': 'already configured'}
+
+            # Build timeout update config
+            update_attributes = {}
+            if access_token_lifespan is not None:
+                update_attributes['access.token.lifespan'] = str(access_token_lifespan)
+            if session_max_lifespan is not None:
+                update_attributes['client.session.max.lifespan'] = str(session_max_lifespan)
+            if session_idle_timeout is not None:
+                update_attributes['client.session.idle.timeout'] = str(session_idle_timeout)
+
+            if not update_attributes:
+                globals.logger.info(f"No timeout values specified for client {client_id}, skipping")
+                return {'updated': False, 'skipped': True, 'failed': False, 'reason': 'no values to update'}
+
+            # Update client
+            client['attributes'] = {**attributes, **update_attributes}
+            response = api_keycloak_clients.client_update(realm_name, client_uuid, client, token)
+
+            if response.status_code in [200, 204]:
+                globals.logger.info(f"Successfully updated session timeouts for client {client_id}: {update_attributes}")
+                return {'updated': True, 'skipped': False, 'failed': False, 'reason': 'success'}
+            else:
+                globals.logger.error(f"Failed to update client {client_id}: {response.status_code} {response.text}")
+                return {'updated': False, 'skipped': False, 'failed': True, 'reason': f'update failed: {response.status_code}'}
+
+        except Exception as e:
+            globals.logger.error(f"Exception while updating client {client_id}: {e}")
+            return {'updated': False, 'skipped': False, 'failed': True, 'reason': f'exception: {e}'}
 
 if __name__ == '__main__':
     ret = update_keycloak_session_timeout().start()

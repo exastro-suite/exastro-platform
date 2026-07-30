@@ -19,7 +19,6 @@
     "frontchannelLogout": false,
     "protocol": "openid-connect",
     "attributes": {
-        "access.token.lifespan": "1800",
         "client.session.max.lifespan": "36000",
         "client.session.idle.timeout": "1800",
         "post.logout.redirect.uris": "/*",
