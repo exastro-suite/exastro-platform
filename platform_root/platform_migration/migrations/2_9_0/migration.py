@@ -13,7 +13,7 @@
 #   limitations under the License.
 from . import update_keycloak
 from . import update_keycloak_audience
-from . import update_keycloak_realm_sso
+from . import update_keycloak_session_timeout
 
 
 def main():
@@ -24,14 +24,16 @@ def main():
     if result != 0:
         return result
 
-    # Add SSO session timeout settings to realms
-    api = update_keycloak_realm_sso.update_keycloak_realm_sso()
+    # Add audience mapper to service account clients
+    api = update_keycloak_audience.update_keycloak_audience()
     result = api.start()
     if result != 0:
         return result
 
-    # Add audience mapper to service account clients
-    api = update_keycloak_audience.update_keycloak_audience()
+    # Update session timeout settings (client + realm)
+    # - Sets user token client to 30min/10hours if not configured
+    # - Extends realm SSO timeout to accommodate all clients (respects user customization)
+    api = update_keycloak_session_timeout.update_keycloak_session_timeout()
     result = api.start()
 
     return result

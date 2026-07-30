@@ -211,7 +211,7 @@ def get_organization_realms(token):
     return organization_realms
 
 
-def update_realm_sso_settings(realm_name, token, sso_session_idle_timeout=86400, sso_session_max_lifespan=86400):
+def update_realm_sso_settings(realm_name, token, sso_session_idle_timeout=86400, sso_session_max_lifespan=86400, skip_if_configured=False):
     """realm の SSO session timeout 設定を更新
        Update SSO session timeout settings for a realm
 
@@ -220,6 +220,7 @@ def update_realm_sso_settings(realm_name, token, sso_session_idle_timeout=86400,
         token (str): keycloak admin access token
         sso_session_idle_timeout (int): SSO session idle timeout in seconds (default: 86400 = 24 hours)
         sso_session_max_lifespan (int): SSO session max lifespan in seconds (default: 86400 = 24 hours)
+        skip_if_configured (bool): If True, skip update when any SSO timeout is already configured (respects user customization)
 
     Returns:
         bool: True if updated or already configured, False if failed
@@ -239,7 +240,12 @@ def update_realm_sso_settings(realm_name, token, sso_session_idle_timeout=86400,
     current_max = realm_config.get('ssoSessionMaxLifespan')
 
     if current_idle == sso_session_idle_timeout and current_max == sso_session_max_lifespan:
-        globals.logger.info(f"SSO settings already configured for realm {realm_name}")
+        globals.logger.info(f"SSO settings already configured for realm {realm_name} (idle={current_idle}, max={current_max})")
+        return True
+
+    # If skip_if_configured=True, skip update when user has customized settings
+    if skip_if_configured and (current_idle is not None or current_max is not None):
+        globals.logger.info(f"SSO settings already exist for realm {realm_name} (idle={current_idle}, max={current_max}), skipping update to respect user configuration")
         return True
 
     # Update SSO settings
@@ -251,7 +257,7 @@ def update_realm_sso_settings(realm_name, token, sso_session_idle_timeout=86400,
     response = realm_update(realm_name, update_config, token)
 
     if response.status_code in [200, 204]:
-        globals.logger.info(f"Successfully updated SSO settings for realm {realm_name}")
+        globals.logger.info(f"Successfully updated SSO settings for realm {realm_name} (idle={sso_session_idle_timeout}, max={sso_session_max_lifespan})")
         return True
     else:
         globals.logger.error(f"Failed to update SSO settings for realm {realm_name}: {response.status_code} {response.text}")
