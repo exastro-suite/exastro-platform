@@ -277,64 +277,6 @@ def add_audience_mapper_to_client(realm_name, client_id, audience_client_id, tok
         return {'added': False, 'skipped': False, 'error': str(e)}
 
 
-def add_audience_mapper_to_realm_clients(realm_name, token, audience_client_id="_platform", target_client_filter=None):
-    """Add audience protocol mapper to clients in a realm
-
-    Args:
-        realm_name (str): realm name
-        token (str): admin access token
-        audience_client_id (str): audience client ID to add (default: "_platform")
-        target_client_filter (str): if specified, only add mapper to clients whose clientId matches this string
-
-    Returns:
-        dict: {'added': int, 'skipped': int, 'failed': int}
-    """
-    globals.logger.info(f'Adding audience mapper {audience_client_id} to clients in realm {realm_name}')
-
-    stats = {'added': 0, 'skipped': 0, 'failed': 0}
-
-    try:
-        # Get all clients in realm
-        response = clients_get(realm_name, None, token)
-        if response.status_code != 200:
-            globals.logger.error(f"Failed to get clients in realm {realm_name}: {response.status_code}")
-            return stats
-
-        clients = response.json()
-        globals.logger.debug(f"Found {len(clients)} clients in realm {realm_name}")
-
-        for client in clients:
-            client_id = client.get('clientId')
-
-            # Apply filter if specified
-            if target_client_filter and target_client_filter not in client_id:
-                globals.logger.debug(f"Skipping client {client_id} (does not match filter: {target_client_filter})")
-                stats['skipped'] += 1
-                continue
-
-            # Skip service account clients (they don't need audience mappers themselves)
-            if client.get('serviceAccountsEnabled', False) and not client.get('publicClient', False):
-                globals.logger.debug(f"Skipping service account client {client_id}")
-                stats['skipped'] += 1
-                continue
-
-            result = add_audience_mapper_to_client(realm_name, client_id, audience_client_id, token)
-
-            if result['added']:
-                stats['added'] += 1
-            elif result['skipped']:
-                stats['skipped'] += 1
-            else:
-                stats['failed'] += 1
-
-        globals.logger.info(f"Realm {realm_name} audience mapper stats: added={stats['added']}, skipped={stats['skipped']}, failed={stats['failed']}")
-        return stats
-
-    except Exception as e:
-        globals.logger.error(f"Exception while processing realm {realm_name}: {e}")
-        return stats
-
-
 def add_basic_scope_to_client(realm_name, client_id, token):
     """Add basic client scope to a specific client's defaultClientScopes
 
