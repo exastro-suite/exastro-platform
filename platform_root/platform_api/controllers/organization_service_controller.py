@@ -2225,13 +2225,20 @@ def organization_setting_update(body, organization_id):  # noqa: E501
             realm_json["offlineSessionMaxLifespan"] = 999999999
             realm_json["offlineSessionIdleTimeout"] = 999999999
 
+        # Keycloak 26.5.0 compatibility: Update realm SSO session settings
+        # client.session.max.lifespan must not exceed realm.ssoSessionMaxLifespan
+        # Reference: https://www.keycloak.org/docs/latest/upgrading/index.html#migrating-to-26-5-0
+        access_token_seconds = body["token"]["access_token_lifespan_minutes"] * 60
+        realm_json["ssoSessionMaxLifespan"] = access_token_seconds
+        realm_json["ssoSessionIdleTimeout"] = access_token_seconds
+
         api_client_update = True
         if "attributes" not in api_client_json:
             api_client_json["attributes"] = {}
 
-        api_client_json["attributes"]["access.token.lifespan"] = body["token"]["access_token_lifespan_minutes"] * 60
-        api_client_json["attributes"]["client.session.max.lifespan"] = body["token"]["access_token_lifespan_minutes"] * 60
-        api_client_json["attributes"]["client.session.idle.timeout"] = body["token"]["access_token_lifespan_minutes"] * 60
+        api_client_json["attributes"]["access.token.lifespan"] = access_token_seconds
+        api_client_json["attributes"]["client.session.max.lifespan"] = access_token_seconds
+        api_client_json["attributes"]["client.session.idle.timeout"] = access_token_seconds
 
     if realm_updete:
         # realm更新
