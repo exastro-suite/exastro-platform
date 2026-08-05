@@ -49,10 +49,9 @@ class update_keycloak_audience():
             token_response = api_keycloak_tokens.get_user_token(keycloak_user, keycloak_password, "master")
             token = token_response.json()['access_token']
 
-            # Add audience mapper to master realm _platform-console -> _platform
-            globals.logger.info("Adding audience mapper to master realm _platform-console")
-            stats = api_keycloak_clients.add_audience_mapper_to_realm_clients("master", token)
-            globals.logger.info(f"Master realm _platform-console: {stats}")
+            # Add audience mapper to master realm clients
+            globals.logger.info("Adding audience mapper to master realm clients")
+            self.__add_audience_mapper_to_master_realm(token)
 
             # Add audience mapper to all organization realms
             globals.logger.info("Adding audience mapper to organization realms")
@@ -66,6 +65,46 @@ class update_keycloak_audience():
 
         globals.logger.info(f"Keycloak audience mapper update successful !!")
         return 0
+
+    def __add_audience_mapper_to_master_realm(self, token):
+        """Add audience mapper to master realm clients
+
+        Args:
+            token (str): keycloak access token
+        """
+        globals.logger.info(f"### Start func:{inspect.currentframe().f_code.co_name}")
+
+        # Define target clients that need _platform audience mapper
+        # These clients issue tokens that will be introspected by _platform client
+        target_clients = [
+            "_platform",          # Service account client (internal API)
+            "_platform-api",      # API token client
+            "_platform-console"   # Console client
+        ]
+
+        total_stats = {'added': 0, 'skipped': 0, 'failed': 0}
+
+        # Add _platform audience mapper to each target client
+        for client_id in target_clients:
+            globals.logger.info(f"  Adding _platform audience to client: {client_id}")
+
+            result = api_keycloak_clients.add_audience_mapper_to_client(
+                "master", client_id, "_platform", token
+            )
+
+            if result['added']:
+                total_stats['added'] += 1
+                globals.logger.info(f"    [OK] Added to {client_id}")
+            elif result['skipped']:
+                total_stats['skipped'] += 1
+                globals.logger.info(f"    [SKIP] Skipped {client_id} (already exists or not applicable)")
+            else:
+                total_stats['failed'] += 1
+                error_msg = result.get('error', 'Unknown error')
+                globals.logger.warning(f"    [FAIL] Failed to add to {client_id}: {error_msg}")
+
+        globals.logger.info(f"Master realm total: added={total_stats['added']}, skipped={total_stats['skipped']}, failed={total_stats['failed']}")
+        globals.logger.info(f"### End func:{inspect.currentframe().f_code.co_name}")
 
     def __add_audience_mapper_to_all_organizations(self, token):
         """Add audience mapper to all organization realm clients
@@ -84,21 +123,41 @@ class update_keycloak_audience():
 
         globals.logger.info(f"Found {len(organization_realms)} organization realms: {organization_realms}")
 
-        # For each organization realm, add audience mappers
+        # Define target clients that need system-auth audience mapper
+        # These clients issue tokens that will be introspected by system-{realm}-auth client
+        target_clients = [
+            "{realm}",              # User token client (Web UI)
+            "_{realm}-api",         # API token client
+            "{realm}-workspaces"    # Service account client (internal API)
+        ]
+
+        # For each organization realm, add audience mappers to specific clients
         for realm_name in organization_realms:
             globals.logger.info(f"Processing realm: {realm_name}")
 
-            # Add _platform audience to organization client (e.g., org1)
-            stats = api_keycloak_clients.add_audience_mapper_to_realm_clients(
-                realm_name, token, audience_client_id="_platform", target_client_filter=realm_name
-            )
-            globals.logger.info(f"Realm {realm_name} client: {stats}")
+            total_stats = {'added': 0, 'skipped': 0, 'failed': 0}
 
-            # Add system-auth audience to organization client
-            stats = api_keycloak_clients.add_audience_mapper_to_realm_clients(
-                realm_name, token, audience_client_id=f"system-{realm_name}-auth", target_client_filter=realm_name
-            )
-            globals.logger.info(f"Realm {realm_name} system-auth audience: {stats}")
+            # Add system-auth audience mapper to each target client
+            for client_template in target_clients:
+                client_id = client_template.replace("{realm}", realm_name)
+                globals.logger.info(f"  Adding system-auth audience to client: {client_id}")
+
+                result = api_keycloak_clients.add_audience_mapper_to_client(
+                    realm_name, client_id, f"system-{realm_name}-auth", token
+                )
+
+                if result['added']:
+                    total_stats['added'] += 1
+                    globals.logger.info(f"    [OK] Added to {client_id}")
+                elif result['skipped']:
+                    total_stats['skipped'] += 1
+                    globals.logger.info(f"    [SKIP] Skipped {client_id} (already exists or not applicable)")
+                else:
+                    total_stats['failed'] += 1
+                    error_msg = result.get('error', 'Unknown error')
+                    globals.logger.warning(f"    [FAIL] Failed to add to {client_id}: {error_msg}")
+
+            globals.logger.info(f"Realm {realm_name} total: added={total_stats['added']}, skipped={total_stats['skipped']}, failed={total_stats['failed']}")
 
         globals.logger.info(f"### End func:{inspect.currentframe().f_code.co_name}")
 
