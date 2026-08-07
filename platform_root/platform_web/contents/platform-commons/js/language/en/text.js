@@ -664,6 +664,7 @@ langArray['400-27005'] = 'The specified plan limit value already exists and cann
 langArray['400-29001'] = 'The specified organization\'s plan start date and time cannot be registered because another plan has already been registered. (Target ID: {0}, Plan: {1}, Plan start time: {2})'
 langArray['400-30001'] = 'Failed to get offline session (Target ID: {0} user: {1} client: {2})'
 langArray['400-30002'] = 'Failed to get realm information (Target ID: {0}'
+langArray['400-30003'] = 'Failed to generate token.'
 langArray['400-34001'] = 'The specified notification destination already exists and cannot be created (id:{0})'
 langArray['400-34002'] = 'The same notification destination name cannot be specified ({0})'
 langArray['400-34003'] = 'The specified notification destination name already exists and cannot be created ({0})'
