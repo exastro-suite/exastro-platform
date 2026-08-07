@@ -36,7 +36,7 @@ def token_create(organization_id, token_request_body, execute_user_id=None):
         execute_user_id (str): execute user id
 
     Returns:
-        _type_: _description_
+        response: HTTP Response
     """
     try:
         headers_data = {
@@ -114,6 +114,9 @@ def token_create(organization_id, token_request_body, execute_user_id=None):
         response.status_code = redirect_response.status_code
         response.data = redirect_response.content
         response.headers = headers
+
+        if redirect_response.status_code != 200:
+            response.text = redirect_response.text
 
         return response
 
