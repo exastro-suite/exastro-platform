@@ -176,6 +176,7 @@ def test_notifications_validate(connexion_client):
     enable_batch = False
     batch_period_seconds = 60
     batch_count_limit = 100
+    retry_count_limit = 3
 
     # validate informations None
     validate = validation.validate_destination_informations(
@@ -184,6 +185,8 @@ def test_notifications_validate(connexion_client):
         enable_batch,
         batch_period_seconds,
         batch_count_limit,
+        True,
+        retry_count_limit,
         'create')
     assert not validate.ok, "create notifications validate informations None"
 
@@ -194,6 +197,8 @@ def test_notifications_validate(connexion_client):
         enable_batch,
         batch_period_seconds,
         batch_count_limit,
+        True,
+        retry_count_limit,
         'create')
     assert not validate.ok, "create notifications validate informations array len = 0"
 
@@ -204,6 +209,8 @@ def test_notifications_validate(connexion_client):
         enable_batch,
         batch_period_seconds,
         batch_count_limit,
+        True,
+        retry_count_limit,
         'create')
     assert validate.ok, "create notifications validate informations mail array max"
 
@@ -214,6 +221,8 @@ def test_notifications_validate(connexion_client):
         enable_batch,
         batch_period_seconds,
         batch_count_limit,
+        True,
+        retry_count_limit,
         'create')
     assert not validate.ok, "create notifications validate informations mail array max + 1"
 
@@ -224,6 +233,8 @@ def test_notifications_validate(connexion_client):
         enable_batch,
         batch_period_seconds,
         batch_count_limit,
+        True,
+        retry_count_limit,
         'create')
     assert not validate.ok, "create notifications validate informations address_header None"
 
@@ -234,6 +245,8 @@ def test_notifications_validate(connexion_client):
         enable_batch,
         batch_period_seconds,
         batch_count_limit,
+        True,
+        retry_count_limit,
         'create')
     assert not validate.ok, "create notifications validate informations address_header other"
 
@@ -244,6 +257,8 @@ def test_notifications_validate(connexion_client):
         enable_batch,
         batch_period_seconds,
         batch_count_limit,
+        True,
+        retry_count_limit,
         'create')
     assert not validate.ok, "create notifications validate informations mail None"
 
@@ -257,6 +272,8 @@ def test_notifications_validate(connexion_client):
         enable_batch,
         batch_period_seconds,
         batch_count_limit,
+        True,
+        retry_count_limit,
         'create')
     assert not validate.ok, "create notifications validate informations mail max length + 1"
 
@@ -267,6 +284,8 @@ def test_notifications_validate(connexion_client):
         enable_batch,
         batch_period_seconds,
         batch_count_limit,
+        True,
+        retry_count_limit,
         'create')
     assert not validate.ok, "create notifications validate informations mail format"
 
@@ -277,6 +296,8 @@ def test_notifications_validate(connexion_client):
         enable_batch,
         batch_period_seconds,
         batch_count_limit,
+        True,
+        retry_count_limit,
         'create')
     assert validate.ok, "create notifications validate informations teams workflow array max"
 
@@ -287,6 +308,8 @@ def test_notifications_validate(connexion_client):
         enable_batch,
         batch_period_seconds,
         batch_count_limit,
+        True,
+        retry_count_limit,
         'create')
     assert not validate.ok, "create notifications validate informations teams workflow array max + 1"
 
@@ -297,6 +320,8 @@ def test_notifications_validate(connexion_client):
         enable_batch,
         batch_period_seconds,
         batch_count_limit,
+        True,
+        retry_count_limit,
         'create')
     assert not validate.ok, "create notifications validate informations teams workflow None"
 
@@ -307,6 +332,8 @@ def test_notifications_validate(connexion_client):
         enable_batch,
         batch_period_seconds,
         batch_count_limit,
+        True,
+        retry_count_limit,
         'create')
     assert validate.ok, "create notifications validate informations teams workflow max length"
 
@@ -317,6 +344,8 @@ def test_notifications_validate(connexion_client):
         enable_batch,
         batch_period_seconds,
         batch_count_limit,
+        True,
+        retry_count_limit,
         'create')
     assert not validate.ok, "create notifications validate informations teams workflow max length + 1"
 
@@ -327,6 +356,8 @@ def test_notifications_validate(connexion_client):
         enable_batch,
         batch_period_seconds,
         batch_count_limit,
+        True,
+        retry_count_limit,
         'create')
     assert not validate.ok, "create notifications validate informations teams workflow format"
 
@@ -337,6 +368,8 @@ def test_notifications_validate(connexion_client):
         enable_batch,
         batch_period_seconds,
         batch_count_limit,
+        True,
+        retry_count_limit,
         'create')
     assert validate.ok, "create notifications validate informations webhook array max"
 
@@ -347,6 +380,8 @@ def test_notifications_validate(connexion_client):
         enable_batch,
         batch_period_seconds,
         batch_count_limit,
+        True,
+        retry_count_limit,
         'create')
     assert not validate.ok, "create notifications validate informations webhook array max + 1"
 
@@ -357,6 +392,8 @@ def test_notifications_validate(connexion_client):
         enable_batch,
         batch_period_seconds,
         batch_count_limit,
+        True,
+        retry_count_limit,
         'create')
     assert not validate.ok, "create notifications validate informations webhook None"
 
@@ -367,6 +404,8 @@ def test_notifications_validate(connexion_client):
         enable_batch,
         batch_period_seconds,
         batch_count_limit,
+        True,
+        retry_count_limit,
         'create')
     assert validate.ok, "create notifications validate informations webhook max length"
 
@@ -377,6 +416,8 @@ def test_notifications_validate(connexion_client):
         enable_batch,
         batch_period_seconds,
         batch_count_limit,
+        True,
+        retry_count_limit,
         'create')
     assert not validate.ok, "create notifications validate informations webhook max length + 1"
 
@@ -387,6 +428,8 @@ def test_notifications_validate(connexion_client):
         enable_batch,
         batch_period_seconds,
         batch_count_limit,
+        True,
+        retry_count_limit,
         'create')
     assert not validate.ok, "create notifications validate informations webhook format"
 
@@ -397,6 +440,8 @@ def test_notifications_validate(connexion_client):
         enable_batch,
         batch_period_seconds,
         batch_count_limit,
+        True,
+        retry_count_limit,
         'create')
     assert validate.ok, "create notifications validate informations seervicenow array max"
 
@@ -407,6 +452,8 @@ def test_notifications_validate(connexion_client):
         enable_batch,
         batch_period_seconds,
         batch_count_limit,
+        True,
+        retry_count_limit,
         'create')
     assert not validate.ok, "create notifications validate informations servicenow array max + 1"
 
@@ -417,6 +464,8 @@ def test_notifications_validate(connexion_client):
         enable_batch,
         batch_period_seconds,
         batch_count_limit,
+        True,
+        retry_count_limit,
         'create')
     assert not validate.ok, "create notifications validate informations servicenow servicenow_user None"
 
@@ -427,6 +476,8 @@ def test_notifications_validate(connexion_client):
         enable_batch,
         batch_period_seconds,
         batch_count_limit,
+        True,
+        retry_count_limit,
         'create')
     assert not validate.ok, "create notifications validate informations servicenow servicenow_user max length + 1"
 
@@ -437,6 +488,8 @@ def test_notifications_validate(connexion_client):
         enable_batch,
         batch_period_seconds,
         batch_count_limit,
+        True,
+        retry_count_limit,
         'create')
     assert not validate.ok, "create notifications validate informations servicenow servicenow_password None"
 
@@ -447,6 +500,8 @@ def test_notifications_validate(connexion_client):
         enable_batch,
         batch_period_seconds,
         batch_count_limit,
+        True,
+        retry_count_limit,
         'create')
     assert not validate.ok, "create notifications validate informations servicenow servicenow_password max length + 1"
 
@@ -457,6 +512,8 @@ def test_notifications_validate(connexion_client):
         enable_batch,
         batch_period_seconds,
         batch_count_limit,
+        True,
+        retry_count_limit,
         'create')
     assert not validate.ok, "create notifications validate informations servicenow table_api_url None"
 
@@ -467,6 +524,8 @@ def test_notifications_validate(connexion_client):
         enable_batch,
         batch_period_seconds,
         batch_count_limit,
+        True,
+        retry_count_limit,
         'create')
     assert not validate.ok, "create notifications validate informations servicenow table_api_url max length + 1"
 
@@ -477,6 +536,8 @@ def test_notifications_validate(connexion_client):
         enable_batch,
         batch_period_seconds,
         batch_count_limit,
+        True,
+        retry_count_limit,
         'create')
     assert not validate.ok, "create notifications validate informations servicenow table_api_url format"
 
@@ -487,6 +548,8 @@ def test_notifications_validate(connexion_client):
         True,
         batch_period_seconds,
         batch_count_limit,
+        True,
+        retry_count_limit,
         'create')
     assert not validate.ok, "create notifications validate informations servicenow enable_batch is True, batch_api_url cannot be set to None"
 
@@ -497,6 +560,8 @@ def test_notifications_validate(connexion_client):
         True,
         batch_period_seconds,
         batch_count_limit,
+        True,
+        retry_count_limit,
         'create')
     assert not validate.ok, "create notifications validate informations servicenow batch_api_url max length + 1"
 
@@ -507,6 +572,8 @@ def test_notifications_validate(connexion_client):
         True,
         batch_period_seconds,
         batch_count_limit,
+        True,
+        retry_count_limit,
         'create')
     assert not validate.ok, "create notifications validate informations servicenow batch_api_url format"
 
@@ -517,6 +584,8 @@ def test_notifications_validate(connexion_client):
         True,
         None,
         batch_count_limit,
+        True,
+        retry_count_limit,
         'create')
     assert not validate.ok, "create notifications validate informations servicenow enable_batch is True, batch_period_seconds cannot be set to None"
 
@@ -527,6 +596,8 @@ def test_notifications_validate(connexion_client):
         True,
         const.min_batch_period_seconds - 1,
         batch_count_limit,
+        True,
+        retry_count_limit,
         'create')
     assert not validate.ok, "create notifications validate informations servicenow enable_batch is True, batch_period_seconds min length - 1"
 
@@ -537,6 +608,8 @@ def test_notifications_validate(connexion_client):
         True,
         const.max_batch_period_seconds + 1,
         batch_count_limit,
+        True,
+        retry_count_limit,
         'create')
     assert not validate.ok, "create notifications validate informations servicenow enable_batch is True, batch_period_seconds max length + 1"
 
@@ -547,6 +620,8 @@ def test_notifications_validate(connexion_client):
         True,
         batch_period_seconds,
         None,
+        True,
+        retry_count_limit,
         'create')
     assert not validate.ok, "create notifications validate informations servicenow enable_batch is True, batch_count_limit cannot be set to None"
 
@@ -557,6 +632,8 @@ def test_notifications_validate(connexion_client):
         True,
         batch_period_seconds,
         const.min_batch_count_limit - 1,
+        True,
+        retry_count_limit,
         'create')
     assert not validate.ok, "create notifications validate informations servicenow enable_batch is True, batch_count_limit min length - 1"
 
@@ -567,6 +644,8 @@ def test_notifications_validate(connexion_client):
         True,
         batch_period_seconds,
         const.max_batch_count_limit + 1,
+        True,
+        retry_count_limit,
         'create')
     assert not validate.ok, "create notifications validate informations servicenow enable_batch is True, batch_count_limit max length + 1"
 

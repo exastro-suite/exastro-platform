@@ -1,0 +1,17 @@
+{
+  "name": "keycloak-js-bundle",
+  "version": "1.0.0",
+  "description": "Bundle keycloak-js for static serving",
+  "type": "module",
+  "scripts": {
+    "build": "rollup -c"
+  },
+  "dependencies": {
+    "keycloak-js": "26.2.4"
+  },
+  "devDependencies": {
+    "rollup": "^4.9.0",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-terser": "^0.4.4"
+  }
+}

@@ -34,6 +34,7 @@ import globals
 MSG_FUNCTION_ID = "30"
 
 
+@common.platform_exception_handler
 def token_create(organization_id):  # noqa: E501
     """create token
 
@@ -41,11 +42,23 @@ def token_create(organization_id):  # noqa: E501
         organization_id (str): organization id
 
     Returns:
-        _type_: _description_
+        response: HTTP Response
     """
     globals.logger.info(f"### func:{inspect.currentframe().f_code.co_name}")
 
-    return bl_token_service.token_create(organization_id, request.form)
+    resp_token = bl_token_service.token_create(organization_id, request.form)
+
+    if resp_token.status_code != 200:
+        globals.logger.error(f"response.status_code:{resp_token.status_code}")
+        globals.logger.error(f"response.text:{resp_token.text}")
+        message_id = "400-30003"
+        message = multi_lang.get_text(
+            message_id,
+            "tokenの生成に失敗しました。"
+        )
+        raise common.OtherException(status_code=resp_token.status_code, data=None, message_id=message_id, message=message)
+
+    return resp_token
 
 
 @common.platform_exception_handler
@@ -77,7 +90,7 @@ def refresh_token_delete(organization_id):  # noqa: E501
     if response.status_code not in [200, 204, 404]:
         globals.logger.error(f"response.status_code:{response.status_code}")
         globals.logger.error(f"response.text:{response.text}")
-        message_id = f"500-{MSG_FUNCTION_ID}001"
+        message_id = "500-30001"
         message = multi_lang.get_text(
             message_id,
             "offline sessionの削除に失敗しました(対象ID:{0} user:{1} client:{2})",
@@ -131,7 +144,7 @@ def refresh_token_delete_for_mng():  # noqa: E501
     if response.status_code not in [200, 204, 404]:
         globals.logger.error(f"response.status_code:{response.status_code}")
         globals.logger.error(f"response.text:{response.text}")
-        message_id = f"500-{MSG_FUNCTION_ID}001"
+        message_id = "500-30001"
         message = multi_lang.get_text(
             message_id,
             "offline sessionの削除に失敗しました(対象ID:{0} user:{1} client:{2})",
@@ -192,7 +205,7 @@ def refresh_token_list(organization_id):
     elif response.status_code != 200:
         globals.logger.error(f"response.status_code:{response.status_code}")
         globals.logger.error(f"response.text:{response.text}")
-        message_id = f"400-{MSG_FUNCTION_ID}001"
+        message_id = "400-30001"
         message = multi_lang.get_text(
             message_id,
             "offline sessionの取得に失敗しました(対象ID:{0} user:{1} client:{2})",
@@ -210,7 +223,7 @@ def refresh_token_list(organization_id):
     if response.status_code != 200:
         globals.logger.error(f"response.status_code:{response.status_code}")
         globals.logger.error(f"response.text:{response.text}")
-        message_id = f"400-{MSG_FUNCTION_ID}002"
+        message_id = "400-30002"
         message = multi_lang.get_text(
             message_id,
             "realm情報の取得に失敗しました(対象ID:{0}",
@@ -275,7 +288,7 @@ def refresh_token_list_for_mng():  # noqa: E501
     elif response.status_code != 200:
         globals.logger.error(f"response.status_code:{response.status_code}")
         globals.logger.error(f"response.text:{response.text}")
-        message_id = f"400-{MSG_FUNCTION_ID}001"
+        message_id = "400-30001"
         message = multi_lang.get_text(
             message_id,
             "offline sessionの取得に失敗しました(対象ID:{0} user:{1} client:{2})",
@@ -293,7 +306,7 @@ def refresh_token_list_for_mng():  # noqa: E501
     if response.status_code != 200:
         globals.logger.error(f"response.status_code:{response.status_code}")
         globals.logger.error(f"response.text:{response.text}")
-        message_id = f"400-{MSG_FUNCTION_ID}002"
+        message_id = "400-30002"
         message = multi_lang.get_text(
             message_id,
             "realm情報の取得に失敗しました(対象ID:{0}",

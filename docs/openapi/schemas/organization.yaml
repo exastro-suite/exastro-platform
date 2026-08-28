@@ -53,6 +53,8 @@ properties:
             type: boolean
           oase:
             type: boolean
+          ai_assistant:
+            type: boolean
   status:
     type: string
     example: Organization Create Complete

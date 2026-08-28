@@ -19,6 +19,8 @@
     "frontchannelLogout": false,
     "protocol": "openid-connect",
     "attributes": {
+        "client.session.max.lifespan": "36000",
+        "client.session.idle.timeout": "1800",
         "post.logout.redirect.uris": "/*",
         "id.token.as.detached.signature": "false",
         "saml.assertion.signature": "false",
@@ -46,11 +48,26 @@
     "authenticationFlowBindingOverrides": {},
     "fullScopeAllowed": true,
     "nodeReRegistrationTimeout": -1,
+    "protocolMappers": [
+        {
+            "name": "audience-system-auth",
+            "protocol": "openid-connect",
+            "protocolMapper": "oidc-audience-mapper",
+            "consentRequired": false,
+            "config": {
+                "included.client.audience": "system-{{organization_id}}-auth",
+                "id.token.claim": "false",
+                "access.token.claim": "true",
+                "introspection.token.claim": "true"
+            }
+        }
+    ],
     "defaultClientScopes": [
         "web-origins",
         "profile",
         "roles",
-        "email"
+        "email",
+        "basic"
     ],
     "optionalClientScopes": [
         "address",

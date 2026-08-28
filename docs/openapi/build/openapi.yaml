@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: Exastro Platform API
   description: Exastro Platform API
-  version: 1.11.0
+  version: 2.9.0
 servers:
   - url: 'https://{host}'
     description: API endpoint
@@ -71,6 +71,8 @@ tags:
     description: 通知機能に関する操作(内部用)
   - name: InternalHealthCheckService
     description: ヘルスチェックに関する操作(内部用)
+  - name: InternalServiceAccountUsersService
+    description: サービスアカウントユーザーに関する操作(内部用)
 paths:
   /api/platform/organizations:
     get:
@@ -189,7 +191,7 @@ paths:
                       properties:
                         drivers:
                           type: object
-                          description: 'terraform_cloud_ep: Terraform-Cloud/EP driver <br/>terraform_cli: Terraform-CLI driver, <br/>ci_cd: CI/CD for IaC, <br/>oase: OASE, '
+                          description: 'terraform_cloud_ep: Terraform-Cloud/EP driver <br/>terraform_cli: Terraform-CLI driver, <br/>ci_cd: CI/CD for IaC, <br/>oase: OASE, <br/>ai_assistant: Exastro AI Assistant, '
                           properties:
                             terraform_cloud_ep:
                               type: boolean
@@ -199,11 +201,14 @@ paths:
                               type: boolean
                             oase:
                               type: boolean
+                            ai_assistant:
+                              type: boolean
                           required:
                             - terraform_cloud_ep
                             - terraform_cli
                             - ci_cd
                             - oase
+                            - ai_assistant
                         services:
                           type: object
                           properties:
@@ -236,6 +241,7 @@ paths:
                       terraform_cli: true
                       ci_cd: true
                       oase: true
+                      ai_assistant: true
                     services:
                       document_store:
                         name: mongodb
@@ -3979,6 +3985,170 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/runtimeError'
+  '/internal-api/{organization_id}/platform/workspaces/{workspace_id}/service-account-users':
+    get:
+      tags:
+        - InternalServiceAccountUsersService
+      summary: List returns list of service account users
+      x-openapi-router-controller: controllers.internal_service_account_users_service_controller
+      operationId: internal_service_account_user_list
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: workspace_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - $ref: '#/components/schemas/serviceAccountUserList'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+    post:
+      tags:
+        - InternalServiceAccountUsersService
+      summary: Create an service account user
+      x-openapi-router-controller: controllers.internal_service_account_users_service_controller
+      operationId: internal_service_account_user_create
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: workspace_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/serviceAccountUserCreate'
+        required: true
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        example: null
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+  '/internal-api/{organization_id}/platform/workspaces/{workspace_id}/service-account-users/{user_id}/refresh_tokens':
+    get:
+      tags:
+        - InternalServiceAccountUsersService
+      summary: List returns list of service account user tokens
+      x-openapi-router-controller: controllers.internal_service_account_users_service_controller
+      operationId: internal_service_account_user_token_list
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: workspace_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - $ref: '#/components/schemas/serviceAccountUserTokenList'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+    post:
+      tags:
+        - InternalServiceAccountUsersService
+      summary: Create an service account user token
+      x-openapi-router-controller: controllers.internal_service_account_users_service_controller
+      operationId: internal_service_account_user_token_create
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: workspace_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+        required: true
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/responseOk'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          refresh_token:
+                            type: string
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
 components:
   schemas:
     responseOk:
@@ -4101,6 +4271,8 @@ components:
                   type: boolean
                 oase:
                   type: boolean
+                ai_assistant:
+                  type: boolean
         status:
           type: string
           example: Organization Create Complete
@@ -4133,7 +4305,7 @@ components:
           properties:
             drivers:
               type: object
-              description: 'terraform_cloud_ep: Terraform-Cloud/EP driver <br/>terraform_cli: Terraform-CLI driver, <br/>ci_cd: CI/CD for IaC, <br/>oase: OASE, '
+              description: 'terraform_cloud_ep: Terraform-Cloud/EP driver <br/>terraform_cli: Terraform-CLI driver, <br/>ci_cd: CI/CD for IaC, <br/>oase: OASE, <br/>ai_assistant: Exastro AI Assistant, '
               properties:
                 terraform_cloud_ep:
                   type: boolean
@@ -4142,6 +4314,8 @@ components:
                 ci_cd:
                   type: boolean
                 oase:
+                  type: boolean
+                ai_assistant:
                   type: boolean
             services:
               type: object
