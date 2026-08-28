@@ -69,10 +69,14 @@ $(function(){
             "Hashing Iterations",
             "Password Blacklist",
             "Hashing Algorithm",
-            "Regular Expression"
+            "Regular Expression",
+            "Not Recently Used (In Days)",
+            "Not Contains Username",
+            "Recovery Codes Warning Threshold"
         ];
-        $body.find('li.pf-c-select__menu-wrapper button.pf-c-select__menu-item').each((index, element) => {
-            if(hiddenPolicyTexts.indexOf($(element).text()) != -1) {
+        $body.find('li.pf-v5-c-menu__list-item button.pf-v5-c-menu__item').each((index, element) => {
+            const text = $(element).find('span.pf-v5-c-menu__item-text').text();
+            if(hiddenPolicyTexts.indexOf(text) != -1) {
                 $(element).css("display", "none");
             }
         });
@@ -83,16 +87,25 @@ $(function(){
         */
         return [
             '<style>',
-            'form.keycloak__policies_authentication__form > div.pf-c-form__group:has(label.pf-c-form__label[for="hashIterations"]) {',
+            'form.keycloak__policies_authentication__form > div.pf-v5-c-form__group:has(label.pf-v5-c-form__label[for="hashIterations"]) {',
             '   display: none !important;',
             '}',
-            'form.keycloak__policies_authentication__form > div.pf-c-form__group:has(label.pf-c-form__label[for="passwordBlacklist"]) {',
+            'form.keycloak__policies_authentication__form > div.pf-v5-c-form__group:has(label.pf-v5-c-form__label[for="passwordBlacklist"]) {',
             '   display: none !important;',
             '}',
-            'form.keycloak__policies_authentication__form > div.pf-c-form__group:has(label.pf-c-form__label[for="hashAlgorithm"]) {',
+            'form.keycloak__policies_authentication__form > div.pf-v5-c-form__group:has(label.pf-v5-c-form__label[for="hashAlgorithm"]) {',
             '   display: none !important;',
             '}',
-            'form.keycloak__policies_authentication__form > div.pf-c-form__group:has(label.pf-c-form__label[for="regexPattern"]) {',
+            'form.keycloak__policies_authentication__form > div.pf-v5-c-form__group:has(label.pf-v5-c-form__label[for="regexPattern"]) {',
+            '   display: none !important;',
+            '}',
+            'form.keycloak__policies_authentication__form > div.pf-v5-c-form__group:has(label.pf-v5-c-form__label[for="passwordAge"]) {',
+            '   display: none !important;',
+            '}',
+            'form.keycloak__policies_authentication__form > div.pf-v5-c-form__group:has(label.pf-v5-c-form__label[for="notContainsUsername"]) {',
+            '   display: none !important;',
+            '}',
+            'form.keycloak__policies_authentication__form > div.pf-v5-c-form__group:has(label.pf-v5-c-form__label[for="recoveryCodesWarningThreshold"]) {',
             '   display: none !important;',
             '}',
             '</style>',

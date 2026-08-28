@@ -13,7 +13,7 @@
 #   limitations under the License.
 
 # FROM jboss/keycloak:16.1.1 as common_build
-FROM quay.io/keycloak/keycloak:24.0 as common_build
+FROM quay.io/keycloak/keycloak:26.7 as common_build
 
 # Keycloakのtagを変更した場合は、platform-migrationのDockerfileにあるENV KEYCLOAK_VERSIONも合わせて変更する必要があります
 # If you change Keycloak tag, you need to change ENV KEYCLOAK_VERSION in platform-migration Dockerfile as well
@@ -21,11 +21,19 @@ FROM quay.io/keycloak/keycloak:24.0 as common_build
 # Enable health and metrics support
 ENV KC_HEALTH_ENABLED=true
 ENV KC_METRICS_ENABLED=true
+# Use legacy observability interface for /health endpoint on management port
+ENV KC_LEGACY_OBSERVABILITY_INTERFACE=true
 
-ENV KC_PROXY=edge
+ENV KC_PROXY_HEADERS=xforwarded
 ENV KC_HTTP_RELATIVE_PATH=/auth
 ENV KC_HTTP_ENABLED=true
 ENV KC_HOSTNAME_STRICT=false
+
+# Connection pool settings (for persistent sessions in Keycloak 25+)
+# These can be overridden at runtime via environment variables
+ENV KC_DB_POOL_INITIAL_SIZE=10
+ENV KC_DB_POOL_MIN_SIZE=10
+ENV KC_DB_POOL_MAX_SIZE=50
 
 # # Configure a database vendor
 # # ENV KC_DB=mariadb

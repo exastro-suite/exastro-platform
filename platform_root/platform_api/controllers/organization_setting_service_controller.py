@@ -176,22 +176,33 @@ def __keycloak_mailserver_set(body, organization_id):
     # Get a service account token
     token = __get_token()
 
+    # Convert boolean values to string for Keycloak compatibility
+    # Keycloak expects "true"/"false" strings, not boolean values
+    # Note: Only include user/password fields when auth=true to prevent data loss
+    has_credentials = bool(body.get("authentication_user") and body.get("authentication_password"))
+    auth_enable = has_credentials or body.get("authentication_enable", False)
+
+    smtp_server = {
+        "host": body.get("smtp_host", ""),
+        "port": body.get("smtp_port", ""),
+        "from": body.get("send_from", ""),
+        "fromDisplayName": body.get("send_name", ""),
+        "replyTo": body.get("reply_to", ""),
+        "replyToDisplayName": body.get("reply_name", ""),
+        "envelopeFrom": body.get("envelope_from", ""),
+        "ssl": str(body.get("ssl_enable", False)).lower(),
+        "starttls": str(body.get("start_tls_enable", False)).lower(),
+        "auth": str(auth_enable).lower()
+    }
+
+    # Only add user/password fields when authentication is enabled
+    if auth_enable:
+        smtp_server["user"] = body.get("authentication_user", "")
+        smtp_server["password"] = body.get("authentication_password", "")
+
     realm_json = {
         "resetPasswordAllowed": True,
-        "smtpServer":{
-            "host": body.get("smtp_host"),
-            "port": body.get("smtp_port"),
-            "from": body.get("send_from"),
-            "fromDisplayName": body.get("send_name"),
-            "replyTo": body.get("reply_to"),
-            "replyToDisplayName": body.get("reply_name"),
-            "envelopeFrom": body.get("envelope_from"),
-            "ssl": body.get("ssl_enable"),
-            "starttls": body.get("start_tls_enable"),
-            "auth": body.get("authentication_enable"),
-            "user": body.get("authentication_user"),
-            "password": body.get("authentication_password")
-        }
+        "smtpServer": smtp_server
     }
 
     # realm更新
@@ -223,20 +234,7 @@ def __keycloak_mailserver_delete(organization_id):
 
     realm_json = {
         "resetPasswordAllowed": False,
-        "smtpServer":{
-            "host": "",
-            "port": "",
-            "from": "",
-            "fromDisplayName": "",
-            "replyTo": "",
-            "replyToDisplayName": "",
-            "envelopeFrom": "",
-            "ssl": False,
-            "starttls": False,
-            "auth": False,
-            "user": "",
-            "password": ""
-        }
+        "smtpServer": {}
     }
 
     # realm更新
