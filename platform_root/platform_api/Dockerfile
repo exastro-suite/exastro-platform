@@ -41,6 +41,9 @@ ENV PLATFORM_API_WSGI_THREADS               15
 #   AIアシスタント系(platform-api-ai-assistant) / AI assistant group (platform-api-ai-assistant)
 ENV AI_ASSISTANT_WSGI_PROCESSES             1
 ENV AI_ASSISTANT_WSGI_THREADS               15
+#   AIアシスタント系のrequest-timeout(秒)。AI_ASSISTANT_READ_TIMEOUTより大きく、APACHE_TIMEOUTより小さくすること
+#   request-timeout (seconds) for the AI assistant group. Must be greater than AI_ASSISTANT_READ_TIMEOUT and less than APACHE_TIMEOUT
+ENV AI_ASSISTANT_WSGI_REQUEST_TIMEOUT       330
 
 # AIアシスタント機能の設定 / AI assistant feature settings
 #   BedrockへのHTTPリクエストの読み込みタイムアウト(秒) / Read timeout (seconds) for HTTP requests to Bedrock
