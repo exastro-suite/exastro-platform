@@ -627,10 +627,25 @@ def get_response_error_message(res):
     Returns:
         str: error message value
     """
+    # Ref: https://github.com/keycloak/keycloak/blob/26.7.0/integration/client-cli/admin-cli/src/main/java/org/keycloak/client/cli/util/HeadersBodyStatus.java#L50
     try:
         json_text = json.loads(res)
 
-        return json_text.get("errorMessage")
+        description = json_text.get("error_description")
+        err = json_text.get("error")
+        msg = json_text.get("errorMessage")
+
+        if msg is not None:
+            message = msg
+        elif err is not None:
+            if description is not None:
+                message = f"{description} [{err}]"
+            else:
+                message = err
+        else:
+            message = None
+
+        return message
     except Exception:
         return None
 

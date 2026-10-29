@@ -48,6 +48,7 @@ properties:
           <br/>terraform_cli: Terraform-CLI driver,
           <br/>ci_cd: CI/CD for IaC,
           <br/>oase: OASE,
+          <br/>ai_assistant: Exastro AI Assistant,
           "
         properties:
           terraform_cloud_ep:
@@ -57,6 +58,8 @@ properties:
           ci_cd:
             type: boolean
           oase:
+            type: boolean
+          ai_assistant:
             type: boolean
       services:
         type: object

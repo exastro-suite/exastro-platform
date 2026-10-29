@@ -32,6 +32,15 @@ from common_library.common.db import DBconnector
 from common_library.common import api_keycloak_tokens, api_keycloak_realms, multi_lang
 from common_resources.en import language
 
+# unittest用のkeycloakとDBはproxyを経由しないように設定
+for env_var in ['no_proxy', 'NO_PROXY']:
+    current_value = os.environ.get(env_var, '')
+    unittest_hosts = ['unittest-keycloak', 'unittest-platform-db']
+    hosts_to_add = [host for host in unittest_hosts if host not in current_value]
+    if hosts_to_add:
+        new_value = ','.join([current_value] + hosts_to_add) if current_value else ','.join(hosts_to_add)
+        os.environ[env_var] = new_value
+
 
 @pytest.fixture(scope='session')
 def connexion_client():
@@ -48,7 +57,7 @@ def connexion_client():
         server_args={'template_folder': '../templates'})
 
     connexion_app.add_api('swagger.yaml')
-    
+
     app = connexion_app.app
     globals.init(app)
 

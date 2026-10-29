@@ -1,0 +1,137 @@
+#   Copyright 2026 NEC Corporation
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+
+get:
+  tags:
+    - UsersService
+  summary: |-
+    現在選択中のAIサービスを取得
+    Get the currently selected AI service
+  description: |-
+    ユーザーが現在選択中のAIサービス(ai_service_id)を取得する。あわせてai_service_name(ai_service_idから導出)と、
+    そのAIサービスの/{ai_service_id}/ai-preferenceに保存されているmodel_id/model_name(未保存の場合はnull)を返す。
+    一度も保存していない場合は全項目nullで返す。
+    Get the AI service (ai_service_id) the user currently has selected. Also returns ai_service_name (derived from ai_service_id)
+    and the model_id/model_name saved in that AI service's /{ai_service_id}/ai-preference (null if never saved there).
+    If nothing has been saved yet, all fields are returned as null.
+  operationId: get_current_ai_preference
+  x-openapi-router-controller: controllers.users_service_controller
+  parameters:
+    - name: organization_id
+      in: path
+      required: true
+      schema:
+        type: string
+  responses:
+    200:
+      description: |-
+        成功
+        Success
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '../schemas/responseOk.yaml'
+              - type: object
+                properties:
+                  data:
+                    $ref: '../schemas/currentAiPreferenceInfo.yaml'
+    403:
+      description: |-
+        AIアシスタント機能が有効になっていない
+        The AI assistant feature is not enabled
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'
+    500:
+      description: |-
+        サーバーエラー
+        Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'
+
+put:
+  tags:
+    - UsersService
+  summary: |-
+    現在選択中のAIサービスを保存
+    Save the currently selected AI service
+  description: |-
+    ユーザーが現在選択中のAIサービスをai_service_idで保存する。既存の設定があれば上書き、無ければ新規作成する(create-or-replace)。
+    Save the AI service the user currently has selected, by ai_service_id. Creates the setting if it does not exist yet, otherwise replaces it (create-or-replace).
+  operationId: update_current_ai_preference
+  x-openapi-router-controller: controllers.users_service_controller
+  parameters:
+    - name: organization_id
+      in: path
+      required: true
+      schema:
+        type: string
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - ai_service_id
+          properties:
+            ai_service_id:
+              type: string
+              description: |-
+                現在選択中とするAIサービスID
+                AI service ID to mark as currently selected
+              enum: [bedrock-cache, bedrock]
+              example: "bedrock-cache"
+  responses:
+    200:
+      description: |-
+        保存成功
+        Saved successfully
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '../schemas/responseOk.yaml'
+              - type: object
+                properties:
+                  data:
+                    $ref: '../schemas/currentAiPreferenceInfo.yaml'
+    400:
+      description: |-
+        バリデーションエラー
+        Validation error
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'
+    403:
+      description: |-
+        AIアシスタント機能が有効になっていない
+        The AI assistant feature is not enabled
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'
+    500:
+      description: |-
+        サーバーエラー
+        Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'

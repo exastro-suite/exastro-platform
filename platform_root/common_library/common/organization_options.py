@@ -12,9 +12,12 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 from contextlib import closing
+from functools import wraps
+import inspect
 import json
 
 import globals
+from common_library.common import common, multi_lang
 from common_library.common.db import DBconnector
 from common_library.common.libs import queries_organization_options
 
@@ -45,3 +48,37 @@ def is_enabled_options_ita_drivers(organization_id, driver_name):
     except Exception as ex:
         globals.logger.debug(f'is_enabled_options_ita_drivers exception: {ex}')
         return False
+
+
+def require_ita_driver(driver_name, message_id, message_text):
+    """指定したITA driverが有効な場合のみControllerの処理を許可するデコレータ
+    無効な場合は403(NotAllowedException)を返す
+    Decorator that only allows the controller to proceed when the given ITA driver is enabled;
+    raises a 403 (NotAllowedException) otherwise
+
+    Args:
+        driver_name (str): driver_name (T_ORGANIZATION.INFORMATIONS内のext_options.options_ita.drivers.<driver_name>)
+        message_id (str): 無効時に返すmessage_id
+        message_text (str): 無効時に返すデフォルトメッセージ
+
+    Returns:
+        decorator
+    """
+
+    def decorator(func):
+        @wraps(func)
+        def inner_func(*args, **kwargs):
+            # organization_idはconnexionが渡す引数の位置・キーワードいずれで来ても取得できるようにbindする
+            # Bind so organization_id can be retrieved regardless of whether connexion passes it positionally or as a keyword argument
+            bound = inspect.signature(func).bind(*args, **kwargs)
+            organization_id = bound.arguments.get("organization_id")
+
+            if not is_enabled_options_ita_drivers(organization_id, driver_name):
+                message = multi_lang.get_text(message_id, message_text)
+                raise common.NotAllowedException(message_id=message_id, message=message)
+
+            return func(*args, **kwargs)
+
+        return inner_func
+
+    return decorator

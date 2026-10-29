@@ -2111,3 +2111,293 @@ def validate_service_account_user_type(service_account_user_type):
         )
 
     return result(True)
+
+
+def validate_conversation_title(title):
+    """Validate AI Assistant conversation title
+
+    Args:
+        title (str): conversation title
+
+    Returns:
+        result: Validation result
+    """
+    if title is None or title == "":
+        return result(
+            False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
+            multi_lang.get_text('000-00226', "会話タイトル")
+        )
+
+    if len(title) > const.length_conversation_title:
+        return result(
+            False, 400, '400-{}012'.format(MSG_FUNCTION_ID), '指定可能な文字数を超えています。(項目:{0},最大文字数:{1})',
+            multi_lang.get_text('000-00226', "会話タイトル"),
+            str(const.length_conversation_title)
+        )
+
+    return result(True)
+
+
+def validate_conversation_model_id(model_id):
+    """Validate AI Assistant conversation model_id
+
+    Args:
+        model_id (str): model id
+
+    Returns:
+        result: Validation result
+    """
+    if model_id is None or model_id == "":
+        return result(
+            False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
+            multi_lang.get_text('000-00227', "AIモデルID")
+        )
+
+    if len(model_id) > const.length_conversation_model_id:
+        return result(
+            False, 400, '400-{}012'.format(MSG_FUNCTION_ID), '指定可能な文字数を超えています。(項目:{0},最大文字数:{1})',
+            multi_lang.get_text('000-00227', "AIモデルID"),
+            str(const.length_conversation_model_id)
+        )
+
+    return result(True)
+
+
+def validate_conversation_ai_service_id(ai_service_id):
+    """Validate AI Assistant conversation ai_service_id
+
+    Args:
+        ai_service_id (str): AI service id
+
+    Returns:
+        result: Validation result
+    """
+    if ai_service_id is None or ai_service_id == "":
+        return result(
+            False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
+            multi_lang.get_text('000-00228', "AIサービスID")
+        )
+
+    if len(ai_service_id) > const.length_conversation_ai_service_id:
+        return result(
+            False, 400, '400-{}012'.format(MSG_FUNCTION_ID), '指定可能な文字数を超えています。(項目:{0},最大文字数:{1})',
+            multi_lang.get_text('000-00228', "AIサービスID"),
+            str(const.length_conversation_ai_service_id)
+        )
+
+    return result(True)
+
+
+def validate_conversation_tools(tools):
+    """Validate AI Assistant conversation tools (Anthropic tools形式の配列。省略可)
+
+    Args:
+        tools (list): tool definitions
+
+    Returns:
+        result: Validation result
+    """
+    if tools is not None and type(tools) is not list:
+        return result(
+            False, 400, '400-{}002'.format(MSG_FUNCTION_ID), 'リクエストボディのパラメータ({0})が不正です。',
+            'tools'
+        )
+
+    return result(True)
+
+
+def validate_message_contents(contents):
+    """Validate AI Assistant message contents (JSON配列)
+
+    Args:
+        contents (list): message contents
+
+    Returns:
+        result: Validation result
+    """
+    if contents is None:
+        return result(
+            False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
+            multi_lang.get_text('000-00229', "会話メッセージ内容")
+        )
+
+    if type(contents) is not list:
+        return result(
+            False, 400, '400-{}002'.format(MSG_FUNCTION_ID), 'リクエストボディのパラメータ({0})が不正です。',
+            'contents'
+        )
+
+    return result(True)
+
+
+def validate_messages(messages):
+    """Validate AI Assistant messages (JSON配列。各要素はcontents(JSON配列)を持つオブジェクトである必要がある)
+
+    Args:
+        messages (list): messages
+
+    Returns:
+        result: Validation result
+    """
+    if messages is None:
+        return result(
+            False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
+            multi_lang.get_text('000-00230', "会話メッセージ一覧")
+        )
+
+    if type(messages) is not list:
+        return result(
+            False, 400, '400-{}002'.format(MSG_FUNCTION_ID), 'リクエストボディのパラメータ({0})が不正です。',
+            'messages'
+        )
+
+    for item in messages:
+        if not isinstance(item, dict) or type(item.get('contents')) is not list:
+            return result(
+                False, 400, '400-{}002'.format(MSG_FUNCTION_ID), 'リクエストボディのパラメータ({0})が不正です。',
+                'messages[].contents'
+            )
+
+    return result(True)
+
+
+def validate_lesson_prompt_profile(prompt_profile):
+    """Validate AI Assistant lesson prompt_profile (required; LLMEditor/AgenticAI only)
+
+    Args:
+        prompt_profile (str): target prompt_profile
+
+    Returns:
+        result: Validation result
+    """
+    if prompt_profile is None or prompt_profile == "":
+        return result(
+            False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
+            multi_lang.get_text('000-00237', "対象prompt_profile")
+        )
+
+    if prompt_profile not in const.LESSON_PROMPT_PROFILES:
+        return result(
+            False, 400, '400-00037', '指定可能な値ではありません({0})',
+            multi_lang.get_text('000-00237', "対象prompt_profile")
+        )
+
+    return result(True)
+
+
+def validate_conversation_status(status):
+    """Validate AI Assistant conversation status (active/closed/archived)
+
+    Args:
+        status (str): conversation status
+
+    Returns:
+        result: Validation result
+    """
+    if status not in const.CONVERSATION_STATUSES:
+        return result(
+            False, 400, '400-00037', '指定可能な値ではありません({0})',
+            multi_lang.get_text('000-00231', "会話ステータス")
+        )
+
+    return result(True)
+
+
+def validate_lesson_content(lesson):
+    """Validate AI Assistant lesson content
+
+    Args:
+        lesson (str): lesson content
+
+    Returns:
+        result: Validation result
+    """
+    if lesson is None or lesson == "":
+        return result(
+            False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
+            multi_lang.get_text('000-00232', "学習事項の内容")
+        )
+
+    if len(lesson) > const.length_lesson_content:
+        return result(
+            False, 400, '400-{}012'.format(MSG_FUNCTION_ID), '指定可能な文字数を超えています。(項目:{0},最大文字数:{1})',
+            multi_lang.get_text('000-00232', "学習事項の内容"),
+            str(const.length_lesson_content)
+        )
+
+    return result(True)
+
+
+def validate_lesson_category(category):
+    """Validate AI Assistant lesson category (任意項目。指定された場合のみ文字数を検証する)
+
+    Args:
+        category (str): lesson category
+
+    Returns:
+        result: Validation result
+    """
+    if category is None or category == "":
+        return result(True)
+
+    if len(category) > const.length_lesson_category:
+        return result(
+            False, 400, '400-{}012'.format(MSG_FUNCTION_ID), '指定可能な文字数を超えています。(項目:{0},最大文字数:{1})',
+            multi_lang.get_text('000-00233', "学習事項の分類"),
+            str(const.length_lesson_category)
+        )
+
+    return result(True)
+
+
+def validate_lesson_priority(priority):
+    """Validate AI Assistant lesson priority (任意項目。指定された場合のみ範囲を検証する)
+
+    Args:
+        priority (int): lesson priority
+
+    Returns:
+        result: Validation result
+    """
+    if priority is None:
+        return result(True)
+
+    if not isinstance(priority, int) or not (const.LESSON_PRIORITY_MIN <= priority <= const.LESSON_PRIORITY_MAX):
+        return result(
+            False, 400, '400-00037', '指定可能な値ではありません({0})',
+            multi_lang.get_text('000-00234', "学習事項の重要度")
+        )
+
+    return result(True)
+
+
+def validate_lesson_bulk_items(lessons):
+    """Validate AI Assistant bulk-update items
+    (必須。空でないリストで、各要素はlesson_id(空でない文字列)とenabled(bool)を持つオブジェクトであること。
+    要素ごとに異なるenabledを指定できる)
+
+    Args:
+        lessons (list): [{"lesson_id": str, "enabled": bool}, ...]
+
+    Returns:
+        result: Validation result
+    """
+    if not lessons or type(lessons) is not list:
+        return result(
+            False, 400, '400-{}011'.format(MSG_FUNCTION_ID), '必須項目が不足しています。({0})',
+            multi_lang.get_text('000-00235', "学習事項一覧")
+        )
+
+    for item in lessons:
+        if (
+            not isinstance(item, dict)
+            or not isinstance(item.get("lesson_id"), str)
+            or not item.get("lesson_id")
+            or not isinstance(item.get("enabled"), bool)
+        ):
+            return result(
+                False, 400, '400-{}002'.format(MSG_FUNCTION_ID), 'リクエストボディのパラメータ({0})が不正です。',
+                multi_lang.get_text('000-00235', "学習事項一覧")
+            )
+
+    return result(True)

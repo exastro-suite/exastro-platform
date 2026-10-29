@@ -57,10 +57,10 @@ $(function(){
         });
     }
 
-    // 
+    //
     // refresh token取得APIの呼出
     // Call refresh token get API
-    // 
+    //
     function call_api_promise_getTokenList() {
         console.log("[CALL] call_api_promise_getTokenList");
         return call_api_promise({
@@ -74,10 +74,10 @@ $(function(){
         })
     }
 
-    // 
+    //
     // リフレッシュ トークンの一覧を表示
     // display a list of refresh tokens
-    // 
+    //
     function displayTokenList(list) {
         console.log("[CALL] displayTokenList");
 
@@ -102,7 +102,7 @@ $(function(){
             .replace(/\${id}/g, fn.cv(row.id, '', true))
             .replace(/\${start_timestamp}/g, fn.date(new Date(row.start_timestamp),'yyyy/MM/dd HH:mm:ss'))
             .replace(/\${create_user_name}/g, fn.cv(row.create_user_name, '', true))
-            .replace(/\${expire_timestamp}/g, fn.date(new Date(row.expire_timestamp),'yyyy/MM/dd HH:mm:ss'))
+            .replace(/\${expire_timestamp}/g, row.expire_timestamp ? fn.date(new Date(row.expire_timestamp),'yyyy/MM/dd HH:mm:ss') : '-')
             .replace(/\${lastaccess_timestamp}/g, fn.date(new Date(row.lastaccess_timestamp),'yyyy/MM/dd HH:mm:ss'));
             $('#token_list tbody').append(row_html);
         }
@@ -129,7 +129,7 @@ $(function(){
         $("#button_delete_modal_open").on('click',() => {
             delete_modal_open();
         });
-        
+
         $('#button_register').prop('disabled',false);
         $('#button_register').on('click',() => {
             $('#button_register').prop('disabled',true);
@@ -141,10 +141,10 @@ $(function(){
         });
     }
 
-    // 
+    //
     // トークン発行
     // issuance token
-    // 
+    //
     function create_service_account_user_token(){
         console.log("[CALL] create_service_account_user_token");
 
@@ -169,13 +169,13 @@ $(function(){
         });
     }
 
-    // 
+    //
     // サービスアカウントユーザートークン発行API呼出処理
     // Process to call service account user token creation API
-    // 
+    //
     function call_api_promise_create_service_account_user_token(reqbody){
         console.log("[CALL] call_api_promise_create_service_account_user_token");
-        
+
         // refresh tokenを発行 - create refresh token
         return call_api_promise({
             type: "POST",
@@ -189,10 +189,10 @@ $(function(){
         })
     }
 
-    // 
+    //
     // Display of result of issuing refresh token
     // refresh tokenの発行結果の表示
-    // 
+    //
     function display_result_created(data, status, jqXHR) {
         console.log("[CALL] display_result_created");
 

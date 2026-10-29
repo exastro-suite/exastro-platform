@@ -1,0 +1,63 @@
+#   Copyright 2026 NEC Corporation
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+
+type: object
+properties:
+  ai_service_id:
+    type: string
+    description: |-
+      AIサービスID
+      AI service ID
+    enum: [bedrock-cache, bedrock]
+    example: "bedrock-cache"
+  ai_service_name:
+    type: string
+    description: |-
+      AIサービスの表示名
+      Display name of the AI service
+    example: "Amazon Bedrock (Login Cache)"
+  description:
+    type: string
+    description: |-
+      AIサービスの説明(認証方式の違いなど)
+      Description of the AI service (e.g. differences in authentication method)
+    example: "AWS Login Cacheを使用し、トークンを自動更新する認証方式"
+  settings:
+    type: object
+    description: |-
+      Credential登録フォームの入力項目定義。キー名がそのままcredential_dataに保存されるキー名になる
+      Definition of the credential registration form's input fields. The key names are used verbatim as the credential_data key names
+    additionalProperties:
+      type: object
+      properties:
+        title:
+          type: string
+          description: |-
+            入力項目の表示名
+            Display label for the input field
+        type:
+          type: string
+          description: |-
+            入力項目の種別(password/text等)
+            Input field type (password/text, etc.)
+        required:
+          type: boolean
+          description: |-
+            入力必須かどうか
+            Whether the input field is required
+    example:
+      apiKey:
+        title: "認証情報（Login Cache）"
+        type: "password"
+        required: true

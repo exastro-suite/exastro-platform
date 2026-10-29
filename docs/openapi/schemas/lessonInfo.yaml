@@ -1,0 +1,75 @@
+#   Copyright 2026 NEC Corporation
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+
+type: object
+properties:
+  lesson_id:
+    type: string
+    description: |-
+      学習事項ID(ULID)
+      Lesson ID (ULID)
+    example: "01J9Z8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8"
+  lesson:
+    type: string
+    description: |-
+      学習事項の内容(過去の会話から判明した失敗・教訓・注意点等)
+      Lesson content (a failure, lesson, or caveat learned from a past conversation)
+    example: "本番環境への反映前に、必ずdry-run実行で差分を確認すること"
+  category:
+    type: string
+    nullable: true
+    description: |-
+      分類(任意)
+      Category (optional)
+    example: "Ansible"
+  prompt_profile:
+    type: string
+    nullable: true
+    description: |-
+      システムプロンプトへの反映対象prompt_profile(未設定の場合はnull=全プロファイル共通)
+      Target prompt_profile for system-prompt injection (null means it applies to all profiles)
+    example: "LLMEditor"
+  priority:
+    type: integer
+    minimum: 1
+    maximum: 10
+    description: |-
+      重要度(1:最低 〜 10:最高)。システムプロンプトへの掲載順に使用する
+      Priority (1: lowest - 10: highest). Used to order lessons when injecting them into the system prompt
+    example: 8
+  enabled:
+    type: boolean
+    description: |-
+      有効/無効フラグ(trueの場合のみシステムプロンプトへ反映される)
+      Enabled flag (only lessons with true are injected into the system prompt)
+    example: true
+  conversation_id:
+    type: string
+    nullable: true
+    description: |-
+      学習元の会話ID(任意。Workspace内DB側のIDのため外部キーではない)
+      Originating conversation ID (optional; not a foreign key since conversations live in a separate, workspace-scoped database)
+    example: "conv-001"
+  created_at:
+    type: string
+    description: |-
+      作成日時
+      Created at
+    example: "2026-09-15T02:00:00.000Z"
+  updated_at:
+    type: string
+    description: |-
+      最終更新日時
+      Last updated at
+    example: "2026-09-15T02:00:00.000Z"

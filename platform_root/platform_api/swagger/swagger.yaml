@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: Exastro Platform API
   description: Exastro Platform API
-  version: 1.11.0
+  version: 2.10.0
 servers:
 - url: "https://{host}"
   description: API endpoint
@@ -54,12 +54,16 @@ tags:
   description: メンテナンスモードに関する操作
 - name: NotificationService
   description: 通知機能に関する操作
+- name: NotificationJobService
+  description: 通知ジョブに関する操作
 - name: MailserverSettings
   description: メールサーバーに関する操作
 - name: AuditLogService
   description: 監査ログに関する操作
 - name: ServiceAccountUsersService
   description: サービスアカウントユーザーに関する操作
+- name: AIAssistantService
+  description: AIアシスタントに関する操作
 - name: InternalCommonService
   description: 共通(内部用)
 - name: InternalPlanService
@@ -72,8 +76,12 @@ tags:
   description: メンテナンスモードに関する操作(内部用)
 - name: InternalNotificationService
   description: 通知機能に関する操作(内部用)
+- name: InternalNotificationJobService
+  description: 通知ジョブに関する操作(内部用)
 - name: InternalHealthCheckService
   description: ヘルスチェックに関する操作(内部用)
+- name: InternalServiceAccountUsersService
+  description: サービスアカウントユーザーに関する操作(内部用)
 paths:
   /api/platform/organizations:
     get:
@@ -186,6 +194,7 @@ paths:
                       terraform_cli: true
                       ci_cd: true
                       oase: true
+                      ai_assistant: true
                     services:
                       document_store:
                         name: mongodb
@@ -784,6 +793,606 @@ paths:
               schema:
                 $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.common_service_controller
+  /api/{organization_id}/platform/users/_current/{credential_type}/credentials:
+    get:
+      tags:
+      - UsersService
+      summary: Credentialを取得
+      description: |
+        このcredential_typeに登録されているCredentialを取得する(1credential_typeにつき1件のみ)。
+        credential_dataのうち、GET /ai-servicesのsettingsでtype: password以外と定義されている項目のみ
+        値を返す(passwordタイプの項目は値を返さずマスクする)。未登録の場合も404にはせず、
+        credential_id等がnullの状態で200を返す。
+      operationId: get_credential
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: credential_type
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          enum:
+          - bedrock-cache
+          - bedrock
+      responses:
+        "200":
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_200_14"
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+      x-openapi-router-controller: controllers.users_service_controller
+    put:
+      tags:
+      - UsersService
+      summary: Credentialを更新
+      description: このcredential_typeに登録済みのCredentialを全体更新する(部分更新ではない)。
+      operationId: update_credential
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: credential_type
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          enum:
+          - bedrock-cache
+          - bedrock
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/credential_type_credentials_body"
+            examples:
+              update_cache:
+                summary: キャッシュファイルを更新(bedrock-cache)
+                value:
+                  credential_name: AWS Login Cache
+                  credential_data:
+                    apiKey: "{\"idToken\":\"...\",\"accessToken\":\"...\",\"refreshToken\"\
+                      :\"...\",\"region\":\"ap-northeast-1\"}"
+              update_manual:
+                summary: アクセスキーを更新(bedrock)
+                value:
+                  credential_name: My Bedrock Credential
+                  credential_data:
+                    accessKeyId: ASIA...
+                    secretAccessKey: '...'
+                    sessionToken: '...'
+        required: true
+      responses:
+        "200":
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_200_15"
+        "400":
+          description: バリデーションエラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+        "404":
+          description: |
+            このcredential_typeでCredentialが未登録(更新対象なし。先にPOSTで登録する)
+            No credential is registered for this credential_type (nothing to update; register one with POST first)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+      x-openapi-router-controller: controllers.users_service_controller
+    post:
+      tags:
+      - UsersService
+      summary: Credentialを登録
+      description: 外部サービスのCredentialを登録する
+      operationId: register_credential
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: credential_type
+        in: path
+        description: |
+          Credentialタイプ
+          - bedrock-cache: AWS Login Cache (自動トークン更新、credential_data: {"apiKey": "<キャッシュファイル全体のJSON文字列>"})
+          - bedrock: AWS Bedrock (手動Credential登録)
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          enum:
+          - bedrock-cache
+          - bedrock
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/credential_type_credentials_body_1"
+        required: true
+      responses:
+        "200":
+          description: 登録成功
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_200_15"
+        "400":
+          description: バリデーションエラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+        "409":
+          description: |
+            既にこのcredential_typeでCredentialが登録済み(1credential_typeにつき1件のみ登録可能。更新はPUTを使用する)
+            A credential is already registered for this credential_type (only one credential is allowed per credential_type; use PUT to update it)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+        "500":
+          description: サーバーエラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+      x-openapi-router-controller: controllers.users_service_controller
+    delete:
+      tags:
+      - UsersService
+      summary: Credentialを削除
+      description: |-
+        このcredential_typeに登録されているCredentialを削除する。
+        認証情報が無くなったAIサービスの設定を残さないため、あわせて/{ai_service_id}/ai-preferenceのAI利用設定も削除し、
+        このAIサービスを使用中だった場合は/ai-preferenceの現在選択中のAIサービスも未選択に戻す。
+      operationId: delete_credential
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: credential_type
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          enum:
+          - bedrock-cache
+          - bedrock
+      responses:
+        "200":
+          description: 削除成功
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_200_16"
+        "404":
+          description: このcredential_typeでCredentialが未登録
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+      x-openapi-router-controller: controllers.users_service_controller
+  /api/{organization_id}/platform/users/_current/{credential_type}/credentials/verify:
+    post:
+      tags:
+      - UsersService
+      summary: Credentialを検証
+      description: このcredential_typeに登録されているCredentialが有効かどうかを検証する
+      operationId: verify_credential
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: credential_type
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          enum:
+          - bedrock-cache
+          - bedrock
+      responses:
+        "200":
+          description: 検証結果
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_200_17"
+        "404":
+          description: Credentialが見つからない
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+      x-openapi-router-controller: controllers.users_service_controller
+  /api/{organization_id}/platform/users/_current/{credential_type}/models:
+    get:
+      tags:
+      - UsersService
+      summary: 使用可能なモデル一覧を取得
+      description: 登録されたCredentialを使用して、AIサービスで利用可能なモデル一覧を取得する
+      operationId: list_models
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: credential_type
+        in: path
+        description: AIサービスID(現在はbedrock-cacheとbedrockのみ対応)
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          enum:
+          - bedrock-cache
+          - bedrock
+      responses:
+        "200":
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_200_18"
+        "400":
+          description: バリデーションエラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+        "403":
+          description: |-
+            AIアシスタント機能が有効になっていない
+            The AI assistant feature is not enabled
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+        "404":
+          description: Credentialが見つからない
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+      x-openapi-router-controller: controllers.users_service_controller
+  /api/{organization_id}/platform/users/_current/{ai_service_id}/ai-preference:
+    get:
+      tags:
+      - UsersService
+      summary: |-
+        AI利用設定を取得
+        Get the AI preference
+      description: |-
+        ユーザーの、このAIサービス(ai_service_id)向けのAI利用設定(デフォルトモデル、ピックアップモデル一覧)を取得する。
+        AIサービスごとに個別の設定を持てるようai_service_id単位で管理する。一度も保存していない場合は全項目nullまたは空配列で返す。
+        Get the user's AI preference (default model, list of picked-up models) for this AI service (ai_service_id).
+        Preferences are managed per ai_service_id so each AI service can have its own settings. If nothing has been saved yet, all fields are returned as null or an empty array.
+      operationId: get_ai_preference
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: ai_service_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          enum:
+          - bedrock-cache
+          - bedrock
+      responses:
+        "200":
+          description: |-
+            成功
+            Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_200_19"
+        "403":
+          description: |-
+            AIアシスタント機能が有効になっていない
+            The AI assistant feature is not enabled
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+        "500":
+          description: |-
+            サーバーエラー
+            Server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+      x-openapi-router-controller: controllers.users_service_controller
+    put:
+      tags:
+      - UsersService
+      summary: |-
+        AI利用設定を保存
+        Save the AI preference
+      description: |-
+        ユーザーの、このAIサービス(ai_service_id)向けのAI利用設定を全置換で保存する。model_idは必須で、指定した内容にそのまま置き換わる（部分更新ではない）。
+        Save the user's AI preference for this AI service (ai_service_id) as a full replacement. model_id is required, and the stored content is entirely replaced with what is specified (not a partial update).
+      operationId: update_ai_preference
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: ai_service_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          enum:
+          - bedrock-cache
+          - bedrock
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ai_service_id_aipreference_body"
+        required: true
+      responses:
+        "200":
+          description: |-
+            保存成功
+            Saved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_200_19"
+        "400":
+          description: |-
+            バリデーションエラー
+            Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+        "403":
+          description: |-
+            AIアシスタント機能が有効になっていない
+            The AI assistant feature is not enabled
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+        "500":
+          description: |-
+            サーバーエラー
+            Server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+      x-openapi-router-controller: controllers.users_service_controller
+  /api/{organization_id}/platform/users/_current/ai-preference:
+    get:
+      tags:
+      - UsersService
+      summary: |-
+        現在選択中のAIサービスを取得
+        Get the currently selected AI service
+      description: |-
+        ユーザーが現在選択中のAIサービス(ai_service_id)を取得する。あわせてai_service_name(ai_service_idから導出)と、
+        そのAIサービスの/{ai_service_id}/ai-preferenceに保存されているmodel_id/model_name(未保存の場合はnull)を返す。
+        一度も保存していない場合は全項目nullで返す。
+        Get the AI service (ai_service_id) the user currently has selected. Also returns ai_service_name (derived from ai_service_id)
+        and the model_id/model_name saved in that AI service's /{ai_service_id}/ai-preference (null if never saved there).
+        If nothing has been saved yet, all fields are returned as null.
+      operationId: get_current_ai_preference
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: |-
+            成功
+            Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_200_20"
+        "403":
+          description: |-
+            AIアシスタント機能が有効になっていない
+            The AI assistant feature is not enabled
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+        "500":
+          description: |-
+            サーバーエラー
+            Server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+      x-openapi-router-controller: controllers.users_service_controller
+    put:
+      tags:
+      - UsersService
+      summary: |-
+        現在選択中のAIサービスを保存
+        Save the currently selected AI service
+      description: |-
+        ユーザーが現在選択中のAIサービスをai_service_idで保存する。既存の設定があれば上書き、無ければ新規作成する(create-or-replace)。
+        Save the AI service the user currently has selected, by ai_service_id. Creates the setting if it does not exist yet, otherwise replaces it (create-or-replace).
+      operationId: update_current_ai_preference
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/_current_aipreference_body"
+        required: true
+      responses:
+        "200":
+          description: |-
+            保存成功
+            Saved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_200_20"
+        "400":
+          description: |-
+            バリデーションエラー
+            Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+        "403":
+          description: |-
+            AIアシスタント機能が有効になっていない
+            The AI assistant feature is not enabled
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+        "500":
+          description: |-
+            サーバーエラー
+            Server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+      x-openapi-router-controller: controllers.users_service_controller
+  /api/{organization_id}/platform/ai-services:
+    get:
+      tags:
+      - AIAssistantService
+      summary: |-
+        システムとして利用可能なAIサービス一覧を取得
+        Get the list of AI services supported by the system
+      description: |-
+        現時点でシステムとして利用可能なAIサービスID一覧を返す(固定値。現在はbedrock-cache, bedrockの2件)。ユーザーのCredential登録状況とは無関係な、システム全体の対応状況を表す。
+        Return the list of AI service IDs currently supported by the system (a fixed value; currently bedrock-cache and bedrock). This reflects system-wide support and is unrelated to any individual user's credential registration status.
+      operationId: get_ai_services
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: |-
+            成功
+            Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_200_21"
+        "403":
+          description: |-
+            AIアシスタント機能が有効になっていない
+            The AI assistant feature is not enabled
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+      x-openapi-router-controller: controllers.ai_assistant_service_controller
   /api/{organization_id}/platform/workspaces:
     get:
       tags:
@@ -812,7 +1421,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/inline_response_200_14"
+                $ref: "#/components/schemas/inline_response_200_22"
         default:
           description: An unexpected error response.
           content:
@@ -880,7 +1489,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/inline_response_200_15"
+                $ref: "#/components/schemas/inline_response_200_23"
         default:
           description: An unexpected error response.
           content:
@@ -989,7 +1598,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/inline_response_200_16"
+                $ref: "#/components/schemas/inline_response_200_24"
         default:
           description: An unexpected error response.
           content:
@@ -1048,7 +1657,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/inline_response_200_17"
+                $ref: "#/components/schemas/inline_response_200_25"
               examples:
                 mail settings:
                   $ref: "#/components/examples/settingsDestinationSubDestinationInformationsExampleMail"
@@ -1236,7 +1845,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/inline_response_200_18"
+                $ref: "#/components/schemas/inline_response_200_26"
               examples:
                 mail settings:
                   $ref: "#/components/examples/settingsDestinationOneGetExampleMail"
@@ -1540,7 +2149,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/inline_response_200_14"
+                $ref: "#/components/schemas/inline_response_200_22"
         default:
           description: An unexpected error response.
           content:
@@ -1593,7 +2202,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/inline_response_200_2"
+                $ref: "#/components/schemas/inline_response_200_27"
         default:
           description: An unexpected error response.
           content:
@@ -1601,6 +2210,1334 @@ paths:
               schema:
                 $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.notification_service_controller
+  /api/{organization_id}/platform/workspaces/{workspace_id}/notification-jobs:
+    get:
+      tags:
+      - NotificationJobService
+      summary: Get notification job list
+      operationId: notification_job_list
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: workspace_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: page_size
+        in: query
+        description: "Maximum number of return values at one time (default: 100)"
+        required: false
+        style: form
+        explode: true
+        schema:
+          minimum: 1
+          type: integer
+          default: 100
+      - name: current_page
+        in: query
+        description: "Current display page (default: 1)"
+        required: false
+        style: form
+        explode: true
+        schema:
+          minimum: 1
+          type: integer
+          default: 1
+      - name: notification_status
+        in: query
+        description: Filter by notification status
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          enum:
+          - Unsent
+          - Successful
+          - Failed
+          - AbortedExpired
+      - name: func_id
+        in: query
+        description: Filter by function ID
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: destination_id
+        in: query
+        description: Filter by destination ID
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: from_date
+        in: query
+        description: Filter by date range (from)
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          format: date-time
+      - name: to_date
+        in: query
+        description: Filter by date range (to)
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          format: date-time
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_200_28"
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+      x-openapi-router-controller: controllers.notification_job_service_controller
+  /api/{organization_id}/platform/workspaces/{workspace_id}/notification-jobs/{notification_id}:
+    get:
+      tags:
+      - NotificationJobService
+      summary: Get notification job by ID
+      operationId: notification_job_get
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: workspace_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: notification_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_200_29"
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+      x-openapi-router-controller: controllers.notification_job_service_controller
+  /api/{organization_id}/platform/workspaces/{workspace_id}/conversations:
+    get:
+      tags:
+      - AIAssistantService
+      summary: |-
+        会話一覧を取得
+        Get the list of conversations
+      description: |-
+        ユーザーの会話一覧を取得する
+        Get the list of the user's conversations.
+      operationId: list_conversations
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: workspace_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: prompt_profile
+        in: query
+        description: |-
+          プロンプトプロファイル（会話一覧は常にこの値で絞り込む）
+          Prompt profile (the conversation list is always filtered by this value)
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+          enum:
+          - LLMEditor
+          - AgenticAI
+      - name: status
+        in: query
+        description: |-
+          ステータスフィルター
+          Status filter
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          enum:
+          - active
+          - closed
+          - archived
+      - name: limit
+        in: query
+        description: |-
+          取得件数
+          Number of items to retrieve
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+          default: 50
+      - name: offset
+        in: query
+        description: |-
+          オフセット
+          Offset
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+          default: 0
+      responses:
+        "200":
+          description: |-
+            成功
+            Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_200_30"
+        "403":
+          description: |-
+            AIアシスタント機能が有効になっていない
+            The AI assistant feature is not enabled
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+      x-openapi-router-controller: controllers.ai_assistant_service_controller
+    post:
+      tags:
+      - AIAssistantService
+      summary: |-
+        会話を作成
+        Create a conversation
+      description: |-
+        新しいチャット会話を作成する
+        Create a new chat conversation.
+      operationId: create_conversation
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: workspace_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/workspace_id_conversations_body"
+        required: true
+      responses:
+        "200":
+          description: |-
+            会話作成成功
+            Conversation created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_200_31"
+        "400":
+          description: |-
+            バリデーションエラー
+            Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+        "403":
+          description: |-
+            AIアシスタント機能が有効になっていない
+            The AI assistant feature is not enabled
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+        "404":
+          description: |-
+            指定したai_service_idのactiveなCredentialが登録されていない
+            No active credential is registered for the specified ai_service_id
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+        "500":
+          description: |-
+            サーバーエラー
+            Server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+      x-openapi-router-controller: controllers.ai_assistant_service_controller
+  /api/{organization_id}/platform/workspaces/{workspace_id}/conversations/{conversation_id}:
+    delete:
+      tags:
+      - AIAssistantService
+      summary: |-
+        会話を削除
+        Delete a conversation
+      description: |-
+        会話を削除する。会話に紐づくメッセージ履歴も合わせて削除する。
+        Delete a conversation. The message history associated with the conversation is also deleted.
+      operationId: delete_conversation
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: workspace_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: conversation_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: |-
+            削除成功
+            Deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_200_32"
+        "403":
+          description: |-
+            AIアシスタント機能が有効になっていない
+            The AI assistant feature is not enabled
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+        "404":
+          description: |-
+            会話が見つからない
+            Conversation not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+        "500":
+          description: |-
+            サーバーエラー
+            Server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+      x-openapi-router-controller: controllers.ai_assistant_service_controller
+    patch:
+      tags:
+      - AIAssistantService
+      summary: |-
+        会話を部分更新
+        Partially update a conversation
+      description: |-
+        会話を部分更新する。title・statusのうち、リクエストボディで指定された項目のみを更新し、指定しなかった項目は変更しない（PATCH）。
+        Partially update a conversation. Only the fields provided in the request body (title, status) are updated; fields not provided are left unchanged (PATCH semantics).
+      operationId: update_conversation
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: workspace_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: conversation_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/conversations_conversation_id_body"
+        required: true
+      responses:
+        "200":
+          description: |-
+            更新成功
+            Updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_200_33"
+        "400":
+          description: |-
+            バリデーションエラー
+            Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+        "403":
+          description: |-
+            AIアシスタント機能が有効になっていない
+            The AI assistant feature is not enabled
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+        "404":
+          description: |-
+            会話が見つからない
+            Conversation not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+        "500":
+          description: |-
+            サーバーエラー
+            Server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+      x-openapi-router-controller: controllers.ai_assistant_service_controller
+  /api/{organization_id}/platform/workspaces/{workspace_id}/conversations/{conversation_id}/completions:
+    post:
+      tags:
+      - AIAssistantService
+      summary: |-
+        AI応答を生成
+        Generate an AI response
+      description: |-
+        ユーザーメッセージを送信し、AIとの会話を1ターン進めて応答を取得する。messageは省略可能で、省略した場合は会話の既存履歴のみでAIサービスに問い合わせる（新規ターンは追加されず、応答結果も保存されない＝問い合わせのみ）。なお、多くの生成AIサービスのAPIでは会話がuserターンで終わっている必要があるため、履歴の最後がassistantターンで終わっている（＝直前のやり取りに既に応答済み）状態でmessageを省略した場合は、直前のassistant応答を一時的に取り除いた上でその手前のuserターンまでで再度問い合わせる（＝応答の再生成）。会話に既存の履歴が全く無い場合、または再生成のためにassistantターンを取り除いた結果userターンも残らない場合は400エラーになる。
+        Send a user message and advance the conversation with the AI by one turn to get a response. The message field is optional; if omitted, the AI service is queried using only the conversation's existing history (no new turn is added and the response is not saved — query only). Note that many generative AI service APIs require the conversation to end with a user turn; if the history already ends with an assistant turn (i.e. the previous exchange was already answered) and message is omitted, the trailing assistant turn is temporarily dropped and the AI is queried again up to the preceding user turn (i.e. the response is regenerated). A 400 error is returned if the conversation has no existing history at all, or if no user turn remains after dropping the trailing assistant turn.
+      operationId: create_completion
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: workspace_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: conversation_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/conversation_id_completions_body"
+        required: true
+      responses:
+        "200":
+          description: |-
+            AI応答の生成成功
+            AI response generated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_200_34"
+        "400":
+          description: |-
+            バリデーションエラー
+            Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+        "403":
+          description: |-
+            AIアシスタント機能が有効になっていない
+            The AI assistant feature is not enabled
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+        "404":
+          description: |-
+            会話が見つからない、または使用するai_service_idのactiveなCredentialが登録されていない
+            Conversation not found, or no active credential is registered for the ai_service_id in use
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+        "500":
+          description: |-
+            サーバーエラー
+            Server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+        default:
+          description: "AIサービスのAPIがエラー時に返したHTTPステータスコードをそのまま返す(例: 429, 500, 503等)。\
+            \ AIサービスへのリクエストがタイムアウトした場合は504、接続に失敗した場合は503を返す。 リトライ可否の判断はこのステータスコードを\
+            基準に行うこと。 Returns the HTTP status code exactly as returned by the AI service's\
+            \ API on error (e.g. 429, 500, 503, etc.). Returns 504 when the request\
+            \ to the AI service times out, and 503 when the connection to it fails.\
+            \ Retry decisions should be based on this status code."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+      x-openapi-router-controller: controllers.ai_assistant_service_controller
+  /api/{organization_id}/platform/workspaces/{workspace_id}/conversations/{conversation_id}/messages:
+    get:
+      tags:
+      - AIAssistantService
+      summary: |-
+        会話メッセージ一覧を取得
+        Get the list of conversation messages
+      description: |-
+        会話のメッセージ（UI用）を取得する
+        Get the messages (for UI use) of a conversation.
+      operationId: list_messages
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: workspace_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: conversation_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: limit
+        in: query
+        description: |-
+          取得件数
+          Number of items to retrieve
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+          default: 100
+      - name: offset
+        in: query
+        description: |-
+          オフセット(message_seq基準)
+          Offset (based on message_seq)
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+          default: 0
+      responses:
+        "200":
+          description: |-
+            成功
+            Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_200_35"
+        "403":
+          description: |-
+            AIアシスタント機能が有効になっていない
+            The AI assistant feature is not enabled
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+        "404":
+          description: |-
+            会話が見つからない
+            Conversation not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+      x-openapi-router-controller: controllers.ai_assistant_service_controller
+    put:
+      tags:
+      - AIAssistantService
+      summary: |-
+        会話メッセージを全置き換え
+        Replace all conversation messages
+      description: |-
+        GETで取得できる内容をそのまま置き換える。既存のメッセージレコードは全て削除され、リクエストで指定したmessagesの内容にすべて入れ替わる（部分更新ではなく全置換）。
+        Replace the content returned by GET entirely. All existing message records are deleted and replaced with the content of the messages specified in the request (a full replacement, not a partial update).
+      operationId: replace_messages
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: workspace_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: conversation_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/conversation_id_messages_body"
+        required: true
+      responses:
+        "200":
+          description: |-
+            置き換え成功
+            Replaced successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_200_35"
+        "400":
+          description: |-
+            バリデーションエラー
+            Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+        "403":
+          description: |-
+            AIアシスタント機能が有効になっていない
+            The AI assistant feature is not enabled
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+        "404":
+          description: |-
+            会話が見つからない
+            Conversation not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+        "500":
+          description: |-
+            サーバーエラー
+            Server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+      x-openapi-router-controller: controllers.ai_assistant_service_controller
+    post:
+      tags:
+      - AIAssistantService
+      summary: |-
+        会話メッセージを作成
+        Create a conversation message
+      description: |-
+        UIからの応答を会話メッセージとして保存する(スナップショットとして保存)
+        Save a UI response as a conversation message (saved as a snapshot).
+      operationId: create_message
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: workspace_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: conversation_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/conversation_id_messages_body_1"
+        required: true
+      responses:
+        "200":
+          description: |-
+            作成成功
+            Created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_200_36"
+        "400":
+          description: |-
+            バリデーションエラー
+            Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+        "403":
+          description: |-
+            AIアシスタント機能が有効になっていない
+            The AI assistant feature is not enabled
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+        "404":
+          description: |-
+            会話が見つからない
+            Conversation not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+        "500":
+          description: |-
+            サーバーエラー
+            Server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+      x-openapi-router-controller: controllers.ai_assistant_service_controller
+    delete:
+      tags:
+      - AIAssistantService
+      summary: |-
+        会話メッセージを全削除
+        Delete all conversation messages
+      description: |-
+        会話に紐づくメッセージレコードを全て削除する
+        Delete all message records associated with the conversation.
+      operationId: delete_messages
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: workspace_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: conversation_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: |-
+            削除成功
+            Deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_200_37"
+        "403":
+          description: |-
+            AIアシスタント機能が有効になっていない
+            The AI assistant feature is not enabled
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+        "404":
+          description: |-
+            会話が見つからない
+            Conversation not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+        "500":
+          description: |-
+            サーバーエラー
+            Server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+      x-openapi-router-controller: controllers.ai_assistant_service_controller
+  /api/{organization_id}/platform/workspaces/{workspace_id}/lessons:
+    get:
+      tags:
+      - AIAssistantService
+      summary: |-
+        学習事項一覧を取得
+        Get the list of lessons
+      description: |-
+        ユーザーの学習事項一覧を取得する(ワークスペース単位)。対象prompt_profileは必須(一覧は常にこの値で絞り込む)。有効/無効フラグ・分類でも絞り込み可能で、ページングもできる。
+        Get the list of the user's lessons for this workspace. The target prompt_profile is required (the list is always filtered by this value). Also supports filtering by enabled flag or category, and pagination.
+      operationId: list_lessons
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: workspace_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: enabled
+        in: query
+        description: |-
+          有効/無効フィルター(省略時は絞り込みなし)
+          Enabled-flag filter (no filtering if omitted)
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: boolean
+      - name: category
+        in: query
+        description: |-
+          分類フィルター(省略時は絞り込みなし)
+          Category filter (no filtering if omitted)
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: prompt_profile
+        in: query
+        description: |-
+          対象prompt_profileフィルター(必須。全プロファイル共通(未設定)の学習事項はこのフィルターでは
+          対象外になる点に注意。完全一致のみ)
+          Target prompt_profile filter (required; note that lessons with no prompt_profile set
+          (applying to all profiles) are excluded by this filter — exact match only)
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+          enum:
+          - LLMEditor
+          - AgenticAI
+      - name: limit
+        in: query
+        description: |-
+          取得件数
+          Number of items to retrieve
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+          default: 50
+      - name: offset
+        in: query
+        description: |-
+          オフセット
+          Offset
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+          default: 0
+      responses:
+        "200":
+          description: |-
+            成功
+            Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_200_38"
+        "400":
+          description: |-
+            prompt_profile未指定・不正な値
+            prompt_profile is missing or invalid
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+        "403":
+          description: |-
+            AIアシスタント機能が有効になっていない
+            The AI assistant feature is not enabled
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+        "500":
+          description: |-
+            サーバーエラー
+            Server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+      x-openapi-router-controller: controllers.ai_assistant_service_controller
+    post:
+      tags:
+      - AIAssistantService
+      summary: |-
+        学習事項を作成
+        Create a lesson
+      description: |-
+        ユーザーの学習事項(過去の会話から判明した失敗・教訓・注意点)を新規登録する。登録した学習事項はenabledがtrueの間、AIアシスタントのシステムプロンプトへ自動的に反映される。
+        Register a new lesson (a failure, lesson, or caveat learned from a past conversation) for the user. While a lesson's enabled flag is true, it is automatically injected into the AI assistant's system prompt.
+      operationId: create_lesson
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: workspace_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/workspace_id_lessons_body"
+        required: true
+      responses:
+        "200":
+          description: |-
+            登録成功
+            Registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_200_39"
+        "400":
+          description: |-
+            バリデーションエラー、またはこのユーザー・このWorkspaceの学習事項登録件数が上限(AI_ASSISTANT_LESSONS_MAX_COUNT環境変数、既定200件)に達している
+            Validation error, or the number of lessons already registered by this user in this workspace has reached the limit (AI_ASSISTANT_LESSONS_MAX_COUNT env var, default 200)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+        "403":
+          description: |-
+            AIアシスタント機能が有効になっていない
+            The AI assistant feature is not enabled
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+        "500":
+          description: |-
+            サーバーエラー
+            Server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+      x-openapi-router-controller: controllers.ai_assistant_service_controller
+    patch:
+      tags:
+      - AIAssistantService
+      summary: |-
+        複数の学習事項の有効/無効を一括更新
+        Bulk-update the enabled flag for multiple lessons
+      description: |-
+        複数の学習事項について、有効/無効フラグをまとめて更新する(要素ごとに異なる有効/無効を指定できるため、混在した状態を1回の呼び出しで反映できる)。存在しない・他ユーザー所有のIDが含まれる場合、そのIDは更新されず件数に反映されない(エラーにはならない)。
+        Bulk-update the enabled flag for multiple lessons at once (each item may specify a different enabled value, so a mixed set of changes can be applied in a single call). IDs that don't exist or belong to another user are simply not updated and excluded from the count (this is not treated as an error).
+      operationId: bulk_update_lessons
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: workspace_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/workspace_id_lessons_body_1"
+        required: true
+      responses:
+        "200":
+          description: |-
+            更新成功
+            Updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_200_40"
+        "400":
+          description: |-
+            バリデーションエラー
+            Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+        "403":
+          description: |-
+            AIアシスタント機能が有効になっていない
+            The AI assistant feature is not enabled
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+        "500":
+          description: |-
+            サーバーエラー
+            Server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+      x-openapi-router-controller: controllers.ai_assistant_service_controller
+  /api/{organization_id}/platform/workspaces/{workspace_id}/lessons/{lesson_id}:
+    get:
+      tags:
+      - AIAssistantService
+      summary: |-
+        学習事項を取得
+        Get a lesson
+      description: |-
+        指定した学習事項を1件取得する。
+        Get a single lesson by ID.
+      operationId: get_lesson
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: workspace_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: lesson_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: |-
+            成功
+            Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_200_39"
+        "403":
+          description: |-
+            AIアシスタント機能が有効になっていない
+            The AI assistant feature is not enabled
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+        "404":
+          description: |-
+            学習事項が見つからない
+            Lesson not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+        "500":
+          description: |-
+            サーバーエラー
+            Server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+      x-openapi-router-controller: controllers.ai_assistant_service_controller
+    delete:
+      tags:
+      - AIAssistantService
+      summary: |-
+        学習事項を削除
+        Delete a lesson
+      description: |-
+        指定した学習事項をID単位で削除する。
+        Delete a single lesson by ID.
+      operationId: delete_lesson
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: workspace_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: lesson_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: |-
+            削除成功
+            Deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_200_41"
+        "403":
+          description: |-
+            AIアシスタント機能が有効になっていない
+            The AI assistant feature is not enabled
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+        "404":
+          description: |-
+            学習事項が見つからない
+            Lesson not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+        "500":
+          description: |-
+            サーバーエラー
+            Server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+      x-openapi-router-controller: controllers.ai_assistant_service_controller
+    patch:
+      tags:
+      - AIAssistantService
+      summary: |-
+        学習事項を部分更新
+        Partially update a lesson
+      description: |-
+        学習事項を部分更新する。lesson・category・priority・enabledのうち、リクエストボディで指定された項目のみを更新し、指定しなかった項目は変更しない(PATCH)。主な用途は一覧UIでの有効/無効の切り替えや内容の修正。
+        Partially update a lesson. Only the fields provided in the request body (lesson, category, priority, enabled) are updated; fields not provided are left unchanged (PATCH semantics). The main use is toggling enabled or correcting content from a list UI.
+      operationId: update_lesson
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: workspace_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: lesson_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/lessons_lesson_id_body"
+        required: true
+      responses:
+        "200":
+          description: |-
+            更新成功
+            Updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_200_39"
+        "400":
+          description: |-
+            バリデーションエラー
+            Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+        "403":
+          description: |-
+            AIアシスタント機能が有効になっていない
+            The AI assistant feature is not enabled
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+        "404":
+          description: |-
+            学習事項が見つからない
+            Lesson not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+        "500":
+          description: |-
+            サーバーエラー
+            Server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+      x-openapi-router-controller: controllers.ai_assistant_service_controller
   /api/{organization_id}/platform/users:
     get:
       tags:
@@ -1650,7 +3587,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/inline_response_200_19"
+                $ref: "#/components/schemas/inline_response_200_42"
         default:
           description: An unexpected error response.
           content:
@@ -1719,7 +3656,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/inline_response_200_20"
+                $ref: "#/components/schemas/inline_response_200_43"
         default:
           description: An unexpected error response.
           content:
@@ -1835,7 +3772,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/inline_response_200_21"
+                $ref: "#/components/schemas/inline_response_200_44"
         default:
           description: An unexpected error response.
           content:
@@ -2014,7 +3951,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/inline_response_200_22"
+                $ref: "#/components/schemas/inline_response_200_45"
         default:
           description: An unexpected error response.
           content:
@@ -2226,7 +4163,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/inline_response_200_23"
+                $ref: "#/components/schemas/inline_response_200_46"
         default:
           description: An unexpected error response.
           content:
@@ -2261,7 +4198,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/inline_response_200_24"
+                $ref: "#/components/schemas/inline_response_200_47"
         default:
           description: An unexpected error response.
           content:
@@ -2338,7 +4275,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/inline_response_200_25"
+                $ref: "#/components/schemas/inline_response_200_48"
         default:
           description: An unexpected error response.
           content:
@@ -2366,7 +4303,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/inline_response_200_26"
+                $ref: "#/components/schemas/inline_response_200_49"
         default:
           description: An unexpected error response.
           content:
@@ -2401,7 +4338,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/inline_response_200_27"
+                $ref: "#/components/schemas/inline_response_200_50"
         default:
           description: An unexpected error response.
           content:
@@ -2465,7 +4402,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/inline_response_200_28"
+                $ref: "#/components/schemas/inline_response_200_51"
         default:
           description: An unexpected error response.
           content:
@@ -2518,7 +4455,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/inline_response_200_28"
+                $ref: "#/components/schemas/inline_response_200_51"
         default:
           description: An unexpected error response.
           content:
@@ -2546,7 +4483,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/inline_response_200_29"
+                $ref: "#/components/schemas/inline_response_200_52"
               example:
                 value:
                   result: 200
@@ -2675,7 +4612,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/inline_response_200_30"
+                $ref: "#/components/schemas/inline_response_200_53"
         default:
           description: An unexpected error response.
           content:
@@ -2708,7 +4645,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/inline_response_200_31"
+                $ref: "#/components/schemas/inline_response_200_54"
         default:
           description: An unexpected error response.
           content:
@@ -2786,7 +4723,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/inline_response_200_32"
+                $ref: "#/components/schemas/inline_response_200_55"
         default:
           description: An unexpected error response.
           content:
@@ -2869,7 +4806,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/inline_response_200_33"
+                $ref: "#/components/schemas/inline_response_200_56"
         default:
           description: An unexpected error response.
           content:
@@ -3002,7 +4939,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/inline_response_200_34"
+                $ref: "#/components/schemas/inline_response_200_57"
         default:
           description: An unexpected error response.
           content:
@@ -3050,7 +4987,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/inline_response_200_35"
+                $ref: "#/components/schemas/inline_response_200_58"
         default:
           description: An unexpected error response.
           content:
@@ -3343,7 +5280,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/inline_response_200_36"
+                $ref: "#/components/schemas/inline_response_200_59"
         default:
           description: An unexpected error response.
           content:
@@ -3398,7 +5335,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/inline_response_200_37"
+                $ref: "#/components/schemas/inline_response_200_60"
         default:
           description: An unexpected error response.
           content:
@@ -3516,7 +5453,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/inline_response_200_38"
+                $ref: "#/components/schemas/inline_response_200_61"
         default:
           description: An unexpected error response.
           content:
@@ -3572,7 +5509,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/inline_response_200_19"
+                $ref: "#/components/schemas/inline_response_200_42"
         default:
           description: An unexpected error response.
           content:
@@ -3628,7 +5565,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/inline_response_200_39"
+                $ref: "#/components/schemas/inline_response_200_62"
         default:
           description: An unexpected error response.
           content:
@@ -3649,7 +5586,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/inline_response_200_28"
+                $ref: "#/components/schemas/inline_response_200_51"
         default:
           description: An unexpected error response.
           content:
@@ -3706,7 +5643,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/inline_response_200_17"
+                $ref: "#/components/schemas/inline_response_200_25"
               examples:
                 mail settings:
                   $ref: "#/components/examples/settingsDestinationSubDestinationInformationsExampleMail"
@@ -3757,7 +5694,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/inline_response_200_18"
+                $ref: "#/components/schemas/inline_response_200_26"
               examples:
                 mail settings:
                   $ref: "#/components/examples/settingsDestinationOneGetExampleMail"
@@ -3883,7 +5820,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/inline_response_200_14"
+                $ref: "#/components/schemas/inline_response_200_22"
         default:
           description: An unexpected error response.
           content:
@@ -3936,7 +5873,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/inline_response_200_2"
+                $ref: "#/components/schemas/inline_response_200_27"
         default:
           description: An unexpected error response.
           content:
@@ -3944,6 +5881,150 @@ paths:
               schema:
                 $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.internal_notification_service_controller
+  /internal-api/{organization_id}/platform/workspaces/{workspace_id}/notification-jobs:
+    get:
+      tags:
+      - InternalNotificationJobService
+      summary: Get notification job list (Internal API)
+      operationId: internal_notification_job_list
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: workspace_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: page_size
+        in: query
+        description: "Maximum number of return values at one time (default: 100)"
+        required: false
+        style: form
+        explode: true
+        schema:
+          minimum: 1
+          type: integer
+          default: 100
+      - name: current_page
+        in: query
+        description: "Current display page (default: 1)"
+        required: false
+        style: form
+        explode: true
+        schema:
+          minimum: 1
+          type: integer
+          default: 1
+      - name: notification_status
+        in: query
+        description: Filter by notification status
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          enum:
+          - Unsent
+          - Successful
+          - Failed
+          - AbortedExpired
+      - name: func_id
+        in: query
+        description: Filter by function ID
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: destination_id
+        in: query
+        description: Filter by destination ID
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: from_date
+        in: query
+        description: Filter by date range (from)
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          format: date-time
+      - name: to_date
+        in: query
+        description: Filter by date range (to)
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          format: date-time
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_200_63"
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+      x-openapi-router-controller: controllers.internal_notification_job_service_controller
+  /internal-api/{organization_id}/platform/workspaces/{workspace_id}/notification-jobs/{notification_id}:
+    get:
+      tags:
+      - InternalNotificationJobService
+      summary: Get notification job by ID (Internal API)
+      operationId: internal_notification_job_get
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: workspace_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: notification_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_200_64"
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+      x-openapi-router-controller: controllers.internal_notification_job_service_controller
   /internal-api/health-check/liveness:
     get:
       tags:
@@ -3984,6 +6065,172 @@ paths:
               schema:
                 $ref: "#/components/schemas/runtimeError"
       x-openapi-router-controller: controllers.internal_health_check_service_controller
+  /internal-api/{organization_id}/platform/workspaces/{workspace_id}/service-account-users:
+    get:
+      tags:
+      - InternalServiceAccountUsersService
+      summary: List returns list of service account users
+      operationId: internal_service_account_user_list
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: workspace_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_200_55"
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+      x-openapi-router-controller: controllers.internal_service_account_users_service_controller
+    post:
+      tags:
+      - InternalServiceAccountUsersService
+      summary: Create an service account user
+      operationId: internal_service_account_user_create
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: workspace_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/serviceAccountUserCreate"
+        required: true
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_200_2"
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+      x-openapi-router-controller: controllers.internal_service_account_users_service_controller
+  /internal-api/{organization_id}/platform/workspaces/{workspace_id}/service-account-users/{user_id}/refresh_tokens:
+    get:
+      tags:
+      - InternalServiceAccountUsersService
+      summary: List returns list of service account user tokens
+      operationId: internal_service_account_user_token_list
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: workspace_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: user_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_200_57"
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+      x-openapi-router-controller: controllers.internal_service_account_users_service_controller
+    post:
+      tags:
+      - InternalServiceAccountUsersService
+      summary: Create an service account user token
+      operationId: internal_service_account_user_token_create
+      parameters:
+      - name: organization_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: workspace_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: user_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+        required: true
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_200_58"
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runtimeError"
+      x-openapi-router-controller: controllers.internal_service_account_users_service_controller
 components:
   schemas:
     responseOk:
@@ -5267,6 +7514,290 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/serviceAccountUserTokenList_data"
+    aiCredentialInfo:
+      type: object
+      properties:
+        credential_id:
+          type: string
+        credential_type:
+          type: string
+          enum:
+          - bedrock-cache
+          - bedrock
+        credential_name:
+          type: string
+        status:
+          type: string
+          enum:
+          - active
+          - expired
+          - disabled
+        expires_at:
+          type: string
+          format: date-time
+        last_validated_at:
+          type: string
+          format: date-time
+        last_used_at:
+          type: string
+          format: date-time
+        validation_error:
+          type: string
+        notes:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    modelInfo:
+      type: object
+      properties:
+        id:
+          type: string
+          description: モデルID
+        name:
+          type: string
+          description: モデル名
+        description:
+          type: string
+          description: モデル説明
+        type:
+          type: string
+          description: プロバイダータイプ
+        status:
+          type: string
+          description: ステータス
+    conversationInfo:
+      type: object
+      properties:
+        conversation_id:
+          type: string
+        prompt_profile:
+          type: string
+          description: |-
+            プロンプトプロファイル（AgenticAI/LLMEditor）
+            Prompt profile (AgenticAI/LLMEditor)
+        ai_service_id:
+          type: string
+          description: |-
+            AIサービスID（bedrock/bedrock-cache）
+            AI service ID (bedrock/bedrock-cache)
+        model_id:
+          type: string
+          description: |-
+            会話のデフォルトモデルID(completionsでmodel_id省略時に使用)
+            Default model ID for the conversation (used when model_id is omitted in completions)
+        title:
+          type: string
+        status:
+          type: string
+          enum:
+          - active
+          - closed
+          - archived
+        current_token_count:
+          type: integer
+          description: |-
+            この会話でこれまでに消費した累積トークン数(input+output)。completions呼び出しでBedrockからusageが返るたびに加算され、
+            messageを省略した問い合わせ(既存履歴のみでの再問い合わせ・tool_result継続・添付ファイルのみのターン等、応答結果を
+            保存しない呼び出し)でも実際に消費したトークンとして加算される(保存の有無とは独立)。
+            Cumulative tokens (input+output) consumed by this conversation so far. Incremented every time a completions call returns
+            usage from Bedrock, including message-omitted calls (re-querying existing history, tool_result continuations,
+            attachment-only turns, etc. — calls whose response is not persisted); accumulation is independent of whether the
+            turn was persisted.
+        message_count:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    aiPreferenceInfo:
+      type: object
+      properties:
+        ai_service_id:
+          type: string
+          description: |-
+            AIサービスID(パスパラメータの値をそのまま返す)
+            AI service ID (echoes the path parameter value)
+          example: bedrock-cache
+          enum:
+          - bedrock-cache
+          - bedrock
+        ai_service_name:
+          type: string
+          description: |-
+            AIサービスの表示名(ai_service_idからサーバー側で導出。取得時のみ付与され、未知のIDの場合はnull)
+            Display name of the AI service (derived server-side from ai_service_id at GET time; null if the ID is unrecognized)
+          nullable: true
+          readOnly: true
+          example: Amazon Bedrock (Login Cache)
+        model_id:
+          type: string
+          description: |-
+            デフォルトで使用するモデルID(一度も保存していない場合はnull)
+            Default model ID to use (null if never saved)
+          nullable: true
+          example: anthropic.claude-3-5-sonnet-20240620-v1:0
+        model_name:
+          type: string
+          description: |-
+            デフォルトモデルの表示名(PUT時にクライアントが指定した値をそのまま保存・返却。未指定または未保存の場合はnull)
+            Display name of the default model (stored/returned verbatim as supplied by the client at PUT time; null if not provided or never saved)
+          nullable: true
+          example: Claude 3.5 Sonnet
+        pickup_model_ids:
+          type: array
+          description: |-
+            UIでモデル選択の候補を絞り込むためにピックアップしたモデル一覧(選択肢が多すぎる問題への対処用)。
+            IDだけでは表示名がわからず使いにくいため、id・nameを持つオブジェクトの配列とする
+            List of models picked to narrow down the model choices shown in the UI (addresses having too many models to choose from).
+            An array of objects with id and name (an ID alone is hard to use for display purposes)
+          example:
+          - id: anthropic.claude-3-5-sonnet-20240620-v1:0
+            name: Claude 3.5 Sonnet
+          - id: global.anthropic.claude-sonnet-5
+            name: Claude Sonnet 5
+          items:
+            $ref: "#/components/schemas/aiPreferenceInfo_pickup_model_ids"
+    currentAiPreferenceInfo:
+      type: object
+      properties:
+        ai_service_id:
+          type: string
+          description: |-
+            現在選択中のAIサービスID(一度も保存していない場合はnull)
+            Currently selected AI service ID (null if never saved)
+          nullable: true
+          example: bedrock-cache
+          enum:
+          - bedrock-cache
+          - bedrock
+        ai_service_name:
+          type: string
+          description: |-
+            AIサービスの表示名(ai_service_idからサーバー側で導出。取得時のみ付与され、未知のIDまたはai_service_idがnullの場合はnull)
+            Display name of the AI service (derived server-side from ai_service_id at GET time; null if the ID is unrecognized or ai_service_id is null)
+          nullable: true
+          readOnly: true
+          example: Amazon Bedrock (Login Cache)
+        model_id:
+          type: string
+          description: |-
+            このAIサービスの/{ai_service_id}/ai-preferenceに保存されているデフォルトモデルID(未保存の場合はnull。ここには保存しない、参照のみ)
+            Default model ID from this AI service's /{ai_service_id}/ai-preference (null if never saved there; referenced only, not stored here)
+          nullable: true
+          readOnly: true
+          example: anthropic.claude-3-5-sonnet-20240620-v1:0
+        model_name:
+          type: string
+          description: |-
+            このAIサービスの/{ai_service_id}/ai-preferenceに保存されているデフォルトモデルの表示名(未保存の場合はnull。ここには保存しない、参照のみ)
+            Default model display name from this AI service's /{ai_service_id}/ai-preference (null if never saved there; referenced only, not stored here)
+          nullable: true
+          readOnly: true
+          example: Claude 3.5 Sonnet
+    aiServiceInfo:
+      type: object
+      properties:
+        ai_service_id:
+          type: string
+          description: |-
+            AIサービスID
+            AI service ID
+          example: bedrock-cache
+          enum:
+          - bedrock-cache
+          - bedrock
+        ai_service_name:
+          type: string
+          description: |-
+            AIサービスの表示名
+            Display name of the AI service
+          example: Amazon Bedrock (Login Cache)
+        description:
+          type: string
+          description: |-
+            AIサービスの説明(認証方式の違いなど)
+            Description of the AI service (e.g. differences in authentication method)
+          example: AWS Login Cacheを使用し、トークンを自動更新する認証方式
+        settings:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/aiServiceInfo_settings"
+          description: |-
+            Credential登録フォームの入力項目定義。キー名がそのままcredential_dataに保存されるキー名になる
+            Definition of the credential registration form's input fields. The key names are used verbatim as the credential_data key names
+          example:
+            apiKey:
+              title: 認証情報（Login Cache）
+              type: password
+              required: true
+    lessonInfo:
+      type: object
+      properties:
+        lesson_id:
+          type: string
+          description: |-
+            学習事項ID(ULID)
+            Lesson ID (ULID)
+          example: 01J9Z8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8
+        lesson:
+          type: string
+          description: |-
+            学習事項の内容(過去の会話から判明した失敗・教訓・注意点等)
+            Lesson content (a failure, lesson, or caveat learned from a past conversation)
+          example: 本番環境への反映前に、必ずdry-run実行で差分を確認すること
+        category:
+          type: string
+          description: |-
+            分類(任意)
+            Category (optional)
+          nullable: true
+          example: Ansible
+        prompt_profile:
+          type: string
+          description: |-
+            システムプロンプトへの反映対象prompt_profile(未設定の場合はnull=全プロファイル共通)
+            Target prompt_profile for system-prompt injection (null means it applies to all profiles)
+          nullable: true
+          example: LLMEditor
+        priority:
+          maximum: 10
+          minimum: 1
+          type: integer
+          description: |-
+            重要度(1:最低 〜 10:最高)。システムプロンプトへの掲載順に使用する
+            Priority (1: lowest - 10: highest). Used to order lessons when injecting them into the system prompt
+          example: 8
+        enabled:
+          type: boolean
+          description: |-
+            有効/無効フラグ(trueの場合のみシステムプロンプトへ反映される)
+            Enabled flag (only lessons with true are injected into the system prompt)
+          example: true
+        conversation_id:
+          type: string
+          description: |-
+            学習元の会話ID(任意。Workspace内DB側のIDのため外部キーではない)
+            Originating conversation ID (optional; not a foreign key since conversations live in a separate, workspace-scoped database)
+          nullable: true
+          example: conv-001
+        created_at:
+          type: string
+          description: |-
+            作成日時
+            Created at
+          example: 2026-09-15T02:00:00.000Z
+        updated_at:
+          type: string
+          description: |-
+            最終更新日時
+            Last updated at
+          example: 2026-09-15T02:00:00.000Z
     inline_response_200:
       allOf:
       - $ref: "#/components/schemas/responseOk"
@@ -5280,6 +7811,7 @@ components:
             $ref: "#/components/schemas/organization"
     apiplatformorganizationsorganization_id_optionsIta_drivers:
       required:
+      - ai_assistant
       - ci_cd
       - oase
       - terraform_cli
@@ -5294,8 +7826,11 @@ components:
           type: boolean
         oase:
           type: boolean
+        ai_assistant:
+          type: boolean
       description: "terraform_cloud_ep: Terraform-Cloud/EP driver <br/>terraform_cli:\
-        \ Terraform-CLI driver, <br/>ci_cd: CI/CD for IaC, <br/>oase: OASE, "
+        \ Terraform-CLI driver, <br/>ci_cd: CI/CD for IaC, <br/>oase: OASE, <br/>ai_assistant:\
+        \ Exastro AI Assistant, "
     apiplatformorganizationsorganization_id_optionsIta_services_document_store:
       type: object
       properties:
@@ -5403,8 +7938,168 @@ components:
     inline_response_200_14:
       allOf:
       - $ref: "#/components/schemas/responseOk"
-      - $ref: "#/components/schemas/workspaceList"
+      - type: object
+        properties:
+          data:
+            $ref: "#/components/schemas/inline_response_200_14_data"
+    credential_type_credentials_body:
+      required:
+      - credential_data
+      - credential_name
+      type: object
+      properties:
+        credential_name:
+          type: string
+          description: Credential名
+        credential_data:
+          type: object
+          description: Credentialデータ(キー名はGET /ai-servicesのsettingsで定義される)
+        notes:
+          type: string
+          description: 備考(任意)
     inline_response_200_15:
+      allOf:
+      - $ref: "#/components/schemas/responseOk"
+      - type: object
+        properties:
+          data:
+            $ref: "#/components/schemas/inline_response_200_15_data"
+    credential_type_credentials_body_1:
+      required:
+      - credential_data
+      - credential_name
+      type: object
+      properties:
+        credential_name:
+          type: string
+          description: Credential名
+          example: My Bedrock Credential
+        credential_data:
+          type: object
+          description: |
+            Credentialデータ(JSON形式、サービスごとに異なる。キー名はGET /ai-servicesのsettingsで定義される)
+
+            bedrock-cache の例(apiKeyの値は ~/.aws/login/cache/*.json の内容全体をJSON文字列化したもの):
+              {"apiKey": "{\"idToken\":\"...\",\"accessToken\":\"...\",\"refreshToken\":\"...\",\"region\":\"ap-northeast-1\"}"}
+
+            bedrock の例(regionは必須。フォールバックのデフォルト値は無いため、未指定の場合はAWS呼び出し時にエラーとなる):
+              {
+                "accessKeyId": "ASIA...",
+                "secretAccessKey": "...",
+                "sessionToken": "...",
+                "region": "ap-northeast-1"
+              }
+          example:
+            accessKeyId: ASIA...
+            secretAccessKey: '...'
+            sessionToken: '...'
+            region: ap-northeast-1
+        notes:
+          type: string
+          description: 備考
+    inline_response_200_16:
+      allOf:
+      - $ref: "#/components/schemas/responseOk"
+      - type: object
+        properties:
+          data:
+            $ref: "#/components/schemas/inline_response_200_16_data"
+    inline_response_200_17:
+      allOf:
+      - $ref: "#/components/schemas/responseOk"
+      - type: object
+        properties:
+          data:
+            $ref: "#/components/schemas/inline_response_200_17_data"
+    inline_response_200_18:
+      allOf:
+      - $ref: "#/components/schemas/responseOk"
+      - type: object
+        properties:
+          data:
+            $ref: "#/components/schemas/inline_response_200_18_data"
+    inline_response_200_19:
+      allOf:
+      - $ref: "#/components/schemas/responseOk"
+      - type: object
+        properties:
+          data:
+            $ref: "#/components/schemas/aiPreferenceInfo"
+    apiorganization_idplatformusers_currentai_service_idaipreference_pickup_model_ids:
+      required:
+      - id
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+          nullable: true
+    ai_service_id_aipreference_body:
+      required:
+      - model_id
+      type: object
+      properties:
+        model_id:
+          type: string
+          description: |-
+            このAIサービスでデフォルトで使用するモデルID
+            Default model ID to use for this AI service
+          example: anthropic.claude-3-5-sonnet-20240620-v1:0
+        model_name:
+          type: string
+          description: |-
+            デフォルトモデルの表示名(任意。指定した値をそのまま保存・返却する。サーバー側では解決しない)
+            Display name for the default model (optional; stored and returned verbatim as supplied — not resolved server-side)
+          nullable: true
+          example: Claude 3.5 Sonnet
+        pickup_model_ids:
+          type: array
+          description: |-
+            UIでモデル選択の候補を絞り込むためにピックアップしたモデル一覧(省略時は空配列)。
+            各要素はidが必須、nameは任意
+            List of models picked to narrow down the model choices shown in the UI (empty array if omitted).
+            Each entry requires id; name is optional
+          example:
+          - id: anthropic.claude-3-5-sonnet-20240620-v1:0
+            name: Claude 3.5 Sonnet
+          - id: global.anthropic.claude-sonnet-5
+            name: Claude Sonnet 5
+          items:
+            $ref: "#/components/schemas/apiorganization_idplatformusers_currentai_service_idaipreference_pickup_model_ids"
+    inline_response_200_20:
+      allOf:
+      - $ref: "#/components/schemas/responseOk"
+      - type: object
+        properties:
+          data:
+            $ref: "#/components/schemas/currentAiPreferenceInfo"
+    _current_aipreference_body:
+      required:
+      - ai_service_id
+      type: object
+      properties:
+        ai_service_id:
+          type: string
+          description: |-
+            現在選択中とするAIサービスID
+            AI service ID to mark as currently selected
+          example: bedrock-cache
+          enum:
+          - bedrock-cache
+          - bedrock
+    inline_response_200_21:
+      allOf:
+      - $ref: "#/components/schemas/responseOk"
+      - type: object
+        properties:
+          data:
+            $ref: "#/components/schemas/inline_response_200_21_data"
+    inline_response_200_22:
+      allOf:
+      - $ref: "#/components/schemas/responseOk"
+      - $ref: "#/components/schemas/workspaceList"
+    inline_response_200_23:
       allOf:
       - $ref: "#/components/schemas/responseOk"
       - title: workspaceDetail is Workspace resources.
@@ -5414,31 +8109,468 @@ components:
             allOf:
             - $ref: "#/components/schemas/workspace"
             - $ref: "#/components/schemas/responseStat"
-    inline_response_200_16:
+    inline_response_200_24:
       allOf:
       - $ref: "#/components/schemas/responseOk"
       - $ref: "#/components/schemas/memberList"
-    inline_response_200_17:
+    inline_response_200_25:
       allOf:
       - $ref: "#/components/schemas/responseOk"
       - $ref: "#/components/schemas/settingsDestinationList"
-    inline_response_200_18:
+    inline_response_200_26:
       allOf:
       - $ref: "#/components/schemas/responseOk"
       - $ref: "#/components/schemas/settingsDestinationOne"
       - $ref: "#/components/schemas/responseStat"
-    inline_response_200_19:
+    inline_response_200_27:
+      allOf:
+      - $ref: "#/components/schemas/responseOk"
+      - type: object
+        properties:
+          data:
+            type: array
+            description: List of notification IDs
+            items:
+              type: string
+    inline_response_200_28:
+      allOf:
+      - $ref: "#/components/schemas/responseOk"
+      - title: Notification job list result.
+        type: object
+        properties:
+          data:
+            type: array
+            items:
+              $ref: "#/paths/~1api~1%7Borganization_id%7D~1platform~1workspaces~1%7Bworkspace_id%7D~1notification-jobs~1%7Bnotification_id%7D/get/responses/200/content/application~1json/schema/allOf/1/properties/data"
+          total:
+            type: integer
+            description: Total count of records
+          page:
+            type: integer
+            description: Current page number
+          page_size:
+            type: integer
+            description: Records per page
+    inline_response_200_29:
+      allOf:
+      - $ref: "#/components/schemas/responseOk"
+      - title: Notification job single result.
+        type: object
+        properties:
+          data:
+            $ref: "#/components/schemas/Notification job data."
+    inline_response_200_30:
+      allOf:
+      - $ref: "#/components/schemas/responseOk"
+      - type: object
+        properties:
+          data:
+            $ref: "#/components/schemas/inline_response_200_30_data"
+    workspace_id_conversations_body:
+      required:
+      - ai_service_id
+      - model_id
+      - title
+      type: object
+      properties:
+        title:
+          type: string
+          description: |-
+            会話タイトル
+            Conversation title
+          example: Bedrockとのチャット
+        model_id:
+          type: string
+          description: |-
+            会話のデフォルトモデルID(completionsでmodel_idを省略した際にこの値が使用される)
+            Default model ID for the conversation (used when model_id is omitted in completions)
+          example: anthropic.claude-3-5-sonnet-20240620-v1:0
+        ai_service_id:
+          type: string
+          description: |-
+            使用するAIサービスID(自動推定はしない。指定したサービスのactiveなCredentialが登録済みである必要がある)
+            AI service ID to use (no auto-detection; an active credential for the specified service must already be registered)
+          example: bedrock-cache
+          enum:
+          - bedrock-cache
+          - bedrock
+        prompt_profile:
+          type: string
+          description: |-
+            プロンプトプロファイル（システムプロンプト切り替え用）
+            Prompt profile (used to switch the system prompt)
+          example: LLMEditor
+          default: LLMEditor
+          enum:
+          - LLMEditor
+          - AgenticAI
+          - Lessons
+          - GenerateTitle
+        tools:
+          type: array
+          description: |-
+            ツール定義（Anthropic tools形式の配列。省略時はツール未使用の会話になる。会話単位で固定し、completionsの都度指定はしない）
+            Tool definitions (an array in Anthropic tools format; omit for a conversation without tools. Fixed per conversation, not specified per completions call)
+          example:
+          - name: get_weather
+            description: 指定した地域の現在の天気を取得する
+            input_schema:
+              type: object
+              properties:
+                location:
+                  type: string
+              required:
+              - location
+          items:
+            type: object
+    inline_response_200_31:
+      allOf:
+      - $ref: "#/components/schemas/responseOk"
+      - type: object
+        properties:
+          data:
+            $ref: "#/components/schemas/inline_response_200_31_data"
+    inline_response_200_32:
+      allOf:
+      - $ref: "#/components/schemas/responseOk"
+      - type: object
+        properties:
+          data:
+            $ref: "#/components/schemas/inline_response_200_32_data"
+    conversations_conversation_id_body:
+      type: object
+      properties:
+        title:
+          type: string
+          description: |-
+            変更後の会話タイトル(省略時は変更しない)
+            New conversation title (unchanged if omitted)
+          example: nginx構築Playbook生成(更新後)
+        status:
+          type: string
+          description: |-
+            変更後のステータス(省略時は変更しない)
+            New status (unchanged if omitted)
+          example: closed
+          enum:
+          - active
+          - closed
+          - archived
+    inline_response_200_33:
+      allOf:
+      - $ref: "#/components/schemas/responseOk"
+      - type: object
+        properties:
+          data:
+            $ref: "#/components/schemas/inline_response_200_33_data"
+    conversation_id_completions_body:
+      type: object
+      properties:
+        message:
+          type: string
+          description: |-
+            ユーザーメッセージ(省略可。省略時は会話の既存履歴のみで問い合わせ、結果は保存されない)
+            User message (optional; if omitted, queries using only the conversation's existing history and the result is not saved)
+          example: こんにちは、Bedrockのテストです
+        ai_service_id:
+          type: string
+          description: |-
+            AIサービスID(メッセージ固有、会話のデフォルトをオーバーライド、省略時は会話のAI_SERVICE_IDを使用)
+            AI service ID (specific to this message, overrides the conversation default; if omitted, the conversation's AI_SERVICE_ID is used)
+          example: bedrock-cache
+          enum:
+          - bedrock-cache
+          - bedrock
+        model_id:
+          type: string
+          description: |-
+            使用するモデルID(メッセージ固有、会話のデフォルトをオーバーライド、省略時は会話作成時に指定したデフォルトモデルIDを使用)
+            Model ID to use (specific to this message, overrides the conversation default; if omitted, the default model ID specified when the conversation was created is used)
+          example: anthropic.claude-3-5-sonnet-20240620-v1:0
+        menu_id:
+          type: string
+          description: |-
+            ITA画面ID(指定時はメニュー固有のシステムプロンプトを追加)
+            ITA screen ID (when specified, a menu-specific system prompt is appended)
+          example: menu_001
+    inline_response_200_34:
+      allOf:
+      - $ref: "#/components/schemas/responseOk"
+      - type: object
+        properties:
+          data:
+            $ref: "#/components/schemas/inline_response_200_34_data"
+    inline_response_200_35:
+      allOf:
+      - $ref: "#/components/schemas/responseOk"
+      - type: object
+        properties:
+          data:
+            $ref: "#/components/schemas/inline_response_200_35_data"
+    apiorganization_idplatformworkspacesworkspace_idconversationsconversation_idmessages_messages:
+      required:
+      - contents
+      type: object
+      properties:
+        contents:
+          type: array
+          description: |-
+            会話メッセージJSON配列（各要素にrole, content, _timestamp等を含む）
+            JSON array of conversation messages (each element contains role, content, _timestamp, etc.)
+          items:
+            type: object
+    conversation_id_messages_body:
+      required:
+      - messages
+      type: object
+      properties:
+        messages:
+          type: array
+          description: |-
+            置き換え後のメッセージレコード一覧(GETレスポンスのmessagesと同じ形)
+            List of message records after replacement (same shape as the messages field in the GET response)
+          example:
+            messages:
+            - contents:
+              - role: user
+                content:
+                - type: text
+                  text: お天気情報システムの全貌を調べて！
+                _timestamp: 2026-08-27T07:10:56.261Z
+              - role: assistant
+                content:
+                - text: お天気情報システムに関する資産をExastro内で調査します。
+                  type: text
+                _timestamp: 2026-08-27T07:11:01.226Z
+                _thinkingMs: 4448
+                _model: global.anthropic.claude-opus-5
+          items:
+            $ref: "#/components/schemas/apiorganization_idplatformworkspacesworkspace_idconversationsconversation_idmessages_messages"
+    apiorganization_idplatformworkspacesworkspace_idconversationsconversation_idmessages_contents:
+      type: object
+      properties:
+        role:
+          type: string
+          enum:
+          - user
+          - assistant
+        content:
+          type: array
+          items:
+            type: object
+        _timestamp:
+          type: string
+          format: date-time
+        _thinkingMs:
+          type: integer
+        _model:
+          type: string
+    conversation_id_messages_body_1:
+      required:
+      - contents
+      type: object
+      properties:
+        contents:
+          type: array
+          description: |-
+            会話メッセージJSON配列（各要素にrole, content, _timestamp等を含む）
+            JSON array of conversation messages (each element contains role, content, _timestamp, etc.)
+          example:
+          - role: user
+            content:
+            - type: text
+              text: お天気情報システムの全貌を調べて！
+            _timestamp: 2026-08-27T07:10:56.261Z
+          - role: assistant
+            content:
+            - text: お天気情報システムに関する資産をExastro内で調査します。
+              type: text
+            _timestamp: 2026-08-27T07:11:01.226Z
+            _thinkingMs: 4448
+            _model: global.anthropic.claude-opus-5
+          items:
+            $ref: "#/components/schemas/apiorganization_idplatformworkspacesworkspace_idconversationsconversation_idmessages_contents"
+    inline_response_200_36:
+      allOf:
+      - $ref: "#/components/schemas/responseOk"
+      - type: object
+        properties:
+          data:
+            $ref: "#/components/schemas/inline_response_200_36_data"
+    inline_response_200_37:
+      allOf:
+      - $ref: "#/components/schemas/responseOk"
+      - type: object
+        properties:
+          data:
+            $ref: "#/components/schemas/inline_response_200_37_data"
+    inline_response_200_38:
+      allOf:
+      - $ref: "#/components/schemas/responseOk"
+      - type: object
+        properties:
+          data:
+            $ref: "#/components/schemas/inline_response_200_38_data"
+    workspace_id_lessons_body:
+      required:
+      - lesson
+      - prompt_profile
+      type: object
+      properties:
+        lesson:
+          type: string
+          description: |-
+            学習事項の内容
+            Lesson content
+          example: 本番環境への反映前に、必ずdry-run実行で差分を確認すること
+        category:
+          type: string
+          description: |-
+            分類(任意)
+            Category (optional)
+          nullable: true
+          example: Ansible
+        prompt_profile:
+          type: string
+          description: |-
+            システムプロンプトへの反映対象prompt_profile(必須)。Lessons/GenerateTitleは学習事項を
+            注入しない専用のprompt_profileのため指定不可。
+            Target prompt_profile for system-prompt injection (required). Lessons/GenerateTitle never
+            receive injected lessons, so they cannot be specified here.
+          example: LLMEditor
+          enum:
+          - LLMEditor
+          - AgenticAI
+        priority:
+          maximum: 10
+          minimum: 1
+          type: integer
+          description: |-
+            重要度(1:最低 〜 10:最高。省略時は5)
+            Priority (1: lowest - 10: highest; defaults to 5 if omitted)
+          example: 8
+          default: 5
+        enabled:
+          type: boolean
+          description: |-
+            有効/無効フラグ(省略時はtrue)
+            Enabled flag (defaults to true if omitted)
+          example: true
+          default: true
+        conversation_id:
+          type: string
+          description: |-
+            学習元の会話ID(任意)
+            Originating conversation ID (optional)
+          nullable: true
+          example: conv-001
+    inline_response_200_39:
+      allOf:
+      - $ref: "#/components/schemas/responseOk"
+      - type: object
+        properties:
+          data:
+            $ref: "#/components/schemas/lessonInfo"
+    apiorganization_idplatformworkspacesworkspace_idlessons_lessons:
+      required:
+      - enabled
+      - lesson_id
+      type: object
+      properties:
+        lesson_id:
+          type: string
+          description: |-
+            学習事項ID
+            Lesson ID
+        enabled:
+          type: boolean
+          description: |-
+            変更後の有効/無効フラグ
+            New enabled flag for this lesson
+    workspace_id_lessons_body_1:
+      required:
+      - lessons
+      type: object
+      properties:
+        lessons:
+          minItems: 1
+          type: array
+          description: |-
+            更新対象。要素ごとに異なるenabledを指定できる
+            Items to update. Each item may specify a different enabled value
+          example:
+          - lesson_id: 01J9Z8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8
+            enabled: true
+          - lesson_id: 01J9Z8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q9
+            enabled: false
+          items:
+            $ref: "#/components/schemas/apiorganization_idplatformworkspacesworkspace_idlessons_lessons"
+    inline_response_200_40:
+      allOf:
+      - $ref: "#/components/schemas/responseOk"
+      - type: object
+        properties:
+          data:
+            $ref: "#/components/schemas/inline_response_200_40_data"
+    inline_response_200_41:
+      allOf:
+      - $ref: "#/components/schemas/responseOk"
+      - type: object
+        properties:
+          data:
+            $ref: "#/components/schemas/inline_response_200_41_data"
+    lessons_lesson_id_body:
+      type: object
+      properties:
+        lesson:
+          type: string
+          description: |-
+            変更後の学習事項の内容(省略時は変更しない)
+            New lesson content (unchanged if omitted)
+          example: 本番環境への反映前に、必ずdry-run実行で差分を確認すること
+        category:
+          type: string
+          description: |-
+            変更後の分類(省略時は変更しない)
+            New category (unchanged if omitted)
+          nullable: true
+          example: Ansible
+        prompt_profile:
+          type: string
+          description: |-
+            変更後の対象prompt_profile(省略時は変更しない)
+            New target prompt_profile (unchanged if omitted)
+          nullable: true
+          example: LLMEditor
+          enum:
+          - LLMEditor
+          - AgenticAI
+        priority:
+          maximum: 10
+          minimum: 1
+          type: integer
+          description: |-
+            変更後の重要度(1:最低 〜 10:最高。省略時は変更しない)
+            New priority (1: lowest - 10: highest; unchanged if omitted)
+          example: 9
+        enabled:
+          type: boolean
+          description: |-
+            変更後の有効/無効フラグ(省略時は変更しない)
+            New enabled flag (unchanged if omitted)
+          example: false
+    inline_response_200_42:
       allOf:
       - $ref: "#/components/schemas/responseOk"
       - $ref: "#/components/schemas/userList"
-    inline_response_200_20:
+    inline_response_200_43:
       allOf:
       - $ref: "#/components/schemas/responseOk"
       - type: object
         properties:
           data:
             $ref: "#/components/schemas/user"
-    inline_response_200_21:
+    inline_response_200_44:
       allOf:
       - $ref: "#/components/schemas/responseOk"
       - $ref: "#/components/schemas/roleDetailList"
@@ -5448,7 +8580,7 @@ components:
     roles_role_name_body:
       oneOf:
       - $ref: "#/components/schemas/roleDetailWorkspacePut"
-    inline_response_200_22:
+    inline_response_200_45:
       allOf:
       - $ref: "#/components/schemas/responseOk"
       - title: roleList is list of Role resources.
@@ -5458,11 +8590,11 @@ components:
             type: array
             items:
               $ref: "#/components/schemas/roleUser"
-    inline_response_200_23:
+    inline_response_200_46:
       allOf:
       - $ref: "#/components/schemas/responseOk"
       - $ref: "#/components/schemas/jobsUserBulkStatusList"
-    inline_response_200_24:
+    inline_response_200_47:
       allOf:
       - $ref: "#/components/schemas/responseOk"
       - title: Jobs user bulk processing result.
@@ -5470,7 +8602,7 @@ components:
         properties:
           data:
             $ref: "#/components/schemas/jobsUserBulkStatus"
-    inline_response_200_25:
+    inline_response_200_48:
       allOf:
       - $ref: "#/components/schemas/responseOk"
       - type: object
@@ -5479,11 +8611,11 @@ components:
             type: object
             example:
               job_id: XXXXXXXXXXXXXXXXXXXXXXXXXX
-    inline_response_200_26:
+    inline_response_200_49:
       allOf:
       - $ref: "#/components/schemas/responseOk"
       - $ref: "#/components/schemas/jobsUserExportStatusList"
-    inline_response_200_27:
+    inline_response_200_50:
       allOf:
       - $ref: "#/components/schemas/responseOk"
       - title: Jobs user export processing result.
@@ -5491,7 +8623,7 @@ components:
         properties:
           data:
             $ref: "#/components/schemas/jobsUserExportStatus"
-    inline_response_200_28:
+    inline_response_200_51:
       allOf:
       - $ref: "#/components/schemas/responseOk"
       - $ref: "#/components/schemas/maintenanceModeSettings"
@@ -5504,15 +8636,15 @@ components:
         data_update_stop:
           type: string
           example: "1"
-    inline_response_200_29:
+    inline_response_200_52:
       allOf:
       - $ref: "#/components/schemas/responseOk"
       - $ref: "#/components/schemas/settingsMailserverList"
-    inline_response_200_30:
+    inline_response_200_53:
       allOf:
       - $ref: "#/components/schemas/responseOk"
       - $ref: "#/components/schemas/AuditLogDownloadList"
-    inline_response_200_31:
+    inline_response_200_54:
       allOf:
       - $ref: "#/components/schemas/responseOk"
       - type: object
@@ -5521,47 +8653,74 @@ components:
             type: object
             example:
               download_id: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-    inline_response_200_32:
+    inline_response_200_55:
       allOf:
       - $ref: "#/components/schemas/responseOk"
       - $ref: "#/components/schemas/serviceAccountUserList"
-    inline_response_200_33:
+    inline_response_200_56:
       allOf:
       - $ref: "#/components/schemas/responseOk"
       - type: object
         properties:
           data:
             $ref: "#/components/schemas/serviceAccountUser"
-    inline_response_200_34:
+    inline_response_200_57:
       allOf:
       - $ref: "#/components/schemas/responseOk"
       - $ref: "#/components/schemas/serviceAccountUserTokenList"
-    inline_response_200_35:
+    inline_response_200_58:
       allOf:
       - $ref: "#/components/schemas/responseOk"
       - type: object
         properties:
           data:
-            $ref: "#/components/schemas/inline_response_200_35_data"
-    inline_response_200_36:
+            $ref: "#/components/schemas/inline_response_200_58_data"
+    inline_response_200_59:
       allOf:
       - $ref: "#/components/schemas/responseOk"
       - $ref: "#/components/schemas/limitsList"
-    inline_response_200_37:
+    inline_response_200_60:
       allOf:
       - $ref: "#/components/schemas/responseOk"
       - type: object
         properties:
           data:
             $ref: "#/components/schemas/planItem"
-    inline_response_200_38:
+    inline_response_200_61:
       allOf:
       - $ref: "#/components/schemas/responseOk"
       - $ref: "#/components/schemas/roleList"
-    inline_response_200_39:
+    inline_response_200_62:
       allOf:
       - $ref: "#/components/schemas/responseOk"
       - $ref: "#/components/schemas/userWorkspaceList"
+    inline_response_200_63:
+      allOf:
+      - $ref: "#/components/schemas/responseOk"
+      - title: Notification job list result (Internal).
+        type: object
+        properties:
+          data:
+            type: array
+            items:
+              $ref: "#/paths/~1internal-api~1%7Borganization_id%7D~1platform~1workspaces~1%7Bworkspace_id%7D~1notification-jobs~1%7Bnotification_id%7D/get/responses/200/content/application~1json/schema/allOf/1/properties/data"
+          total:
+            type: integer
+            description: Total count of records
+          page:
+            type: integer
+            description: Current page number
+          page_size:
+            type: integer
+            description: Records per page
+    inline_response_200_64:
+      allOf:
+      - $ref: "#/components/schemas/responseOk"
+      - title: Notification job single result (Internal).
+        type: object
+        properties:
+          data:
+            $ref: "#/components/schemas/Notification job data Internal."
     organization_organization_managers:
       type: object
       properties:
@@ -5601,6 +8760,8 @@ components:
           type: boolean
         oase:
           type: boolean
+        ai_assistant:
+          type: boolean
     organization_optionsIta:
       type: object
       properties:
@@ -5617,8 +8778,11 @@ components:
           type: boolean
         oase:
           type: boolean
+        ai_assistant:
+          type: boolean
       description: "terraform_cloud_ep: Terraform-Cloud/EP driver <br/>terraform_cli:\
-        \ Terraform-CLI driver, <br/>ci_cd: CI/CD for IaC, <br/>oase: OASE, "
+        \ Terraform-CLI driver, <br/>ci_cd: CI/CD for IaC, <br/>oase: OASE, <br/>ai_assistant:\
+        \ Exastro AI Assistant, "
     organizationCreate_optionsIta:
       type: object
       properties:
@@ -5845,11 +9009,532 @@ components:
           format: uuid
         create_user_name:
           type: string
+    aiPreferenceInfo_pickup_model_ids:
+      required:
+      - id
+      type: object
+      properties:
+        id:
+          type: string
+          description: |-
+            モデルID
+            Model ID
+        name:
+          type: string
+          description: |-
+            表示用のモデル名(任意)
+            Display name for the model (optional)
+          nullable: true
+    aiServiceInfo_settings:
+      type: object
+      properties:
+        title:
+          type: string
+          description: |-
+            入力項目の表示名
+            Display label for the input field
+        type:
+          type: string
+          description: |-
+            入力項目の種別(password/text等)
+            Input field type (password/text, etc.)
+        required:
+          type: boolean
+          description: |-
+            入力必須かどうか
+            Whether the input field is required
+    inline_response_200_14_data:
+      type: object
+      properties:
+        credential_id:
+          type: string
+          nullable: true
+        credential_type:
+          type: string
+        credential_name:
+          type: string
+          nullable: true
+        status:
+          type: string
+          nullable: true
+        expires_at:
+          type: string
+          format: date-time
+          nullable: true
+        last_used_at:
+          type: string
+          format: date-time
+          nullable: true
+        credential_data_keys:
+          type: array
+          description: |-
+            Credentialデータに含まれるキー一覧(未登録時は空配列。passwordタイプの項目も含む)
+            List of keys contained in the credential data (an empty array when not registered; includes password-type keys too)
+          items:
+            type: string
+        credential_data:
+          type: object
+          description: |-
+            settingsでtype: password以外と定義されている項目のみ、実際の値を含む
+            (passwordタイプの項目は含まない。未登録時は空オブジェクト)
+            Contains actual values only for entries whose settings type is not "password"
+            (password-type entries are omitted; an empty object when not registered)
+          example:
+            accessKeyId: ASIA...
+            region: ap-northeast-1
+    inline_response_200_15_data:
+      type: object
+      properties:
+        credential_id:
+          type: string
+        credential_type:
+          type: string
+        credential_name:
+          type: string
+        status:
+          type: string
+        message:
+          type: string
+    inline_response_200_16_data:
+      type: object
+      properties:
+        credential_type:
+          type: string
+        current_ai_service_cleared:
+          type: boolean
+          description: 削除したAIサービスを使用中だったため、現在選択中のAIサービスを未選択に戻したかどうか
+          example: true
+        message:
+          type: string
+    inline_response_200_17_data:
+      type: object
+      properties:
+        valid:
+          type: boolean
+        message:
+          type: string
+        account_id:
+          type: string
+          description: AWSアカウントID(Bedrockの場合)
+        user_id:
+          type: string
+          description: AWS User ID(Bedrockの場合)
+    inline_response_200_18_data:
+      type: object
+      properties:
+        models:
+          type: array
+          items:
+            $ref: "#/components/schemas/modelInfo"
+        count:
+          type: integer
+          description: モデル数
+        credential_type:
+          type: string
+          description: AIサービスID
+    inline_response_200_21_data:
+      type: object
+      properties:
+        ai_services:
+          type: array
+          description: |-
+            利用可能なAIサービスの一覧
+            List of available AI services
+          items:
+            $ref: "#/components/schemas/aiServiceInfo"
+        count:
+          type: integer
+    Notification job data.:
+      title: Notification job data.
+      type: object
+      properties:
+        id:
+          type: string
+          description: Notification ID (ULID format)
+        destination_id:
+          type: string
+          description: Destination ID
+        destination_name:
+          type: string
+          description: Destination name
+        destination_kind:
+          type: string
+          description: Notification method
+          enum:
+          - Mail
+          - Teams_WF
+          - Teams
+          - Webhook
+          - ServiceNow
+        func_id:
+          type: string
+          description: Function ID
+        func_informations:
+          type: object
+          description: Function information details
+        message_informations:
+          type: object
+          description: Notification message content
+        notification_status:
+          type: string
+          description: Notification status
+          enum:
+          - Unsent
+          - Successful
+          - Failed
+          - AbortedExpired
+        notification_timestamp:
+          type: string
+          description: Notification sent timestamp
+          format: date-time
+          nullable: true
+        http_response_code:
+          type: integer
+          description: HTTP response code
+          nullable: true
+        http_response_body:
+          type: string
+          description: HTTP response body
+          nullable: true
+        enable_retry:
+          type: boolean
+          description: Whether retry is enabled
+        retry_count_limit:
+          type: integer
+          description: Retry count limit
+          nullable: true
+        retry_count:
+          type: integer
+          description: Current retry count
+        create_timestamp:
+          type: string
+          description: Creation timestamp
+          format: date-time
+        create_user:
+          type: string
+          description: Creator user ID
+        last_update_timestamp:
+          type: string
+          description: Last update timestamp
+          format: date-time
+        last_update_user:
+          type: string
+          description: Last update user ID
+    inline_response_200_30_data:
+      type: object
+      properties:
+        conversations:
+          type: array
+          items:
+            $ref: "#/components/schemas/conversationInfo"
+        count:
+          type: integer
+          description: |-
+            このレスポンスに含まれる件数(limit/offset適用後、conversationsの要素数)
+            Number of items included in this response (after applying limit/offset; the length of conversations)
+        total_count:
+          type: integer
+          description: |-
+            絞り込み条件(prompt_profile・status)に合致する総件数(limit/offset適用前)
+            Total number of items matching the filter conditions (prompt_profile, status), before applying limit/offset
+    inline_response_200_31_data:
+      type: object
+      properties:
+        conversation_id:
+          type: string
+        prompt_profile:
+          type: string
+          description: |-
+            プロンプトプロファイル
+            Prompt profile
+        ai_service_id:
+          type: string
+          description: |-
+            AIサービスID（リクエストで指定した値）
+            AI service ID (the value specified in the request)
+        model_id:
+          type: string
+          description: |-
+            会話のデフォルトモデルID
+            Default model ID for the conversation
+        tools:
+          type: array
+          description: |-
+            ツール定義（未指定の場合は空配列）
+            Tool definitions (an empty array when not specified)
+          items:
+            type: object
+        title:
+          type: string
+        status:
+          type: string
+    inline_response_200_32_data:
+      type: object
+      properties:
+        conversation_id:
+          type: string
+        message:
+          type: string
+    inline_response_200_33_data:
+      type: object
+      properties:
+        conversation_id:
+          type: string
+        title:
+          type: string
+        status:
+          type: string
+    inline_response_200_34_data_usage:
+      type: object
+      properties:
+        input_tokens:
+          type: integer
+          description: |-
+            入力トークン数(Prompt Cachingがヒットした場合、cache_read_input_tokensの分は含まれない)
+            Input token count (excludes cache_read_input_tokens when a prompt cache hit occurs)
+        output_tokens:
+          type: integer
+        total_tokens:
+          type: integer
+        cache_creation_input_tokens:
+          type: integer
+          description: |-
+            Prompt Cachingで新たに書き込まれたトークン数(キャッシュ未使用時は0)
+            Tokens newly written to the prompt cache (0 when caching was not used)
+        cache_read_input_tokens:
+          type: integer
+          description: |-
+            Prompt Cachingから読み取られたトークン数(キャッシュヒットしなかった場合は0)
+            Tokens read from the prompt cache (0 when there was no cache hit)
+    inline_response_200_34_data:
+      type: object
+      properties:
+        conversation_id:
+          type: string
+        message_id:
+          type: string
+          description: |-
+            保存されたメッセージID(messageを省略し結果を保存しなかった場合はnull)
+            Saved message ID (null when message was omitted and the result was not saved)
+          nullable: true
+        user_message_seq:
+          type: integer
+          description: |-
+            スナップショット内でのユーザーメッセージの順序番号(1始まり、messageを省略した場合はnull)
+            Sequence number of the user message within the snapshot (1-based; null when message was omitted)
+          nullable: true
+        assistant_message_seq:
+          type: integer
+          description: |-
+            スナップショット内でのアシスタントメッセージの順序番号(1始まり、messageを省略した場合はnull)
+            Sequence number of the assistant message within the snapshot (1-based; null when message was omitted)
+          nullable: true
+        content:
+          type: array
+          description: |-
+            AIの応答のcontentブロック一覧(Anthropic Messages API形式。text/tool_use/thinking等をそのまま保持し、会話履歴に保存される内容と同じ)。
+            tool_useブロックが含まれる場合、呼び出し側はidentifier/name/inputを見て後続のtool実行を行う想定。
+            List of the AI response's content blocks (Anthropic Messages API format; text/tool_use/thinking etc. are kept as-is, identical to what is saved to the conversation history).
+            When a tool_use block is present, the caller is expected to inspect its id/name/input and run the corresponding tool.
+          example:
+          - type: text
+            text: 確認します。
+          - type: tool_use
+            id: toolu_01ABC
+            name: search-docs
+            input:
+              query: example
+          items:
+            type: object
+        stop_reason:
+          type: string
+          description: |-
+            Bedrockが返した停止理由("end_turn"、会話作成時にtoolsを指定していて且つモデルがツール呼び出しを選択した場合は"tool_use"等)
+            The stop reason returned by Bedrock (e.g. "end_turn", or "tool_use" when tools were specified at conversation creation and the model chose to call one)
+          nullable: true
+        saved:
+          type: boolean
+          description: |-
+            応答結果を会話履歴に保存したかどうか(messageを省略した場合はfalse)
+            Whether the response was saved to the conversation history (false when message was omitted)
+        ai_status_code:
+          type: integer
+          description: |-
+            AIサービスのAPIが返したHTTPステータスコード(通常200)。リトライ判断等に利用できる。
+            The HTTP status code returned by the AI service's API (normally 200). Can be used for retry decisions, etc.
+        usage:
+          $ref: "#/components/schemas/inline_response_200_34_data_usage"
     inline_response_200_35_data:
+      type: object
+      properties:
+        messages:
+          type: array
+          items:
+            $ref: "#/paths/~1api~1%7Borganization_id%7D~1platform~1workspaces~1%7Bworkspace_id%7D~1conversations~1%7Bconversation_id%7D~1messages/post/responses/200/content/application~1json/schema/allOf/1/properties/data"
+        count:
+          type: integer
+        conversation_id:
+          type: string
+    inline_response_200_36_data:
+      type: object
+      properties:
+        message_id:
+          type: string
+          description: |-
+            メッセージID
+            Message ID
+        conversation_id:
+          type: string
+          description: |-
+            会話ID
+            Conversation ID
+        message_seq:
+          type: integer
+          description: |-
+            メッセージ順序番号
+            Message sequence number
+        contents:
+          type: array
+          description: |-
+            会話メッセージJSON配列（各要素にrole, content, _timestamp等を含む）
+            JSON array of conversation messages (each element contains role, content, _timestamp, etc.)
+          items:
+            $ref: "#/components/schemas/apiorganization_idplatformworkspacesworkspace_idconversationsconversation_idmessages_contents"
+        created_at:
+          type: string
+          description: |-
+            作成日時
+            Created timestamp
+          format: date-time
+        updated_at:
+          type: string
+          description: |-
+            最終更新日時
+            Last updated timestamp
+          format: date-time
+    inline_response_200_37_data:
+      type: object
+      properties:
+        conversation_id:
+          type: string
+        deleted_count:
+          type: integer
+          description: |-
+            削除したメッセージレコード件数
+            Number of deleted message records
+    inline_response_200_38_data:
+      type: object
+      properties:
+        lessons:
+          type: array
+          items:
+            $ref: "#/components/schemas/lessonInfo"
+        count:
+          type: integer
+          description: |-
+            このレスポンスに含まれる件数(limit/offset適用後、lessonsの要素数)
+            Number of items included in this response (after applying limit/offset; the length of lessons)
+        total_count:
+          type: integer
+          description: |-
+            絞り込み条件(enabled・category・prompt_profile)に合致する総件数(limit/offset適用前)
+            Total number of items matching the filter conditions (enabled, category, prompt_profile), before applying limit/offset
+    inline_response_200_40_data:
+      type: object
+      properties:
+        updated_count:
+          type: integer
+          description: |-
+            実際に更新された件数(lesson_idsの件数以下になることがある)
+            Number of lessons actually updated (may be less than the number of lesson_ids provided)
+    inline_response_200_41_data:
+      type: object
+      properties:
+        lesson_id:
+          type: string
+        message:
+          type: string
+    inline_response_200_58_data:
       type: object
       properties:
         refresh_token:
           type: string
+    Notification job data Internal.:
+      title: Notification job data (Internal).
+      type: object
+      properties:
+        id:
+          type: string
+          description: Notification ID (ULID format)
+        destination_id:
+          type: string
+          description: Destination ID
+        destination_name:
+          type: string
+          description: Destination name
+        destination_kind:
+          type: string
+          description: Notification method
+          enum:
+          - Mail
+          - Teams_WF
+          - Teams
+          - Webhook
+          - ServiceNow
+        func_id:
+          type: string
+          description: Function ID
+        func_informations:
+          type: object
+          description: Function information details
+        message_informations:
+          type: object
+          description: Notification message content
+        notification_status:
+          type: string
+          description: Notification status
+          enum:
+          - Unsent
+          - Successful
+          - Failed
+          - AbortedExpired
+        notification_timestamp:
+          type: string
+          description: Notification sent timestamp
+          format: date-time
+          nullable: true
+        http_response_code:
+          type: integer
+          description: HTTP response code
+          nullable: true
+        http_response_body:
+          type: string
+          description: HTTP response body
+          nullable: true
+        enable_retry:
+          type: boolean
+          description: Whether retry is enabled
+        retry_count_limit:
+          type: integer
+          description: Retry count limit
+          nullable: true
+        retry_count:
+          type: integer
+          description: Current retry count
+        create_timestamp:
+          type: string
+          description: Creation timestamp
+          format: date-time
+        create_user:
+          type: string
+          description: Creator user ID
+        last_update_timestamp:
+          type: string
+          description: Last update timestamp
+          format: date-time
+        last_update_user:
+          type: string
+          description: Last update user ID
   responses:
     UnauthorizedError:
       description: Access token is missing or invalid

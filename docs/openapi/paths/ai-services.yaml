@@ -1,0 +1,63 @@
+#   Copyright 2026 NEC Corporation
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+
+get:
+  tags:
+    - AIAssistantService
+  summary: |-
+    システムとして利用可能なAIサービス一覧を取得
+    Get the list of AI services supported by the system
+  description: |-
+    現時点でシステムとして利用可能なAIサービスID一覧を返す(固定値。現在はbedrock-cache, bedrockの2件)。ユーザーのCredential登録状況とは無関係な、システム全体の対応状況を表す。
+    Return the list of AI service IDs currently supported by the system (a fixed value; currently bedrock-cache and bedrock). This reflects system-wide support and is unrelated to any individual user's credential registration status.
+  operationId: get_ai_services
+  x-openapi-router-controller: controllers.ai_assistant_service_controller
+  parameters:
+    - name: organization_id
+      in: path
+      required: true
+      schema:
+        type: string
+  responses:
+    200:
+      description: |-
+        成功
+        Success
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '../schemas/responseOk.yaml'
+              - type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      ai_services:
+                        type: array
+                        description: |-
+                          利用可能なAIサービスの一覧
+                          List of available AI services
+                        items:
+                          $ref: '../schemas/aiServiceInfo.yaml'
+                      count:
+                        type: integer
+    403:
+      description: |-
+        AIアシスタント機能が有効になっていない
+        The AI assistant feature is not enabled
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'

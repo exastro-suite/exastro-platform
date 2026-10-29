@@ -60,6 +60,16 @@ AUTH_PATTERN = [
         ]
     },
     {
+        "url": r"^/api/(?P<org_id>[^/][^/]*)/platform/workspaces/(?P<ws_id>[^/][^/]*)/conversations($|/.*$)",
+        # do not regulate - 規制しない
+        "auth": []
+    },
+    {
+        "url": r"^/api/(?P<org_id>[^/][^/]*)/platform/workspaces/(?P<ws_id>[^/][^/]*)/lessons($|/.*$)",
+        # do not regulate - 規制しない
+        "auth": []
+    },
+    {
         "url": r"^/api/(?P<org_id>[^/][^/]*)/platform/workspaces/(?P<ws_id>[^/][^/]*)/settings/notifications/?$",
         "auth": [
             {
@@ -122,7 +132,7 @@ AUTH_PATTERN = [
         ],
     },
     {
-        "url": r"^/api/(?P<org_id>[^/][^/]*)/platform/users/_current/refresh_tokens$",
+        "url": r"^/api/(?P<org_id>[^/][^/]*)/platform/users/_current/.+$",
         # do not regulate - 規制しない
         "auth": []
     },
@@ -279,5 +289,9 @@ AUTH_PATTERN = [
                 ]
             },
         ]
+    },
+    {
+        "url": r"^/api/(?P<org_id>[^/][^/]*)/platform/ai-services$",
+        "auth": []
     },
 ]

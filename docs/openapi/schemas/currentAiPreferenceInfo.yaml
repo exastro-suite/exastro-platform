@@ -1,0 +1,48 @@
+#   Copyright 2026 NEC Corporation
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+
+type: object
+properties:
+  ai_service_id:
+    type: string
+    nullable: true
+    description: |-
+      現在選択中のAIサービスID(一度も保存していない場合はnull)
+      Currently selected AI service ID (null if never saved)
+    enum: [bedrock-cache, bedrock]
+    example: "bedrock-cache"
+  ai_service_name:
+    type: string
+    nullable: true
+    readOnly: true
+    description: |-
+      AIサービスの表示名(ai_service_idからサーバー側で導出。取得時のみ付与され、未知のIDまたはai_service_idがnullの場合はnull)
+      Display name of the AI service (derived server-side from ai_service_id at GET time; null if the ID is unrecognized or ai_service_id is null)
+    example: "Amazon Bedrock (Login Cache)"
+  model_id:
+    type: string
+    nullable: true
+    readOnly: true
+    description: |-
+      このAIサービスの/{ai_service_id}/ai-preferenceに保存されているデフォルトモデルID(未保存の場合はnull。ここには保存しない、参照のみ)
+      Default model ID from this AI service's /{ai_service_id}/ai-preference (null if never saved there; referenced only, not stored here)
+    example: "anthropic.claude-3-5-sonnet-20240620-v1:0"
+  model_name:
+    type: string
+    nullable: true
+    readOnly: true
+    description: |-
+      このAIサービスの/{ai_service_id}/ai-preferenceに保存されているデフォルトモデルの表示名(未保存の場合はnull。ここには保存しない、参照のみ)
+      Default model display name from this AI service's /{ai_service_id}/ai-preference (null if never saved there; referenced only, not stored here)
+    example: "Claude 3.5 Sonnet"

@@ -1,0 +1,353 @@
+#   Copyright 2026 NEC Corporation
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+
+post:
+  tags:
+    - AIAssistantService
+  summary: |-
+    学習事項を作成
+    Create a lesson
+  description: |-
+    ユーザーの学習事項(過去の会話から判明した失敗・教訓・注意点)を新規登録する。登録した学習事項はenabledがtrueの間、AIアシスタントのシステムプロンプトへ自動的に反映される。
+    Register a new lesson (a failure, lesson, or caveat learned from a past conversation) for the user. While a lesson's enabled flag is true, it is automatically injected into the AI assistant's system prompt.
+  operationId: create_lesson
+  x-openapi-router-controller: controllers.ai_assistant_service_controller
+  parameters:
+    - name: organization_id
+      in: path
+      required: true
+      schema:
+        type: string
+    - name: workspace_id
+      in: path
+      required: true
+      schema:
+        type: string
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - lesson
+            - prompt_profile
+          properties:
+            lesson:
+              type: string
+              description: |-
+                学習事項の内容
+                Lesson content
+              example: "本番環境への反映前に、必ずdry-run実行で差分を確認すること"
+            category:
+              type: string
+              nullable: true
+              description: |-
+                分類(任意)
+                Category (optional)
+              example: "Ansible"
+            prompt_profile:
+              type: string
+              enum: [LLMEditor, AgenticAI]
+              description: |-
+                システムプロンプトへの反映対象prompt_profile(必須)。Lessons/GenerateTitleは学習事項を
+                注入しない専用のprompt_profileのため指定不可。
+                Target prompt_profile for system-prompt injection (required). Lessons/GenerateTitle never
+                receive injected lessons, so they cannot be specified here.
+              example: "LLMEditor"
+            priority:
+              type: integer
+              minimum: 1
+              maximum: 10
+              default: 5
+              description: |-
+                重要度(1:最低 〜 10:最高。省略時は5)
+                Priority (1: lowest - 10: highest; defaults to 5 if omitted)
+              example: 8
+            enabled:
+              type: boolean
+              default: true
+              description: |-
+                有効/無効フラグ(省略時はtrue)
+                Enabled flag (defaults to true if omitted)
+              example: true
+            conversation_id:
+              type: string
+              nullable: true
+              description: |-
+                学習元の会話ID(任意)
+                Originating conversation ID (optional)
+              example: "conv-001"
+  responses:
+    200:
+      description: |-
+        登録成功
+        Registered successfully
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '../schemas/responseOk.yaml'
+              - type: object
+                properties:
+                  data:
+                    $ref: '../schemas/lessonInfo.yaml'
+    400:
+      description: |-
+        バリデーションエラー、またはこのユーザー・このWorkspaceの学習事項登録件数が上限(AI_ASSISTANT_LESSONS_MAX_COUNT環境変数、既定200件)に達している
+        Validation error, or the number of lessons already registered by this user in this workspace has reached the limit (AI_ASSISTANT_LESSONS_MAX_COUNT env var, default 200)
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'
+    403:
+      description: |-
+        AIアシスタント機能が有効になっていない
+        The AI assistant feature is not enabled
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'
+    500:
+      description: |-
+        サーバーエラー
+        Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'
+
+get:
+  tags:
+    - AIAssistantService
+  summary: |-
+    学習事項一覧を取得
+    Get the list of lessons
+  description: |-
+    ユーザーの学習事項一覧を取得する(ワークスペース単位)。対象prompt_profileは必須(一覧は常にこの値で絞り込む)。有効/無効フラグ・分類でも絞り込み可能で、ページングもできる。
+    Get the list of the user's lessons for this workspace. The target prompt_profile is required (the list is always filtered by this value). Also supports filtering by enabled flag or category, and pagination.
+  operationId: list_lessons
+  x-openapi-router-controller: controllers.ai_assistant_service_controller
+  parameters:
+    - name: organization_id
+      in: path
+      required: true
+      schema:
+        type: string
+    - name: workspace_id
+      in: path
+      required: true
+      schema:
+        type: string
+    - name: enabled
+      in: query
+      required: false
+      schema:
+        type: boolean
+      description: |-
+        有効/無効フィルター(省略時は絞り込みなし)
+        Enabled-flag filter (no filtering if omitted)
+    - name: category
+      in: query
+      required: false
+      schema:
+        type: string
+      description: |-
+        分類フィルター(省略時は絞り込みなし)
+        Category filter (no filtering if omitted)
+    - name: prompt_profile
+      in: query
+      required: true
+      schema:
+        type: string
+        enum: [LLMEditor, AgenticAI]
+      description: |-
+        対象prompt_profileフィルター(必須。全プロファイル共通(未設定)の学習事項はこのフィルターでは
+        対象外になる点に注意。完全一致のみ)
+        Target prompt_profile filter (required; note that lessons with no prompt_profile set
+        (applying to all profiles) are excluded by this filter — exact match only)
+    - name: limit
+      in: query
+      required: false
+      schema:
+        type: integer
+        default: 50
+      description: |-
+        取得件数
+        Number of items to retrieve
+    - name: offset
+      in: query
+      required: false
+      schema:
+        type: integer
+        default: 0
+      description: |-
+        オフセット
+        Offset
+  responses:
+    200:
+      description: |-
+        成功
+        Success
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '../schemas/responseOk.yaml'
+              - type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      lessons:
+                        type: array
+                        items:
+                          $ref: '../schemas/lessonInfo.yaml'
+                      count:
+                        type: integer
+                        description: |-
+                          このレスポンスに含まれる件数(limit/offset適用後、lessonsの要素数)
+                          Number of items included in this response (after applying limit/offset; the length of lessons)
+                      total_count:
+                        type: integer
+                        description: |-
+                          絞り込み条件(enabled・category・prompt_profile)に合致する総件数(limit/offset適用前)
+                          Total number of items matching the filter conditions (enabled, category, prompt_profile), before applying limit/offset
+    400:
+      description: |-
+        prompt_profile未指定・不正な値
+        prompt_profile is missing or invalid
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'
+    403:
+      description: |-
+        AIアシスタント機能が有効になっていない
+        The AI assistant feature is not enabled
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'
+    500:
+      description: |-
+        サーバーエラー
+        Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'
+
+patch:
+  tags:
+    - AIAssistantService
+  summary: |-
+    複数の学習事項の有効/無効を一括更新
+    Bulk-update the enabled flag for multiple lessons
+  description: |-
+    複数の学習事項について、有効/無効フラグをまとめて更新する(要素ごとに異なる有効/無効を指定できるため、混在した状態を1回の呼び出しで反映できる)。存在しない・他ユーザー所有のIDが含まれる場合、そのIDは更新されず件数に反映されない(エラーにはならない)。
+    Bulk-update the enabled flag for multiple lessons at once (each item may specify a different enabled value, so a mixed set of changes can be applied in a single call). IDs that don't exist or belong to another user are simply not updated and excluded from the count (this is not treated as an error).
+  operationId: bulk_update_lessons
+  x-openapi-router-controller: controllers.ai_assistant_service_controller
+  parameters:
+    - name: organization_id
+      in: path
+      required: true
+      schema:
+        type: string
+    - name: workspace_id
+      in: path
+      required: true
+      schema:
+        type: string
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - lessons
+          properties:
+            lessons:
+              type: array
+              minItems: 1
+              description: |-
+                更新対象。要素ごとに異なるenabledを指定できる
+                Items to update. Each item may specify a different enabled value
+              items:
+                type: object
+                required:
+                  - lesson_id
+                  - enabled
+                properties:
+                  lesson_id:
+                    type: string
+                    description: |-
+                      学習事項ID
+                      Lesson ID
+                  enabled:
+                    type: boolean
+                    description: |-
+                      変更後の有効/無効フラグ
+                      New enabled flag for this lesson
+              example:
+                - lesson_id: "01J9Z8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8"
+                  enabled: true
+                - lesson_id: "01J9Z8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q9"
+                  enabled: false
+  responses:
+    200:
+      description: |-
+        更新成功
+        Updated successfully
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '../schemas/responseOk.yaml'
+              - type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      updated_count:
+                        type: integer
+                        description: |-
+                          実際に更新された件数(lesson_idsの件数以下になることがある)
+                          Number of lessons actually updated (may be less than the number of lesson_ids provided)
+    400:
+      description: |-
+        バリデーションエラー
+        Validation error
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'
+    403:
+      description: |-
+        AIアシスタント機能が有効になっていない
+        The AI assistant feature is not enabled
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'
+    500:
+      description: |-
+        サーバーエラー
+        Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'

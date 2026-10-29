@@ -158,7 +158,15 @@ def test_settings_mailserver_create(connexion_client):
         assert response_data["smtpServer"]["ssl"].upper() == str(bool(kc_create_data["SSL_ENABLE"])).upper()
         assert response_data["smtpServer"]["starttls"].upper() == str(bool(kc_create_data["START_TLS_ENABLE"])).upper()
         assert response_data["smtpServer"]["auth"].upper() == str(bool(kc_create_data["AUTHENTICATION_ENABLE"])).upper()
-        assert response_data["smtpServer"]["user"] == kc_create_data["AUTHENTICATION_USER"]
+        # When auth=false, Keycloak may not return the 'user' field
+        if kc_create_data["AUTHENTICATION_ENABLE"]:
+            assert response_data["smtpServer"]["user"] == kc_create_data["AUTHENTICATION_USER"], \
+                "user field should be present when authentication is enabled"
+        else:
+            # When auth=false, 'user' field may be absent or empty
+            if "user" in response_data["smtpServer"]:
+                assert response_data["smtpServer"]["user"] == "", \
+                    "user field should be empty when authentication is disabled"
 
 
     with test_common.requsts_mocker_default(), \
@@ -491,7 +499,17 @@ def test_settings_mailserver_create(connexion_client):
         assert response_data["smtpServer"]["ssl"].upper() == str(bool(kc_update_data["SSL_ENABLE"])).upper()
         assert response_data["smtpServer"]["starttls"].upper() == str(bool(kc_update_data["START_TLS_ENABLE"])).upper()
         assert response_data["smtpServer"]["auth"].upper() == str(bool(kc_update_data["AUTHENTICATION_ENABLE"])).upper()
-        assert response_data["smtpServer"]["user"] == str(kc_update_data["AUTHENTICATION_USER"])
+        # When auth=true, Keycloak should return the 'user' field
+        if kc_update_data["AUTHENTICATION_ENABLE"]:
+            assert "user" in response_data["smtpServer"], \
+                "user field should be present when authentication is enabled"
+            assert response_data["smtpServer"]["user"] == str(kc_update_data["AUTHENTICATION_USER"]), \
+                f"Expected user={kc_update_data['AUTHENTICATION_USER']}, got {response_data['smtpServer'].get('user')}"
+        else:
+            # When auth=false, 'user' field may be absent or empty
+            if "user" in response_data["smtpServer"]:
+                assert response_data["smtpServer"]["user"] == "", \
+                    "user field should be empty when authentication is disabled"
 
 
 def test_setting_mailserver_delete(connexion_client):
@@ -532,20 +550,13 @@ def test_setting_mailserver_delete(connexion_client):
 
         assert response.status_code == 200
 
-        kc_delete_data = __sample_kc_delete_data()
         response_data = response.json()
-        assert response_data["resetPasswordAllowed"] == False
-        assert response_data["smtpServer"]["host"] == kc_delete_data["smtpServer"]["host"]
-        assert response_data["smtpServer"]["port"] == kc_delete_data["smtpServer"]["port"]
-        assert response_data["smtpServer"]["from"] == kc_delete_data["smtpServer"]["from"]
-        assert response_data["smtpServer"]["fromDisplayName"] == kc_delete_data["smtpServer"]["fromDisplayName"]
-        assert response_data["smtpServer"]["replyTo"] == kc_delete_data["smtpServer"]["replyTo"]
-        assert response_data["smtpServer"]["replyToDisplayName"] == kc_delete_data["smtpServer"]["replyToDisplayName"]
-        assert response_data["smtpServer"]["envelopeFrom"] == kc_delete_data["smtpServer"]["envelopeFrom"]
-        assert response_data["smtpServer"]["ssl"].upper() == str(bool(kc_delete_data["smtpServer"]["ssl"])).upper()
-        assert response_data["smtpServer"]["starttls"].upper() == str(bool(kc_delete_data["smtpServer"]["starttls"])).upper()
-        assert response_data["smtpServer"]["auth"].upper() == str(bool(kc_delete_data["smtpServer"]["auth"])).upper()
-        assert response_data["smtpServer"]["user"] == str(kc_delete_data["smtpServer"]["user"])
+        assert response_data["resetPasswordAllowed"] is False
+        # After deletion, smtpServer should be empty or contain empty values
+        assert response_data["smtpServer"] == {} or (
+            response_data["smtpServer"].get("host", "") == "" and
+            response_data["smtpServer"].get("from", "") == ""
+        )
 
     with test_common.requsts_mocker_default(), \
             test_common.pymysql_execute_raise_exception_mocker(queries_mailserver.SQL_DELETE_SMTP_SERVER, Exception("DB Error Test")):
@@ -898,69 +909,67 @@ def __sample_update_data(update={}):
 
 
 def __sample_kc_create_data(sample_data, update={}):
+    smtp_server = {
+        "host": sample_data["smtp_host"],
+        "port": sample_data["smtp_port"],
+        "from": sample_data["send_from"],
+        "fromDisplayName": sample_data["send_name"],
+        "replyTo": sample_data["reply_to"],
+        "replyToDisplayName": sample_data["reply_name"],
+        "envelopeFrom": sample_data["envelope_from"],
+        "ssl": str(sample_data["ssl_enable"]).lower(),
+        "starttls": str(sample_data["start_tls_enable"]).lower(),
+        "auth": str(sample_data["authentication_enable"]).lower()
+    }
+
+    # Only include user/password when authentication is enabled
+    if sample_data["authentication_enable"]:
+        smtp_server["user"] = sample_data["authentication_user"]
+        smtp_server["password"] = sample_data["authentication_password"]
+
     return dict(
         {
             "resetPasswordAllowed": True,
-            "smtpServer":{
-                "host": sample_data["smtp_host"],
-                "port": sample_data["smtp_port"],
-                "from": sample_data["send_from"],
-                "fromDisplayName": sample_data["send_name"],
-                "replyTo": sample_data["reply_to"],
-                "replyToDisplayName": sample_data["reply_name"],
-                "envelopeFrom": sample_data["envelope_from"],
-                "ssl": sample_data["ssl_enable"],
-                "starttls": sample_data["start_tls_enable"],
-                "auth": sample_data["authentication_enable"],
-                "user": sample_data["authentication_user"],
-                "password": sample_data["authentication_password"]
-            }
+            "smtpServer": smtp_server
         },
         **update
     )
 
 
 def __sample_kc_update_data(sample_data, update={}):
+    smtp_server = {
+        "host": sample_data["smtp_host"],
+        "port": sample_data["smtp_port"],
+        "from": sample_data["send_from"],
+        "fromDisplayName": sample_data["send_name"],
+        "replyTo": sample_data["reply_to"],
+        "replyToDisplayName": sample_data["reply_name"],
+        "envelopeFrom": sample_data["envelope_from"],
+        "ssl": str(sample_data["ssl_enable"]).lower(),
+        "starttls": str(sample_data["start_tls_enable"]).lower(),
+        "auth": str(sample_data["authentication_enable"]).lower()
+    }
+
+    # Only include user/password when authentication is enabled
+    if sample_data["authentication_enable"]:
+        smtp_server["user"] = sample_data["authentication_user"]
+        smtp_server["password"] = sample_data["authentication_password"]
+
     return dict(
         {
             "resetPasswordAllowed": True,
-            "smtpServer":{
-                "host": sample_data["smtp_host"],
-                "port": sample_data["smtp_port"],
-                "from": sample_data["send_from"],
-                "fromDisplayName": sample_data["send_name"],
-                "replyTo": sample_data["reply_to"],
-                "replyToDisplayName": sample_data["reply_name"],
-                "envelopeFrom": sample_data["envelope_from"],
-                "ssl": sample_data["ssl_enable"],
-                "starttls": sample_data["start_tls_enable"],
-                "auth": sample_data["authentication_enable"],
-                "user": sample_data["authentication_user"],
-                "password": sample_data["authentication_password"]
-            }
+            "smtpServer": smtp_server
         },
         **update
     )
 
 
 def __sample_kc_delete_data(update={}):
+    # To clear SMTP server configuration in Keycloak, send empty smtpServer object
     return dict(
         {
             "resetPasswordAllowed": False,
-            "smtpServer":{
-                "host": "",
-                "port": "",
-                "from": "",
-                "fromDisplayName": "",
-                "replyTo": "",
-                "replyToDisplayName": "",
-                "envelopeFrom": "",
-                "ssl": False,
-                "starttls": False,
-                "auth": False,
-                "user": "",
-                "password": ""
-            }
+            "smtpServer": {}
         },
         **update
     )

@@ -386,9 +386,9 @@ def notification_register(body, organization_id, workspace_id):  # noqa: E501
         return common.response_validation_error(validate)
 
     # register
-    bl_notification_service.notification_register(body, organization_id, workspace_id, user_id)
+    data = bl_notification_service.notification_register(body, organization_id, workspace_id, user_id)
 
-    return common.response_200_ok(data=None)
+    return common.response_200_ok(data=data)
 
 
 @common.platform_exception_handler

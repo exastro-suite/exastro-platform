@@ -42,7 +42,7 @@ def main():
         make_organizations[org_info["organization_id"]] = {
             "user_id": org_info['user_id'],
             "workspace_id": [],
-        } 
+        }
 
         #
         # generate workspace
@@ -270,7 +270,8 @@ def sample_data_organization(id, update={}):
                 "terraform_cloud_ep": False,
                 "terraform_cli": False,
                 "ci_cd": False,
-                "oase": False
+                "oase": False,
+                "ai_assistant": False
             }
         }
     }, **update)

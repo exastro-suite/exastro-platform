@@ -100,7 +100,7 @@ $(function(){
             const row_html = row_template
             .replace(/\${id}/g, fn.cv(row.id, '', true))
             .replace(/\${start_timestamp}/g, fn.date(new Date(row.start_timestamp),'yyyy/MM/dd HH:mm:ss'))
-            .replace(/\${expire_timestamp}/g, fn.date(new Date(row.expire_timestamp),'yyyy/MM/dd HH:mm:ss'))
+            .replace(/\${expire_timestamp}/g, row.expire_timestamp ? fn.date(new Date(row.expire_timestamp),'yyyy/MM/dd HH:mm:ss') : '-')
             .replace(/\${lastaccess_timestamp}/g, fn.date(new Date(row.lastaccess_timestamp),'yyyy/MM/dd HH:mm:ss'));
             $('#token_list tbody').append(row_html);
         }

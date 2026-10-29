@@ -188,6 +188,7 @@ def notification_register(body, organization_id, workspace_id, user_id):  # noqa
     """
 
     insert_notifications = []
+    data = []
     with closing(DBconnector().connect_workspacedb(organization_id, workspace_id)) as conn:
         with conn.cursor() as cursor:
             for row in body:
@@ -250,6 +251,8 @@ def notification_register(body, organization_id, workspace_id, user_id):  # noqa
                     conn.rollback()
                     raise
 
+                data.append(parameter['notification_id'])
+
             conn.commit()
 
     with closing(DBconnector().connect_platformdb()) as conn:
@@ -299,6 +302,8 @@ def notification_register(body, organization_id, workspace_id, user_id):  # noqa
                 except Exception:
                     conn.rollback()
                     raise
+
+    return data
 
 
 def notification_list(organization_id, workspace_id, page_size=None, current_page=None, details_info=None, func_id=None, match=None, like_before=None, like_after=None, like_all=None):  # noqa: E501
@@ -453,3 +458,137 @@ def settings_notification_delete(organization_id, workspace_id, destination_id, 
                 raise common.InternalErrorException(message_id=message_id, message=message)
 
     return None
+
+
+def notification_job_get(organization_id, workspace_id, notification_id):
+    """Get notification job by ID
+
+    Args:
+        organization_id (str): organization_id
+        workspace_id (str): workspace_id
+        notification_id (str): notification_id
+
+    Returns:
+        dict: notification job record
+    """
+    with closing(DBconnector().connect_workspacedb(organization_id, workspace_id)) as conn:
+        with conn.cursor() as cursor:
+            cursor.execute(queries_bl_notification.SQL_QUERY_NOTIFICATION_MESSAGE_BY_ID, {"notification_id": notification_id})
+            result = cursor.fetchone()
+
+    if result is None:
+        raise common.NotFoundException(
+            message_id="404-35002",
+            message=multi_lang.get_text("404-35002", "通知ジョブが存在しません(notification_id:{0})", notification_id)
+        )
+
+    data = notification_job_rowset(result)
+    return data
+
+
+def notification_job_list(organization_id, workspace_id, page_size=100, current_page=1, notification_status=None, func_id=None, destination_id=None, from_date=None, to_date=None):
+    """Get notification job list
+
+    Args:
+        organization_id (str): organization_id
+        workspace_id (str): workspace_id
+        page_size (int): records per page (default: 100)
+        current_page (int): current page number (default: 1)
+        notification_status (str): filter by notification status
+        func_id (str): filter by function ID
+        destination_id (str): filter by destination ID
+        from_date (str): filter by date range (from)
+        to_date (str): filter by date range (to)
+
+    Returns:
+        dict: list of notification job records with pagination info
+    """
+    # Build WHERE clause based on filters
+    where_clauses = []
+    parameters = {}
+
+    if notification_status:
+        where_clauses.append("NOTIFICATION_STATUS = %(notification_status)s")
+        parameters["notification_status"] = notification_status
+
+    if func_id:
+        where_clauses.append("FUNC_ID = %(func_id)s")
+        parameters["func_id"] = func_id
+
+    if destination_id:
+        where_clauses.append("DESTINATION_ID = %(destination_id)s")
+        parameters["destination_id"] = destination_id
+
+    if from_date:
+        where_clauses.append("CREATE_TIMESTAMP >= %(from_date)s")
+        parameters["from_date"] = from_date
+
+    if to_date:
+        where_clauses.append("CREATE_TIMESTAMP <= %(to_date)s")
+        parameters["to_date"] = to_date
+
+    where_clause = " WHERE " + " AND ".join(where_clauses) if where_clauses else ""
+
+    # page_sizeが100以上の場合、100で固定する。
+    if page_size > 100:
+        page_size = 100
+
+    with closing(DBconnector().connect_workspacedb(organization_id, workspace_id)) as conn:
+        with conn.cursor() as cursor:
+            # Get total count
+            count_query = queries_bl_notification.SQL_QUERY_NOTIFICATION_MESSAGES_COUNT + where_clause
+            cursor.execute(count_query, parameters)
+            total = cursor.fetchone()["count"]
+
+            # Calculate pagination
+            offset = (current_page - 1) * page_size
+            parameters["limit"] = page_size
+            parameters["offset"] = offset
+
+            # Get data with pagination
+            list_query = queries_bl_notification.SQL_QUERY_NOTIFICATION_MESSAGES + where_clause + " ORDER BY CREATE_TIMESTAMP DESC LIMIT %(limit)s OFFSET %(offset)s"
+            cursor.execute(list_query, parameters)
+            results = cursor.fetchall()
+
+    # Transform rows
+    data_list = [notification_job_rowset(row) for row in results]
+
+    return {
+        "data": data_list,
+        "total": total,
+        "page": current_page,
+        "page_size": page_size
+    }
+
+
+def notification_job_rowset(row):
+    """Transform database row to response format
+
+    Args:
+        row (dict): database row
+
+    Returns:
+        dict: formatted notification job data
+    """
+    row_set = {
+        "id": row["NOTIFICATION_ID"],
+        "destination_id": row["DESTINATION_ID"],
+        "destination_name": row["DESTINATION_NAME"],
+        "destination_kind": row["DESTINATION_KIND"],
+        "func_id": row["FUNC_ID"],
+        "func_informations": json.loads(row["FUNC_INFORMATIONS"]) if row["FUNC_INFORMATIONS"] else None,
+        "message_informations": json.loads(row["MESSAGE_INFORMATIONS"]) if row["MESSAGE_INFORMATIONS"] else None,
+        "notification_status": row["NOTIFICATION_STATUS"],
+        "notification_timestamp": common.datetime_to_str(row["NOTIFICATION_TIMESTAMP"]) if row["NOTIFICATION_TIMESTAMP"] else None,
+        "http_response_code": row["HTTP_RESPONSE_CODE"],
+        "http_response_body": row["HTTP_RESPONSE_BODY"],
+        "enable_retry": True if row["ENABLE_RETRY"] == 1 else False,
+        "retry_count_limit": row["RETRY_COUNT_LIMIT"],
+        "retry_count": row["RETRY_COUNT"],
+        "create_timestamp": common.datetime_to_str(row["CREATE_TIMESTAMP"]),
+        "create_user": row["CREATE_USER"],
+        "last_update_timestamp": common.datetime_to_str(row["LAST_UPDATE_TIMESTAMP"]),
+        "last_update_user": row["LAST_UPDATE_USER"],
+    }
+
+    return row_set

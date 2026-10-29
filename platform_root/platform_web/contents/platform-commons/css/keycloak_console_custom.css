@@ -1,9 +1,9 @@
 /* ヘッダの非表示 */
-header.pf-c-page__header {
+header.pf-v5-c-masthead {
     display: none !important;
 }
 /* メニューのstyle変更 */
-#page-sidebar .pf-c-nav__link {
+#page-sidebar .pf-v5-c-nav__link {
     padding-top: 4px;
     padding-bottom: 4px;
     font-size: 14px;

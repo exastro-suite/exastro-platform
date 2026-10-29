@@ -50,12 +50,27 @@
     "authenticationFlowBindingOverrides": {},
     "fullScopeAllowed": true,
     "nodeReRegistrationTimeout": -1,
+    "protocolMappers": [
+        {
+            "name": "audience-_platform",
+            "protocol": "openid-connect",
+            "protocolMapper": "oidc-audience-mapper",
+            "consentRequired": false,
+            "config": {
+                "included.client.audience": "_platform",
+                "id.token.claim": "false",
+                "access.token.claim": "true",
+                "introspection.token.claim": "true"
+            }
+        }
+    ],
     "defaultClientScopes": [
         "web-origins",
         "acr",
         "profile",
         "roles",
-        "email"
+        "email",
+        "basic"
     ],
     "optionalClientScopes": [
         "address",
