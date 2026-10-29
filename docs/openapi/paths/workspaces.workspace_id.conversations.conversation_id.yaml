@@ -1,0 +1,185 @@
+#   Copyright 2026 NEC Corporation
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+
+patch:
+  tags:
+    - AIAssistantService
+  summary: |-
+    会話を部分更新
+    Partially update a conversation
+  description: |-
+    会話を部分更新する。title・statusのうち、リクエストボディで指定された項目のみを更新し、指定しなかった項目は変更しない（PATCH）。
+    Partially update a conversation. Only the fields provided in the request body (title, status) are updated; fields not provided are left unchanged (PATCH semantics).
+  operationId: update_conversation
+  x-openapi-router-controller: controllers.ai_assistant_service_controller
+  parameters:
+    - name: organization_id
+      in: path
+      required: true
+      schema:
+        type: string
+    - name: workspace_id
+      in: path
+      required: true
+      schema:
+        type: string
+    - name: conversation_id
+      in: path
+      required: true
+      schema:
+        type: string
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            title:
+              type: string
+              description: |-
+                変更後の会話タイトル(省略時は変更しない)
+                New conversation title (unchanged if omitted)
+              example: "nginx構築Playbook生成(更新後)"
+            status:
+              type: string
+              enum: [active, closed, archived]
+              description: |-
+                変更後のステータス(省略時は変更しない)
+                New status (unchanged if omitted)
+              example: "closed"
+  responses:
+    200:
+      description: |-
+        更新成功
+        Updated successfully
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '../schemas/responseOk.yaml'
+              - type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      conversation_id:
+                        type: string
+                      title:
+                        type: string
+                      status:
+                        type: string
+    400:
+      description: |-
+        バリデーションエラー
+        Validation error
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'
+    403:
+      description: |-
+        AIアシスタント機能が有効になっていない
+        The AI assistant feature is not enabled
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'
+    404:
+      description: |-
+        会話が見つからない
+        Conversation not found
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'
+    500:
+      description: |-
+        サーバーエラー
+        Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'
+
+delete:
+  tags:
+    - AIAssistantService
+  summary: |-
+    会話を削除
+    Delete a conversation
+  description: |-
+    会話を削除する。会話に紐づくメッセージ履歴も合わせて削除する。
+    Delete a conversation. The message history associated with the conversation is also deleted.
+  operationId: delete_conversation
+  x-openapi-router-controller: controllers.ai_assistant_service_controller
+  parameters:
+    - name: organization_id
+      in: path
+      required: true
+      schema:
+        type: string
+    - name: workspace_id
+      in: path
+      required: true
+      schema:
+        type: string
+    - name: conversation_id
+      in: path
+      required: true
+      schema:
+        type: string
+  responses:
+    200:
+      description: |-
+        削除成功
+        Deleted successfully
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '../schemas/responseOk.yaml'
+              - type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      conversation_id:
+                        type: string
+                      message:
+                        type: string
+    403:
+      description: |-
+        AIアシスタント機能が有効になっていない
+        The AI assistant feature is not enabled
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'
+    404:
+      description: |-
+        会話が見つからない
+        Conversation not found
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'
+    500:
+      description: |-
+        サーバーエラー
+        Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'

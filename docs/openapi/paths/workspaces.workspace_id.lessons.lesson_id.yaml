@@ -1,0 +1,266 @@
+#   Copyright 2026 NEC Corporation
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+
+get:
+  tags:
+    - AIAssistantService
+  summary: |-
+    学習事項を取得
+    Get a lesson
+  description: |-
+    指定した学習事項を1件取得する。
+    Get a single lesson by ID.
+  operationId: get_lesson
+  x-openapi-router-controller: controllers.ai_assistant_service_controller
+  parameters:
+    - name: organization_id
+      in: path
+      required: true
+      schema:
+        type: string
+    - name: workspace_id
+      in: path
+      required: true
+      schema:
+        type: string
+    - name: lesson_id
+      in: path
+      required: true
+      schema:
+        type: string
+  responses:
+    200:
+      description: |-
+        成功
+        Success
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '../schemas/responseOk.yaml'
+              - type: object
+                properties:
+                  data:
+                    $ref: '../schemas/lessonInfo.yaml'
+    403:
+      description: |-
+        AIアシスタント機能が有効になっていない
+        The AI assistant feature is not enabled
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'
+    404:
+      description: |-
+        学習事項が見つからない
+        Lesson not found
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'
+    500:
+      description: |-
+        サーバーエラー
+        Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'
+
+patch:
+  tags:
+    - AIAssistantService
+  summary: |-
+    学習事項を部分更新
+    Partially update a lesson
+  description: |-
+    学習事項を部分更新する。lesson・category・priority・enabledのうち、リクエストボディで指定された項目のみを更新し、指定しなかった項目は変更しない(PATCH)。主な用途は一覧UIでの有効/無効の切り替えや内容の修正。
+    Partially update a lesson. Only the fields provided in the request body (lesson, category, priority, enabled) are updated; fields not provided are left unchanged (PATCH semantics). The main use is toggling enabled or correcting content from a list UI.
+  operationId: update_lesson
+  x-openapi-router-controller: controllers.ai_assistant_service_controller
+  parameters:
+    - name: organization_id
+      in: path
+      required: true
+      schema:
+        type: string
+    - name: workspace_id
+      in: path
+      required: true
+      schema:
+        type: string
+    - name: lesson_id
+      in: path
+      required: true
+      schema:
+        type: string
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            lesson:
+              type: string
+              description: |-
+                変更後の学習事項の内容(省略時は変更しない)
+                New lesson content (unchanged if omitted)
+              example: "本番環境への反映前に、必ずdry-run実行で差分を確認すること"
+            category:
+              type: string
+              nullable: true
+              description: |-
+                変更後の分類(省略時は変更しない)
+                New category (unchanged if omitted)
+              example: "Ansible"
+            prompt_profile:
+              type: string
+              nullable: true
+              enum: [LLMEditor, AgenticAI]
+              description: |-
+                変更後の対象prompt_profile(省略時は変更しない)
+                New target prompt_profile (unchanged if omitted)
+              example: "LLMEditor"
+            priority:
+              type: integer
+              minimum: 1
+              maximum: 10
+              description: |-
+                変更後の重要度(1:最低 〜 10:最高。省略時は変更しない)
+                New priority (1: lowest - 10: highest; unchanged if omitted)
+              example: 9
+            enabled:
+              type: boolean
+              description: |-
+                変更後の有効/無効フラグ(省略時は変更しない)
+                New enabled flag (unchanged if omitted)
+              example: false
+  responses:
+    200:
+      description: |-
+        更新成功
+        Updated successfully
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '../schemas/responseOk.yaml'
+              - type: object
+                properties:
+                  data:
+                    $ref: '../schemas/lessonInfo.yaml'
+    400:
+      description: |-
+        バリデーションエラー
+        Validation error
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'
+    403:
+      description: |-
+        AIアシスタント機能が有効になっていない
+        The AI assistant feature is not enabled
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'
+    404:
+      description: |-
+        学習事項が見つからない
+        Lesson not found
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'
+    500:
+      description: |-
+        サーバーエラー
+        Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'
+
+delete:
+  tags:
+    - AIAssistantService
+  summary: |-
+    学習事項を削除
+    Delete a lesson
+  description: |-
+    指定した学習事項をID単位で削除する。
+    Delete a single lesson by ID.
+  operationId: delete_lesson
+  x-openapi-router-controller: controllers.ai_assistant_service_controller
+  parameters:
+    - name: organization_id
+      in: path
+      required: true
+      schema:
+        type: string
+    - name: workspace_id
+      in: path
+      required: true
+      schema:
+        type: string
+    - name: lesson_id
+      in: path
+      required: true
+      schema:
+        type: string
+  responses:
+    200:
+      description: |-
+        削除成功
+        Deleted successfully
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '../schemas/responseOk.yaml'
+              - type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      lesson_id:
+                        type: string
+                      message:
+                        type: string
+    403:
+      description: |-
+        AIアシスタント機能が有効になっていない
+        The AI assistant feature is not enabled
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'
+    404:
+      description: |-
+        学習事項が見つからない
+        Lesson not found
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'
+    500:
+      description: |-
+        サーバーエラー
+        Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'

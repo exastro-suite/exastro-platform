@@ -161,8 +161,10 @@ post:
               - type: object
                 properties:
                   data:
-                    type: object
-                    example: null
+                    type: array
+                    items:
+                      type: string
+                    description: List of notification IDs
     default:
       description: An unexpected error response.
       content:

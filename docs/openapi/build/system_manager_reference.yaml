@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: Exastro Platform API (System Management)
   description: Exastro Platform API for System Manager
-  version: 2.9.0
+  version: 2.10.0
 servers:
   - url: 'https://{host}'
     description: API endpoint
@@ -2182,6 +2182,320 @@ components:
                 format: uuid
               create_user_name:
                 type: string
+    aiCredentialInfo:
+      type: object
+      properties:
+        credential_id:
+          type: string
+        credential_type:
+          type: string
+          enum:
+            - bedrock-cache
+            - bedrock
+        credential_name:
+          type: string
+        status:
+          type: string
+          enum:
+            - active
+            - expired
+            - disabled
+        expires_at:
+          type: string
+          format: date-time
+        last_validated_at:
+          type: string
+          format: date-time
+        last_used_at:
+          type: string
+          format: date-time
+        validation_error:
+          type: string
+        notes:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    modelInfo:
+      type: object
+      properties:
+        id:
+          type: string
+          description: モデルID
+        name:
+          type: string
+          description: モデル名
+        description:
+          type: string
+          description: モデル説明
+        type:
+          type: string
+          description: プロバイダータイプ
+        status:
+          type: string
+          description: ステータス
+    conversationInfo:
+      type: object
+      properties:
+        conversation_id:
+          type: string
+        prompt_profile:
+          type: string
+          description: |-
+            プロンプトプロファイル（AgenticAI/LLMEditor）
+            Prompt profile (AgenticAI/LLMEditor)
+        ai_service_id:
+          type: string
+          description: |-
+            AIサービスID（bedrock/bedrock-cache）
+            AI service ID (bedrock/bedrock-cache)
+        model_id:
+          type: string
+          description: |-
+            会話のデフォルトモデルID(completionsでmodel_id省略時に使用)
+            Default model ID for the conversation (used when model_id is omitted in completions)
+        title:
+          type: string
+        status:
+          type: string
+          enum:
+            - active
+            - closed
+            - archived
+        current_token_count:
+          type: integer
+          description: |-
+            この会話でこれまでに消費した累積トークン数(input+output)。completions呼び出しでBedrockからusageが返るたびに加算され、
+            messageを省略した問い合わせ(既存履歴のみでの再問い合わせ・tool_result継続・添付ファイルのみのターン等、応答結果を
+            保存しない呼び出し)でも実際に消費したトークンとして加算される(保存の有無とは独立)。
+            Cumulative tokens (input+output) consumed by this conversation so far. Incremented every time a completions call returns
+            usage from Bedrock, including message-omitted calls (re-querying existing history, tool_result continuations,
+            attachment-only turns, etc. — calls whose response is not persisted); accumulation is independent of whether the
+            turn was persisted.
+        message_count:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    aiPreferenceInfo:
+      type: object
+      properties:
+        ai_service_id:
+          type: string
+          description: |-
+            AIサービスID(パスパラメータの値をそのまま返す)
+            AI service ID (echoes the path parameter value)
+          enum:
+            - bedrock-cache
+            - bedrock
+          example: bedrock-cache
+        ai_service_name:
+          type: string
+          nullable: true
+          readOnly: true
+          description: |-
+            AIサービスの表示名(ai_service_idからサーバー側で導出。取得時のみ付与され、未知のIDの場合はnull)
+            Display name of the AI service (derived server-side from ai_service_id at GET time; null if the ID is unrecognized)
+          example: Amazon Bedrock (Login Cache)
+        model_id:
+          type: string
+          nullable: true
+          description: |-
+            デフォルトで使用するモデルID(一度も保存していない場合はnull)
+            Default model ID to use (null if never saved)
+          example: 'anthropic.claude-3-5-sonnet-20240620-v1:0'
+        model_name:
+          type: string
+          nullable: true
+          description: |-
+            デフォルトモデルの表示名(PUT時にクライアントが指定した値をそのまま保存・返却。未指定または未保存の場合はnull)
+            Display name of the default model (stored/returned verbatim as supplied by the client at PUT time; null if not provided or never saved)
+          example: Claude 3.5 Sonnet
+        pickup_model_ids:
+          type: array
+          description: |-
+            UIでモデル選択の候補を絞り込むためにピックアップしたモデル一覧(選択肢が多すぎる問題への対処用)。
+            IDだけでは表示名がわからず使いにくいため、id・nameを持つオブジェクトの配列とする
+            List of models picked to narrow down the model choices shown in the UI (addresses having too many models to choose from).
+            An array of objects with id and name (an ID alone is hard to use for display purposes)
+          items:
+            type: object
+            required:
+              - id
+            properties:
+              id:
+                type: string
+                description: |-
+                  モデルID
+                  Model ID
+              name:
+                type: string
+                nullable: true
+                description: |-
+                  表示用のモデル名(任意)
+                  Display name for the model (optional)
+          example:
+            - id: 'anthropic.claude-3-5-sonnet-20240620-v1:0'
+              name: Claude 3.5 Sonnet
+            - id: global.anthropic.claude-sonnet-5
+              name: Claude Sonnet 5
+    currentAiPreferenceInfo:
+      type: object
+      properties:
+        ai_service_id:
+          type: string
+          nullable: true
+          description: |-
+            現在選択中のAIサービスID(一度も保存していない場合はnull)
+            Currently selected AI service ID (null if never saved)
+          enum:
+            - bedrock-cache
+            - bedrock
+          example: bedrock-cache
+        ai_service_name:
+          type: string
+          nullable: true
+          readOnly: true
+          description: |-
+            AIサービスの表示名(ai_service_idからサーバー側で導出。取得時のみ付与され、未知のIDまたはai_service_idがnullの場合はnull)
+            Display name of the AI service (derived server-side from ai_service_id at GET time; null if the ID is unrecognized or ai_service_id is null)
+          example: Amazon Bedrock (Login Cache)
+        model_id:
+          type: string
+          nullable: true
+          readOnly: true
+          description: |-
+            このAIサービスの/{ai_service_id}/ai-preferenceに保存されているデフォルトモデルID(未保存の場合はnull。ここには保存しない、参照のみ)
+            Default model ID from this AI service's /{ai_service_id}/ai-preference (null if never saved there; referenced only, not stored here)
+          example: 'anthropic.claude-3-5-sonnet-20240620-v1:0'
+        model_name:
+          type: string
+          nullable: true
+          readOnly: true
+          description: |-
+            このAIサービスの/{ai_service_id}/ai-preferenceに保存されているデフォルトモデルの表示名(未保存の場合はnull。ここには保存しない、参照のみ)
+            Default model display name from this AI service's /{ai_service_id}/ai-preference (null if never saved there; referenced only, not stored here)
+          example: Claude 3.5 Sonnet
+    aiServiceInfo:
+      type: object
+      properties:
+        ai_service_id:
+          type: string
+          description: |-
+            AIサービスID
+            AI service ID
+          enum:
+            - bedrock-cache
+            - bedrock
+          example: bedrock-cache
+        ai_service_name:
+          type: string
+          description: |-
+            AIサービスの表示名
+            Display name of the AI service
+          example: Amazon Bedrock (Login Cache)
+        description:
+          type: string
+          description: |-
+            AIサービスの説明(認証方式の違いなど)
+            Description of the AI service (e.g. differences in authentication method)
+          example: AWS Login Cacheを使用し、トークンを自動更新する認証方式
+        settings:
+          type: object
+          description: |-
+            Credential登録フォームの入力項目定義。キー名がそのままcredential_dataに保存されるキー名になる
+            Definition of the credential registration form's input fields. The key names are used verbatim as the credential_data key names
+          additionalProperties:
+            type: object
+            properties:
+              title:
+                type: string
+                description: |-
+                  入力項目の表示名
+                  Display label for the input field
+              type:
+                type: string
+                description: |-
+                  入力項目の種別(password/text等)
+                  Input field type (password/text, etc.)
+              required:
+                type: boolean
+                description: |-
+                  入力必須かどうか
+                  Whether the input field is required
+          example:
+            apiKey:
+              title: 認証情報（Login Cache）
+              type: password
+              required: true
+    lessonInfo:
+      type: object
+      properties:
+        lesson_id:
+          type: string
+          description: |-
+            学習事項ID(ULID)
+            Lesson ID (ULID)
+          example: 01J9Z8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8
+        lesson:
+          type: string
+          description: |-
+            学習事項の内容(過去の会話から判明した失敗・教訓・注意点等)
+            Lesson content (a failure, lesson, or caveat learned from a past conversation)
+          example: 本番環境への反映前に、必ずdry-run実行で差分を確認すること
+        category:
+          type: string
+          nullable: true
+          description: |-
+            分類(任意)
+            Category (optional)
+          example: Ansible
+        prompt_profile:
+          type: string
+          nullable: true
+          description: |-
+            システムプロンプトへの反映対象prompt_profile(未設定の場合はnull=全プロファイル共通)
+            Target prompt_profile for system-prompt injection (null means it applies to all profiles)
+          example: LLMEditor
+        priority:
+          type: integer
+          minimum: 1
+          maximum: 10
+          description: |-
+            重要度(1:最低 〜 10:最高)。システムプロンプトへの掲載順に使用する
+            Priority (1: lowest - 10: highest). Used to order lessons when injecting them into the system prompt
+          example: 8
+        enabled:
+          type: boolean
+          description: |-
+            有効/無効フラグ(trueの場合のみシステムプロンプトへ反映される)
+            Enabled flag (only lessons with true are injected into the system prompt)
+          example: true
+        conversation_id:
+          type: string
+          nullable: true
+          description: |-
+            学習元の会話ID(任意。Workspace内DB側のIDのため外部キーではない)
+            Originating conversation ID (optional; not a foreign key since conversations live in a separate, workspace-scoped database)
+          example: conv-001
+        created_at:
+          type: string
+          description: |-
+            作成日時
+            Created at
+          example: '2026-09-15T02:00:00.000Z'
+        updated_at:
+          type: string
+          description: |-
+            最終更新日時
+            Last updated at
+          example: '2026-09-15T02:00:00.000Z'
   securitySchemes:
     BearerAuth:
       description: Credentials or access token for API

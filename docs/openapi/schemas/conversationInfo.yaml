@@ -1,0 +1,56 @@
+#   Copyright 2026 NEC Corporation
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+
+type: object
+properties:
+  conversation_id:
+    type: string
+  prompt_profile:
+    type: string
+    description: |-
+      プロンプトプロファイル（AgenticAI/LLMEditor）
+      Prompt profile (AgenticAI/LLMEditor)
+  ai_service_id:
+    type: string
+    description: |-
+      AIサービスID（bedrock/bedrock-cache）
+      AI service ID (bedrock/bedrock-cache)
+  model_id:
+    type: string
+    description: |-
+      会話のデフォルトモデルID(completionsでmodel_id省略時に使用)
+      Default model ID for the conversation (used when model_id is omitted in completions)
+  title:
+    type: string
+  status:
+    type: string
+    enum: [active, closed, archived]
+  current_token_count:
+    type: integer
+    description: |-
+      この会話でこれまでに消費した累積トークン数(input+output)。completions呼び出しでBedrockからusageが返るたびに加算され、
+      messageを省略した問い合わせ(既存履歴のみでの再問い合わせ・tool_result継続・添付ファイルのみのターン等、応答結果を
+      保存しない呼び出し)でも実際に消費したトークンとして加算される(保存の有無とは独立)。
+      Cumulative tokens (input+output) consumed by this conversation so far. Incremented every time a completions call returns
+      usage from Bedrock, including message-omitted calls (re-querying existing history, tool_result continuations,
+      attachment-only turns, etc. — calls whose response is not persisted); accumulation is independent of whether the
+      turn was persisted.
+  message_count:
+    type: integer
+  created_at:
+    type: string
+    format: date-time
+  updated_at:
+    type: string
+    format: date-time

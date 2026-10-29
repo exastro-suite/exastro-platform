@@ -1,0 +1,80 @@
+#   Copyright 2026 NEC Corporation
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+
+title: Notification job data.
+type: object
+properties:
+  id:
+    type: string
+    description: Notification ID (ULID format)
+  destination_id:
+    type: string
+    description: Destination ID
+  destination_name:
+    type: string
+    description: Destination name
+  destination_kind:
+    type: string
+    enum: [Mail, Teams_WF, Teams, Webhook, ServiceNow]
+    description: Notification method
+  func_id:
+    type: string
+    description: Function ID
+  func_informations:
+    type: object
+    description: Function information details
+  message_informations:
+    type: object
+    description: Notification message content
+  notification_status:
+    type: string
+    enum: [Unsent, Successful, Failed, AbortedExpired]
+    description: Notification status
+  notification_timestamp:
+    type: string
+    format: date-time
+    description: Notification sent timestamp
+    nullable: true
+  http_response_code:
+    type: integer
+    description: HTTP response code
+    nullable: true
+  http_response_body:
+    type: string
+    description: HTTP response body
+    nullable: true
+  enable_retry:
+    type: boolean
+    description: Whether retry is enabled
+  retry_count_limit:
+    type: integer
+    description: Retry count limit
+    nullable: true
+  retry_count:
+    type: integer
+    description: Current retry count
+  create_timestamp:
+    type: string
+    format: date-time
+    description: Creation timestamp
+  create_user:
+    type: string
+    description: Creator user ID
+  last_update_timestamp:
+    type: string
+    format: date-time
+    description: Last update timestamp
+  last_update_user:
+    type: string
+    description: Last update user ID

@@ -1,0 +1,175 @@
+#   Copyright 2026 NEC Corporation
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+
+get:
+  tags:
+    - UsersService
+  summary: |-
+    AI利用設定を取得
+    Get the AI preference
+  description: |-
+    ユーザーの、このAIサービス(ai_service_id)向けのAI利用設定(デフォルトモデル、ピックアップモデル一覧)を取得する。
+    AIサービスごとに個別の設定を持てるようai_service_id単位で管理する。一度も保存していない場合は全項目nullまたは空配列で返す。
+    Get the user's AI preference (default model, list of picked-up models) for this AI service (ai_service_id).
+    Preferences are managed per ai_service_id so each AI service can have its own settings. If nothing has been saved yet, all fields are returned as null or an empty array.
+  operationId: get_ai_preference
+  x-openapi-router-controller: controllers.users_service_controller
+  parameters:
+    - name: organization_id
+      in: path
+      required: true
+      schema:
+        type: string
+    - name: ai_service_id
+      in: path
+      required: true
+      schema:
+        type: string
+        enum: [bedrock-cache, bedrock]
+  responses:
+    200:
+      description: |-
+        成功
+        Success
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '../schemas/responseOk.yaml'
+              - type: object
+                properties:
+                  data:
+                    $ref: '../schemas/aiPreferenceInfo.yaml'
+    403:
+      description: |-
+        AIアシスタント機能が有効になっていない
+        The AI assistant feature is not enabled
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'
+    500:
+      description: |-
+        サーバーエラー
+        Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'
+
+put:
+  tags:
+    - UsersService
+  summary: |-
+    AI利用設定を保存
+    Save the AI preference
+  description: |-
+    ユーザーの、このAIサービス(ai_service_id)向けのAI利用設定を全置換で保存する。model_idは必須で、指定した内容にそのまま置き換わる（部分更新ではない）。
+    Save the user's AI preference for this AI service (ai_service_id) as a full replacement. model_id is required, and the stored content is entirely replaced with what is specified (not a partial update).
+  operationId: update_ai_preference
+  x-openapi-router-controller: controllers.users_service_controller
+  parameters:
+    - name: organization_id
+      in: path
+      required: true
+      schema:
+        type: string
+    - name: ai_service_id
+      in: path
+      required: true
+      schema:
+        type: string
+        enum: [bedrock-cache, bedrock]
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - model_id
+          properties:
+            model_id:
+              type: string
+              description: |-
+                このAIサービスでデフォルトで使用するモデルID
+                Default model ID to use for this AI service
+              example: "anthropic.claude-3-5-sonnet-20240620-v1:0"
+            model_name:
+              type: string
+              nullable: true
+              description: |-
+                デフォルトモデルの表示名(任意。指定した値をそのまま保存・返却する。サーバー側では解決しない)
+                Display name for the default model (optional; stored and returned verbatim as supplied — not resolved server-side)
+              example: "Claude 3.5 Sonnet"
+            pickup_model_ids:
+              type: array
+              description: |-
+                UIでモデル選択の候補を絞り込むためにピックアップしたモデル一覧(省略時は空配列)。
+                各要素はidが必須、nameは任意
+                List of models picked to narrow down the model choices shown in the UI (empty array if omitted).
+                Each entry requires id; name is optional
+              items:
+                type: object
+                required:
+                  - id
+                properties:
+                  id:
+                    type: string
+                  name:
+                    type: string
+                    nullable: true
+              example:
+                - id: "anthropic.claude-3-5-sonnet-20240620-v1:0"
+                  name: "Claude 3.5 Sonnet"
+                - id: "global.anthropic.claude-sonnet-5"
+                  name: "Claude Sonnet 5"
+  responses:
+    200:
+      description: |-
+        保存成功
+        Saved successfully
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '../schemas/responseOk.yaml'
+              - type: object
+                properties:
+                  data:
+                    $ref: '../schemas/aiPreferenceInfo.yaml'
+    400:
+      description: |-
+        バリデーションエラー
+        Validation error
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'
+    403:
+      description: |-
+        AIアシスタント機能が有効になっていない
+        The AI assistant feature is not enabled
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'
+    500:
+      description: |-
+        サーバーエラー
+        Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'

@@ -3322,7 +3322,7 @@ CREATE TABLE `t_platform_version` (
 
 LOCK TABLES `t_platform_version` WRITE;
 /*!40000 ALTER TABLE `t_platform_version` DISABLE KEYS */;
-INSERT INTO `t_platform_version` VALUES (1,'2.9.0','2026-08-05 22:44:47','system','2026-08-05 22:45:45','2.9.0');
+INSERT INTO `t_platform_version` VALUES (1,'2.10.0','2026-08-05 22:44:47','system','2026-08-05 22:45:45','2.10.0');
 /*!40000 ALTER TABLE `t_platform_version` ENABLE KEYS */;
 UNLOCK TABLES;
 

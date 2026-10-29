@@ -1,0 +1,207 @@
+#   Copyright 2026 NEC Corporation
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+
+post:
+  tags:
+    - AIAssistantService
+  summary: |-
+    AI応答を生成
+    Generate an AI response
+  description: |-
+    ユーザーメッセージを送信し、AIとの会話を1ターン進めて応答を取得する。messageは省略可能で、省略した場合は会話の既存履歴のみでAIサービスに問い合わせる（新規ターンは追加されず、応答結果も保存されない＝問い合わせのみ）。なお、多くの生成AIサービスのAPIでは会話がuserターンで終わっている必要があるため、履歴の最後がassistantターンで終わっている（＝直前のやり取りに既に応答済み）状態でmessageを省略した場合は、直前のassistant応答を一時的に取り除いた上でその手前のuserターンまでで再度問い合わせる（＝応答の再生成）。会話に既存の履歴が全く無い場合、または再生成のためにassistantターンを取り除いた結果userターンも残らない場合は400エラーになる。
+    Send a user message and advance the conversation with the AI by one turn to get a response. The message field is optional; if omitted, the AI service is queried using only the conversation's existing history (no new turn is added and the response is not saved — query only). Note that many generative AI service APIs require the conversation to end with a user turn; if the history already ends with an assistant turn (i.e. the previous exchange was already answered) and message is omitted, the trailing assistant turn is temporarily dropped and the AI is queried again up to the preceding user turn (i.e. the response is regenerated). A 400 error is returned if the conversation has no existing history at all, or if no user turn remains after dropping the trailing assistant turn.
+  operationId: create_completion
+  x-openapi-router-controller: controllers.ai_assistant_service_controller
+  parameters:
+    - name: organization_id
+      in: path
+      required: true
+      schema:
+        type: string
+    - name: workspace_id
+      in: path
+      required: true
+      schema:
+        type: string
+    - name: conversation_id
+      in: path
+      required: true
+      schema:
+        type: string
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              description: |-
+                ユーザーメッセージ(省略可。省略時は会話の既存履歴のみで問い合わせ、結果は保存されない)
+                User message (optional; if omitted, queries using only the conversation's existing history and the result is not saved)
+              example: "こんにちは、Bedrockのテストです"
+            ai_service_id:
+              type: string
+              description: |-
+                AIサービスID(メッセージ固有、会話のデフォルトをオーバーライド、省略時は会話のAI_SERVICE_IDを使用)
+                AI service ID (specific to this message, overrides the conversation default; if omitted, the conversation's AI_SERVICE_ID is used)
+              enum: [bedrock-cache, bedrock]
+              example: "bedrock-cache"
+            model_id:
+              type: string
+              description: |-
+                使用するモデルID(メッセージ固有、会話のデフォルトをオーバーライド、省略時は会話作成時に指定したデフォルトモデルIDを使用)
+                Model ID to use (specific to this message, overrides the conversation default; if omitted, the default model ID specified when the conversation was created is used)
+              example: "anthropic.claude-3-5-sonnet-20240620-v1:0"
+            menu_id:
+              type: string
+              description: |-
+                ITA画面ID(指定時はメニュー固有のシステムプロンプトを追加)
+                ITA screen ID (when specified, a menu-specific system prompt is appended)
+              example: "menu_001"
+  responses:
+    200:
+      description: |-
+        AI応答の生成成功
+        AI response generated successfully
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '../schemas/responseOk.yaml'
+              - type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      conversation_id:
+                        type: string
+                      message_id:
+                        type: string
+                        nullable: true
+                        description: |-
+                          保存されたメッセージID(messageを省略し結果を保存しなかった場合はnull)
+                          Saved message ID (null when message was omitted and the result was not saved)
+                      user_message_seq:
+                        type: integer
+                        nullable: true
+                        description: |-
+                          スナップショット内でのユーザーメッセージの順序番号(1始まり、messageを省略した場合はnull)
+                          Sequence number of the user message within the snapshot (1-based; null when message was omitted)
+                      assistant_message_seq:
+                        type: integer
+                        nullable: true
+                        description: |-
+                          スナップショット内でのアシスタントメッセージの順序番号(1始まり、messageを省略した場合はnull)
+                          Sequence number of the assistant message within the snapshot (1-based; null when message was omitted)
+                      content:
+                        type: array
+                        description: |-
+                          AIの応答のcontentブロック一覧(Anthropic Messages API形式。text/tool_use/thinking等をそのまま保持し、会話履歴に保存される内容と同じ)。
+                          tool_useブロックが含まれる場合、呼び出し側はidentifier/name/inputを見て後続のtool実行を行う想定。
+                          List of the AI response's content blocks (Anthropic Messages API format; text/tool_use/thinking etc. are kept as-is, identical to what is saved to the conversation history).
+                          When a tool_use block is present, the caller is expected to inspect its id/name/input and run the corresponding tool.
+                        items:
+                          type: object
+                        example:
+                          - type: "text"
+                            text: "確認します。"
+                          - type: "tool_use"
+                            id: "toolu_01ABC"
+                            name: "search-docs"
+                            input:
+                              query: "example"
+                      stop_reason:
+                        type: string
+                        nullable: true
+                        description: |-
+                          Bedrockが返した停止理由("end_turn"、会話作成時にtoolsを指定していて且つモデルがツール呼び出しを選択した場合は"tool_use"等)
+                          The stop reason returned by Bedrock (e.g. "end_turn", or "tool_use" when tools were specified at conversation creation and the model chose to call one)
+                      saved:
+                        type: boolean
+                        description: |-
+                          応答結果を会話履歴に保存したかどうか(messageを省略した場合はfalse)
+                          Whether the response was saved to the conversation history (false when message was omitted)
+                      ai_status_code:
+                        type: integer
+                        description: |-
+                          AIサービスのAPIが返したHTTPステータスコード(通常200)。リトライ判断等に利用できる。
+                          The HTTP status code returned by the AI service's API (normally 200). Can be used for retry decisions, etc.
+                      usage:
+                        type: object
+                        properties:
+                          input_tokens:
+                            type: integer
+                            description: |-
+                              入力トークン数(Prompt Cachingがヒットした場合、cache_read_input_tokensの分は含まれない)
+                              Input token count (excludes cache_read_input_tokens when a prompt cache hit occurs)
+                          output_tokens:
+                            type: integer
+                          total_tokens:
+                            type: integer
+                          cache_creation_input_tokens:
+                            type: integer
+                            description: |-
+                              Prompt Cachingで新たに書き込まれたトークン数(キャッシュ未使用時は0)
+                              Tokens newly written to the prompt cache (0 when caching was not used)
+                          cache_read_input_tokens:
+                            type: integer
+                            description: |-
+                              Prompt Cachingから読み取られたトークン数(キャッシュヒットしなかった場合は0)
+                              Tokens read from the prompt cache (0 when there was no cache hit)
+    400:
+      description: |-
+        バリデーションエラー
+        Validation error
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'
+    403:
+      description: |-
+        AIアシスタント機能が有効になっていない
+        The AI assistant feature is not enabled
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'
+    404:
+      description: |-
+        会話が見つからない、または使用するai_service_idのactiveなCredentialが登録されていない
+        Conversation not found, or no active credential is registered for the ai_service_id in use
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'
+    500:
+      description: |-
+        サーバーエラー
+        Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'
+    default:
+      description: >-
+        AIサービスのAPIがエラー時に返したHTTPステータスコードをそのまま返す(例: 429, 500, 503等)。
+        AIサービスへのリクエストがタイムアウトした場合は504、接続に失敗した場合は503を返す。
+        リトライ可否の判断はこのステータスコードを基準に行うこと。
+        Returns the HTTP status code exactly as returned by the AI service's API on error (e.g. 429, 500, 503, etc.).
+        Returns 504 when the request to the AI service times out, and 503 when the connection to it fails.
+        Retry decisions should be based on this status code.
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'

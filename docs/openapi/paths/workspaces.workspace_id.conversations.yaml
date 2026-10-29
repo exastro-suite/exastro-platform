@@ -1,0 +1,273 @@
+#   Copyright 2026 NEC Corporation
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+
+post:
+  tags:
+    - AIAssistantService
+  summary: |-
+    会話を作成
+    Create a conversation
+  description: |-
+    新しいチャット会話を作成する
+    Create a new chat conversation.
+  operationId: create_conversation
+  x-openapi-router-controller: controllers.ai_assistant_service_controller
+  parameters:
+    - name: organization_id
+      in: path
+      required: true
+      schema:
+        type: string
+    - name: workspace_id
+      in: path
+      required: true
+      schema:
+        type: string
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - title
+            - model_id
+            - ai_service_id
+          properties:
+            title:
+              type: string
+              description: |-
+                会話タイトル
+                Conversation title
+              example: "Bedrockとのチャット"
+            model_id:
+              type: string
+              description: |-
+                会話のデフォルトモデルID(completionsでmodel_idを省略した際にこの値が使用される)
+                Default model ID for the conversation (used when model_id is omitted in completions)
+              example: "anthropic.claude-3-5-sonnet-20240620-v1:0"
+            ai_service_id:
+              type: string
+              description: |-
+                使用するAIサービスID(自動推定はしない。指定したサービスのactiveなCredentialが登録済みである必要がある)
+                AI service ID to use (no auto-detection; an active credential for the specified service must already be registered)
+              enum:
+                - bedrock-cache
+                - bedrock
+              example: "bedrock-cache"
+            prompt_profile:
+              type: string
+              description: |-
+                プロンプトプロファイル（システムプロンプト切り替え用）
+                Prompt profile (used to switch the system prompt)
+              default: "LLMEditor"
+              enum:
+                - LLMEditor
+                - AgenticAI
+                - Lessons
+                - GenerateTitle
+              example: "LLMEditor"
+            tools:
+              type: array
+              description: |-
+                ツール定義（Anthropic tools形式の配列。省略時はツール未使用の会話になる。会話単位で固定し、completionsの都度指定はしない）
+                Tool definitions (an array in Anthropic tools format; omit for a conversation without tools. Fixed per conversation, not specified per completions call)
+              items:
+                type: object
+              example:
+                - name: "get_weather"
+                  description: "指定した地域の現在の天気を取得する"
+                  input_schema:
+                    type: object
+                    properties:
+                      location:
+                        type: string
+                    required: ["location"]
+  responses:
+    200:
+      description: |-
+        会話作成成功
+        Conversation created successfully
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '../schemas/responseOk.yaml'
+              - type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      conversation_id:
+                        type: string
+                      prompt_profile:
+                        type: string
+                        description: |-
+                          プロンプトプロファイル
+                          Prompt profile
+                      ai_service_id:
+                        type: string
+                        description: |-
+                          AIサービスID（リクエストで指定した値）
+                          AI service ID (the value specified in the request)
+                      model_id:
+                        type: string
+                        description: |-
+                          会話のデフォルトモデルID
+                          Default model ID for the conversation
+                      tools:
+                        type: array
+                        description: |-
+                          ツール定義（未指定の場合は空配列）
+                          Tool definitions (an empty array when not specified)
+                        items:
+                          type: object
+                      title:
+                        type: string
+                      status:
+                        type: string
+    400:
+      description: |-
+        バリデーションエラー
+        Validation error
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'
+    403:
+      description: |-
+        AIアシスタント機能が有効になっていない
+        The AI assistant feature is not enabled
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'
+    404:
+      description: |-
+        指定したai_service_idのactiveなCredentialが登録されていない
+        No active credential is registered for the specified ai_service_id
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'
+    500:
+      description: |-
+        サーバーエラー
+        Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'
+
+get:
+  tags:
+    - AIAssistantService
+  summary: |-
+    会話一覧を取得
+    Get the list of conversations
+  description: |-
+    ユーザーの会話一覧を取得する
+    Get the list of the user's conversations.
+  operationId: list_conversations
+  x-openapi-router-controller: controllers.ai_assistant_service_controller
+  parameters:
+    - name: organization_id
+      in: path
+      required: true
+      schema:
+        type: string
+    - name: workspace_id
+      in: path
+      required: true
+      schema:
+        type: string
+    - name: prompt_profile
+      in: query
+      required: true
+      schema:
+        type: string
+        enum: [LLMEditor, AgenticAI]
+      description: |-
+        プロンプトプロファイル（会話一覧は常にこの値で絞り込む）
+        Prompt profile (the conversation list is always filtered by this value)
+    - name: status
+      in: query
+      required: false
+      schema:
+        type: string
+        enum: [active, closed, archived]
+      description: |-
+        ステータスフィルター
+        Status filter
+    - name: limit
+      in: query
+      required: false
+      schema:
+        type: integer
+        default: 50
+      description: |-
+        取得件数
+        Number of items to retrieve
+    - name: offset
+      in: query
+      required: false
+      schema:
+        type: integer
+        default: 0
+      description: |-
+        オフセット
+        Offset
+  responses:
+    200:
+      description: |-
+        成功
+        Success
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '../schemas/responseOk.yaml'
+              - type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      conversations:
+                        type: array
+                        items:
+                          $ref: '../schemas/conversationInfo.yaml'
+                      count:
+                        type: integer
+                        description: |-
+                          このレスポンスに含まれる件数(limit/offset適用後、conversationsの要素数)
+                          Number of items included in this response (after applying limit/offset; the length of conversations)
+                      total_count:
+                        type: integer
+                        description: |-
+                          絞り込み条件(prompt_profile・status)に合致する総件数(limit/offset適用前)
+                          Total number of items matching the filter conditions (prompt_profile, status), before applying limit/offset
+    403:
+      description: |-
+        AIアシスタント機能が有効になっていない
+        The AI assistant feature is not enabled
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'
+    default:
+      description: An unexpected error response.
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'

@@ -34,6 +34,35 @@ ENV DB_CONNECT_TIMEOUT      10
 ENV DB_CONNECT_RETRY_SLEEP_TIME    0.5
 ENV DB_CONNECT_RETRY_LIMIT  3
 
+# mod_wsgiのプロセス・スレッド数(config/httpd.conf/wsgi.conf参照) / mod_wsgi processes and threads (see config/httpd.conf/wsgi.conf)
+#   通常系(platform-api) / Default group (platform-api)
+ENV PLATFORM_API_WSGI_PROCESSES             1
+ENV PLATFORM_API_WSGI_THREADS               15
+#   AIアシスタント系(platform-api-ai-assistant) / AI assistant group (platform-api-ai-assistant)
+ENV AI_ASSISTANT_WSGI_PROCESSES             1
+ENV AI_ASSISTANT_WSGI_THREADS               15
+#   AIアシスタント系のrequest-timeout(秒)。AI_ASSISTANT_READ_TIMEOUTより大きく、APACHE_TIMEOUTより小さくすること
+#   request-timeout (seconds) for the AI assistant group. Must be greater than AI_ASSISTANT_READ_TIMEOUT and less than APACHE_TIMEOUT
+ENV AI_ASSISTANT_WSGI_REQUEST_TIMEOUT       330
+
+# AIアシスタント機能の設定 / AI assistant feature settings
+#   BedrockへのHTTPリクエストの読み込みタイムアウト(秒) / Read timeout (seconds) for HTTP requests to Bedrock
+ENV AI_ASSISTANT_READ_TIMEOUT               300
+#   Bedrockへの接続タイムアウト(秒) / Connect timeout (seconds) for Bedrock
+ENV AI_ASSISTANT_CONNECT_TIMEOUT            30
+#   Bedrock呼び出しのリトライ最大回数(boto3の標準リトライ) / Maximum retry attempts for Bedrock calls (boto3 standard retry mode)
+ENV AI_ASSISTANT_MAX_ATTEMPTS               1
+#   Bedrock応答生成時のデフォルト最大トークン数 / Default max_tokens for Bedrock response generation
+ENV AI_ASSISTANT_MAX_TOKENS_DEFAULT         20480
+#   max_tokensがモデルの上限を超えた場合の自動リトライ回数 / Number of automatic retries when max_tokens exceeds the model's limit
+ENV AI_ASSISTANT_MAX_TOKENS_RETRY_COUNT     3
+#   学習事項をシステムプロンプトへ注入する際の最大件数 / Maximum number of lessons to inject into the system prompt
+ENV AI_ASSISTANT_LESSONS_MAX_ITEMS          20
+#   学習事項セクション全体の最大文字数 / Max character length of the lessons section as a whole
+ENV AI_ASSISTANT_LESSONS_MAX_CHARS          6000
+#   ユーザー1人・Workspace1つあたりに登録できる学習事項の最大件数 / Maximum number of lessons a single user may register within a single workspace
+ENV AI_ASSISTANT_LESSONS_MAX_COUNT          200
+
 RUN --mount=type=secret,id=host_certificate_file,dst=/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem \
     dnf install -y \
     langpacks-en \

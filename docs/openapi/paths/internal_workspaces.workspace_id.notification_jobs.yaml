@@ -1,0 +1,88 @@
+#   Copyright 2026 NEC Corporation
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+
+get:
+  tags:
+  - InternalNotificationJobService
+  summary: Get notification job list (Internal API)
+  x-openapi-router-controller: controllers.internal_notification_job_service_controller
+  operationId: internal_notification_job_list
+  parameters:
+  - name: organization_id
+    in: path
+    required: true
+    schema:
+      type: string
+  - name: workspace_id
+    in: path
+    required: true
+    schema:
+      type: string
+  - name: page_size
+    in: query
+    description: "Maximum number of return values at one time (default: 100)"
+    schema:
+      type: integer
+      minimum: 1
+      default: 100
+  - name: current_page
+    in: query
+    description: "Current display page (default: 1)"
+    schema:
+      type: integer
+      minimum: 1
+      default: 1
+  - name: notification_status
+    in: query
+    description: "Filter by notification status"
+    schema:
+      type: string
+      enum: [Unsent, Successful, Failed, AbortedExpired]
+  - name: func_id
+    in: query
+    description: "Filter by function ID"
+    schema:
+      type: string
+  - name: destination_id
+    in: query
+    description: "Filter by destination ID"
+    schema:
+      type: string
+  - name: from_date
+    in: query
+    description: "Filter by date range (from)"
+    schema:
+      type: string
+      format: date-time
+  - name: to_date
+    in: query
+    description: "Filter by date range (to)"
+    schema:
+      type: string
+      format: date-time
+  responses:
+    200:
+      description: A successful response.
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '../schemas/responseOk.yaml'
+              - $ref: '../schemas/internal.notification.job.list.yaml'
+    default:
+      description: An unexpected error response.
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'

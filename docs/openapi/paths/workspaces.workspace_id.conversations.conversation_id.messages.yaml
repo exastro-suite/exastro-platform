@@ -1,0 +1,420 @@
+#   Copyright 2026 NEC Corporation
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+
+get:
+  tags:
+    - AIAssistantService
+  summary: |-
+    会話メッセージ一覧を取得
+    Get the list of conversation messages
+  description: |-
+    会話のメッセージ（UI用）を取得する
+    Get the messages (for UI use) of a conversation.
+  operationId: list_messages
+  x-openapi-router-controller: controllers.ai_assistant_service_controller
+  parameters:
+    - name: organization_id
+      in: path
+      required: true
+      schema:
+        type: string
+    - name: workspace_id
+      in: path
+      required: true
+      schema:
+        type: string
+    - name: conversation_id
+      in: path
+      required: true
+      schema:
+        type: string
+    - name: limit
+      in: query
+      required: false
+      schema:
+        type: integer
+        default: 100
+      description: |-
+        取得件数
+        Number of items to retrieve
+    - name: offset
+      in: query
+      required: false
+      schema:
+        type: integer
+        default: 0
+      description: |-
+        オフセット(message_seq基準)
+        Offset (based on message_seq)
+  responses:
+    200:
+      description: |-
+        成功
+        Success
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '../schemas/responseOk.yaml'
+              - type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      messages:
+                        type: array
+                        items:
+                          $ref: '../schemas/messageInfo.yaml'
+                      count:
+                        type: integer
+                      conversation_id:
+                        type: string
+    403:
+      description: |-
+        AIアシスタント機能が有効になっていない
+        The AI assistant feature is not enabled
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'
+    404:
+      description: |-
+        会話が見つからない
+        Conversation not found
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'
+    default:
+      description: An unexpected error response.
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'
+
+post:
+  tags:
+    - AIAssistantService
+  summary: |-
+    会話メッセージを作成
+    Create a conversation message
+  description: |-
+    UIからの応答を会話メッセージとして保存する(スナップショットとして保存)
+    Save a UI response as a conversation message (saved as a snapshot).
+  operationId: create_message
+  x-openapi-router-controller: controllers.ai_assistant_service_controller
+  parameters:
+    - name: organization_id
+      in: path
+      required: true
+      schema:
+        type: string
+    - name: workspace_id
+      in: path
+      required: true
+      schema:
+        type: string
+    - name: conversation_id
+      in: path
+      required: true
+      schema:
+        type: string
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - contents
+          properties:
+            contents:
+              type: array
+              description: |-
+                会話メッセージJSON配列（各要素にrole, content, _timestamp等を含む）
+                JSON array of conversation messages (each element contains role, content, _timestamp, etc.)
+              items:
+                type: object
+                properties:
+                  role:
+                    type: string
+                    enum: [user, assistant]
+                  content:
+                    type: array
+                    items:
+                      type: object
+                  _timestamp:
+                    type: string
+                    format: date-time
+                  _thinkingMs:
+                    type: integer
+                  _model:
+                    type: string
+              example:
+                - role: "user"
+                  content:
+                    - type: "text"
+                      text: "お天気情報システムの全貌を調べて！"
+                  _timestamp: "2026-08-27T07:10:56.261Z"
+                - role: "assistant"
+                  content:
+                    - text: "お天気情報システムに関する資産をExastro内で調査します。"
+                      type: "text"
+                  _timestamp: "2026-08-27T07:11:01.226Z"
+                  _thinkingMs: 4448
+                  _model: "global.anthropic.claude-opus-5"
+  responses:
+    200:
+      description: |-
+        作成成功
+        Created successfully
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '../schemas/responseOk.yaml'
+              - type: object
+                properties:
+                  data:
+                    $ref: '../schemas/messageInfo.yaml'
+    400:
+      description: |-
+        バリデーションエラー
+        Validation error
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'
+    403:
+      description: |-
+        AIアシスタント機能が有効になっていない
+        The AI assistant feature is not enabled
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'
+    404:
+      description: |-
+        会話が見つからない
+        Conversation not found
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'
+    500:
+      description: |-
+        サーバーエラー
+        Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'
+
+put:
+  tags:
+    - AIAssistantService
+  summary: |-
+    会話メッセージを全置き換え
+    Replace all conversation messages
+  description: |-
+    GETで取得できる内容をそのまま置き換える。既存のメッセージレコードは全て削除され、リクエストで指定したmessagesの内容にすべて入れ替わる（部分更新ではなく全置換）。
+    Replace the content returned by GET entirely. All existing message records are deleted and replaced with the content of the messages specified in the request (a full replacement, not a partial update).
+  operationId: replace_messages
+  x-openapi-router-controller: controllers.ai_assistant_service_controller
+  parameters:
+    - name: organization_id
+      in: path
+      required: true
+      schema:
+        type: string
+    - name: workspace_id
+      in: path
+      required: true
+      schema:
+        type: string
+    - name: conversation_id
+      in: path
+      required: true
+      schema:
+        type: string
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - messages
+          properties:
+            messages:
+              type: array
+              description: |-
+                置き換え後のメッセージレコード一覧(GETレスポンスのmessagesと同じ形)
+                List of message records after replacement (same shape as the messages field in the GET response)
+              items:
+                type: object
+                required:
+                  - contents
+                properties:
+                  contents:
+                    type: array
+                    description: |-
+                      会話メッセージJSON配列（各要素にrole, content, _timestamp等を含む）
+                      JSON array of conversation messages (each element contains role, content, _timestamp, etc.)
+                    items:
+                      type: object
+              example:
+                messages:
+                  - contents:
+                      - role: "user"
+                        content:
+                          - type: "text"
+                            text: "お天気情報システムの全貌を調べて！"
+                        _timestamp: "2026-08-27T07:10:56.261Z"
+                      - role: "assistant"
+                        content:
+                          - text: "お天気情報システムに関する資産をExastro内で調査します。"
+                            type: "text"
+                        _timestamp: "2026-08-27T07:11:01.226Z"
+                        _thinkingMs: 4448
+                        _model: "global.anthropic.claude-opus-5"
+  responses:
+    200:
+      description: |-
+        置き換え成功
+        Replaced successfully
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '../schemas/responseOk.yaml'
+              - type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      messages:
+                        type: array
+                        items:
+                          $ref: '../schemas/messageInfo.yaml'
+                      count:
+                        type: integer
+                      conversation_id:
+                        type: string
+    400:
+      description: |-
+        バリデーションエラー
+        Validation error
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'
+    403:
+      description: |-
+        AIアシスタント機能が有効になっていない
+        The AI assistant feature is not enabled
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'
+    404:
+      description: |-
+        会話が見つからない
+        Conversation not found
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'
+    500:
+      description: |-
+        サーバーエラー
+        Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'
+
+delete:
+  tags:
+    - AIAssistantService
+  summary: |-
+    会話メッセージを全削除
+    Delete all conversation messages
+  description: |-
+    会話に紐づくメッセージレコードを全て削除する
+    Delete all message records associated with the conversation.
+  operationId: delete_messages
+  x-openapi-router-controller: controllers.ai_assistant_service_controller
+  parameters:
+    - name: organization_id
+      in: path
+      required: true
+      schema:
+        type: string
+    - name: workspace_id
+      in: path
+      required: true
+      schema:
+        type: string
+    - name: conversation_id
+      in: path
+      required: true
+      schema:
+        type: string
+  responses:
+    200:
+      description: |-
+        削除成功
+        Deleted successfully
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '../schemas/responseOk.yaml'
+              - type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      conversation_id:
+                        type: string
+                      deleted_count:
+                        type: integer
+                        description: |-
+                          削除したメッセージレコード件数
+                          Number of deleted message records
+    403:
+      description: |-
+        AIアシスタント機能が有効になっていない
+        The AI assistant feature is not enabled
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'
+    404:
+      description: |-
+        会話が見つからない
+        Conversation not found
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'
+    500:
+      description: |-
+        サーバーエラー
+        Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/runtimeError.yaml'

@@ -1,0 +1,65 @@
+#   Copyright 2026 NEC Corporation
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+
+type: object
+properties:
+  message_id:
+    type: string
+    description: |-
+      メッセージID
+      Message ID
+  conversation_id:
+    type: string
+    description: |-
+      会話ID
+      Conversation ID
+  message_seq:
+    type: integer
+    description: |-
+      メッセージ順序番号
+      Message sequence number
+  contents:
+    type: array
+    description: |-
+      会話メッセージJSON配列（各要素にrole, content, _timestamp等を含む）
+      JSON array of conversation messages (each element contains role, content, _timestamp, etc.)
+    items:
+      type: object
+      properties:
+        role:
+          type: string
+          enum: [user, assistant]
+        content:
+          type: array
+          items:
+            type: object
+        _timestamp:
+          type: string
+          format: date-time
+        _thinkingMs:
+          type: integer
+        _model:
+          type: string
+  created_at:
+    type: string
+    format: date-time
+    description: |-
+      作成日時
+      Created timestamp
+  updated_at:
+    type: string
+    format: date-time
+    description: |-
+      最終更新日時
+      Last updated timestamp

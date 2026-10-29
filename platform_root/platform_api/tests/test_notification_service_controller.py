@@ -988,6 +988,9 @@ def test_notification_register(connexion_client):
         logger.debug(f"response_text:{response.text}")
 
         assert response.status_code == 200, "register notifications OK response route"
+        assert "data" in response.json, "register notifications response has data field"
+        assert isinstance(response.json["data"], list), "register notifications response data is list"
+        assert len(response.json["data"]) == 1, "register notifications response data has 1 notification_id"
 
     with test_common.requsts_mocker_default(), \
             test_common.pymysql_execute_raise_exception_mocker(queries_bl_notification.SQL_INSERT_NOTIFICATION_MESSAGE, Exception("DB Error Test")):
@@ -1823,4 +1826,3 @@ def test_settings_notification_put(connexion_client):
             json=sample_data_mail('mail-db-error'))
 
         assert response.status_code == 500, "update notifications response code: db error"
-
