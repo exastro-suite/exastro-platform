@@ -45,6 +45,11 @@ RUN --mount=type=secret,id=host_certificate_file,dst=/etc/pki/ca-trust/extracted
 &&  groupadd $GROUPNAME \
 &&  useradd -m -s /bin/bash -g $GROUPNAME $USERNAME
 
+# Update the OS CA store (ca-certificates)
+RUN --mount=type=secret,id=host_certificate_file,dst=/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem \
+    dnf update -y ca-certificates
+RUN update-ca-trust extract
+
 WORKDIR $APP_PATH
 
 COPY ./platform_root/platform_job/pyproject.toml ./platform_root/platform_job/poetry.lock $APP_PATH/
@@ -123,6 +128,8 @@ ENV JOB_NOTIFICATION_SERVICENOW_BATCH_MAX_WORKERS=4
 ENV JOB_NOTIFICATION_SMTP_TIMEOUT=10.0
 #   smtps ssl verify TRUE/FALSE
 ENV JOB_NOTIFICATION_SMTPS_SSL_VERIFY_ENABLED=TRUE
+#   starttls ssl verify TRUE/FALSE
+ENV JOB_NOTIFICATION_STARTTLS_SSL_VERIFY_ENABLED=FALSE
 #   通知を取りやめる経過時間（0の場合は取りやめしない） 1440(min) = 1(day)
 ENV JOB_NOTIFICATION_ABORTED_EXPIRED_DURATION_MINUTES=1440
 ENV JOB_NOTIFICATION_CLEANUP_EXPIRED_DAYS=14

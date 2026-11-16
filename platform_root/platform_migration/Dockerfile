@@ -49,6 +49,11 @@ RUN --mount=type=secret,id=host_certificate_file,dst=/etc/pki/ca-trust/extracted
 &&  groupadd $GROUPNAME \
 &&  useradd -m -s /bin/bash -g $GROUPNAME $USERNAME
 
+# Update the OS CA store (ca-certificates)
+RUN --mount=type=secret,id=host_certificate_file,dst=/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem \
+    dnf update -y ca-certificates
+RUN update-ca-trust extract
+
 WORKDIR $APP_PATH
 
 COPY ./platform_root/platform_migration/pyproject.toml ./platform_root/platform_migration/poetry.lock $APP_PATH/

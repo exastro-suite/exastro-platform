@@ -14,6 +14,8 @@
 import requests_mock
 
 import os
+import ssl
+import pytest
 import ulid
 import base64
 import json
@@ -344,6 +346,8 @@ def test_execute_mail_smtp_tls_normally():
         assert len(smtp_instances) == 1
         assert smtp_instances[0].kind == 'smtp'
         assert smtp_instances[0].tls
+        # 既定(オフ)では証明書検証用のcontextを渡さない / by default(off) no verifying context is passed
+        assert smtp_instances[0].tls_context is None
         assert smtp_instances[0].host == mserver['SMTP_HOST']
         assert smtp_instances[0].port == mserver['SMTP_PORT']
         assert smtp_instances[0].timeout == job_manager_config.JOBS[const.PROCESS_KIND_NOTIFICATION]['extra_config']['smtp_timeout']
@@ -358,6 +362,94 @@ def test_execute_mail_smtp_tls_normally():
         assert smtp_instances[0].message.get('reply-to', "") == formataddr((mserver['REPLY_NAME'], mserver['REPLY_TO']))
         assert smtp_instances[0].from_addr == mserver['ENVELOPE_FROM']
         assert sorted(smtp_instances[0].to_addrs) == sorted(mail_to + mail_cc + mail_bcc)
+
+
+def test_execute_mail_smtp_tls_ssl_verify_enabled():
+    """email送信(smtp starttls)でJOB_NOTIFICATION_STARTTLS_SSL_VERIFY_ENABLED=TRUEの場合、証明書を検証するcontextでstarttlsすること
+    When JOB_NOTIFICATION_STARTTLS_SSL_VERIFY_ENABLED=TRUE, starttls is called with a verifying context
+    """
+    testdata = import_module("tests.db.exports.testdata")
+
+    organization_id = list(testdata.ORGANIZATIONS.keys())[0]
+    workspace_id = testdata.ORGANIZATIONS[organization_id]["workspace_id"][0]
+
+    make_mailserver_setting(
+        organization_id,
+        {
+            "SMTP_HOST": "test_mailserver",
+            "SMTP_PORT": 587,
+            "SEND_FROM": "from@test",
+            "SEND_NAME": "from_name",
+            "REPLY_TO": "replay@test",
+            "ENVELOPE_FROM": "envelope_from@test",
+            "START_TLS_ENABLE": 1,
+            "AUTHENTICATION_ENABLE": 0,
+        })
+
+    queue = make_notification_mail(
+        organization_id,
+        workspace_id,
+        [],
+        ["test_cc1@test"],
+        [],
+        "test_execute_mail_smtp_tls_ssl_verify_enabled title",
+        "test_execute_mail_smtp_tls_ssl_verify_enabled text")
+
+    extra_config = job_manager_config.JOBS[const.PROCESS_KIND_NOTIFICATION]['extra_config']
+    with test_common.requsts_mocker_default(), \
+            mock.patch.dict(extra_config, {"starttls_ssl_verify_enabled": True}), \
+            mock.patch("smtplib.SMTP", mocked_smtp), \
+            mock.patch("smtplib.SMTP_SSL", mocked_smtps):
+
+        mocked_smtp_base.init_instances()
+        executor = NotificationJobExecutor(queue)
+        result = executor.execute_base()
+
+        assert result
+        smtp_instances = mocked_smtp_base.get_instances()
+        assert len(smtp_instances) == 1
+        assert smtp_instances[0].tls
+        assert smtp_instances[0].tls_context is not None
+        assert smtp_instances[0].tls_context.verify_mode == ssl.CERT_REQUIRED
+        assert smtp_instances[0].tls_context.check_hostname is True
+
+
+@pytest.mark.parametrize("raised, expect_warning", [
+    (ssl.SSLCertVerificationError(1, "certificate verify failed"), True),
+    (ssl.SSLError(1, "handshake failure"), False),
+])
+def test_connect_smtp_starttls_cert_verify_error_log(raised, expect_warning):
+    """starttlsで証明書検証エラーの場合のみ専用のwarningログを出し、例外は上位に伝わること
+    Only a certificate verification error outputs the dedicated warning log, and the exception is propagated
+    """
+    class raising_smtp():
+        def __init__(self, host=None, port=None, timeout=None):
+            pass
+
+        def starttls(self, context=None):
+            raise raised
+
+        def set_debuglevel(self, level):
+            pass
+
+    executor = NotificationJobExecutor.__new__(NotificationJobExecutor)
+    executor.job_config = {"extra_config": dict(
+        job_manager_config.JOBS[const.PROCESS_KIND_NOTIFICATION]['extra_config'], starttls_ssl_verify_enabled=True)}
+    smtp_conn_info = {"START_TLS_ENABLE": 1, "SSL_ENABLE": 0, "SMTP_HOST": "smtp.example.com", "SMTP_PORT": 587, "AUTHENTICATION_ENABLE": 0}
+
+    with mock.patch("smtplib.SMTP", raising_smtp), \
+            mock.patch("jobs.NotificationJobExecutor.globals.logger") as mocked_logger:
+        with pytest.raises(type(raised)):
+            executor._NotificationJobExecutor__connect_smtp(smtp_conn_info)
+
+    if expect_warning:
+        assert mocked_logger.warning.call_count == 1
+        message = mocked_logger.warning.call_args[0][0]
+        assert "JOB_NOTIFICATION_STARTTLS_SSL_VERIFY_ENABLED" in message
+        assert "SSL_CERT_FILE" in message
+        assert "smtp.example.com" in message
+    else:
+        mocked_logger.warning.assert_not_called()
 
 
 def test_execute_mail_smtp_ssl_normally():
@@ -2059,6 +2151,7 @@ class mocked_smtp_base():
         self.host = host
         self.port = port
         self.tls = False
+        self.tls_context = None
         self.timeout = timeout
         self.context = context
         self.auth_user = None
@@ -2074,8 +2167,9 @@ class mocked_smtp_base():
     def __exit__(self, exc_type, exc_value, traceback):
         pass
 
-    def starttls(self):
+    def starttls(self, context=None):
         self.tls = True
+        self.tls_context = context
 
     def login(self, user, password):
         self.auth_user = user
