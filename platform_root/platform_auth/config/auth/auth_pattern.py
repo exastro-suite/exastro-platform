@@ -88,13 +88,33 @@ AUTH_PATTERN = [
     },
     {
         "url": r"^/api/(?P<org_id>[^/][^/]*)/platform/workspaces/(?P<ws_id>[^/][^/]*)/conversations($|/.*$)",
-        # do not regulate - 規制しない
-        "auth": []
+        # members of the workspace (data is filtered by user in controller) - ワークスペースのメンバー(コントローラでユーザーにより絞り込み)
+        "auth": [
+            {
+                "method": ["*"],
+                "roles": [
+                    {"client": "{org_id}-workspaces", "role": "{ws_id}"},
+                    {"client": "{org_id}-workspaces", "role": const.WS_AUTH_ADMIN},
+                    {"client": "{org_id}-workspaces", "role": const.ORG_AUTH_WS_MAINTE},
+                    {"client": "{org_id}-workspaces", "role": const.ORG_AUTH_WS_ROLE_MAINTE},
+                ]
+            }
+        ]
     },
     {
         "url": r"^/api/(?P<org_id>[^/][^/]*)/platform/workspaces/(?P<ws_id>[^/][^/]*)/lessons($|/.*$)",
-        # do not regulate - 規制しない
-        "auth": []
+        # members of the workspace (data is filtered by user in controller) - ワークスペースのメンバー(コントローラでユーザーにより絞り込み)
+        "auth": [
+            {
+                "method": ["*"],
+                "roles": [
+                    {"client": "{org_id}-workspaces", "role": "{ws_id}"},
+                    {"client": "{org_id}-workspaces", "role": const.WS_AUTH_ADMIN},
+                    {"client": "{org_id}-workspaces", "role": const.ORG_AUTH_WS_MAINTE},
+                    {"client": "{org_id}-workspaces", "role": const.ORG_AUTH_WS_ROLE_MAINTE},
+                ]
+            }
+        ]
     },
     {
         "url": r"^/api/(?P<org_id>[^/][^/]*)/platform/workspaces/(?P<ws_id>[^/][^/]*)/settings/notifications/?$",
