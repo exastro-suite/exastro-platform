@@ -1,0 +1,7 @@
+; 当ファイルをpytest.iniにコピーして利用してください
+
+[pytest]
+; pythonのimportディレクトリを/appからカレントディレクトリ(/workspace/platform_root/***)に変更
+; この設定を読み込まないとpytestのカバレッジやdebuggerがうまく動きません(/app配下のソースがimportされちゃう)
+pythonpath=.
+testpaths=tests

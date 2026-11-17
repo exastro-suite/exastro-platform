@@ -751,6 +751,13 @@ class auth_proxy:
         """
         globals.logger.debug(f"### start func:{inspect.currentframe().f_code.co_name} {request.path=} {request.method=}")
 
+        # Paths containing control characters (e.g. line feed) are denied.
+        # The regular expressions of AUTH_PATTERN do not match them, so they must not reach the backend
+        # - 制御文字(改行など)を含むパスは拒否する。AUTH_PATTERNの正規表現では判定できないため、バックエンドへ到達させない
+        if re.search(r"[\x00-\x1f\x7f]", request.path):
+            globals.logger.info('FORBIDDEN Is allowed request. control character in path.')
+            return False
+
         # check from the back - 後ろから順番にチェックする
         for pattern in reversed(auth_pattern.AUTH_PATTERN):
 
@@ -764,10 +771,20 @@ class auth_proxy:
             for k, v in match.groupdict().items():
                 match_dict[k] = re.escape(v)
 
+            if not pattern["auth"]:
+                # "auth": [] is explicitly not regulated (any authenticated user) - 明示的に規制しない(認証済みの全ユーザーを許可)
+                globals.logger.debug('SUCCEED Is allowed request. not regulated')
+                return True
+
             for auth in pattern["auth"]:
                 if not ("*" in auth["method"] or request.method in auth["method"]):
                     # If the method does not match, proceed to the next - methodが一致していない時は次に進む
                     continue
+
+                if auth["roles"] is auth_pattern.ANY_USER:
+                    # Any authenticated user is allowed for this method - このmethodは認証済みの全ユーザーを許可
+                    globals.logger.debug('SUCCEED Is allowed request. method not regulated')
+                    return True
 
                 # When the method matches, check if there is a match for the role
                 # - methodが一致した時、roleに合致するものが存在するかチェックする
@@ -797,12 +814,12 @@ class auth_proxy:
                 globals.logger.debug('FORBIDDEN Is allowed request.')
                 return False
 
-            # Access is allowed when there is no matching method
-            # - methodに一致するものが無いときはAccess可する
-            globals.logger.debug('SUCCEED Is allowed request. method no match')
-            return True
+            # Access is denied when there is no matching method (default deny)
+            # - methodに一致するものが無いときはAccess不可とする(デフォルト拒否)
+            globals.logger.warning(f'FORBIDDEN Is allowed request. method no match. {request.path=} {request.method=}')
+            return False
 
-        # Access is allowed when there is no matching url
-        # - urlに一致するものが無いときはAccess可する
-        globals.logger.debug('SUCCEED Is allowed request. pattern no match')
-        return True
+        # Access is denied when there is no matching url (default deny)
+        # - urlに一致するものが無いときはAccess不可とする(デフォルト拒否)
+        globals.logger.warning(f'FORBIDDEN Is allowed request. pattern no match. {request.path=} {request.method=}')
+        return False

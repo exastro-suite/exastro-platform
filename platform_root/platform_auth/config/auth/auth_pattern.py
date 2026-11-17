@@ -15,10 +15,23 @@
 
 from common_library.common import const
 
+# Any authenticated user is allowed (use as "roles") - 認証済みの全ユーザーを許可する("roles"に指定)
+ANY_USER = None
+
+# Default is deny. A request is allowed only if it matches an entry of this list
+# - デフォルトは拒否。このリストのエントリに一致し、許可された場合のみアクセスできる
+#   "auth": []  : not regulated (any authenticated user) - 規制しない(認証済みの全ユーザーを許可)
+#   "roles": [] : denied for all users - 全ユーザー拒否
+#   "roles": ANY_USER : any authenticated user for the method - そのmethodは認証済みの全ユーザーを許可
 AUTH_PATTERN = [
     {
         "url": r"^/api/(?P<org_id>[^/][^/]*)/platform/workspaces/?$",
         "auth": [
+            {
+                # workspace list (filtered by user in controller) - ワークスペース一覧(コントローラでユーザーにより絞り込み)
+                "method": ["GET"],
+                "roles": ANY_USER
+            },
             {
                 "method": ["POST"],
                 "roles": [
@@ -60,18 +73,61 @@ AUTH_PATTERN = [
         ]
     },
     {
+        "url": r"^/api/(?P<org_id>[^/][^/]*)/platform/workspaces/(?P<ws_id>[^/][^/]*)/notifications/?$",
+        "auth": [
+            {
+                "method": ["GET", "POST"],
+                "roles": [
+                    {"client": "{org_id}-workspaces", "role": "{ws_id}"},
+                    {"client": "{org_id}-workspaces", "role": const.WS_AUTH_ADMIN},
+                    {"client": "{org_id}-workspaces", "role": const.ORG_AUTH_WS_MAINTE},
+                    {"client": "{org_id}-workspaces", "role": const.ORG_AUTH_WS_ROLE_MAINTE},
+                ]
+            }
+        ]
+    },
+    {
         "url": r"^/api/(?P<org_id>[^/][^/]*)/platform/workspaces/(?P<ws_id>[^/][^/]*)/conversations($|/.*$)",
-        # do not regulate - 規制しない
-        "auth": []
+        # members of the workspace (data is filtered by user in controller) - ワークスペースのメンバー(コントローラでユーザーにより絞り込み)
+        "auth": [
+            {
+                "method": ["*"],
+                "roles": [
+                    {"client": "{org_id}-workspaces", "role": "{ws_id}"},
+                    {"client": "{org_id}-workspaces", "role": const.WS_AUTH_ADMIN},
+                    {"client": "{org_id}-workspaces", "role": const.ORG_AUTH_WS_MAINTE},
+                    {"client": "{org_id}-workspaces", "role": const.ORG_AUTH_WS_ROLE_MAINTE},
+                ]
+            }
+        ]
     },
     {
         "url": r"^/api/(?P<org_id>[^/][^/]*)/platform/workspaces/(?P<ws_id>[^/][^/]*)/lessons($|/.*$)",
-        # do not regulate - 規制しない
-        "auth": []
+        # members of the workspace (data is filtered by user in controller) - ワークスペースのメンバー(コントローラでユーザーにより絞り込み)
+        "auth": [
+            {
+                "method": ["*"],
+                "roles": [
+                    {"client": "{org_id}-workspaces", "role": "{ws_id}"},
+                    {"client": "{org_id}-workspaces", "role": const.WS_AUTH_ADMIN},
+                    {"client": "{org_id}-workspaces", "role": const.ORG_AUTH_WS_MAINTE},
+                    {"client": "{org_id}-workspaces", "role": const.ORG_AUTH_WS_ROLE_MAINTE},
+                ]
+            }
+        ]
     },
     {
         "url": r"^/api/(?P<org_id>[^/][^/]*)/platform/workspaces/(?P<ws_id>[^/][^/]*)/settings/notifications/?$",
         "auth": [
+            {
+                "method": ["GET"],
+                "roles": [
+                    {"client": "{org_id}-workspaces", "role": "{ws_id}"},
+                    {"client": "{org_id}-workspaces", "role": const.WS_AUTH_ADMIN},
+                    {"client": "{org_id}-workspaces", "role": const.ORG_AUTH_WS_MAINTE},
+                    {"client": "{org_id}-workspaces", "role": const.ORG_AUTH_WS_ROLE_MAINTE},
+                ]
+            },
             {
                 "method": ["POST"],
                 "roles": [
@@ -227,6 +283,17 @@ AUTH_PATTERN = [
         ]
     },
     {
+        "url": r"^/api/(?P<org_id>[^/][^/]*)/platform/setting($|/.*$)",
+        "auth": [
+            {
+                "method": ["*"],
+                "roles": [
+                    {"client": "{org_id}-workspaces", "role": const.ORG_AUTH_UPDATE},
+                ]
+            }
+        ]
+    },
+    {
         "url": r"^/api/(?P<org_id>[^/][^/]*)/platform/auditlog/download($|/.*$)",
         "auth": [
             {
@@ -292,6 +359,33 @@ AUTH_PATTERN = [
     },
     {
         "url": r"^/api/(?P<org_id>[^/][^/]*)/platform/ai-services$",
+        "auth": []
+    },
+    {
+        "url": r"^/api/(?P<org_id>[^/][^/]*)/platform/limits$",
+        # published in the user API reference - ユーザー向けAPIリファレンスに公開
+        "auth": []
+    },
+    {
+        "url": r"^/api/(?P<org_id>[^/][^/]*)/platform/maintenance-mode-setting$",
+        # referenced by all users from the workspace screens - ワークスペース関連画面から全ユーザーが参照する
+        "auth": []
+    },
+    # ----------------------------------------------------------------
+    # System administrator APIs (master realm) - システム管理者向けAPI(masterレルム)
+    # ----------------------------------------------------------------
+    {
+        "url": r"^/api/platform($|/.*$)",
+        # The token of the system administrator console (_platform-console) has no realm role,
+        # so the role cannot be checked here. Any authenticated user of the master realm is allowed (same as before).
+        # - システム管理者コンソール(_platform-console)のtokenにはrealmロールが含まれないため、ここではロールを判定しない。
+        #   masterレルムの認証済みユーザーを許可する(従来どおり)
+        "auth": []
+    },
+    {
+        "url": r"^/api/ita($|/.*$)",
+        # ITA system management API (master realm). Same as /api/platform
+        # - ITAシステム管理API(masterレルム)。/api/platformと同じ扱い
         "auth": []
     },
 ]
