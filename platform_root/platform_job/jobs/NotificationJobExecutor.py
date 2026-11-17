@@ -886,7 +886,21 @@ class NotificationJobExecutor(BaseJobExecutor):
                 host=smtp_conn_info['SMTP_HOST'],
                 port=smtp_conn_info['SMTP_PORT'],
                 timeout=self.job_config['extra_config']['smtp_timeout'])
-            smtp.starttls()
+            # context=None の場合、smtplib は検証なしの標準 context を使う
+            # If context is None, smtplib uses its default (non-verifying) context, same as the former call without arguments
+            if self.job_config['extra_config']['starttls_ssl_verify_enabled']:
+                context = ssl.create_default_context()
+            else:
+                context = None
+            try:
+                smtp.starttls(context=context)
+            except ssl.SSLCertVerificationError as e:
+                # 証明書検証エラーと分かるログを出力し、例外は上位に伝える / log that the cause is certificate verification and re-raise the exception
+                globals.logger.warning(
+                    f"Certificate verification failed for the SMTP server (STARTTLS): {smtp_conn_info['SMTP_HOST']}. "
+                    "Check the environment variable JOB_NOTIFICATION_STARTTLS_SSL_VERIFY_ENABLED. "
+                    "If a private CA is used, set SSL_CERT_FILE to a bundle that contains both public and private CAs.")
+                raise e
 
         elif smtp_conn_info['SSL_ENABLE'] == 1:
             if self.job_config['extra_config']['smtps_ssl_verify_enabled']:

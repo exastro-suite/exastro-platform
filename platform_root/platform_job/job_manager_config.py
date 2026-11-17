@@ -118,6 +118,8 @@ JOBS = {
             "smtp_timeout": float(os.environ.get('JOB_NOTIFICATION_SMTP_TIMEOUT')),
             # smtpsのssl verify(TRUE/FALSE) / smtps ssl verify(TRUE/FALSE)
             "smtps_ssl_verify_enabled": common.val_to_boolean(os.environ.get('JOB_NOTIFICATION_SMTPS_SSL_VERIFY_ENABLED', 'TRUE')),
+            # starttlsのssl verify(TRUE/FALSE) 既定FALSE=検証しない / starttls ssl verify(TRUE/FALSE) default FALSE=no verification
+            "starttls_ssl_verify_enabled": common.val_to_boolean(os.environ.get('JOB_NOTIFICATION_STARTTLS_SSL_VERIFY_ENABLED', 'FALSE')),
             # 通知を取りやめる経過時間（0の場合は取りやめしない） 1440(min) = 1(day)
             "aborted_expired_duration_minutes": int(os.environ.get('JOB_NOTIFICATION_ABORTED_EXPIRED_DURATION_MINUTES')),
         }
